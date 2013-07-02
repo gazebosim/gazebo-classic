@@ -21,7 +21,7 @@
 #include <list>
 #include <vector>
 #include <deque>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
@@ -204,7 +204,7 @@ namespace gazebo
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
       private: boost::mutex *propMutex, *receiveMutex;
-      private: rml::ElementPtr rmlElement;
+      private: sdf::ElementPtr sdfElement;
       private: std::string selectedEntityName;
       private: bool fillingPropertyTree;
       private: QtProperty *selectedProperty;

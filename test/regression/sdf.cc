@@ -17,22 +17,22 @@
 #include "ServerFixture.hh"
 
 using namespace gazebo;
-class RMLTest : public ServerFixture
+class SDFTest : public ServerFixture
 {
 };
 
 TEST_F(PR2Test, Param)
 {
-  rml::ParamT<char> charP("c", 'a', 0);
-  rml::ParamT<bool> boolP("b", true, 0);
-  rml::ParamT<float> floatP("f", 1.0, 0);
-  rml::ParamT<double> doubleP("d", 1.0, 0);
-  rml::ParamT<int> intP("i", 1, 0);
-  rml::ParamT<unsigned int> uintP("ui", 1, 0);
-  rml::ParamT<std::string> stringP("s", "default", 0);
-  rml::ParamT<common::Color> colorP("c", common::Color(.1, .2, .3, 1), 0);
-  rml::ParamT<math::Vector3> vec3P("v3", math::Vector3(1, 2, 3), 0);
-  rml::ParamT<math::Pose> poseP("v3", math::Pose(math::Vector3(1, 2, 3),
+  sdf::ParamT<char> charP("c", 'a', 0);
+  sdf::ParamT<bool> boolP("b", true, 0);
+  sdf::ParamT<float> floatP("f", 1.0, 0);
+  sdf::ParamT<double> doubleP("d", 1.0, 0);
+  sdf::ParamT<int> intP("i", 1, 0);
+  sdf::ParamT<unsigned int> uintP("ui", 1, 0);
+  sdf::ParamT<std::string> stringP("s", "default", 0);
+  sdf::ParamT<common::Color> colorP("c", common::Color(.1, .2, .3, 1), 0);
+  sdf::ParamT<math::Vector3> vec3P("v3", math::Vector3(1, 2, 3), 0);
+  sdf::ParamT<math::Pose> poseP("v3", math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(0, 0, M_PI)), 0);
 
   EXPECT_TRUE(boolP.IsBool());

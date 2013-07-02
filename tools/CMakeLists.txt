@@ -5,11 +5,11 @@ include_directories(
   ${PROJECT_BINARY_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
-  ${RML_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
 )
 
 link_directories( 
-  ${RML_LIBRARY_DIRS}
+  ${SDF_LIBRARY_DIRS}
 )
 
 set (test_sources 
@@ -19,7 +19,7 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-if (NOT HAVE_RML)
+if (NOT HAVE_SDF)
   target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface gazebo_common)
 else()
   target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)

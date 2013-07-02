@@ -60,7 +60,7 @@ TEST_F(PhysicsTest, State)
       math::Pose pose(0, 0, 3, 0, 0, 0);
       math::Vector3 size(1.0, 0.1, 0.1);
       newModelStr
-        << "<gazebo version='" << RML_VERSION << "'>\n"
+        << "<gazebo version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
         << "    <pose>" << pose << "</pose>\n"
         << "    <link name='link_1'>\n"

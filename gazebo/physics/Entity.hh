@@ -62,8 +62,8 @@ namespace gazebo
       public: virtual ~Entity();
 
       /// \brief Load the entity.
-      /// \param[in] _rml Pointer to an RML element.
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] _sdf Pointer to an SDF element.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finalize the entity.
       public: virtual void Fini();
@@ -71,9 +71,9 @@ namespace gazebo
       /// \brief Reset the entity.
       public: virtual void Reset();
 
-      /// \brief Update the parameters using new rml values.
-      /// \param[in] _rml RML to update from.
-      public: virtual void UpdateParameters(rml::ElementPtr _rml);
+      /// \brief Update the parameters using new sdf values.
+      /// \param[in] _sdf SDF to update from.
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity.
       /// \param[in] _name The new name.

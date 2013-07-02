@@ -54,11 +54,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GpuRaySensor();
 
-      /// \brief Load the sensor with RML parameters
-      /// \param[in] _rml RML Sensor parameters
+      /// \brief Load the sensor with SDF parameters
+      /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                rml::ElementPtr &_rml);
+                                sdf::ElementPtr &_sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
@@ -247,20 +247,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive();
 
-      /// \brief Scan RML elementz.
-      protected: rml::ElementPtr scanElem;
+      /// \brief Scan SDF elementz.
+      protected: sdf::ElementPtr scanElem;
 
-      /// \brief Horizontal RML element.
-      protected: rml::ElementPtr horzElem;
+      /// \brief Horizontal SDF element.
+      protected: sdf::ElementPtr horzElem;
 
-      /// \brief Vertical RML element.
-      protected: rml::ElementPtr vertElem;
+      /// \brief Vertical SDF element.
+      protected: sdf::ElementPtr vertElem;
 
-      /// \brief Range RML element.
-      protected: rml::ElementPtr rangeElem;
+      /// \brief Range SDF element.
+      protected: sdf::ElementPtr rangeElem;
 
-      /// \brief Camera RML element.
-      protected: rml::ElementPtr cameraElem;
+      /// \brief Camera SDF element.
+      protected: sdf::ElementPtr cameraElem;
 
       /// \brief Horizontal ray count.
       protected: unsigned int horzRayCount;

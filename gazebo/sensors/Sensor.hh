@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -74,11 +74,11 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Sensor();
 
-      /// \brief Load the sensor with RML parameters.
-      /// \param[in] _rml RML Sensor parameters.
+      /// \brief Load the sensor with SDF parameters.
+      /// \param[in] _sdf SDF Sensor parameters.
       /// \param[in] _worldName Name of world to load from.
       public: virtual void Load(const std::string &_worldName,
-                                rml::ElementPtr _rml);
+                                sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters.
       /// \param[in] _worldName Name of world to load from.
@@ -151,11 +151,11 @@ namespace gazebo
       public: common::Time GetLastMeasurementTime();
 
       /// \brief Return true if user requests the sensor to be visualized
-      ///        via tag:  <visualize>true</visualize> in RML.
+      ///        via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
       public: bool GetVisualize() const;
 
-      /// \brief Returns the topic name as set in RML.
+      /// \brief Returns the topic name as set in SDF.
       /// \return Topic name.
       public: virtual std::string GetTopic() const;
 
@@ -191,14 +191,14 @@ namespace gazebo
       public: void ResetLastUpdateTime();
 
       /// \brief Load a plugin for this sensor.
-      /// \param[in] _rml RML parameters.
-      private: void LoadPlugin(rml::ElementPtr _rml);
+      /// \param[in] _sdf SDF parameters.
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       /// \brief True if sensor generation is active.
       protected: bool active;
 
-      /// \brief Pointer the the RML element for the sensor.
-      protected: rml::ElementPtr rml;
+      /// \brief Pointer the the SDF element for the sensor.
+      protected: sdf::ElementPtr sdf;
 
       /// \brief Pose of the sensor.
       protected: math::Pose pose;

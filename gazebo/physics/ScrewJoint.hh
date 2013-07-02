@@ -51,15 +51,15 @@ namespace gazebo
               {return 2;}
 
       /// \brief Load a ScrewJoint.
-      /// \param[in] _rml RML value to load from
-      public: virtual void Load(rml::ElementPtr _rml)
+      /// \param[in] _sdf SDF value to load from
+      public: virtual void Load(sdf::ElementPtr _sdf)
                  {
-                   T::Load(_rml);
+                   T::Load(_sdf);
 
-                   if (_rml->HasElement("thread_pitch"))
+                   if (_sdf->HasElement("thread_pitch"))
                    {
                      this->threadPitch =
-                       _rml->GetElement("thread_pitch")->Get<double>();
+                       _sdf->GetElement("thread_pitch")->Get<double>();
                    }
                    else
                    {
@@ -67,14 +67,14 @@ namespace gazebo
                      this->threadPitch = 1.0;
                    }
 
-                   if (_rml->HasElement("axis"))
+                   if (_sdf->HasElement("axis"))
                    {
-                     rml::ElementPtr axisElem = _rml->GetElement("axis");
+                     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
                      this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
-                       rml::ElementPtr limitElem =
-                         _rml->GetElement("axis")->GetElement("limit");
+                       sdf::ElementPtr limitElem =
+                         _sdf->GetElement("axis")->GetElement("limit");
 
                        // Perform this three step ordering to ensure the
                        // parameters are set properly. This is taken from

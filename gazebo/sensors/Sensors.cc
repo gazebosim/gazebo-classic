@@ -62,7 +62,7 @@ bool sensors::fini()
 }
 
 /////////////////////////////////////////////////
-std::string sensors::create_sensor(rml::ElementPtr _elem,
+std::string sensors::create_sensor(sdf::ElementPtr _elem,
                                    const std::string &_worldName,
                                    const std::string &_parentName)
 {

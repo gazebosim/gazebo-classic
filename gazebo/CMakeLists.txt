@@ -3,7 +3,7 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${RML_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
 )
 
 include_directories(
@@ -13,14 +13,13 @@ include_directories(
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
-  ${RML_LIBRARY_DIRS}
+  ${SDF_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )
 
 # Remove this whole if block in Gazebo 2.0
-if (NOT HAVE_RML)
+if (NOT HAVE_SDF)
   add_subdirectory(sdf)
-  add_subdirectory(rml)
   include_directories(${PROJECT_SOURCE_DIR}/gazebo)
 endif()
 
@@ -107,7 +106,7 @@ target_link_libraries(libgazebo
   pthread
 )
 
-if (NOT HAVE_RML)
+if (NOT HAVE_SDF)
   target_link_libraries(libgazebo gazebo_sdf_interface)
   target_link_libraries(gazebo gazebo_sdf_interface)
   target_link_libraries(gzserver gazebo_sdf_interface)

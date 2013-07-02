@@ -46,9 +46,9 @@ ODESliderJoint::~ODESliderJoint()
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::Load(rml::ElementPtr _rml)
+void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 {
-  SliderJoint<ODEJoint>::Load(_rml);
+  SliderJoint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////

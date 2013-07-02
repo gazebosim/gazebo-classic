@@ -1,0 +1,671 @@
+<sdf version="1.4">
+  <world name="default">
+    <scene>
+      <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
+      <background>0.500000 0.500000 0.500000 1.000000</background>
+      <shadows>0</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0.000000 0.000000 100.000000 0.000000 -0.000000 0.000000</pose>
+      <diffuse>1.000000 1.000000 1.000000 1.000000</diffuse>
+      <specular>0.100000 0.100000 0.100000 1.000000</specular>
+      <attenuation>
+        <range>1000.000000</range>
+        <linear>0.010000</linear>
+        <constant>0.900000</constant>
+        <quadratic>0.000000</quadratic>
+      </attenuation>
+      <direction>-1.000000 0.000000 -1.000000</direction>
+      <cast_shadows>1</cast_shadows>
+    </light>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 -9.810000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>100</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.300000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>1.000000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.000000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+      <max_step_size>0.001000</max_step_size>
+    </physics>
+    <model name="model_1">
+      <pose>0.000000 0.000000 2.100000 -1.415927 -0.000000 0.000000</pose>
+      <link name="link_1">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <link name="link_2">
+        <pose>0.000000 0.000000 -1.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="joint_1" type="revolute">
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <static>0</static>
+    </model>
+    <model name="model_2">
+      <pose>1.000000 0.000000 2.100000 -1.415927 -0.000000 0.000000</pose>
+      <link name="link_1">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <link name="link_2">
+        <pose>0.000000 0.000000 -1.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="joint_1" type="revolute">
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <static>0</static>
+    </model>
+    <model name="model_3">
+      <pose>0.000000 -2.500000 2.100000 0.000000 -1.415927 0.000000</pose>
+      <link name="link_1">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <link name="link_2">
+        <pose>0.000000 0.000000 -1.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_box">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box>
+              <size>0.100000 0.100000 1.000000</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.500000</mu>
+                <mu2>0.200000</mu2>
+                <fdir1>1.000000 0.000000 0.000000</fdir1>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.000000</restitution_coefficient>
+              <threshold>1000000.000000</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.000000</soft_cfm>
+                <soft_erp>0.200000</soft_erp>
+                <kp>1000000000000000.000000</kp>
+                <kd>10000000000000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000100</min_depth>
+              </ode>
+            </contact>
+          </surface>
+          <laser_retro>100.000000</laser_retro>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="joint_1" type="revolute">
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <axis>
+          <limit>
+            <lower>-100.000000</lower>
+            <upper>100.000000</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+        </axis>
+        <physics>
+          <ode>
+            <cfm>0.200000</cfm>
+            <bounce>0.000000</bounce>
+            <max_force>1000.000000</max_force>
+            <velocity>0.000000</velocity>
+            <fudge_factor>0.000000</fudge_factor>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <suspension>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </suspension>
+          </ode>
+        </physics>
+      </joint>
+      <static>0</static>
+    </model>
+  </world>
+</sdf>

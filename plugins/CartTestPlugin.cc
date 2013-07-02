@@ -45,7 +45,7 @@ CartTestPlugin::CartTestPlugin()
 
 /////////////////////////////////////////////////
 void CartTestPlugin::Load(physics::ModelPtr _model,
-                           rml::ElementPtr _sdf)
+                           sdf::ElementPtr _sdf)
 {
   this->model = _model;
 

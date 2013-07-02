@@ -68,8 +68,8 @@ double BuildingMaker::conversionScale;
   this->stairsCounter = 0;
   this->floorCounter = 0;
 
-  this->modelTemplateRML.reset(new rml::RML);
-  this->modelTemplateRML->SetFromString(this->GetTemplateRMLString());
+  this->modelTemplateSDF.reset(new sdf::SDF);
+  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
   this->connections.push_back(
   gui::editor::Events::ConnectSaveBuildingEditor(
@@ -197,7 +197,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  rml::ElementPtr visualElem =  this->modelTemplateRML->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
@@ -233,7 +233,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  rml::ElementPtr visualElem =  this->modelTemplateRML->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/BlueTransparent");
@@ -271,7 +271,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  rml::ElementPtr visualElem =  this->modelTemplateRML->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/YellowTransparent");
@@ -308,7 +308,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  rml::ElementPtr visualElem =  this->modelTemplateRML->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visVisual->Load(visualElem);
   visVisual->DetachObjects();
@@ -374,7 +374,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
-  rml::ElementPtr visualElem =  this->modelTemplateRML->root
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
@@ -433,7 +433,7 @@ void BuildingMaker::Stop()
 //  scene->RemoveVisual(this->modelVisual);
 //  this->modelVisual.reset();
 //  this->visuals.clear();
-//  this->modelRML.reset();
+//  this->modelSDF.reset();
 //  this->modelVisual->SetVisible(false);
 }
 
@@ -481,15 +481,15 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::SaveToRML(const std::string &_savePath)
+void BuildingMaker::SaveToSDF(const std::string &_savePath)
 {
   this->saveLocation = _savePath;
   std::ofstream savefile;
   boost::filesystem::path path;
   path = boost::filesystem::operator/(this->saveLocation,
-      this->modelName + ".rml");
+      this->modelName + ".sdf");
   savefile.open(path.string().c_str());
-  savefile << this->modelRML->ToString();
+  savefile << this->modelSDF->ToString();
   savefile.close();
 }
 
@@ -501,9 +501,9 @@ void BuildingMaker::FinishModel()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::GenerateRML()
+void BuildingMaker::GenerateSDF()
 {
-  // This function generates an RML file for the final building model (which
+  // This function generates an SDF file for the final building model (which
   // will eventually be uploaded to the server). It loops through all the model
   // manip objects (allItems), grabs pose and size data of each model manip, and
   // creates a link element consisting of a visual and a collision element with
@@ -512,21 +512,21 @@ void BuildingMaker::GenerateRML()
   // surface of the parent by using a rectangular surface subdivision algorithm.
   // TODO Refactor code
 
-  rml::ElementPtr modelElem;
-  rml::ElementPtr linkElem;
-  rml::ElementPtr visualElem;
-  rml::ElementPtr collisionElem;
+  sdf::ElementPtr modelElem;
+  sdf::ElementPtr linkElem;
+  sdf::ElementPtr visualElem;
+  sdf::ElementPtr collisionElem;
 
-  this->modelRML.reset(new rml::RML);
-  this->modelRML->SetFromString(this->GetTemplateRMLString());
+  this->modelSDF.reset(new sdf::SDF);
+  this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelRML->root->GetElement("model");
+  modelElem = this->modelSDF->root->GetElement("model");
 
   linkElem = modelElem->GetElement("link");
-  rml::ElementPtr templateLinkElem = linkElem->Clone();
-  rml::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+  sdf::ElementPtr templateLinkElem = linkElem->Clone();
+  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
       "visual")->Clone();
-  rml::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
       "collision")->Clone();
   modelElem->ClearElements();
   std::stringstream visualNameStream;
@@ -546,7 +546,7 @@ void BuildingMaker::GenerateRML()
     std::string name = itemsIt->first;
     BuildingModelManip *buildingModelManip = itemsIt->second;
     rendering::VisualPtr visual = buildingModelManip->GetVisual();
-    rml::ElementPtr newLinkElem = templateLinkElem->Clone();
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
@@ -758,7 +758,7 @@ void BuildingMaker::GenerateRML()
     else
     {
       // TODO: This handles the special case for stairs where
-      // there are nested visuals which RML doesn't support.
+      // there are nested visuals which SDF doesn't support.
       // Should somehow generalize/combine the code above and below
       newLinkElem->ClearElements();
       for (unsigned int i = 0; i< visual->GetChildCount(); ++i)
@@ -789,35 +789,35 @@ void BuildingMaker::GenerateRML()
     modelElem->InsertElement(newLinkElem);
   }
   (modelElem->AddElement("static"))->Set("true");
-  // qDebug() << this->modelRML->ToString().c_str();
+  // qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::GenerateRMLWithCSG()
+void BuildingMaker::GenerateSDFWithCSG()
 {
 #ifdef HAVE_GTS
-  // This function generates an RML file for the final building model in a
-  // similar manner to the GenerateRML function. However instead of using a
+  // This function generates an SDF file for the final building model in a
+  // similar manner to the GenerateSDF function. However instead of using a
   // surface subdivision algorithm for making openings for attached objects,
   // it uses boolean operations to find the difference between one mesh and
   // the other.
   // TODO The function is not yet integrated as custom shapes are not yet
   // supported in Gazebo.
-  rml::ElementPtr modelElem;
-  rml::ElementPtr linkElem;
-  rml::ElementPtr visualElem;
-  rml::ElementPtr collisionElem;
+  sdf::ElementPtr modelElem;
+  sdf::ElementPtr linkElem;
+  sdf::ElementPtr visualElem;
+  sdf::ElementPtr collisionElem;
 
-  this->modelRML.reset(new rml::RML);
-  this->modelRML->SetFromString(this->GetTemplateRMLString());
+  this->modelSDF.reset(new sdf::SDF);
+  this->modelSDF->SetFromString(this->GetTemplateSDFString());
 
-  modelElem = this->modelRML->root->GetElement("model");
+  modelElem = this->modelSDF->root->GetElement("model");
   linkElem = modelElem->GetElement("link");
 
-  rml::ElementPtr templateLinkElem = linkElem->Clone();
-  rml::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+  sdf::ElementPtr templateLinkElem = linkElem->Clone();
+  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
       "visual")->Clone();
-  rml::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
       "collision")->Clone();
   modelElem->ClearElements();
   std::stringstream visualNameStream;
@@ -835,7 +835,7 @@ void BuildingMaker::GenerateRMLWithCSG()
     std::string name = itemsIt->first;
     BuildingModelManip *buildingModelManip = itemsIt->second;
     rendering::VisualPtr visual = buildingModelManip->GetVisual();
-    rml::ElementPtr newLinkElem = templateLinkElem->Clone();
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
@@ -925,14 +925,14 @@ void BuildingMaker::GenerateRMLWithCSG()
       booleanMesh->SetName(booleanMeshName);
       common::MeshManager::Instance()->AddMesh(booleanMesh);
 
-      // finally create the rml elements
+      // finally create the sdf elements
       visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
           + "_Visual");
       collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
           + "_Collision");
-      rml::ElementPtr visGeomElem = visualElem->GetElement("geometry");
+      sdf::ElementPtr visGeomElem = visualElem->GetElement("geometry");
       visGeomElem->ClearElements();
-      rml::ElementPtr meshElem = visGeomElem->AddElement("mesh");
+      sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
       // TODO create the folder
       std::string uri = "model://" + this->modelName + "/meshes/"
           + booleanMeshName;
@@ -980,9 +980,9 @@ void BuildingMaker::GenerateRMLWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  this->GenerateRML();
+  this->GenerateSDF();
   msgs::Factory msg;
-  msg.set_rml(this->modelRML->ToString());
+  msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
 
@@ -1031,10 +1031,10 @@ double BuildingMaker::ConvertAngle(double _angle)
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::GetTemplateRMLString()
+std::string BuildingMaker::GetTemplateSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<rml version ='" << RML_VERSION << "'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='building_template_model'>"
     << "<pose>0 0 0.0 0 0 0</pose>"
     << "<link name ='link'>"
@@ -1062,7 +1062,7 @@ std::string BuildingMaker::GetTemplateRMLString()
     << "</link>"
     << "<static>true</static>"
     << "</model>"
-    << "</rml>";
+    << "</sdf>";
 
   return newModelStr.str();
 }
@@ -1309,8 +1309,8 @@ void BuildingMaker::OnSave()
   if (this->saved)
   {
     this->SetModelName(this->modelName);
-    this->GenerateRML();
-    this->SaveToRML(this->saveLocation);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
   }
   else
   {
@@ -1321,8 +1321,8 @@ void BuildingMaker::OnSave()
       this->modelName = this->saveDialog->GetModelName();
       this->saveLocation = this->saveDialog->GetSaveLocation();
       this->SetModelName(this->modelName);
-      this->GenerateRML();
-      this->SaveToRML(this->saveLocation);
+      this->GenerateSDF();
+      this->SaveToSDF(this->saveLocation);
       this->saved = true;
     }
   }
@@ -1339,8 +1339,8 @@ void BuildingMaker::OnDone()
     this->modelName = this->finishDialog->GetModelName();
     this->saveLocation = this->finishDialog->GetSaveLocation();
     this->SetModelName(this->modelName);
-    this->GenerateRML();
-    this->SaveToRML(this->saveLocation);
+    this->GenerateSDF();
+    this->SaveToSDF(this->saveLocation);
     this->FinishModel();
     gui::editor::Events::discardBuildingModel();
     gui::editor::Events::finishBuildingModel();

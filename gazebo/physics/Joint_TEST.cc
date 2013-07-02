@@ -268,9 +268,9 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   }
 }
 
-TEST_F(Joint_TEST, joint_RML14)
+TEST_F(Joint_TEST, joint_SDF14)
 {
-  Load("worlds/RML_1_4.world");
+  Load("worlds/SDF_1_4.world");
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

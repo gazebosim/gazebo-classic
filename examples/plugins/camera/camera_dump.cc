@@ -23,7 +23,7 @@ namespace gazebo
   {
     public: CameraDump() : CameraPlugin(), saveCount(0) {}
 
-    public: void Load(sensors::SensorPtr _parent, rml::ElementPtr _sdf)
+    public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     {
       // Don't forget to load the camera plugin
       CameraPlugin::Load(_parent, _sdf);

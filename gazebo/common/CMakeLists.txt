@@ -119,8 +119,8 @@ target_link_libraries(gazebo_common
   pthread
 )
 
-if (HAVE_RML)
-  target_link_libraries(gazebo_common ${RML_LIBRARIES})
+if (HAVE_SDF)
+  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
 endif()
 
 if (HAVE_GTS)

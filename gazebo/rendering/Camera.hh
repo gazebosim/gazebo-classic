@@ -28,7 +28,7 @@
 #include <list>
 #include <vector>
 #include <deque>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -85,8 +85,8 @@ namespace gazebo
       public: virtual ~Camera();
 
       /// \brief Load the camera with a set of parmeters
-      /// \param[in] _rml The RML camera info
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] _sdf The SDF camera info
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
       public: virtual void Load();
@@ -524,7 +524,7 @@ namespace gazebo
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 
-      /// \brief Get the next frame filename based on RML parameters
+      /// \brief Get the next frame filename based on SDF parameters
       /// \return The frame's filename
       protected: std::string GetFrameFilename();
 
@@ -542,7 +542,7 @@ namespace gazebo
       private: void ConvertRGBToBAYER(unsigned char *_dst, unsigned char *_src,
                    std::string _format, int _width, int _height);
 
-      /// \brief Set the clip distance based on stored RML values
+      /// \brief Set the clip distance based on stored SDF values
       private: void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
@@ -557,8 +557,8 @@ namespace gazebo
       /// \brief Name of the camera.
       protected: std::string name;
 
-      /// \brief Camera's RML values.
-      protected: rml::ElementPtr rml;
+      /// \brief Camera's SDF values.
+      protected: sdf::ElementPtr sdf;
 
       /// \brief ID of the window that the camera is attached to.
       protected: unsigned int windowId;
@@ -646,8 +646,8 @@ namespace gazebo
       /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
 
-      /// \brief Pointer to image RML element.
-      private: rml::ElementPtr imageElem;
+      /// \brief Pointer to image SDF element.
+      private: sdf::ElementPtr imageElem;
 
       /// \brief Visual that the camera is tracking.
       private: VisualPtr trackedVisual;

@@ -54,7 +54,7 @@ namespace gazebo
       public: virtual ~ODEJoint();
 
       // Documentation inherited.
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Reset();

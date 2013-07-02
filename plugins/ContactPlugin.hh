@@ -40,8 +40,8 @@ namespace gazebo
 
     /// \brief Load the sensor plugin.
     /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
-    /// \param[in] _sdf RML element that describes the plugin.
-    public: virtual void Load(sensors::SensorPtr _sensor, rml::ElementPtr _sdf);
+    /// \param[in] _sdf SDF element that describes the plugin.
+    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     /// \brief Callback that recieves the contact sensor's update signal.
     /// Override this this function to get callbacks when the contact sensor

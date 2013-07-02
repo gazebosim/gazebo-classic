@@ -23,7 +23,7 @@ namespace gazebo
 {
   class WorldEdit : public WorldPlugin
   {
-    public: void Load(physics::WorldPtr /*_parent*/, rml::ElementPtr _sdf)
+    public: void Load(physics::WorldPtr /*_parent*/, sdf::ElementPtr _sdf)
     {
       // Create a new transport node
       transport::NodePtr node(new transport::Node());

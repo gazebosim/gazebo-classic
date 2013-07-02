@@ -136,8 +136,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  this->rml.reset(new rml::Element);
-  rml::initFile("scene.rml", this->rml);
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("scene.sdf", this->sdf);
 
   this->terrain = NULL;
   this->selectedVis.reset();
@@ -223,14 +223,14 @@ Scene::~Scene()
   }
   this->connections.clear();
 
-  this->rml->Reset();
-  this->rml.reset();
+  this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
-void Scene::Load(rml::ElementPtr _rml)
+void Scene::Load(sdf::ElementPtr _sdf)
 {
-  this->rml->Copy(_rml);
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 
@@ -271,9 +271,9 @@ void Scene::Init()
   this->SetSky();
 
   // Create Fog
-  if (this->rml->HasElement("fog"))
+  if (this->sdf->HasElement("fog"))
   {
-    boost::shared_ptr<rml::Element> fogElem = this->rml->GetElement("fog");
+    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
@@ -381,7 +381,7 @@ std::string Scene::GetName() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
-  this->rml->GetElement("ambient")->Set(_color);
+  this->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
   if (this->manager &&
@@ -394,13 +394,13 @@ void Scene::SetAmbientColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  return this->rml->Get<common::Color>("ambient");
+  return this->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
-  this->rml->GetElement("background")->Set(_color);
+  this->sdf->GetElement("background")->Set(_color);
   Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
@@ -426,7 +426,7 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  return this->rml->Get<common::Color>("background");
+  return this->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -1133,7 +1133,7 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
-  rml::ElementPtr elem = this->rml->GetElement("fog");
+  sdf::ElementPtr elem = this->sdf->GetElement("fog");
 
   elem->GetElement("type")->Set(_type);
   elem->GetElement("color")->Set(_color);
@@ -1328,7 +1328,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
   if (_msg->has_fog())
   {
-    rml::ElementPtr elem = this->rml->GetElement("fog");
+    sdf::ElementPtr elem = this->sdf->GetElement("fog");
 
     if (_msg->fog().has_color())
       elem->GetElement("color")->Set(
@@ -2442,7 +2442,7 @@ void Scene::SetSky()
 /////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
-  this->rml->GetElement("shadows")->Set(_value);
+  this->sdf->GetElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
   {
@@ -2488,7 +2488,7 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  return this->rml->Get<bool>("shadows");
+  return this->sdf->Get<bool>("shadows");
 }
 
 /////////////////////////////////////////////////
@@ -2584,7 +2584,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-void Scene::CreateCOMVisual(rml::ElementPtr _elem, VisualPtr _linkVisual)
+void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
   COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
                                     _linkVisual));

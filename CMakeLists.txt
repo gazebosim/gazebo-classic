@@ -287,6 +287,10 @@ else (build_errors)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/unversioned/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
+  # This is only needed for backward compatibility with the internal
+  # version of SDF
+  include_directories(${PROJECT_SOURCE_DIR}/gazebo)
   
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
@@ -300,7 +304,7 @@ else (build_errors)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
-    add_subdirectory(rml)
+    add_subdirectory(sdf)
   endif (BUILD_GAZEBO)
 
   ########################################
@@ -315,9 +319,9 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
-  if (HAVE_RML)
+  if (HAVE_SDF)
     set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport)
-    set(PKG_DEPENDS Boost Protobuf RML)
+    set(PKG_DEPENDS Boost Protobuf SDF)
   else()
     set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport gazebo_sdf_interface)
     set(PKG_DEPENDS Boost Protobuf)

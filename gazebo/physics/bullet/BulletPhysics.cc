@@ -294,13 +294,13 @@ BulletPhysics::~BulletPhysics()
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::Load(rml::ElementPtr _rml)
+void BulletPhysics::Load(sdf::ElementPtr _sdf)
 {
-  PhysicsEngine::Load(_rml);
+  PhysicsEngine::Load(_sdf);
 
-  rml::ElementPtr bulletElem = this->rml->GetElement("bullet");
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->rml->Get<math::Vector3>("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -478,7 +478,7 @@ void BulletPhysics::Reset()
 // //////////////////////////////////////////////////
 // void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 // {
-//   // TODO: set RML parameter
+//   // TODO: set SDF parameter
 //   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 //   // Line below commented out because it wasn't helping pendulum test.
 //   // info.m_numIterations = _iters;
@@ -491,8 +491,8 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
   if (!this->dynamicsWorld)
     return;
 
-  rml::ElementPtr bulletElem = this->rml->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet RML element does not exist");
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -672,8 +672,8 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(BulletParam _param) const
 {
-  rml::ElementPtr bulletElem = this->rml->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet RML element does not exist");
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   boost::any value = 0;
   switch (_param)
@@ -855,7 +855,7 @@ void BulletPhysics::ConvertMass(void * /*_engineMass*/,
 //////////////////////////////////////////////////
 double BulletPhysics::GetWorldCFM()
 {
-  rml::ElementPtr elem = this->rml->GetElement("bullet");
+  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
   elem = elem->GetElement("constraints");
   return elem->Get<double>("cfm");
 }
@@ -863,7 +863,7 @@ double BulletPhysics::GetWorldCFM()
 //////////////////////////////////////////////////
 void BulletPhysics::SetWorldCFM(double _cfm)
 {
-  rml::ElementPtr elem = this->rml->GetElement("bullet");
+  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
   elem = elem->GetElement("constraints");
   elem->GetElement("cfm")->Set(_cfm);
 
@@ -874,7 +874,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->rml->GetElement("gravity")->Set(_gravity);
+  this->sdf->GetElement("gravity")->Set(_gravity);
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

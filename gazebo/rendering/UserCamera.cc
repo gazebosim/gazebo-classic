@@ -77,9 +77,9 @@ UserCamera::~UserCamera()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::Load(rml::ElementPtr _rml)
+void UserCamera::Load(sdf::ElementPtr _sdf)
 {
-  Camera::Load(_rml);
+  Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -338,7 +338,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
-      this->rml->Get<double>("horizontal_fov");
+      this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

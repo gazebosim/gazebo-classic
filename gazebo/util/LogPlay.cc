@@ -163,8 +163,8 @@ uint32_t LogPlay::GetRandSeed() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  std::string startMarker = "<rml ";
-  std::string endMarker = "</rml>";
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
   size_t end = this->currentChunk.find(endMarker);
 

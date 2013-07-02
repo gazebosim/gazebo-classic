@@ -70,9 +70,9 @@ namespace gazebo
 
       /// \brief Constructor
       ///
-      /// Build a ModelState from RML data
-      /// \param[in] _rml RML data to load a model state from.
-      public: explicit ModelState(const rml::ElementPtr _rml);
+      /// Build a ModelState from SDF data
+      /// \param[in] _sdf SDF data to load a model state from.
+      public: explicit ModelState(const sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~ModelState();
@@ -87,11 +87,11 @@ namespace gazebo
       public: void Load(const ModelPtr _model, const common::Time &_realTime,
                   const common::Time &_simTime);
 
-      /// \brief Load state from RML element.
+      /// \brief Load state from SDF element.
       ///
-      /// Load ModelState information from stored data in and RML::Element
-      /// \param[in] _elem Pointer to the RML::Element containing state info.
-      public: virtual void Load(const rml::ElementPtr _elem);
+      /// Load ModelState information from stored data in and SDF::Element
+      /// \param[in] _elem Pointer to the SDF::Element containing state info.
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
       /// \return The math::Pose of the Model.
@@ -180,9 +180,9 @@ namespace gazebo
       /// \return True if the joint exists in the model.
       public: bool HasJointState(const std::string &_jointName) const;
 
-      /// \brief Populate a state RML element with data from the object.
-      /// \param[out] _rml RML element to populate.
-      public: void FillRML(rml::ElementPtr _rml);
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
 
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State

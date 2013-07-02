@@ -33,7 +33,7 @@ CameraPlugin::~CameraPlugin()
 }
 
 /////////////////////////////////////////////////
-void CameraPlugin::Load(sensors::SensorPtr _sensor, rml::ElementPtr /*_sdf*/)
+void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";

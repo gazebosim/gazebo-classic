@@ -43,7 +43,7 @@ COMVisual::~COMVisual()
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(rml::ElementPtr _elem)
+void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
   math::Pose pose = _elem->Get<math::Pose>("origin");

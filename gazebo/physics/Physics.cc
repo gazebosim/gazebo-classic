@@ -74,11 +74,11 @@ physics::WorldPtr physics::get_world(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void physics::load_worlds(rml::ElementPtr _rml)
+void physics::load_worlds(sdf::ElementPtr _sdf)
 {
   std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Load(_rml);
+    (*iter)->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
@@ -114,9 +114,9 @@ void physics::stop_worlds()
 }
 
 /////////////////////////////////////////////////
-void physics::load_world(WorldPtr _world, rml::ElementPtr _rml)
+void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf)
 {
-  _world->Load(_rml);
+  _world->Load(_sdf);
 }
 
 /////////////////////////////////////////////////

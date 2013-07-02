@@ -42,7 +42,7 @@ namespace gazebo
       public: virtual ~BulletMeshShape();
 
       /// \brief Load the trimesh
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       protected: virtual void Init();
     };

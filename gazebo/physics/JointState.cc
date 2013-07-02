@@ -51,11 +51,11 @@ JointState::JointState(JointPtr _joint)
 }
 
 /////////////////////////////////////////////////
-JointState::JointState(const rml::ElementPtr _rml)
+JointState::JointState(const sdf::ElementPtr _sdf)
   : State()
 {
-  // Load the state from RML
-  this->Load(_rml);
+  // Load the state from SDF
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
@@ -78,7 +78,7 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
 }
 
 /////////////////////////////////////////////////
-void JointState::Load(const rml::ElementPtr _elem)
+void JointState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
   this->name = _elem->Get<std::string>("name");
@@ -87,7 +87,7 @@ void JointState::Load(const rml::ElementPtr _elem)
   this->angles.clear();
   if (_elem->HasElement("angle"))
   {
-    rml::ElementPtr childElem = _elem->GetElement("angle");
+    sdf::ElementPtr childElem = _elem->GetElement("angle");
     while (childElem)
     {
       unsigned int axis = childElem->Get<unsigned int>("axis");
@@ -198,17 +198,17 @@ JointState JointState::operator+(const JointState &_state) const
 }
 
 /////////////////////////////////////////////////
-void JointState::FillRML(rml::ElementPtr _rml)
+void JointState::FillSDF(sdf::ElementPtr _sdf)
 {
-  _rml->ClearElements();
+  _sdf->ClearElements();
 
-  _rml->GetAttribute("name")->Set(this->name);
+  _sdf->GetAttribute("name")->Set(this->name);
 
   int i = 0;
   for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
        iter != this->angles.end(); ++iter, ++i)
   {
-    rml::ElementPtr elem = _rml->AddElement("angle");
+    sdf::ElementPtr elem = _sdf->AddElement("angle");
     elem->GetAttribute("axis")->Set(i);
     elem->Set((*iter).Radian());
   }

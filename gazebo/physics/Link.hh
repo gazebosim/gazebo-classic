@@ -59,9 +59,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Link();
 
-      /// \brief Load the body based on an RML element.
-      /// \param[in] _rml RML parameters.
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \brief Load the body based on an SDF element.
+      /// \param[in] _sdf SDF parameters.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the body.
       public: virtual void Init();
@@ -75,9 +75,9 @@ namespace gazebo
       /// \brief Reset the link.
       public: void ResetPhysicsStates();
 
-      /// \brief Update the parameters using new rml values.
-      /// \param[in] _rml RML values to load from.
-      public: virtual void UpdateParameters(rml::ElementPtr _rml);
+      /// \brief Update the parameters using new sdf values.
+      /// \param[in] _sdf SDF values to load from.
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Update the body.
       public: virtual void Update();
@@ -435,8 +435,8 @@ namespace gazebo
       private: void PublishData();
 
       /// \brief Load a new collision helper function.
-      /// \param[in] _rml RML element used to load the collision.
-      private: void LoadCollision(rml::ElementPtr _rml);
+      /// \param[in] _sdf SDF element used to load the collision.
+      private: void LoadCollision(sdf::ElementPtr _sdf);
 
       /// \brief Set the inertial properties based on the collision
       /// entities.

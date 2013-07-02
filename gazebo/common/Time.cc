@@ -578,15 +578,15 @@ bool Time::operator>=(double _time) const
 }
 
 /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
 /////////////////////////////////////////////////
-Time::Time(const rml::Time &_time)
+Time::Time(const sdf::Time &_time)
 : sec(_time.sec), nsec(_time.nsec)
 {
 }
 
 /////////////////////////////////////////////////
-Time &Time::operator =(const rml::Time &_time)
+Time &Time::operator =(const sdf::Time &_time)
 {
   this->sec = _time.sec;
   this->nsec = _time.nsec;

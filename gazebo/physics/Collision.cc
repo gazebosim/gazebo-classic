@@ -56,7 +56,7 @@ Collision::Collision(LinkPtr _link)
   this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
-  rml::initFile("collision.rml", this->rml);
+  sdf::initFile("collision.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -81,22 +81,22 @@ void Collision::Fini()
 }
 
 //////////////////////////////////////////////////
-void Collision::Load(rml::ElementPtr _rml)
+void Collision::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_rml);
+  Entity::Load(_sdf);
 
-  this->maxContacts = _rml->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
-  if (this->rml->HasElement("laser_retro"))
-    this->SetLaserRetro(this->rml->Get<double>("laser_retro"));
+  if (this->sdf->HasElement("laser_retro"))
+    this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->rml->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
-  this->surface->Load(this->rml->GetElement("surface"));
+  this->surface->Load(this->sdf->GetElement("surface"));
 
   if (this->shape)
-    this->shape->Load(this->rml->GetElement("geometry")->GetFirstElement());
+    this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 
@@ -120,7 +120,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->rml->Get<math::Pose>("pose"));
+    this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -151,7 +151,7 @@ bool Collision::IsPlaceable() const
 //////////////////////////////////////////////////
 void Collision::SetLaserRetro(float _retro)
 {
-  this->rml->GetElement("laser_retro")->Set(_retro);
+  this->sdf->GetElement("laser_retro")->Set(_retro);
   this->laserRetro = _retro;
 }
 
@@ -287,9 +287,9 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-void Collision::UpdateParameters(rml::ElementPtr _rml)
+void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  Entity::UpdateParameters(_rml);
+  Entity::UpdateParameters(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -354,7 +354,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.mutable_material()->mutable_script()->set_name(
       "Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
-  geom->CopyFrom(msgs::GeometryFromRML(this->rml->GetElement("geometry")));
+  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
 
   return msg;
 }
@@ -375,7 +375,7 @@ void Collision::SetState(const CollisionState &_state)
 void Collision::SetMaxContacts(double _maxContacts)
 {
   this->maxContacts = static_cast<int>(_maxContacts);
-  this->rml->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 /////////////////////////////////////////////////

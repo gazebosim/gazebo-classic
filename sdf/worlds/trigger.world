@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <plugin filename="libTriggerPlugin.so" name="trigger">
+      <point>0 0 0</point>
+      <radius>5</radius>
+    </plugin>
+    <model name="sphere">
+      <pose>0 0 10.0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <mass>1</mass>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="box">
+      <pose>1 0 50.0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <mass>1</mass>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cylinder">
+      <pose>5 0 50.0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <mass>1</mass>
+          <geometry>
+            <sphere>
+              <radius>0.2</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.2</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

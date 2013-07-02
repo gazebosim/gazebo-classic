@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo_config.h"
 
@@ -276,7 +276,7 @@ void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open World"), "",
-      tr("RML Files (*.xml *.rml *.world)")).toStdString();
+      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
   if (!filename.empty())
   {
@@ -291,7 +291,7 @@ void MainWindow::Import()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Import Collada Mesh"), "",
-      tr("RML Files (*.dae *.zip)")).toStdString();
+      tr("SDF Files (*.dae *.zip)")).toStdString();
 
   if (!filename.empty())
   {
@@ -309,7 +309,7 @@ void MainWindow::SaveAs()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
-      tr("RML Files (*.xml *.rml *.world)")).toStdString();
+      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
   // Return if the user has canceled.
   if (filename.empty())
@@ -323,9 +323,9 @@ void MainWindow::SaveAs()
 /////////////////////////////////////////////////
 void MainWindow::Save()
 {
-  // Get the latest world in RML.
+  // Get the latest world in SDF.
   boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_rml");
+    transport::request(get_world(), "world_sdf");
 
   msgs::GzString msg;
   std::string msgData;
@@ -336,26 +336,26 @@ void MainWindow::Save()
     // Parse the response message
     msg.ParseFromString(response->serialized_data());
 
-    // Parse the string into rml, so that we can insert user camera settings.
-    rml::RML rml_parsed;
-    rml_parsed.SetFromString(msg.data());
-    // Check that rml contains world
-    if (rml_parsed.root->HasElement("world"))
+    // Parse the string into sdf, so that we can insert user camera settings.
+    sdf::SDF sdf_parsed;
+    sdf_parsed.SetFromString(msg.data());
+    // Check that sdf contains world
+    if (sdf_parsed.root->HasElement("world"))
     {
-      rml::ElementPtr world = rml_parsed.root->GetElement("world");
-      rml::ElementPtr guiElem = world->GetElement("gui");
+      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
         guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
 
-      rml::ElementPtr cameraElem = guiElem->GetElement("camera");
+      sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
       // TODO: export track_visual properties as well.
-      msgData = rml_parsed.root->ToString("");
+      msgData = sdf_parsed.root->ToString("");
     }
     else
     {
@@ -383,7 +383,7 @@ void MainWindow::Save()
   {
     QMessageBox msgBox;
     msgBox.setText("Unable to save world.\n"
-                   "Unable to retrieve RML world description from server.");
+                   "Unable to retrieve SDF world description from server.");
     msgBox.exec();
   }
 }
@@ -422,10 +422,10 @@ void MainWindow::About()
         "http://gazebosim.org/api</a></td>"
       "</tr>"
       "<tr>"
-        "<td style='padding-right: 10px;'>RML:</td>"
-        "<td><a href='http://gazebosim.org/rml' "
+        "<td style='padding-right: 10px;'>SDF:</td>"
+        "<td><a href='http://gazebosim.org/sdf' "
         "style='text-decoration: none; color: #f58113'>"
-        "http://gazebosim.org/rml</a></td>"
+        "http://gazebosim.org/sdf</a></td>"
       "</tr>"
       "<tr>"
         "<td style='padding-right: 10px;'>Messages:</td>"

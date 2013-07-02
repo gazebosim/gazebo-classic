@@ -50,8 +50,8 @@ namespace gazebo
       public: virtual ~PhysicsEngine();
 
       /// \brief Load the physics engine.
-      /// \param[in] _rml Pointer to the RML parameters.
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] _sdf Pointer to the SDF parameters.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the physics engine.
       public: virtual void Init() = 0;
@@ -306,8 +306,8 @@ namespace gazebo
       /// \brief Pointer to the world.
       protected: WorldPtr world;
 
-      /// \brief Our RML values.
-      protected: rml::ElementPtr rml;
+      /// \brief Our SDF values.
+      protected: sdf::ElementPtr sdf;
 
       /// \brief Node for communication.
       protected: transport::NodePtr node;

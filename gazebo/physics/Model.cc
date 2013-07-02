@@ -80,17 +80,17 @@ Model::~Model()
 }
 
 //////////////////////////////////////////////////
-void Model::Load(rml::ElementPtr _rml)
+void Model::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_rml);
+  Entity::Load(_sdf);
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
-  this->SetStatic(this->rml->Get<bool>("static"));
-  this->rml->GetElement("static")->GetValue()->SetUpdateFunc(
+  this->SetStatic(this->sdf->Get<bool>("static"));
+  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
       boost::bind(&Entity::IsStatic, this));
 
-  this->SetAutoDisable(this->rml->Get<bool>("allow_auto_disable"));
+  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -107,9 +107,9 @@ void Model::LoadLinks()
   /// BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  if (this->rml->HasElement("link"))
+  if (this->sdf->HasElement("link"))
   {
-    rml::ElementPtr linkElem = this->rml->GetElement("link");
+    sdf::ElementPtr linkElem = this->sdf->GetElement("link");
     bool canonicalLinkInitialized = false;
     while (linkElem)
     {
@@ -119,7 +119,7 @@ void Model::LoadLinks()
 
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
-      ///        the canonical tag in rml
+      ///        the canonical tag in sdf
       if (!canonicalLinkInitialized)
       {
         link->SetCanonicalLink(true);
@@ -139,9 +139,9 @@ void Model::LoadLinks()
 void Model::LoadJoints()
 {
   // Load the joints
-  if (this->rml->HasElement("joint"))
+  if (this->sdf->HasElement("joint"))
   {
-    rml::ElementPtr jointElem = this->rml->GetElement("joint");
+    sdf::ElementPtr jointElem = this->sdf->GetElement("joint");
     while (jointElem)
     {
       try
@@ -156,9 +156,9 @@ void Model::LoadJoints()
     }
   }
 
-  if (this->rml->HasElement("gripper"))
+  if (this->sdf->HasElement("gripper"))
   {
-    rml::ElementPtr gripperElem = this->rml->GetElement("gripper");
+    sdf::ElementPtr gripperElem = this->sdf->GetElement("gripper");
     while (gripperElem)
     {
       this->LoadGripper(gripperElem);
@@ -326,13 +326,13 @@ void Model::Fini()
 }
 
 //////////////////////////////////////////////////
-void Model::UpdateParameters(rml::ElementPtr _rml)
+void Model::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  Entity::UpdateParameters(_rml);
+  Entity::UpdateParameters(_sdf);
 
-  if (_rml->HasElement("link"))
+  if (_sdf->HasElement("link"))
   {
-    rml::ElementPtr linkElem = _rml->GetElement("link");
+    sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
       LinkPtr link = boost::dynamic_pointer_cast<Link>(
@@ -343,9 +343,9 @@ void Model::UpdateParameters(rml::ElementPtr _rml)
   }
   /*
 
-  if (_rml->HasElement("joint"))
+  if (_sdf->HasElement("joint"))
   {
-    rml::ElementPtr jointElem = _rml->GetElement("joint");
+    sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
       JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
@@ -357,9 +357,9 @@ void Model::UpdateParameters(rml::ElementPtr _rml)
 }
 
 //////////////////////////////////////////////////
-const rml::ElementPtr Model::GetRML()
+const sdf::ElementPtr Model::GetSDF()
 {
-  return Entity::GetRML();
+  return Entity::GetSDF();
 }
 
 //////////////////////////////////////////////////
@@ -638,11 +638,11 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadJoint(rml::ElementPtr _rml)
+void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
-  std::string stype = _rml->Get<std::string>("type");
+  std::string stype = _sdf->Get<std::string>("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
      boost::static_pointer_cast<Model>(shared_from_this()));
@@ -652,7 +652,7 @@ void Model::LoadJoint(rml::ElementPtr _rml)
   joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
-  joint->Load(_rml);
+  joint->Load(_sdf);
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
     gzthrow("can't have two joint with the same name");
@@ -666,11 +666,11 @@ void Model::LoadJoint(rml::ElementPtr _rml)
 }
 
 //////////////////////////////////////////////////
-void Model::LoadGripper(rml::ElementPtr _rml)
+void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
   Gripper *gripper = new Gripper(
       boost::static_pointer_cast<Model>(shared_from_this()));
-  gripper->Load(_rml);
+  gripper->Load(_sdf);
   this->grippers.push_back(gripper);
 }
 
@@ -697,7 +697,7 @@ void Model::LoadPlugins()
     if (iterations < 50)
     {
       // Load the plugins
-      rml::ElementPtr pluginElem = this->rml->GetElement("plugin");
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
       while (pluginElem)
       {
         this->LoadPlugin(pluginElem);
@@ -718,10 +718,10 @@ unsigned int Model::GetPluginCount() const
 {
   unsigned int result = 0;
 
-  // Count all the plugins specified in RML
-  if (this->rml->HasElement("plugin"))
+  // Count all the plugins specified in SDF
+  if (this->sdf->HasElement("plugin"))
   {
-    rml::ElementPtr pluginElem = this->rml->GetElement("plugin");
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
     while (pluginElem)
     {
       result++;
@@ -748,10 +748,10 @@ unsigned int Model::GetSensorCount() const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadPlugin(rml::ElementPtr _rml)
+void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _rml->Get<std::string>("name");
-  std::string filename = _rml->Get<std::string>("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   gazebo::ModelPluginPtr plugin =
     gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
@@ -766,7 +766,7 @@ void Model::LoadPlugin(rml::ElementPtr _rml)
     }
 
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
-    plugin->Load(myself, _rml);
+    plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
   }
@@ -1005,5 +1005,5 @@ void Model::SetAutoDisable(bool _auto)
 /////////////////////////////////////////////////
 bool Model::GetAutoDisable() const
 {
-  return this->rml->Get<bool>("allow_auto_disable");
+  return this->sdf->Get<bool>("allow_auto_disable");
 }

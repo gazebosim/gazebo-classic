@@ -55,22 +55,22 @@ Gripper::~Gripper()
 }
 
 /////////////////////////////////////////////////
-void Gripper::Load(rml::ElementPtr _rml)
+void Gripper::Load(sdf::ElementPtr _sdf)
 {
   this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
 
-  rml::ElementPtr grasp_check = _rml->GetElement("grasp_check");
+  sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
   this->min_contact_count = grasp_check->Get<unsigned int>("min_contact_count");
   this->attachSteps = grasp_check->Get<int>("attach_steps");
   this->detachSteps = grasp_check->Get<int>("detach_steps");
 
-  rml::ElementPtr palmLinkElem = _rml->GetElement("palm_link");
+  sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
   if (!this->palmLink)
     gzerr << "palm link [" << palmLinkElem->Get<std::string>()
           << "] not found!\n";
 
-  rml::ElementPtr gripperLinkElem = _rml->GetElement("gripper_link");
+  sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
 
   while (gripperLinkElem)
   {

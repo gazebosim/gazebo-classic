@@ -45,9 +45,9 @@ namespace gazebo
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
 
-      /// \brief Get the RML information for the sphere.
-      /// \return The RML as a string.
-      public: std::string GetRMLString();
+      /// \brief Get the SDF information for the sphere.
+      /// \return The SDF as a string.
+      public: std::string GetSDFString();
 
       protected: virtual void CreateTheEntity();
 

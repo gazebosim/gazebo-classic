@@ -48,7 +48,7 @@ namespace gazebo
     /// \class SystemPaths SystemPaths.hh common/common.hh
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#gazeboPaths - media paths containing
-    ///            worlds, models, rml descriptions, material scripts,
+    ///            worlds, models, sdf descriptions, material scripts,
     ///            textures.
     ///        \li SystemPaths#ogrePaths - ogre library paths.
     ///            Should point to Ogre RenderSystem_GL.so et. al.

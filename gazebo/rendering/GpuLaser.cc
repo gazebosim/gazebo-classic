@@ -66,9 +66,9 @@ GpuLaser::~GpuLaser()
 }
 
 //////////////////////////////////////////////////
-void GpuLaser::Load(rml::ElementPtr &_rml)
+void GpuLaser::Load(sdf::ElementPtr &_sdf)
 {
-  Camera::Load(_rml);
+  Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////

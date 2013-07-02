@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"
@@ -184,11 +184,11 @@ namespace gazebo
       /// \return Angle in radians.
       public: static double ConvertAngle(double _angle);
 
-      /// \brief Save model to RML format.
-      /// \param[in] _savePath Path to save the RML to.
-      public: void SaveToRML(const std::string &_savePath);
+      /// \brief Save model to SDF format.
+      /// \param[in] _savePath Path to save the SDF to.
+      public: void SaveToSDF(const std::string &_savePath);
 
-      /// \brief Reset the building maker and the RML.
+      /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
       // Documentation inherited
@@ -197,8 +197,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Stop();
 
-      /// \brief Generate the RML from building part visuals.
-      public: void GenerateRML();
+      /// \brief Generate the SDF from building part visuals.
+      public: void GenerateSDF();
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -213,11 +213,11 @@ namespace gazebo
       /// \return Name of the model created.
       private: std::string CreateModel();
 
-      /// \brief Generate RML with CSG support (to be supported).
-      private: void GenerateRMLWithCSG();
+      /// \brief Generate SDF with CSG support (to be supported).
+      private: void GenerateSDFWithCSG();
 
-      /// \brief Get a template RML string of a simple model.
-      private: std::string GetTemplateRMLString();
+      /// \brief Get a template SDF string of a simple model.
+      private: std::string GetTemplateSDFString();
 
       /// \brief Internal helper function for QPointF comparison used by the
       /// surface subsivision algorithm.
@@ -260,11 +260,11 @@ namespace gazebo
       /// manage the visuals representing the building part.
       private: std::map<std::string, BuildingModelManip *> allItems;
 
-      /// \brief The building model in RML format.
-      private: rml::RMLPtr modelRML;
+      /// \brief The building model in SDF format.
+      private: sdf::SDFPtr modelSDF;
 
-      /// \brief A template RML of a simple box model.
-      private: rml::RMLPtr modelTemplateRML;
+      /// \brief A template SDF of a simple box model.
+      private: sdf::SDFPtr modelTemplateSDF;
 
       /// \brief Name of the building model.
       private: std::string modelName;

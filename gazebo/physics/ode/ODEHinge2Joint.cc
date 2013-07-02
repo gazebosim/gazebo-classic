@@ -45,9 +45,9 @@ ODEHinge2Joint::~ODEHinge2Joint()
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::Load(rml::ElementPtr _rml)
+void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
-  Hinge2Joint<ODEJoint>::Load(_rml);
+  Hinge2Joint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////

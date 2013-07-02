@@ -25,7 +25,7 @@
 
 #include <string>
 #include <iostream>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -63,10 +63,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Light();
 
-      /// \brief Load the light using a set of RML parameters.
-      /// \param[in] _rml Pointer to the RML containing the Light
+      /// \brief Load the light using a set of SDF parameters.
+      /// \param[in] _sdf Pointer to the SDF containing the Light
       /// description.
-      public: void Load(rml::ElementPtr _rml);
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Load the light using default parameters.
       public: void Load();
@@ -177,12 +177,12 @@ namespace gazebo
       /// \private Helper node to create a visual representation of the light
       private: void CreateVisual();
 
-      /// \brief Update the ogre light source based on RML values
+      /// \brief Update the ogre light source based on SDF values
       private: void Update();
 
-      /// \brief Update RML value based on a message.
+      /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateRMLFromMsg(ConstLightPtr &_msg);
+      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;
@@ -193,8 +193,8 @@ namespace gazebo
       /// \brief The lines used to visualize the light.
       private: DynamicLines *line;
 
-      /// \brief RML element data for the light.
-      private: rml::ElementPtr rml;
+      /// \brief SDF element data for the light.
+      private: sdf::ElementPtr sdf;
 
       /// \brief Event connection to toggle visualization on/off.
       private: event::ConnectionPtr showLightsConnection;

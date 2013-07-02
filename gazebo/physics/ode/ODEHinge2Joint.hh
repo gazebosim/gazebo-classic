@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual ~ODEHinge2Joint();
 
       // Documentation inherited.
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);

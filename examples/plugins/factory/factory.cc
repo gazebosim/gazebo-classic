@@ -21,7 +21,7 @@ namespace gazebo
 {
   class Factory : public WorldPlugin
   {
-    public: void Load(physics::WorldPtr _parent, rml::ElementPtr /*_sdf*/)
+    public: void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
       // Option 1: Insert model from file via function call.
       // The filename must be in the GAZEBO_RESOURCE_PATH environment variable.
@@ -29,8 +29,8 @@ namespace gazebo
 
       // Option 2: Insert model from string via function call.
       // Insert a sphere model from string
-      rml::RML sphereRML;
-      sphereRML.SetFromString(
+      sdf::SDF sphereSDF;
+      sphereSDF.SetFromString(
          "<gazebo version ='1.0'>\
           <model name ='sphere'>\
             <origin pose ='1 2 0 0 0 0'/>\
@@ -54,7 +54,7 @@ namespace gazebo
             </link>\
           </model>\
         </gazebo>");
-      _parent->InsertModel(sphereRML);
+      _parent->InsertModel(sphereSDF);
 
       // Option 3: Insert model from file via message passing.
       {

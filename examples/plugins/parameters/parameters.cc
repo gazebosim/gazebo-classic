@@ -20,18 +20,18 @@ namespace gazebo
 {
   class Parameters : public WorldPlugin
   {
-    public: void Load(physics::WorldPtr /*_parent*/, rml::ElementPtr _sdf)
+    public: void Load(physics::WorldPtr /*_parent*/, sdf::ElementPtr _sdf)
     {
       this->PrintValues("", _sdf);
     }
 
-    private: void PrintValues(std::string _prefix, rml::ElementPtr _sdf)
+    private: void PrintValues(std::string _prefix, sdf::ElementPtr _sdf)
     {
       if (_sdf->GetValue())
         std::cout << _prefix << _sdf->GetValue()->GetAsString() << "\n";
 
       _prefix += "  ";
-      rml::ElementPtr elem = _sdf->GetFirstElement();
+      sdf::ElementPtr elem = _sdf->GetFirstElement();
       while (elem)
       {
         this->PrintValues(_prefix, elem);

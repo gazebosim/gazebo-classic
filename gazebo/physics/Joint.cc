@@ -95,20 +95,20 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
   this->parentLink = _parent;
   this->childLink = _child;
 
-  // Joint is loaded without rml from a model
-  // Initialize this->rml so it can be used for data storage
-  rml::initFile("joint.rml", this->rml);
+  // Joint is loaded without sdf from a model
+  // Initialize this->sdf so it can be used for data storage
+  sdf::initFile("joint.sdf", this->sdf);
 
   this->LoadImpl(_pose);
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(rml::ElementPtr _rml)
+void Joint::Load(sdf::ElementPtr _sdf)
 {
-  Base::Load(_rml);
+  Base::Load(_sdf);
 
-  rml::ElementPtr parentElem = _rml->GetElement("parent");
-  rml::ElementPtr childElem = _rml->GetElement("child");
+  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
+  sdf::ElementPtr childElem = _sdf->GetElement("child");
 
   GZ_ASSERT(parentElem, "Parent element is NULL");
   GZ_ASSERT(childElem, "Child element is NULL");
@@ -136,7 +136,7 @@ void Joint::Load(rml::ElementPtr _rml)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _rml->Get<math::Pose>("pose");
+  this->anchorPose = _sdf->Get<math::Pose>("pose");
   this->LoadImpl(this->anchorPose);
 }
 
@@ -165,9 +165,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
   else
     this->anchorPos = _pose.pos;
 
-  if (this->rml->HasElement("sensor"))
+  if (this->sdf->HasElement("sensor"))
   {
-    rml::ElementPtr sensorElem = this->rml->GetElement("sensor");
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
       /// \todo This if statement is a hack to prevent Joints from creating
@@ -195,13 +195,13 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->rml->HasElement("axis"))
+  if (this->sdf->HasElement("axis"))
   {
-    rml::ElementPtr axisElem = this->rml->GetElement("axis");
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
-      rml::ElementPtr limitElem = axisElem->GetElement("limit");
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
       this->upperLimit[0] = limitElem->Get<double>("upper");
@@ -219,13 +219,13 @@ void Joint::Init()
     }
   }
 
-  if (this->rml->HasElement("axis2"))
+  if (this->sdf->HasElement("axis2"))
   {
-    rml::ElementPtr axisElem = this->rml->GetElement("axis2");
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
-      rml::ElementPtr limitElem = axisElem->GetElement("limit");
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
       this->upperLimit[1] = limitElem->Get<double>("upper");
@@ -245,16 +245,16 @@ void Joint::Init()
 
   // Set parent name: if parentLink is NULL, it's name be the world
   if (!this->parentLink)
-    this->rml->GetElement("parent")->Set("world");
+    this->sdf->GetElement("parent")->Set("world");
 
   // Set axis in physics engines
-  if (this->rml->HasElement("axis"))
+  if (this->sdf->HasElement("axis"))
   {
-    this->SetAxis(0, this->rml->GetElement("axis")->Get<math::Vector3>("xyz"));
+    this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
   }
-  if (this->rml->HasElement("axis2"))
+  if (this->sdf->HasElement("axis2"))
   {
-    this->SetAxis(1, this->rml->GetElement("axis2")->Get<math::Vector3>("xyz"));
+    this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
   }
 
   this->ComputeInertiaRatio();
@@ -265,10 +265,10 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 {
   math::Vector3 vec;
 
-  if (_index == 0 && this->rml->HasElement("axis"))
-    vec = this->rml->GetElement("axis")->Get<math::Vector3>("xyz");
-  else if (this->rml->HasElement("axis2"))
-    vec = this->rml->GetElement("axis2")->Get<math::Vector3>("xyz");
+  if (_index == 0 && this->sdf->HasElement("axis"))
+    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
+  else if (this->sdf->HasElement("axis2"))
+    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
@@ -301,9 +301,9 @@ void Joint::Update()
 }
 
 //////////////////////////////////////////////////
-void Joint::UpdateParameters(rml::ElementPtr _rml)
+void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  Base::UpdateParameters(_rml);
+  Base::UpdateParameters(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -430,15 +430,15 @@ math::Angle Joint::GetAngle(int _index) const
 //////////////////////////////////////////////////
 void Joint::SetHighStop(int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->rml != NULL, "Joint rml member is NULL");
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
   {
-    this->rml->GetElement("axis")->GetElement("limit")
+    this->sdf->GetElement("axis")->GetElement("limit")
              ->GetElement("upper")->Set(_angle.Radian());
   }
   else if (_index == 1)
   {
-    this->rml->GetElement("axis2")->GetElement("limit")
+    this->sdf->GetElement("axis2")->GetElement("limit")
              ->GetElement("upper")->Set(_angle.Radian());
   }
   else
@@ -451,15 +451,15 @@ void Joint::SetHighStop(int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 void Joint::SetLowStop(int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->rml != NULL, "Joint rml member is NULL");
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
   {
-    this->rml->GetElement("axis")->GetElement("limit")
+    this->sdf->GetElement("axis")->GetElement("limit")
              ->GetElement("lower")->Set(_angle.Radian());
   }
   else if (_index == 1)
   {
-    this->rml->GetElement("axis2")->GetElement("limit")
+    this->sdf->GetElement("axis2")->GetElement("limit")
              ->GetElement("lower")->Set(_angle.Radian());
   }
   else

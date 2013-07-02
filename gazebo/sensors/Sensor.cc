@@ -19,7 +19,7 @@
  * Date: 25 May 2007
  */
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -44,8 +44,8 @@ Sensor::Sensor(SensorCategory _cat)
 {
   this->category = _cat;
 
-  this->rml.reset(new rml::Element);
-  rml::initFile("sensor.rml", this->rml);
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sensor.sdf", this->sdf);
 
   this->active = false;
 
@@ -62,28 +62,28 @@ Sensor::~Sensor()
     this->node->Fini();
   this->node.reset();
 
-  if (this->rml)
-    this->rml->Reset();
-  this->rml.reset();
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
   this->connections.clear();
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load(const std::string &_worldName, rml::ElementPtr _rml)
+void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  this->rml->Copy(_rml);
+  this->sdf->Copy(_sdf);
   this->Load(_worldName);
 }
 
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName)
 {
-  if (this->rml->HasElement("pose"))
+  if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->rml->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<math::Pose>("pose");
   }
 
-  if (this->rml->Get<bool>("always_on"))
+  if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
@@ -98,12 +98,12 @@ void Sensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->rml->Get<double>("update_rate"));
+  this->SetUpdateRate(this->sdf->Get<double>("update_rate"));
 
   // Load the plugins
-  if (this->rml->HasElement("plugin"))
+  if (this->sdf->HasElement("plugin"))
   {
-    rml::ElementPtr pluginElem = this->rml->GetElement("plugin");
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
@@ -167,7 +167,7 @@ void Sensor::Fini()
 //////////////////////////////////////////////////
 std::string Sensor::GetName() const
 {
-  return this->rml->Get<std::string>("name");
+  return this->sdf->Get<std::string>("name");
 }
 
 //////////////////////////////////////////////////
@@ -178,10 +178,10 @@ std::string Sensor::GetScopedName() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::LoadPlugin(rml::ElementPtr _rml)
+void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _rml->Get<std::string>("name");
-  std::string filename = _rml->Get<std::string>("filename");
+  std::string name = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)
@@ -195,7 +195,7 @@ void Sensor::LoadPlugin(rml::ElementPtr _rml)
     }
 
     SensorPtr myself = shared_from_this();
-    plugin->Load(myself, _rml);
+    plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
   }
@@ -252,22 +252,22 @@ common::Time Sensor::GetLastMeasurementTime()
 //////////////////////////////////////////////////
 std::string Sensor::GetType() const
 {
-  return this->rml->Get<std::string>("type");
+  return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 bool Sensor::GetVisualize() const
 {
-  return this->rml->Get<bool>("visualize");
+  return this->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////
 std::string Sensor::GetTopic() const
 {
   std::string result;
-  if (this->rml->HasElement("topic") &&
-      this->rml->Get<std::string>("topic") != "__default__")
-    result = this->rml->Get<std::string>("topic");
+  if (this->sdf->HasElement("topic") &&
+      this->sdf->Get<std::string>("topic") != "__default__")
+    result = this->sdf->Get<std::string>("topic");
   return result;
 }
 

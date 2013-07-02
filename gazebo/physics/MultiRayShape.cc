@@ -54,7 +54,7 @@ void MultiRayShape::Init()
 
   double minRange, maxRange;
 
-  this->rayElem = this->rml->GetElement("ray");
+  this->rayElem = this->sdf->GetElement("ray");
   this->scanElem = this->rayElem->GetElement("scan");
   this->horzElem = this->scanElem->GetElement("horizontal");
   this->rangeElem = this->rayElem->GetElement("range");

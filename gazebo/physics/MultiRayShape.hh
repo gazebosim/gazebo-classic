@@ -148,20 +148,20 @@ namespace gazebo
       /// \brief Pose offset of all the rays.
       protected: math::Pose offset;
 
-      /// \brief Ray RML element pointer.
-      protected: rml::ElementPtr rayElem;
+      /// \brief Ray SDF element pointer.
+      protected: sdf::ElementPtr rayElem;
 
-      /// \brief Scan RML element pointer.
-      protected: rml::ElementPtr scanElem;
+      /// \brief Scan SDF element pointer.
+      protected: sdf::ElementPtr scanElem;
 
-      /// \brief Horizontal RML element pointer.
-      protected: rml::ElementPtr horzElem;
+      /// \brief Horizontal SDF element pointer.
+      protected: sdf::ElementPtr horzElem;
 
-      /// \brief Vertical RML element pointer.
-      protected: rml::ElementPtr vertElem;
+      /// \brief Vertical SDF element pointer.
+      protected: sdf::ElementPtr vertElem;
 
-      /// \brief Range RML element pointer.
-      protected: rml::ElementPtr rangeElem;
+      /// \brief Range SDF element pointer.
+      protected: sdf::ElementPtr rangeElem;
 
       /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;

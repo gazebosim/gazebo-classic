@@ -19,8 +19,8 @@
 
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
+#ifdef HAVE_SDF
+#include "sdf/sdf.hh"
 #else
 #include "gazebo/sdf/sdf.hh"
 #endif
@@ -30,21 +30,21 @@
 
 std::vector<std::string> params;
 
-using namespace rml;
+using namespace sdf;
 
 /////////////////////////////////////////////////
 void help()
 {
-  std::cout << "This tool provides information about RML files.\n\n";
-  std::cout << "gzrml <command>\n\n";
+  std::cout << "This tool provides information about SDF files.\n\n";
+  std::cout << "gzsdf <command>\n\n";
   std::cout << "Commands:\n";
-  std::cout << "    describe [RML version]     Print the RML format.\n";
+  std::cout << "    describe [SDF version]     Print the SDF format.\n";
   std::cout << "    convert [file]             "
             << "In place conversion to the latest format.\n";
-  std::cout << "    doc [RML version]          Print HTML RML.\n";
-  std::cout << "    check [file] [RML version] Check the RML format for the";
+  std::cout << "    doc [SDF version]          Print HTML SDF.\n";
+  std::cout << "    check [file] [SDF version] Check the SDF format for the";
   std::cout << " given file.\n";
-  std::cout << "    print [RML verison]         Prints RML, useful for ";
+  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
   std::cout << " debugging and as a conversion tool.\n\n";
 }
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzrml.log");
+    gazebo::common::Console::Instance()->Init("gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {
@@ -88,15 +88,15 @@ int main(int argc, char** argv)
   if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {
     if (params.size() == 3)
-      RML::version = params[2];
+      SDF::version = params[2];
   }
   else if (params.size() == 2)
-    RML::version = params[1];
+    SDF::version = params[1];
 
-  boost::shared_ptr<RML> rml(new RML());
-  if (!init(rml))
+  boost::shared_ptr<SDF> sdf(new SDF());
+  if (!init(sdf))
   {
-    std::cerr << "ERROR: RML parsing the xml failed" << std::endl;
+    std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
     return -1;
   }
 
@@ -112,9 +112,9 @@ int main(int argc, char** argv)
     if (!file_exists(params[1]))
       std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
-    if (!readFile(params[1], rml))
+    if (!readFile(params[1], sdf))
     {
-      std::cerr << "Error: RML parsing the xml failed\n";
+      std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
 
@@ -123,12 +123,12 @@ int main(int argc, char** argv)
   }
   else if (params[0] == "describe")
   {
-    rml->PrintDescription();
+    sdf->PrintDescription();
     success = true;
   }
   else if (params[0] == "doc")
   {
-    rml->PrintDoc();
+    sdf->PrintDoc();
     success = true;
   }
   else if (params[0] == "convert")
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
     if (params.size() < 2)
     {
       help();
-      std::cerr << "Error: Missing RML file to convert\n\n";
+      std::cerr << "Error: Missing SDF file to convert\n\n";
       return -1;
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
-      if (rml::Converter::Convert(&xmlDoc, RML::version, true))
+      if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
       {
         success = true;
 
@@ -176,13 +176,13 @@ int main(int argc, char** argv)
     if (!file_exists(params[1]))
       std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
-    if (!readFile(params[1], rml))
+    if (!readFile(params[1], sdf))
     {
-      std::cerr << "Error: RML parsing the xml failed\n";
+      std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
     success = true;
-    rml->PrintValues();
+    sdf->PrintValues();
   }
   else
   {

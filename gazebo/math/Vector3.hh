@@ -28,8 +28,8 @@
 
 /*
 #include <gazebo/gazebo_config.h>
-#if HAVE_RML
-#include <rml/rml.hh>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
 #endif
 */
 
@@ -77,16 +77,16 @@ namespace gazebo
       public: Vector3(const Vector3 &_v);
 
               /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
       /// Deprecated
-      public: Vector3(const rml::Vector3 &_v) __attribute__((deprecated));
+      public: Vector3(const sdf::Vector3 &_v) __attribute__((deprecated));
 
       /// Deprecated
-      public: Vector3 &operator =(const rml::Vector3 &_v)
+      public: Vector3 &operator =(const sdf::Vector3 &_v)
               __attribute__((deprecated));
 
       /// Deprecated
-      public: bool operator!=(const rml::Vector3 &_v) const
+      public: bool operator!=(const sdf::Vector3 &_v) const
               __attribute__((deprecated));
 #endif
 */

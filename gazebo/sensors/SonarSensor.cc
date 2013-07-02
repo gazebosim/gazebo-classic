@@ -68,10 +68,10 @@ std::string SonarSensor::GetTopic() const
 //////////////////////////////////////////////////
 void SonarSensor::Load(const std::string &_worldName)
 {
-  rml::ElementPtr sonarElem = this->rml->GetElement("sonar");
+  sdf::ElementPtr sonarElem = this->sdf->GetElement("sonar");
   if (!sonarElem)
   {
-    gzerr << "Sonar sensor is missing <sonar> RML element";
+    gzerr << "Sonar sensor is missing <sonar> SDF element";
     return;
   }
 

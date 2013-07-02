@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
@@ -55,9 +55,9 @@ namespace gazebo
 
       /// \brief Constructor
       ///
-      /// Build a WorldState from RML data
-      /// \param[in] _rml RML data to load a world state from.
-      public: explicit WorldState(const rml::ElementPtr _rml);
+      /// Build a WorldState from SDF data
+      /// \param[in] _sdf SDF data to load a world state from.
+      public: explicit WorldState(const sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~WorldState();
@@ -68,11 +68,11 @@ namespace gazebo
       /// \param[in] _world Pointer to a world
       public: void Load(const WorldPtr _world);
 
-      /// \brief Load state from RML element.
+      /// \brief Load state from SDF element.
       ///
-      /// Set a WorldState from an RML element containing WorldState info.
-      /// \param[in] _elem Pointer to the WorldState RML element.
-      public: virtual void Load(const rml::ElementPtr _elem);
+      /// Set a WorldState from an SDF element containing WorldState info.
+      /// \param[in] _elem Pointer to the WorldState SDF element.
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Set the world.
       /// \param[in] _world Pointer to the world.
@@ -116,9 +116,9 @@ namespace gazebo
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
-      /// \brief Populate a state RML element with data from the object.
-      /// \param[out] _rml RML element to populate.
-      public: void FillRML(rml::ElementPtr _rml);
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
 
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
@@ -202,7 +202,7 @@ namespace gazebo
       private: ModelState_M modelStates;
 
       /// \brief List of new added models. The
-      /// value is the RML that describes the model.
+      /// value is the SDF that describes the model.
       private: std::vector<std::string> insertions;
 
       /// \brief List of deleted models. Each string is the name of the

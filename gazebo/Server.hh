@@ -58,7 +58,7 @@ namespace gazebo
     public: bool LoadFile(const std::string &_filename="worlds/empty.world",
                           const std::string &_physics="");
 
-    public: bool LoadString(const std::string &_rmlString);
+    public: bool LoadString(const std::string &_sdfString);
     public: void Init();
     public: void Run();
     public: void Stop();
@@ -71,7 +71,7 @@ namespace gazebo
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
     /// \param[in] _physics Type of physics engine to use (ode|bullet).
-    private: bool LoadImpl(rml::ElementPtr _elem,
+    private: bool LoadImpl(sdf::ElementPtr _elem,
                            const std::string &_physics="");
 
     private: static void SigInt(int _v);

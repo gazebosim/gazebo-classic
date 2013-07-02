@@ -32,7 +32,7 @@ ContactPlugin::~ContactPlugin()
 }
 
 /////////////////////////////////////////////////
-void ContactPlugin::Load(sensors::SensorPtr _sensor, rml::ElementPtr /*_sdf*/)
+void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
   this->parentSensor =

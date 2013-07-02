@@ -234,7 +234,7 @@ void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 }
 
 //////////////////////////////////////////////////
-std::string SensorManager::CreateSensor(rml::ElementPtr _elem,
+std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
@@ -243,7 +243,6 @@ std::string SensorManager::CreateSensor(rml::ElementPtr _elem,
 
   if (!sensor)
   {
-    _elem->PrintValues("  ");
     gzerr << "Unable to create sensor of type[" << type << "]\n";
     return std::string();
   }

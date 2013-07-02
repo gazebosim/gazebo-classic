@@ -23,7 +23,7 @@
 #define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -66,8 +66,8 @@ namespace gazebo
       public: virtual ~DepthCamera();
 
       /// \brief Load the camera with a set of parmeters
-      /// \param[in] _rml The RML camera info
-      public: void Load(rml::ElementPtr &_rml);
+      /// \param[in] _sdf The SDF camera info
+      public: void Load(sdf::ElementPtr &_sdf);
 
        /// \brief Load the camera with default parmeters
       public: void Load();

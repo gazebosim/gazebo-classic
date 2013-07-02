@@ -76,11 +76,11 @@ TEST_F(ServerFixtureTest, LoadBullet)
 #endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
-// SpawnRML:
-// Verify that the SpawnRML function does not get stuck in a loop
+// SpawnSDF:
+// Verify that the SpawnSDF function does not get stuck in a loop
 // Gazebo issue #530
 ////////////////////////////////////////////////////////////////////////
-TEST_F(ServerFixtureTest, SpawnRML)
+TEST_F(ServerFixtureTest, SpawnSDF)
 {
   // Note the second argument of Load sets the pause state
   Load("worlds/blank.world", true);
@@ -90,7 +90,7 @@ TEST_F(ServerFixtureTest, SpawnRML)
 
   std::stringstream sdfStr;
   math::Pose pose(1, 2, 3, 0, 0, 0);
-  sdfStr << "<sdf version='" << RML_VERSION << "'>"
+  sdfStr << "<sdf version='" << SDF_VERSION << "'>"
          << "<model name='box'>"
          << "  <pose>" << pose << "</pose>"
          << "  <link name='link'>"
@@ -107,7 +107,7 @@ TEST_F(ServerFixtureTest, SpawnRML)
          << "  </link>"
          << "</model>"
          << "</sdf>";
-  SpawnRML(sdfStr.str());
+  SpawnSDF(sdfStr.str());
 
   physics::ModelPtr model;
   model = world->GetModel("box");

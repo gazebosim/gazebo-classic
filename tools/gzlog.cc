@@ -25,7 +25,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -36,7 +36,7 @@
 
 namespace po = boost::program_options;
 
-rml::ElementPtr g_stateSdf;
+sdf::ElementPtr g_stateSdf;
 
 /// \brief Base class for all filters.
 class FilterBase
@@ -606,7 +606,7 @@ class StateFilter : public FilterBase
 
             // Read and parse the state information
             g_stateSdf->ClearElements();
-            rml::readString(_stateString, g_stateSdf);
+            sdf::readString(_stateString, g_stateSdf);
             state.Load(g_stateSdf);
 
             std::ostringstream result;
@@ -622,7 +622,7 @@ class StateFilter : public FilterBase
 
             if (this->xmlOutput)
             {
-              result << "<rml version='" << RML_VERSION << "'>\n"
+              result << "<sdf version='" << SDF_VERSION << "'>\n"
                 << "<state world_name='" << state.GetName() << "'>\n"
                 << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
                 << "<real_time>" << state.GetRealTime() << "</real_time>\n"
@@ -632,7 +632,7 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</rml></state>\n";
+              result << "</sdf></state>\n";
 
             this->prevTime = state.GetSimTime();
             return result.str();
@@ -751,14 +751,14 @@ void info(const std::string &_filename)
 {
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
-  // Get the RML world description from the log file
-  std::string rmlString;
-  gazebo::util::LogPlay::Instance()->Step(rmlString);
+  // Get the SDF world description from the log file
+  std::string sdfString;
+  gazebo::util::LogPlay::Instance()->Step(sdfString);
 
-  // Parse the first RML world description
-  rml::ElementPtr rml(new rml::Element);
-  rml::initFile("root.rml", rml);
-  rml::readString(rmlString, rml);
+  // Parse the first SDF world description
+  sdf::ElementPtr sdf(new sdf::Element);
+  sdf::initFile("root.sdf", sdf);
+  sdf::readString(sdfString, sdf);
 
   gazebo::physics::WorldState state;
 
@@ -767,19 +767,19 @@ void info(const std::string &_filename)
   gazebo::common::Time endTime(0, 0);
   gazebo::common::Time startTime(0, 0);
 
-  if (rml)
+  if (sdf)
   {
     // Check for a world element
-    if (rml->HasElement("world"))
+    if (sdf->HasElement("world"))
     {
       // Get a pointer to the world element
-      rml::ElementPtr worldElem = rml->GetElement("world");
+      sdf::ElementPtr worldElem = sdf->GetElement("world");
 
       // Check for a model
       if (worldElem->HasElement("model"))
       {
         // Get a pointer to the first model element.
-        rml::ElementPtr modelElem = worldElem->GetElement("model");
+        sdf::ElementPtr modelElem = worldElem->GetElement("model");
 
         // Count all the model elements.
         while (modelElem)
@@ -806,7 +806,7 @@ void info(const std::string &_filename)
       play->GetChunk(play->GetChunkCount()-1, stateString);
 
       g_stateSdf->ClearElements();
-      rml::readString(stateString, g_stateSdf);
+      sdf::readString(stateString, g_stateSdf);
 
       state.Load(g_stateSdf);
       endTime = state.GetWallTime();
@@ -1017,9 +1017,9 @@ int main(int argc, char **argv)
 
   std::string command, filename, filter;
 
-  // Create a state rml element.
-  g_stateSdf.reset(new rml::Element);
-  rml::initFile("state.rml", g_stateSdf);
+  // Create a state sdf element.
+  g_stateSdf.reset(new sdf::Element);
+  sdf::initFile("state.sdf", g_stateSdf);
 
   // Get the command name
   command = vm.count("command") ? vm["command"].as<std::string>() : "";

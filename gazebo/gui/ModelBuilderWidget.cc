@@ -93,7 +93,7 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
   // TODO: Use messages so that the gui doesn't depend upon physics
   physics::init();
   this->world = physics::create_world("model_builder");
-  this->world->Load(rml::ElementPtr());
+  this->world->Load(sdf::ElementPtr());
   this->world->Init();
   this->world->SetPaused(true);
 
@@ -123,7 +123,7 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
     </link>\
   </model>";
 
-  msg.set_rml(newModelStr.str());
+  msg.set_sdf(newModelStr.str());
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("model_builder");

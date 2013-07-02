@@ -24,7 +24,7 @@ namespace gazebo
 {
   class AnimatePose : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr _parent, rml::ElementPtr /*_sdf*/)
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
       gazebo::common::PoseAnimationPtr anim(
           new gazebo::common::PoseAnimation("test", 1000.0, true));

@@ -29,7 +29,7 @@ SpringTestPlugin::SpringTestPlugin()
 
 /////////////////////////////////////////////////
 void SpringTestPlugin::Load(physics::ModelPtr _model,
-                           rml::ElementPtr _sdf)
+                           sdf::ElementPtr _sdf)
 {
   this->model = _model;
 

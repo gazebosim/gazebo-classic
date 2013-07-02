@@ -50,7 +50,7 @@ BulletLink::~BulletLink()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::Load(rml::ElementPtr _rml)
+void BulletLink::Load(sdf::ElementPtr _sdf)
 {
   this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
@@ -58,7 +58,7 @@ void BulletLink::Load(rml::ElementPtr _rml)
   if (this->bulletPhysics == NULL)
     gzthrow("Not using the bullet physics engine");
 
-  Link::Load(_rml);
+  Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -70,8 +70,8 @@ void BulletLink::Init()
 
   Link::Init();
 
-  GZ_ASSERT(this->rml != NULL, "Unable to initialize link, RML is NULL");
-  this->SetKinematic(this->rml->Get<bool>("kinematic"));
+  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
@@ -167,7 +167,7 @@ void BulletLink::Init()
     this->rigidLink->setDeactivationTime(1.0);
   }
 
-  this->SetGravityMode(this->rml->Get<bool>("gravity"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -234,7 +234,7 @@ bool BulletLink::GetGravityMode() const
 //////////////////////////////////////////////////
 void BulletLink::SetSelfCollide(bool _collide)
 {
-  this->rml->GetElement("self_collide")->Set(_collide);
+  this->sdf->GetElement("self_collide")->Set(_collide);
 }
 
 //////////////////////////////////////////////////

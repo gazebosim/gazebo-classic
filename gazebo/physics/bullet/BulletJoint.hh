@@ -46,7 +46,7 @@ namespace gazebo
       public: virtual ~BulletJoint();
 
       /// \brief Load a BulletJoint
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint
       public: virtual void Reset();

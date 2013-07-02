@@ -45,9 +45,9 @@ BulletScrewJoint::~BulletScrewJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::Load(rml::ElementPtr _rml)
+void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 {
-  ScrewJoint<BulletJoint>::Load(_rml);
+  ScrewJoint<BulletJoint>::Load(_sdf);
   this->SetThreadPitch(0, this->threadPitch);
 }
 

@@ -46,9 +46,9 @@ BulletHingeJoint::~BulletHingeJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::Load(rml::ElementPtr _rml)
+void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 {
-  HingeJoint<BulletJoint>::Load(_rml);
+  HingeJoint<BulletJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -152,9 +152,9 @@ void BulletHingeJoint::Init()
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->rml != NULL, "Joint rml member is NULL");
-  rml::ElementPtr limitElem;
-  limitElem = this->rml->GetElement("axis")->GetElement("limit");
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  sdf::ElementPtr limitElem;
+  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
     this->angleOffset + limitElem->Get<double>("lower"),
     this->angleOffset + limitElem->Get<double>("upper"));

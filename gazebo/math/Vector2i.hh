@@ -29,8 +29,8 @@
 /*
 // Remove in gazebo 2.0
 #include <gazebo/gazebo_config.h>
-#if HAVE_RML
-#include <rml/rml.hh>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
 #endif
 */
 
@@ -60,12 +60,12 @@ namespace gazebo
       public: Vector2i(const Vector2i &_pt);
 
               /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
       /// Deprecated
-      public: Vector2i(const rml::Vector2i &_pt) __attribute__((deprecated));
+      public: Vector2i(const sdf::Vector2i &_pt) __attribute__((deprecated));
 
       /// Deprecated
-      public: Vector2i &operator =(const rml::Vector2i &_v)
+      public: Vector2i &operator =(const sdf::Vector2i &_v)
               __attribute__((deprecated));
 #endif*/
 

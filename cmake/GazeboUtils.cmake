@@ -167,7 +167,7 @@ macro (gz_build_tests)
       )
 
 
-    if (NOT HAVE_RML)
+    if (NOT HAVE_SDF)
       target_link_libraries(${BINARY_NAME}
         libgtest.a
         libgtest_main.a
@@ -250,7 +250,7 @@ if (VALID_DISPLAY)
       gazebo_transport
       )
 
-    if (NOT HAVE_RML)
+    if (NOT HAVE_SDF)
       target_link_libraries(${BINARY_NAME}
         gazebo_gui
         gazebo_sdf_interface

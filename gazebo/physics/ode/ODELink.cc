@@ -53,7 +53,7 @@ ODELink::~ODELink()
 }
 
 //////////////////////////////////////////////////
-void ODELink::Load(rml::ElementPtr _rml)
+void ODELink::Load(sdf::ElementPtr _sdf)
 {
   this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
@@ -61,7 +61,7 @@ void ODELink::Load(rml::ElementPtr _rml)
   if (this->odePhysics == NULL)
     gzthrow("Not using the ode physics engine");
 
-  Link::Load(_rml);
+  Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -86,9 +86,9 @@ void ODELink::Init()
     }
   }
 
-  GZ_ASSERT(this->rml != NULL, "Unable to initialize link, RML is NULL");
-  this->SetKinematic(this->rml->Get<bool>("kinematic"));
-  this->SetGravityMode(this->rml->Get<bool>("gravity"));
+  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -212,7 +212,7 @@ void ODELink::Update()
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
-  this->rml->GetElement("gravity")->Set(_mode);
+  this->sdf->GetElement("gravity")->Set(_mode);
   if (this->linkId)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
@@ -245,7 +245,7 @@ bool ODELink::GetGravityMode() const
 //////////////////////////////////////////////////
 void ODELink::SetSelfCollide(bool _collide)
 {
-  this->rml->GetElement("self_collide")->Set(_collide);
+  this->sdf->GetElement("self_collide")->Set(_collide);
   if (_collide)
     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
 }
@@ -697,7 +697,7 @@ void ODELink::SetAngularDamping(double _damping)
 //////////////////////////////////////////////////
 void ODELink::SetKinematic(const bool &_state)
 {
-  this->rml->GetElement("kinematic")->Set(_state);
+  this->sdf->GetElement("kinematic")->Set(_state);
   if (this->linkId)
   {
     if (_state && !dBodyIsKinematic(this->linkId))

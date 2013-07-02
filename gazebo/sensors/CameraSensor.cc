@@ -59,9 +59,9 @@ void CameraSensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::Load(const std::string &_worldName, rml::ElementPtr _rml)
+void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_worldName, _rml);
+  Sensor::Load(_worldName, _sdf);
 }
 
 //////////////////////////////////////////////////
@@ -110,7 +110,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->rml->Get<std::string>("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -119,7 +119,7 @@ void CameraSensor::Init()
     }
     this->camera->SetCaptureData(true);
 
-    rml::ElementPtr cameraSdf = this->rml->GetElement("camera");
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks

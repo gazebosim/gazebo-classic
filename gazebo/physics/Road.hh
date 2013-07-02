@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \class Road Road.hh physics/physics.hh
-    /// \brief for building a Road from RML
+    /// \brief for building a Road from SDF
     class Road : public Base
     {
       /// \brief Constructor.
@@ -41,9 +41,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Road();
 
-      /// \brief Load the road from RML.
-      /// \param[in] _rml RML values to load from.
-      public: void Load(rml::ElementPtr _rml);
+      /// \brief Load the road from SDF.
+      /// \param[in] _sdf SDF values to load from.
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the road.
       public: virtual void Init();

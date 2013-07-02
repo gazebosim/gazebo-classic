@@ -24,7 +24,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -98,8 +98,8 @@ namespace gazebo
       public: virtual ~Scene();
 
       /// \brief Load the scene from a set of parameters.
-      /// \param[in] _scene RML scene element to load.
-      public: void Load(rml::ElementPtr _scene);
+      /// \param[in] _scene SDF scene element to load.
+      public: void Load(sdf::ElementPtr _scene);
 
       /// \brief Load the scene with default parameters.
       public: void Load();
@@ -555,17 +555,17 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual);
 
-      /// \brief Create a center of mass visual using RML data.
-      /// \param[in] _elem RML element data.
+      /// \brief Create a center of mass visual using SDF data.
+      /// \param[in] _elem SDF element data.
       /// \param[in] _linkVisual Pointer to the link's visual.
-      private: void CreateCOMVisual(rml::ElementPtr _elem,
+      private: void CreateCOMVisual(sdf::ElementPtr _elem,
                                     VisualPtr _linkVisual);
 
       /// \brief Name of the scene.
       private: std::string name;
 
-      /// \brief Scene RML element.
-      private: rml::ElementPtr rml;
+      /// \brief Scene SDF element.
+      private: sdf::ElementPtr sdf;
 
       /// \brief All the cameras.
       private: std::vector<CameraPtr> cameras;

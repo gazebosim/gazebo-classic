@@ -28,7 +28,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -614,40 +614,40 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (modelXML)
     {
-      TiXmlElement *rmlXML = modelXML->FirstChildElement("rml");
+      TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
       bool sdf = false;
-      if (!rmlXML)
+      if (!sdfXML)
       {
-        rmlXML = modelXML->FirstChildElement("sdf");
+        sdfXML = modelXML->FirstChildElement("sdf");
         sdf = true;
       }
 
-      TiXmlElement *rmlSearch = rmlXML;
+      TiXmlElement *sdfSearch = sdfXML;
 
-      // Find the RML element that matches our current RML version.
-      while (rmlSearch)
+      // Find the SDF element that matches our current SDF version.
+      while (sdfSearch)
       {
-        if (rmlSearch->Attribute("version") &&
-            std::string(rmlSearch->Attribute("version")) == RML_VERSION)
+        if (sdfSearch->Attribute("version") &&
+            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
         {
-          rmlXML = rmlSearch;
+          sdfXML = sdfSearch;
           break;
         }
 
         if (sdf)
-          rmlSearch = rmlSearch->NextSiblingElement("sdf");
+          sdfSearch = sdfSearch->NextSiblingElement("sdf");
         else
-          rmlSearch = rmlSearch->NextSiblingElement("rml");
+          sdfSearch = sdfSearch->NextSiblingElement("sdf");
       }
 
-      if (rmlXML)
+      if (sdfXML)
       {
-        result = path + "/" + rmlXML->GetText();
+        result = path + "/" + sdfXML->GetText();
       }
       else
       {
         gzerr << "Manifest[" << manifestPath << "] doesn't have "
-              << "<model><rml>...</rml></model> element.\n";
+              << "<model><sdf>...</sdf></model> element.\n";
       }
     }
     else

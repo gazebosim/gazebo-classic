@@ -48,7 +48,7 @@ namespace gazebo
       public: virtual ~BulletHinge2Joint();
 
       /// \brief Load the BulletHinge2Joint
-      protected: virtual void Load(rml::ElementPtr _rml);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
       public: virtual void Attach(LinkPtr _one, LinkPtr _two);

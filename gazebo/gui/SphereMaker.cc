@@ -156,10 +156,10 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-std::string SphereMaker::GetRMLString()
+std::string SphereMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<rml version ='" << RML_VERSION << "'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='unit_sphere_" << counter << "'>"
     << "  <pose>0 0 0.5 0 0 0</pose>"
     << "  <link name='link'>"
@@ -182,7 +182,7 @@ std::string SphereMaker::GetRMLString()
     << "    </visual>"
     << "  </link>"
     << "  </model>"
-    << "</rml>";
+    << "</sdf>";
 
   return newModelStr.str();
 }
@@ -192,7 +192,7 @@ std::string SphereMaker::GetRMLString()
 void SphereMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  msg.set_rml(this->GetRMLString());
+  msg.set_sdf(this->GetSDFString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

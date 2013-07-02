@@ -24,12 +24,12 @@ class ForceTorqueSensor_TEST : public ServerFixture
 };
 
 static std::string forceTorqueSensorString =
-"<rml version='1.4'>"
+"<sdf version='1.4'>"
 "  <sensor name='force_torque' type='force_torque'>"
 "    <update_rate>30</update_rate>"
 "    <always_on>true</always_on>"
 "  </sensor>"
-"</rml>";
+"</sdf>";
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a ForceTorque sensor
@@ -38,12 +38,12 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   Load("worlds/pioneer2dx.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  rml::ElementPtr rml(new rml::Element);
-  rml::initFile("sensor.rml", rml);
-  rml::readString(forceTorqueSensorString, rml);
+  sdf::ElementPtr sdf(new sdf::Element);
+  sdf::initFile("sensor.sdf", sdf);
+  sdf::readString(forceTorqueSensorString, sdf);
 
   // Create the Ray sensor
-  std::string sensorName = mgr->CreateSensor(rml, "default",
+  std::string sensorName = mgr->CreateSensor(sdf, "default",
       "pioneer2dx::left_wheel_hinge");
 
   // Make sure the returned sensor name is correct

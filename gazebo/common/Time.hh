@@ -29,8 +29,8 @@
 
 // Remove in gazebo 2.0
 /*#include <gazebo/gazebo_config.h>
-#if HAVE_RML
-#include <rml/rml.hh>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
 #endif
 */
 
@@ -59,12 +59,12 @@ namespace gazebo
       public: Time(const Time &_time);
 
               /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
       /// Deprecated
-      public: Time(const rml::Time &_time) GAZEBO_DEPRECATED(1.9);
+      public: Time(const sdf::Time &_time) GAZEBO_DEPRECATED(1.9);
 
       /// Deprecated
-      public: Time &operator =(const rml::Time &_time) GAZEBO_DEPRECATED(1.9);
+      public: Time &operator =(const sdf::Time &_time) GAZEBO_DEPRECATED(1.9);
 #endif
 */
 

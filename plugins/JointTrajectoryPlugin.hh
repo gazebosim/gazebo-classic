@@ -41,7 +41,7 @@ namespace gazebo
     public: virtual ~JointTrajectoryPlugin();
 
     /// \brief Load the controller
-    public: void Load(physics::ModelPtr _parent, rml::ElementPtr _sdf);
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Update the controller
     /// \param[in] _info Update information provided by the server.

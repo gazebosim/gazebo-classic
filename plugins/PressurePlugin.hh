@@ -45,7 +45,7 @@ namespace gazebo
     public: virtual ~PressurePlugin();
 
     // Documentation inherited.
-    public: virtual void Load(sensors::SensorPtr _sensor, rml::ElementPtr _sdf);
+    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     // Documentation inherited.
     public: virtual void Init();

@@ -31,7 +31,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -71,11 +71,11 @@ namespace gazebo
       /// \brief Destructor.
       public: ~World();
 
-      /// \brief Load the world using RML parameters.
+      /// \brief Load the world using SDF parameters.
       ///
-      /// Load a world from and RML pointer.
-      /// \param[in] _rml RML parameters.
-      public: void Load(rml::ElementPtr _rml);
+      /// Load a world from and SDF pointer.
+      /// \param[in] _sdf SDF parameters.
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Save a world to a file.
       ///
@@ -234,23 +234,23 @@ namespace gazebo
       /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
 
-      /// \brief Insert a model from an RML file.
+      /// \brief Insert a model from an SDF file.
       ///
-      /// Spawns a model into the world base on and RML file.
-      /// \param[in] _rmlFilename The name of the RML file (including path).
-      public: void InsertModelFile(const std::string &_rmlFilename);
+      /// Spawns a model into the world base on and SDF file.
+      /// \param[in] _sdfFilename The name of the SDF file (including path).
+      public: void InsertModelFile(const std::string &_sdfFilename);
 
-      /// \brief Insert a model from an RML string.
+      /// \brief Insert a model from an SDF string.
       ///
-      /// Spawns a model into the world base on and RML string.
-      /// \param[in] _rmlString A string containing valid RML markup.
-      public: void InsertModelString(const std::string &_rmlString);
+      /// Spawns a model into the world base on and SDF string.
+      /// \param[in] _sdfString A string containing valid SDF markup.
+      public: void InsertModelString(const std::string &_sdfString);
 
-      /// \brief Insert a model using RML.
+      /// \brief Insert a model using SDF.
       ///
-      /// Spawns a model into the world base on and RML object.
-      /// \param[in] _rml A reference to an RML object.
-      public: void InsertModelRML(const rml::RML &_rml);
+      /// Spawns a model into the world base on and SDF object.
+      /// \param[in] _sdf A reference to an SDF object.
+      public: void InsertModelSDF(const sdf::SDF &_sdf);
 
       /// \brief Return a version of the name with "<world_name>::" removed
       /// \param[in] _name Usually the name of an entity.
@@ -276,10 +276,10 @@ namespace gazebo
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
       /// \param[in] _name A unique name for the plugin.
-      /// \param[in] _rml The RML to pass into the plugin.
+      /// \param[in] _sdf The SDF to pass into the plugin.
       public: void LoadPlugin(const std::string &_filename,
                               const std::string &_name,
-                              rml::ElementPtr _rml);
+                              sdf::ElementPtr _sdf);
 
       /// \brief Remove a running plugin.
       /// \param[in] _name The unique name of the plugin to remove.
@@ -300,8 +300,8 @@ namespace gazebo
       public: void EnablePhysicsEngine(bool _enable)
               {this->enablePhysicsEngine = _enable;}
 
-      /// \brief Update the state RML value from the current state.
-      public: void UpdateStateRML();
+      /// \brief Update the state SDF value from the current state.
+      public: void UpdateStateSDF();
 
       /// \brief Return true if the world has been loaded.
       /// \return True if World::Load has completed.
@@ -326,31 +326,31 @@ namespace gazebo
 
       /// \brief Load all plugins.
       ///
-      /// Load all plugins specified in the RML for the model.
+      /// Load all plugins specified in the SDF for the model.
       private: void LoadPlugins();
 
       /// \brief Create and load all entities.
-      /// \param[in] _rml RML element.
+      /// \param[in] _sdf SDF element.
       /// \param[in] _parent Parent of the model to load.
-      private: void LoadEntities(rml::ElementPtr _rml, BasePtr _parent);
+      private: void LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load a model.
-      /// \param[in] _rml RML element containing the Model description.
+      /// \param[in] _sdf SDF element containing the Model description.
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
-      private: ModelPtr LoadModel(rml::ElementPtr _rml, BasePtr _parent);
+      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load an actor.
-      /// \param[in] _rml RML element containing the Actor description.
+      /// \param[in] _sdf SDF element containing the Actor description.
       /// \param[in] _parent Parent of the Actor.
       /// \return Pointer to the newly created Actor.
-      private: ActorPtr LoadActor(rml::ElementPtr _rml, BasePtr _parent);
+      private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load a road.
-      /// \param[in] _rml RML element containing the Road description.
+      /// \param[in] _sdf SDF element containing the Road description.
       /// \param[in] _parent Parent of the Road.
       /// \return Pointer to the newly created Road.
-      private: RoadPtr LoadRoad(rml::ElementPtr _rml, BasePtr _parent);
+      private: RoadPtr LoadRoad(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Function to run physics. Used by physicsThread.
       private: void RunLoop();
@@ -407,9 +407,9 @@ namespace gazebo
       /// \brief Single loop verison of model updating.
       private: void ModelUpdateSingleLoop();
 
-      /// \brief Helper function to load a plugin from RML.
-      /// \param[in] _rml RML plugin description.
-      private: void LoadPlugin(rml::ElementPtr _rml);
+      /// \brief Helper function to load a plugin from SDF.
+      /// \param[in] _sdf SDF plugin description.
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       /// \brief Fills a model message with data from a model
       /// \param[out] _msg Model message to fill.
@@ -566,8 +566,8 @@ namespace gazebo
       /// World::SetPaused to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
-      /// \brief THe world's RML values.
-      private: rml::ElementPtr rml;
+      /// \brief THe world's SDF values.
+      private: sdf::ElementPtr sdf;
 
       /// \brief All the plugins.
       private: std::vector<WorldPluginPtr> plugins;
@@ -634,12 +634,12 @@ namespace gazebo
       private: WorldState prevStates[2];
       private: int stateToggle;
 
-      private: rml::ElementPtr logPlayStateRML;
+      private: sdf::ElementPtr logPlayStateSDF;
       private: WorldState logPlayState;
 
-      /// \brief Store a factory RML object to improve speed at which
+      /// \brief Store a factory SDF object to improve speed at which
       /// objects are inserted via the factory.
-      private: rml::RMLPtr factoryRML;
+      private: sdf::SDFPtr factorySDF;
 
       /// \brief The list of models that need to publish their pose.
       private: std::set<ModelPtr> publishModelPoses;

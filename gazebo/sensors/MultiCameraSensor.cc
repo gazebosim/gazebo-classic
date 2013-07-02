@@ -106,7 +106,7 @@ void MultiCameraSensor::Init()
   }
 
   // Create and initialize all the cameras
-  rml::ElementPtr cameraSdf = this->rml->GetElement("camera");
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
     rendering::CameraPtr camera = scene->CreateCamera(

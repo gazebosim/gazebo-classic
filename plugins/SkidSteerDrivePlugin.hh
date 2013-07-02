@@ -39,8 +39,8 @@ namespace gazebo
 
     /// \brief Called when the plugin is loaded
     /// \param[in] _model Pointer to the model for which the plugin is loaded
-    /// \param[in] _sdf Pointer to the RML for _model
-    public: void Load(physics::ModelPtr _model, rml::ElementPtr _sdf);
+    /// \param[in] _sdf Pointer to the SDF for _model
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \def ID for each of the four wheels
     public: enum {RIGHT_FRONT, RIGHT_REAR, LEFT_FRONT, LEFT_REAR};
@@ -70,10 +70,10 @@ namespace gazebo
     /// \brief Max force limit for each wheel joint (Default 5.0)
     private: double maxForce;
 
-    /// \brief Distance between wheels on the same axis (Determined from RML)
+    /// \brief Distance between wheels on the same axis (Determined from SDF)
     private: double wheelSeparation;
 
-    /// \brief Radius of the wheels (Determined from RML)
+    /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
   };
 }

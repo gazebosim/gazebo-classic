@@ -48,9 +48,9 @@ namespace gazebo
       public: virtual ~Gripper();
 
       /// \brief Load the gripper.
-      /// \param[in] _rml Shared point to an rml element that contains the list
+      /// \param[in] _sdf Shared point to an sdf element that contains the list
       /// of links in the gripper.
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize.
       public: virtual void Init();

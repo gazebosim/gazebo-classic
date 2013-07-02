@@ -51,8 +51,8 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
-  this->rml.reset(new rml::Element);
-  rml::initFile("visual.rml", this->rml);
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -95,8 +95,8 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
-  this->rml.reset(new rml::Element);
-  rml::initFile("visual.rml", this->rml);
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -147,8 +147,8 @@ Visual::~Visual()
     this->sceneNode = NULL;
   }
 
-  this->rml->Reset();
-  this->rml.reset();
+  this->sdf->Reset();
+  this->sdf.reset();
   this->parent.reset();
   this->children.clear();
 }
@@ -189,7 +189,7 @@ void Visual::Fini()
 VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
-  result->Load(this->rml);
+  result->Load(this->sdf);
 
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
@@ -251,38 +251,38 @@ void Visual::Init()
 //////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
-  rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
   geomElem->ClearElements();
 
   if (_msg->has_geometry())
   {
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      rml::ElementPtr elem = geomElem->AddElement("box");
+      sdf::ElementPtr elem = geomElem->AddElement("box");
       elem->GetElement("size")->Set(
           msgs::Convert(_msg->geometry().box().size()));
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
-      rml::ElementPtr elem = geomElem->AddElement("sphere");
+      sdf::ElementPtr elem = geomElem->AddElement("sphere");
       elem->GetElement("radius")->Set(_msg->geometry().sphere().radius());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      rml::ElementPtr elem = geomElem->AddElement("cylinder");
+      sdf::ElementPtr elem = geomElem->AddElement("cylinder");
       elem->GetElement("radius")->Set(_msg->geometry().cylinder().radius());
       elem->GetElement("length")->Set(_msg->geometry().cylinder().length());
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
       math::Plane plane = msgs::Convert(_msg->geometry().plane());
-      rml::ElementPtr elem = geomElem->AddElement("plane");
+      sdf::ElementPtr elem = geomElem->AddElement("plane");
       elem->GetElement("normal")->Set(plane.normal);
       elem->GetElement("size")->Set(plane.size);
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
-      rml::ElementPtr elem = geomElem->AddElement("mesh");
+      sdf::ElementPtr elem = geomElem->AddElement("mesh");
       elem->GetElement("uri")->Set(_msg->geometry().mesh().filename());
 
       if (_msg->geometry().mesh().has_submesh())
@@ -301,7 +301,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_pose())
   {
-    rml::ElementPtr elem = this->rml->GetElement("pose");
+    sdf::ElementPtr elem = this->sdf->GetElement("pose");
     math::Pose p(msgs::Convert(_msg->pose().position()),
                   msgs::Convert(_msg->pose().orientation()));
 
@@ -312,54 +312,54 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      rml::ElementPtr elem =
-        this->rml->GetElement("material")->GetElement("script");
+      sdf::ElementPtr elem =
+        this->sdf->GetElement("material")->GetElement("script");
       elem->GetElement("name")->Set(_msg->material().script().name());
       for (int i = 0; i < _msg->material().script().uri_size(); ++i)
       {
-        rml::ElementPtr uriElem = elem->AddElement("uri");
+        sdf::ElementPtr uriElem = elem->AddElement("uri");
         uriElem->Set(_msg->material().script().uri(i));
       }
     }
 
     if (_msg->material().has_ambient())
     {
-      rml::ElementPtr elem = this->rml->GetElement("material");
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
       elem->GetElement("ambient")->Set(
           msgs::Convert(_msg->material().ambient()));
     }
 
     if (_msg->material().has_diffuse())
     {
-      rml::ElementPtr elem = this->rml->GetElement("material");
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
       elem->GetElement("diffuse")->Set(
           msgs::Convert(_msg->material().diffuse()));
     }
 
     if (_msg->material().has_specular())
     {
-      rml::ElementPtr elem = this->rml->GetElement("material");
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
       elem->GetElement("specular")->Set(
           msgs::Convert(_msg->material().specular()));
     }
 
     if (_msg->material().has_emissive())
     {
-      rml::ElementPtr elem = this->rml->GetElement("material");
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
       elem->GetElement("emissive")->Set(
           msgs::Convert(_msg->material().emissive()));
     }
   }
 
   if (_msg->has_cast_shadows())
-    this->rml->GetElement("cast_shadows")->Set(_msg->cast_shadows());
+    this->sdf->GetElement("cast_shadows")->Set(_msg->cast_shadows());
 
   if (_msg->has_laser_retro())
-    this->rml->GetElement("laser_retro")->Set(_msg->laser_retro());
+    this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
   if (_msg->has_plugin())
   {
-    rml::ElementPtr elem = this->rml->GetElement("plugin");
+    sdf::ElementPtr elem = this->sdf->GetElement("plugin");
     if (_msg->plugin().has_name())
       elem->GetAttribute("name")->Set(_msg->plugin().name());
     if (_msg->plugin().has_filename())
@@ -368,7 +368,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       TiXmlDocument innerXML;
       innerXML.Parse(_msg->plugin().innerxml().c_str());
-      rml::copyChildren(elem, innerXML.RootElement());
+      sdf::copyChildren(elem, innerXML.RootElement());
     }
   }
 
@@ -377,9 +377,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 }
 
 //////////////////////////////////////////////////
-void Visual::Load(rml::ElementPtr _rml)
+void Visual::Load(sdf::ElementPtr _sdf)
 {
-  this->rml->Copy(_rml);
+  this->sdf->Copy(_sdf);
   this->Load();
   this->scene->AddVisual(shared_from_this());
 }
@@ -396,7 +396,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->rml->Get<math::Pose>("pose");
+  pose = this->sdf->Get<math::Pose>("pose");
 
   std::string meshName = this->GetMeshName();
   std::string subMeshName = this->GetSubMeshName();
@@ -428,7 +428,7 @@ void Visual::Load()
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
     {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
-          this->rml->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
+          this->sdf->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
     }
   }
 
@@ -443,13 +443,13 @@ void Visual::Load()
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
 
   // Set the material of the mesh
-  if (this->rml->HasElement("material"))
+  if (this->sdf->HasElement("material"))
   {
-    rml::ElementPtr matElem = this->rml->GetElement("material");
+    sdf::ElementPtr matElem = this->sdf->GetElement("material");
     if (matElem->HasElement("script"))
     {
-      rml::ElementPtr scriptElem = matElem->GetElement("script");
-      rml::ElementPtr uriElem = scriptElem->GetElement("uri");
+      sdf::ElementPtr scriptElem = matElem->GetElement("script");
+      sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
 
       // Add all the URI paths to the render engine
       while (uriElem)
@@ -476,7 +476,7 @@ void Visual::Load()
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->rml->Get<bool>("cast_shadows"));
+  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
 }
 
@@ -522,7 +522,7 @@ void Visual::Update()
 void Visual::SetName(const std::string &_name)
 {
   this->name = _name;
-  this->rml->GetAttribute("name")->Set(_name);
+  this->sdf->GetAttribute("name")->Set(_name);
 }
 
 //////////////////////////////////////////////////
@@ -576,8 +576,8 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 {
   // This code makes plane render before grids. This allows grids to overlay
   // planes, and then other elements to overlay both planes and grids.
-  // if (this->rml->HasElement("geometry"))
-  // if (this->rml->GetElement("geometry")->HasElement("plane"))
+  // if (this->sdf->HasElement("geometry"))
+  // if (this->sdf->GetElement("geometry")->HasElement("plane"))
   // _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
 
   if (!this->HasAttachedObject(_obj->getName()))
@@ -681,7 +681,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
@@ -702,9 +702,9 @@ void Visual::SetScale(const math::Vector3 &_scale)
 math::Vector3 Visual::GetScale()
 {
   math::Vector3 result(1, 1, 1);
-  if (this->rml->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
-    rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
     if (geomElem->HasElement("box"))
     {
@@ -1410,7 +1410,7 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  std::string file = this->rml->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->Get<std::string>();
 
   std::string uriFile = common::find_file(file);
@@ -1423,7 +1423,7 @@ std::string Visual::GetNormalMap() const
 //////////////////////////////////////////////////
 void Visual::SetNormalMap(const std::string &_nmap)
 {
-  this->rml->GetElement("material")->GetElement(
+  this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
   if (this->useRTShader)
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1432,14 +1432,14 @@ void Visual::SetNormalMap(const std::string &_nmap)
 //////////////////////////////////////////////////
 std::string Visual::GetShaderType() const
 {
-  return this->rml->GetElement("material")->GetElement(
+  return this->sdf->GetElement("material")->GetElement(
       "shader")->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 void Visual::SetShaderType(const std::string &_type)
 {
-  this->rml->GetElement("material")->GetElement(
+  this->sdf->GetElement("material")->GetElement(
       "shader")->GetAttribute("type")->Set(_type);
   if (this->useRTShader)
     RTShaderSystem::Instance()->UpdateShaders();
@@ -2023,9 +2023,9 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-  if (this->rml->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
-    rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("plane"))
       return true;
   }
@@ -2043,9 +2043,9 @@ bool Visual::IsPlane() const
 //////////////////////////////////////////////////
 std::string Visual::GetMeshName() const
 {
-  if (this->rml->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
-    rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("box"))
       return "unit_box";
     else if (geomElem->HasElement("sphere"))
@@ -2056,15 +2056,13 @@ std::string Visual::GetMeshName() const
       return "unit_plane";
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
-      rml::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
       std::string uri = tmpElem->Get<std::string>("uri");
       if (uri.empty())
       {
         gzerr << "<uri> element missing for geometry element:\n";
-        geomElem->PrintValues("  ");
-
         return std::string();
       }
 
@@ -2085,12 +2083,12 @@ std::string Visual::GetSubMeshName() const
 {
   std::string result;
 
-  if (this->rml->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
-    rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("mesh"))
     {
-      rml::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
         result = tmpElem->GetElement("submesh")->Get<std::string>("name");
     }
@@ -2104,12 +2102,12 @@ bool Visual::GetCenterSubMesh() const
 {
   bool result = false;
 
-  if (this->rml->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
-    rml::ElementPtr geomElem = this->rml->GetElement("geometry");
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("mesh"))
     {
-      rml::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
         result = tmpElem->GetElement("submesh")->Get<bool>("center");
     }
@@ -2335,9 +2333,9 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 //////////////////////////////////////////////////
 void Visual::LoadPlugins()
 {
-  if (this->rml->HasElement("plugin"))
+  if (this->sdf->HasElement("plugin"))
   {
-    rml::ElementPtr pluginElem = this->rml->GetElement("plugin");
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
@@ -2356,7 +2354,7 @@ void Visual::LoadPlugins()
 //////////////////////////////////////////////////
 void Visual::LoadPlugin(const std::string &_filename,
                        const std::string &_name,
-                       rml::ElementPtr _rml)
+                       sdf::ElementPtr _sdf)
 {
   gazebo::VisualPluginPtr plugin = gazebo::VisualPlugin::Create(_filename,
                                                               _name);
@@ -2370,7 +2368,7 @@ void Visual::LoadPlugin(const std::string &_filename,
             << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
       return;
     }
-    plugin->Load(shared_from_this(), _rml);
+    plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
 
     if (this->initialized)
@@ -2393,9 +2391,9 @@ void Visual::RemovePlugin(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void Visual::LoadPlugin(rml::ElementPtr _rml)
+void Visual::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _rml->Get<std::string>("name");
-  std::string filename = _rml->Get<std::string>("filename");
-  this->LoadPlugin(filename, pluginName, _rml);
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
+  this->LoadPlugin(filename, pluginName, _sdf);
 }

@@ -53,15 +53,15 @@ namespace gazebo
       public: virtual void Fini();
 
       /// \brief Load the collision.
-      /// \param[in] _rml RML to load from.
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] _sdf SDF to load from.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the collision.
       public: virtual void Init();
 
-      /// \brief Update the parameters using new rml values.
-      /// \param[in] _rml RML values to update from.
-      public: virtual void UpdateParameters(rml::ElementPtr _rml);
+      /// \brief Update the parameters using new sdf values.
+      /// \param[in] _sdf SDF values to update from.
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _placeable True to make the object movable.

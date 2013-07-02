@@ -25,7 +25,7 @@
 #include "gazebo/sdf/interface/Param.hh"
 
 #define SDF_VERSION "1.4"
-#define RML_VERSION "1.4"
+#define SDF_VERSION "1.4"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser
@@ -34,7 +34,7 @@ namespace sdf
   class SDF;
   class Element;
   typedef boost::shared_ptr<SDF> SDFPtr;
-  typedef boost::shared_ptr<SDF> RMLPtr;
+  typedef boost::shared_ptr<SDF> SDFPtr;
   typedef boost::shared_ptr<Element> ElementPtr;
   typedef std::vector< ElementPtr > ElementPtr_V;
 
@@ -313,12 +313,7 @@ namespace sdf
 
     public: static std::string version;
   };
-
-  class RML : public SDF
-  {
-  };
   /// \}
 }
 
-namespace rml = sdf;
 #endif

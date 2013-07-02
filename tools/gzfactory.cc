@@ -28,7 +28,7 @@ void help()
   std::cerr << "This tool for spawning or deleting models into or from a "
             << "running Gazebo simulation.\n\n"
             << "  gzfactory <spawn|delete> [options]\n"
-            << "    spawn   : Spawn new model. Must specify a RML model file.\n"
+            << "    spawn   : Spawn new model. Must specify a SDF model file.\n"
             << "    delete  : Delete existing model. Must specify model name.\n"
             << "\n\n";
 }
@@ -60,20 +60,20 @@ void Spawn(po::variables_map &_vm)
     return;
   }
 
-  boost::shared_ptr<rml::RML> sdf(new rml::RML());
-  if (!rml::init(sdf))
+  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+  if (!sdf::init(sdf))
   {
-    std::cerr << "ERROR: RML parsing the xml failed" << std::endl;
+    std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
     return;
   }
 
-  if (!rml::readFile(filename, sdf))
+  if (!sdf::readFile(filename, sdf))
   {
-    std::cerr << "Error: RML parsing the xml failed\n";
+    std::cerr << "Error: SDF parsing the xml failed\n";
     return;
   }
 
-  rml::ElementPtr modelElem = sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = sdf->root->GetElement("model");
 
   if (!modelElem)
   {
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "produce this help message")
-    ("sdf,f", po::value<std::string>(), "RML model file.")
+    ("sdf,f", po::value<std::string>(), "SDF model file.")
     ("world-name,w", po::value<std::string>(), "Name of Gazebo world.")
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("pose-x,x", po::value<double>(), "set model x position.")

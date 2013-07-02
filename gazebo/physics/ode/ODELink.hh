@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~ODELink();
 
       // Documentation inherited
-      public: virtual void Load(rml::ElementPtr _rml);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
       public: virtual void Init();

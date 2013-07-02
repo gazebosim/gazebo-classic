@@ -26,7 +26,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -139,8 +139,8 @@ namespace gazebo
       public: virtual ~Base();
 
       /// \brief Load
-      /// \param[in] node Pointer to an RML parameters
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] node Pointer to an SDF parameters
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finialize the object
       public: virtual void Fini();
@@ -158,10 +158,10 @@ namespace gazebo
       /// \brief Update the object
       public: virtual void Update() {}
 
-      /// \brief Update the parameters using new rml values.
-      /// \param[in] _rml Update the object's parameters based on RML
+      /// \brief Update the parameters using new sdf values.
+      /// \param[in] _sdf Update the object's parameters based on SDF
       /// values.
-      public: virtual void UpdateParameters(rml::ElementPtr _rml);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity.
       /// \param[in] _name New name.
@@ -287,17 +287,17 @@ namespace gazebo
       /// \return The World this object is part of.
       public: const WorldPtr &GetWorld() const;
 
-      /// \brief Get the RML values for the object.
-      /// \return The RML values for the object.
-      public: virtual const rml::ElementPtr GetRML();
+      /// \brief Get the SDF values for the object.
+      /// \return The SDF values for the object.
+      public: virtual const sdf::ElementPtr GetSDF();
 
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
       protected: void ComputeScopedName();
 
-      /// \brief The RML values for this object.
-      protected: rml::ElementPtr rml;
+      /// \brief The SDF values for this object.
+      protected: sdf::ElementPtr sdf;
 
       /// \brief Parent of this entity.
       protected: BasePtr parent;
@@ -326,7 +326,7 @@ namespace gazebo
       /// \brief True if selected.
       private: bool selected;
 
-      /// \brief Local copy of the rml name.
+      /// \brief Local copy of the sdf name.
       private: std::string name;
 
       /// \brief Local copy of the scoped name.

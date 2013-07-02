@@ -3,7 +3,7 @@ include_directories (
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
-  ${RML_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest

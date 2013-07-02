@@ -32,8 +32,8 @@ namespace gazebo
 
     /// \brief Load the plugin.
     /// \param[in] _world Pointer to world
-    /// \param[in] _sdf Pointer to the RML configuration.
-    public: virtual void Load(physics::WorldPtr _world, rml::ElementPtr _sdf);
+    /// \param[in] _sdf Pointer to the SDF configuration.
+    public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
     /// \brief Initialize the plugin.
     public: virtual void Init();

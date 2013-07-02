@@ -51,9 +51,9 @@ namespace gazebo
               }
 
       /// \brief Template to ::Load the BallJoint.
-      /// \param[in] _rml RML to load the joint from.
-      public: void Load(rml::ElementPtr _rml)
-              {T::Load(_rml);}
+      /// \param[in] _sdf SDF to load the joint from.
+      public: void Load(sdf::ElementPtr _sdf)
+              {T::Load(_sdf);}
 
       /// \internal
       /// \brief Set the axis of rotation. This is not used for ball joints.

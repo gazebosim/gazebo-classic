@@ -604,9 +604,9 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
 }
 
 /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
 //////////////////////////////////////////////////
-Quaternion::Quaternion(const rml::Quaternion &_qt)
+Quaternion::Quaternion(const sdf::Quaternion &_qt)
 {
   this->w = _qt.w;
   this->x = _qt.x;
@@ -615,7 +615,7 @@ Quaternion::Quaternion(const rml::Quaternion &_qt)
 }
 
 //////////////////////////////////////////////////
-Quaternion &Quaternion::operator =(const rml::Quaternion &_qt)
+Quaternion &Quaternion::operator =(const sdf::Quaternion &_qt)
 {
   this->w = _qt.w;
   this->x = _qt.x;

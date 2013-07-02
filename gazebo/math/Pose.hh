@@ -27,8 +27,8 @@
 /*
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
+#ifdef HAVE_SDF
+#include "sdf/sdf.hh"
 #endif
 */
 
@@ -72,12 +72,12 @@ namespace gazebo
       public: Pose(const Pose &_pose);
 
               /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
       /// Deprecated
-      public: Pose(const rml::Pose &_pose) __attribute__((deprecated));
+      public: Pose(const sdf::Pose &_pose) __attribute__((deprecated));
 
       /// Deprecated
-      public: Pose &operator=(const rml::Pose &_pose)
+      public: Pose &operator=(const sdf::Pose &_pose)
               __attribute__((deprecated));
 #endif
 */

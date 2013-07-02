@@ -37,11 +37,11 @@ CollisionState::CollisionState(const CollisionPtr _collision)
 }
 
 /////////////////////////////////////////////////
-CollisionState::CollisionState(const rml::ElementPtr _rml)
+CollisionState::CollisionState(const sdf::ElementPtr _sdf)
   : State()
 {
-  // Load the state from RML
-  this->Load(_rml);
+  // Load the state from SDF
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
@@ -50,7 +50,7 @@ CollisionState::~CollisionState()
 }
 
 /////////////////////////////////////////////////
-void CollisionState::Load(const rml::ElementPtr _elem)
+void CollisionState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
   this->name = _elem->Get<std::string>("name");
@@ -109,11 +109,11 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
 }
 
 /////////////////////////////////////////////////
-void CollisionState::FillRML(rml::ElementPtr _rml)
+void CollisionState::FillSDF(sdf::ElementPtr _sdf)
 {
-  _rml->ClearElements();
+  _sdf->ClearElements();
 
-  _rml->GetAttribute("name")->Set(this->name);
-  _rml->GetElement("pose")->Set(this->pose);
+  _sdf->GetAttribute("name")->Set(this->name);
+  _sdf->GetElement("pose")->Set(this->pose);
 }
 

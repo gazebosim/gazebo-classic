@@ -22,7 +22,7 @@
 #ifndef _HINGE2JOINT_HH_
 #define _HINGE2JOINT_HH_
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
@@ -54,16 +54,16 @@ namespace gazebo
               {return 2;}
 
       /// \brief Load the joint.
-      /// \param[in] _rml RML values to load from.
-      public: virtual void Load(rml::ElementPtr _rml)
+      /// \param[in] _sdf SDF values to load from.
+      public: virtual void Load(sdf::ElementPtr _sdf)
               {
-                T::Load(_rml);
+                T::Load(_sdf);
 
                 this->SetAxis(0,
-                    _rml->GetElement("axis")->Get<math::Vector3>("xyz"));
+                    _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
 
                 this->SetAxis(1,
-                    _rml->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
               }
     };
     /// \}

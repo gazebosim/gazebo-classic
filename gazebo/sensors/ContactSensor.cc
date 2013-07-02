@@ -53,19 +53,19 @@ ContactSensor::~ContactSensor()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::Load(const std::string &_worldName, rml::ElementPtr _rml)
+void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_worldName, _rml);
+  Sensor::Load(_worldName, _sdf);
 
   // Create a publisher for the contact information.
-  if (this->rml->HasElement("contact") &&
-      this->rml->GetElement("contact")->HasElement("topic") &&
-      this->rml->GetElement("contact")->Get<std::string>("topic")
+  if (this->sdf->HasElement("contact") &&
+      this->sdf->GetElement("contact")->HasElement("topic") &&
+      this->sdf->GetElement("contact")->Get<std::string>("topic")
       != "__default_topic__")
   {
-    // This will create a topic based on the name specified in RML.
+    // This will create a topic based on the name specified in SDF.
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-      this->rml->GetElement("contact")->Get<std::string>("topic"), 100);
+      this->sdf->GetElement("contact")->Get<std::string>("topic"), 100);
   }
   else
   {
@@ -87,8 +87,8 @@ void ContactSensor::Load(const std::string &_worldName)
   std::string collisionName;
   std::string collisionScopedName;
 
-  rml::ElementPtr collisionElem =
-    this->rml->GetElement("contact")->GetElement("collision");
+  sdf::ElementPtr collisionElem =
+    this->sdf->GetElement("contact")->GetElement("collision");
 
   std::string entityName =
       this->world->GetEntity(this->parentName)->GetScopedName();

@@ -58,9 +58,9 @@ namespace gazebo
       /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
-      /// \brief Get the RML information for the cylinder.
-      /// \return The RML as a string.
-      public: std::string GetRMLString();
+      /// \brief Get the SDF information for the cylinder.
+      /// \return The SDF as a string.
+      public: std::string GetSDFString();
 
       /// Documentation inherited
       private: virtual void CreateTheEntity();

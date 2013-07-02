@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <iostream>
 #include <vector>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/common/Time.hh"
@@ -89,11 +89,11 @@ void Load()
 
 
   // Load the world file
-  rml::RMLPtr rml(new rml::RML());
-  rml::initFile(config_filename, rml);
-  rml::readFile(config_filename, rml);
+  sdf::SDFPtr sdf(new sdf::SDF());
+  sdf::initFile(config_filename, sdf);
+  sdf::readFile(config_filename, sdf);
 
-  rml::ElementPtr worldElem = rml->root->GetElement("world");
+  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
 
   while (worldElem)
   {

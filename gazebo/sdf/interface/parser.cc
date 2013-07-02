@@ -75,9 +75,9 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
   std::string filename = find_file(_filename);
 
   // This can be removed in gazebo 2.0
-  if (_filename.find(".rml") == _filename.size()-4)
+  if (_filename.find(".sdf") == _filename.size()-4)
   {
-    sdfFilename = _filename.substr(0, _filename.find(".rml")) + ".sdf";
+    sdfFilename = _filename.substr(0, _filename.find(".sdf")) + ".sdf";
     sdfFilename = find_file(sdfFilename);
   }
 
@@ -99,9 +99,9 @@ bool initFile(const std::string &_filename, ElementPtr _sdf)
   std::string filename = find_file(_filename);
 
   // This can be removed in gazebo 2.0
-  if (_filename.find(".rml") == _filename.size()-4)
+  if (_filename.find(".sdf") == _filename.size()-4)
   {
-    sdfFilename = _filename.substr(0, _filename.find(".rml")) + ".sdf";
+    sdfFilename = _filename.substr(0, _filename.find(".sdf")) + ".sdf";
     sdfFilename = find_file(sdfFilename);
   }
 
@@ -294,7 +294,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
   else
   {
     if (_filename.find(".urdf") != std::string::npos)
-      gzerr << "Unable to parse URDF without RML installed.\n";
+      gzerr << "Unable to parse URDF without SDF installed.\n";
     else
       gzerr << "Unable to parser file[" << _filename << "]\n";
   }
@@ -342,7 +342,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   // check sdf version, use old parser if necessary
   TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
 
-  if (!sdfNode && _xmlDoc->FirstChildElement("rml"))
+  if (!sdfNode && _xmlDoc->FirstChildElement("sdf"))
   {
     Converter::Convert(_xmlDoc, SDF::version);
     sdfNode = _xmlDoc->FirstChildElement("sdf");
@@ -397,7 +397,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   /* check gazebo version, use old parser if necessary */
   TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
 
-  if (!sdfNode && _xmlDoc->FirstChildElement("rml"))
+  if (!sdfNode && _xmlDoc->FirstChildElement("sdf"))
   {
     Converter::Convert(_xmlDoc, SDF::version);
     sdfNode = _xmlDoc->FirstChildElement("sdf");
@@ -590,11 +590,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             else
             {
               TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
-              bool rml = false;
+              bool sdf = false;
               if (!sdfXML)
               {
-                rml = true;
-                sdfXML =  modelXML->FirstChildElement("rml");
+                sdf = true;
+                sdfXML =  modelXML->FirstChildElement("sdf");
               }
 
               TiXmlElement *sdfSearch = sdfXML;
@@ -609,8 +609,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
                   break;
                 }
 
-                if (rml)
-                  sdfSearch = sdfSearch->NextSiblingElement("rml");
+                if (sdf)
+                  sdfSearch = sdfSearch->NextSiblingElement("sdf");
                 else
                   sdfSearch = sdfSearch->NextSiblingElement("sdf");
               }

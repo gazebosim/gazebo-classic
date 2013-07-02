@@ -9,7 +9,7 @@ namespace gazebo
               printf("Hello World!\n");
             }
 
-    public: void Load(physics::WorldPtr _world, rml::ElementPtr _sdf)
+    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             {
             }
 

@@ -28,7 +28,7 @@
 #include <vector>
 #include <list>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -126,14 +126,14 @@ namespace gazebo
       /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
 
-      /// \brief Add a sensor from an RML element. This function will also Load
+      /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.
-      /// \param[in] _elem The RML element that describes the sensor
+      /// \param[in] _elem The SDF element that describes the sensor
       /// \param[in] _worldName Name of the world in which to create the sensor
       /// \param[in] _parentName The name of the parent link which the sensor is
       /// attached to.
       /// \return The name of the sensor
-      public: std::string CreateSensor(rml::ElementPtr _elem,
+      public: std::string CreateSensor(sdf::ElementPtr _elem,
                                        const std::string &_worldName,
                                        const std::string &_parentName);
 

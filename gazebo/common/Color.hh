@@ -26,8 +26,8 @@
 
 // Remove in gazebo 2.0
 /*#include <gazebo/gazebo_config.h>
-#if HAVE_RML
-#include <rml/rml.hh>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
 #endif
 */
 
@@ -90,16 +90,16 @@ namespace gazebo
       /// \param[in] _clr Color to copy
       public: Color(const Color &_clr);
 /*
-#ifdef HAVE_RML
+#ifdef HAVE_SDF
       /// Deprecated
-      public: Color(const rml::Color &_clr) GAZEBO_DEPRECATED(1.9);
+      public: Color(const sdf::Color &_clr) GAZEBO_DEPRECATED(1.9);
 
       /// Deprecated
-      public: Color &operator =(const rml::Color &_clr) GAZEBO_DEPRECATED(1.9);
+      public: Color &operator =(const sdf::Color &_clr) GAZEBO_DEPRECATED(1.9);
 
       /// Deprecated
       public: bool operator!=(
-                  const rml::Color &_pt) const GAZEBO_DEPRECATED(1.9);
+                  const sdf::Color &_pt) const GAZEBO_DEPRECATED(1.9);
 #endif
 */
 

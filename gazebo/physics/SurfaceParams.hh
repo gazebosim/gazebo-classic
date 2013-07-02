@@ -22,7 +22,7 @@
 #ifndef _SURFACEPARAMS_HH_
 #define _SURFACEPARAMS_HH_
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -46,8 +46,8 @@ namespace gazebo
       public: virtual ~SurfaceParams();
 
       /// \brief Load the contact params.
-      /// \param[in] _rml RML values to load from.
-      public: virtual void Load(rml::ElementPtr _rml);
+      /// \param[in] _sdf SDF values to load from.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.

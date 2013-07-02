@@ -21,7 +21,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
@@ -166,15 +166,15 @@ ODEPhysics::~ODEPhysics()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::Load(rml::ElementPtr _rml)
+void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
-  PhysicsEngine::Load(_rml);
+  PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _rml->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
-  rml::ElementPtr odeElem = this->rml->GetElement("ode");
-  rml::ElementPtr solverElem = odeElem->GetElement("solver");
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
   this->stepType = solverElem->Get<std::string>("type");
 
@@ -199,7 +199,7 @@ void ODEPhysics::Load(rml::ElementPtr _rml)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
 
-  math::Vector3 g = this->rml->Get<math::Vector3>("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
 
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -270,8 +270,8 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_solver_type())
   {
-    rml::ElementPtr solverElem =
-      this->rml->GetElement("ode")->GetElement("solver");
+    sdf::ElementPtr solverElem =
+      this->sdf->GetElement("ode")->GetElement("solver");
     if (_msg->solver_type() == "quick")
     {
       solverElem->GetElement("type")->Set("quick");
@@ -542,7 +542,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
-  this->rml->GetElement("ode")->GetElement("solver")->
+  this->sdf->GetElement("ode")->GetElement("solver")->
     GetElement("precon_iters")->Set(_iters);
 
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
@@ -551,7 +551,7 @@ void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
-  this->rml->GetElement("ode")->GetElement(
+  this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("iters")->Set(_iters);
   dWorldSetQuickStepNumIterations(this->worldId, _iters);
 }
@@ -559,7 +559,7 @@ void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSW(double _w)
 {
-  this->rml->GetElement("ode")->GetElement(
+  this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("sor")->Set(_w);
   dWorldSetQuickStepW(this->worldId, _w);
 }
@@ -567,7 +567,7 @@ void ODEPhysics::SetSORPGSW(double _w)
 //////////////////////////////////////////////////
 void ODEPhysics::SetWorldCFM(double _cfm)
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
   elem->GetElement("cfm")->Set(_cfm);
 
@@ -577,7 +577,7 @@ void ODEPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void ODEPhysics::SetWorldERP(double _erp)
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
   elem->GetElement("erp")->Set(_erp);
   dWorldSetERP(this->worldId, _erp);
@@ -586,7 +586,7 @@ void ODEPhysics::SetWorldERP(double _erp)
 //////////////////////////////////////////////////
 void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 {
-  this->rml->GetElement("ode")->GetElement(
+  this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement(
         "contact_max_correcting_vel")->Set(_vel);
   dWorldSetContactMaxCorrectingVel(this->worldId, _vel);
@@ -595,7 +595,7 @@ void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 //////////////////////////////////////////////////
 void ODEPhysics::SetContactSurfaceLayer(double _depth)
 {
-  this->rml->GetElement("ode")->GetElement(
+  this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement("contact_surface_layer")->Set(_depth);
   dWorldSetContactSurfaceLayer(this->worldId, _depth);
 }
@@ -604,33 +604,33 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
   this->maxContacts = _maxContacts;
-  this->rml->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSPreconIters()
 {
-  return this->rml->GetElement("ode")->GetElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<int>("precon_iters");
 }
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
-  return this->rml->GetElement("ode")->GetElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<int>("iters");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetSORPGSW()
 {
-  return this->rml->GetElement("ode")->GetElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<double>("sor");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetWorldCFM()
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
   return elem->Get<double>("cfm");
 }
@@ -638,7 +638,7 @@ double ODEPhysics::GetWorldCFM()
 //////////////////////////////////////////////////
 double ODEPhysics::GetWorldERP()
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
   return elem->Get<double>("erp");
 }
@@ -646,14 +646,14 @@ double ODEPhysics::GetWorldERP()
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactMaxCorrectingVel()
 {
-  return this->rml->GetElement("ode")->GetElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "constraints")->Get<double>("contact_max_correcting_vel");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactSurfaceLayer()
 {
-  return this->rml->GetElement("ode")->GetElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "constraints")->Get<double>("contact_surface_layer");
 }
 
@@ -719,14 +719,14 @@ dSpaceID ODEPhysics::GetSpaceId() const
 //////////////////////////////////////////////////
 std::string ODEPhysics::GetStepType() const
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode")->GetElement("solver");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
   return elem->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepType(const std::string &_type)
 {
-  rml::ElementPtr elem = this->rml->GetElement("ode")->GetElement("solver");
+  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
   elem->GetElement("type")->Set(_type);
   this->stepType = _type;
 }
@@ -734,7 +734,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->rml->GetElement("gravity")->Set(_gravity);
+  this->sdf->GetElement("gravity")->Set(_gravity);
   dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
@@ -1118,8 +1118,8 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 //////////////////////////////////////////////////
 void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
 {
-  rml::ElementPtr odeElem = this->rml->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE RML element does not exist");
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
   switch (_param)
   {
@@ -1305,8 +1305,8 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(ODEParam _param) const
 {
-  rml::ElementPtr odeElem = this->rml->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE RML element does not exist");
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
   boost::any value = 0;
   switch (_param)

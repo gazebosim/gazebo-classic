@@ -19,7 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -107,7 +107,7 @@ bool Server::ParseArgs(int argc, char **argv)
 
   po::options_description h_desc("Hidden options");
   h_desc.add_options()
-    ("world_file", po::value<std::string>(), "RML world to load.");
+    ("world_file", po::value<std::string>(), "SDF world to load.");
 
   h_desc.add_options()
     ("pass_through", po::value<std::vector<std::string> >(),
@@ -220,12 +220,12 @@ bool Server::ParseArgs(int argc, char **argv)
       << "  Random Seed: "
       << util::LogPlay::Instance()->GetRandSeed() << "\n";
 
-    // Get the RML world description from the log file
-    std::string rmlString;
-    util::LogPlay::Instance()->Step(rmlString);
+    // Get the SDF world description from the log file
+    std::string sdfString;
+    util::LogPlay::Instance()->Step(sdfString);
 
     // Load the server
-    if (!this->LoadString(rmlString))
+    if (!this->LoadString(sdfString))
       return false;
   }
   else
@@ -273,46 +273,44 @@ bool Server::LoadFile(const std::string &_filename,
   fclose(test);
 
   // Load the world file
-  rml::RMLPtr rml(new rml::RML);
-  if (!rml::init(rml))
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize rml\n";
+    gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  rml->root->PrintValues("  ");
-
-  if (!rml::readFile(common::find_file(_filename), rml))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
-    gzerr << "Unable to read rml file[" << _filename << "]\n";
+    gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
-  return this->LoadImpl(rml->root, _physics);
+  return this->LoadImpl(sdf->root, _physics);
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadString(const std::string &_rmlString)
+bool Server::LoadString(const std::string &_sdfString)
 {
   // Load the world file
-  rml::RMLPtr rml(new rml::RML);
-  if (!rml::init(rml))
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize rml\n";
+    gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!rml::readString(_rmlString, rml))
+  if (!sdf::readString(_sdfString, sdf))
   {
-    gzerr << "Unable to read RML string[" << _rmlString << "]\n";
+    gzerr << "Unable to read SDF string[" << _sdfString << "]\n";
     return false;
   }
 
-  return this->LoadImpl(rml->root);
+  return this->LoadImpl(sdf->root);
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(rml::ElementPtr _elem,
+bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
   std::string host = "";
@@ -357,7 +355,7 @@ bool Server::LoadImpl(rml::ElementPtr _elem,
     }
   }
 
-  rml::ElementPtr worldElem = _elem->GetElement("world");
+  sdf::ElementPtr worldElem = _elem->GetElement("world");
   if (worldElem)
   {
     physics::WorldPtr world = physics::create_world();
@@ -574,16 +572,16 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
   gzerr << "Open World is not implemented\n";
   return false;
 /*
-  rml::RMLPtr rml(new rml::RML);
-  if (!rml::init(rml))
+  sdf::SDFPtr sdf(new sdf::SDF);
+  if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize rml\n";
+    gzerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!rml::readFile(_filename, rml))
+  if (!sdf::readFile(_filename, sdf))
   {
-    gzerr << "Unable to read rml file[" << _filename << "]\n";
+    gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
@@ -600,7 +598,7 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
 
   gazebo::transport::clear_buffers();
 
-  rml::ElementPtr worldElem = rml->root->GetElement("world");
+  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
 
   physics::WorldPtr world = physics::create_world();
 

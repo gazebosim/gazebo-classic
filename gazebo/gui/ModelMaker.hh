@@ -19,7 +19,7 @@
 
 #include <list>
 #include <string>
-#include <rml/rml.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/EntityMaker.hh"
 
@@ -38,7 +38,7 @@ namespace gazebo
       public: virtual ~ModelMaker();
 
       public: bool InitFromModel(const std::string &_modelName);
-      public: bool InitFromRMLString(const std::string &_data);
+      public: bool InitFromSDFString(const std::string &_data);
       public: bool InitFromFile(const std::string &_filename);
 
       public: virtual void Start(const rendering::UserCameraPtr _camera);
@@ -61,7 +61,7 @@ namespace gazebo
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
-      private: rml::RMLPtr modelRML;
+      private: sdf::SDFPtr modelSDF;
 
       private: bool clone;
     };

@@ -46,9 +46,9 @@ ODEHingeJoint::~ODEHingeJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::Load(rml::ElementPtr _rml)
+void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 {
-  HingeJoint<ODEJoint>::Load(_rml);
+  HingeJoint<ODEJoint>::Load(_sdf);
 
   this->SetParam(dParamFMax, 0);
   this->SetForce(0, 0);

@@ -2,7 +2,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
-  ${RML_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
 )
 
 set (plugins
