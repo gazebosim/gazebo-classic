@@ -22,12 +22,7 @@
 #ifndef _HINGE2JOINT_HH_
 #define _HINGE2JOINT_HH_
 
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
+#include <rml/rml.hh>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"

@@ -26,12 +26,13 @@
 #include <iostream>
 #include <cmath>
 
-
+/*
 // Remove the gazebo_confif and ifdefs in Gazebo 1.8
 #include "gazebo/gazebo_config.h"
 #ifdef HAVE_RML
 #include "rml/rml.hh"
 #endif
+*/
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -81,6 +82,7 @@ namespace gazebo
     /// \param qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
+            /*
 #ifdef HAVE_RML
     /// Deprecated
     public: Quaternion(const rml::Quaternion &_qt) __attribute__((deprecated));
@@ -88,6 +90,7 @@ namespace gazebo
     /// Deprecated
     public: Quaternion &operator =(const rml::Quaternion &_qt);
 #endif
+*/
 
     /// \brief Destructor
     public: ~Quaternion();

@@ -603,6 +603,7 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
   }
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Quaternion::Quaternion(const rml::Quaternion &_qt)
@@ -624,3 +625,4 @@ Quaternion &Quaternion::operator =(const rml::Quaternion &_qt)
   return *this;
 }
 #endif
+*/

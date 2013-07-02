@@ -537,6 +537,7 @@ void Color::Clamp()
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Color::Color(const rml::Color &_pt)
@@ -565,3 +566,4 @@ bool Color::operator!=(const rml::Color &_pt) const
          !math::equal(this->a, _pt.a);
 }
 #endif
+*/

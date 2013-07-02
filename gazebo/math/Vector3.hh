@@ -26,10 +26,12 @@
 #include <iostream>
 #include <fstream>
 
+/*
 #include <gazebo/gazebo_config.h>
 #if HAVE_RML
 #include <rml/rml.hh>
 #endif
+*/
 
 #include "gazebo/math/Helpers.hh"
 
@@ -74,6 +76,7 @@ namespace gazebo
       /// \param[in] _v a vector
       public: Vector3(const Vector3 &_v);
 
+              /*
 #ifdef HAVE_RML
       /// Deprecated
       public: Vector3(const rml::Vector3 &_v) __attribute__((deprecated));
@@ -86,6 +89,7 @@ namespace gazebo
       public: bool operator!=(const rml::Vector3 &_v) const
               __attribute__((deprecated));
 #endif
+*/
 
       /// \brief Destructor
       public: virtual ~Vector3();

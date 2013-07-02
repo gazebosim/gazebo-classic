@@ -205,6 +205,7 @@ int Vector2i::operator[](unsigned int index) const
   }
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Vector2i::Vector2i(const rml::Vector2i &_pt)
@@ -221,3 +222,4 @@ Vector2i &Vector2i::operator =(const rml::Vector2i &_pt)
   return *this;
 }
 #endif
+*/

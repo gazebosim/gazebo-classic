@@ -18,11 +18,7 @@
 #define _PHYSICS_HH_
 
 #include <string>
-#ifdef HAVE_RML
 #include <rml/rml.hh>
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
 
 #include "gazebo/physics/PhysicsTypes.hh"
 

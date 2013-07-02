@@ -368,6 +368,7 @@ bool Vector3::Equal(const Vector3 &_v) const
          math::equal(this->z, _v.z);
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Vector3 &Vector3::operator =(const rml::Vector3 &_pt)
@@ -395,3 +396,4 @@ bool Vector3::operator!=(const rml::Vector3 &_pt) const
          !equal(this->z, _pt.z, 0.001);
 }
 #endif
+*/

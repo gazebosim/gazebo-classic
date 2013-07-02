@@ -24,11 +24,13 @@
 
 #include <iostream>
 
+/*
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
 #ifdef HAVE_RML
 #include "rml/rml.hh"
 #endif
+*/
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -69,6 +71,7 @@ namespace gazebo
       /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
 
+              /*
 #ifdef HAVE_RML
       /// Deprecated
       public: Pose(const rml::Pose &_pose) __attribute__((deprecated));
@@ -77,6 +80,7 @@ namespace gazebo
       public: Pose &operator=(const rml::Pose &_pose)
               __attribute__((deprecated));
 #endif
+*/
 
       /// \brief Destructor
       public: virtual ~Pose();

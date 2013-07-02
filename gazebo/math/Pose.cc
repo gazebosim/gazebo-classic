@@ -239,6 +239,7 @@ void Pose::Round(int _precision)
   this->pos.Round(_precision);
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Pose::Pose(const rml::Pose &_pose)
@@ -268,3 +269,4 @@ Pose &Pose::operator=(const rml::Pose &_pose)
   return *this;
 }
 #endif
+*/

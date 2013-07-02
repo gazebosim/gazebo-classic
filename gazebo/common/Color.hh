@@ -25,10 +25,11 @@
 #include <iostream>
 
 // Remove in gazebo 2.0
-#include <gazebo/gazebo_config.h>
+/*#include <gazebo/gazebo_config.h>
 #if HAVE_RML
 #include <rml/rml.hh>
 #endif
+*/
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -88,18 +89,19 @@ namespace gazebo
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
       public: Color(const Color &_clr);
-
+/*
 #ifdef HAVE_RML
       /// Deprecated
-      public: Color(const rml::Color &_clr) GAZEBO_DEPRECATED(1.6);
+      public: Color(const rml::Color &_clr) GAZEBO_DEPRECATED(1.9);
 
       /// Deprecated
-      public: Color &operator =(const rml::Color &_clr) GAZEBO_DEPRECATED(1.5);
+      public: Color &operator =(const rml::Color &_clr) GAZEBO_DEPRECATED(1.9);
 
       /// Deprecated
       public: bool operator!=(
-                  const rml::Color &_pt) const GAZEBO_DEPRECATED(1.5);
+                  const rml::Color &_pt) const GAZEBO_DEPRECATED(1.9);
 #endif
+*/
 
       /// \brief Destructor
       public: virtual ~Color();

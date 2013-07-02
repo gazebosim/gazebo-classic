@@ -577,6 +577,7 @@ bool Time::operator>=(double _time) const
   return *this >= Time(_time);
 }
 
+/*
 #ifdef HAVE_RML
 /////////////////////////////////////////////////
 Time::Time(const rml::Time &_time)
@@ -592,3 +593,4 @@ Time &Time::operator =(const rml::Time &_time)
   return *this;
 }
 #endif
+*/

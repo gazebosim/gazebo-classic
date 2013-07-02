@@ -21,12 +21,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include <gazebo/gazebo_config.h>
-#ifdef HAVE_RML
 #include <rml/rml.hh>
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
 
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"

@@ -18,12 +18,7 @@
 #define _GAZEBO_SENSORS_HH_
 
 #include <string>
-#include <gazebo/gazebo_config.h>
-#ifdef HAVE_RML
 #include <rml/rml.hh>
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
 #include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo

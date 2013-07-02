@@ -204,6 +204,7 @@ double Vector2d::operator[](unsigned int index) const
   }
 }
 
+/*
 #ifdef HAVE_RML
 //////////////////////////////////////////////////
 Vector2d::Vector2d(const rml::Vector2d &_pt)
@@ -220,3 +221,4 @@ Vector2d &Vector2d::operator =(const rml::Vector2d &_pt)
   return *this;
 }
 #endif
+*/

@@ -19,12 +19,7 @@
 
 #include <string>
 
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_RML
-#include "rml/rml.hh"
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
 

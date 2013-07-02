@@ -26,11 +26,13 @@
 #include <iostream>
 #include <fstream>
 
+/*
 // Remove in gazebo 2.0
 #include <gazebo/gazebo_config.h>
 #if HAVE_RML
 #include <rml/rml.hh>
 #endif
+*/
 
 namespace gazebo
 {
@@ -55,6 +57,7 @@ namespace gazebo
       /// \param[in] _v the value
       public: Vector2d(const Vector2d &_v);
 
+              /*
 #ifdef HAVE_RML
       /// Deprecated
       public: Vector2d(const rml::Vector2d &_v) __attribute__((deprecated));
@@ -63,6 +66,7 @@ namespace gazebo
       public: Vector2d &operator =(const rml::Vector2d &_v)
               __attribute__((deprecated));
 #endif
+*/
 
       /// \brief Destructor
       public: virtual ~Vector2d();
