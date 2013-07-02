@@ -44,6 +44,10 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessReceiver", WirelessReceiver)
 
+const double WirelessReceiver::N = 4.5;
+const double WirelessReceiver::C = 300000000;
+
+
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
   : Sensor(sensors::OTHER)
@@ -74,6 +78,29 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
   this->entity = this->world->GetEntity(this->parentName);
+
+  if (this->sdf->HasElement("transceiver"))
+  {
+    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+
+    if (transElem->HasElement("frequency"))
+    {
+      this->freq = transElem->GetValueDouble("frequency");
+      //cout << "Freq: " << this->freq << endl;
+    }
+
+    if (transElem->HasElement("power"))
+    {
+      this->power = transElem->GetValueDouble("power");
+      //cout << "Power: " << this->gain << endl;
+    }
+
+    if (transElem->HasElement("gain"))
+    {
+      this->gain = transElem->GetValueDouble("gain");
+      //cout << "Gain: " << this->gain << endl;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -94,35 +121,39 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
   if (this->pub)                                                           
   {                                                                             
     msgs::WirelessNodes msg;
+    std::string tid;
+    double tfreq;
+    double tpow;
+    double tgain;
+    math::Pose tpos;
+    double x;
+    double rxPower;
+    double wavelength;
 
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
     for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
     {
       if ((*it)->GetType() == "wirelessTransmitter")
       {
-        std::string id;
-        double freq;
-        math::Pose pos;
+        tid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetESSID();
+        tfreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetFreq();
+        tpow = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPower();
+        tgain = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetGain();
+        tpos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPose();
 
-        id = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetESSID();
-        freq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetFreq();
-        pos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPose();
+        msgs::WirelessNode *wirelessNode = msg.add_node();
+        wirelessNode->set_essid(tid);
+        wirelessNode->set_frequency(tfreq);
 
-        msgs::WirelessNode *wireless_node = msg.add_node();
-        wireless_node->set_essid(id);
-        wireless_node->set_frequency(freq);
-
-        math::Pose my_pos = entity->GetWorldPose();
-        double distance = my_pos.pos.Distance(pos.pos);
+        math::Pose myPos = entity->GetWorldPose();
+        double distance = myPos.pos.Distance(tpos.pos);
         
-        if (distance > 0.0)
-        {
-          wireless_node->set_signal_level(1.0 / (distance));
-        }
-        else
-        {
-          wireless_node->set_signal_level(0.0);
-        }
+        x = math::Rand::GetDblNormal(0.0, 10.0);
+        wavelength = C / tfreq;
+
+        rxPower = tpow + tgain + this->gain - x + 20 * log10(wavelength) -
+                  20 * log10(4 * M_PI) - 10 * N * log10(distance);
+        wirelessNode->set_signal_level(rxPower);
       }
     }
                                                                                 
@@ -130,3 +161,20 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
   }
 }
 
+/////////////////////////////////////////////////
+double WirelessReceiver::GetFreq()
+{
+  return this->freq;
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::GetPower()
+{
+  return this->power;
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::GetGain()
+{
+  return this->gain;
+}

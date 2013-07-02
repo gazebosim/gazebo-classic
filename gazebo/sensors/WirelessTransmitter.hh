@@ -30,6 +30,7 @@
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
 
+
 namespace gazebo
 {
   namespace sensors
@@ -68,11 +69,15 @@ namespace gazebo
               {return entity->GetWorldPose();}
 
       public: static double GetSignalStrength(const math::Pose _transmitter,
-                                              const math::Pose _receiver);
+        const math::Pose _receiver);
 
       public: double GetFreq();
 
       public: std::string GetESSID();
+
+      public: double GetPower();
+
+      public: double GetGain();
 
       /// \brief Pointer the entity that has the transmitter.
       private: physics::EntityPtr entity;
@@ -84,6 +89,10 @@ namespace gazebo
       private: double signalLevel;
 
       private: std::string essid;
+
+      private: double power;
+
+      private: double gain;
     };
     /// \}
   }

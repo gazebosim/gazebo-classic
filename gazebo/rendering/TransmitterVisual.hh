@@ -57,7 +57,7 @@ namespace gazebo
       private: std::string GetTemplateSDFString();
 
       /// \brief Callback when laser data is received.
-      private: void OnScan(ConstPosePtr &_msg);
+      private: void OnScan(ConstPropagationGridPtr &_msg);
 
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;

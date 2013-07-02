@@ -48,6 +48,9 @@ namespace gazebo
     /// \brief Sensor class for receiving wireless signals.
     class WirelessReceiver: public Sensor
     {
+      public: static const double N;
+      public: static const double C;
+
       /// \brief Constructor
       public: WirelessReceiver();
 
@@ -68,10 +71,22 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
+      public: double GetFreq();
+
+      public: double GetPower();
+
+      public: double GetGain();
+
       /// \brief Parent entity
       private: physics::EntityPtr entity;
 
       private: transport::PublisherPtr pub;
+
+      private: double freq;
+
+      private: double power;
+
+      private: double gain;
     };
     /// \}
   }
