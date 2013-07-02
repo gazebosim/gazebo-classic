@@ -527,6 +527,11 @@ void MainWindow::Rotate()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::UniversalManip()
+{
+  gui::Events::manipMode("universal");
+}
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -854,6 +859,14 @@ void MainWindow::CreateActions()
   g_rotateAct->setCheckable(true);
   g_rotateAct->setChecked(false);
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
+
+  g_universalManipAct = new QAction(QIcon(":/images/cursor.png"),
+      tr("Rotation Mode"), this);
+  g_universalManipAct->setStatusTip(tr("Universal manipulate mode"));
+  g_universalManipAct->setCheckable(true);
+  g_universalManipAct->setChecked(false);
+  connect(g_universalManipAct, SIGNAL(triggered()), this,
+      SLOT(UniversalManip()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));

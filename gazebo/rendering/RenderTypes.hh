@@ -57,6 +57,7 @@ namespace gazebo
     class RFIDVisual;
     class RFIDTagVisual;
     class WindowManager;
+    class Manipulator;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -129,6 +130,10 @@ namespace gazebo
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
+
+    /// \def ContactVisualPtr
+    /// \brief Shared pointer to ContactVisual
+    typedef boost::shared_ptr<Manipulator> ManipulatorPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

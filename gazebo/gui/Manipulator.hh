@@ -17,7 +17,8 @@
 #ifndef _MODELMANIPULATOR_HH_
 #define _MODELMANIPULATOR_HH_
 
-
+#include <string>
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -35,11 +36,29 @@ namespace gazebo
       /// \brief Deconstructor
       public: virtual ~Manipulator();
 
-      public: void Init();
+      public: void Load();
 
       public: void Attach(rendering::VisualPtr _vis);
 
       public: void Attach(std::string _entity);
+
+      private: rendering::VisualPtr transVisual;
+      private: rendering::VisualPtr scaleVisual;
+
+      private: rendering::VisualPtr rotVisual;
+      private: rendering::VisualPtr rotXVisual;
+      private: rendering::VisualPtr rotYVisual;
+      private: rendering::VisualPtr rotZVisual;
+
+      private: rendering::VisualPtr manipVisual;
+
+      private: rendering::AxisVisualPtr axisVisual;
+
+      private: static int counter;
+
+      private: std::string name;
+
+      private: rendering::VisualPtr parent;
 
     };
   }

@@ -32,6 +32,7 @@ set (sources
   JointVisual.cc
   LaserVisual.cc
   Light.cc
+  Manipulator.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
@@ -71,6 +72,7 @@ set (headers
   JointVisual.hh
   LaserVisual.hh
   Light.hh
+  Manipulator.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh
@@ -102,21 +104,21 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
 )
 
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
-  gazebo_common 
+  gazebo_common
   gazebo_sdf_interface
   gazebo_skyx
   gazebo_selection_buffer
-  ${ogre_libraries} 
-  ${OPENGL_LIBRARIES} 
+  ${ogre_libraries}
+  ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
-  X11 
+  X11
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)

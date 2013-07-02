@@ -32,6 +32,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
+#include "gazebo/rendering/Manipulator.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
@@ -144,6 +145,7 @@ GLWidget::~GLWidget()
   this->modelPub.reset();
   this->lightPub.reset();
   this->selectionSub.reset();
+  this->manipulator.reset();
 
   this->userCamera.reset();
 }
@@ -210,6 +212,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
 
     event::Events::postRender();
   }
+
   _e->accept();
 }
 
@@ -375,6 +378,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMousePressTranslate();
+  else if (this->state == "universal")
+    this->OnMousePressUniversal();
 
   return true;
 }
@@ -388,6 +393,8 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseReleaseTranslate();
+  else if (this->state == "universal")
+    this->OnMouseReleaseUniversal();
 
   return true;
 }
@@ -402,8 +409,67 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
     this->OnMouseMoveNormal();
   else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
+  else if (this->state == "universal")
+    this->OnMouseMoveUniversal();
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveUniversal()
+{
+  if (!this->mouseEvent.dragging)
+  {
+    std::string mode;
+    this->userCamera->GetVisual(this->mouseEvent.pos, mode);
+    this->manipulator->SetHighlight(mode);
+
+    if (mode.empty())
+    {
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    }
+  }
+  else
+  {
+    if (this->mouseEvent.button == common::MouseEvent::LEFT)
+    {
+      /// TODO add logic for rotate/scale/translate vis
+
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    }
+    else
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressUniversal()
+{
+  this->OnMousePressNormal();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseReleaseUniversal()
+{
+  if (!this->mouseEvent.dragging)
+  {
+    this->OnMouseReleaseNormal();
+    if (this->selectedVis && !this->selectedVis->IsPlane())
+    {
+      this->manipulator->SetVisible(true);
+      this->manipulator->Attach(this->selectedVis);
+      gzerr << " attach " << std::endl;
+    }
+    else
+    {
+      this->manipulator->SetVisible(false);
+      this->manipulator->Detach();
+    }
+  }
+  else
+  {
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -591,6 +657,7 @@ void GLWidget::OnMouseMoveTranslate()
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
       QApplication::setOverrideCursor(Qt::ArrowCursor);
+
     this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
@@ -665,7 +732,7 @@ void GLWidget::OnMouseReleaseTranslate()
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
-    this->SetSelectedVisual(rendering::VisualPtr());
+//    this->SetSelectedVisual(rendering::VisualPtr());
     event::Events::setSelectedEntity("", "normal");
   }
 
@@ -797,6 +864,10 @@ void GLWidget::OnCreateScene(const std::string &_name)
 
   this->ViewScene(rendering::get_scene(_name));
   this->sceneCreated = true;
+
+  this->manipulator.reset(new rendering::Manipulator("__GL_MANIP__",
+      rendering::get_scene(_name)->GetWorldVisual()));
+  this->manipulator->Load();
 }
 
 /////////////////////////////////////////////////

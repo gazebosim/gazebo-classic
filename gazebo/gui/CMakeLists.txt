@@ -31,7 +31,7 @@ set (sources
   JointControlWidget.cc
   LightMaker.cc
   MainWindow.cc
-  Manipulator.cc
+#  Manipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
@@ -70,7 +70,7 @@ set (headers
   Gui.hh
   GuiEvents.hh
   LightMaker.hh
-  Manipulator.hh
+#  Manipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
