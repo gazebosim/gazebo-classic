@@ -60,6 +60,8 @@ set (msgs
   pose_v.proto
   poses_stamped.proto
   projector.proto
+  propagation_particle.proto
+  propagation_grid.proto
   publishers.proto
   publish.proto
   quaternion.proto
