@@ -44,6 +44,7 @@ add_dependencies(gazebo_physics_ode gazebo_msgs)
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
+
 if(HAVE_BULLET)
   add_dependencies(gazebo_physics_bullet gazebo_msgs)
 endif()
@@ -110,6 +111,13 @@ target_link_libraries(libgazebo
   gazebo_math
   pthread
 )
+
+if (NOT HAVE_RML)
+  target_link_libraries(libgazebo gazebo_sdf_interface)
+  target_link_libraries(gazebo gazebo_sdf_interface)
+  target_link_libraries(gzserver gazebo_sdf_interface)
+  target_link_libraries(gzmaster gazebo_sdf_interface)
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)

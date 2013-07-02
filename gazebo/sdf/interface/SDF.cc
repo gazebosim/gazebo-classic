@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"

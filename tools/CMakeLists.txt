@@ -28,7 +28,11 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
+if (NOT HAVE_RML)
+  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface gazebo_common)
+else()
+  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
+endif()
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)
