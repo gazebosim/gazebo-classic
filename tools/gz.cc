@@ -298,7 +298,7 @@ bool ModelCommand::RunImpl()
   else
   {
     std::cout << "A model name is required using the "
-      << "(-m <mode_name> command line argument)\n";
+      << "(-m <model_name> command line argument)\n";
     return false;
   }
 
@@ -437,7 +437,7 @@ bool JointCommand::RunImpl()
   else
   {
     std::cout << "A model name is required using the "
-      << "(-m <mode_name> command line argument)\n";
+      << "(-m <model_name> command line argument)\n";
     return false;
   }
 
@@ -507,6 +507,64 @@ bool JointCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
+CameraCommand::CameraCommand()
+  : Command("camera", "Control a camera")
+{
+  // Options that are visible to the user through help.
+  this->visibleOptions.add_options()
+    ("world-name,w", po::value<std::string>(), "World name.")
+    ("camera-name,c", po::value<std::string>(), "Camera name.")
+    ("follow,f", po::value<std::string>(), "Model to follow.");
+}
+
+/////////////////////////////////////////////////
+void CameraCommand::HelpDetailed()
+{
+  std::cout <<
+    "\tChange properties of a camera. If a name for the world, \n"
+    "\toption -w, is not specified, the first world found on \n"
+    "\tthe Gazebo master will be used.\n" 
+    "\tA camera name is required.\n"
+    << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool CameraCommand::RunImpl()
+{
+  std::string cameraName, worldName;
+
+  if (this->vm.count("world-name"))
+    worldName = this->vm["world-name"].as<std::string>();
+
+  if (this->vm.count("camera-name"))
+    cameraName = this->vm["camera-name"].as<std::string>();
+  else
+  {
+    std::cout << "A camera name is required using the "
+      << "(-c <camera_name> command line argument)\n";
+    return false;
+  }
+
+  msgs::CameraCmd msg;
+  msg.set_name(cameraName);
+  if (this->vm.count("follow"))
+    msg.set_follow_model(this->vm["follow"].as<std::string>());
+
+  transport::NodePtr node(new transport::Node());
+  node->Init(worldName);
+
+  transport::PublisherPtr pub =
+    node->Advertise<msgs::CameraCmd>(
+        std::string("~/") + cameraName + "/cmd");
+
+  pub->WaitForConnection();
+
+  pub->Publish(msg, true);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   gazebo::common::Console::Instance()->SetQuiet(true);
@@ -546,6 +604,7 @@ int main(int argc, char **argv)
   // Get the command name
   command = vm.count("command") ? vm["command"].as<std::string>() : "";
 
+  g_commandMap["camera"] = new CameraCommand();
   g_commandMap["joint"] = new JointCommand();
   g_commandMap["model"] = new ModelCommand();
   g_commandMap["world"] = new WorldCommand();

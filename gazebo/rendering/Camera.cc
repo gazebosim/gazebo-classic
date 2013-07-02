@@ -155,6 +155,9 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
 }
 
 //////////////////////////////////////////////////
@@ -247,6 +250,9 @@ void Camera::Load()
       gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
         std::endl;
   }
+
+  this->cmdSub = this->node->Subscribe("~/" + this->GetName() + "/cmd",
+      &Camera::OnCmdMsg, this, true);
 }
 
 //////////////////////////////////////////////////
@@ -277,6 +283,8 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->node.reset();
+
   if (this->gaussianNoiseCompositorListener)
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
@@ -307,6 +315,17 @@ void Camera::SetScene(ScenePtr _scene)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
+  boost::mutex::scoped_lock lock(this->receiveMutex);
+
+  // Process all the command messages.
+  for (CameraCmdMsgs_L::iterator iter = this->commandMsgs.begin();
+      iter != this->commandMsgs.end(); ++iter)
+  {
+    if ((*iter)->has_follow_model())
+      this->TrackVisual((*iter)->follow_model());
+  }
+  this->commandMsgs.clear();
+
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
   {
@@ -896,9 +915,9 @@ math::Vector3 Camera::GetRight()
 }
 
 //////////////////////////////////////////////////
-void Camera::SetSceneNode(Ogre::SceneNode *node)
+void Camera::SetSceneNode(Ogre::SceneNode *_node)
 {
-  this->sceneNode = node;
+  this->sceneNode = _node;
 }
 
 //////////////////////////////////////////////////
@@ -1638,4 +1657,12 @@ bool Camera::IsInitialized() const
 bool Camera::GetInitialized() const
 {
   return this->initialized && this->scene->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
+{
+  printf("Received camera command\n");
+  boost::mutex::scoped_lock lock(this->receiveMutex);
+  this->commandMsgs.push_back(_msg);
 }

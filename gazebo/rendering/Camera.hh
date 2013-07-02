@@ -29,6 +29,11 @@
 #include <vector>
 #include <deque>
 
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
 
@@ -550,6 +555,9 @@ namespace gazebo
       /// \return Integer representation of the Ogre image format
       private: static int GetOgrePixelFormat(const std::string &_format);
 
+      /// \brief Receive command message.
+      /// \param[in] _msg Camera Command message.
+      private: void OnCmdMsg(ConstCameraCmdPtr &_msg);
 
       /// \brief Create the ogre camera.
       private: void CreateCamera();
@@ -704,6 +712,23 @@ namespace gazebo
       /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
       /// devation of the distibution from which we sample
       private: double noiseStdDev;
+
+      /// \brief Communication Node
+      private: transport::NodePtr node;
+
+      /// \brief Subscribe to camera command topic
+      private: transport::SubscriberPtr cmdSub;
+
+      /// \def CameraCmdMsgs_L
+      /// \brief List for holding camera command messages.
+      typedef std::list<boost::shared_ptr<msgs::CameraCmd const> >
+        CameraCmdMsgs_L;
+
+      /// \brief List of camera cmd messages.
+      private: CameraCmdMsgs_L commandMsgs;
+
+      /// \brief Mutex to lock the various message buffers.
+      private: boost::mutex receiveMutex;
     };
     /// \}
   }

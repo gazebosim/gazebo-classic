@@ -120,5 +120,18 @@ namespace gazebo
     // Documentation inherited
     protected: virtual bool RunImpl();
   };
+
+  /// \brief Camera command
+  class CameraCommand : public Command
+  {
+    /// \brief Constructor
+    public: CameraCommand();
+
+    // Documentation inherited
+    public: virtual void HelpDetailed();
+
+    // Documentation inherited
+    protected: virtual bool RunImpl();
+  };
 }
 #endif

@@ -37,10 +37,7 @@ boost::condition_variable g_msgCondition;
 /////////////////////////////////////////////////
 bool custom_exec(std::string _cmd)
 {
-  printf("System\n");
-  system(_cmd.c_str());
-
-  return true;
+  return system(_cmd.c_str()) >= 0;
 }
 
 /////////////////////////////////////////////////
@@ -154,6 +151,14 @@ void WorldControlCB(ConstWorldControlPtr &_msg)
 
 /////////////////////////////////////////////////
 void PhysicsCB(ConstPhysicsPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(g_mutex);
+  g_msgDebugOut = _msg->DebugString();
+  g_msgCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+void CameraCB(ConstCameraCmdPtr &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_msgDebugOut = _msg->DebugString();
