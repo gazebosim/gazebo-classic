@@ -24,9 +24,6 @@
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo_config.h"
-#ifdef HAVE_URDFDOM
-  #include "gazebo/sdf/interface/parser_urdf.hh"
-#endif
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -296,20 +293,10 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     return true;
   else
   {
-#ifdef HAVE_URDFDOM
-    urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.InitModelFile(filename);
-    if (sdf::readDoc(&doc, _sdf, "urdf file"))
-    {
-      gzlog << "parse from urdf file [" << filename << "].\n";
-      return true;
-    }
+    if (_filename.find(".urdf") != std::string::npos)
+      gzerr << "Unable to parse URDF without RML installed.\n";
     else
-    {
-      gzerr << "parse as old urdf model file failed.\n";
-      return false;
-    }
-#endif
+      gzerr << "Unable to parser file[" << _filename << "]\n";
   }
 
   return false;
@@ -323,22 +310,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
   if (readDoc(&xmlDoc, _sdf, "data-string"))
     return true;
   else
-  {
-#ifdef HAVE_URDFDOM
-    urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.InitModelString(_xmlString);
-    if (sdf::readDoc(&doc, _sdf, "urdf string"))
-    {
-      gzlog << "Parsing from urdf.\n";
-      return true;
-    }
-    else
-    {
-      gzerr << "parse as old urdf model file failed.\n";
-      return false;
-    }
-#endif
-  }
+    gzerr << "Unable to parser string[" << _xmlString << "]\n";
 
   return false;
 }

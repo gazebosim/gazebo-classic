@@ -5,16 +5,6 @@ include_directories(
   ${RML_INCLUDE_DIRS}
 )
 
-# Remove this whole if block in Gazebo 2.0
-if (NOT HAVE_RML)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS}
-    ${console_bridge_LIBRARY_DIRS}
-    )
-endif()
-
-
 set (plugins
   CameraPlugin
   CartTestPlugin
