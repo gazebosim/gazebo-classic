@@ -74,10 +74,18 @@ bool init(SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
+  std::string sdfFilename;
   std::string filename = find_file(_filename);
 
+  // This can be removed in gazebo 2.0
+  if (_filename.find(".rml") == _filename.size()-4)
+  {
+    sdfFilename = _filename.substr(0, _filename.find(".rml")) + ".sdf";
+    sdfFilename = find_file(sdfFilename);
+  }
+
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(filename))
+  if (xmlDoc.LoadFile(filename) || xmlDoc.LoadFile(sdfFilename))
   {
     return initDoc(&xmlDoc, _sdf);
   }
@@ -90,11 +98,21 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
+  std::string sdfFilename;
   std::string filename = find_file(_filename);
 
+  // This can be removed in gazebo 2.0
+  if (_filename.find(".rml") == _filename.size()-4)
+  {
+    sdfFilename = _filename.substr(0, _filename.find(".rml")) + ".sdf";
+    sdfFilename = find_file(sdfFilename);
+  }
+
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(filename))
+  if (xmlDoc.LoadFile(filename) || xmlDoc.LoadFile(sdfFilename))
+  {
     return initDoc(&xmlDoc, _sdf);
+  }
   else
     gzerr << "Unable to load file[" << _filename << "]\n";
 
