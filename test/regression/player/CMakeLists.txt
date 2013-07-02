@@ -1,5 +1,4 @@
 include_directories (
-  ${PROJECT_BINARY_DIR}/gazebo 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
