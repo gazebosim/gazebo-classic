@@ -148,7 +148,8 @@ namespace gazebo
                                         const std::string &_mode);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
-      private: void TranslateEntity(rendering::VisualPtr &_vis);
+      private: void TranslateEntity(rendering::VisualPtr &_vis,
+          bool _local = false);
 
       private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
