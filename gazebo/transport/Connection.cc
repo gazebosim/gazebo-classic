@@ -96,7 +96,7 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  delete this->headerBuffer;
+  delete [] this->headerBuffer;
   this->headerBuffer = NULL;
 
   this->Shutdown();
