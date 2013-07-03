@@ -71,7 +71,8 @@ namespace gazebo
 
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \return Signal strength in a world's point (dBm).
-      public: double GetSignalStrength(const math::Pose _receiver);
+      public: double GetSignalStrength(const math::Pose _receiver,
+          const double rxGain);
 
       /// \brief Size of the grid used for visualization.
       private: static const double STEP;

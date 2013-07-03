@@ -33,9 +33,9 @@ using namespace physics;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
 
-const double WirelessTransmitter::N_EMPTY = 10.0;
-const double WirelessTransmitter::N_OBSTACLE = 20.0;
-const double WirelessTransmitter::MODEL_STD_DESV = 3.0;
+const double WirelessTransmitter::N_EMPTY = 10;
+const double WirelessTransmitter::N_OBSTACLE = 15.0;
+const double WirelessTransmitter::MODEL_STD_DESV = 6.0;
 const double WirelessTransmitter::XLIMIT = 10.0;
 const double WirelessTransmitter::YLIMIT = 10.0;
 const double WirelessTransmitter::STEP = 1.0;
@@ -72,7 +72,9 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
       while (y <= YLIMIT)
       {
         pos = math::Pose(x, y, 0, 0, 0, 0);
-        strength = this->GetSignalStrength(pos);
+        // For the propagation model assume the receiver antenna has the same
+        // gain as the transmitter
+        strength = this->GetSignalStrength(pos, this->GetGain());
 
         // Add a new particle to the grid
         p = msg.add_particle();
@@ -109,7 +111,8 @@ math::Pose WirelessTransmitter::GetPose() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
+double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
+    const double rxGain)
 {
   math::Pose txPos = this->GetPose();
   std::string entityName;
@@ -120,9 +123,6 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->
       GetPhysicsUpdateMutex()));
-
-  // We assume that rxGain is equals to txGain
-  double gainRx = this->gain;
   
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = N_EMPTY;
@@ -148,7 +148,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
   double wavelength = C / this->GetFreq();
 
   // Hata-Okumara propagation model
-  double rxPower = this->GetPower() + this->GetGain() + gainRx - x +
+  double rxPower = this->GetPower() + this->GetGain() + rxGain - x +
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
 
   return rxPower;

@@ -80,7 +80,7 @@ std::string TransmitterVisual::GetTemplateSDFString()
     <<     "<material>"
     <<       "<script>"
     <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
-    <<         "<name>Gazebo/GreyTransparent</name>"
+    <<         "<name>Gazebo/Grey</name>"
     <<       "</script>"
     <<     "</material>"
     <<   "</visual>"
@@ -127,7 +127,7 @@ void TransmitterVisual::Update()
       rendering::VisualPtr linkVisual(
           new rendering::Visual("test::" + si.str(), shared_from_this()));
       linkVisual->Load(visualElem);
-      linkVisual->SetTransparency(0.9);
+      //linkVisual->SetTransparency(0.2);
       linkVisual->SetPosition(math::Vector3(0, 0, 0));
       this->vectorLink.push_back(linkVisual);
     }
@@ -149,6 +149,6 @@ void TransmitterVisual::Update()
     rendering::VisualPtr linkVisual = this->vectorLink[i];
     linkVisual->SetPosition(math::Vector3(p.x(), p.y(), 0));
     linkVisual->SetDiffuse(color);
-    linkVisual->SetTransparency(0.8);
+    //linkVisual->SetTransparency(0.2);
   }
 }

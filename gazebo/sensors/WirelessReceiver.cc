@@ -51,49 +51,30 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
   if (this->pub)                                                           
   {
-    std::string id;                                                                           
+    std::string txEssid;                                                                           
     msgs::WirelessNodes msg;
     double rxPower;
     double txFreq;
-    double txGain;
-    math::Pose txPos;
-    double txPow;
-    double x;
-    double wavelength;
 
+    math::Pose myPos = entity->GetWorldPose();
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
     for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
     {
       if ((*it)->GetType() == "wirelessTransmitter")
       {
-        id = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+        txEssid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetESSID();
         txFreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetFreq();
-        txPow = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetPower();
-        txGain = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetGain();
-        txPos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetPose();
+        rxPower = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetSignalStrength(myPos, this->GetGain());
 
         msgs::WirelessNode *wirelessNode = msg.add_node();
-        wirelessNode->set_essid(id);
+        wirelessNode->set_essid(txEssid);
         wirelessNode->set_frequency(txFreq);
-
-        math::Pose myPos = entity->GetWorldPose();
-        double distance = myPos.pos.Distance(txPos.pos);
-        
-        x = math::Rand::GetDblNormal(0.0, WirelessTransmitter::MODEL_STD_DESV);
-        wavelength = C / txFreq;
-
-        rxPower = txPow + txGain + this->gain - x + 20 * log10(wavelength) -
-                  20 * log10(4 * M_PI) -
-                  10 * WirelessTransmitter::N_EMPTY * log10(distance);
         wirelessNode->set_signal_level(rxPower);
       }
-    }
-                                                                                
+    }                                
     this->pub->Publish(msg);                                               
   }
 }
