@@ -1095,31 +1095,40 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 {
   math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
 
-  math::Vector3 axisA;
-  math::Vector3 axisB;
+//  math::Vector3 axisA;
+//  math::Vector3 axisB;
   math::Vector3 rpyAmt;
+
+  math::Vector3 normal;
 
   if (this->keyText == "x" || this->keyText == "X")
   {
-    axisA = mouseMoveVisStartPose.rot.GetYAxis();
-    axisB = mouseMoveVisStartPose.rot.GetZAxis();
+//    axisA = mouseMoveVisStartPose.rot.GetYAxis();
+//    axisB = mouseMoveVisStartPose.rot.GetZAxis();
+    normal = mouseMoveVisStartPose.rot.GetXAxis();
+
     rpyAmt.x = 1.0;
   }
   else if (this->keyText == "y" || this->keyText == "Y")
   {
-    axisA = mouseMoveVisStartPose.rot.GetZAxis();
-    axisB = mouseMoveVisStartPose.rot.GetXAxis();
+//    axisA = mouseMoveVisStartPose.rot.GetZAxis();
+//    axisB = mouseMoveVisStartPose.rot.GetXAxis();
+
+    normal = mouseMoveVisStartPose.rot.GetYAxis();
     rpyAmt.y = 1.0;
   }
   else
   {
-    axisA = this->mouseMoveVisStartPose.rot.GetXAxis();
-    axisB = this->mouseMoveVisStartPose.rot.GetYAxis();
+//    axisA = this->mouseMoveVisStartPose.rot.GetXAxis();
+//    axisB = this->mouseMoveVisStartPose.rot.GetYAxis();
+
+    normal = mouseMoveVisStartPose.rot.GetZAxis();
     rpyAmt.z = 1.0;
   }
 
-  math::Vector3 normal = (axisA.Cross(axisB)).Normalize();
-  double offset = normal.Dot(this->mouseMoveVisStartPose.pos);
+//  math::Vector3 normal = (axisA.Cross(axisB)).Normalize();
+//  double offset = normal.Dot(this->mouseMoveVisStartPose.pos);
+  double offset = this->mouseMoveVisStartPose.pos.Dot(normal);
 
   math::Vector3 pressPoint;
   this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pressPos.x,
