@@ -355,7 +355,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
   this->ConnectSubscribers(_pub.topic());
 }
 
-
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType)

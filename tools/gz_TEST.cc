@@ -67,13 +67,19 @@ void waitForMsg(const std::string &_cmd)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_msgDebugOut.clear();
-  std::string result = custom_exec_str(_cmd);
-  std::cout << "R[" << result << "]\n";
-  //EXPECT_TRUE();
 
-  EXPECT_TRUE(g_msgCondition.timed_wait(lock,
-        boost::posix_time::milliseconds(10000)));
+  bool good = false;
+  int iters = 0;
+  while (!good and iters < 10)
+  {
+    custom_exec(_cmd);
 
+    good = g_msgCondition.timed_wait(lock,
+        boost::posix_time::milliseconds(1000));
+    ++iters;
+  }
+
+  EXPECT_LT(iters, 10);
   EXPECT_TRUE(!g_msgDebugOut.empty());
 }
 
@@ -515,7 +521,7 @@ TEST(gz, Stress)
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
   gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/world_control", &WorldControlCB);
+    node->Subscribe("~/world_control", &WorldControlCB, true);
 
   // Run the transport loop: starts a new thread
   gazebo::transport::run();
@@ -523,13 +529,13 @@ TEST(gz, Stress)
   // Test world reset time
   for (unsigned int i = 0; i < 1000; ++i)
   {
-    printf("I[%d]\n", i);
     waitForMsg("gz world -w default -t");
 
     gazebo::msgs::WorldControl msg;
     msg.mutable_reset()->set_time_only(true);
     ASSERT_EQ(g_msgDebugOut, msg.DebugString());
   }
+
   fini();
 }
 

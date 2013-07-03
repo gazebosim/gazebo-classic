@@ -26,6 +26,8 @@
 using namespace gazebo;
 using namespace transport;
 
+uint32_t Publisher::idCounter = 0;
+
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, bool /*_latch*/)
@@ -33,7 +35,8 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 {
   this->queueLimitWarned = false;
   this->updatePeriod = 0;
-  this->waiting = false;
+  this->pubId = 0;
+  this->id = ++idCounter;
 }
 
 //////////////////////////////////////////////////
@@ -46,18 +49,13 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
-  this->waiting = false;
   this->pubId = 0;
+  this->id = ++idCounter;
 }
 
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
-  printf("Delete Publisher\n");
-  this->Fini();
-
-  if (this->pubIds.size() > 0)
-    printf("Error\n");
 }
 
 //////////////////////////////////////////////////
@@ -128,10 +126,10 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   MessagePtr msgPtr(_message.New());
   msgPtr->CopyFrom(_message);
 
+  this->publication->SetPrevMsg(this->id, msgPtr);
+
   {
     boost::mutex::scoped_lock lock(this->mutex);
-    if (this->prevMsg == NULL)
-      this->prevMsg = msgPtr;
 
     this->messages.push_back(msgPtr);
 
@@ -154,9 +152,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
   if (_block)
   {
-    printf("SendMessage\n");
     this->SendMessage();
-    printf("SendMessage complete\n");
   }
   else
   {
@@ -174,15 +170,12 @@ void Publisher::SendMessage()
   {
     boost::mutex::scoped_lock lock(this->mutex);
     if (!this->pubIds.empty() || this->messages.empty())
-    {
-      printf("return\n");
       return;
-    }
 
     for (unsigned int i = 0; i < this->messages.size(); ++i)
     {
       this->pubId = (this->pubId + 1) % 10000;
-      this->pubIds.push_back(this->pubId);
+      this->pubIds[this->pubId] = 0;
       localIds.push_back(this->pubId);
     }
 
@@ -200,10 +193,12 @@ void Publisher::SendMessage()
     for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
-      printf("Publication message\n");
       // Send the latest message.
-      this->publication->Publish(*iter,
+      this->pubIds[*pubIter] = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+
+      if (this->pubIds[*pubIter] <= 0)
+        this->pubIds.erase(*pubIter);
     }
 
     // Clear the local buffer.
@@ -242,13 +237,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  std::list<uint32_t>::iterator iter =
-    std::find(this->pubIds.begin(), this->pubIds.end(), _id);
-  if (iter != this->pubIds.end())
-  {
+  std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+  if (iter != this->pubIds.end() && (--iter->second) <= 0)
     this->pubIds.erase(iter);
-    this->waiting = false;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -271,32 +262,17 @@ bool Publisher::GetLatching() const
 }
 
 //////////////////////////////////////////////////
-std::string Publisher::GetPrevMsg() const
-{
-  std::string result;
-  boost::mutex::scoped_lock lock(this->mutex);
-  if (this->prevMsg)
-    this->prevMsg->SerializeToString(&result);
-  return result;
-}
-
-//////////////////////////////////////////////////
-MessagePtr Publisher::GetPrevMsgPtr() const
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  if (this->prevMsg)
-    return this->prevMsg;
-  return MessagePtr();
-}
-
-//////////////////////////////////////////////////
 void Publisher::Fini()
 {
-  printf("Fini publisher\n");
-  this->node.reset();
   if (!this->messages.empty())
     this->SendMessage();
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
+
+  // Wait for the message to be published
+  while (!this->pubIds.empty())
+    usleep(100);
+
+  this->node.reset();
 }

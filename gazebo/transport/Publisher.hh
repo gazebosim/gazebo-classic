@@ -118,14 +118,6 @@ namespace gazebo
       /// Deprecated
       public: bool GetLatching() const GAZEBO_DEPRECATED(1.5);
 
-      /// \brief Get the previously published message
-      /// \return The previously published message, if any
-      public: std::string GetPrevMsg() const;
-
-      /// \brief Get the previously published message
-      /// \return The previously published message, if any
-      public: MessagePtr GetPrevMsgPtr() const;
-
       /// \brief Finalize the publisher.
       public: void Fini();
 
@@ -168,21 +160,21 @@ namespace gazebo
       /// one for debug.
       private: PublicationPtr publication;
 
-      /// \brief The previous message published. Used for latching topics.
-      private: MessagePtr prevMsg;
-
       /// \brief Pointer to our containing node.
       private: NodePtr node;
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
 
-      /// \brief True if waiting to here back about a sent message.
-      private: bool waiting;
-
       /// \brief Current id of the sent message.
       private: uint32_t pubId;
-      private: std::list<uint32_t> pubIds;
+      private: std::map<uint32_t, int> pubIds;
+
+      /// \brief Unique ID for this publisher.
+      private: uint32_t id;
+
+      /// \brief Counter to create unique ID for publishers.
+      private: static uint32_t idCounter;
     };
     /// \}
   }

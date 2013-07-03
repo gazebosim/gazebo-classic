@@ -112,7 +112,9 @@ namespace gazebo
       /// \param[in] _msg Message to be published
       /// \param[in] _cb Callback to be invoked after publishing
       /// is completed
-      public: void Publish(MessagePtr _msg,
+      /// \return Number of remote subscribers that will receive the
+      /// message.
+      public: int Publish(MessagePtr _msg,
                   boost::function<void(uint32_t)> _cb,
                   uint32_t _id);
 
@@ -134,6 +136,11 @@ namespace gazebo
       /// \brief Remove a publisher
       /// \param[in] _pub Pointer to publisher object to remove
       public: void RemovePublisher(PublisherPtr _pub);
+
+      /// \brief Set the previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \param[in] _msg The previous message.
+      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
 
       /// \brief Remove nodes that have been marked for removal
       private: void RemoveNodes();
@@ -167,6 +174,9 @@ namespace gazebo
 
       /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
+
+      /// \brief Publishers and their last messages.
+      private: std::map<uint32_t, MessagePtr> prevMsgs;
 
       /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;

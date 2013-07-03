@@ -46,6 +46,7 @@ void Publication::AddSubscription(const NodePtr &_node)
 
   {
     boost::mutex::scoped_lock lock(this->nodeMutex);
+
     endIter = this->nodes.end();
     iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
   }
@@ -59,12 +60,13 @@ void Publication::AddSubscription(const NodePtr &_node)
 
     boost::mutex::scoped_lock lock(this->callbackMutex);
 
-    std::vector<PublisherPtr>::iterator pubIter;
-    for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
-         ++pubIter)
+    for (std::map<uint32_t, MessagePtr>::iterator pubIter =
+        this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
     {
-      if ((*pubIter)->GetPrevMsgPtr())
-        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsgPtr());
+      if (pubIter->second)
+      {
+        _node->InsertLatchedMsg(this->topic, pubIter->second);
+      }
     }
   }
 }
@@ -79,19 +81,27 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
   if (iter == this->callbacks.end())
   {
+
     this->callbacks.push_back(_callback);
 
     if (_callback->GetLatching())
     {
-      std::vector<PublisherPtr>::iterator pubIter;
-      for (pubIter = this->publishers.begin();
-           pubIter != this->publishers.end(); ++pubIter)
+      for (std::map<uint32_t, MessagePtr>::iterator pubIter =
+          this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
       {
-        if ((*pubIter)->GetPrevMsgPtr())
-          _callback->HandleMessage((*pubIter)->GetPrevMsgPtr());
+        if (pubIter->second)
+        {
+          _callback->HandleMessage(pubIter->second);
+        }
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
+{
+  this->prevMsgs[_pubId] = _msg;
 }
 
 //////////////////////////////////////////////////
@@ -268,9 +278,10 @@ void Publication::LocalPublish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+int Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
     uint32_t _id)
 {
+  int result = 0;
   std::list<NodePtr>::iterator iter, endIter;
 
   {
@@ -305,19 +316,26 @@ void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
       while (cbIter != this->callbacks.end())
       {
         if ((*cbIter)->HandleData(data, _cb, _id))
+        {
+          ++result;
           ++cbIter;
+        }
         else
           this->callbacks.erase(cbIter++);
       }
 
       if (this->callbacks.empty() && !_cb.empty())
+      {
         _cb(_id);
+      }
     }
     else if (!_cb.empty())
     {
       _cb(_id);
     }
   }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

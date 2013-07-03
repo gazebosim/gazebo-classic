@@ -656,8 +656,6 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &_host,
       return ConnectionPtr();
     }
   }
-  // else
-  //  printf("Found Connections\n");
 
   return conn;
 }

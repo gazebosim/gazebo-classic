@@ -156,7 +156,6 @@ namespace gazebo
           transport::TopicManager::Instance()->Advertise<M>(
               decodedTopic, _queueLimit, _hzRate);
 
-        printf("Ad[%d]\n", publisher.use_count());
         boost::mutex::scoped_lock lock(this->publisherMutex);
         publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);

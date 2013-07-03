@@ -149,16 +149,17 @@ WorldCommand::WorldCommand()
 /////////////////////////////////////////////////
 void WorldCommand::HelpDetailed()
 {
-  std::cout << 
+  std::cout <<
     "\tChange properties of a Gazebo world on a running\n "
     "\tserver. If a name for the world, option -w, is not specified\n"
-    "\tthe first world found on the Gazebo master will be used.\n" 
+    "\tthe first world found on the Gazebo master will be used.\n"
     << std::endl;
 }
 
 /////////////////////////////////////////////////
 bool WorldCommand::RunImpl()
 {
+  printf("WorldCommand::RunImpl\n");
   std::string worldName;
 
   if (this->vm.count("world-name"))
@@ -186,10 +187,10 @@ bool WorldCommand::RunImpl()
     msg.mutable_reset()->set_model_only(true);
 
 
-  printf("Publish\n");
+  printf("WorldCommand. Publish\n");
   pub->Publish(msg, true);
   node->Fini();
-  printf("Use count[%d]\n", pub.use_count());
+  printf("Node Use count[%d]\n", pub.use_count());
   pub.reset();
 
   return true;
@@ -215,7 +216,7 @@ void PhysicsCommand::HelpDetailed()
   std::cout <<
     "\tChange properties of the physics engine on a specific\n"
     "\tworld. If a name for the world, option -w, is not specified,\n"
-    "\tthe first world found on the Gazebo master will be used.\n" 
+    "\tthe first world found on the Gazebo master will be used.\n"
     << std::endl;
 }
 
@@ -286,7 +287,7 @@ void ModelCommand::HelpDetailed()
     "\tChange properties of a model, delete a model, or\n"
     "\tspawn a new model. If a name for the world, option -w, is\n"
     "\tnot pecified, the first world found on the Gazebo master\n"
-    "\twill be used.\n" 
+    "\twill be used.\n"
     << std::endl;
 }
 
@@ -424,7 +425,7 @@ void JointCommand::HelpDetailed()
   std::cout <<
     "\tChange properties of a joint. If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
-    "\tthe Gazebo master will be used.\n" 
+    "\tthe Gazebo master will be used.\n"
     "\tA model name and joint name are required.\n"
     << std::endl;
 }
@@ -528,7 +529,7 @@ void CameraCommand::HelpDetailed()
   std::cout <<
     "\tChange properties of a camera. If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
-    "\tthe Gazebo master will be used.\n" 
+    "\tthe Gazebo master will be used.\n"
     "\tA camera name is required.\n"
     << std::endl;
 }
