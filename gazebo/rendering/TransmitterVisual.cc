@@ -19,25 +19,14 @@
  * Date: 27 Jun 2013
  */
 
-#include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
-
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/LaserVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
-
-#include "gazebo/sensors/WirelessTransmitter.hh"
-
-#include "gazebo/physics/physics.hh"
-
-#include <iostream>
-using namespace std;
 
 using namespace gazebo;
 using namespace rendering;
-using namespace sensors;
 
 /////////////////////////////////////////////////
 TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
@@ -65,60 +54,13 @@ TransmitterVisual::~TransmitterVisual()
   this->rayFan = NULL;
 }
 
+/////////////////////////////////////////////////
 void TransmitterVisual::Load()
 {
   Visual::Load();
-  /*this->modelTemplateSDF.reset(new sdf::SDF);
-  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
-
-   sdf::ElementPtr visualElem = this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-
-  rendering::VisualPtr linkVisual(new rendering::Visual("test", shared_from_this()));
-  linkVisual->Load(visualElem);
-  linkVisual->SetTransparency(0);
-  linkVisual->SetPosition(math::Vector3(0, 0, 0));
-
-  double x = -10.0;
-  double y = -10.0;
-  for (int i = 0; i < 21; i++)
-  {
-    for (int j = 0; j < 21; j++)
-    {
-      math::Pose pose = math::Pose(x, y, 0, 0, 0, 0);
-
-      // Assuming that the Rx gain is the same as Tx gain
-      double strength = WirelessTransmitter::GetSignalStrength(
-        this->GetWorldPose(), pose);
-
-      common::Color color(strength, strength, strength);
-
-      stringstream sx;
-      stringstream sy;
-      sx << i;
-      sy << j;
-
-      rendering::VisualPtr link2Visual = linkVisual->Clone("New name::" +
-        sx.str() + "::" + sy.str(), linkVisual->GetParent());
-      
-      link2Visual->SetPosition(math::Vector3(x + 0.05, y + 0.05, 0));
-      link2Visual->SetDiffuse(color);
-      link2Visual->SetTransparency(0);
-
-      //cout << sx.str() << "," << sy.str() << ":" << strength << endl;
-      x += 1.0;
-    }
-    x = -10.0;
-    y += 1.0;
-  }*/
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
-
-  /*this->linkVisual.reset(new rendering::Visual("test", shared_from_this()));
-  this->linkVisual->Load(visualElem);
-  linkVisual->SetTransparency(0.9);
-  this->linkVisual->SetPosition(math::Vector3(0, 0, 0));*/
 }
 
 /////////////////////////////////////////////////
@@ -155,7 +97,6 @@ std::string TransmitterVisual::GetTemplateSDFString()
 void TransmitterVisual::OnScan(ConstPropagationGridPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  cout << "Grid received\n";
 
   this->gridMsg = _msg;
   this->receivedMsg = true;
@@ -182,11 +123,11 @@ void TransmitterVisual::Update()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     for (int i = 0; i < gridMsg->particle_size(); i++)
     {
-      stringstream si;
+      std::stringstream si;
       si << i;
-      /*rendering::VisualPtr link2Visual = this->linkVisual->Clone("New name::" +
-      si.str(), this->linkVisual->GetParent());*/
-      rendering::VisualPtr link2Visual(new rendering::Visual("test::" + si.str(), shared_from_this()));
+
+      rendering::VisualPtr link2Visual(
+          new rendering::Visual("test::" + si.str(), shared_from_this()));
       link2Visual->Load(visualElem);
       link2Visual->SetTransparency(0.9);
       link2Visual->SetPosition(math::Vector3(0, 0, 0));
@@ -199,7 +140,6 @@ void TransmitterVisual::Update()
   {
     gazebo::msgs::PropagationParticle p;
     p = gridMsg->particle(i);
-    //cout << "Particle received " << p.x() << "," << p.y() << ": "<< p.signal_level() << endl;
 
     double x = p.x();
     double y = p.y();
@@ -216,9 +156,5 @@ void TransmitterVisual::Update()
     link2Visual->SetPosition(math::Vector3(x, y, 0));
     link2Visual->SetDiffuse(color);
     link2Visual->SetTransparency(0.8);
-    cout << strength << endl;
-
   }
-  //linkVisual->SetTransparency(0.9);
-
 }

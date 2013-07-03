@@ -19,26 +19,24 @@
  * Date: 24 June 2013
  */
 
-#include "gazebo/common/Exception.hh"
-
+#include "gazebo/math/Rand.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/WirelessTransmitter.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/sensors/SensorFactory.hh"
-#include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/sensors/WirelessTransmitter.hh"
-
-#include "gazebo/physics/physics.hh"
-
-#include <iostream>
-using namespace std;
 
 using namespace gazebo;
 using namespace sensors;
 using namespace physics;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
+
+const double WirelessTransmitter::XLIMIT = 10.0;
+const double WirelessTransmitter::YLIMIT = 10.0;
+const double WirelessTransmitter::STEP = 1.0;
+const unsigned int WirelessTransmitter::C = 300000000;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
@@ -69,7 +67,8 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->entity = this->world->GetEntity(this->parentName);
-  this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(), 30);
+  this->pub = this->node->Advertise<msgs::PropagationGrid>(
+      this->GetTopic(), 30);
 
   if (this->sdf->HasElement("transceiver"))
   {
@@ -78,39 +77,82 @@ void WirelessTransmitter::Load(const std::string &_worldName)
     if (transElem->HasElement("essid"))
     {
       this->essid = transElem->GetValueString("essid");
-      //cout << "ESSID: " << this->essid << endl;
     }
 
     if (transElem->HasElement("frequency"))
     {
       this->freq = transElem->GetValueDouble("frequency");
-      //cout << "Freq: " << this->freq << endl;
     }
 
     if (transElem->HasElement("power"))
     {
       this->power = transElem->GetValueDouble("power");
-      //cout << "Power: " << this->gain << endl;
     }
 
     if (transElem->HasElement("gain"))
     {
       this->gain = transElem->GetValueDouble("gain");
-      //cout << "Gain: " << this->gain << endl;
     }
   }
 }
 
-/////////////////////////////////////////////////
-double WirelessTransmitter::GetFreq()
+//////////////////////////////////////////////////
+void WirelessTransmitter::Init()
 {
-  return this->freq;
+  Sensor::Init();
+}
+
+//////////////////////////////////////////////////
+void WirelessTransmitter::UpdateImpl(bool /*_force*/)
+{
+  if (this->pub)                                                           
+  {                                                                             
+    msgs::PropagationGrid msg;
+    math::Pose pos;
+    double strength;
+    msgs::PropagationParticle *p;
+    
+    double x = -XLIMIT;
+    double y = -YLIMIT;
+    while (x <= XLIMIT)
+    {
+      while (y <= YLIMIT)
+      {
+        pos = math::Pose(x, y, 0, 0, 0, 0);
+        strength = this->GetSignalStrength(pos);
+
+        // Add a new particle to the grid
+        p = msg.add_particle();
+        p->set_x(x);
+        p->set_y(y);
+        p->set_signal_level(strength);
+        
+        y += STEP;
+      }
+      x += STEP ;
+      y = -YLIMIT;
+    }                                                                          
+    this->pub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void WirelessTransmitter::Fini()
+{
+  Sensor::Fini();
+  this->entity.reset();
 }
 
 /////////////////////////////////////////////////
 std::string WirelessTransmitter::GetESSID()
 {
   return this->essid;
+}
+
+/////////////////////////////////////////////////
+double WirelessTransmitter::GetFreq()
+{
+  return this->freq;
 }
 
 /////////////////////////////////////////////////
@@ -126,100 +168,47 @@ double WirelessTransmitter::GetPower()
 }
 
 /////////////////////////////////////////////////
-void WirelessTransmitter::Fini()
+double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
 {
-  Sensor::Fini();
-  this->entity.reset();
-}
+  math::Pose txPos = this->GetPose();
+  std::string entityName;
+  double dist;
+  math::Vector3 start = txPos.pos;
+  math::Vector3 end = _receiver.pos;
 
-//////////////////////////////////////////////////
-void WirelessTransmitter::Init()
-{
-  Sensor::Init();
-}
+  // Acquire the mutex for avoiding race condition with the physics engine
+  boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->
+      GetPhysicsUpdateMutex()));
 
-//////////////////////////////////////////////////
-void WirelessTransmitter::UpdateImpl(bool /*_force*/)
-{
-  if (this->pub)                                                           
-  {                                                                             
-    msgs::PropagationGrid msg;
-    
-    double x = -10.0;
-    double y = -10.0;
-    for (int i = 0; i < 20; i++)
-    {
-      for (int j = 0; j < 20; j++)
-      {
-        math::Pose pos = math::Pose(x, y, 0, 0, 0, 0);
-
-
-        double strength = WirelessTransmitter::GetSignalStrength(
-          this->GetPose(), pos);
-
-        msgs::PropagationParticle *p = msg.add_particle();
-        p->set_x(x);
-        p->set_y(y);
-        p->set_signal_level(strength);
-        
-        x += 1.0;
-      }
-      x = -10.0;
-      y += 1.0;
-    }                                                                          
-    this->pub->Publish(msg);
-  }
-}
-
-double WirelessTransmitter::GetSignalStrength(const math::Pose _transmitter,
-        const math::Pose _receiver)
-{
-  physics::WorldPtr world = physics::get_world("default");
-
-  boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
-
-  double _powTx = 14.5;
-  double _gainTx = 2.5;
-  double _gainRx = 2.5;
-  double _freq = 2442.0;
+  // We assume that rxGain is equals to txGain
+  double gainRx = this->gain;
   
-  // Compute the value of N deppending on the number of objects between
-  // transmitter and receiver
-  double N = 10;
+  // Compute the value of n depending on the obstacles between Tx and Rx
+  double n = 10;
 
   /// \brief Ray used to test for collisions when placing entities.
   physics::RayShapePtr testRay;
   
-  if (world == NULL)
-  {
-    cout << "World is NULL\n" ;
-    return 0.0;
-  }
-
   testRay = boost::dynamic_pointer_cast<RayShape>(
       world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  std::string entityName;
-  double dist;
-  math::Vector3 start = _transmitter.pos;
-  math::Vector3 end = _receiver.pos;
   testRay->SetPoints(start, end);
   testRay->GetIntersection(dist, entityName);
-  cout << dist << "," << entityName << endl;
-
   testRay.reset();
 
-  double distance = _transmitter.pos.Distance(_receiver.pos);
+  //ToDo: The ray will intersect with my own collision model. Fix it.
   if (dist > 0 && entityName != "")
   {
-    N = 20;
+    n = 20;
   }
-  
-  double x = math::Rand::GetDblNormal(0.0, 3.0);
-  double wavelength = 300000000 / _freq;
 
-  double rxPower = _powTx + _gainTx + _gainRx - x + 20 * log10(wavelength) -
-            20 * log10(4 * M_PI) - 10 * N * log10(distance);
+  double distance = txPos.pos.Distance(_receiver.pos);  
+  double x = math::Rand::GetDblNormal(0.0, 3.0);
+  double wavelength = C / this->GetFreq();
+
+  // Propagation model
+  double rxPower = this->GetPower() + this->GetGain() + gainRx - x +
+      20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
 
   return rxPower;
 }

@@ -19,25 +19,14 @@
  * Date: 24 June 2013
  */
 
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/Entity.hh"
-
-#include "gazebo/common/Exception.hh"
-
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-
+#include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/WirelessReceiver.hh"
 #include "gazebo/sensors/WirelessTransmitter.hh"
-
-#include <iostream>
-using namespace std;
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -46,7 +35,6 @@ GZ_REGISTER_STATIC_SENSOR("wirelessReceiver", WirelessReceiver)
 
 const double WirelessReceiver::N = 4.5;
 const double WirelessReceiver::C = 300000000;
-
 
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
@@ -58,7 +46,6 @@ WirelessReceiver::WirelessReceiver()
 /////////////////////////////////////////////////
 WirelessReceiver::~WirelessReceiver()
 {
-  // this->link.reset();
 }
 
 //////////////////////////////////////////////////                              
@@ -86,19 +73,16 @@ void WirelessReceiver::Load(const std::string &_worldName)
     if (transElem->HasElement("frequency"))
     {
       this->freq = transElem->GetValueDouble("frequency");
-      //cout << "Freq: " << this->freq << endl;
     }
 
     if (transElem->HasElement("power"))
     {
       this->power = transElem->GetValueDouble("power");
-      //cout << "Power: " << this->gain << endl;
     }
 
     if (transElem->HasElement("gain"))
     {
       this->gain = transElem->GetValueDouble("gain");
-      //cout << "Gain: " << this->gain << endl;
     }
   }
 }
@@ -119,15 +103,15 @@ void WirelessReceiver::Init()
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
   if (this->pub)                                                           
-  {                                                                             
+  {
+    std::string id;                                                                           
     msgs::WirelessNodes msg;
-    std::string tid;
-    double tfreq;
-    double tpow;
-    double tgain;
-    math::Pose tpos;
-    double x;
     double rxPower;
+    double txFreq;
+    double txGain;
+    math::Pose txPos;
+    double txPow;
+    double x;
     double wavelength;
 
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
@@ -135,23 +119,28 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     {
       if ((*it)->GetType() == "wirelessTransmitter")
       {
-        tid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetESSID();
-        tfreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetFreq();
-        tpow = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPower();
-        tgain = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetGain();
-        tpos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->GetPose();
+        id = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetESSID();
+        txFreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetFreq();
+        txPow = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetPower();
+        txGain = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetGain();
+        txPos = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetPose();
 
         msgs::WirelessNode *wirelessNode = msg.add_node();
-        wirelessNode->set_essid(tid);
-        wirelessNode->set_frequency(tfreq);
+        wirelessNode->set_essid(id);
+        wirelessNode->set_frequency(txFreq);
 
         math::Pose myPos = entity->GetWorldPose();
-        double distance = myPos.pos.Distance(tpos.pos);
+        double distance = myPos.pos.Distance(txPos.pos);
         
         x = math::Rand::GetDblNormal(0.0, 10.0);
-        wavelength = C / tfreq;
+        wavelength = C / txFreq;
 
-        rxPower = tpow + tgain + this->gain - x + 20 * log10(wavelength) -
+        rxPower = txPow + txGain + this->gain - x + 20 * log10(wavelength) -
                   20 * log10(4 * M_PI) - 10 * N * log10(distance);
         wirelessNode->set_signal_level(rxPower);
       }

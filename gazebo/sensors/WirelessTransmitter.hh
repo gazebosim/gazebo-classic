@@ -22,14 +22,9 @@
 #ifndef _WIRELESS_TRANSMITTER_HH_
 #define _WIRELESS_TRANSMITTER_HH_
 
-#include <vector>
-#include <string>
-
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
-
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -63,36 +58,62 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Returns pose of transmitter in world coordinate.
+      /// \brief Returns the Service Set Identifier (network name).
+      /// \return Service Set Identifier (network name).
+      public: std::string GetESSID();
+
+      /// \brief Returns transmission frequency (MHz).
+      /// \return Transmission frequency (MHz).
+      public: double GetFreq();
+
+      /// \brief Returns the antenna's gain of the transmitter (dBi).
+      /// \return Antenna's gain of the transmitter (dBi).
+      public: double GetGain();
+
+      /// \brief Returns the pose of the transmitter in world coordinate.
       /// \return Pose of object.
       public: math::Pose GetPose() const
               {return entity->GetWorldPose();}
 
-      public: static double GetSignalStrength(const math::Pose _transmitter,
-        const math::Pose _receiver);
-
-      public: double GetFreq();
-
-      public: std::string GetESSID();
-
+      /// \brief Returns the transmitter power (dBm).
+      /// \return Transmitter power (dBm).
       public: double GetPower();
 
-      public: double GetGain();
+      /// \brief Returns the signal strength in a given world's point (dBm).
+      /// \return Signal strength in a world's point (dBm).
+      public: double GetSignalStrength(const math::Pose _receiver);
+
+      /// \brief The visualization shows the propagation model from a grid
+      /// in which the x coordinates go from -XLIMIT to XLIMIT.
+      private: static const double XLIMIT;
+
+      /// \brief The visualization shows the propagation model from a grid
+      /// in which the y coordinates go from -YLIMIT to YLIMIT.
+      private: static const double YLIMIT;
+
+      /// \brief Size of the grid used for visualization.
+      private: static const double STEP;
+
+      /// \brief Light velocity in the air.
+      private: static const unsigned int C;
 
       /// \brief Pointer the entity that has the transmitter.
       private: physics::EntityPtr entity;
 
-      private: transport::PublisherPtr pub;
-
-      private: double freq;
-
-      private: double signalLevel;
-
+      /// \brief Service Set Identifier (network name).
       private: std::string essid;
 
+      /// \brief Transmission frequency (MHz).
+      private: double freq;
+
+      /// \brief Antenna's gain of the transmitter (dBi).
+      private: double gain;
+
+      /// \brief Transmitter's power (dBm).
       private: double power;
 
-      private: double gain;
+      /// \brief Publisher to publish propagation model data
+      private: transport::PublisherPtr pub;
     };
     /// \}
   }

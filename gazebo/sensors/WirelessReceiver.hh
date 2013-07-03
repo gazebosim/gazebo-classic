@@ -22,16 +22,9 @@
 #ifndef _WIRELESS_RECEIVER_HH_
 #define _WIRELESS_RECEIVER_HH_
 
-#include <vector>
-#include <string>
-
 #include "gazebo/physics/PhysicsTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -66,26 +59,37 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
 
+      /// \brief Returns reception frequency (MHz).
+      /// \return Reception frequency (MHz).
       public: double GetFreq();
 
-      public: double GetPower();
-
+      /// \brief Returns the antenna's gain of the receiver (dBi).
+      /// \return Antenna's gain of the receiver (dBi).
       public: double GetGain();
+
+      /// \brief Returns the receiver power (dBm).
+      /// \return Receiver power (dBm).
+      public: double GetPower();
 
       /// \brief Parent entity
       private: physics::EntityPtr entity;
 
+      /// \brief Publisher to publish propagation model data
       private: transport::PublisherPtr pub;
 
+      /// \brief Reception frequency (MHz).
       private: double freq;
 
+      /// \brief Receiver's power (dBm).
       private: double power;
 
+      /// \brief Antenna's gain of the receiver (dBi).
       private: double gain;
     };
     /// \}
