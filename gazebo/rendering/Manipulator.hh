@@ -98,6 +98,9 @@ namespace gazebo
       private: VisualPtr transZVisual;
 
       private: VisualPtr scaleVisual;
+      private: VisualPtr scaleXVisual;
+      private: VisualPtr scaleYVisual;
+      private: VisualPtr scaleZVisual;
 
       private: VisualPtr rotVisual;
       private: VisualPtr rotXVisual;

@@ -147,9 +147,24 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void RotateEntity(rendering::VisualPtr &_vis);
+      /// \brief Rotate entity.
+      /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _local True to apply rotation in local frame.
+      private: void RotateEntity(rendering::VisualPtr &_vis,
+          bool _local = false);
+
+      /// \brief Translate entity.
+      /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _local True to apply translation in local frame.
       private: void TranslateEntity(rendering::VisualPtr &_vis,
           bool _local = false);
+
+      /// \brief Scale entity.
+      /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _local True to apply scaling in local frame.
+      private: void ScaleEntity(rendering::VisualPtr &_vis,
+          bool _local = false);
+
 
       private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);

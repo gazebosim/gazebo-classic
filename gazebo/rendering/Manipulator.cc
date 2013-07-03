@@ -63,7 +63,7 @@ void Manipulator::Load()
       this->rotVisual));
   this->scaleVisual.reset(new rendering::Visual(
       this->name + "__SELECTION_OBJ_SCALE__",
-      this->transVisual));
+      this->rotVisual));
 
   this->rotXVisual.reset(
       new rendering::Visual(
@@ -137,16 +137,16 @@ void Manipulator::Load()
   this->rotYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->rotZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  // Rotation mainipulation tool
+  // Translation mainipulation tool
   this->transXVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_ROT_X__" + this->name, this->transVisual));
+      "__SELECTION_OBJ_TRANS_X__" + this->name, this->transVisual));
   this->transYVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_ROT_Y__" + this->name, this->transVisual));
+      "__SELECTION_OBJ_TRANS_Y__" + this->name, this->transVisual));
   this->transZVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_ROT_Z__" + this->name, this->transVisual));
+      "__SELECTION_OBJ_TRANS_Z__" + this->name, this->transVisual));
 
   this->transXVisual->Load();
   this->transYVisual->Load();
@@ -244,6 +244,115 @@ void Manipulator::Load()
   this->transYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->transZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
+
+  // Scale mainipulation tool
+  this->scaleXVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_X__" + this->name, this->scaleVisual));
+  this->scaleYVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_Y__" + this->name, this->scaleVisual));
+  this->scaleZVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_Z__" + this->name, this->scaleVisual));
+
+  this->scaleXVisual->Load();
+  this->scaleYVisual->Load();
+  this->scaleZVisual->Load();
+
+//  this->InsertMesh("axis_shaft");
+//  this->InsertMesh("axis_head");
+
+  Ogre::MovableObject *scaleShaftXObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_X__" + this->name, "axis_shaft"));
+  Ogre::MovableObject *scaleHeadXObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_X__" + this->name, "axis_head"));
+  Ogre::SceneNode *scaleShaftXNode =
+      this->scaleXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->name);
+  Ogre::SceneNode *scaleHeadXNode =
+      this->scaleXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->name);
+  scaleShaftXNode->attachObject(scaleShaftXObj);
+  scaleShaftXNode->setPosition(0, 0, 0.1);
+  scaleHeadXNode->attachObject(scaleHeadXObj);
+  scaleHeadXNode->setPosition(0, 0, 0.24);
+//  shaftXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
+//  headXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
+  scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+
+
+  Ogre::MovableObject *scaleShaftYObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_Y__" + this->name, "axis_shaft"));
+  Ogre::MovableObject *scaleHeadYObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->name, "axis_head"));
+  Ogre::SceneNode *scaleShaftYNode =
+      this->scaleYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__"  + this->name);
+  Ogre::SceneNode *scaleHeadYNode =
+      this->scaleYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__"  + this->name);
+  scaleShaftYNode->attachObject(scaleShaftYObj);
+  scaleShaftYNode->setPosition(0, 0, 0.1);
+  scaleHeadYNode->attachObject(scaleHeadYObj);
+  scaleHeadYNode->setPosition(0, 0, 0.24);
+//  shaftYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
+//  headYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
+  scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleHeadYNode->setUserAny(Ogre::Any(std::string("scale_y")));
+
+  Ogre::MovableObject *scaleShaftZObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_Z__" + this->name, "axis_shaft"));
+  Ogre::MovableObject *scaleHeadZObj =
+      (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->name, "axis_head"));
+  Ogre::SceneNode *scaleShaftZNode =
+      this->scaleZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__"  + this->name);
+  Ogre::SceneNode *scaleHeadZNode =
+      this->scaleZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__"  + this->name);
+  scaleShaftZNode->attachObject(scaleShaftZObj);
+  scaleShaftZNode->setPosition(0, 0, 0.1);
+  scaleHeadZNode->attachObject(scaleHeadZObj);
+  scaleHeadZNode->setPosition(0, 0, 0.24);
+//  shaftZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
+//  headZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
+  scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+
+  this->scaleXVisual->SetRotation(
+      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+  this->scaleYVisual->SetRotation(
+      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+
+  this->highlightMaterials[this->scaleXVisual->GetName()]
+      = "Gazebo/RedTransparent";
+  this->highlightMaterials[this->scaleYVisual->GetName()]
+      = "Gazebo/GreenTransparent";
+  this->highlightMaterials[this->scaleZVisual->GetName()]
+      = "Gazebo/BlueTransparent";
+
+  this->scaleXVisual->SetMaterial(
+      this->highlightMaterials[this->scaleXVisual->GetName()]);
+  this->scaleYVisual->SetMaterial(
+      this->highlightMaterials[this->scaleYVisual->GetName()]);
+  this->scaleZVisual->SetMaterial(
+      this->highlightMaterials[this->scaleZVisual->GetName()]);
+
+  this->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+
+  this->scaleXVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->scaleYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->scaleZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+
   // Add to scene so they are selectable by the mouse
   this->scene->AddVisual(this->transXVisual);
   this->scene->AddVisual(this->transYVisual);
@@ -251,6 +360,9 @@ void Manipulator::Load()
   this->scene->AddVisual(this->rotXVisual);
   this->scene->AddVisual(this->rotYVisual);
   this->scene->AddVisual(this->rotZVisual);
+  this->scene->AddVisual(this->scaleXVisual);
+  this->scene->AddVisual(this->scaleYVisual);
+  this->scene->AddVisual(this->scaleZVisual);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
@@ -395,6 +507,18 @@ void Manipulator::SetHighlight(const std::string &_mode)
   {
     tmpMode = ROT_Z;
   }
+  else if (_mode == "scale_x")
+  {
+    tmpMode = SCALE_X;
+  }
+  else if (_mode == "scale_y")
+  {
+    tmpMode = SCALE_Y;
+  }
+  else if (_mode == "scale_z")
+  {
+    tmpMode = SCALE_Z;
+  }
   this->SetHighlight(tmpMode);
 }
 
@@ -441,6 +565,21 @@ void Manipulator::SetHighlight(ManipulationMode _mode)
   {
     this->rotZVisual->SetMaterial("Gazebo/BlueTransparentLow");
     this->activeVis = this->rotZVisual;
+  }
+  else if (this->mode == SCALE_X)
+  {
+    this->scaleXVisual->SetMaterial("Gazebo/RedTransparentLow");
+    this->activeVis = this->scaleXVisual;
+  }
+  else if (this->mode == SCALE_Y)
+  {
+    this->scaleYVisual->SetMaterial("Gazebo/GreenTransparentLow");
+    this->activeVis = this->scaleYVisual;
+  }
+  else if (this->mode == SCALE_Z)
+  {
+    this->scaleZVisual->SetMaterial("Gazebo/BlueTransparentLow");
+    this->activeVis = this->scaleZVisual;
   }
 }
 
