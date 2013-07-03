@@ -525,13 +525,11 @@ void GLWidget::OnMousePressUniversal()
   if (!this->manipulator->GetVisible()
       || (mouseVis && mouseVis != this->manipulator->GetParent()))
   {
-    gzerr << " set vis to mouseVis " << std::endl;
     vis = mouseVis;
   }
   else
   {
     vis = this->manipulator->GetParent();
-    gzerr << " set vis to parent " << std::endl;
   }
 
   if (vis && !vis->IsPlane() &&
@@ -541,7 +539,6 @@ void GLWidget::OnMousePressUniversal()
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
     this->SetMouseMoveVisual(vis);
-    gzerr << " SetMouseMoveVisual in press " << std::endl;
 
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -834,7 +831,6 @@ void GLWidget::OnMouseReleaseTranslate()
     {
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
-      gzerr << " remove mouseVis in OnMouseReleaseTranslate " << std::endl;
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
 //    this->SetSelectedVisual(rendering::VisualPtr());
@@ -1097,8 +1093,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
 //  math::Vector3 axisA;
 //  math::Vector3 axisB;
-  math::Vector3 rpyAmt;
-
+  math::Vector3 localNormal;
   math::Vector3 normal;
 
   if (this->keyText == "x" || this->keyText == "X")
@@ -1106,8 +1101,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 //    axisA = mouseMoveVisStartPose.rot.GetYAxis();
 //    axisB = mouseMoveVisStartPose.rot.GetZAxis();
     normal = mouseMoveVisStartPose.rot.GetXAxis();
-
-    rpyAmt.x = 1.0;
+    localNormal.x = 1.0;
   }
   else if (this->keyText == "y" || this->keyText == "Y")
   {
@@ -1115,7 +1109,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 //    axisB = mouseMoveVisStartPose.rot.GetXAxis();
 
     normal = mouseMoveVisStartPose.rot.GetYAxis();
-    rpyAmt.y = 1.0;
+    localNormal.y = 1.0;
   }
   else
   {
@@ -1123,7 +1117,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 //    axisB = this->mouseMoveVisStartPose.rot.GetYAxis();
 
     normal = mouseMoveVisStartPose.rot.GetZAxis();
-    rpyAmt.z = 1.0;
+    localNormal.z = 1.0;
   }
 
 //  math::Vector3 normal = (axisA.Cross(axisB)).Normalize();
@@ -1151,9 +1145,15 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
   if (this->mouseEvent.shift)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
-  rpy += rpyAmt * angle;
+//  gzerr << " rptAmt " << rpyAmt << " rpy " << rpy << std::endl;
 
-  _vis->SetRotation(math::Quaternion(rpy));
+//  rpy += rpyAmt * angle;
+
+  math::Quaternion rot(localNormal, angle);
+
+  _vis->SetRotation(this->mouseMoveVisStartPose.rot * rot);
+//  _vis->SetRotation(math::Quaternion(rpy));
+//  _vis->SetWorldRotation(math::Quaternion(rpy));
 }
 
 /////////////////////////////////////////////////
