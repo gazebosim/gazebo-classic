@@ -39,7 +39,6 @@ namespace gazebo
     /// \brief Sensor class for receiving wireless signals.
     class WirelessTransceiver: public Sensor
     {
-      public: static const double N;
       public: static const double C;
 
       /// \brief Constructor

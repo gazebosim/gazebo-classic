@@ -37,6 +37,18 @@ namespace gazebo
     /// \brief Transmitter to send wireless signals 
     class WirelessTransmitter: public WirelessTransceiver
     {
+      /// \brief Constant used in the propagation model when there are no
+      /// obstacles between transmitter and receiver
+      public: static const double N_EMPTY;
+
+      /// \brief Constant used in the propagation model when there are
+      /// obstacles between transmitter and receiver
+      public: static const double N_OBSTACLE;
+
+      /// \brief Std desv of the Gaussian random variable used in the
+      /// propagation model
+      public: static const double MODEL_STD_DESV;
+      
       /// \brief Constructor.
       public: WirelessTransmitter();
 
@@ -49,6 +61,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
+      // Documentation inherited
+      public: virtual void Load(const std::string &_worldName);
+
       /// \brief Returns the Service Set Identifier (network name).
       /// \return Service Set Identifier (network name).
       public: std::string GetESSID();
@@ -60,18 +75,6 @@ namespace gazebo
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \return Signal strength in a world's point (dBm).
       public: double GetSignalStrength(const math::Pose _receiver);
-
-      /// \brief Constant used in the propagation model when there are no
-      /// obstacles between transmitter and receiver
-      private: static const double N_EMPTY;
-
-      /// \brief Constant used in the propagation model when there are
-      /// obstacles between transmitter and receiver
-      private: static const double N_OBSTACLE;
-
-      /// \brief Std desv of the Gaussian random variable used in the
-      /// propagation model
-      private: static const double MODEL_STD_DESV;
 
       /// \brief The visualization shows the propagation model from a grid
       /// in which the x coordinates go from -XLIMIT to XLIMIT.

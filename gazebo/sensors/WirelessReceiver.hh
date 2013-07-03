@@ -46,6 +46,9 @@ namespace gazebo
       public: virtual ~WirelessReceiver();
 
       // Documentation inherited
+      public: virtual void Load(const std::string &_worldName);
+
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
     };
     /// \}

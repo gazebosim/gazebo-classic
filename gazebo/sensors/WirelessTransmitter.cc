@@ -53,6 +53,13 @@ WirelessTransmitter::~WirelessTransmitter()
 {
 }
 
+/////////////////////////////////////////////////
+void WirelessTransmitter::Load(const std::string &_worldName)
+{
+  WirelessTransceiver::Load(_worldName);
+  this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(), 30);
+}
+
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {

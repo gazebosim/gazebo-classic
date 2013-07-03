@@ -33,7 +33,6 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("WirelessTransceiver", WirelessTransceiver)
 
-const double WirelessTransceiver::N = 4.5;
 const double WirelessTransceiver::C = 300000000;
 
 /////////////////////////////////////////////////
@@ -63,7 +62,6 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
   this->entity = this->world->GetEntity(this->parentName);
 
   if (this->sdf->HasElement("transceiver"))

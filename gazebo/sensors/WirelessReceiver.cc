@@ -44,6 +44,13 @@ WirelessReceiver::~WirelessReceiver()
 {
 }
 
+/////////////////////////////////////////////////
+void WirelessReceiver::Load(const std::string &_worldName)
+{
+  WirelessTransceiver::Load(_worldName);
+  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
+}
+
 //////////////////////////////////////////////////
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
@@ -82,11 +89,12 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
         math::Pose myPos = entity->GetWorldPose();
         double distance = myPos.pos.Distance(txPos.pos);
         
-        x = math::Rand::GetDblNormal(0.0, 10.0);
+        x = math::Rand::GetDblNormal(0.0, WirelessTransmitter::MODEL_STD_DESV);
         wavelength = C / txFreq;
 
         rxPower = txPow + txGain + this->gain - x + 20 * log10(wavelength) -
-                  20 * log10(4 * M_PI) - 10 * N * log10(distance);
+                  20 * log10(4 * M_PI) -
+                  10 * WirelessTransmitter::N_EMPTY * log10(distance);
         wirelessNode->set_signal_level(rxPower);
       }
     }
