@@ -23,7 +23,7 @@
 #define _WIRELESS_TRANSMITTER_HH_
 
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
@@ -35,22 +35,13 @@ namespace gazebo
 
     /// \class WirelessTransmitter WirelessTransmitter.hh sensors/sensors.hh
     /// \brief Transmitter to send wireless signals 
-    class WirelessTransmitter: public Sensor
+    class WirelessTransmitter: public WirelessTransceiver
     {
       /// \brief Constructor.
       public: WirelessTransmitter();
 
       /// \brief Destructor.
       public: virtual ~WirelessTransmitter();
-
-      // Documentation inherited                                                
-      public: virtual std::string GetTopic() const;
-
-      // Documentation inherited
-      public: virtual void Load(const std::string & _worldName);
-
-      // Documentation inherited
-      public: virtual void Init();
 
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
@@ -62,22 +53,9 @@ namespace gazebo
       /// \return Service Set Identifier (network name).
       public: std::string GetESSID();
 
-      /// \brief Returns transmission frequency (MHz).
-      /// \return Transmission frequency (MHz).
-      public: double GetFreq();
-
-      /// \brief Returns the antenna's gain of the transmitter (dBi).
-      /// \return Antenna's gain of the transmitter (dBi).
-      public: double GetGain();
-
       /// \brief Returns the pose of the transmitter in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetPose() const
-              {return entity->GetWorldPose();}
-
-      /// \brief Returns the transmitter power (dBm).
-      /// \return Transmitter power (dBm).
-      public: double GetPower();
+      public: math::Pose GetPose() const;
 
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \return Signal strength in a world's point (dBm).
@@ -94,26 +72,8 @@ namespace gazebo
       /// \brief Size of the grid used for visualization.
       private: static const double STEP;
 
-      /// \brief Light velocity in the air.
-      private: static const unsigned int C;
-
-      /// \brief Pointer the entity that has the transmitter.
-      private: physics::EntityPtr entity;
-
       /// \brief Service Set Identifier (network name).
       private: std::string essid;
-
-      /// \brief Transmission frequency (MHz).
-      private: double freq;
-
-      /// \brief Antenna's gain of the transmitter (dBi).
-      private: double gain;
-
-      /// \brief Transmitter's power (dBm).
-      private: double power;
-
-      /// \brief Publisher to publish propagation model data
-      private: transport::PublisherPtr pub;
     };
     /// \}
   }

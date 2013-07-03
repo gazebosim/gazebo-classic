@@ -38,6 +38,9 @@ namespace gazebo
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
+    class WirelessTransceiver;
+    class WirelessTransmitter;
+    class WirelessReceiver;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -75,6 +78,18 @@ namespace gazebo
     /// \brief Shared pointer to RFIDTag
     typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
 
+    /// \def WirelessTransceiverPtr
+    /// \brief Shared pointer to WirelessTransceiver
+    typedef boost::shared_ptr<WirelessTransceiver> WirelessTransceiverPtr;
+
+    /// \def WirelessTransmitterPtr
+    /// \brief Shared pointer to WirelessTransmitter
+    typedef boost::shared_ptr<WirelessTransmitter> WirelessTransmitterPtr;
+
+    /// \def WirelessReceiverPtr
+    /// \brief Shared pointer to WirelessReceiver
+    typedef boost::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
+
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers
     typedef std::vector<SensorPtr> Sensor_V;
@@ -110,6 +125,20 @@ namespace gazebo
     /// \def RFIDTag_V
     /// \brief Vector of RFIDTags
     typedef std::vector<RFIDTag> RFIDTag_V;
+
+    /// \def WirelessTransceiver_V
+    /// \brief Vector of WirelessTransceiver
+    typedef std::vector<WirelessTransceiver> WirelessTransceiver_V;
+
+    /// \def WirelessTransmitter_V
+    /// \brief Vector of WirelessTransmitter
+    typedef std::vector<WirelessTransmitter> WirelessTransmitter_V;
+
+    /// \def WirelessReceiver_V
+    /// \brief Vector of WirelessReceiver
+    typedef std::vector<WirelessReceiver> WirelessReceiver_V;
+
+
     /// \}
   }
 }

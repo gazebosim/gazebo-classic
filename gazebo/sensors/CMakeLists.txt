@@ -15,6 +15,7 @@ set (sources
   SensorFactory.cc
   SensorManager.cc
   WirelessReceiver.cc
+  WirelessTransceiver.cc
   WirelessTransmitter.cc
 ) 
 
@@ -34,6 +35,7 @@ set (headers
   SensorFactory.hh
   SensorManager.hh
   WirelessReceiver.hh
+  WirelessTransceiver.hh
   WirelessTransmitter.hh
 )
 

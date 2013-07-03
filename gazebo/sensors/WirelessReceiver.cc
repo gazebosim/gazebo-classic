@@ -33,70 +33,15 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessReceiver", WirelessReceiver)
 
-const double WirelessReceiver::N = 4.5;
-const double WirelessReceiver::C = 300000000;
-
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
-  : Sensor(sensors::OTHER)
+: WirelessTransceiver()
 {
-  this->active = false;
 }
 
 /////////////////////////////////////////////////
 WirelessReceiver::~WirelessReceiver()
 {
-}
-
-//////////////////////////////////////////////////                              
-std::string WirelessReceiver::GetTopic() const                               
-{                                                                               
-  std::string topicName = "~/";                                                 
-  topicName += this->parentName + "/" + this->GetName() + "/receiver";          
-  boost::replace_all(topicName, "::", "/");                                     
-                                                                                
-  return topicName;                                                             
-}
-
-/////////////////////////////////////////////////
-void WirelessReceiver::Load(const std::string &_worldName)
-{
-  Sensor::Load(_worldName);
-
-  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
-  this->entity = this->world->GetEntity(this->parentName);
-
-  if (this->sdf->HasElement("transceiver"))
-  {
-    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
-
-    if (transElem->HasElement("frequency"))
-    {
-      this->freq = transElem->GetValueDouble("frequency");
-    }
-
-    if (transElem->HasElement("power"))
-    {
-      this->power = transElem->GetValueDouble("power");
-    }
-
-    if (transElem->HasElement("gain"))
-    {
-      this->gain = transElem->GetValueDouble("gain");
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void WirelessReceiver::Fini()
-{
-  Sensor::Fini();
-}
-
-//////////////////////////////////////////////////
-void WirelessReceiver::Init()
-{
-  Sensor::Init();
 }
 
 //////////////////////////////////////////////////
@@ -148,22 +93,4 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
                                                                                 
     this->pub->Publish(msg);                                               
   }
-}
-
-/////////////////////////////////////////////////
-double WirelessReceiver::GetFreq()
-{
-  return this->freq;
-}
-
-/////////////////////////////////////////////////
-double WirelessReceiver::GetPower()
-{
-  return this->power;
-}
-
-/////////////////////////////////////////////////
-double WirelessReceiver::GetGain()
-{
-  return this->gain;
 }

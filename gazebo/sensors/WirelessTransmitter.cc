@@ -36,11 +36,10 @@ GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
 const double WirelessTransmitter::XLIMIT = 10.0;
 const double WirelessTransmitter::YLIMIT = 10.0;
 const double WirelessTransmitter::STEP = 1.0;
-const unsigned int WirelessTransmitter::C = 300000000;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
-: Sensor(sensors::OTHER)
+: WirelessTransceiver()
 {
   this->active = false;
   srand((unsigned)time(NULL));
@@ -49,57 +48,6 @@ WirelessTransmitter::WirelessTransmitter()
 /////////////////////////////////////////////////
 WirelessTransmitter::~WirelessTransmitter()
 {
-}
-
-//////////////////////////////////////////////////                              
-std::string WirelessTransmitter::GetTopic() const                               
-{                                                                               
-  std::string topicName = "~/";                                                 
-  topicName += this->parentName + "/" + this->GetName() + "/transmitter";          
-  boost::replace_all(topicName, "::", "/");                                     
-                                                                                
-  return topicName;                                                             
-}
-
-/////////////////////////////////////////////////
-void WirelessTransmitter::Load(const std::string &_worldName)
-{
-  Sensor::Load(_worldName);
-
-  this->entity = this->world->GetEntity(this->parentName);
-  this->pub = this->node->Advertise<msgs::PropagationGrid>(
-      this->GetTopic(), 30);
-
-  if (this->sdf->HasElement("transceiver"))
-  {
-    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
-
-    if (transElem->HasElement("essid"))
-    {
-      this->essid = transElem->GetValueString("essid");
-    }
-
-    if (transElem->HasElement("frequency"))
-    {
-      this->freq = transElem->GetValueDouble("frequency");
-    }
-
-    if (transElem->HasElement("power"))
-    {
-      this->power = transElem->GetValueDouble("power");
-    }
-
-    if (transElem->HasElement("gain"))
-    {
-      this->gain = transElem->GetValueDouble("gain");
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void WirelessTransmitter::Init()
-{
-  Sensor::Init();
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +87,7 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 /////////////////////////////////////////////////
 void WirelessTransmitter::Fini()
 {
-  Sensor::Fini();
+  WirelessTransceiver::Fini();
   this->entity.reset();
 }
 
@@ -150,21 +98,9 @@ std::string WirelessTransmitter::GetESSID()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetFreq()
+math::Pose WirelessTransmitter::GetPose() const
 {
-  return this->freq;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransmitter::GetGain()
-{
-  return this->gain;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransmitter::GetPower()
-{
-  return this->power;
+  return entity->GetWorldPose();
 }
 
 /////////////////////////////////////////////////
@@ -206,7 +142,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
   double x = math::Rand::GetDblNormal(0.0, 3.0);
   double wavelength = C / this->GetFreq();
 
-  // Propagation model
+  // Hata-Okumara propagation model
   double rxPower = this->GetPower() + this->GetGain() + gainRx - x +
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
 

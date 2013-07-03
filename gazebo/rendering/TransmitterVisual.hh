@@ -35,8 +35,8 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
-    /// \brief Visualization for laser data.
+    /// \class TransmitterVisual TransmitterVisual.hh rendering/rendering.hh
+    /// \brief Visualization for the wireless propagation data.
     class TransmitterVisual : public Visual
     {
       /// \brief Constructor.
@@ -49,16 +49,16 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~TransmitterVisual();
 
+      /// Documentation inherited from parent.
       public: void Load();
 
-      /// Documentation inherited from parent.
-      public: virtual void SetEmissive(const common::Color &_color);
-
+      /// \brief Creates an SDF box on the fly for visualization.
       private: std::string GetTemplateSDFString();
 
-      /// \brief Callback when laser data is received.
-      private: void OnScan(ConstPropagationGridPtr &_msg);
+      /// \brief Callback when a new propagation grid is received.
+      private: void OnNewPropagationGrid(ConstPropagationGridPtr &_msg);
 
+      /// \brief Function that runs on the OGRE thread to refresh the UI.
       public: void Update();
 
       /// \brief Pointer to a node that handles communication.
@@ -70,12 +70,14 @@ namespace gazebo
       /// \brief Renders the laser data.
       private: DynamicLines *rayFan;
 
+      /// \brief Required for accessing to the visual elements.
       private: sdf::SDFPtr modelTemplateSDF;
 
+      /// \brief Use for allocate the visuals for the grid only the first time
+      /// you receive the grid. The next times there are just updates.
       private: bool isFirst;
 
-      private: rendering::VisualPtr linkVisual;
-
+      /// \brief Store the list of visuals
       private: std::vector<rendering::VisualPtr> vectorLink;
 
        /// \brief All the event connections.

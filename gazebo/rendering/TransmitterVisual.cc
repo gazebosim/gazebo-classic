@@ -20,7 +20,6 @@
  */
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
@@ -30,14 +29,14 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
-                         const std::string &_topicName)
+    const std::string &_topicName)
 : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
   this->laserScanSub = this->node->Subscribe(_topicName,
-      &TransmitterVisual::OnScan, this);
+      &TransmitterVisual::OnNewPropagationGrid, this);
 
   this->isFirst = true;
   this->receivedMsg = false;
@@ -94,17 +93,13 @@ std::string TransmitterVisual::GetTemplateSDFString()
 }
 
 /////////////////////////////////////////////////
-void TransmitterVisual::OnScan(ConstPropagationGridPtr &_msg)
+void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
+  // Just copy the data
   this->gridMsg = _msg;
   this->receivedMsg = true;
-}
-
-/////////////////////////////////////////////////
-void TransmitterVisual::SetEmissive(const common::Color &/*_color*/)
-{
 }
 
 ////////////////////////////////////////////////
@@ -115,46 +110,45 @@ void TransmitterVisual::Update()
   if (!this->gridMsg || !this->receivedMsg)
     return;
 
+  // Update the visualization of the last propagation grid received
   this->receivedMsg = false;
 
   if (this->isFirst)
   {
+    // Allocate the grid of visual elements
     sdf::ElementPtr visualElem = this->modelTemplateSDF->root
         ->GetElement("model")->GetElement("link")->GetElement("visual");
+
     for (int i = 0; i < gridMsg->particle_size(); i++)
     {
       std::stringstream si;
       si << i;
 
-      rendering::VisualPtr link2Visual(
+      rendering::VisualPtr linkVisual(
           new rendering::Visual("test::" + si.str(), shared_from_this()));
-      link2Visual->Load(visualElem);
-      link2Visual->SetTransparency(0.9);
-      link2Visual->SetPosition(math::Vector3(0, 0, 0));
-      this->vectorLink.push_back(link2Visual);
+      linkVisual->Load(visualElem);
+      linkVisual->SetTransparency(0.9);
+      linkVisual->SetPosition(math::Vector3(0, 0, 0));
+      this->vectorLink.push_back(linkVisual);
     }
     this->isFirst = false;
   }
 
+  // Update the list of visual elements
   for (int i = 0; i < gridMsg->particle_size(); i++)
   {
     gazebo::msgs::PropagationParticle p;
     p = gridMsg->particle(i);
 
-    double x = p.x();
-    double y = p.y();
-    
-    math::Pose pose = math::Pose(x, y, 0, 0, 0, 0);
+    math::Pose pose = math::Pose(p.x(), p.y(), 0, 0, 0, 0);
 
     // Assuming that the Rx gain is the same as Tx gain
     double strength = p.signal_level();
-
     common::Color color(strength, strength, strength);
 
-    rendering::VisualPtr link2Visual = this->vectorLink[i];
-
-    link2Visual->SetPosition(math::Vector3(x, y, 0));
-    link2Visual->SetDiffuse(color);
-    link2Visual->SetTransparency(0.8);
+    rendering::VisualPtr linkVisual = this->vectorLink[i];
+    linkVisual->SetPosition(math::Vector3(p.x(), p.y(), 0));
+    linkVisual->SetDiffuse(color);
+    linkVisual->SetTransparency(0.8);
   }
 }
