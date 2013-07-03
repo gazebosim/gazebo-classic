@@ -42,9 +42,6 @@ namespace gazebo
       /// \brief Constructor
       public: WirelessReceiver();
 
-      /// \brief Destructor
-      public: virtual ~WirelessReceiver();
-
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 

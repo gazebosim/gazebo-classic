@@ -40,11 +40,6 @@ WirelessReceiver::WirelessReceiver()
 }
 
 /////////////////////////////////////////////////
-WirelessReceiver::~WirelessReceiver()
-{
-}
-
-/////////////////////////////////////////////////
 void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);

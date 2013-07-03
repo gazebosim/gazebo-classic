@@ -48,12 +48,9 @@ namespace gazebo
       /// \brief Std desv of the Gaussian random variable used in the
       /// propagation model
       public: static const double MODEL_STD_DESV;
-      
+
       /// \brief Constructor.
       public: WirelessTransmitter();
-
-      /// \brief Destructor.
-      public: virtual ~WirelessTransmitter();
 
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
@@ -76,6 +73,9 @@ namespace gazebo
       /// \return Signal strength in a world's point (dBm).
       public: double GetSignalStrength(const math::Pose _receiver);
 
+      /// \brief Size of the grid used for visualization.
+      private: static const double STEP;
+
       /// \brief The visualization shows the propagation model from a grid
       /// in which the x coordinates go from -XLIMIT to XLIMIT.
       private: static const double XLIMIT;
@@ -83,9 +83,6 @@ namespace gazebo
       /// \brief The visualization shows the propagation model from a grid
       /// in which the y coordinates go from -YLIMIT to YLIMIT.
       private: static const double YLIMIT;
-
-      /// \brief Size of the grid used for visualization.
-      private: static const double STEP;
 
       /// \brief Service Set Identifier (network name).
       private: std::string essid;

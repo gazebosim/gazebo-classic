@@ -49,11 +49,6 @@ WirelessTransmitter::WirelessTransmitter()
 }
 
 /////////////////////////////////////////////////
-WirelessTransmitter::~WirelessTransmitter()
-{
-}
-
-/////////////////////////////////////////////////
 void WirelessTransmitter::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
