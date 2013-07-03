@@ -313,8 +313,8 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (this->TrackVisualImpl((*iter).data()))
-        erase = true;
+      this->TrackVisualImpl((*iter).data());
+      erase = true;
     }
     else if ((*iter).request() == "attach_visual")
     {
@@ -322,7 +322,9 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       if (this->AttachToVisualImpl(msg.name(), msg.inherit_orientation(),
                                     msg.min_dist(), msg.max_dist()))
+      {
         erase = true;
+      }
     }
 
     if (erase)
@@ -399,7 +401,6 @@ void Camera::Update()
     math::Vector3 displacement = direction;
     displacement.Normalize();
     displacement *= scaling;
-    // displacement.z = 0.0;
 
     math::Vector3 pos = this->GetWorldPosition() + displacement;
     pos.z = math::clamp(pos.z, 3.0, pos.z);
@@ -1444,10 +1445,7 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-  {
     this->trackedVisual.reset();
-    this->camera->setAutoTracking(false, NULL);
-  }
 
   return false;
 }
@@ -1467,9 +1465,8 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->trackedVisual = _visual;
   }
   else
-  {
     this->trackedVisual.reset();
-  }
+
   return true;
 }
 
