@@ -527,6 +527,12 @@ void MainWindow::Rotate()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Scale()
+{
+  gui::Events::manipMode("scale");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::UniversalManip()
 {
   gui::Events::manipMode("universal");
@@ -860,8 +866,15 @@ void MainWindow::CreateActions()
   g_rotateAct->setChecked(false);
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
 
+  g_scaleAct = new QAction(QIcon(":/images/scale.png"),
+      tr("Scale Mode"), this);
+  g_scaleAct->setStatusTip(tr("Scale an object"));
+  g_scaleAct->setCheckable(true);
+  g_scaleAct->setChecked(false);
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
+
   g_universalManipAct = new QAction(QIcon(":/images/cursor.png"),
-      tr("Rotation Mode"), this);
+      tr("Universal Mode"), this);
   g_universalManipAct->setStatusTip(tr("Universal manipulate mode"));
   g_universalManipAct->setCheckable(true);
   g_universalManipAct->setChecked(false);

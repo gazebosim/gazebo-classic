@@ -88,6 +88,9 @@ namespace gazebo
       private slots: void Translate();
       private slots: void Rotate();
 
+      /// \brief Qt callback when the scale mode is triggered.
+      private slots: void Scale();
+
       /// \brief Qt callback when the Universal manipulation mode is triggered.
       private slots: void UniversalManip();
 
