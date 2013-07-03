@@ -97,7 +97,7 @@ void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  // Just copy the data
+  // Just copy the received data but do not update the UI
   this->gridMsg = _msg;
   this->receivedMsg = true;
 }

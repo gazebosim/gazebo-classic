@@ -33,6 +33,9 @@ using namespace physics;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
 
+const double WirelessTransmitter::N_EMPTY = 10.0;
+const double WirelessTransmitter::N_OBSTACLE = 20.0;
+const double WirelessTransmitter::MODEL_STD_DESV = 3.0;
 const double WirelessTransmitter::XLIMIT = 10.0;
 const double WirelessTransmitter::YLIMIT = 10.0;
 const double WirelessTransmitter::STEP = 1.0;
@@ -120,7 +123,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
   double gainRx = this->gain;
   
   // Compute the value of n depending on the obstacles between Tx and Rx
-  double n = 10;
+  double n = N_EMPTY;
 
   /// \brief Ray used to test for collisions when placing entities.
   physics::RayShapePtr testRay;
@@ -132,14 +135,14 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver)
   testRay->GetIntersection(dist, entityName);
   testRay.reset();
 
-  //ToDo: The ray will intersect with my own collision model. Fix it.
+  //ToDo: The ray intersects with my own collision model. Fix it.
   if (dist > 0 && entityName != "")
   {
-    n = 20;
+    n = N_OBSTACLE;
   }
 
   double distance = txPos.pos.Distance(_receiver.pos);  
-  double x = math::Rand::GetDblNormal(0.0, 3.0);
+  double x = math::Rand::GetDblNormal(0.0, MODEL_STD_DESV);
   double wavelength = C / this->GetFreq();
 
   // Hata-Okumara propagation model

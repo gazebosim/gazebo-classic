@@ -61,6 +61,18 @@ namespace gazebo
       /// \return Signal strength in a world's point (dBm).
       public: double GetSignalStrength(const math::Pose _receiver);
 
+      /// \brief Constant used in the propagation model when there are no
+      /// obstacles between transmitter and receiver
+      private: static const double N_EMPTY;
+
+      /// \brief Constant used in the propagation model when there are
+      /// obstacles between transmitter and receiver
+      private: static const double N_OBSTACLE;
+
+      /// \brief Std desv of the Gaussian random variable used in the
+      /// propagation model
+      private: static const double MODEL_STD_DESV;
+
       /// \brief The visualization shows the propagation model from a grid
       /// in which the x coordinates go from -XLIMIT to XLIMIT.
       private: static const double XLIMIT;
