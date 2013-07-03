@@ -159,7 +159,6 @@ void WorldCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool WorldCommand::RunImpl()
 {
-  printf("WorldCommand::RunImpl\n");
   std::string worldName;
 
   if (this->vm.count("world-name"))
@@ -186,12 +185,7 @@ bool WorldCommand::RunImpl()
   if (this->vm.count("reset-models"))
     msg.mutable_reset()->set_model_only(true);
 
-
-  printf("WorldCommand. Publish\n");
   pub->Publish(msg, true);
-  node->Fini();
-  printf("Node Use count[%d]\n", pub.use_count());
-  pub.reset();
 
   return true;
 }
