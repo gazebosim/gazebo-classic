@@ -1,0 +1,20 @@
+<element name="transceiver" required="0">
+  <description>These elements are specific to a wireless transceiver.</description>
+
+  <element name="essid" type="string" default="wireless" required="0">
+    <description>Service set identifier (network name)</description>
+  </element> <!-- End Essid -->
+
+  <element name="frequency" type="double" default="2442" required="1">
+    <description>Specifies the frequency of transmission in MHz</description>
+  </element> <!-- End Frequency -->
+
+  <element name="power" type="double" default="14.50" required="0">
+    <description>Specifies the transmission power in dBm</description>
+  </element> <!-- End Power -->
+
+  <element name="gain" type="double" default="2.5" required="1">
+    <description>Specifies the antenna gain in dBi</description>
+  </element> <!-- End Gain -->
+
+</element> <!-- End Transceiver -->

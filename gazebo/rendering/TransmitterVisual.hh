@@ -59,6 +59,8 @@ namespace gazebo
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstPropagationGridPtr &_msg);
 
+      public: void Update();
+
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;
 
@@ -69,6 +71,24 @@ namespace gazebo
       private: DynamicLines *rayFan;
 
       private: sdf::SDFPtr modelTemplateSDF;
+
+      private: bool isFirst;
+
+      private: rendering::VisualPtr linkVisual;
+
+      private: std::vector<rendering::VisualPtr> vectorLink;
+
+       /// \brief All the event connections.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      /// \brief The current contact message.
+      private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
+
+      /// \brief True if we have received a message.
+      private: bool receivedMsg;
     };
     /// \}
   }

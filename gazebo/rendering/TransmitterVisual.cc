@@ -50,11 +50,12 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   this->laserScanSub = this->node->Subscribe(_topicName,
       &TransmitterVisual::OnScan, this);
 
-  /*this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
+  this->isFirst = true;
+  this->receivedMsg = false;
 
-  this->rayFan->setMaterial("Gazebo/BlueLaser");
-  this->rayFan->AddPoint(math::Vector3(0, 0, 0));
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);*/
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&TransmitterVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
@@ -110,6 +111,14 @@ void TransmitterVisual::Load()
     x = -10.0;
     y += 1.0;
   }*/
+
+  this->modelTemplateSDF.reset(new sdf::SDF);
+  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+
+  /*this->linkVisual.reset(new rendering::Visual("test", shared_from_this()));
+  this->linkVisual->Load(visualElem);
+  linkVisual->SetTransparency(0.9);
+  this->linkVisual->SetPosition(math::Vector3(0, 0, 0));*/
 }
 
 /////////////////////////////////////////////////
@@ -127,6 +136,12 @@ std::string TransmitterVisual::GetTemplateSDFString()
     <<         "<size>1 1 1</size>"
     <<       "</box>"
     <<     "</geometry>"
+    <<     "<material>"
+    <<       "<script>"
+    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
+    <<         "<name>Gazebo/GreyTransparent</name>"
+    <<       "</script>"
+    <<     "</material>"
     <<   "</visual>"
     << "</link>"
     << "<static>true</static>"
@@ -139,24 +154,51 @@ std::string TransmitterVisual::GetTemplateSDFString()
 /////////////////////////////////////////////////
 void TransmitterVisual::OnScan(ConstPropagationGridPtr &_msg)
 {
-
+  boost::mutex::scoped_lock lock(this->mutex);
   cout << "Grid received\n";
 
-  this->modelTemplateSDF.reset(new sdf::SDF);
-  this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
+  this->gridMsg = _msg;
+  this->receivedMsg = true;
+}
 
-  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
+/////////////////////////////////////////////////
+void TransmitterVisual::SetEmissive(const common::Color &/*_color*/)
+{
+}
 
-  rendering::VisualPtr linkVisual(new rendering::Visual("test", shared_from_this()));
-  linkVisual->Load(visualElem);
-  linkVisual->SetTransparency(0);
-  linkVisual->SetPosition(math::Vector3(0, 0, 0));
+////////////////////////////////////////////////
+void TransmitterVisual::Update()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
 
-  for (int i = 0; i < _msg->particle_size(); i++)
+  if (!this->gridMsg || !this->receivedMsg)
+    return;
+
+  this->receivedMsg = false;
+
+  if (this->isFirst)
+  {
+    sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+    for (int i = 0; i < gridMsg->particle_size(); i++)
+    {
+      stringstream si;
+      si << i;
+      /*rendering::VisualPtr link2Visual = this->linkVisual->Clone("New name::" +
+      si.str(), this->linkVisual->GetParent());*/
+      rendering::VisualPtr link2Visual(new rendering::Visual("test::" + si.str(), shared_from_this()));
+      link2Visual->Load(visualElem);
+      link2Visual->SetTransparency(0.9);
+      link2Visual->SetPosition(math::Vector3(0, 0, 0));
+      this->vectorLink.push_back(link2Visual);
+    }
+    this->isFirst = false;
+  }
+
+  for (int i = 0; i < gridMsg->particle_size(); i++)
   {
     gazebo::msgs::PropagationParticle p;
-    p = _msg->particle(i);
+    p = gridMsg->particle(i);
     //cout << "Particle received " << p.x() << "," << p.y() << ": "<< p.signal_level() << endl;
 
     double x = p.x();
@@ -169,19 +211,14 @@ void TransmitterVisual::OnScan(ConstPropagationGridPtr &_msg)
 
     common::Color color(strength, strength, strength);
 
-    stringstream si;
-    si << i;
+    rendering::VisualPtr link2Visual = this->vectorLink[i];
 
-    rendering::VisualPtr link2Visual = linkVisual->Clone("New name::" +
-      si.str(), linkVisual->GetParent());
-    
     link2Visual->SetPosition(math::Vector3(x, y, 0));
     link2Visual->SetDiffuse(color);
-    link2Visual->SetTransparency(0);
-  }
-}
+    link2Visual->SetTransparency(0.8);
+    cout << strength << endl;
 
-/////////////////////////////////////////////////
-void TransmitterVisual::SetEmissive(const common::Color &/*_color*/)
-{
+  }
+  //linkVisual->SetTransparency(0.9);
+
 }

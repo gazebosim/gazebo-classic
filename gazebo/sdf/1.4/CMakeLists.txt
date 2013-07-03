@@ -25,7 +25,7 @@ set (sdfs
   sensor.sdf
   state.sdf
   surface.sdf
-  transmitter.sdf
+  transceiver.sdf
   visual.sdf
   world.sdf
 )

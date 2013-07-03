@@ -147,11 +147,12 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     
     double x = -10.0;
     double y = -10.0;
-    for (int i = 0; i < 21; i++)
+    for (int i = 0; i < 20; i++)
     {
-      for (int j = 0; j < 21; j++)
+      for (int j = 0; j < 20; j++)
       {
         math::Pose pos = math::Pose(x, y, 0, 0, 0, 0);
+
 
         double strength = WirelessTransmitter::GetSignalStrength(
           this->GetPose(), pos);
@@ -173,6 +174,10 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 double WirelessTransmitter::GetSignalStrength(const math::Pose _transmitter,
         const math::Pose _receiver)
 {
+  physics::WorldPtr world = physics::get_world("default");
+
+  boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
+
   double _powTx = 14.5;
   double _gainTx = 2.5;
   double _gainRx = 2.5;
@@ -183,8 +188,8 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _transmitter,
   double N = 10;
 
   /// \brief Ray used to test for collisions when placing entities.
-  /*physics::RayShapePtr testRay;
-  physics::WorldPtr world = physics::get_world("default");
+  physics::RayShapePtr testRay;
+  
   if (world == NULL)
   {
     cout << "World is NULL\n" ;
@@ -202,13 +207,13 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _transmitter,
   testRay->GetIntersection(dist, entityName);
   cout << dist << "," << entityName << endl;
 
-  testRay.reset();*/
+  testRay.reset();
 
   double distance = _transmitter.pos.Distance(_receiver.pos);
-  /*if (dist < distance)
+  if (dist > 0 && entityName != "")
   {
     N = 20;
-  }*/
+  }
   
   double x = math::Rand::GetDblNormal(0.0, 3.0);
   double wavelength = 300000000 / _freq;
