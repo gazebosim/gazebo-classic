@@ -46,6 +46,14 @@ void Node::Fini()
   if (!this->initialized)
     return;
 
+  // Unadvertise all the publishers.
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    (*iter)->Fini();
+    TopicManager::Instance()->Unadvertise(*iter);
+  }
+
   this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 

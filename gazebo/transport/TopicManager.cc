@@ -396,6 +396,18 @@ void TopicManager::Unadvertise(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+  if (publication)
+    publication->RemovePublisher(_pub);
+
+  this->Unadvertise(_pub->GetTopic());
+}
+
+//////////////////////////////////////////////////
 void TopicManager::RegisterTopicNamespace(const std::string &_name)
 {
   ConnectionManager::Instance()->RegisterTopicNamespace(_name);

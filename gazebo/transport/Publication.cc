@@ -382,6 +382,21 @@ void Publication::AddPublisher(PublisherPtr _pub)
 }
 
 //////////////////////////////////////////////////
+void Publication::RemovePublisher(PublisherPtr _pub)
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+
+  GZ_ASSERT(_pub, "Received a NULL PublisherPtr");
+
+  // Find the publiser
+  std::vector<PublisherPtr>::iterator iter = std::find(
+      this->publishers.begin(), this->publishers.end(), _pub);
+
+  if (iter != this->publishers.end())
+    this->publishers.erase(iter);
+}
+
+//////////////////////////////////////////////////
 void Publication::RemoveNodes()
 {
   boost::mutex::scoped_lock removeLock(this->nodeRemoveMutex);

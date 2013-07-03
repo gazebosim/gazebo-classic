@@ -67,8 +67,9 @@ void waitForMsg(const std::string &_cmd)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_msgDebugOut.clear();
-
-  EXPECT_TRUE(custom_exec(_cmd));
+  std::string result = custom_exec_str(_cmd);
+  std::cout << "R[" << result << "]\n";
+  //EXPECT_TRUE();
 
   EXPECT_TRUE(g_msgCondition.timed_wait(lock,
         boost::posix_time::milliseconds(10000)));
@@ -442,7 +443,69 @@ TEST(gz, Physics)
   }
 
   fini();
-}*/
+}
+
+/////////////////////////////////////////////////
+TEST(gz, Camera)
+{
+  init();
+
+  std::string helpOutput = custom_exec_str("gz help camera");
+  EXPECT_NE(helpOutput.find("gz camera"), std::string::npos);
+
+  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node->Init();
+  gazebo::transport::SubscriberPtr sub =
+    node->Subscribe("~/physics", &PhysicsCB);
+
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
+
+  // Test gravity
+  {
+    waitForMsg("gz physics -w default -g 1,2,3 ");
+
+    gazebo::msgs::Physics msg;
+    msg.mutable_gravity()->set_x(1);
+    msg.mutable_gravity()->set_y(2);
+    msg.mutable_gravity()->set_z(3);
+
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test dt
+  {
+    waitForMsg("gz physics -w default -d 0.0123 ");
+
+    gazebo::msgs::Physics msg;
+    msg.set_dt(0.0123);
+
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test iters
+  {
+    waitForMsg("gz physics -w default -i 561 ");
+
+    gazebo::msgs::Physics msg;
+    msg.set_iters(561);
+
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test update-rate
+  {
+    waitForMsg("gz physics -w default -u 1234");
+
+    gazebo::msgs::Physics msg;
+    msg.set_update_rate(1234);
+
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  fini();
+}
+*/
 
 /////////////////////////////////////////////////
 TEST(gz, Stress)
@@ -460,6 +523,7 @@ TEST(gz, Stress)
   // Test world reset time
   for (unsigned int i = 0; i < 1000; ++i)
   {
+    printf("I[%d]\n", i);
     waitForMsg("gz world -w default -t");
 
     gazebo::msgs::WorldControl msg;

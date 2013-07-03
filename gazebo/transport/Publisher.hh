@@ -99,9 +99,6 @@ namespace gazebo
       /// \return The number of outgoing messages
       public: unsigned int GetOutgoingCount() const;
 
-      private: void PublishImpl(const google::protobuf::Message &_message,
-                                bool _block);
-
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
@@ -128,6 +125,16 @@ namespace gazebo
       /// \brief Get the previously published message
       /// \return The previously published message, if any
       public: MessagePtr GetPrevMsgPtr() const;
+
+      /// \brief Finalize the publisher.
+      public: void Fini();
+
+      /// \brief Implementation of Publish.
+      /// \param[in] _message Message to be published
+      /// \param[in] _block Whether to block until the message is actually
+      /// written out
+      private: void PublishImpl(const google::protobuf::Message &_message,
+                                bool _block);
 
       /// \brief Callback when a publish is completed
       /// \param[in] _id ID associated with the publication.

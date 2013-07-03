@@ -131,6 +131,10 @@ namespace gazebo
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Remove a publisher
+      /// \param[in] _pub Pointer to publisher object to remove
+      public: void RemovePublisher(PublisherPtr _pub);
+
       /// \brief Remove nodes that have been marked for removal
       private: void RemoveNodes();
 

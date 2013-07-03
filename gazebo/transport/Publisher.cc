@@ -53,11 +53,11 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
-  if (!this->messages.empty())
-    this->SendMessage();
+  printf("Delete Publisher\n");
+  this->Fini();
 
-  if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+  if (this->pubIds.size() > 0)
+    printf("Error\n");
 }
 
 //////////////////////////////////////////////////
@@ -154,7 +154,9 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
   if (_block)
   {
+    printf("SendMessage\n");
     this->SendMessage();
+    printf("SendMessage complete\n");
   }
   else
   {
@@ -172,7 +174,10 @@ void Publisher::SendMessage()
   {
     boost::mutex::scoped_lock lock(this->mutex);
     if (!this->pubIds.empty() || this->messages.empty())
+    {
+      printf("return\n");
       return;
+    }
 
     for (unsigned int i = 0; i < this->messages.size(); ++i)
     {
@@ -195,6 +200,7 @@ void Publisher::SendMessage()
     for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
+      printf("Publication message\n");
       // Send the latest message.
       this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
@@ -204,27 +210,6 @@ void Publisher::SendMessage()
     localBuffer.clear();
     localIds.clear();
   }
-
-
-  /*MessagePtr msg;
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-    if (!this->messages.empty() && !this->waiting)
-    {
-      msg = this->messages.front();
-      this->waiting = true;
-      this->pubId = (this->pubId + 1) % 10000;
-      this->pubIds.insert(this->pubId);
-    }
-  }
-
-  // Send the latest message.
-  if (msg && this->publication)
-  {
-    this->publication->Publish(msg,
-        boost::bind(&Publisher::OnPublishComplete, this, _1), this->pubId);
-  }
-  */
 }
 
 //////////////////////////////////////////////////
@@ -302,4 +287,16 @@ MessagePtr Publisher::GetPrevMsgPtr() const
   if (this->prevMsg)
     return this->prevMsg;
   return MessagePtr();
+}
+
+//////////////////////////////////////////////////
+void Publisher::Fini()
+{
+  printf("Fini publisher\n");
+  this->node.reset();
+  if (!this->messages.empty())
+    this->SendMessage();
+
+  if (!this->topic.empty())
+    TopicManager::Instance()->Unadvertise(this->topic);
 }

@@ -185,7 +185,12 @@ bool WorldCommand::RunImpl()
   if (this->vm.count("reset-models"))
     msg.mutable_reset()->set_model_only(true);
 
+
+  printf("Publish\n");
   pub->Publish(msg, true);
+  node->Fini();
+  printf("Use count[%d]\n", pub.use_count());
+  pub.reset();
 
   return true;
 }
@@ -621,7 +626,6 @@ int main(int argc, char **argv)
   }
   else
   {
-    std::cout << "Run\n";
     g_commandMap[command]->Run(argc, argv);
   }
 
