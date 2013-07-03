@@ -452,19 +452,19 @@ void GLWidget::OnMouseMoveUniversal()
             == rendering::Manipulator::TRANS_X)
         {
           this->keyText = "x";
-          this->TranslateEntity(this->mouseMoveVis);
+          this->TranslateEntity(this->mouseMoveVis, true);
         }
         else if (this->manipulator->GetMode()
             == rendering::Manipulator::TRANS_Y)
         {
           this->keyText = "y";
-          this->TranslateEntity(this->mouseMoveVis);
+          this->TranslateEntity(this->mouseMoveVis, true);
         }
         else if (this->manipulator->GetMode()
             == rendering::Manipulator::TRANS_Z)
         {
           this->keyText = "z";
-          this->TranslateEntity(this->mouseMoveVis);
+          this->TranslateEntity(this->mouseMoveVis, true);
         }
         else if (this->manipulator->GetMode()
             == rendering::Manipulator::ROT_X)
@@ -1163,6 +1163,7 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
 
   math::Vector3 moveVector(0, 0, 0);
   math::Vector3 planeNorm(0, 0, 0);
+  math::Vector3 projNorm(0, 0, 0);
 
   if (this->keyText == "z")
   {
@@ -1172,21 +1173,25 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
 //    return;
     moveVector.z = 1;
     planeNorm.y = 1;
+    projNorm.x = 1;
   }
   else if (this->keyText == "x")
   {
     moveVector.x = 1;
     planeNorm.y = 1;
+    projNorm.z = 1;
   }
   else if (this->keyText == "y")
   {
     moveVector.y = 1;
     planeNorm.x = 1;
+    projNorm.z = 1;
   }
   else
   {
     moveVector.Set(1, 1, 0);
     planeNorm.z = 1;
+    projNorm.z = 1;
   }
 
   if (_local)
@@ -1206,8 +1211,32 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
-  moveVector *= p1 - p2;
-  pose.pos = this->mouseMoveVisStartPose.pos + moveVector;
+
+  if (_local)
+  {
+//    gzerr << " p1 old " << p1 << std::endl;
+//    math::Vector3 norm = planeNorm.GetPerpendicular();
+//    gzerr << " norm old " << projNorm << std::endl;
+    math::Quaternion quat = _vis->GetWorldPose().rot;
+    projNorm = quat.RotateVector(projNorm);
+//    gzerr << " norm new " << projNorm << std::endl;
+    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
+//    gzerr << " p1 new " << p1 << std::endl;
+
+    /*double t = (norm.x*pose.pos.x - norm.x*p2.x
+        + norm.y*pose.pos.y - norm.y*p2.x
+        + norm.z*pose.pos.z - norm.z*p2.z)
+        / (norm.x*norm.x + norm.y*norm.y + norm.z*norm.z);
+
+    p2.x = p2.x + t*norm.x;
+    p2.y = p2.x + t*norm.y;
+    p2.z = p2.x + t*norm.y;*/
+  }
+  math::Vector3 distance = p1 - p2;
+
+  pose.pos = this->mouseMoveVisStartPose.pos + distance;
+
+//  pose.pos *= moveVector;
 
   if (this->mouseEvent.shift)
   {
@@ -1230,8 +1259,8 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
     }
   }
 
-  if (this->keyText != "z")
-    pose.pos.z = _vis->GetPose().pos.z;
+//  if (this->keyText != "z")
+//    pose.pos.z = _vis->GetPose().pos.z;
 
   _vis->SetPose(pose);
 }
