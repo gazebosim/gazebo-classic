@@ -18,12 +18,12 @@
  * Author: Nate Koenig
  */
 
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/Scene.hh"
-#include "rendering/ArrowVisual.hh"
-#include "rendering/AxisVisual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/ArrowVisual.hh"
+#include "gazebo/rendering/AxisVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

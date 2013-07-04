@@ -45,7 +45,7 @@
 
 #include "gazebo/sensors/SensorManager.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -258,10 +258,11 @@ void Model::Update()
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(const std::string &_jointName, double _position)
+void Model::SetJointPosition(
+  const std::string &_jointName, double _position, int _index)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position);
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////

@@ -20,7 +20,7 @@
  */
 
 #include <float.h>
-#include "physics/ode/ODESurfaceParams.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;

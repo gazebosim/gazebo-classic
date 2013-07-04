@@ -26,12 +26,12 @@
 #include <string>
 #include <iostream>
 
-#include "msgs/msgs.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/Event.hh"
-#include "common/Color.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Color.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace Ogre
 {
