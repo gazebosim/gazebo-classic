@@ -19,10 +19,10 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
-#include "transport/Subscriber.hh"
-#include "transport/ConnectionManager.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 #include "TransportIface.hh"
 
 using namespace gazebo;

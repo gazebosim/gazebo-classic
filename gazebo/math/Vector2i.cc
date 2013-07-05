@@ -20,7 +20,7 @@
  */
 
 #include <math.h>
-#include "math/Vector2i.hh"
+#include "gazebo/math/Vector2i.hh"
 
 using namespace gazebo;
 using namespace math;

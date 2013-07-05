@@ -91,7 +91,10 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
 VideoVisual::~VideoVisual()
 {
   delete this->video;
-  delete this->imageBuffer;
+  this->video = NULL;
+
+  delete [] this->imageBuffer;
+  this->imageBuffer = NULL;
 }
 
 /////////////////////////////////////////////////

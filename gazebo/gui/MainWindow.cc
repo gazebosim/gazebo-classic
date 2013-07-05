@@ -45,7 +45,7 @@
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"

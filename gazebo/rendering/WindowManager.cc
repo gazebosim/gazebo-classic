@@ -20,12 +20,12 @@
 # include <QtCore/qglobal.h>
 #endif
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"

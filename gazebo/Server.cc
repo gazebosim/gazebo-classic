@@ -30,6 +30,7 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/sdf/sdf.hh"
 
@@ -402,6 +403,9 @@ void Server::Init()
 void Server::SigInt(int)
 {
   stop = true;
+
+  // Signal to plugins/etc that a shutdown event has occured
+  event::Events::sigInt();
 }
 
 /////////////////////////////////////////////////

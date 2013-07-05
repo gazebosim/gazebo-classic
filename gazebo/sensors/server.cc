@@ -16,14 +16,14 @@
 */
 #include <signal.h>
 #include <iostream>
-#include "common/SystemPaths.hh"
-#include "common/Time.hh"
-#include "transport/TransportIface.hh"
-#include "sensors/SensorsIface.hh"
-#include "rendering/RenderingIface.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 bool quit = false;
 

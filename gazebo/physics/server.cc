@@ -22,10 +22,10 @@
 #include <iostream>
 #include <vector>
 
-#include "physics/PhysicsIface.hh"
-#include "common/Time.hh"
-#include "transport/TransportIface.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo_config.h"
 
 // Command line options
