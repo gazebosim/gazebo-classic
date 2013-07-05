@@ -396,12 +396,12 @@ void Color::SetFromABGR(const Color::ABGR _v)
 }
 
 //////////////////////////////////////////////////
-Color &Color::operator =(const Color &_pt)
+Color &Color::operator =(const Color &_clr)
 {
-  this->r = _pt.r;
-  this->g = _pt.g;
-  this->b = _pt.b;
-  this->a = _pt.a;
+  this->r = _clr.r;
+  this->g = _clr.g;
+  this->b = _clr.b;
+  this->a = _clr.a;
 
   return *this;
 }
@@ -510,18 +510,18 @@ const Color &Color::operator*=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-bool Color::operator ==(const Color &pt) const
+bool Color::operator ==(const Color &_pt) const
 {
-  return math::equal(this->r, pt.r) &&
-         math::equal(this->g, pt.g) &&
-         math::equal(this->b, pt.b) &&
-         math::equal(this->a, pt.a);
+  return math::equal(this->r, _pt.r) &&
+         math::equal(this->g, _pt.g) &&
+         math::equal(this->b, _pt.b) &&
+         math::equal(this->a, _pt.a);
 }
 
 //////////////////////////////////////////////////
-bool Color::operator!=(const Color &pt) const
+bool Color::operator!=(const Color &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////
@@ -536,3 +536,34 @@ void Color::Clamp()
   this->b = this->b < 0 ? 0: this->b;
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
+
+/*
+#ifdef HAVE_SDF
+//////////////////////////////////////////////////
+Color::Color(const sdf::Color &_pt)
+: r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
+{
+  this->Clamp();
+}
+
+//////////////////////////////////////////////////
+Color &Color::operator =(const sdf::Color &_pt)
+{
+  this->r = _pt.r;
+  this->g = _pt.g;
+  this->b = _pt.b;
+  this->a = _pt.a;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+bool Color::operator!=(const sdf::Color &_pt) const
+{
+  return !math::equal(this->r, _pt.r) ||
+         !math::equal(this->g, _pt.g) ||
+         !math::equal(this->b, _pt.b) ||
+         !math::equal(this->a, _pt.a);
+}
+#endif
+*/

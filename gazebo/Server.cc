@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -31,8 +33,6 @@
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/sensors/Sensors.hh"
 
@@ -280,7 +280,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;

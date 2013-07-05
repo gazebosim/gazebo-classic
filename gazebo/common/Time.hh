@@ -27,6 +27,13 @@
 #include <time.h>
 #include <iostream>
 
+// Remove in gazebo 2.0
+/*#include <gazebo/gazebo_config.h>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+*/
+
 #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
@@ -50,6 +57,16 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] time Time to copy
       public: Time(const Time &_time);
+
+              /*
+#ifdef HAVE_SDF
+      /// Deprecated
+      public: Time(const sdf::Time &_time) GAZEBO_DEPRECATED(1.9);
+
+      /// Deprecated
+      public: Time &operator =(const sdf::Time &_time) GAZEBO_DEPRECATED(1.9);
+#endif
+*/
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to

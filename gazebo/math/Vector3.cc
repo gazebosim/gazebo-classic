@@ -323,9 +323,9 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-bool Vector3::operator!=(const Vector3 &pt) const
+bool Vector3::operator!=(const Vector3 &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////
@@ -350,6 +350,7 @@ double Vector3::operator[](unsigned int index) const
   }
 }
 
+//////////////////////////////////////////////////
 /// Round all values to _decimalPlaces
 void Vector3::Round(int _precision)
 {
@@ -358,6 +359,7 @@ void Vector3::Round(int _precision)
   this->z = precision(this->z, _precision);
 }
 
+//////////////////////////////////////////////////
 /// Returns true if the two vectors are exacatly equal
 bool Vector3::Equal(const Vector3 &_v) const
 {
@@ -365,3 +367,33 @@ bool Vector3::Equal(const Vector3 &_v) const
          math::equal(this->y, _v.y) &&
          math::equal(this->z, _v.z);
 }
+
+/*
+#ifdef HAVE_SDF
+//////////////////////////////////////////////////
+Vector3 &Vector3::operator =(const sdf::Vector3 &_pt)
+{
+  this->x = _pt.x;
+  this->y = _pt.y;
+  this->z = _pt.z;
+
+  return *this;
+}
+
+
+//////////////////////////////////////////////////
+Vector3::Vector3(const sdf::Vector3 &_pt)
+    : x(_pt.x), y(_pt.y), z(_pt.z)
+{
+}
+
+
+//////////////////////////////////////////////////
+bool Vector3::operator!=(const sdf::Vector3 &_pt) const
+{
+  return !equal(this->x, _pt.x, 0.001) ||
+         !equal(this->y, _pt.y, 0.001) ||
+         !equal(this->z, _pt.z, 0.001);
+}
+#endif
+*/

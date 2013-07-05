@@ -16,7 +16,6 @@
 */
 #ifndef _MATRIX3_HH_
 #define _MATRIX3_HH_
-
 #include <assert.h>
 
 #include "gazebo/math/Vector3.hh"

@@ -139,6 +139,14 @@ Pose Pose::operator*(const Pose &pose)
 }
 
 //////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
+}
+
+//////////////////////////////////////////////////
 Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 {
   Quaternion tmp;
@@ -231,3 +239,34 @@ void Pose::Round(int _precision)
   this->pos.Round(_precision);
 }
 
+/*
+#ifdef HAVE_SDF
+//////////////////////////////////////////////////
+Pose::Pose(const sdf::Pose &_pose)
+{
+  this->pos.x = _pose.pos.x;
+  this->pos.y = _pose.pos.y;
+  this->pos.z = _pose.pos.z;
+
+  this->rot.x = _pose.rot.x;
+  this->rot.y = _pose.rot.y;
+  this->rot.z = _pose.rot.z;
+  this->rot.w = _pose.rot.w;
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const sdf::Pose &_pose)
+{
+  this->pos.x = _pose.pos.x;
+  this->pos.y = _pose.pos.y;
+  this->pos.z = _pose.pos.z;
+
+  this->rot.x = _pose.rot.x;
+  this->rot.y = _pose.rot.y;
+  this->rot.z = _pose.rot.z;
+  this->rot.w = _pose.rot.w;
+
+  return *this;
+}
+#endif
+*/

@@ -24,6 +24,14 @@
 
 #include <iostream>
 
+/*
+// Remove the gazebo_config and ifdefs in Gazebo 2.0
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include "sdf/sdf.hh"
+#endif
+*/
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 
@@ -62,6 +70,17 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
+
+              /*
+#ifdef HAVE_SDF
+      /// Deprecated
+      public: Pose(const sdf::Pose &_pose) __attribute__((deprecated));
+
+      /// Deprecated
+      public: Pose &operator=(const sdf::Pose &_pose)
+              __attribute__((deprecated));
+#endif
+*/
 
       /// \brief Destructor
       public: virtual ~Pose();
@@ -154,6 +173,10 @@ namespace gazebo
       /// \return itself
       public: Pose operator*(const Pose &_pose);
 
+      /// \brief Equal operator
+      /// \param[in] _pose Pose to copy
+      public: Pose &operator=(const Pose &_pose);
+
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose
       /// \return the resulting position
@@ -193,7 +216,6 @@ namespace gazebo
                 return result;
               }
 
-
       /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and
       ///        this, find a
       /// \param[in] _b the other pose
@@ -210,12 +232,6 @@ namespace gazebo
       /// \brief Round all values to _precision decimal places
       /// \param[in] _precision
       public: void Round(int _precision);
-
-      /// \brief The position
-      public: Vector3 pos;
-
-      /// \brief The rotation
-      public: Quaternion rot;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream
@@ -240,6 +256,12 @@ namespace gazebo
               _in >> _pose.pos >> _pose.rot;
               return _in;
             }
+
+      /// \brief The position
+      public: Vector3 pos;
+
+      /// \brief The rotation
+      public: Quaternion rot;
     };
     /// \}
   }

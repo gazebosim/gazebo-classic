@@ -28,6 +28,7 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -39,7 +40,6 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 // Forward Declarations
 namespace Ogre

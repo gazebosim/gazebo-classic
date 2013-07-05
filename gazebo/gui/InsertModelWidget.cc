@@ -17,8 +17,8 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sdf/sdf.hh>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"

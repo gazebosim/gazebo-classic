@@ -431,6 +431,7 @@ const Time &Time::operator /=(const Time &_time)
   return *this;
 }
 
+
 /////////////////////////////////////////////////
 bool Time::operator ==(const struct timeval &_tv) const
 {
@@ -575,3 +576,21 @@ bool Time::operator>=(double _time) const
 {
   return *this >= Time(_time);
 }
+
+/*
+#ifdef HAVE_SDF
+/////////////////////////////////////////////////
+Time::Time(const sdf::Time &_time)
+: sec(_time.sec), nsec(_time.nsec)
+{
+}
+
+/////////////////////////////////////////////////
+Time &Time::operator =(const sdf::Time &_time)
+{
+  this->sec = _time.sec;
+  this->nsec = _time.nsec;
+  return *this;
+}
+#endif
+*/

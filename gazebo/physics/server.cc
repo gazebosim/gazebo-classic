@@ -21,11 +21,11 @@
 #include <errno.h>
 #include <iostream>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/Physics.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/Transport.hh"
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo_config.h"
 
 // Command line options
@@ -98,7 +98,7 @@ void Load()
   while (worldElem)
   {
     gazebo::physics::WorldPtr world =
-      gazebo::physics::create_world(worldElem->GetValueString("name"));
+      gazebo::physics::create_world(worldElem->Get<std::string>("name"));
 
     // Create the world
     try
