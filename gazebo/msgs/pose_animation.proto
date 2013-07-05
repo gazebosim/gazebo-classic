@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface PoseAnimation 
-/// \brief Message for a model pose animation
+/// \interface PoseAnimation
+/// \brief Message for a pose animation
 
 
 import "pose.proto";
@@ -10,9 +10,9 @@ import "time.proto";
 
 message PoseAnimation
 {
-  required string model_name      = 1;
-  repeated Pose pose              = 2;
-  repeated Time time              = 3;
+  required string model_name      = 1; // deprecated
+  required string name            = 2;
+  repeated Pose pose              = 3;
+  repeated Time time              = 4;
+  optional bool loop              = 5;
 }
-
-

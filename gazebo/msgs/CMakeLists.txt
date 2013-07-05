@@ -83,6 +83,7 @@ set (msgs
   track_visual.proto
   vector2d.proto
   vector3d.proto
+  video_maker.proto
   visual.proto
   world_control.proto
   world_reset.proto

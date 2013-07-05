@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Video maker
+/// \brief Message for controlling a video maker
+
+import "pose_animation.proto";
+
+message VideoMaker
+{
+  required string name                        = 1;
+  optional bool start                         = 2;
+  optional bool stop                          = 3;
+  optional bool pause                         = 4;
+  repeated PoseAnimation camera_animation     = 5;
+}
