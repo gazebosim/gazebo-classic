@@ -20,6 +20,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo.hh"
@@ -58,6 +59,8 @@ void gazebo::add_plugin(const std::string &_filename)
 bool gazebo::load(int _argc, char **_argv)
 {
   gazebo::common::load();
+
+  util::OpenAL::Instance()->Load();
 
   // Initialize the informational logger. This will log warnings, and
   // errors.
@@ -104,6 +107,7 @@ void gazebo::stop()
 /////////////////////////////////////////////////
 void gazebo::fini()
 {
+  util::OpenAL::Instance()->Fini();
   boost::mutex::scoped_lock lock(fini_mutex);
   util::LogRecord::Instance()->Fini();
   g_plugins.clear();

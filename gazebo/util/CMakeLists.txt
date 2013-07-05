@@ -4,12 +4,14 @@ set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
+  OpenAL.cc
 )
 
 set (headers 
   Diagnostics.hh
   LogPlay.hh
   LogRecord.hh
+  OpenAL.hh
   UtilTypes.hh
 )
 

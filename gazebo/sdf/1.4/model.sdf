@@ -22,5 +22,7 @@
   <include filename="joint.sdf" required="*"/>
   <include filename="plugin.sdf" required="*"/>
   <include filename="gripper.sdf" required="*"/>
+  <include filename="audio_source.sdf" required="*"/>
+  <include filename="audio_sink.sdf" required="*"/>
 
 </element> <!-- End Model -->

@@ -26,6 +26,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -71,6 +72,7 @@ Model::Model(BasePtr _parent)
 {
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
+  this->audioSink = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +100,26 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+
+  if (_sdf->HasElement("audio_source"))
+  {
+    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
+    while (audioElem)
+    {
+      util::OpenALSource *source = util::OpenAL::Instance()->CreateSource(
+          audioElem);
+      // source->SetPos(math::Vector3(0, 0, 1));
+      source->Play();
+      audioElem = audioElem->GetNextElement("audio_source");
+      this->audioSources.push_back(source);
+    }
+  }
+
+  if (_sdf->HasElement("audio_sink"))
+  {
+    this->audioSink = util::OpenAL::Instance()->CreateListener(
+        _sdf->GetElement("audio_sink"));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -210,6 +232,20 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  // Update all the audio sources
+  for (std::vector<util::OpenALSource *>::iterator iter =
+      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+  {
+    (*iter)->SetPos(this->GetWorldPose().pos);
+    (*iter)->SetVel(this->GetWorldLinearVel());
+  }
+
+  if (this->audioSink)
+  {
+    this->audioSink->SetPose(this->GetWorldPose());
+    this->audioSink->SetVel(this->GetWorldLinearVel());
+  }
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)

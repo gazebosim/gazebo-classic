@@ -16,9 +16,7 @@
 */
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Common.hh"
-#include "gazebo/gazebo_config.h"
+#include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_FFMPEG
 extern "C" {
@@ -26,6 +24,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 #endif
+
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Common.hh"
 
 using namespace gazebo;
 

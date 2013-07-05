@@ -37,10 +37,10 @@ namespace gazebo
     /// \brief An audio decoder based on FFMPEG
     class AudioDecoder
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: AudioDecoder();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~AudioDecoder();
 
       /// \brief Set the file to decode.
@@ -55,6 +55,7 @@ namespace gazebo
       public: bool Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize);
 
       /// \brief Get the sample rate from the latest decoded file
+      /// \return Integer sample rate, such as 44100
       public: int GetSampleRate();
 
       /// \brief Free audio object, close files, streams

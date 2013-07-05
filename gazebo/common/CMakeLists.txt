@@ -31,7 +31,6 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
-  OpenAL.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -63,7 +62,6 @@ set (headers
   MeshLoader.hh
   MeshManager.hh
   MouseEvent.hh
-  OpenAL.hh
   PID.hh
   Plugin.hh
   SkeletonAnimation.hh

@@ -38,6 +38,12 @@ namespace boost
 
 namespace gazebo
 {
+  namespace util
+  {
+    class OpenALSource;
+    class OpenALSink;
+  }
+
   namespace physics
   {
     class Gripper;
@@ -348,6 +354,12 @@ namespace gazebo
       private: JointControllerPtr jointController;
 
       private: bool pluginsLoaded;
+
+      /// \brief All the audio sources
+      private: std::vector<util::OpenALSource *> audioSources;
+
+      /// \brief An audio sink
+      private: util::OpenALSink *audioSink;
     };
     /// \}
   }
