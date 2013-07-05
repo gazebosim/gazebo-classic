@@ -32,7 +32,6 @@
 
 namespace gazebo
 {
-
   namespace msgs
   {
     /// Create a request message

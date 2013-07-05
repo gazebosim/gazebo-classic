@@ -17,13 +17,7 @@
 
 #include <sys/stat.h>
 
-// Remove the gazebo_config and ifdefs in Gazebo 2.0
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
-#include "sdf/sdf.hh"
-#else
-#include "gazebo/sdf/sdf.hh"
-#endif
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"

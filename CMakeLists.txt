@@ -290,7 +290,9 @@ else (build_errors)
 
   # This is only needed for backward compatibility with the internal
   # version of SDF
-  include_directories(${PROJECT_SOURCE_DIR}/gazebo)
+  if (NOT HAVE_SDF)
+    include_directories(${PROJECT_SOURCE_DIR}/gazebo)
+  endif()
   
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
