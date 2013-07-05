@@ -36,6 +36,7 @@ namespace gazebo
     {
 
       /// \brief Constructor
+      /// \param[in] _name Name of video maker
       public: VideoMaker(const std::string &_name);
 
       /// \brief Deconstructor
@@ -45,6 +46,7 @@ namespace gazebo
       public: void Load();
 
       /// \brief Load a log file
+      /// \param[in] _log path to log file.
       public: void Load(const std::string &_log);
 
       /// \brief Start the video making process.
