@@ -85,7 +85,7 @@ namespace gazebo
       /// \param[in] _camera Pointer to the camera.
       /// \param[in] _path Pointer to animated path.
       public: void AddCamera(rendering::CameraPtr _camera,
-          common::Animation *_path);
+          common::PoseAnimationPtr _path);
 
       /// \brief Remove a camera from the video maker. The recorded video stream
       /// associated with this camera will also be deleted.

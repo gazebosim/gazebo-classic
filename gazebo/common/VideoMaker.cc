@@ -82,7 +82,7 @@ void VideoMaker::AddCamera(rendering::CameraPtr /*_camera*/)
 
 /////////////////////////////////////////////////
 void VideoMaker::AddCamera(rendering::CameraPtr /*_camera*/,
-          common::Animation */*_path*/)
+    common::PoseAnimationPtr /*_path*/)
 {
 }
 
