@@ -143,7 +143,7 @@ void Sensor::Update(bool _force)
   {
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
-    // NOTE: If you can this equation, also change the matching equation in
+    // NOTE: If you change this equation, also change the matching equation in
     // Sensor::NeedsUpdate
     common::Time adjustedElapsed = this->world->GetSimTime() -
         this->lastUpdateTime + this->updateDelay;
