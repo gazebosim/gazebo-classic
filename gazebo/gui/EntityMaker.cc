@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "transport/TransportIface.hh"
-#include "transport/Node.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

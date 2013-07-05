@@ -26,11 +26,11 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
-#include "math/Vector3.hh"
-#include "common/CommonIface.hh"
-#include "common/Console.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;

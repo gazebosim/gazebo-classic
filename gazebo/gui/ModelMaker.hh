@@ -20,8 +20,8 @@
 #include <list>
 #include <string>
 
-#include "sdf/sdf.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {

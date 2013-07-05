@@ -19,7 +19,7 @@
 #include <cmath>
 #include <stdio.h>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 #include "PID.hh"
 
 using namespace gazebo;

@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"

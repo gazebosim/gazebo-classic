@@ -15,10 +15,10 @@
  *
 */
 #include <boost/thread.hpp>
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "RenderingIface.hh"
 
 using namespace gazebo;

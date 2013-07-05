@@ -15,16 +15,16 @@
  *
 */
 
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
-#include "transport/TransportIface.hh"
+#include "gazebo/transport/TransportIface.hh"
 
-#include "rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/SensorManager.hh"
-#include "sensors/Sensor.hh"
-#include "sensors/SensorsIface.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 using namespace gazebo;
 

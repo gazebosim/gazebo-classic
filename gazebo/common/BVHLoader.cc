@@ -20,14 +20,14 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/CommonIface.hh"
-#include "common/BVHLoader.hh"
-#include "common/SystemPaths.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/Console.hh"
-#include "math/Matrix3.hh"
-#include "math/Angle.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/BVHLoader.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;

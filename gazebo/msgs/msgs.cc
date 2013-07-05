@@ -18,17 +18,17 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "math/Vector3.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Plane.hh"
-#include "math/Rand.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Rand.hh"
 
-#include "common/CommonIface.hh"
-#include "common/Image.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -628,6 +628,15 @@ namespace gazebo
           plgnMsg->set_name(elem->GetValueString("name"));
         // if (elem->HasElement("filename"))
           plgnMsg->set_filename(elem->GetValueString("filename"));
+
+        std::stringstream ss;
+        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
+            innerElem;
+            innerElem = innerElem->GetNextElement(""))
+        {
+          ss << innerElem->ToString("");
+        }
+        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;

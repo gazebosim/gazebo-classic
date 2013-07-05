@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "sensors/sensors.hh"
+#include "gazebo/sensors/sensors.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6

@@ -20,11 +20,11 @@
 
 #include <string>
 
-#include "common/Plugin.hh"
-#include "sensors/DepthCameraSensor.hh"
-#include "sensors/CameraSensor.hh"
-#include "rendering/DepthCamera.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
