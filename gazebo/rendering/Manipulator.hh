@@ -38,7 +38,15 @@ namespace gazebo
       public: enum ManipulationMode
       {
         /// \brief Translation in x
-        MANIP_NONE,
+        MANIP_NONE = 0,
+        /// \brief Translation mode
+        TRANS,
+        /// \brief Rotation mode
+        ROT,
+        /// \brief Scale mode
+        SCALE,
+        /// \brief Translation and Rotation mode
+        TRANS_ROT,
         /// \brief Translation in x
         TRANS_X,
         /// \brief Translation in y
@@ -76,21 +84,30 @@ namespace gazebo
       /// \brief Detach the manipulation tool from the current visual.
       public: void Detach();
 
-      // void SetMode(const std::string &_mode);
+      void SetMode(const std::string &_mode);
 
-      /// \brief Highlight the corresponding manipulator visual based on mode.
-      /// \param[in] _mode Manipulation mode in string
-      void SetHighlight(const std::string &_mode);
+      void SetMode(ManipulationMode _mode);
+
+      /// \brief Set state by highlighting the corresponding manipulator visual.
+      /// \param[in] _state Manipulation state in string
+      void SetState(const std::string &_state);
 
       /// \brief Get the current manipulation mode.
       // std::string GetMode() const;
 
-      /// \brief Highlight the corresponding manipulator visual based on mode.
-      /// \param[in] _mode Manipulation mode
-      void SetHighlight(ManipulationMode _mode);
+      /// \brief Set state by highlighting the corresponding manipulator visual.
+      /// \param[in] _state Manipulation state
+      void SetState(ManipulationMode _state);
+
+      /// \brief Get the current manipulation state.
+      ManipulationMode GetState();
 
       /// \brief Get the current manipulation mode.
       ManipulationMode GetMode();
+
+      private: void CreateScaleVisual();
+      private: void CreateRotateVisual();
+      private: void CreateTranslateVisual();
 
       private: VisualPtr transVisual;
       private: VisualPtr transXVisual;
@@ -117,10 +134,13 @@ namespace gazebo
 
       private: ManipulationMode mode;
 
+      private: ManipulationMode state;
+
       private: VisualPtr activeVis;
 
       private: boost::unordered_map<std::string, std::string>
           highlightMaterials;
+
 
 //      private: VisualPtr parent;
 

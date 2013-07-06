@@ -424,11 +424,11 @@ void GLWidget::OnMouseMoveUniversal()
 {
   if (!this->mouseEvent.dragging)
   {
-    std::string mode;
-    this->userCamera->GetVisual(this->mouseEvent.pos, mode);
-    this->manipulator->SetHighlight(mode);
+    std::string manipState;
+    this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
+    this->manipulator->SetState(manipState);
 
-    if (mode.empty())
+    if (manipState.empty())
     {
       rendering::VisualPtr vis = this->userCamera->GetVisual(
           this->mouseEvent.pos);
@@ -447,60 +447,60 @@ void GLWidget::OnMouseMoveUniversal()
     {
       /// TODO add logic for rotate/scale/translate vis
 
-      //if (this->manipulator->GetMode()
+      //if (this->manipulator->GetState()
       //    != rendering::Manipulator::MANIP_NONE)
 
       if (this->mouseMoveVis)
       {
-        if (this->manipulator->GetMode()
+        if (this->manipulator->GetState()
             == rendering::Manipulator::TRANS_X)
         {
           this->keyText = "x";
           this->TranslateEntity(this->mouseMoveVis, true);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::TRANS_Y)
         {
           this->keyText = "y";
           this->TranslateEntity(this->mouseMoveVis, true);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::TRANS_Z)
         {
           this->keyText = "z";
           this->TranslateEntity(this->mouseMoveVis, true);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::ROT_X)
         {
           this->keyText = "x";
           this->RotateEntity(this->mouseMoveVis);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::ROT_Y)
         {
           this->keyText = "y";
           this->RotateEntity(this->mouseMoveVis);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::ROT_Z)
         {
           this->keyText = "z";
           this->RotateEntity(this->mouseMoveVis);
         }
-        /*else if (this->manipulator->GetMode()
+        /*else if (this->manipulator->GetState()
             == rendering::Manipulator::SCALE_X)
         {
           this->keyText = "x";
           this->ScaleEntity(this->mouseMoveVis);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::SCALE_Y)
         {
           this->keyText = "y";
           this->ScaleEntity(this->mouseMoveVis);
         }
-        else if (this->manipulator->GetMode()
+        else if (this->manipulator->GetState()
             == rendering::Manipulator::SCALE_Z)
         {
           this->keyText = "z";
@@ -598,7 +598,22 @@ void GLWidget::OnMouseReleaseUniversal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressTranslate()
 {
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  this->SetMouseMoveVisual(rendering::VisualPtr());
+
+  rendering::VisualPtr vis;
+  rendering::VisualPtr mouseVis
+      = this->userCamera->GetVisual(this->mouseEvent.pos);
+
+  if (this->manipulator->GetMode() == rendering::Manipulator::MANIP_NONE
+      || (mouseVis && mouseVis != this->manipulator->GetParent()))
+  {
+    vis = mouseVis;
+  }
+  else
+  {
+    vis = this->manipulator->GetParent();
+  }
+//  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
@@ -610,6 +625,22 @@ void GLWidget::OnMousePressTranslate()
 
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+
+    if (this->manipulator)
+    {
+      if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
+      {
+//        this->manipulator->SetVisible(true);
+        this->manipulator->Attach(this->mouseMoveVis);
+        this->manipulator->SetMode(this->state);
+      }
+      else
+      {
+//        this->manipulator->SetVisible(false);
+        this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
+        this->manipulator->Detach();
+      }
+    }
   }
   else
     this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -763,27 +794,109 @@ void GLWidget::OnMouseMoveTranslate()
     if (this->mouseMoveVis &&
         this->mouseEvent.button == common::MouseEvent::LEFT)
     {
-      if (this->state == "translate")
+      if (this->manipulator->GetState()
+          == rendering::Manipulator::TRANS_X)
+      {
+        this->keyText = "x";
+        this->TranslateEntity(this->mouseMoveVis, true);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::TRANS_Y)
+      {
+        this->keyText = "y";
+        this->TranslateEntity(this->mouseMoveVis, true);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::TRANS_Z)
+      {
+        this->keyText = "z";
+        this->TranslateEntity(this->mouseMoveVis, true);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::ROT_X)
+      {
+        this->keyText = "x";
+        this->RotateEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::ROT_Y)
+      {
+        this->keyText = "y";
+        this->RotateEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::ROT_Z)
+      {
+        this->keyText = "z";
+        this->RotateEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::SCALE_X)
+      {
+        this->keyText = "x";
+        this->ScaleEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::SCALE_Y)
+      {
+        this->keyText = "y";
+        this->ScaleEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else if (this->manipulator->GetState()
+          == rendering::Manipulator::SCALE_Z)
+      {
+        this->keyText = "z";
+        this->ScaleEntity(this->mouseMoveVis);
+        this->keyText = "";
+      }
+      else
+        this->TranslateEntity(this->mouseMoveVis);
+//        rendering::VisualPtr attachedVis = this->manipulator->GetParent();
+
+//        this->TranslateEntity(this->mouseMoveVis);
+//      this->keyText = "";
+
+      /*if (this->state == "translate")
         this->TranslateEntity(this->mouseMoveVis);
       else if (this->state == "rotate")
         this->RotateEntity(this->mouseMoveVis);
       else if (this->state == "scale")
+      {
         this->ScaleEntity(this->mouseMoveVis);
+      }*/
     }
     else
       this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
   else
   {
-    rendering::VisualPtr vis = this->userCamera->GetVisual(
-        this->mouseEvent.pos);
-
-    if (vis && !vis->IsPlane())
+    std::string manipState;
+    if (this->manipulator)
+    {
+      this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
+      this->manipulator->SetState(manipState);
+    }
+    if (!manipState.empty())
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
-      QApplication::setOverrideCursor(Qt::ArrowCursor);
+    {
+      rendering::VisualPtr vis = this->userCamera->GetVisual(
+          this->mouseEvent.pos);
 
-    this->userCamera->HandleMouseEvent(this->mouseEvent);
+      if (vis && !vis->IsPlane())
+        QApplication::setOverrideCursor(Qt::OpenHandCursor);
+      else
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    }
   }
 }
 
@@ -1236,11 +1349,16 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
     projNorm = quat.RotateVector(projNorm);
     p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
   }
+
   math::Vector3 distance = p1 - p2;
+
+  if (!_local)
+    distance *= moveVector;
 
   pose.pos = this->mouseMoveVisStartPose.pos + distance;
 
-//  pose.pos *= moveVector;
+//  if (!_local)
+//    pose.pos *= moveVector;
 
   if (this->mouseEvent.shift)
   {
@@ -1263,8 +1381,8 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
     }
   }
 
-//  if (this->keyText != "z")
-//    pose.pos.z = _vis->GetPose().pos.z;
+  if (this->keyText != "z" && !_local)
+    pose.pos.z = _vis->GetPose().pos.z;
 
   _vis->SetPose(pose);
 }
