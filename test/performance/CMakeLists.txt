@@ -7,6 +7,13 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
+  include_directories(SYSTEM ${urdfdom_INCLUDE_DIRS}
+                             ${urdfdom_headers_INCLUDE_DIRS}
+                             ${console_bridge_INCLUDE_DIRS}
+                             ${CMAKE_SOURCE_DIR}/deps/opende/include)
+endif(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
+
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
@@ -22,6 +29,7 @@ set(tests
   RAMLibrary_TEST.cc
   factory_stress.cc
   transport_stress.cc
+  parser_urdf.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
