@@ -5,6 +5,7 @@ set (headers SDF.hh Param.hh parser.hh Converter.hh)
 set (gtest_sources
   SDF_TEST.cc
   Converter_TEST.cc
+  parser_urdf_TEST.cc
 )
 
 if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
