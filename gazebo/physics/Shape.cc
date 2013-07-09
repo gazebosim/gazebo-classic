@@ -37,3 +37,9 @@ Shape::~Shape()
   if (this->collisionParent)
     this->collisionParent->SetShape(ShapePtr());
 }
+
+//////////////////////////////////////////////////
+math::Vector3 Shape::GetScale() const
+{
+  return this->scale;
+}

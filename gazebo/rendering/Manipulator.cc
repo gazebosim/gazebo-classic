@@ -113,7 +113,6 @@ void Manipulator::SetMode(const std::string &_mode)
     tmpMode = TRANS_ROT;
   }
 
-  gzerr << " set mode " << tmpMode << std::endl;
   this->SetMode(tmpMode);
 }
 

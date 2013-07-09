@@ -25,6 +25,7 @@ using namespace physics;
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -62,6 +63,19 @@ void CylinderShape::SetSize(double _radius, double _length)
   this->sdf->GetElement("radius")->Set(_radius);
   this->sdf->GetElement("length")->Set(_length);
 }
+
+//////////////////////////////////////////////////
+void CylinderShape::SetScale(const math::Vector3 &_scale)
+{
+  if (_scale == this->scale)
+    return;
+
+  this->scale = _scale;
+
+  this->SetRadius(_scale.x*this->GetRadius());
+  this->SetLength(_scale.z*this->GetLength());
+}
+
 
 /////////////////////////////////////////////////
 double CylinderShape::GetRadius() const

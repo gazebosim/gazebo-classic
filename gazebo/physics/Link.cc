@@ -990,3 +990,30 @@ void Link::PublishData()
     this->dataPub->Publish(this->linkDataMsg);
   }
 }
+
+/////////////////////////////////////////////////
+void Link::SetScale(const math::Vector3 _scale)
+{
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+    }
+  }
+
+  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+  {
+    msgs::Visual msg;
+    msg.set_name(this->visuals[i]);
+    if (this->parent)
+      msg.set_parent_name(this->parent->GetScopedName());
+    else
+      msg.set_parent_name("");
+
+    msgs::Set(msg.mutable_scale(), _scale);
+
+    this->visPub->Publish(msg);
+  }
+}

@@ -190,6 +190,12 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
+void Collision::SetScale(const math::Vector3 &_scale)
+{
+  this->shape->SetScale(_scale);
+}
+
+//////////////////////////////////////////////////
 void Collision::SetContactsEnabled(bool _enable)
 {
   this->contactsEnabled = _enable;

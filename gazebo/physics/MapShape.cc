@@ -107,7 +107,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
-  _msg.mutable_image()->set_scale(this->GetScale());
+  _msg.mutable_image()->set_scale(this->GetScale().x);
   _msg.mutable_image()->set_threshold(this->GetThreshold());
   _msg.mutable_image()->set_height(this->GetHeight());
   _msg.mutable_image()->set_granularity(this->GetGranularity());
@@ -121,9 +121,23 @@ std::string MapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-double MapShape::GetScale() const
+void MapShape::SetScale(const math::Vector3 &_scale)
 {
-  return this->sdf->GetValueDouble("scale");
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  this->sdf->GetElement("scale")->Set(_scale);
+
+  /// TODO MapShape::SetScale not yet implemented.
+}
+
+//////////////////////////////////////////////////
+math::Vector3 MapShape::GetScale() const
+{
+  double mapScale = this->sdf->GetValueDouble("scale");
+  return math::Vector3(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////
@@ -419,4 +433,3 @@ void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
-

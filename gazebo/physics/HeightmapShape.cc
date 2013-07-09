@@ -126,6 +126,15 @@ void HeightmapShape::Init()
 }
 
 //////////////////////////////////////////////////
+void HeightmapShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::FillHeightMap()
 {
   unsigned int x, y;

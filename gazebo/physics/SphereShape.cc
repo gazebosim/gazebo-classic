@@ -54,6 +54,17 @@ double SphereShape::GetRadius() const
 }
 
 //////////////////////////////////////////////////
+void SphereShape::SetScale(const math::Vector3 &_scale)
+{
+  if (_scale == this->scale)
+    return;
+
+  this->scale = _scale;
+
+  this->SetRadius(_scale.x*this->GetRadius());
+}
+
+//////////////////////////////////////////////////
 void SphereShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::SPHERE);
