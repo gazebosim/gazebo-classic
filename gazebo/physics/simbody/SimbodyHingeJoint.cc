@@ -180,7 +180,7 @@ void SimbodyHingeJoint::SetLowStop(int _index,
 math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 {
   math::Angle result;
-  gzerr << "Not implemented...\n";
+  // gzerr << "Not implemented...\n";
   return result;
 }
 
@@ -188,14 +188,15 @@ math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
 {
   math::Angle result;
-  gzerr << "Not implemented...\n";
+  // gzerr << "Not implemented...\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (this->simbodyPhysics->simbodyPhysicsInitialized &&
+      _index < static_cast<int>(this->GetAngleCount()))
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
       this->simbodyPhysics->integ->getState());

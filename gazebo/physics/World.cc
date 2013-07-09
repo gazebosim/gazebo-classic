@@ -278,12 +278,15 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  // Initialize all the entities
+  // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
   this->physicsEngine->Init();
+  // Need to have set
+  // this->physicsEngine->simbodyPhysicsInitialized = true
+  // by here
 
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));

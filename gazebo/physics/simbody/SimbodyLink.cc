@@ -38,6 +38,7 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
 {
   this->mustBeBaseLink = false;
   this->physicsInitialized = false;
+  this->simbodyPhysics.reset();
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +309,8 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 /////////////////////////////////////////////////
 SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
-  if (!this->IsStatic())
+  if (this->simbodyPhysics->simbodyPhysicsInitialized &&
+     !this->IsStatic())
   {
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
@@ -334,7 +336,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
   else
   {
     gzerr << "inertial block no specified, using unit mass properties\n";
-    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(1,1,1));
+    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(0.1,0.1,0.1));
   }
 }
 

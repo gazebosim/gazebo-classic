@@ -94,9 +94,9 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
   // this->integ = new SimTK::RungeKutta3Integrator(system);
   // this->integ = new SimTK::RungeKutta2Integrator(system);
-  this->integ = new SimTK::ExplicitEulerIntegrator(system);
+  this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.001);
+  this->integ->setAccuracy(0.01);
   this->simbodyPhysicsInitialized = false;
 }
 
@@ -136,6 +136,8 @@ void SimbodyPhysics::Reset()
 void SimbodyPhysics::Init()
 {
   gzerr << "SimbodyPhysics::Init\n";
+
+  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -215,8 +217,6 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzerr << "simbodyJoint [" << (*ji)->GetName()
             << "]is not a SimbodyJointPtr\n";
   }
-
-  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -253,9 +253,8 @@ void SimbodyPhysics::UpdatePhysics()
         << "] dt [" << this->stepTimeDouble
         << "] t [" << this->world->GetSimTime().Double()
         << "]\n";
-
   this->lastUpdateTime = currTime;
-*/
+ */
 
   // pushing new entity pose into dirtyPoses for visualization
   physics::Model_V models = this->world->GetModels();
@@ -442,7 +441,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   {
     SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
 
-    gzerr << "debug : " << (*li)->GetName() << "\n";
+    // gzerr << "debug : " << (*li)->GetName() << "\n";
 
     if (simbodyLink)
       _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
@@ -495,7 +494,7 @@ void SimbodyPhysics::InitSimbodySystem()
   const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.01);
+  this->contact.setTransitionVelocity(0.1);
 
   // Specify gravity (read in above from world).
   if (!math::equal(g.norm(), 0.0))
@@ -811,8 +810,8 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
-  SimTK::ContactMaterial material(1e8,   // stiffness
-                                  100.0,  // dissipation
+  SimTK::ContactMaterial material(1e6,   // stiffness
+                                  0.1,  // dissipation
                                   1.0,   // mu_static
                                   1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
