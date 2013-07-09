@@ -64,6 +64,8 @@ void Manipulator::Load()
   this->transVisual->SetVisible(false);
   this->rotVisual->SetVisible(false);
   this->scaleVisual->SetVisible(false);
+
+  this->GetSceneNode()->setInheritScale(false);
 }
 
 /////////////////////////////////////////////////
@@ -554,10 +556,11 @@ void Manipulator::CreateScaleVisual()
       this->scaleXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->name);
   scaleShaftXNode->attachObject(scaleShaftXObj);
+  scaleShaftXNode->setScale(0.5, 0.5, 1.0);
   scaleShaftXNode->setPosition(0, 0, 0.1);
   scaleHeadXNode->attachObject(scaleHeadXObj);
-  scaleHeadXNode->setScale(0.03, 0.03, 0.03);
-  scaleHeadXNode->setPosition(0, 0, 0.214);
+  scaleHeadXNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadXNode->setPosition(0, 0, 0.21);
 //  shaftXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
 //  headXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
   scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
@@ -577,14 +580,15 @@ void Manipulator::CreateScaleVisual()
       this->scaleYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__"  + this->name);
   scaleShaftYNode->attachObject(scaleShaftYObj);
+  scaleShaftYNode->setScale(0.5, 0.5, 1.0);
   scaleShaftYNode->setPosition(0, 0, 0.1);
   scaleHeadYNode->attachObject(scaleHeadYObj);
-  scaleHeadYNode->setScale(0.03, 0.03, 0.03);
-  scaleHeadYNode->setPosition(0, 0, 0.214);
+  scaleHeadYNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadYNode->setPosition(0, 0, 0.21);
 //  shaftYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
 //  headYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
   scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
-  scaleHeadYNode->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
 
   Ogre::MovableObject *scaleShaftZObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -599,10 +603,11 @@ void Manipulator::CreateScaleVisual()
       this->scaleZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__"  + this->name);
   scaleShaftZNode->attachObject(scaleShaftZObj);
+  scaleShaftZNode->setScale(0.5, 0.5, 1.0);
   scaleShaftZNode->setPosition(0, 0, 0.1);
   scaleHeadZNode->attachObject(scaleHeadZObj);
-  scaleHeadZNode->setScale(0.03, 0.03, 0.03);
-  scaleHeadZNode->setPosition(0, 0, 0.214);
+  scaleHeadZNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadZNode->setPosition(0, 0, 0.21);
 //  shaftZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
 //  headZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
   scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));

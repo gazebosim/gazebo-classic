@@ -966,6 +966,8 @@ void GLWidget::OnMouseReleaseTranslate()
     // server
     if (this->mouseMoveVis)
     {
+      if (this->state == "scale")
+        this->PublishVisualScale(this->mouseMoveVis);
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
@@ -1274,8 +1276,93 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis, bool /*_local*/)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool /*_local*/)
+void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
 {
+  math::Box bbox = _vis->GetBoundingBox();
+  math::Pose pose = _vis->GetPose();
+
+  math::Vector3 origin1, dir1, p1;
+  math::Vector3 origin2, dir2, p2;
+
+  // Cast two rays from the camera into the world
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, origin1, dir1);
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, origin2, dir2);
+
+  math::Vector3 moveVector(0, 0, 0);
+  math::Vector3 planeNorm(0, 0, 0);
+  math::Vector3 projNorm(0, 0, 0);
+
+  if (this->keyText == "z")
+  {
+//    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
+//    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
+//    _vis->SetPose(pose);
+//    return;
+    moveVector.z = 1;
+    planeNorm.y = 1;
+    projNorm.x = 1;
+  }
+  else if (this->keyText == "x")
+  {
+    moveVector.x = 1;
+    planeNorm.y = 1;
+    projNorm.z = 1;
+  }
+  else if (this->keyText == "y")
+  {
+    moveVector.y = 1;
+    planeNorm.x = 1;
+    projNorm.z = 1;
+  }
+  else
+  {
+    moveVector.Set(1, 1, 0);
+    planeNorm.z = 1;
+    projNorm.z = 1;
+  }
+
+  if (_local)
+  {
+    math::Quaternion quat = _vis->GetWorldPose().rot;
+    planeNorm = quat.RotateVector(planeNorm);
+  }
+
+  // Compute the distance from the camera to plane of translation
+  double d = pose.pos.Dot(planeNorm);
+  math::Plane plane(planeNorm, d);
+  double dist1 = plane.Distance(origin1, dir1);
+  double dist2 = plane.Distance(origin2, dir2);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  p2 = origin2 + dir2 * dist2;
+
+
+  if (_local)
+  {
+    math::Quaternion quat = _vis->GetWorldPose().rot;
+    projNorm = quat.RotateVector(projNorm);
+    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
+  }
+
+  math::Vector3 distance = p1 - p2;
+
+  if (!_local)
+    distance *= moveVector;
+
+  gzerr << " bbox " << bbox.GetXLength() << " " << bbox.GetYLength() << " "
+      << bbox.GetZLength() << std::endl;
+
+  gzerr << " distance " << distance << std::endl;
+
+  math::Vector3 bboxSize = bbox.GetSize();
+  math::Vector3 scale = (bboxSize + distance)/bboxSize;
+
+  _vis->SetScale(scale);
+//  pose.pos = this->mouseMoveVisStartPose.pos + distance;
 }
 
 /////////////////////////////////////////////////
@@ -1470,6 +1557,25 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
       msg.set_name(_vis->GetName());
       msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
       this->lightPub->Publish(msg);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::PublishVisualScale(rendering::VisualPtr _vis)
+{
+  if (_vis)
+  {
+    // Check to see if the visual is a model.
+    if (gui::get_entity_id(_vis->GetName()))
+    {
+      msgs::Model msg;
+      msg.set_id(gui::get_entity_id(_vis->GetName()));
+      msg.set_name(_vis->GetName());
+
+      msgs::Set(msg.mutable_scale(), _vis->GetScale());
+      gzerr << " publish scale "  << _vis->GetScale() << std::endl;
+      this->modelPub->Publish(msg);
     }
   }
 }

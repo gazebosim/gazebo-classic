@@ -51,6 +51,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
+  this->scale = math::Vector3::One;
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->sdf);
@@ -440,8 +441,39 @@ void Visual::Load()
   if (obj)
     meshSize = obj->getBoundingBox().getSize();
 
-  math::Vector3 scale = this->GetScale();
-  this->sceneNode->setScale(scale.x, scale.y, scale.z);
+  //math::Vector3 scale = this->GetScale();
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+
+    if (geomElem->HasElement("box"))
+    {
+      this->scale = geomElem->GetElement("box")->GetValueVector3("size");
+    }
+    else if (geomElem->HasElement("sphere"))
+    {
+      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      this->scale.Set(r * 2.0, r * 2.0, r * 2.0);
+    }
+    else if (geomElem->HasElement("cylinder"))
+    {
+      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
+      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      this->scale.Set(r * 2.0, r * 2.0, l);
+    }
+    else if (geomElem->HasElement("plane"))
+    {
+      math::Vector2d size =
+        geomElem->GetElement("plane")->GetValueVector2d("size");
+      this->scale.Set(size.x, size.y, 1);
+    }
+    else if (geomElem->HasElement("mesh"))
+    {
+      this->scale = geomElem->GetElement("mesh")->GetValueVector3("scale");
+    }
+  }
+
+  this->sceneNode->setScale(this->scale.x, this->scale.y, this->scale.z);
 
   // Set the material of the mesh
   if (this->sdf->HasElement("material"))
@@ -682,6 +714,11 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
@@ -702,7 +739,8 @@ void Visual::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
-  math::Vector3 result(1, 1, 1);
+  return this->scale;
+  /*math::Vector3 result(1, 1, 1);
   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
@@ -734,7 +772,7 @@ math::Vector3 Visual::GetScale()
     }
   }
 
-  return result;
+  return result;*/
 }
 
 
@@ -1953,47 +1991,53 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 scale(1, 1, 1);
+    math::Vector3 geomScale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      scale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::Convert(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      scale.x = _msg->geometry().cylinder().radius() * 2.0;
-      scale.y = _msg->geometry().cylinder().radius() * 2.0;
-      scale.z = _msg->geometry().cylinder().length();
+      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.z = _msg->geometry().cylinder().length();
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
-      scale.x = scale.y = scale.z = _msg->geometry().sphere().radius() * 2.0;
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().sphere().radius() * 2.0;
+    }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      scale.x = scale.y = 1.0;
+      geomScale.x = geomScale.y = 1.0;
       if (_msg->geometry().plane().has_size())
       {
-        scale.x = _msg->geometry().plane().size().x();
-        scale.y = _msg->geometry().plane().size().y();
+        geomScale.x = _msg->geometry().plane().size().x();
+        geomScale.y = _msg->geometry().plane().size().y();
       }
-      scale.z = 1.0;
+      geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
-      scale.x = scale.y = scale.z = _msg->geometry().image().scale();
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().image().scale();
+    }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      scale = msgs::Convert(_msg->geometry().heightmap().size());
+      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        scale = msgs::Convert(_msg->geometry().mesh().scale());
+        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
       else
-        scale.x = scale.y = scale.z = 1.0;
+        geomScale.x = geomScale.y = geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      scale.x = scale.y = scale.z = 1.0;
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
-    this->SetScale(scale);
+    this->SetScale(geomScale);
   }
 
   /*if (msg->points.size() > 0)

@@ -170,7 +170,15 @@ namespace gazebo
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
+
+      /// \brief Publish visual's pose to the server
+      /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
+
+      /// \brief Publish visual's scale to the server
+      /// \param[in] _vis Pointer to the visual whose scale is to be published.
+      private: void PublishVisualScale(rendering::VisualPtr _vis);
+
       private: void ClearSelection();
 
       /// \brief Copy an object by name
