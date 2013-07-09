@@ -30,12 +30,17 @@ using namespace physics;
 // b: Semi-minor polar axis (meters)
 // if: inverse flattening (no units)
 // wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
-const double g_earth_wgs84_axis_a = 6378137.0;
-const double g_earth_wgs84_axis_b = 6356752.314245;
-const double g_earth_wgs84_axis_if = 298.257223563;
+const double g_earth_wgs84_axis_equatorial = 6378137.0;
+const double g_earth_wgs84_axis_polar = 6356752.314245;
+const double g_earth_wgs84_flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates()
+SphericalCoordinates::SphericalCoordinates() :
+      surfaceModel(EARTH_WGS84),
+      headingCosine(1.0),
+      headingSine(0.0),
+      radiusMeridional(1.0),
+      radiusNormal(1.0)
 {
 }
 
@@ -65,9 +70,11 @@ void SphericalCoordinates::Load(sdf::ElementPtr _sdf)
       this->surfaceModel = EARTH_WGS84;
       break;
   }
-  this->latitudeReferenceDegrees = _sdf->GetValueDouble("latitude_deg");
-  this->longitudeReferenceDegrees = _sdf->GetValueDouble("longitude_deg");
-  this->headingOffsetDegrees = _sdf->GetValueDouble("heading_deg");
+  this->latitudeReference.SetFromDegree(_sdf->GetValueDouble("latitude_deg"));
+  this->longitudeReference.SetFromDegree(_sdf->GetValueDouble("longitude_deg"));
+  this->headingOffsetDegrees.SetFromDegree(_sdf->GetValueDouble("heading_deg"));
+  this->headingCosine = cos(this->headingOffset.Radian());
+  this->headingSine = sin(this->headingOffset.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -76,16 +83,33 @@ void SphericalCoordinates::Init()
   switch (this->surfaceModel)
   {
     case: EARTH_WGS84:
-      
+      // Currently uses radius of curvature equations from wikipedia
+      // http://en.wikipedia.org/wiki/Earth_radius#Radius_of_curvature
+      double a = g_earth_wgs84_axis_equatorial;
+      double b = g_earth_wgs84_axis_polar;
+      double ab = a*b;
+      double cosLat = cos(this->latitudeReference.Radian());
+      double sinLat = sin(this->latitudeReference.Radian());
+      double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
+      this->radiusMeridional = ab*ab / denom / sqrt(denom);
+      this->radiusNormal = a*a / sqrt(denom);
       break;
   }
-  //cos(this->latitudeReferenceDegrees*M_PI) * g_earth_wgs84_axis_a
-  //sin(this->latitudeReferenceDegrees*M_PI) * g_earth_wgs84_axis_b
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
 {
   math::Vector3 spherical;
+  double east  = _xyz.x * this->headingCosine - _xyz.y * this->headingSine;
+  double north = _xyz.x * this->headingSine   + _xyz.y * this->headingCosine;
+  math::Angle deltaLatitude(north / this->radiusMeridional);
+  math::Angle deltaLongitude(east / this->radiusNormal);
+  // geodetic latitude in degrees
+  spherical.x = this->latitudeReference.Degree() + deltaLatitude.Degree();
+  // geodetic longitude in degrees
+  spherical.y = this->longitudeReference.Degree() + deltaLongitude.Degree();
+  // geodetic altitude
+  spherical.z = this->radiusNormal + _xyz.z;
   return spherical;
 }

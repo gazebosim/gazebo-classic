@@ -22,6 +22,7 @@
 #ifndef _SPHERICALCOORDINATES_HH_
 #define _SPHERICALCOORDINATES_HH_
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/sdf/sdf.hh"
 
@@ -68,19 +69,28 @@ namespace gazebo
       /// \brief Type of surface model being used.
       private: SurfaceModelType surfaceModel;
 
-      /// \brief Latitude of reference point in degrees.
-      private: double latitudeReferenceDegrees;
+      /// \brief Latitude of reference point.
+      private: math::Angle latitudeReference;
 
-      /// \brief Longitude of reference point in degrees.
-      private: double longitudeReferenceDegrees;
+      /// \brief Longitude of reference point.
+      private: math::Angle longitudeReference;
 
-      /// \brief Heading offset in degrees, expressed as angle from East to
+      /// \brief Heading offset, expressed as angle from East to
       ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
-      private: double headingOffsetDegrees;
+      private: math::Angle headingOffset;
 
-      /// \brief Reference radii of planetary surface in meters, stored as
-      ///        East radius, North radius, vertical radius.
-      private: math::Vector3 radiiReference;
+      /// \brief Cosine of heading offset angle.
+      private: double headingCosine;
+
+      /// \brief Sine of heading offset angle.
+      private: double headingSine;
+
+      /// \brief Meridional radius of curvature of earth at reference latitude.
+      private: double radiusMeridional;
+
+      /// \brief Radius of curvature of earth at reference latitude computed
+      ///        as ellipsoidal normal.
+      private: double radiusNormal;
     };
     /// \}
   }
