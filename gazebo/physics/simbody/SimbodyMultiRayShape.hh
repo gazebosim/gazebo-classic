@@ -17,7 +17,7 @@
 #ifndef _SIMBODYMULTIRAYSHAPE_HH_
 #define _SIMBODYMULTIRAYSHAPE_HH_
 
-#include "physics/MultiRayShape.hh"
+#include "gazebo/physics/MultiRayShape.hh"
 
 namespace gazebo
 {

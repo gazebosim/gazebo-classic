@@ -22,8 +22,8 @@
 #ifndef _SIMBODY_BOXSHAPE_HH_
 #define _SIMBODY_BOXSHAPE_HH_
 
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {

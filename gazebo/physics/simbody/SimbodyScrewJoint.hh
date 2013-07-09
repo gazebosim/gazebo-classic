@@ -22,8 +22,8 @@
 #ifndef _SIMBODYSCREWJOINT_HH_
 #define _SIMBODYSCREWJOINT_HH_
 
-#include "physics/simbody/SimbodyJoint.hh"
-#include "physics/ScrewJoint.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
 
 namespace gazebo
 {

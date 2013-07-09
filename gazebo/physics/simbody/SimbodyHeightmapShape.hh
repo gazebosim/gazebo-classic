@@ -23,9 +23,9 @@
 #define _SIMBODYHEIGHTMAPGEOM_HH_
 #include <string>
 
-#include "physics/HeightmapShape.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/Collision.hh"
 
 namespace gazebo
 {

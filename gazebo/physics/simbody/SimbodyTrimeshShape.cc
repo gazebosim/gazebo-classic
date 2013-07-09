@@ -19,12 +19,12 @@
  * Date: 21 May 2009
  */
 
-#include "common/Mesh.hh"
+#include "gazebo/common/Mesh.hh"
 
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyCollision.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/simbody/SimbodyTrimeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyTrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;

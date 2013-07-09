@@ -27,8 +27,8 @@
 
 #include <Simbody.h>
 
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/Joint.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {

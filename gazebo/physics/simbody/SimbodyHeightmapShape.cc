@@ -19,12 +19,12 @@
  * Date: 8 May 2003
  */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyCollision.hh"
-#include "physics/simbody/SimbodyHeightmapShape.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

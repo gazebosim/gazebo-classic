@@ -22,11 +22,11 @@
 #ifndef _SIMBODYHINGE2JOINT_HH_
 #define _SIMBODYHINGE2JOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/Hinge2Joint.hh"
-#include "physics/simbody/SimbodyJoint.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/Hinge2Joint.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 
 namespace gazebo
 {

@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"

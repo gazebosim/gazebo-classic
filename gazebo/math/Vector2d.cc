@@ -20,8 +20,8 @@
  */
 
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector2d.hh"
 
 using namespace gazebo;
 using namespace math;

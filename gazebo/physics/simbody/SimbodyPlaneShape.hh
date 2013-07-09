@@ -24,8 +24,8 @@
 
 #include <iostream>
 
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/PlaneShape.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/PlaneShape.hh"
 
 namespace gazebo
 {
