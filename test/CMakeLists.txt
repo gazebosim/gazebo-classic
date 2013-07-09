@@ -14,6 +14,7 @@ link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
+  ${SDF_LIBRARY_DIRS}
 )
 
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
