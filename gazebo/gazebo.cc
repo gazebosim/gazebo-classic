@@ -77,8 +77,6 @@ bool gazebo::load(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool gazebo::init()
 {
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
-
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
        iter != g_plugins.end(); ++iter)
   {
