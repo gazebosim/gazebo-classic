@@ -98,6 +98,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   /// \TODO:  make sdf parameter
   this->integ->setAccuracy(0.01);
   this->simbodyPhysicsInitialized = false;
+  this->simbodyPhysicsStepped = false;
 }
 
 //////////////////////////////////////////////////
@@ -244,6 +245,7 @@ void SimbodyPhysics::UpdatePhysics()
                        this->world->GetSimTime().Double());
   }
 
+  this->simbodyPhysicsStepped = true;
   const SimTK::State &s = this->integ->getState();
 
 /* debug
@@ -810,8 +812,8 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
-  SimTK::ContactMaterial material(1e6,   // stiffness
-                                  0.1,  // dissipation
+  SimTK::ContactMaterial material(1e8,   // stiffness
+                                  1.0,  // dissipation
                                   1.0,   // mu_static
                                   1.0,   // mu_dynamic
                                   0.5);  // mu_viscous

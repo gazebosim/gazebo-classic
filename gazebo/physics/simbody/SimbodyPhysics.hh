@@ -208,6 +208,7 @@ namespace gazebo
 
       /// \brief true if initialized
       public: bool simbodyPhysicsInitialized;
+      public: bool simbodyPhysicsStepped;
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(
