@@ -717,6 +717,7 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (this->scale == _scale)
     return;
 
+  math::Vector3 tmpScale = this->scale;
   this->scale = _scale;
 
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
@@ -724,16 +725,19 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
+  {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
+  }
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetElement("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("cylinder")->GetElement("radius")
+        ->Set(_scale.x/2.0);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
 
-  this->sceneNode->setScale(Conversions::Convert(_scale));
+  this->sceneNode->setScale(Conversions::Convert(this->scale));
 }
 
 //////////////////////////////////////////////////
@@ -1987,6 +1991,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         this->SetNormalMap(_msg->material().normal_map());
     }
   }
+
+  if (_msg->has_scale())
+    this->SetScale(msgs::Convert(_msg->scale()));
 
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())

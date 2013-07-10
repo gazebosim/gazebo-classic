@@ -1003,7 +1003,7 @@ void Link::SetScale(const math::Vector3 _scale)
     }
   }
 
-  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+/*  for (unsigned int i = 0; i < this->visuals.size(); ++i)
   {
     msgs::Visual msg;
     msg.set_name(this->visuals[i]);
@@ -1015,5 +1015,5 @@ void Link::SetScale(const math::Vector3 _scale)
     msgs::Set(msg.mutable_scale(), _scale);
 
     this->visPub->Publish(msg);
-  }
+  }*/
 }

@@ -821,6 +821,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_is_static(this->IsStatic());
   _msg.mutable_pose()->CopyFrom(msgs::Convert(this->GetWorldPose()));
   _msg.set_id(this->GetId());
+  msgs::Set(_msg.mutable_scale(), this->scale);
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
@@ -965,6 +966,11 @@ void Model::SetState(const ModelState &_state)
 /////////////////////////////////////////////////
 void Model::SetScale(const math::Vector3 &_scale)
 {
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {

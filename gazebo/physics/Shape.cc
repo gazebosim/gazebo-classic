@@ -29,6 +29,8 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////

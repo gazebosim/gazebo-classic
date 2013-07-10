@@ -622,6 +622,7 @@ void GLWidget::OnMousePressTranslate()
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
     this->SetMouseMoveVisual(vis);
+//    this->mouseVisualScale = vis->GetScale();
 
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -967,7 +968,10 @@ void GLWidget::OnMouseReleaseTranslate()
     if (this->mouseMoveVis)
     {
       if (this->state == "scale")
+      {
         this->PublishVisualScale(this->mouseMoveVis);
+        this->mouseMoveVis->SetScale(this->mouseVisualScale);
+      }
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
@@ -1358,11 +1362,42 @@ void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
 
   gzerr << " distance " << distance << std::endl;
 
-  math::Vector3 bboxSize = bbox.GetSize();
-  math::Vector3 scale = (bboxSize + distance)/bboxSize;
+  math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
+  math::Vector3 scale = (bboxSize + distance/2.0)/bboxSize;
 
-  _vis->SetScale(scale);
-//  pose.pos = this->mouseMoveVisStartPose.pos + distance;
+  // a bit hacky to check for unit sphere and cylinder simple shapes in order
+  // to constrain the scaling dimensions.
+  if (_vis->GetName().find("unit_sphere") != std::string::npos)
+  {
+    if (moveVector.x > 0)
+    {
+      scale.y = scale.x;
+      scale.z = scale.x;
+    }
+    else if (moveVector.y > 0)
+    {
+      scale.x = scale.y;
+      scale.z = scale.y;
+    }
+    else if (moveVector.z > 0)
+    {
+      scale.x = scale.z;
+      scale.y = scale.z;
+    }
+  }
+  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  {
+    if (moveVector.x > 0)
+    {
+      scale.y = scale.x;
+    }
+    else if (moveVector.y > 0)
+    {
+      scale.x = scale.y;
+    }
+  }
+
+  _vis->SetScale(this->mouseVisualScale * scale);
 }
 
 /////////////////////////////////////////////////
@@ -1511,6 +1546,9 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->mouseMoveVis = _vis;
+  if (_vis)
+    this->mouseVisualScale = _vis->GetScale();
+  else this->mouseVisualScale = math::Vector3::One;
 }
 
 /////////////////////////////////////////////////
@@ -1574,8 +1612,10 @@ void GLWidget::PublishVisualScale(rendering::VisualPtr _vis)
       msg.set_name(_vis->GetName());
 
       msgs::Set(msg.mutable_scale(), _vis->GetScale());
-      gzerr << " publish scale "  << _vis->GetScale() << std::endl;
+      gzerr << " publish scale "  << _vis->GetScale() <<
+        " " << this->mouseVisualScale << std::endl;
       this->modelPub->Publish(msg);
+
     }
   }
 }

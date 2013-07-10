@@ -70,12 +70,11 @@ void CylinderShape::SetScale(const math::Vector3 &_scale)
   if (_scale == this->scale)
     return;
 
+  this->SetRadius((_scale.x/this->scale.x)*this->GetRadius());
+  this->SetLength((_scale.z/this->scale.z)*this->GetLength());
+
   this->scale = _scale;
-
-  this->SetRadius(_scale.x*this->GetRadius());
-  this->SetLength(_scale.z*this->GetLength());
 }
-
 
 /////////////////////////////////////////////////
 double CylinderShape::GetRadius() const

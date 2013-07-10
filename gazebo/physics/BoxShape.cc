@@ -57,9 +57,9 @@ void BoxShape::SetScale(const math::Vector3 &_scale)
   if (_scale == this->scale)
     return;
 
-  this->scale = _scale;
+  this->SetSize((_scale/this->scale)*this->GetSize());
 
-  this->SetSize(_scale*this->GetSize());
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////

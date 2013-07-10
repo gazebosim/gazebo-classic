@@ -238,6 +238,8 @@ namespace gazebo
       private: bool sceneCreated;
 
       private: rendering::ManipulatorPtr manipulator;
+
+      private: math::Vector3 mouseVisualScale;
     };
   }
 }

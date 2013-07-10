@@ -1375,6 +1375,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
+    if (_msg.has_scale())
+    {
+//      msgs::Set(vm->mutable_scale(), _msg.scale());
+      vm->mutable_scale()->set_x(_msg.scale().x());
+      vm->mutable_scale()->set_y(_msg.scale().y());
+      vm->mutable_scale()->set_z(_msg.scale().z());
+    }
     this->visualMsgs.push_back(vm);
   }
 
@@ -1399,6 +1406,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     for (int k = 0; k < _msg.link(j).visual_size(); k++)
     {
+      gzerr << " process model visual msg " <<linkName << std::endl;
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
       this->visualMsgs.push_back(vm);
@@ -1437,6 +1445,7 @@ void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  gzerr << " on visual msg " << _msg->name() << std::endl;
   this->visualMsgs.push_back(_msg);
 }
 
