@@ -9,7 +9,7 @@ else
 fi
 
 # Create a logfile based on the current time
-timestamp=`eval date +%d_%m_%Y_%R:%S`
+timestamp=`eval date +%Y_%m_%d_%R:%S`
 logfile="/tmp/gazebo_test-$timestamp.txt"
 logfileVerbose="/tmp/gazebo_test-$timestamp-verbose.txt"
 logfileRaw=/tmp/gazebo_build/raw.log
