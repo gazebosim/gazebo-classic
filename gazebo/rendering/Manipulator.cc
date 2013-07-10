@@ -77,13 +77,13 @@ void Manipulator::Attach(rendering::VisualPtr _vis)
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
 
-  ///TODO set scale of visuals to be size of vis bounding box
+  /// TODO set scale of visuals to be size of vis bounding box
+  /// Commented out because it doesn't look nice
+  // math::Vector3 bboxSize = _vis->GetBoundingBox().GetSize()
+  //    * _vis->GetScale();
+  // double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+  // this->SetScale(math::Vector3(max, max, max));
 }
-/*
-/////////////////////////////////////////////////
-void Manipulator::Attach(std::string _entity)
-{
-}*/
 
 /////////////////////////////////////////////////
 void Manipulator::Detach()
@@ -348,11 +348,11 @@ void Manipulator::CreateTranslateVisual()
       this->transXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->name);
   transShaftXNode->attachObject(shaftXObj);
+  transShaftXNode->setScale(0.5, 0.5, 1.0);
   transShaftXNode->setPosition(0, 0, 0.1);
   transHeadXNode->attachObject(headXObj);
-  transHeadXNode->setPosition(0, 0, 0.24);
-//  shaftXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
-//  headXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
+  transHeadXNode->setScale(0.5, 0.5, 0.5);
+  transHeadXNode->setPosition(0, 0, 0.22);
   shaftXObj->setUserAny(Ogre::Any(std::string("trans_x")));
   headXObj->setUserAny(Ogre::Any(std::string("trans_x")));
 
@@ -370,11 +370,11 @@ void Manipulator::CreateTranslateVisual()
       this->transYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_TRANS_HEAD_NODE_Y__"  + this->name);
   transShaftYNode->attachObject(shaftYObj);
+  transShaftYNode->setScale(0.5, 0.5, 1.0);
   transShaftYNode->setPosition(0, 0, 0.1);
   transHeadYNode->attachObject(headYObj);
-  transHeadYNode->setPosition(0, 0, 0.24);
-//  shaftYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
-//  headYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
+  transHeadYNode->setScale(0.5, 0.5, 0.5);
+  transHeadYNode->setPosition(0, 0, 0.22);
   shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
   headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
 
@@ -391,11 +391,11 @@ void Manipulator::CreateTranslateVisual()
       this->transZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_TRANS_HEAD_NODE_Z__"  + this->name);
   transShaftZNode->attachObject(shaftZObj);
+  transShaftZNode->setScale(0.5, 0.5, 1.0);
   transShaftZNode->setPosition(0, 0, 0.1);
   transHeadZNode->attachObject(headZObj);
-  transHeadZNode->setPosition(0, 0, 0.24);
-//  shaftZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
-//  headZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
+  transHeadZNode->setScale(0.5, 0.5, 0.5);
+  transHeadZNode->setPosition(0, 0, 0.22);
   shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
   headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
 
@@ -438,7 +438,6 @@ void Manipulator::CreateRotateVisual()
   this->rotVisual.reset(new rendering::Visual(
       this->name + "__SELECTION_OBJ_ROT__",
       shared_from_this()));
-//      this->manipVisual));
 
   this->rotXVisual.reset(
       new rendering::Visual(
@@ -459,7 +458,6 @@ void Manipulator::CreateRotateVisual()
       this->rotXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_X__"  + this->name);
   xNode->attachObject(rotXObj);
-//  rotXObj->setUserAny(Ogre::Any(this->rotXVisual->GetName()));
   rotXObj->setUserAny(Ogre::Any(std::string("rot_x")));
 
   Ogre::MovableObject *rotYObj =
@@ -469,7 +467,6 @@ void Manipulator::CreateRotateVisual()
       this->rotYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->name);
   yNode->attachObject(rotYObj);
-//  rotYObj->setUserAny(Ogre::Any(this->rotYVisual->GetName()));
   rotYObj->setUserAny(Ogre::Any(std::string("rot_y")));
 
   Ogre::MovableObject *rotZObj =
@@ -479,7 +476,6 @@ void Manipulator::CreateRotateVisual()
       this->rotZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->name);
   zNode->attachObject(rotZObj);
-//  rotZObj->setUserAny(Ogre::Any(this->rotZVisual->GetName()));
   rotZObj->setUserAny(Ogre::Any(std::string("rot_z")));
 
   this->rotXVisual->Load();
@@ -540,7 +536,6 @@ void Manipulator::CreateScaleVisual()
   this->scaleYVisual->Load();
   this->scaleZVisual->Load();
 
-//  this->InsertMesh("axis_shaft");
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *scaleShaftXObj =
@@ -561,8 +556,6 @@ void Manipulator::CreateScaleVisual()
   scaleHeadXNode->attachObject(scaleHeadXObj);
   scaleHeadXNode->setScale(0.02, 0.02, 0.02);
   scaleHeadXNode->setPosition(0, 0, 0.21);
-//  shaftXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
-//  headXObj->setUserAny(Ogre::Any(this->transXVisual->GetName()));
   scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
   scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
 
@@ -585,8 +578,6 @@ void Manipulator::CreateScaleVisual()
   scaleHeadYNode->attachObject(scaleHeadYObj);
   scaleHeadYNode->setScale(0.02, 0.02, 0.02);
   scaleHeadYNode->setPosition(0, 0, 0.21);
-//  shaftYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
-//  headYObj->setUserAny(Ogre::Any(this->transYVisual->GetName()));
   scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
   scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
 
@@ -608,8 +599,6 @@ void Manipulator::CreateScaleVisual()
   scaleHeadZNode->attachObject(scaleHeadZObj);
   scaleHeadZNode->setScale(0.02, 0.02, 0.02);
   scaleHeadZNode->setPosition(0, 0, 0.21);
-//  shaftZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
-//  headZObj->setUserAny(Ogre::Any(this->transZVisual->GetName()));
   scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
   scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
 

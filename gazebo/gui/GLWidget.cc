@@ -446,7 +446,6 @@ void GLWidget::OnMousePressTranslate()
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
     this->SetMouseMoveVisual(vis);
-//    this->mouseVisualScale = vis->GetScale();
 
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -793,11 +792,10 @@ void GLWidget::OnMouseReleaseTranslate()
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
+      this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
+      this->manipulator->Detach();
     }
     this->SetSelectedVisual(rendering::VisualPtr());
-    this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
-    this->manipulator->Detach();
-
     event::Events::setSelectedEntity("", "normal");
   }
   else
