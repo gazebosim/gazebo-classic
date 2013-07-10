@@ -533,11 +533,6 @@ void MainWindow::Scale()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::UniversalManip()
-{
-  gui::Events::manipMode("universal");
-}
-/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -872,14 +867,6 @@ void MainWindow::CreateActions()
   g_scaleAct->setCheckable(true);
   g_scaleAct->setChecked(false);
   connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
-
-  g_universalManipAct = new QAction(QIcon(":/images/cursor.png"),
-      tr("Universal Mode"), this);
-  g_universalManipAct->setStatusTip(tr("Universal manipulate mode"));
-  g_universalManipAct->setCheckable(true);
-  g_universalManipAct->setChecked(false);
-  connect(g_universalManipAct, SIGNAL(triggered()), this,
-      SLOT(UniversalManip()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));

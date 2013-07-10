@@ -85,15 +85,15 @@ namespace gazebo
       private slots: void Step();
       private slots: void NewModel();
       private slots: void Arrow();
+
+      /// \brief Qt callback when the translate mode is triggered.
       private slots: void Translate();
+
+      /// \brief Qt callback when the rotate mode is triggered.
       private slots: void Rotate();
 
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
-
-      /// \brief Qt callback when the Universal manipulation mode is triggered.
-      private slots: void UniversalManip();
-
 
       private slots: void CreateBox();
       private slots: void CreateSphere();

@@ -92,9 +92,6 @@ namespace gazebo
       /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
-      /// \brief Process a mouse move event in universal manipulation mode.
-      private: void OnMouseMoveUniversal();
-
       /// \brief Callback for a mouse release event.
       /// \param[in] _event The mouse release event
       /// \return True if handled by this function.
@@ -105,9 +102,6 @@ namespace gazebo
 
       /// \brief Process an object translate mouse release event.
       private: void OnMouseReleaseTranslate();
-
-      /// \brief Process a mouse release event in universal manipulation mode.
-      private: void OnMouseReleaseUniversal();
 
       /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
@@ -125,9 +119,6 @@ namespace gazebo
 
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
-
-      /// \brief Process a mouse press event in universal manipulation mode.
-      private: void OnMousePressUniversal();
 
       private: void OnRequest(ConstRequestPtr &_msg);
 
