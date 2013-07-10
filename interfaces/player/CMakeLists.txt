@@ -26,6 +26,10 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
+link_directories( 
+  ${SDF_LIBRARY_DIRS} 
+)
+
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
 
 gz_add_library(gazebo_player ${sources})

@@ -201,6 +201,10 @@ bool Server::ParseArgs(int argc, char **argv)
   else
     this->params["pause"] = "false";
 
+  // We must set the findFile callback here, before potentially calling
+  // LoadFile() below.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
   //

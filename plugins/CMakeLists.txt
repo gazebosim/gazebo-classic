@@ -5,6 +5,10 @@ include_directories(
   ${SDF_INCLUDE_DIRS}
 )
 
+link_directories(
+  ${SDF_LIBRARY_DIRS}
+)
+
 set (plugins
   CameraPlugin
   CartTestPlugin
