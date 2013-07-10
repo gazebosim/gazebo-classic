@@ -457,6 +457,7 @@ namespace urdf2gazebo
     private: std::map<std::string, std::vector<GazeboExtension*> > extensions;
 
     private: urdf::Pose initialRobotPose;
+    private: bool initialRobotPoseValid;
     private: std::string collisionExt;
     private: std::string visualExt;
 
