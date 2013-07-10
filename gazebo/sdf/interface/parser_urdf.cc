@@ -78,7 +78,7 @@ URDF2Gazebo::URDF2Gazebo()
     this->reduceFixedJoints = true;
 
     // for compatibility with old gazebo, consider changing to "_collision"
-    this->collisionExt = "_geom";
+    this->collisionExt = "_collision";
     this->visualExt = "_visual";
 }
 
