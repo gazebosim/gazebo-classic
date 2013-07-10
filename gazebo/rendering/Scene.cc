@@ -1406,7 +1406,6 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     for (int k = 0; k < _msg.link(j).visual_size(); k++)
     {
-      gzerr << " process model visual msg " <<linkName << std::endl;
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
       this->visualMsgs.push_back(vm);
@@ -1445,7 +1444,6 @@ void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  gzerr << " on visual msg " << _msg->name() << std::endl;
   this->visualMsgs.push_back(_msg);
 }
 

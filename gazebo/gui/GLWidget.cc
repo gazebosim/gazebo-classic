@@ -285,6 +285,12 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   {
     this->PopHistory();
   }
+  else if (_event->key() == Qt::Key_R)
+    g_rotateAct->trigger();
+  else if (_event->key() == Qt::Key_T)
+    g_translateAct->trigger();
+  else if (_event->key() == Qt::Key_S)
+    g_scaleAct->trigger();
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -425,8 +431,12 @@ void GLWidget::OnMouseMoveUniversal()
   if (!this->mouseEvent.dragging)
   {
     std::string manipState;
-    this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
-    this->manipulator->SetState(manipState);
+
+    if (this->manipulator)
+    {
+      this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
+      this->manipulator->SetState(manipState);
+    }
 
     if (manipState.empty())
     {
@@ -536,8 +546,6 @@ void GLWidget::OnMouseMoveUniversal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressUniversal()
 {
-//  this->OnMousePressTranslate();
-
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
@@ -627,21 +635,17 @@ void GLWidget::OnMousePressTranslate()
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
-    if (this->manipulator)
+    if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
     {
-      if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
-      {
-//        this->manipulator->SetVisible(true);
-        this->manipulator->Attach(this->mouseMoveVis);
-        this->manipulator->SetMode(this->state);
-      }
-      else
-      {
-//        this->manipulator->SetVisible(false);
-        this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
-        this->manipulator->Detach();
-      }
+      this->manipulator->Attach(this->mouseMoveVis);
+      this->manipulator->SetMode(this->state);
     }
+    else
+    {
+      this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
+      this->manipulator->Detach();
+    }
+
   }
   else
     this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -880,11 +884,9 @@ void GLWidget::OnMouseMoveTranslate()
   else
   {
     std::string manipState;
-    if (this->manipulator)
-    {
-      this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
-      this->manipulator->SetState(manipState);
-    }
+    this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
+    this->manipulator->SetState(manipState);
+
     if (!manipState.empty())
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
@@ -976,8 +978,24 @@ void GLWidget::OnMouseReleaseTranslate()
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
-//    this->SetSelectedVisual(rendering::VisualPtr());
+    this->SetSelectedVisual(rendering::VisualPtr());
+    this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
+    this->manipulator->Detach();
+
     event::Events::setSelectedEntity("", "normal");
+  }
+  else
+  {
+    if (this->mouseEvent.button == common::MouseEvent::LEFT)
+    {
+      rendering::VisualPtr vis =
+        this->userCamera->GetVisual(this->mouseEvent.pos);
+      if (vis && vis->IsPlane())
+      {
+        this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
+        this->manipulator->Detach();
+      }
+    }
   }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -1555,6 +1573,16 @@ void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
 void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
+
+  if (this->manipulator->GetMode() != rendering::Manipulator::MANIP_NONE)
+  {
+    this->manipulator->SetMode(this->state);
+  }
+  if (this->selectedVis && !this->selectedVis->IsPlane())
+  {
+    this->manipulator->Attach(this->selectedVis);
+    this->manipulator->SetMode(this->state);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1612,10 +1640,7 @@ void GLWidget::PublishVisualScale(rendering::VisualPtr _vis)
       msg.set_name(_vis->GetName());
 
       msgs::Set(msg.mutable_scale(), _vis->GetScale());
-      gzerr << " publish scale "  << _vis->GetScale() <<
-        " " << this->mouseVisualScale << std::endl;
       this->modelPub->Publish(msg);
-
     }
   }
 }

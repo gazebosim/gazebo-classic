@@ -43,8 +43,6 @@
 
 namespace gazebo
 {
-
-
   namespace gui
   {
     class GLWidget : public QWidget
