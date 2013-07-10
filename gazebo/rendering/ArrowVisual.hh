@@ -22,7 +22,7 @@
 #define _ARROWVISUAL_HH_
 
 #include <string>
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace ogre
 {

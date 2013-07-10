@@ -1,5 +1,4 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo
   ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
@@ -46,3 +45,6 @@ set(TEST_TYPE "INTEGRATION")
 add_subdirectory(regression)
 add_subdirectory(cmake)
 add_subdirectory(pkgconfig)
+
+set(headers ServerFixture.hh)
+gz_install_includes("test" ${headers} ${PROJECT_BINARY_DIR}/test_config.h)

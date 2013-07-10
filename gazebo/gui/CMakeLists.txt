@@ -143,7 +143,7 @@ add_definitions(${QT_DEFINITIONS})
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(gui_headers
-    "GUI Headers" "#include \"gui/${hdr}\"\n")
+    "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 
