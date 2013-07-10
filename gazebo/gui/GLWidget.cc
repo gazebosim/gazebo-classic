@@ -264,6 +264,20 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  // reset mouseMoveVisStartPose if in manipulation mode.
+  if (this->state == "translate" || this->state == "rotate"
+      || this->state == "scale")
+  {
+    if (this->keyText == "x" || this->keyText == "y" || this->keyText == "z")
+    {
+      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      if (this->mouseMoveVis)
+      {
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+      }
+    }
+  }
+
   this->userCamera->HandleKeyPressEvent(this->keyText);
 }
 
@@ -275,8 +289,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 
   if (_event->isAutoRepeat())
     return;
-
-  this->keyText = "";
 
   this->keyModifiers = _event->modifiers();
 
@@ -307,9 +319,13 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     {
       this->mouseEvent.pressPos = this->mouseEvent.pos;
       if (this->mouseMoveVis)
+      {
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+      }
     }
   }
+
+  this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
 }
@@ -660,21 +676,21 @@ void GLWidget::OnMouseMoveTranslate()
           == rendering::Manipulator::SCALE_X)
       {
         this->keyText = "x";
-        this->ScaleEntity(this->mouseMoveVis);
+        this->ScaleEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
       else if (this->manipulator->GetState()
           == rendering::Manipulator::SCALE_Y)
       {
         this->keyText = "y";
-        this->ScaleEntity(this->mouseMoveVis);
+        this->ScaleEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
       else if (this->manipulator->GetState()
           == rendering::Manipulator::SCALE_Z)
       {
         this->keyText = "z";
-        this->ScaleEntity(this->mouseMoveVis);
+        this->ScaleEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
       else
@@ -1130,27 +1146,29 @@ void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
   math::Vector3 planeNorm(0, 0, 0);
   math::Vector3 projNorm(0, 0, 0);
 
+  math::Vector3 planeNormOther(0, 0, 0);
+
   if (this->keyText == "z")
   {
-//    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
-//    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
-//    _vis->SetPose(pose);
-//    return;
     moveVector.z = 1;
     planeNorm.y = 1;
     projNorm.x = 1;
+    planeNormOther.x = 1;
   }
   else if (this->keyText == "x")
   {
     moveVector.x = 1;
-    planeNorm.y = 1;
-    projNorm.z = 1;
+    planeNorm.z = 1;
+    projNorm.y = 1;
+    planeNormOther.y = 1;
+
   }
   else if (this->keyText == "y")
   {
     moveVector.y = 1;
-    planeNorm.x = 1;
-    projNorm.z = 1;
+    planeNorm.z = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
   }
   else
   {
@@ -1161,8 +1179,20 @@ void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
 
   if (_local)
   {
-    math::Quaternion quat = _vis->GetWorldPose().rot;
-    planeNorm = quat.RotateVector(planeNorm);
+    planeNorm = pose.rot.RotateVector(planeNorm);
+    projNorm = pose.rot.RotateVector(projNorm);
+  }
+
+  // Fine tune translation
+  // Make sure we don't cast a ray parallel to planeNorm
+  double angle = dir1.Dot(planeNorm);
+  if (_local)
+    planeNormOther = pose.rot.RotateVector(planeNormOther);
+  double angleOther = dir1.Dot(planeNormOther);
+  if (fabs(angleOther) > fabs(angle))
+  {
+    projNorm = planeNorm;
+    planeNorm = planeNormOther;
   }
 
   // Compute the distance from the camera to plane of translation
@@ -1176,23 +1206,18 @@ void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
-
   if (_local)
-  {
-    math::Quaternion quat = _vis->GetWorldPose().rot;
-    projNorm = quat.RotateVector(projNorm);
     p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
-  }
 
   math::Vector3 distance = p1 - p2;
 
   if (!_local)
     distance *= moveVector;
 
-  gzerr << " bbox " << bbox.GetXLength() << " " << bbox.GetYLength() << " "
-      << bbox.GetZLength() << std::endl;
+  // gzerr << " bbox " << bbox.GetXLength() << " " << bbox.GetYLength() << " "
+  //   << bbox.GetZLength() << std::endl;
 
-  gzerr << " distance " << distance << std::endl;
+  // gzerr << " distance " << distance << std::endl;
 
   math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
   math::Vector3 scale = (bboxSize + distance/2.0)/bboxSize;
@@ -1229,6 +1254,8 @@ void GLWidget::ScaleEntity(rendering::VisualPtr &_vis, bool _local)
     }
   }
 
+  scale = pose.rot.RotateVectorReverse(scale);
+
   _vis->SetScale(this->mouseVisualScale * scale);
 }
 
@@ -1250,27 +1277,29 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
   math::Vector3 planeNorm(0, 0, 0);
   math::Vector3 projNorm(0, 0, 0);
 
+  math::Vector3 planeNormOther(0, 0, 0);
+
   if (this->keyText == "z")
   {
-//    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
-//    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
-//    _vis->SetPose(pose);
-//    return;
     moveVector.z = 1;
     planeNorm.y = 1;
     projNorm.x = 1;
+    planeNormOther.x = 1;
   }
   else if (this->keyText == "x")
   {
     moveVector.x = 1;
-    planeNorm.y = 1;
-    projNorm.z = 1;
+    planeNorm.z = 1;
+    projNorm.y = 1;
+    planeNormOther.y = 1;
+
   }
   else if (this->keyText == "y")
   {
     moveVector.y = 1;
-    planeNorm.x = 1;
-    projNorm.z = 1;
+    planeNorm.z = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
   }
   else
   {
@@ -1281,8 +1310,20 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
 
   if (_local)
   {
-    math::Quaternion quat = _vis->GetWorldPose().rot;
-    planeNorm = quat.RotateVector(planeNorm);
+    planeNorm = pose.rot.RotateVector(planeNorm);
+    projNorm = pose.rot.RotateVector(projNorm);
+  }
+
+  // Fine tune translation
+  // Make sure we don't cast a ray parallel to planeNorm
+  double angle = dir1.Dot(planeNorm);
+  if (_local)
+    planeNormOther = pose.rot.RotateVector(planeNormOther);
+  double angleOther = dir1.Dot(planeNormOther);
+  if (fabs(angleOther) > fabs(angle))
+  {
+    projNorm = planeNorm;
+    planeNorm = planeNormOther;
   }
 
   // Compute the distance from the camera to plane of translation
@@ -1296,13 +1337,8 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
-
   if (_local)
-  {
-    math::Quaternion quat = _vis->GetWorldPose().rot;
-    projNorm = quat.RotateVector(projNorm);
     p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
-  }
 
   math::Vector3 distance = p1 - p2;
 
@@ -1310,9 +1346,6 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis, bool _local)
     distance *= moveVector;
 
   pose.pos = this->mouseMoveVisStartPose.pos + distance;
-
-//  if (!_local)
-//    pose.pos *= moveVector;
 
   if (this->mouseEvent.shift)
   {

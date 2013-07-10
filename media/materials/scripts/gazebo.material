@@ -397,6 +397,66 @@ material Gazebo/TurquoiseGlowOutline
 	}
 }
 
+material Gazebo/RedTransparentOverlay
+{
+	technique
+	{
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+	}
+}
+
+material Gazebo/BlueTransparentOverlay
+{
+	technique
+	{
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 0 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+	}
+}
+
+material Gazebo/GreenTransparentOverlay
+{
+	technique
+	{
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+	}
+}
+
 material Gazebo/RedTransparent
 {
 	technique
@@ -406,7 +466,7 @@ material Gazebo/RedTransparent
       scene_blend alpha_blend
       depth_write off
       lighting off
-
+      
       texture_unit
       {
         colour_op_ex source1 src_manual src_current 1 0 0
@@ -453,68 +513,6 @@ material Gazebo/BlueTransparent
       {
         colour_op_ex source1 src_current src_current 0 1 0
         alpha_op_ex source1 src_manual src_current 0.5
-      }
-    }
-	}
-}
-
-
-material Gazebo/RedTransparentLow
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write off
-      lighting off
-
-      texture_unit
-      {
-        colour_op_ex source1 src_manual src_current 1 0 0
-        alpha_op_ex source1 src_manual src_current 0.7
-      }
-    }
-	}
-}
-
-material Gazebo/GreenTransparentLow
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write off
-
-      ambient 0.0 1.0 0.0 1
-      diffuse 0.0 1.0 0.0 1
-
-      texture_unit
-      {
-        colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.7
-      }
-    }
-	}
-}
-
-material Gazebo/BlueTransparentLow
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write off
-
-      ambient 0.0 0.0 1.0 1
-      diffuse 0.0 0.0 1.0 1
-
-      texture_unit
-      {
-        colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.7
       }
     }
 	}

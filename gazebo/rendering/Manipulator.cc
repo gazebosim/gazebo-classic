@@ -79,10 +79,10 @@ void Manipulator::Attach(rendering::VisualPtr _vis)
 
   /// TODO set scale of visuals to be size of vis bounding box
   /// Commented out because it doesn't look nice
-  // math::Vector3 bboxSize = _vis->GetBoundingBox().GetSize()
-  //    * _vis->GetScale();
-  // double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
-  // this->SetScale(math::Vector3(max, max, max));
+  math::Vector3 bboxSize = _vis->GetBoundingBox().GetSize()  * _vis->GetScale();
+  double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+  max = std::min(std::max(0.5, max), 3.0);
+  this->SetScale(math::Vector3(max, max, max));
 }
 
 /////////////////////////////////////////////////
@@ -252,54 +252,40 @@ void Manipulator::SetState(ManipulationMode _state)
 
   if (this->activeVis)
   {
-    this->activeVis->SetMaterial(
-        this->highlightMaterials[this->activeVis->GetName()]);
+    Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(
+      this->activeVis->GetMaterialName());
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
+      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.5);
+    this->activeVis.reset();
   }
 
   if (this->state == TRANS_X)
-  {
-    this->transXVisual->SetMaterial("Gazebo/RedTransparentLow");
     this->activeVis = this->transXVisual;
-  }
   else if (this->state == TRANS_Y)
-  {
-    this->transYVisual->SetMaterial("Gazebo/GreenTransparentLow");
     this->activeVis = this->transYVisual;
-  }
   else if (this->state == TRANS_Z)
-  {
-    this->transZVisual->SetMaterial("Gazebo/BlueTransparentLow");
     this->activeVis = this->transZVisual;
-  }
   else if (this->state == ROT_X)
-  {
-    this->rotXVisual->SetMaterial("Gazebo/RedTransparentLow");
     this->activeVis = this->rotXVisual;
-  }
   else if (this->state == ROT_Y)
-  {
-    this->rotYVisual->SetMaterial("Gazebo/GreenTransparentLow");
     this->activeVis = this->rotYVisual;
-  }
   else if (this->state == ROT_Z)
-  {
-    this->rotZVisual->SetMaterial("Gazebo/BlueTransparentLow");
     this->activeVis = this->rotZVisual;
-  }
   else if (this->state == SCALE_X)
-  {
-    this->scaleXVisual->SetMaterial("Gazebo/RedTransparentLow");
     this->activeVis = this->scaleXVisual;
-  }
   else if (this->state == SCALE_Y)
-  {
-    this->scaleYVisual->SetMaterial("Gazebo/GreenTransparentLow");
     this->activeVis = this->scaleYVisual;
-  }
   else if (this->state == SCALE_Z)
-  {
-    this->scaleZVisual->SetMaterial("Gazebo/BlueTransparentLow");
     this->activeVis = this->scaleZVisual;
+
+  if (this->activeVis)
+  {
+    Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(
+      this->activeVis->GetMaterialName());
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
+      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.7);
   }
 }
 
@@ -316,7 +302,6 @@ void Manipulator::CreateTranslateVisual()
   this->transVisual.reset(new rendering::Visual(
       this->name + "__SELECTION_OBJ_TRANS__",
       shared_from_this()));
-//      this->rotVisual));
 
   this->transXVisual.reset(
       new rendering::Visual(
@@ -405,11 +390,11 @@ void Manipulator::CreateTranslateVisual()
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
   this->highlightMaterials[this->transXVisual->GetName()]
-      = "Gazebo/RedTransparent";
+      = "Gazebo/RedTransparentOverlay";
   this->highlightMaterials[this->transYVisual->GetName()]
-      = "Gazebo/GreenTransparent";
+      = "Gazebo/GreenTransparentOverlay";
   this->highlightMaterials[this->transZVisual->GetName()]
-      = "Gazebo/BlueTransparent";
+      = "Gazebo/BlueTransparentOverlay";
 
   this->transXVisual->SetMaterial(
       this->highlightMaterials[this->transXVisual->GetName()]);
@@ -608,11 +593,11 @@ void Manipulator::CreateScaleVisual()
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
   this->highlightMaterials[this->scaleXVisual->GetName()]
-      = "Gazebo/RedTransparent";
+      = "Gazebo/RedTransparentOverlay";
   this->highlightMaterials[this->scaleYVisual->GetName()]
-      = "Gazebo/GreenTransparent";
+      = "Gazebo/GreenTransparentOverlay";
   this->highlightMaterials[this->scaleZVisual->GetName()]
-      = "Gazebo/BlueTransparent";
+      = "Gazebo/BlueTransparentOverlay";
 
   this->scaleXVisual->SetMaterial(
       this->highlightMaterials[this->scaleXVisual->GetName()]);
