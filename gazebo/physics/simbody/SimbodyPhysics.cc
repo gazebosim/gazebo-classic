@@ -96,7 +96,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // this->integ = new SimTK::RungeKutta2Integrator(system);
   this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.01);
+  this->integ->setAccuracy(0.001);
   this->simbodyPhysicsInitialized = false;
   this->simbodyPhysicsStepped = false;
 }
@@ -496,7 +496,7 @@ void SimbodyPhysics::InitSimbodySystem()
   const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.1);
+  this->contact.setTransitionVelocity(0.01);
 
   // Specify gravity (read in above from world).
   if (!math::equal(g.norm(), 0.0))
@@ -813,7 +813,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
   SimTK::ContactMaterial material(1e8,   // stiffness
-                                  1.0,  // dissipation
+                                  100.0,  // dissipation
                                   1.0,   // mu_static
                                   1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
