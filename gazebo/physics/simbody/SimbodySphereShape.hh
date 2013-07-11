@@ -22,8 +22,8 @@
 #ifndef _SIMBODY_SPHERESHAPE_HH_
 #define _SIMBODY_SPHERESHAPE_HH_
 
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/SphereShape.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
 {

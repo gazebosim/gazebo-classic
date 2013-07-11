@@ -28,11 +28,11 @@
 
 #include <Simbody.h>
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
-#include "physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 namespace gazebo
 {
@@ -126,6 +126,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
+      // Documentation inherited
+      public: virtual ModelPtr CreateModel(BasePtr _parent);
+      
       private: SimTK::MultibodySystem *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
@@ -202,6 +205,10 @@ namespace gazebo
       }
 
       public: static std::string GetTypeString(physics::Base::EntityType _type);
+
+      /// \brief true if initialized
+      public: bool simbodyPhysicsInitialized;
+      public: bool simbodyPhysicsStepped;
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(

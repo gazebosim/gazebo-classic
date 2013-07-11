@@ -127,6 +127,10 @@ namespace gazebo
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
 
+      /// \brief Create a new model.
+      /// \param[in]
+      public: virtual ModelPtr CreateModel(BasePtr _base);
+
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.
       public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;
@@ -153,7 +157,7 @@ namespace gazebo
       /// \param[in] _type Type of joint to create.
       /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
-                                           ModelPtr _parent) = 0;
+                                           ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.

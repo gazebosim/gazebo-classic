@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -53,11 +53,13 @@ Entity::Entity(BasePtr _parent)
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
+  this->visualMsg->set_parent_name(this->world->GetName());
   this->poseMsg = new msgs::Pose;
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
+    this->visualMsg->set_parent_name(this->parentEntity->GetScopedName());
     this->SetStatic(this->parentEntity->IsStatic());
   }
 
@@ -110,6 +112,9 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+  else
+    this->visualMsg->set_parent_name(this->world->GetName());
+
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);

@@ -21,11 +21,11 @@
 
 #ifndef _SIMBODYSLIDERJOINT_HH_
 #define _SIMBODYSLIDERJOINT_HH_
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/simbody/SimbodyJoint.hh"
-#include "physics/SliderJoint.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/SliderJoint.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 
 namespace gazebo
 {

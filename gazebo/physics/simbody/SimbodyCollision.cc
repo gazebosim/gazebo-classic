@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
 
 using namespace gazebo;
 using namespace physics;

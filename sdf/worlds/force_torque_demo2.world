@@ -12,7 +12,7 @@
       <background>0.500000 0.500000 0.500000 1.000000</background>
       <shadows>0</shadows>
     </scene>
-    <physics type="ode">
+    <physics type="simbody">
       <gravity>0.000000 0.000000 -9.810000</gravity>
       <ode>
         <solver>
@@ -71,9 +71,9 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -102,9 +102,9 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -133,9 +133,9 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>

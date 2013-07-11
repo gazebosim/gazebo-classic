@@ -83,6 +83,11 @@ TEST_F(HeightmapTest, PhysicsLoad)
 }
 
 /////////////////////////////////////////////////
+//
+// Disabled: segfaults ocassionally
+// See https://bitbucket.org/osrf/gazebo/issue/521 for details
+
+/*
 TEST_F(HeightmapTest, Heights)
 {
   Load("worlds/heightmap_test.world");
@@ -106,9 +111,6 @@ TEST_F(HeightmapTest, Heights)
     int i = 0;
     while (i < 20 && (heightmap = scene->GetHeightmap()) == NULL)
     {
-      // Make sure to PreRender so that the Scene can process its messages
-      scene->PreRender();
-
       common::Time::MSleep(100);
       i++;
     }
@@ -208,6 +210,7 @@ TEST_F(HeightmapTest, Heights)
   // printf(" %f};\nstatic float *heights = __heights;\n",
   // shape->GetHeight(x,y));
 }
+*/
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, WhiteAlpha)

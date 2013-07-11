@@ -22,9 +22,9 @@
 #ifndef _SIMBODYBALLJOINT_HH_
 #define _SIMBODYBALLJOINT_HH_
 
-#include "physics/BallJoint.hh"
-#include "physics/simbody/SimbodyJoint.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/BallJoint.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 
 namespace gazebo
 {

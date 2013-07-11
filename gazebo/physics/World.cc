@@ -56,8 +56,8 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -100,6 +100,7 @@ World::World(const std::string &_name)
   this->logThread = NULL;
   this->stop = false;
 
+  this->currentStateBuffer = 0;
   this->stateToggle = 0;
 
   this->pluginsLoaded = false;
@@ -175,7 +176,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
     "~/pose/info", 10, 60.0);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -277,12 +278,15 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  // Initialize all the entities
+  // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
   this->physicsEngine->Init();
+  // Need to have set
+  // this->physicsEngine->simbodyPhysicsInitialized = true
+  // by here
 
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
@@ -301,6 +305,7 @@ void World::Init()
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
+  this->logPrevIteration = 0;
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
@@ -515,7 +520,12 @@ void World::Step()
         this->stepInc--;
     }
     else
+    {
+      // Flush the log record buffer, if there is data in it.
+      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+        util::LogRecord::Instance()->Notify();
       this->pauseTime += stepTime;
+    }
   }
 
   this->ProcessMessages();
@@ -712,7 +722,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
-    model.reset(new Model(_parent));
+    model = this->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
@@ -1707,6 +1717,7 @@ void World::UpdateStateSDF()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
+  int bufferIndex = this->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
@@ -1717,38 +1728,43 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
   }
-  else if (this->states.size() >= 1)
+  else if (this->states[bufferIndex].size() >= 1)
   {
-    do
     {
-      size_t end = this->states.size();
+      boost::mutex::scoped_lock lock(this->logBufferMutex);
+      this->currentStateBuffer ^= 1;
+    }
+    for (std::deque<WorldState>::iterator iter =
+        this->states[bufferIndex].begin();
+        iter != this->states[bufferIndex].end(); ++iter)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>" << *iter << "</sdf>";
+    }
 
-      // Get the difference from the previous state.
-      for (size_t i = 0; i < end; ++i)
-      {
-        _stream << "<sdf version='" << SDF_VERSION << "'>"
-          << this->states[0] << "</sdf>";
-
-        this->states.pop_front();
-      }
-    } while (this->states.size() > 1000);
+    this->states[bufferIndex].clear();
   }
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
   if (!util::LogRecord::Instance()->GetRunning())
   {
-    boost::mutex::scoped_lock lock(this->logMutex);
+    boost::mutex::scoped_lock lock(this->logBufferMutex);
 
     // Output any data that may have been pushed onto the queue
-    for (size_t i = 0; i < this->states.size(); ++i)
+    for (size_t i = 0; i < this->states[this->currentStateBuffer^1].size(); ++i)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
-        << this->states[i] << "</sdf>";
+        << this->states[this->currentStateBuffer^1][i] << "</sdf>";
+    }
+    for (size_t i = 0; i < this->states[this->currentStateBuffer].size(); ++i)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->states[this->currentStateBuffer][i] << "</sdf>";
     }
 
     // Clear everything.
-    this->states.clear();
+    this->states[0].clear();
+    this->states[1].clear();
     this->stateToggle = 0;
     this->prevStates[0] = WorldState();
     this->prevStates[1] = WorldState();
@@ -1816,7 +1832,8 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
-  this->statPub->Publish(this->worldStatsMsg);
+  if (this->statPub && this->statPub->HasConnections())
+    this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
 }
 
@@ -1857,14 +1874,16 @@ void World::LogWorker()
     if (!diffState.IsZero())
     {
       this->stateToggle = currState;
-
-      // Store the entire current state (instead of the diffState). A slow
-      // moving link may never be captured if only diff state is recorded.
-      this->states.push_back(this->prevStates[currState]);
-
-      // Tell the logger to update, once the number of states exceeds 1000
-      if (this->states.size() > 1000)
-        util::LogRecord::Instance()->Notify();
+      {
+        // Store the entire current state (instead of the diffState). A slow
+        // moving link may never be captured if only diff state is recorded.
+        boost::mutex::scoped_lock bLock(this->logBufferMutex);
+        this->states[this->currentStateBuffer].push_back(
+            this->prevStates[currState]);
+        // Tell the logger to update, once the number of states exceeds 1000
+        if (this->states[this->currentStateBuffer].size() > 1000)
+          util::LogRecord::Instance()->Notify();
+      }
     }
 
     this->logContinueCondition.notify_all();

@@ -134,7 +134,7 @@ namespace gazebo
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).
       /// \param[in] _path Path in which to store log files.
-      public: bool Start(const std::string &_encoding="bz2",
+      public: bool Start(const std::string &_encoding="zlib",
                   const std::string &_path="");
 
       /// \brief Get the encoding used.
@@ -174,6 +174,10 @@ namespace gazebo
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.
       public: void Write(bool _force = false);
+
+      /// \brief Get the size of the buffer.
+      /// \return Size of the buffer, in bytes.
+      public: unsigned int GetBufferSize() const;
 
       /// \brief Update the log files
       ///

@@ -19,13 +19,13 @@
  * Date: 21 May 2003
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/simbody/SimbodyHinge2Joint.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;

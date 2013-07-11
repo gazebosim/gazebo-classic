@@ -48,6 +48,7 @@ ContactManager::~ContactManager()
     if (iter->second)
     {
       iter->second->collisions.clear();
+      iter->second->collisionNames.clear();
       iter->second->publisher.reset();
       delete iter->second;
       iter->second = NULL;
@@ -65,7 +66,7 @@ void ContactManager::Init(WorldPtr _world)
   this->node->Init(this->world->GetName());
 
   this->contactPub =
-    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
+    this->node->Advertise<msgs::Contacts>("~/physics/contacts", 50);
 }
 
 /////////////////////////////////////////////////
@@ -88,9 +89,30 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
-    if (iter->second->collisions.find(_collision1->GetScopedName()) !=
+    // A model can simply be loaded later, so convert ones that are not yet
+    // found
+    if (!iter->second->collisionNames.empty())
+    {
+      std::vector<std::string>::iterator it;
+      for (it = iter->second->collisionNames.begin();
+          it != iter->second->collisionNames.end();)
+      {
+        Collision *col = boost::dynamic_pointer_cast<Collision>(
+            this->world->GetByName(*it)).get();
+        if (!col)
+        {
+          ++it;
+          continue;
+        }
+        else
+          it = iter->second->collisionNames.erase(it);
+        iter->second->collisions.insert(col);
+      }
+    }
+
+    if (iter->second->collisions.find(_collision1) !=
         iter->second->collisions.end() ||
-        iter->second->collisions.find(_collision2->GetScopedName()) !=
+        iter->second->collisions.find(_collision2) !=
         iter->second->collisions.end())
     {
       publishers.push_back(iter->second);
@@ -201,12 +223,12 @@ void ContactManager::PublishContacts()
   this->contactPub->Publish(msg);
 
   // publish to other custom topics
-  msgs::Contacts msg2;
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
     ContactPublisher *contactPublisher = iter->second;
+    msgs::Contacts msg2;
     for (unsigned int j = 0;
         j < contactPublisher->contacts.size(); ++j)
     {
@@ -247,8 +269,23 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
-  for (unsigned int i = 0; i < _collisions.size(); ++i)
-    contactPublisher->collisions.insert(_collisions[i]);
+  contactPublisher->collisionNames = _collisions;
+  // convert collision names to pointers
+  std::vector<std::string>::iterator iter;
+  for (iter = contactPublisher->collisionNames.begin();
+      iter != contactPublisher->collisionNames.end();)
+  {
+    Collision *col = boost::dynamic_pointer_cast<Collision>(
+       this->world->GetByName(*iter)).get();
+    if (!col)
+    {
+      ++iter;
+      continue;
+    }
+    else
+      iter = contactPublisher->collisionNames.erase(iter);
+    contactPublisher->collisions.insert(col);
+  }
 
   this->customContactPublishers[name] = contactPublisher;
 

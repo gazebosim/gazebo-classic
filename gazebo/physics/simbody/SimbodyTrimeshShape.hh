@@ -22,7 +22,7 @@
 #ifndef _SIMBODYTRIMESHSHAPE_HH_
 #define _SIMBODYTRIMESHSHAPE_HH_
 
-#include "physics/TrimeshShape.hh"
+#include "gazebo/physics/TrimeshShape.hh"
 
 namespace gazebo
 {

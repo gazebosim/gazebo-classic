@@ -22,6 +22,7 @@
 using namespace gazebo;
 using namespace transport;
 
+extern void dummy_callback_fn(uint32_t);
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
@@ -223,7 +224,7 @@ void Publication::RemoveSubscription(const std::string &_host,
 }
 
 //////////////////////////////////////////////////
-void Publication::LocalPublish(const std::string &data)
+void Publication::LocalPublish(const std::string &_data)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -234,7 +235,7 @@ void Publication::LocalPublish(const std::string &data)
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleData(this->topic, _data))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -254,7 +255,8 @@ void Publication::LocalPublish(const std::string &data)
     {
       if ((*cbIter)->IsLocal())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(_data,
+              boost::bind(&dummy_callback_fn, _1), 0))
           ++cbIter;
         else
           cbIter = this->callbacks.erase(cbIter);
@@ -266,7 +268,8 @@ void Publication::LocalPublish(const std::string &data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
+void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+    uint32_t _id)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -301,16 +304,20 @@ void Publication::Publish(MessagePtr _msg, const boost::function<void()> &_cb)
 
       while (cbIter != this->callbacks.end())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(data, _cb, _id))
           ++cbIter;
         else
           this->callbacks.erase(cbIter++);
       }
+
+      if (this->callbacks.empty() && !_cb.empty())
+        _cb(_id);
+    }
+    else if (!_cb.empty())
+    {
+      _cb(_id);
     }
   }
-
-  if (_cb)
-    (_cb)();
 }
 
 //////////////////////////////////////////////////

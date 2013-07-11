@@ -18,12 +18,12 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/simbody/SimbodyHingeJoint.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -180,7 +180,7 @@ void SimbodyHingeJoint::SetLowStop(int _index,
 math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 {
   math::Angle result;
-  gzerr << "Not implemented...\n";
+  // gzerr << "Not implemented...\n";
   return result;
 }
 
@@ -188,14 +188,15 @@ math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
 {
   math::Angle result;
-  gzerr << "Not implemented...\n";
+  // gzerr << "Not implemented...\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (this->simbodyPhysics->simbodyPhysicsStepped &&
+      _index < static_cast<int>(this->GetAngleCount()))
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
       this->simbodyPhysics->integ->getState());
@@ -218,8 +219,14 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    return math::Angle(this->mobod.getOneQ(
-      this->simbodyPhysics->integ->getState(), _index));
+    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+      return math::Angle(this->mobod.getOneQ(
+        this->simbodyPhysics->integ->getState(), _index));
+    else
+    {
+      gzwarn << "simbody not yet initialized\n";
+      return math::Angle();
+    }
   }
   else
   {

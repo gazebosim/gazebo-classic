@@ -19,21 +19,21 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf.hh"
-#include "transport/transport.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "physics/Physics.hh"
-#include "physics/World.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
 
-#include "common/Timer.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Plugin.hh"
+#include "gazebo/common/Timer.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Plugin.hh"
 
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
-#include "sensors/Sensor.hh"
-#include "sensors/SensorManager.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -50,6 +50,7 @@ Sensor::Sensor(SensorCategory _cat)
 
   this->node = transport::NodePtr(new transport::Node());
 
+  this->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
 }
 
@@ -131,9 +132,23 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod
-        || _force)
+    // Adjust time-to-update period to compensate for delays caused by another
+    // sensor's update in the same thread.
+    common::Time adjustedElapsed = this->world->GetSimTime() -
+        this->lastUpdateTime + this->updateDelay;
+
+    if (adjustedElapsed >= this->updatePeriod || _force)
     {
+      this->updateDelay = std::max(common::Time::Zero,
+          adjustedElapsed - this->updatePeriod);
+
+      // if delay is more than a full update period, then give up trying
+      // to catch up. This happens normally when the sensor just changed from
+      // an inactive to an active state, or the sensor just cannot hit its
+      // target update rate (worst case).
+      if (this->updateDelay >= this->updatePeriod)
+        this->updateDelay = common::Time::Zero;
+
       this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
       this->updated();
@@ -144,6 +159,7 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  this->active = false;
   this->plugins.clear();
 }
 
@@ -179,6 +195,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }

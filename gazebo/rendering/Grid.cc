@@ -17,11 +17,11 @@
 
 #include <sstream>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
 
 using namespace gazebo;
 using namespace rendering;

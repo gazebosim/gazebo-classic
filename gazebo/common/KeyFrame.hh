@@ -17,8 +17,8 @@
 #ifndef _KEYFRAME_HH_
 #define _KEYFRAME_HH_
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {

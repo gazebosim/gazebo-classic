@@ -19,12 +19,12 @@
  * Date: 24 May 2009
  */
 
-#include "physics/World.hh"
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyCollision.hh"
-#include "physics/simbody/SimbodyRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;

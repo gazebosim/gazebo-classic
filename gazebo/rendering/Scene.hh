@@ -24,15 +24,15 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace SkyX
 {
@@ -75,6 +75,13 @@ namespace gazebo
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class Scene : public boost::enable_shared_from_this<Scene>
     {
+      public: enum SkyXMode {
+        GZ_SKYX_ALL = 0x0FFFFFFF,
+        GZ_SKYX_CLOUDS = 0x0000001,
+        GZ_SKYX_MOON = 0x0000002,
+        GZ_SKYX_NONE = 0
+      };
+
       /// \brief Constructor.
       private: Scene() {}
 
@@ -403,8 +410,22 @@ namespace gazebo
       /// \return True if clouds are displayed.
       public: bool GetShowClouds() const;
 
+
+      /// \brief Set SkyX mode to enable/disable skyx components such as
+      /// clouds and moon.
+      /// \param[in] _mode SkyX mode bitmask.
+      /// \sa Scene::SkyXMode
+      public: void SetSkyXMode(unsigned int _mode);
+
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -764,13 +785,6 @@ namespace gazebo
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
-
-      /// \brief Get the scene simulation time.
-      /// Note this is different from World::GetSimTime() because
-      /// there is a lag between the time new poses are sent out by World
-      /// and when they are received and applied by the Scene.
-      /// \return The current simulation time in Scene
-      public: common::Time GetSimTime() const;
     };
     /// \}
   }

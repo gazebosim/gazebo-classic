@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 
 #define TOL 1e-4
@@ -319,6 +319,9 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   physics->SetGravity(math::Vector3(0, 0, gravityZ));
 
   msgs::Contacts contacts;
+
+  physics->SetContactMaxCorrectingVel(0);
+  physics->SetSORPGSIters(100);
 
   world->StepWorld(1);
 

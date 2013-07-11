@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;

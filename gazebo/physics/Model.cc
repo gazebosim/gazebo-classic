@@ -42,12 +42,10 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Contact.hh"
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 #include "gazebo/sensors/SensorManager.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -200,13 +198,6 @@ void Model::Init()
     (*iter)->Init();
   }
 
-  // rebuild simbody state
-  physics::SimbodyPhysicsPtr simbodyPhysics =
-    boost::shared_dynamic_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-  if (simbodyPhysics)
-    simbodyPhysics->InitModel(this);
-
   // Initialize the joints messages for visualizer
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
@@ -273,10 +264,11 @@ void Model::Update()
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(const std::string &_jointName, double _position)
+void Model::SetJointPosition(
+  const std::string &_jointName, double _position, int _index)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position);
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
@@ -770,16 +762,18 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
+  std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
+  gazebo::ModelPluginPtr plugin =
+    gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
     {
       gzerr << "Model[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+            << "Plugin filename[" << filename << "] name["
+            << pluginName << "]\n";
       return;
     }
 

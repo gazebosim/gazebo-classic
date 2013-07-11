@@ -243,6 +243,9 @@ namespace gazebo
 
       /// \brief The category of the sensor.
       private: SensorCategory category;
+
+      /// \brief Keep track how much the update has been delayed.
+      private: common::Time updateDelay;
     };
     /// \}
   }
