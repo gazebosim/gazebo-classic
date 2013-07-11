@@ -1875,7 +1875,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
     this->ParseGazeboExtension(urdfXml);
 
     /* parse robot pose */
-    // this->ParseRobotOrigin(urdfXml);
+    this->ParseRobotOrigin(urdfXml);
 
     ConstUrdfLinkPtr rootLink = robotModel->getRoot();
 
@@ -1906,7 +1906,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
     this->InsertGazeboExtensionRobot(robot);
 
     /* insert robot pose */
-    // this->InsertRobotOrigin(robot);
+    this->InsertRobotOrigin(robot);
 
     // add robot to gazeboXmlOut
     TiXmlElement *gazeboSdf = new TiXmlElement("sdf");

@@ -1,9 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
-# HACK!  why do we need this?  can't find -lSimTK*
-link_directories(${Simbody_LIB_DIR})
-
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()

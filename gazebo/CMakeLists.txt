@@ -13,7 +13,6 @@ link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
-  ${Simbody_LIB_DIR} #HACK!! remove
 )
 
 if(HAVE_URDFDOM_HEADERS)

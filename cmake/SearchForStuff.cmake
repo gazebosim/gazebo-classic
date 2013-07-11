@@ -130,6 +130,15 @@ if (PKG_CONFIG_FOUND)
   endif()
   
   #################################################
+  # Find bullet
+  pkg_check_modules(BULLET bullet>=2.81)
+  if (BULLET_FOUND)
+    set (HAVE_BULLET TRUE)
+  else()
+    set (HAVE_BULLET FALSE)
+  endif()
+
+  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)
