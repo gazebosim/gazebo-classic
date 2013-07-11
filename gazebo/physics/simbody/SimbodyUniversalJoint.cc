@@ -19,11 +19,11 @@
  * Date: 24 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyUniversalJoint.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

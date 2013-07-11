@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  * Date: 14 Oct 2009
  */
-#include "physics/SphereShape.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
 using namespace physics;

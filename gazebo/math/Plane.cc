@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "math/Plane.hh"
+#include "gazebo/math/Plane.hh"
 
 using namespace gazebo;
 using namespace math;

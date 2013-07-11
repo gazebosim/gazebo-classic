@@ -19,15 +19,15 @@
  * Date: 13 Feb 2006
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
+#include "gazebo/physics/World.hh"
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/simbody/SimbodyCollision.hh"
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -38,6 +38,7 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
 {
   this->mustBeBaseLink = false;
   this->physicsInitialized = false;
+  this->simbodyPhysics.reset();
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +309,8 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 /////////////////////////////////////////////////
 SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
-  if (!this->IsStatic())
+  if (this->simbodyPhysics->simbodyPhysicsInitialized &&
+     !this->IsStatic())
   {
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
@@ -334,7 +336,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
   else
   {
     gzerr << "inertial block no specified, using unit mass properties\n";
-    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(1,1,1));
+    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(0.1,0.1,0.1));
   }
 }
 

@@ -36,8 +36,8 @@
 #include <SimTKmath.h>
 // using namespace SimTK;
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
 
 namespace gazebo
 {

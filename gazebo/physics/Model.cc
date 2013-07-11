@@ -45,7 +45,7 @@
 
 #include "gazebo/sensors/SensorManager.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;

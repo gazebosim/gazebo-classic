@@ -28,11 +28,11 @@
 
 #include <Simbody.h>
 
-#include "physics/simbody/simbody_inc.h"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
-#include "physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 namespace gazebo
 {
@@ -208,6 +208,7 @@ namespace gazebo
 
       /// \brief true if initialized
       public: bool simbodyPhysicsInitialized;
+      public: bool simbodyPhysicsStepped;
 
       /// \brief Helper functions
       private: void CreateMultibodyGraph(

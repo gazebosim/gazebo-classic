@@ -15,8 +15,6 @@
  *
 */
 #include <urdf_parser/urdf_parser.h>
-#include <sdf/interface/parser_urdf.hh>
-#include <sdf/sdf.hh>
 
 #include <fstream>
 #include <sstream>
@@ -25,6 +23,8 @@
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/sdf/interface/parser_urdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace urdf2gazebo
 {
@@ -509,7 +509,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
 
           std::ostringstream origStream;
           origStream << *childElem;
-          gzdbg << "extension [" << origStream.str() <<
+          gzlog << "extension [" << origStream.str() <<
                 "] not converted from URDF, probably already in SDF format.\n";
           xmlNewDoc.Parse(origStream.str().c_str());
 
@@ -1394,7 +1394,7 @@ void URDF2Gazebo::CreateLink(TiXmlElement *_root,
     _currentTransform = localTransform * _currentTransform;
   }
   else
-    gzdbg << "[" << _link->name << "] has no parent joint\n";
+    gzlog << "[" << _link->name << "] has no parent joint\n";
 
   // create origin tag for this element
   this->AddTransform(elem, _currentTransform);
@@ -1870,7 +1870,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
     this->ParseGazeboExtension(urdfXml);
 
     /* parse robot pose */
-    this->ParseRobotOrigin(urdfXml);
+    // this->ParseRobotOrigin(urdfXml);
 
     ConstUrdfLinkPtr rootLink = robotModel->getRoot();
 
@@ -1901,7 +1901,7 @@ TiXmlDocument URDF2Gazebo::InitModelString(const std::string &_urdfStr,
     this->InsertGazeboExtensionRobot(robot);
 
     /* insert robot pose */
-    this->InsertRobotOrigin(robot);
+    // this->InsertRobotOrigin(robot);
 
     // add robot to gazeboXmlOut
     TiXmlElement *gazeboSdf = new TiXmlElement("sdf");

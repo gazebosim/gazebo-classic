@@ -22,8 +22,8 @@
 #ifndef _SIMBODY_CYLINDERSHAPE_HH_
 #define _SIMBODY_CYLINDERSHAPE_HH_
 
-#include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/CylinderShape.hh"
 
 namespace gazebo
 {

@@ -17,7 +17,7 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 #include <string>
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 namespace po = boost::program_options;

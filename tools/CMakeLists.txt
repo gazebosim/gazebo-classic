@@ -6,7 +6,6 @@ add_definitions(${QT_DEFINITIONS})
 
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
-  ${PROJECT_SOURCE_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
 )

@@ -19,40 +19,40 @@
  * Date: 11 June 2007
  */
 
-#include "physics/simbody/SimbodyTypes.hh"
-#include "physics/simbody/SimbodyModel.hh"
-#include "physics/simbody/SimbodyLink.hh"
-#include "physics/simbody/SimbodyJoint.hh"
-#include "physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/SimbodyModel.hh"
+#include "gazebo/physics/simbody/SimbodyLink.hh"
+#include "gazebo/physics/simbody/SimbodyJoint.hh"
+#include "gazebo/physics/simbody/SimbodyCollision.hh"
 
-#include "physics/simbody/SimbodyPlaneShape.hh"
-#include "physics/simbody/SimbodySphereShape.hh"
-#include "physics/simbody/SimbodyHeightmapShape.hh"
-#include "physics/simbody/SimbodyMultiRayShape.hh"
-#include "physics/simbody/SimbodyBoxShape.hh"
-#include "physics/simbody/SimbodyCylinderShape.hh"
-#include "physics/simbody/SimbodyTrimeshShape.hh"
-#include "physics/simbody/SimbodyRayShape.hh"
+#include "gazebo/physics/simbody/SimbodyPlaneShape.hh"
+#include "gazebo/physics/simbody/SimbodySphereShape.hh"
+#include "gazebo/physics/simbody/SimbodyHeightmapShape.hh"
+#include "gazebo/physics/simbody/SimbodyMultiRayShape.hh"
+#include "gazebo/physics/simbody/SimbodyBoxShape.hh"
+#include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
+#include "gazebo/physics/simbody/SimbodyTrimeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
-#include "physics/simbody/SimbodyHingeJoint.hh"
-#include "physics/simbody/SimbodyUniversalJoint.hh"
-#include "physics/simbody/SimbodyBallJoint.hh"
-#include "physics/simbody/SimbodySliderJoint.hh"
-#include "physics/simbody/SimbodyHinge2Joint.hh"
-#include "physics/simbody/SimbodyScrewJoint.hh"
+#include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
+#include "gazebo/physics/simbody/SimbodyUniversalJoint.hh"
+#include "gazebo/physics/simbody/SimbodyBallJoint.hh"
+#include "gazebo/physics/simbody/SimbodySliderJoint.hh"
+#include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
+#include "gazebo/physics/simbody/SimbodyScrewJoint.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/World.hh"
-#include "physics/Entity.hh"
-#include "physics/Model.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Vector3.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Vector3.hh"
 
 #include "SimbodyPhysics.hh"
 
@@ -94,10 +94,11 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
   // this->integ = new SimTK::RungeKutta3Integrator(system);
   // this->integ = new SimTK::RungeKutta2Integrator(system);
-  this->integ = new SimTK::ExplicitEulerIntegrator(system);
+  this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.001);
+  this->integ->setAccuracy(0.01);
   this->simbodyPhysicsInitialized = false;
+  this->simbodyPhysicsStepped = false;
 }
 
 //////////////////////////////////////////////////
@@ -136,6 +137,8 @@ void SimbodyPhysics::Reset()
 void SimbodyPhysics::Init()
 {
   gzerr << "SimbodyPhysics::Init\n";
+
+  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -215,8 +218,6 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzerr << "simbodyJoint [" << (*ji)->GetName()
             << "]is not a SimbodyJointPtr\n";
   }
-
-  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -244,6 +245,7 @@ void SimbodyPhysics::UpdatePhysics()
                        this->world->GetSimTime().Double());
   }
 
+  this->simbodyPhysicsStepped = true;
   const SimTK::State &s = this->integ->getState();
 
 /* debug
@@ -253,9 +255,8 @@ void SimbodyPhysics::UpdatePhysics()
         << "] dt [" << this->stepTimeDouble
         << "] t [" << this->world->GetSimTime().Double()
         << "]\n";
-
   this->lastUpdateTime = currTime;
-*/
+ */
 
   // pushing new entity pose into dirtyPoses for visualization
   physics::Model_V models = this->world->GetModels();
@@ -442,7 +443,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   {
     SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
 
-    gzerr << "debug : " << (*li)->GetName() << "\n";
+    // gzerr << "debug : " << (*li)->GetName() << "\n";
 
     if (simbodyLink)
       _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
@@ -495,7 +496,7 @@ void SimbodyPhysics::InitSimbodySystem()
   const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.01);
+  this->contact.setTransitionVelocity(0.1);
 
   // Specify gravity (read in above from world).
   if (!math::equal(g.norm(), 0.0))
@@ -812,7 +813,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
   SimTK::ContactMaterial material(1e8,   // stiffness
-                                  100.0,  // dissipation
+                                  1.0,  // dissipation
                                   1.0,   // mu_static
                                   1.0,   // mu_dynamic
                                   0.5);  // mu_viscous
