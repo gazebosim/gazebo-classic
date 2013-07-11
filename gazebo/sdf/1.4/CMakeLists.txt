@@ -23,6 +23,7 @@ set (sdfs
   root.sdf
   scene.sdf
   sensor.sdf
+  spherical_coordinates.sdf
   state.sdf
   surface.sdf
   visual.sdf
