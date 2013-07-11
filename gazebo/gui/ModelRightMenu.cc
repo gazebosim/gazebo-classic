@@ -109,7 +109,7 @@ ModelRightMenu::ModelRightMenu()
 /////////////////////////////////////////////////
 bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 {
-  if (_event.key == 16777216)
+  if (_event.key == Qt::Key_Escape)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
     cam->TrackVisual("");
