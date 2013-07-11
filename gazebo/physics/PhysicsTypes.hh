@@ -41,6 +41,7 @@ namespace gazebo
     class JointController;
     class Contact;
     class PhysicsEngine;
+    class SphericalCoordinates;
     class Mass;
     class Road;
     class Shape;
@@ -100,6 +101,10 @@ namespace gazebo
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+
+    /// \def  SphericalCoordinatesPtr
+    /// \brief Boost shared pointer to a SphericalCoordinates object
+    typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object

@@ -449,6 +449,9 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
 
+      /// \brief Pointer the spherical coordinates data.
+      private: SphericalCoordinatesPtr sphericalCoordinates;
+
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
 

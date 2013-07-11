@@ -16,7 +16,7 @@
 */
 
 #include <string>
-#include <math>
+#include <math.h>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -58,21 +58,19 @@ void SphericalCoordinates::Load(sdf::ElementPtr _sdf)
 
   // Identify surface model type
   std::string surfaceModelStr = _sdf->GetValueString("surface_model");
-  switch (surfaceModelStr)
-  {
-    case "EARTH_WGS84":
-      this->surfaceModel = EARTH_WGS84;
-      break;
 
-    default:
-      gzwarn << "surface_model parameter not recognized, "
-             << "EARTH_WGS84 will be used by default\n";
-      this->surfaceModel = EARTH_WGS84;
-      break;
+  if ("EARTH_WGS84" == surfaceModelStr)
+    this->surfaceModel = EARTH_WGS84;
+  else
+  {
+    gzwarn << "surface_model parameter not recognized, "
+           << "EARTH_WGS84 will be used by default\n";
+    this->surfaceModel = EARTH_WGS84;
   }
+
   this->latitudeReference.SetFromDegree(_sdf->GetValueDouble("latitude_deg"));
   this->longitudeReference.SetFromDegree(_sdf->GetValueDouble("longitude_deg"));
-  this->headingOffsetDegrees.SetFromDegree(_sdf->GetValueDouble("heading_deg"));
+  this->headingOffset.SetFromDegree(_sdf->GetValueDouble("heading_deg"));
   this->headingCosine = cos(this->headingOffset.Radian());
   this->headingSine = sin(this->headingOffset.Radian());
 }
@@ -82,17 +80,22 @@ void SphericalCoordinates::Init()
 {
   switch (this->surfaceModel)
   {
-    case: EARTH_WGS84:
+    case EARTH_WGS84:
       // Currently uses radius of curvature equations from wikipedia
       // http://en.wikipedia.org/wiki/Earth_radius#Radius_of_curvature
-      double a = g_earth_wgs84_axis_equatorial;
-      double b = g_earth_wgs84_axis_polar;
-      double ab = a*b;
-      double cosLat = cos(this->latitudeReference.Radian());
-      double sinLat = sin(this->latitudeReference.Radian());
-      double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
-      this->radiusMeridional = ab*ab / denom / sqrt(denom);
-      this->radiusNormal = a*a / sqrt(denom);
+      {
+        double a = g_earth_wgs84_axis_equatorial;
+        double b = g_earth_wgs84_axis_polar;
+        double ab = a*b;
+        double cosLat = cos(this->latitudeReference.Radian());
+        double sinLat = sin(this->latitudeReference.Radian());
+        double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
+        this->radiusMeridional = ab*ab / denom / sqrt(denom);
+        this->radiusNormal = a*a / sqrt(denom);
+      }
+      break;
+
+    default:
       break;
   }
 }

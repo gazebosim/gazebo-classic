@@ -55,6 +55,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/SphericalCoordinates.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -208,6 +209,13 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
 
+  // This should also come before loading of entities
+  this->sphericalCoordinates.reset(new SphericalCoordinates());
+  if (this->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
+  this->sphericalCoordinates->Load(
+    this->sdf->GetElement("spherical_coordinates"));
+
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
   this->rootElement->SetWorld(shared_from_this());
@@ -284,6 +292,8 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
+
+  this->sphericalCoordinates->Init();
 
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
