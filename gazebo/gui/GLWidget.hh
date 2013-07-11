@@ -161,14 +161,6 @@ namespace gazebo
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
-      /// \brief Publish visual's pose to the server
-      /// \param[in] _vis Pointer to the visual whose pose is to be published.
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
-
-      /// \brief Publish visual's scale to the server
-      /// \param[in] _vis Pointer to the visual whose scale is to be published.
-      private: void PublishVisualScale(rendering::VisualPtr _vis);
-
       private: void ClearSelection();
 
       /// \brief Copy an object by name
@@ -181,10 +173,6 @@ namespace gazebo
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
-
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
-      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       private: int windowId;
 
@@ -208,17 +196,15 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
+      private: rendering::VisualPtr hoverVis, selectedVis;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
 
@@ -229,10 +215,6 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
-
-      private: rendering::SelectionObjPtr selectionObj;
-
-      private: math::Vector3 mouseVisualScale;
     };
   }
 }

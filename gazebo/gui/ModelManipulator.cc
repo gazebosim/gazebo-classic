@@ -1,0 +1,704 @@
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include "gazebo/transport/transport.hh"
+
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/SelectionObj.hh"
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/Gui.hh"
+
+#include "gazebo/gui/ModelManipulator.hh"
+
+using namespace gazebo;
+using namespace gui;
+
+/////////////////////////////////////////////////
+ModelManipulator::ModelManipulator()
+{
+  this->initialized = false;
+  this->selectionObj.reset();
+  this->mouseMoveVis.reset();
+}
+
+/////////////////////////////////////////////////
+ModelManipulator::~ModelManipulator()
+{
+  this->modelPub.reset();
+  this->selectionObj.reset();
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::Init()
+{
+  if (this->initialized)
+    return;
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (!cam)
+    return;
+
+  if (!cam->GetScene())
+    return;
+
+  this->userCamera = cam;
+  this->scene =  cam->GetScene();
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
+  this->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
+      this->scene->GetWorldVisual()));
+  this->selectionObj->Load();
+
+  this->initialized = true;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
+    const math::Vector3 &_axis, bool /*_local*/)
+{
+  math::Vector3 normal;
+
+  if (_axis.x > 0)
+    normal = mouseMoveVisStartPose.rot.GetXAxis();
+  else if (_axis.y > 0)
+    normal = mouseMoveVisStartPose.rot.GetYAxis();
+  else if (_axis.z > 0)
+    normal = mouseMoveVisStartPose.rot.GetZAxis();
+
+  double offset = this->mouseMoveVisStartPose.pos.Dot(normal);
+
+  math::Vector3 pressPoint;
+  this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, math::Plane(normal, offset), pressPoint);
+
+  math::Vector3 newPoint;
+  this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, math::Plane(normal, offset), newPoint);
+
+  math::Vector3 v1 = pressPoint - this->mouseMoveVisStartPose.pos;
+  math::Vector3 v2 = newPoint - this->mouseMoveVisStartPose.pos;
+  v1 = v1.Normalize();
+  v2 = v2.Normalize();
+  double signTest = v1.Cross(v2).Dot(normal);
+  double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+
+  if (signTest < 0 )
+    angle *= -1;
+
+  if (this->mouseEvent.shift)
+    angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
+
+//  gzerr << " rptAmt " << rpyAmt << " rpy " << rpy << std::endl;
+  math::Quaternion rot(_axis, angle);
+
+  _vis->SetRotation(this->mouseMoveVisStartPose.rot * rot);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
+    const math::Vector3 &_axis, bool _local)
+{
+  math::Box bbox = _vis->GetBoundingBox();
+  math::Pose pose = _vis->GetPose();
+
+  math::Vector3 origin1, dir1, p1;
+  math::Vector3 origin2, dir2, p2;
+
+  // Cast two rays from the camera into the world
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, origin1, dir1);
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, origin2, dir2);
+
+  math::Vector3 planeNorm(0, 0, 0);
+  math::Vector3 projNorm(0, 0, 0);
+
+  math::Vector3 planeNormOther(0, 0, 0);
+
+  if (_axis.x > 0 && _axis.y > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.z = 1;
+  }
+  else if (_axis.z > 0)
+  {
+    planeNorm.y = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
+  }
+  else if (_axis.x > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.y = 1;
+    planeNormOther.y = 1;
+
+  }
+  else if (_axis.y > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
+  }
+
+  if (_local)
+  {
+    planeNorm = pose.rot.RotateVector(planeNorm);
+    projNorm = pose.rot.RotateVector(projNorm);
+  }
+
+  // Fine tune translation
+  // Make sure we don't cast a ray parallel to planeNorm
+  double angle = dir1.Dot(planeNorm);
+  if (_local)
+    planeNormOther = pose.rot.RotateVector(planeNormOther);
+  double angleOther = dir1.Dot(planeNormOther);
+  if (fabs(angleOther) > fabs(angle))
+  {
+    projNorm = planeNorm;
+    planeNorm = planeNormOther;
+  }
+
+  // Compute the distance from the camera to plane of translation
+  double d = pose.pos.Dot(planeNorm);
+  math::Plane plane(planeNorm, d);
+  double dist1 = plane.Distance(origin1, dir1);
+  double dist2 = plane.Distance(origin2, dir2);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  p2 = origin2 + dir2 * dist2;
+
+  if (_local)
+    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
+
+  math::Vector3 distance = p1 - p2;
+
+  if (!_local)
+    distance *= _axis;
+
+  // gzerr << " bbox " << bbox.GetXLength() << " " << bbox.GetYLength() << " "
+  //   << bbox.GetZLength() << std::endl;
+
+  // gzerr << " distance " << distance << std::endl;
+
+  math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
+  math::Vector3 scale = (bboxSize + distance/2.0)/bboxSize;
+
+  // a bit hacky to check for unit sphere and cylinder simple shapes in order
+  // to constrain the scaling dimensions.
+  if (_vis->GetName().find("unit_sphere") != std::string::npos)
+  {
+    if (_axis.x > 0)
+    {
+      scale.y = scale.x;
+      scale.z = scale.x;
+    }
+    else if (_axis.y > 0)
+    {
+      scale.x = scale.y;
+      scale.z = scale.y;
+    }
+    else if (_axis.z > 0)
+    {
+      scale.x = scale.z;
+      scale.y = scale.z;
+    }
+  }
+  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  {
+    if (_axis.x > 0)
+    {
+      scale.y = scale.x;
+    }
+    else if (_axis.y > 0)
+    {
+      scale.x = scale.y;
+    }
+  }
+
+  scale = pose.rot.RotateVectorReverse(scale);
+
+  _vis->SetScale(this->mouseVisualScale * scale);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
+    const math::Vector3 &_axis, bool _local)
+{
+  math::Pose pose = _vis->GetPose();
+
+  math::Vector3 origin1, dir1, p1;
+  math::Vector3 origin2, dir2, p2;
+
+  // Cast two rays from the camera into the world
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, origin1, dir1);
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, origin2, dir2);
+
+  math::Vector3 planeNorm(0, 0, 0);
+  math::Vector3 projNorm(0, 0, 0);
+
+  math::Vector3 planeNormOther(0, 0, 0);
+
+  if (_axis.x > 0 && _axis.y > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.z = 1;
+  }
+  else if (_axis.z > 0)
+  {
+    planeNorm.y = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
+  }
+  else if (_axis.x > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.y = 1;
+    planeNormOther.y = 1;
+
+  }
+  else if (_axis.y > 0)
+  {
+    planeNorm.z = 1;
+    projNorm.x = 1;
+    planeNormOther.x = 1;
+  }
+
+
+  if (_local)
+  {
+    planeNorm = pose.rot.RotateVector(planeNorm);
+    projNorm = pose.rot.RotateVector(projNorm);
+  }
+
+  // Fine tune translation
+  // Make sure we don't cast a ray parallel to planeNorm
+  double angle = dir1.Dot(planeNorm);
+  if (_local)
+    planeNormOther = pose.rot.RotateVector(planeNormOther);
+  double angleOther = dir1.Dot(planeNormOther);
+  if (fabs(angleOther) > fabs(angle))
+  {
+    projNorm = planeNorm;
+    planeNorm = planeNormOther;
+  }
+
+  // Compute the distance from the camera to plane of translation
+  double d = pose.pos.Dot(planeNorm);
+  math::Plane plane(planeNorm, d);
+  double dist1 = plane.Distance(origin1, dir1);
+  double dist2 = plane.Distance(origin2, dir2);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  p2 = origin2 + dir2 * dist2;
+
+  if (_local)
+    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
+
+  math::Vector3 distance = p1 - p2;
+
+  if (!_local)
+    distance *= _axis;
+
+  pose.pos = this->mouseMoveVisStartPose.pos + distance;
+
+  if (this->mouseEvent.shift)
+  {
+    if (ceil(pose.pos.x) - pose.pos.x <= .4)
+        pose.pos.x = ceil(pose.pos.x);
+    else if (pose.pos.x - floor(pose.pos.x) <= .4)
+      pose.pos.x = floor(pose.pos.x);
+
+    if (ceil(pose.pos.y) - pose.pos.y <= .4)
+        pose.pos.y = ceil(pose.pos.y);
+    else if (pose.pos.y - floor(pose.pos.y) <= .4)
+      pose.pos.y = floor(pose.pos.y);
+
+    if (_axis.z > 0.0)
+    {
+      if (ceil(pose.pos.z) - pose.pos.z <= .4)
+        pose.pos.z = ceil(pose.pos.z);
+      else if (pose.pos.z - floor(pose.pos.z) <= .4)
+        pose.pos.z = floor(pose.pos.z);
+    }
+  }
+
+  if (!(_axis.z > 0) && !_local)
+    pose.pos.z = _vis->GetPose().pos.z;
+
+  _vis->SetPose(pose);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
+{
+  if (_vis)
+  {
+    // Check to see if the visual is a model.
+    if (gui::get_entity_id(_vis->GetName()))
+    {
+      msgs::Model msg;
+      msg.set_id(gui::get_entity_id(_vis->GetName()));
+      msg.set_name(_vis->GetName());
+
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      this->modelPub->Publish(msg);
+    }
+    // Otherwise, check to see if the visual is a light
+    else if (this->scene->GetLight(_vis->GetName()))
+    {
+      msgs::Light msg;
+      msg.set_name(_vis->GetName());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      this->lightPub->Publish(msg);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
+{
+  if (_vis)
+  {
+    // Check to see if the visual is a model.
+    if (gui::get_entity_id(_vis->GetName()))
+    {
+      msgs::Model msg;
+      msg.set_id(gui::get_entity_id(_vis->GetName()));
+      msg.set_name(_vis->GetName());
+
+      msgs::Set(msg.mutable_scale(), _vis->GetScale());
+      this->modelPub->Publish(msg);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
+{
+  this->mouseEvent = _event;
+  this->SetMouseMoveVisual(rendering::VisualPtr());
+
+  rendering::VisualPtr vis;
+  rendering::VisualPtr mouseVis
+      = this->userCamera->GetVisual(this->mouseEvent.pos);
+
+  if (this->selectionObj->GetMode() == rendering::SelectionObj::SELECTION_NONE
+      || (mouseVis && mouseVis != this->selectionObj->GetParent()))
+  {
+    vis = mouseVis;
+  }
+  else
+  {
+    vis = this->selectionObj->GetParent();
+  }
+
+  if (vis && !vis->IsPlane() &&
+      this->mouseEvent.button == common::MouseEvent::LEFT)
+  {
+    vis = vis->GetRootVisual();
+    this->mouseMoveVisStartPose = vis->GetWorldPose();
+
+    this->SetMouseMoveVisual(vis);
+
+    event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
+    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+
+    if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
+    {
+      this->selectionObj->Attach(this->mouseMoveVis);
+      this->selectionObj->SetMode(this->state);
+    }
+    else
+    {
+      this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+      this->selectionObj->Detach();
+    }
+
+  }
+  else
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
+{
+  this->mouseEvent = _event;
+  if (this->mouseEvent.dragging)
+  {
+    if (this->mouseMoveVis &&
+        this->mouseEvent.button == common::MouseEvent::LEFT)
+    {
+      if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_X)
+      {
+        this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_Y)
+      {
+        this->TranslateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_Z)
+      {
+        this->TranslateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_X)
+      {
+        this->RotateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_Y)
+      {
+        this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_Z)
+      {
+        this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_X)
+      {
+        this->ScaleEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
+
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_Y)
+      {
+        this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+      }
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_Z)
+      {
+        this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+      }
+      else
+        this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 1, 0));
+    }
+    else
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+  }
+  else
+  {
+    std::string manipState;
+    this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
+    this->selectionObj->SetState(manipState);
+
+    if (!manipState.empty())
+      QApplication::setOverrideCursor(Qt::OpenHandCursor);
+    else
+    {
+      rendering::VisualPtr vis = this->userCamera->GetVisual(
+          this->mouseEvent.pos);
+
+      if (vis && !vis->IsPlane())
+        QApplication::setOverrideCursor(Qt::OpenHandCursor);
+      else
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
+{
+  this->mouseEvent = _event;
+  if (this->mouseEvent.dragging)
+  {
+    // If we were dragging a visual around, then publish its new pose to the
+    // server
+    if (this->mouseMoveVis)
+    {
+      if (this->state == "scale")
+      {
+        this->PublishVisualScale(this->mouseMoveVis);
+        this->mouseMoveVis->SetScale(this->mouseVisualScale);
+      }
+      this->PublishVisualPose(this->mouseMoveVis);
+      this->SetMouseMoveVisual(rendering::VisualPtr());
+      QApplication::setOverrideCursor(Qt::OpenHandCursor);
+//      this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+//      this->selectionObj->Detach();
+    }
+//    this->SetSelectedVisual(rendering::VisualPtr());
+    event::Events::setSelectedEntity("", "normal");
+  }
+  else
+  {
+    if (this->mouseEvent.button == common::MouseEvent::LEFT)
+    {
+      rendering::VisualPtr vis =
+        this->userCamera->GetVisual(this->mouseEvent.pos);
+      if (vis && vis->IsPlane())
+      {
+        this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+        this->selectionObj->Detach();
+      }
+    }
+  }
+
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
+}
+
+//////////////////////////////////////////////////
+void ModelManipulator::SetMode(const std::string &_mode)
+{
+  this->state = _mode;
+  if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE)
+  {
+    this->selectionObj->SetMode(this->state);
+  }
+/*  if (this->selectedVis && !this->selectedVis->IsPlane())
+  {
+    this->selectionObj->Attach(this->selectedVis);
+    this->selectionObj->SetMode(this->state);
+  }*/
+}
+
+
+/////////////////////////////////////////////////
+void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
+{
+  this->mouseMoveVis = _vis;
+  if (_vis)
+    this->mouseVisualScale = _vis->GetScale();
+  else this->mouseVisualScale = math::Vector3::One;
+}
+
+//////////////////////////////////////////////////
+void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
+{
+  this->keyEvent = _event;
+  // reset mouseMoveVisStartPose if in manipulation mode.
+  if (this->state == "translate" || this->state == "rotate"
+      || this->state == "scale")
+  {
+    if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
+        || _event.key == Qt::Key_Z)
+    {
+      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      if (this->mouseMoveVis)
+      {
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
+{
+  this->keyEvent = _event;
+  // reset mouseMoveVisStartPose if in manipulation mode.
+  if (this->state == "translate" || this->state == "rotate"
+      || this->state == "scale")
+  {
+    if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
+        || _event.key == Qt::Key_Z)
+    {
+      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      if (this->mouseMoveVis)
+      {
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+// Migrated from GLWidget.cc and commented out since it doesn't seem like
+// it's currently used
+/*void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
+{
+  if (!this->mouseEvent.dragging)
+    return;
+
+  // Get the point on the plane which correspoinds to the mouse
+  math::Vector3 pp;
+
+  // Rotate the visual using the middle mouse button
+  if (this->mouseEvent.buttons == common::MouseEvent::MIDDLE)
+  {
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double yaw = (delta.x * 0.01) + rpy.z;
+    if (!this->mouseEvent.shift)
+    {
+      double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
+
+      if (fabs(yaw - snap) < GZ_DTOR(10))
+        yaw = snap;
+    }
+
+    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, yaw));
+  }
+  else if (this->mouseEvent.buttons == common::MouseEvent::RIGHT)
+  {
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double pitch = (delta.y * 0.01) + rpy.y;
+    if (!this->mouseEvent.shift)
+    {
+      double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
+
+      if (fabs(pitch - snap) < GZ_DTOR(10))
+        pitch = snap;
+    }
+
+    _vis->SetWorldRotation(math::Quaternion(rpy.x, pitch, rpy.z));
+  }
+  else if (this->mouseEvent.buttons & common::MouseEvent::LEFT &&
+           this->mouseEvent.buttons & common::MouseEvent::RIGHT)
+  {
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double roll = (delta.x * 0.01) + rpy.x;
+    if (!this->mouseEvent.shift)
+    {
+      double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
+
+      if (fabs(roll - snap) < GZ_DTOR(10))
+        roll = snap;
+    }
+
+    _vis->SetWorldRotation(math::Quaternion(roll, rpy.y, rpy.z));
+  }
+  else
+  {
+    this->TranslateEntity(_vis);
+  }
+}*/
