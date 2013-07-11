@@ -15,7 +15,7 @@
  *
  */
 
-#include "gui/Actions.hh"
+#include "gazebo/gui/Actions.hh"
 
 QAction *gazebo::gui::g_arrowAct = 0;
 QAction *gazebo::gui::g_translateAct = 0;

@@ -14,35 +14,35 @@
  * limitations under the License.
  *
 */
-#include <msgs/msgs.hh>
-
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 #include <limits>
 #include <algorithm>
 
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
-#include "common/Plugin.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/CommonTypes.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/BVHLoader.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/BVHLoader.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Actor.hh"
-#include "physics/Physics.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Physics.hh"
+
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 
 using namespace gazebo;
 class FileHandling : public ServerFixture

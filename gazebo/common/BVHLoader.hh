@@ -21,7 +21,7 @@
 #include <map>
 #include <string>
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 #define X_POSITION 0
 #define Y_POSITION 1
