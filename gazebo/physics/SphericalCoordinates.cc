@@ -106,6 +106,8 @@ math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
   math::Vector3 spherical;
   double east  = _xyz.x * this->headingCosine - _xyz.y * this->headingSine;
   double north = _xyz.x * this->headingSine   + _xyz.y * this->headingCosine;
+  // Assumes small changes in latitude / longitude.
+  // May not work well near the north / south poles.
   math::Angle deltaLatitude(north / this->radiusMeridional);
   math::Angle deltaLongitude(east / this->radiusNormal);
   // geodetic latitude in degrees

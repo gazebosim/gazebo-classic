@@ -49,14 +49,14 @@ namespace gazebo
       public: explicit SphericalCoordinates();
 
       /// \brief Destructor.
-      public: virtual ~SphericalCoordinates();
+      public: ~SphericalCoordinates();
 
       /// \brief Load using SDF parameters.
       /// \param[in] _sdf SDF parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
+      public: void Init();
 
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
