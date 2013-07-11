@@ -49,6 +49,7 @@ set (headers
   Events.hh
   Exception.hh
   Image.hh
+  KeyEvent.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh

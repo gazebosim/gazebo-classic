@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MOUSEEVENT_HH
-#define MOUSEEVENT_HH
+#ifndef _MOUSEEVENT_HH_
+#define _MOUSEEVENT_HH_
 
 #include "gazebo/math/Vector2i.hh"
 
