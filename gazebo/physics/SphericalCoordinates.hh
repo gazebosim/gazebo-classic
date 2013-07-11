@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Spherical coordinate conversion for GPS
- * Author: Steven Peters
- * Date: 5 July 2013
- */
 
 #ifndef _SPHERICALCOORDINATES_HH_
 #define _SPHERICALCOORDINATES_HH_

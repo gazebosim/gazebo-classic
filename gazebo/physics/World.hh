@@ -121,6 +121,10 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the spherical coordinates converter.
+      /// \return Pointer to the spherical coordinates converter.
+      public: SphericalCoordinatesPtr GetSphericalCoordinates() const;
+
       /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
