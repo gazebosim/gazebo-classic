@@ -169,6 +169,17 @@ namespace gazebo
       /// \param[in] _value New input step size.
       private: void OnInputStepSizeChanged(int _value);
 
+      /// \brief Handle follow model user event.
+      /// \param[in] _modelName Name of the model that is being followed.
+      private: void OnFollow(const std::string &_modelName);
+
+      /// \brief Helper function that creates a greyed out icon for an
+      /// action. This lets the action have a visible disabled state.
+      /// \param[in] _pixmap The image to use as an greyed out icon.
+      /// \param[in, out] _act Action that receives the icon.
+      private: void CreateDisabledIcon(const std::string &_pixmap,
+                   QAction *_act);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -201,6 +212,9 @@ namespace gazebo
 
       /// \brief Mainwindow's menubar
       private: QMenuBar *menuBar;
+
+      /// \brief The Edit menu.
+      private: QMenu *editMenu;
 
       /// \brief A layout for the menu bar.
       private: QHBoxLayout *menuLayout;

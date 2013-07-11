@@ -35,6 +35,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -242,6 +243,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
+  this->keyEvent.key = _event->key();
+
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
@@ -279,6 +282,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandlePress(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -328,6 +334,9 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
 }
 
 /////////////////////////////////////////////////

@@ -275,10 +275,11 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 {
   Camera::TrackVisualImpl(_visual);
-  if (_visual)
+  /*if (_visual)
     this->SetViewController(OrbitViewController::GetTypeString());
   else
     this->SetViewController(FPSViewController::GetTypeString());
+    */
 
   return true;
 }

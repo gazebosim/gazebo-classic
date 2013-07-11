@@ -14,19 +14,34 @@
  * limitations under the License.
  *
 */
+#ifndef _KEYEVENT_HH_
+#define _KEYEVENT_HH_
 
-#include "gazebo/gui/GuiEvents.hh"
+namespace gazebo
+{
+  namespace common
+  {
+    /// \addtogroup gazebo_common
+    /// \{
 
-using namespace gazebo;
-using namespace gui;
+    /// \class KeyEvent KeyEvent.hh common/common.hh
+    /// \brief Generic description of a keyboard event.
+    class KeyEvent
+    {
+      /// \brief Key event types enumeration.
+      public: enum EventType {NO_EVENT, PRESS, RELEASE};
 
-event::EventT<void (std::string, std::string)> Events::createEntity;
-event::EventT<void (bool)> Events::moveMode;
-event::EventT<void (std::string)> Events::manipMode;
-event::EventT<void (bool)> Events::fullScreen;
-event::EventT<void ()> Events::fps;
-event::EventT<void ()> Events::orbit;
-event::EventT<void (std::string)> Events::keyPress;
-event::EventT<void (const msgs::Model &)> Events::modelUpdate;
-event::EventT<void (int)> Events::inputStepSize;
-event::EventT<void (const std::string &)> Events::follow;
+      /// \brief Constructor.
+      public: KeyEvent()
+              : type(NO_EVENT), key(0)
+              {}
+
+      /// \brief Event type.
+      public: EventType type;
+
+      public: int key;
+    };
+    /// \}
+  }
+}
+#endif
