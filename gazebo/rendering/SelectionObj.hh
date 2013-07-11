@@ -14,81 +14,131 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTION_OBJ_
-#define _SELECTION_OBJ_
+#ifndef _SELECTIONOBJ_HH_
+#define _SELECTIONOBJ_HH_
 
 #include <string>
+#include <boost/unordered/unordered_map.hpp>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class SelectionObj SelectionObj.hh rendering/rendering.hh
-    /// \brief A graphical selection object
-    ///
-    /// Used to draw a visual around a selected object.
-    class SelectionObj
+    /// \class SelectionObj SelectionObj.hh
+    /// \brief Interactive selection object for models and links
+    class SelectionObj : public Visual
     {
-      /// \brief Constructor
-      /// \param[in] _scene Scene to use.
-      public: SelectionObj(Scene *_scene);
+      /// \enum Manipulation modes
+      /// \brief Unique identifiers for manipulation modes.
+      public: enum SelectionMode
+      {
+        /// \brief Translation in x
+        SELECTION_NONE = 0,
+        /// \brief Translation mode
+        TRANS,
+        /// \brief Rotation mode
+        ROT,
+        /// \brief Scale mode
+        SCALE,
+        /// \brief Translation and Rotation mode
+        TRANS_ROT,
+        /// \brief Translation in x
+        TRANS_X,
+        /// \brief Translation in y
+        TRANS_Y,
+        /// \brief Translation in z
+        TRANS_Z,
+        /// \brief Rotation in x
+        ROT_X,
+        /// \brief Rotation in y
+        ROT_Y,
+        /// \brief Rotation in z
+        ROT_Z,
+        /// \brief Scale in x
+        SCALE_X,
+        /// \brief Scale in y
+        SCALE_Y,
+        /// \brief Scale in z
+        SCALE_Z
+      };
 
-      /// \brief Destructor
+      /// \brief Constructor
+      public: SelectionObj(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Deconstructor
       public: virtual ~SelectionObj();
 
-      /// \brief Initialize the rendering::SelectionObj object
-      public: void Init();
+      /// \brief Load
+      public: void Load();
 
-      /// \brief Set the position of the node
-      /// \param[in] This draws the selection object around the passed in
+      /// \brief Attach the selection object to the given visual
+      /// \param[in] _vis Pointer to visual to which the selection object
+      /// will be attached.
+      public: void Attach(rendering::VisualPtr _vis);
+
+      /// \brief Detach the selection object from the current visual.
+      public: void Detach();
+
+      void SetMode(const std::string &_mode);
+
+      void SetMode(SelectionMode _mode);
+
+      /// \brief Set state by highlighting the corresponding selection object
       /// visual.
-      public: void Attach(VisualPtr _visual);
+      /// \param[in] _state Selection state in string format.
+      void SetState(const std::string &_state);
 
-      /// \brief Clear the rendering::SelectionObj object
-      public: void Clear();
+      /// \brief Set state by highlighting the corresponding selection object
+      /// visual.
+      /// \param[in] _state Selection state.
+      void SetState(SelectionMode _state);
 
-      /// \brief Return true if the user is move the selection obj
-      /// \return True if something is selected.
-      public: bool IsActive() const;
+      /// \brief Get the current selection state.
+      SelectionMode GetState();
 
-      /// \brief Set true if the user is moving the selection obj
-      /// \param[in] _active True if the user is interacting with the
-      /// selection object.
-      public: void SetActive(bool _active);
+      /// \brief Get the current selection mode.
+      SelectionMode GetMode();
 
-      /// \brief Get the name of the visual the selection obj is attached to
-      /// \return Name of the selected visual.
-      public: std::string GetVisualName() const;
+      private: void CreateScaleVisual();
+      private: void CreateRotateVisual();
+      private: void CreateTranslateVisual();
 
-      /// \brief Highlight the selection object based on a modifier
-      /// \param[in] _mod Modifier used when highlighting the selection
-      /// object.
-      public: void SetHighlight(const std::string &_mod);
+      private: VisualPtr transVisual;
+      private: VisualPtr transXVisual;
+      private: VisualPtr transYVisual;
+      private: VisualPtr transZVisual;
 
-      /// \brief The visual node for the selection object
-      private: VisualPtr node;
+      private: VisualPtr scaleVisual;
+      private: VisualPtr scaleXVisual;
+      private: VisualPtr scaleYVisual;
+      private: VisualPtr scaleZVisual;
 
-      /// \brief Pointer to the scene
-      private: Scene *scene;
+      private: VisualPtr rotVisual;
+      private: VisualPtr rotXVisual;
+      private: VisualPtr rotYVisual;
+      private: VisualPtr rotZVisual;
 
-      /// \brief Name of the visual selected.
-      private: std::string visualName;
+      private: AxisVisualPtr axisVisual;
 
-      /// \brief True if a user is interacting with the selection object.
-      private: bool active;
+      private: static int counter;
 
-      /// \brief Size of the selection object box.
-      private: double boxSize;
+      private: std::string name;
+
+      private: SelectionMode mode;
+
+      private: SelectionMode state;
+
+      private: VisualPtr activeVis;
+
+      private: boost::unordered_map<std::string, std::string>
+          highlightMaterials;
     };
-    /// \}
   }
 }
+
 #endif

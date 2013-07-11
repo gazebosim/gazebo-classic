@@ -32,7 +32,6 @@ set (sources
   JointVisual.cc
   LaserVisual.cc
   Light.cc
-  Manipulator.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
@@ -45,6 +44,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  SelectionObj.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -72,7 +72,6 @@ set (headers
   JointVisual.hh
   LaserVisual.hh
   Light.hh
-  Manipulator.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh
@@ -86,6 +85,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  SelectionObj.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh

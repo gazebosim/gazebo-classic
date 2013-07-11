@@ -226,7 +226,7 @@ namespace gazebo
       ///  OnCreateScene
       private: bool sceneCreated;
 
-      private: rendering::ManipulatorPtr manipulator;
+      private: rendering::SelectionObjPtr selectionObj;
 
       private: math::Vector3 mouseVisualScale;
     };

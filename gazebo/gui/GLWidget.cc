@@ -32,7 +32,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
 #include "gazebo/rendering/FPSViewController.hh"
-#include "gazebo/rendering/Manipulator.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
@@ -145,7 +145,7 @@ GLWidget::~GLWidget()
   this->modelPub.reset();
   this->lightPub.reset();
   this->selectionSub.reset();
-  this->manipulator.reset();
+  this->selectionObj.reset();
 
   this->userCamera.reset();
 }
@@ -444,14 +444,14 @@ void GLWidget::OnMousePressTranslate()
   rendering::VisualPtr mouseVis
       = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-  if (this->manipulator->GetMode() == rendering::Manipulator::MANIP_NONE
-      || (mouseVis && mouseVis != this->manipulator->GetParent()))
+  if (this->selectionObj->GetMode() == rendering::SelectionObj::SELECTION_NONE
+      || (mouseVis && mouseVis != this->selectionObj->GetParent()))
   {
     vis = mouseVis;
   }
   else
   {
-    vis = this->manipulator->GetParent();
+    vis = this->selectionObj->GetParent();
   }
 //  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
@@ -468,13 +468,13 @@ void GLWidget::OnMousePressTranslate()
 
     if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
     {
-      this->manipulator->Attach(this->mouseMoveVis);
-      this->manipulator->SetMode(this->state);
+      this->selectionObj->Attach(this->mouseMoveVis);
+      this->selectionObj->SetMode(this->state);
     }
     else
     {
-      this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
-      this->manipulator->Detach();
+      this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+      this->selectionObj->Detach();
     }
 
   }
@@ -630,64 +630,64 @@ void GLWidget::OnMouseMoveTranslate()
     if (this->mouseMoveVis &&
         this->mouseEvent.button == common::MouseEvent::LEFT)
     {
-      if (this->manipulator->GetState()
-          == rendering::Manipulator::TRANS_X)
+      if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_X)
       {
         this->keyText = "x";
         this->TranslateEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::TRANS_Y)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_Y)
       {
         this->keyText = "y";
         this->TranslateEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::TRANS_Z)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::TRANS_Z)
       {
         this->keyText = "z";
         this->TranslateEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::ROT_X)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_X)
       {
         this->keyText = "x";
         this->RotateEntity(this->mouseMoveVis);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::ROT_Y)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_Y)
       {
         this->keyText = "y";
         this->RotateEntity(this->mouseMoveVis);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::ROT_Z)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::ROT_Z)
       {
         this->keyText = "z";
         this->RotateEntity(this->mouseMoveVis);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::SCALE_X)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_X)
       {
         this->keyText = "x";
         this->ScaleEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::SCALE_Y)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_Y)
       {
         this->keyText = "y";
         this->ScaleEntity(this->mouseMoveVis, true);
         this->keyText = "";
       }
-      else if (this->manipulator->GetState()
-          == rendering::Manipulator::SCALE_Z)
+      else if (this->selectionObj->GetState()
+          == rendering::SelectionObj::SCALE_Z)
       {
         this->keyText = "z";
         this->ScaleEntity(this->mouseMoveVis, true);
@@ -695,7 +695,7 @@ void GLWidget::OnMouseMoveTranslate()
       }
       else
         this->TranslateEntity(this->mouseMoveVis);
-//        rendering::VisualPtr attachedVis = this->manipulator->GetParent();
+//        rendering::VisualPtr attachedVis = this->selectionObj->GetParent();
 
 //        this->TranslateEntity(this->mouseMoveVis);
 //      this->keyText = "";
@@ -716,7 +716,7 @@ void GLWidget::OnMouseMoveTranslate()
   {
     std::string manipState;
     this->userCamera->GetVisual(this->mouseEvent.pos, manipState);
-    this->manipulator->SetState(manipState);
+    this->selectionObj->SetState(manipState);
 
     if (!manipState.empty())
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
@@ -808,8 +808,8 @@ void GLWidget::OnMouseReleaseTranslate()
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
-      this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
-      this->manipulator->Detach();
+      this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+      this->selectionObj->Detach();
     }
     this->SetSelectedVisual(rendering::VisualPtr());
     event::Events::setSelectedEntity("", "normal");
@@ -822,8 +822,8 @@ void GLWidget::OnMouseReleaseTranslate()
         this->userCamera->GetVisual(this->mouseEvent.pos);
       if (vis && vis->IsPlane())
       {
-        this->manipulator->SetMode(rendering::Manipulator::MANIP_NONE);
-        this->manipulator->Detach();
+        this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+        this->selectionObj->Detach();
       }
     }
   }
@@ -957,9 +957,9 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->ViewScene(rendering::get_scene(_name));
   this->sceneCreated = true;
 
-  this->manipulator.reset(new rendering::Manipulator("__GL_MANIP__",
+  this->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       rendering::get_scene(_name)->GetWorldVisual()));
-  this->manipulator->Load();
+  this->selectionObj->Load();
 }
 
 /////////////////////////////////////////////////
@@ -1421,14 +1421,14 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  if (this->manipulator->GetMode() != rendering::Manipulator::MANIP_NONE)
+  if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE)
   {
-    this->manipulator->SetMode(this->state);
+    this->selectionObj->SetMode(this->state);
   }
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
-    this->manipulator->Attach(this->selectedVis);
-    this->manipulator->SetMode(this->state);
+    this->selectionObj->Attach(this->selectedVis);
+    this->selectionObj->SetMode(this->state);
   }
 }
 
