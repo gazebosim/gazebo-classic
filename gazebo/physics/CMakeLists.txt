@@ -35,7 +35,6 @@ set (sources
   Road.cc
   Shape.cc
   SphereShape.cc
-  SphericalCoordinates.cc
   State.cc
   SurfaceParams.cc
   TrimeshShape.cc
@@ -80,7 +79,6 @@ set (headers
   ScrewJoint.hh
   SliderJoint.hh
   SphereShape.hh
-  SphericalCoordinates.hh
   State.hh
   SurfaceParams.hh
   TrimeshShape.hh
