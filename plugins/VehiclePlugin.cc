@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
 
 using namespace gazebo;
@@ -43,10 +43,33 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // this->physics = this->model->GetWorld()->GetPhysicsEngine();
 
   this->joints[0] = this->model->GetJoint(_sdf->GetValueString("front_left"));
-  this->joints[1] = this->model->GetJoint(_sdf->GetValueString("front_right"));
-  this->joints[2] = this->model->GetJoint(_sdf->GetValueString("back_left"));
-  this->joints[3] = this->model->GetJoint(_sdf->GetValueString("back_right"));
+  if (!this->joints[0])
+  {
+    gzerr << "Unable to find joint: front_left\n";
+    return;
+  }
 
+  this->joints[1] = this->model->GetJoint(_sdf->GetValueString("front_right"));
+  if (!this->joints[1])
+  {
+    gzerr << "Unable to find joint: front_right\n";
+    return;
+  }
+
+  this->joints[2] = this->model->GetJoint(_sdf->GetValueString("back_left"));
+  if (!this->joints[2])
+  {
+    gzerr << "Unable to find joint: back_left\n";
+    return;
+  }
+
+
+  this->joints[3] = this->model->GetJoint(_sdf->GetValueString("back_right"));
+  if (!this->joints[3])
+  {
+    gzerr << "Unable to find joint: back_right\n";
+    return;
+  }
 
   this->joints[0]->SetAttribute("suspension_erp", 0, 0.15);
   this->joints[0]->SetAttribute("suspension_cfm", 0, 0.04);
@@ -112,7 +135,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->frontPower = _sdf->GetValueDouble("front_power");
   this->rearPower = _sdf->GetValueDouble("rear_power");
 
-  this->connections.push_back(event::Events::ConnectWorldUpdateStart(
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());
@@ -128,7 +151,7 @@ void VehiclePlugin::Init()
   this->chassis = this->joints[0]->GetParent();
 
   // This assumes that the largest dimension of the wheel is the diameter
-  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+  physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
   math::Box bb = parent->GetBoundingBox();
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;

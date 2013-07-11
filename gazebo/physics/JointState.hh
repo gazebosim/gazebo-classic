@@ -43,6 +43,13 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      public: JointState(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime);
+
+      /// \brief Constructor.
+      /// \param[in] _joint Joint to get the state of.
       public: explicit JointState(JointPtr _joint);
 
       /// \brief Constructor
@@ -53,6 +60,13 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~JointState();
+
+      /// \brief Load.
+      /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      public: void Load(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       /// \param[in] _elem SDf values to load from.
@@ -99,19 +113,19 @@ namespace gazebo
       /// \param[in] _out output stream.
       /// \param[in] _state Joint state to output.
       /// \return The stream.
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::JointState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::JointState &_state)
       {
-        _out << "<joint name='" << _state.GetName() << "'>\n";
+        _out << "<joint name='" << _state.GetName() << "'>";
 
         int i = 0;
         for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
-          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>\n";
+          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
         }
 
-        _out << "</joint>\n";
+        _out << "</joint>";
 
         return _out;
       }

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
@@ -28,7 +29,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
-                     const std::string &_viewType)
+                     const std::string &_viewType, unsigned int _displayPeriod)
 : QDialog(_parent), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -45,6 +46,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
   this->topicCombo->setMinimumSize(300, 25);
+  this->topicCombo->setObjectName("topicViewTopicCombo");
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
@@ -56,12 +58,12 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   // Create the Hz and bandwidth labels
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
-  QLabel *hzLabel = new QLabel("Hz: ");
+  QLabel *hzLabel = new QLabel(tr("Hz: "));
   this->hzEdit = new QLineEdit;
   this->hzEdit->setReadOnly(true);
   this->hzEdit->setFixedWidth(80);
 
-  QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+  QLabel *bandwidthLabel = new QLabel(tr("Bandwidth: "));
   this->bandwidthEdit = new QLineEdit;
   this->bandwidthEdit->setReadOnly(true);
   this->bandwidthEdit->setFixedWidth(110);
@@ -87,7 +89,9 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->layout()->setContentsMargins(8, 8, 8, 10);
   this->setSizeGripEnabled(true);
 
-  QTimer::singleShot(500, this, SLOT(Update()));
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(_displayPeriod);
 
   this->setWindowFlags(Qt::Window);
 }
@@ -106,47 +110,62 @@ void TopicView::Update()
   // Update the child class.
   this->UpdateImpl();
 
-  // Update the Hz output
-  {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(2) << this->hz;
-    this->hzEdit->setText(tr(stream.str().c_str()));
-  }
+  common::Time currTime = common::Time::GetWallTime();
 
-  // Update the Bandwidth output
+  if (currTime - this->prevDisplayTime >= common::Time(0, 500000000))
   {
-    std::ostringstream stream;
-
-    // Sum up the byte information
-    int sumBytes = 0;
-    for (std::list<int>::iterator iter = this->msgSizes.begin();
-        iter != this->msgSizes.end(); ++iter)
+    // Update the Hz output
     {
-      sumBytes += *iter;
+      common::Time avg;
+      for (std::list<common::Time>::iterator iter = this->dataTimes.begin();
+          iter != this->dataTimes.end(); ++iter)
+      {
+        avg += (*iter);
+      }
+
+      double avgDbl = 0;
+      if (this->dataTimes.size() != 0)
+        avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
+
+      std::ostringstream stream;
+      stream << std::fixed << std::setprecision(2) << avgDbl;
+      this->hzEdit->setText(tr(stream.str().c_str()));
     }
 
-    // Compute the bandwidth
-    common::Time dt = this->times.back() - this->times.front();
-    double bandwidth = 0;
+    // Update the Bandwidth output
+    {
+      std::ostringstream stream;
 
-    if (dt != common::Time(0, 0))
-      bandwidth = sumBytes / dt.Double();
+      // Sum up the byte information
+      int sumBytes = 0;
+      for (std::list<int>::iterator iter = this->msgSizes.begin();
+          iter != this->msgSizes.end(); ++iter)
+      {
+        sumBytes += *iter;
+      }
 
-    // Format the bandwidth output
-    stream << std::fixed << std::setprecision(2);
+      // Compute the bandwidth
+      common::Time dt = this->times.back() - this->times.front();
+      double bandwidth = 0;
 
-    if (bandwidth < 1000)
-      stream << bandwidth << " B/s";
-    else if (bandwidth < 1000000)
-      stream << bandwidth / 1024.0f << " KB/s";
-    else
-      stream << bandwidth/1.049e6 << " MB/s";
+      if (dt != common::Time(0, 0))
+        bandwidth = sumBytes / dt.Double();
 
-    this->bandwidthEdit->setText(tr(stream.str().c_str()));
+      // Format the bandwidth output
+      stream << std::fixed << std::setprecision(2);
+
+      if (bandwidth < 1000)
+        stream << bandwidth << " B/s";
+      else if (bandwidth < 1000000)
+        stream << bandwidth / 1024.0f << " KB/s";
+      else
+        stream << bandwidth/1.049e6 << " MB/s";
+
+      this->bandwidthEdit->setText(tr(stream.str().c_str()));
+    }
+
+    this->prevDisplayTime = currTime;
   }
-
-  // Set the timer to update again.
-  QTimer::singleShot(500, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -154,7 +173,11 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 {
   // Calculate the Hz value.
   if (_dataTime != this->prevTime)
-    this->hz = 1.0 / (_dataTime - this->prevTime).Double();
+  {
+    this->dataTimes.push_back(_dataTime - this->prevTime);
+    if (this->dataTimes.size() > 10)
+      this->dataTimes.pop_front();
+  }
 
   // Store the previous time for future Hz calculations.
   this->prevTime = _dataTime;
@@ -193,7 +216,6 @@ void TopicView::SetTopic(const std::string &_topicName)
 
   this->topicCombo->SetMsgTypeName(this->msgTypeName);
 
-  this->hz = 0.0;
   this->msgSizes.clear();
   this->times.clear();
   std::string topicName = this->node->EncodeTopicName(_topicName);
@@ -269,18 +291,31 @@ void TopicCombo::UpdateList()
   // Otherwise select all the topics to show in the combo box.
   else
   {
+    // Get all the types of viewers. The contents of the vector are message
+    // types.
+    std::vector<std::string> viewTypes;
+    ViewFactory::GetViewTypes(viewTypes);
+
     std::map<std::string, std::list<std::string> > allTopics;
     allTopics = transport::getAdvertisedTopics();
 
     for (std::map<std::string, std::list<std::string> >::iterator
          iter = allTopics.begin(); iter != allTopics.end(); ++iter)
     {
+      // If the topic's message type matches one of the available view types
+      // via the ViewFactory, then skip. We only want to show topics that
+      // don't have a specialized viewer.
+      if (std::find(viewTypes.begin(), viewTypes.end(), iter->first) !=
+          viewTypes.end())
+      {
+        continue;
+      }
+
       // Add all the topic names
       for (std::list<std::string>::iterator topicIter = iter->second.begin();
            topicIter != iter->second.end(); ++topicIter)
       {
-        if ((*topicIter).find("__dbg") == std::string::npos &&
-            std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
+        if (std::find(topics.begin(), topics.end(), *topicIter) == topics.end())
         {
           topics.push_back(*topicIter);
         }
@@ -292,9 +327,6 @@ void TopicCombo::UpdateList()
   for (std::list<std::string>::iterator iter = topics.begin();
       iter != topics.end(); ++iter)
   {
-    if ((*iter).find("__dbg") != std::string::npos)
-      continue;
-
     // Get the shorthand notation for the topic.
     std::string topicName = this->node->EncodeTopicName(*iter);
 

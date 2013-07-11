@@ -14,20 +14,20 @@
  * limitations under the License.
  *
 */
-#include <string.h>
-#include "math/Helpers.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
 
-#include "rendering/RenderEngine.hh"
 #include "ServerFixture.hh"
-
 
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
 {
+  public: void LoadEmptyOfType(const std::string &_physicsType);
 };
 
+////////////////////////////////////////////////////////////////////////
+// LoadPaused:
+// Verify that ServerFixture can load world in paused state
+// Gazebo issue #334
+////////////////////////////////////////////////////////////////////////
 TEST_F(ServerFixtureTest, LoadPaused)
 {
   // Note the second argument of Load sets the pause state
@@ -44,6 +44,76 @@ TEST_F(ServerFixtureTest, LoadPaused)
   common::Time::MSleep(900);
   gzdbg << "Check IsPaused with 1000 ms delay\n";
   EXPECT_TRUE(world->IsPaused());
+}
+
+////////////////////////////////////////////////////////////////////////
+// LoadEmptyOfType:
+// Verify that ServerFixture can load empty world with different types
+// of physics engines (issue #486)
+////////////////////////////////////////////////////////////////////////
+void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
+{
+  // Note the second argument of Load sets the pause state
+  Load("worlds/empty.world", true, _physicsType);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsType);
+}
+
+TEST_F(ServerFixtureTest, LoadODE)
+{
+  LoadEmptyOfType("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ServerFixtureTest, LoadBullet)
+{
+  LoadEmptyOfType("bullet");
+}
+#endif  // HAVE_BULLET
+
+////////////////////////////////////////////////////////////////////////
+// SpawnSDF:
+// Verify that the SpawnSDF function does not get stuck in a loop
+// Gazebo issue #530
+////////////////////////////////////////////////////////////////////////
+TEST_F(ServerFixtureTest, SpawnSDF)
+{
+  // Note the second argument of Load sets the pause state
+  Load("worlds/blank.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  EXPECT_TRUE(world->IsPaused());
+
+  std::stringstream sdfStr;
+  math::Pose pose(1, 2, 3, 0, 0, 0);
+  sdfStr << "<sdf version='" << SDF_VERSION << "'>"
+         << "<model name='box'>"
+         << "  <pose>" << pose << "</pose>"
+         << "  <link name='link'>"
+         << "    <collision name='col'>"
+         << "      <geometry>"
+         << "        <box><size>1 1 1</size></box>"
+         << "      </geometry>"
+         << "    </collision>"
+         << "    <visual name='vis'>"
+         << "      <geometry>"
+         << "        <box><size>1 1 1</size></box>"
+         << "      </geometry>"
+         << "    </visual>"
+         << "  </link>"
+         << "</model>"
+         << "</sdf>";
+  SpawnSDF(sdfStr.str());
+
+  physics::ModelPtr model;
+  model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+
+  EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
 }
 
 int main(int argc, char **argv)

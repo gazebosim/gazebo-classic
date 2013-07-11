@@ -31,6 +31,12 @@
   <file>images/door.png</file>
   <file>images/window.png</file>  
   <file>images/stairs.png</file>
-  <file>images/wall.png</file>    
+  <file>images/wall.png</file> 
+  <file>images/record.png</file>
+  <file>images/record_stop.png</file>
+  <file>images/right_arrow.png</file>
+  <file>images/left_arrow.png</file>
+  <file>images/up_arrow.png</file>
+  <file>images/screenshot.png</file>  
 </qresource>
 </RCC>

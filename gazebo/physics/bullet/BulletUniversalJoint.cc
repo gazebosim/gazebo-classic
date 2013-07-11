@@ -19,11 +19,13 @@
  * Date: 24 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletUniversalJoint.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,7 +34,9 @@ using namespace physics;
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  this->bulletWorld = _world;
+  this->bulletUniversal = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -46,9 +50,9 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   UniversalJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
@@ -57,20 +61,21 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 axis1 = axisElem->GetValueVector3("xyz");
   math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
 
-  this->btUniversal = new btUniversalConstraint(
+  this->bulletUniversal = new btUniversalConstraint(
       *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
       btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
       btVector3(axis1.x, axis1.y, axis1.z),
       btVector3(axis2.x, axis2.y, axis2.z));
 
-  this->constraint = this->btUniversal;
+  this->constraint = this->bulletUniversal;
 
   // Add the joint to the world
-  this->world->addConstraint(this->btUniversal, true);
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  this->bulletWorld->addConstraint(this->bulletUniversal, true);
 
   // Allows access to impulse
-  this->btUniversal->enableFeedback(true);
+  this->bulletUniversal->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
@@ -89,7 +94,7 @@ void BulletUniversalJoint::SetAnchor(int /*_index*/,
 //////////////////////////////////////////////////
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
-  btVector3 axis = this->btUniversal->getAxis(_index);
+  btVector3 axis = this->bulletUniversal->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
@@ -110,9 +115,9 @@ void BulletUniversalJoint::SetAxis(int /*_index*/,
 math::Angle BulletUniversalJoint::GetAngle(int _index) const
 {
   if (_index == 0)
-    return this->btUniversal->getAngle1();
+    return this->bulletUniversal->getAngle1();
   else
-    return this->btUniversal->getAngle2();
+    return this->bulletUniversal->getAngle2();
 }
 
 //////////////////////////////////////////////////
@@ -150,13 +155,13 @@ double BulletUniversalJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
-  if (this->btUniversal)
+  if (this->bulletUniversal)
   {
     if (_index == 0)
-      this->btUniversal->setUpperLimit(
+      this->bulletUniversal->setUpperLimit(
         _angle.Radian(), this->GetHighStop(1).Radian());
     else
-      this->btUniversal->setUpperLimit(
+      this->bulletUniversal->setUpperLimit(
         this->GetHighStop(0).Radian(), _angle.Radian());
   }
   else
@@ -166,13 +171,13 @@ void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
-  if (this->btUniversal)
+  if (this->bulletUniversal)
   {
     if (_index == 0)
-      this->btUniversal->setLowerLimit(
+      this->bulletUniversal->setLowerLimit(
         _angle.Radian(), this->GetLowStop(1).Radian());
     else
-      this->btUniversal->setUpperLimit(
+      this->bulletUniversal->setUpperLimit(
         this->GetLowStop(0).Radian(), _angle.Radian());
   }
   else
@@ -184,10 +189,10 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
 {
   math::Angle result;
 
-  if (this->btUniversal)
+  if (this->bulletUniversal)
   {
     btRotationalLimitMotor *motor;
-    motor = this->btUniversal->getRotationalLimitMotor(_index);
+    motor = this->bulletUniversal->getRotationalLimitMotor(_index);
     result = motor->m_hiLimit;
   }
   else
@@ -201,10 +206,10 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
 {
   math::Angle result;
 
-  if (this->btUniversal)
+  if (this->bulletUniversal)
   {
     btRotationalLimitMotor *motor;
-    motor = this->btUniversal->getRotationalLimitMotor(_index);
+    motor = this->bulletUniversal->getRotationalLimitMotor(_index);
     result = motor->m_loLimit;
   }
   else

@@ -63,6 +63,9 @@ TextView::TextView(QWidget *_parent, const std::string &_msgType)
   frameLayout->addWidget(this->msgList);
   frameLayout->addLayout(controlLayout);
 
+  connect(this, SIGNAL(AddMsg(QString)), this, SLOT(OnAddMsg(QString)),
+          Qt::QueuedConnection);
+
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
   // }
@@ -106,6 +109,7 @@ void TextView::OnText(const std::string &_msg)
 {
   if (this->paused)
     return;
+
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Update the Hz and Bandwidth info.
@@ -114,9 +118,17 @@ void TextView::OnText(const std::string &_msg)
   // Convert the raw data to a message.
   this->msg->ParseFromString(_msg);
 
+  // Signal to add message to the gui list.
+  this->AddMsg(QString::fromStdString(this->msg->DebugString()));
+}
+
+/////////////////////////////////////////////////
+void TextView::OnAddMsg(QString _msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Create a new list item.
-  QListWidgetItem *item = new QListWidgetItem(
-      QString::fromStdString(msg->DebugString()));
+  QListWidgetItem *item = new QListWidgetItem(_msg);
 
   // Add the new text to the output view.
   this->msgList->addItem(item);

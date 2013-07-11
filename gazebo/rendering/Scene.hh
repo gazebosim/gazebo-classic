@@ -24,15 +24,15 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "rendering/RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace SkyX
 {
@@ -75,6 +75,13 @@ namespace gazebo
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class Scene : public boost::enable_shared_from_this<Scene>
     {
+      public: enum SkyXMode {
+        GZ_SKYX_ALL = 0x0FFFFFFF,
+        GZ_SKYX_CLOUDS = 0x0000001,
+        GZ_SKYX_MOON = 0x0000002,
+        GZ_SKYX_NONE = 0
+      };
+
       /// \brief Constructor.
       private: Scene() {}
 
@@ -156,7 +163,7 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new camera.
-     public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
+      public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
                                                bool _autoRender = true);
 
       /// \brief Create laser that generates data from rendering.
@@ -164,8 +171,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-      //                                   bool _autoRender = true);
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+                                         bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -199,6 +206,10 @@ namespace gazebo
       /// \return Pointer to the UserCamera, or NULL if the index was
       /// invalid.
       public: UserCameraPtr GetUserCamera(uint32_t _index) const;
+
+      /// \brief Remove a camera from the scene
+      /// \param[in] _name Name of the camera.
+      public: void RemoveCamera(const std::string &_name);
 
       /// \brief Get a light by name.
       /// \param[in] _name Name of the light to get.
@@ -367,6 +378,10 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable wireframe for all visuals.
+      /// \param[in] _show True to enable wireframe for all visuals.
+      public: void SetWireframe(bool _show);
+
       /// \brief Enable or disable transparency for all visuals.
       /// \param[in] _show True to enable transparency for all visuals.
       public: void SetTransparent(bool _show);
@@ -386,6 +401,31 @@ namespace gazebo
       /// \brief Enable or disable contact visualization.
       /// \param[in] _show True to enable contact visualization.
       public: void ShowContacts(bool _show);
+
+      /// \brief Display clouds in the sky.
+      /// \param[in] _show True to display clouds.
+      public: void ShowClouds(bool _show);
+
+      /// \brief Get whether or not clouds are displayed.
+      /// \return True if clouds are displayed.
+      public: bool GetShowClouds() const;
+
+
+      /// \brief Set SkyX mode to enable/disable skyx components such as
+      /// clouds and moon.
+      /// \param[in] _mode SkyX mode bitmask.
+      /// \sa Scene::SkyXMode
+      public: void SetSkyXMode(unsigned int _mode);
+
+      /// \brief Return true if the Scene has been initialized.
+      public: bool GetInitialized() const;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -459,7 +499,7 @@ namespace gazebo
 
       /// \brief Proces a scene message.
       /// \param[in] _msg The message data.
-      private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
@@ -483,7 +523,7 @@ namespace gazebo
 
       /// \brief Process a light message.
       /// \param[in] _msg The message data.
-      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
@@ -503,7 +543,7 @@ namespace gazebo
 
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
-      private: void OnPoseMsg(ConstPose_VPtr &_msg);
+      private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
@@ -731,6 +771,20 @@ namespace gazebo
 
       /// \brief True when all objects should be transparent.
       private: bool transparent;
+
+      /// \brief True when all objects should be wireframe.
+      private: bool wireframe;
+
+      /// \brief Initialized.
+      private: bool initialized;
+
+      /// \brief SimTime of this Scene, as we receive PosesStamped from
+      /// the world, we update this time accordingly.
+      private: common::Time sceneSimTimePosesReceived;
+
+      /// \brief SimTime of this Scene, after applying PosesStamped to
+      /// scene, we update this time accordingly.
+      private: common::Time sceneSimTimePosesApplied;
     };
     /// \}
   }

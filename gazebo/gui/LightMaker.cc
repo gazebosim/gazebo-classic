@@ -18,14 +18,14 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -58,6 +58,8 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
+  if (this->lightTypename == "directional")
+    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
 
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;

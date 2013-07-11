@@ -33,7 +33,7 @@ ForceTorquePlugin::ForceTorquePlugin()
 /////////////////////////////////////////////////
 ForceTorquePlugin::~ForceTorquePlugin()
 {
-  event::Events::DisconnectWorldUpdateStart(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 /////////////////////////////////////////////////
@@ -50,12 +50,12 @@ void ForceTorquePlugin::Load(physics::ModelPtr _parent,
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&ForceTorquePlugin::UpdateStates, this));
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&ForceTorquePlugin::UpdateStates, this, _1));
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::UpdateStates()
+void ForceTorquePlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
   common::Time cur_time = this->world->GetSimTime();
 
@@ -67,7 +67,7 @@ void ForceTorquePlugin::UpdateStates()
     if (i < 2)
       this->joints[i]->SetForce(0, 1.0);
 
-    physics::JointWrench jw = this->joints[i]->GetForceTorque(0);
+    physics::JointWrench jw = this->joints[i]->GetForceTorque(0u);
     gzdbg << "model [" << this->model->GetName()
           << "] joint [" << this->joints[i]->GetName()
           << "] b1f [" << jw.body1Force

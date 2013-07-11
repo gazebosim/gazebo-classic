@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "common/Exception.hh"
-#include "msgs/msgs.hh"
-#include "physics/MultiRayShape.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/MultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -80,10 +80,10 @@ void MultiRayShape::Init()
 
   this->offset = this->collisionParent->GetRelativePose();
 
-  // Create and array of ray collisions
-  for (unsigned int j = 0; j < (unsigned int)vertSamples; j++)
+  // Create an array of ray collisions
+  for (unsigned int j = 0; j < (unsigned int)vertSamples; ++j)
   {
-    for (unsigned int i = 0; i < (unsigned int)horzSamples; i++)
+    for (unsigned int i = 0; i < (unsigned int)horzSamples; ++i)
     {
       yawAngle = (horzSamples == 1) ? 0 :
         i * yDiff / (horzSamples - 1) + horzMinAngle;
@@ -113,7 +113,8 @@ double MultiRayShape::GetRange(int _index)
     gzthrow(stream.str());
   }
 
-  return this->rays[_index]->GetLength();
+  // Add min range, because we measured from min range.
+  return this->GetMinRange() + this->rays[_index]->GetLength();
 }
 
 //////////////////////////////////////////////////
@@ -147,14 +148,15 @@ int MultiRayShape::GetFiducial(int _index)
 //////////////////////////////////////////////////
 void MultiRayShape::Update()
 {
-  double maxRange = this->rangeElem->GetValueDouble("max");
+  // The measurable range is (max-min)
+  double fullRange = this->GetMaxRange() - this->GetMinRange();
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   unsigned int ray_size = this->rays.size();
   for (unsigned int i = 0; i < ray_size; i++)
   {
-    this->rays[i]->SetLength(maxRange);
+    this->rays[i]->SetLength(fullRange);
     this->rays[i]->SetRetro(0.0);
 
     // Get the global points of the line

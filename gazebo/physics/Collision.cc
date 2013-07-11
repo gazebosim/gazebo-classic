@@ -21,32 +21,32 @@
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "physics/Contact.hh"
-#include "physics/Shape.hh"
-#include "physics/BoxShape.hh"
-#include "physics/CylinderShape.hh"
-#include "physics/TrimeshShape.hh"
-#include "physics/SphereShape.hh"
-#include "physics/HeightmapShape.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/SphereShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link)
+    : Entity(_link), maxContacts(0)
 {
   this->AddType(Base::COLLISION);
 
@@ -82,6 +82,12 @@ void Collision::Fini()
 void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
+
+  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->SetMaxContacts(this->maxContacts);
+
+  if (this->sdf->HasElement("laser_retro"))
+    this->SetLaserRetro(this->sdf->GetElement("laser_retro")->GetValueDouble());
 
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
 
@@ -346,60 +352,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.mutable_material()->mutable_script()->set_name(
       "Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
-
-  if (this->shape->HasType(BOX_SHAPE))
-  {
-    BoxShape *box = static_cast<BoxShape*>(this->shape.get());
-    geom->set_type(msgs::Geometry::BOX);
-    math::Vector3 size = box->GetSize();
-    msgs::Set(geom->mutable_box()->mutable_size(), size);
-  }
-  else if (this->shape->HasType(CYLINDER_SHAPE))
-  {
-    CylinderShape *cyl = static_cast<CylinderShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
-    geom->mutable_cylinder()->set_radius(cyl->GetRadius());
-    geom->mutable_cylinder()->set_length(cyl->GetLength());
-  }
-
-  else if (this->shape->HasType(SPHERE_SHAPE))
-  {
-    SphereShape *sph = static_cast<SphereShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
-    geom->mutable_sphere()->set_radius(sph->GetRadius());
-  }
-
-  else if (this->shape->HasType(HEIGHTMAP_SHAPE))
-  {
-    HeightmapShape *hgt = static_cast<HeightmapShape*>(this->shape.get());
-    geom->set_type(msgs::Geometry::HEIGHTMAP);
-
-    msgs::Set(geom->mutable_heightmap()->mutable_image(),
-              common::Image(hgt->GetURI()));
-    msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
-    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetPos());
-  }
-
-  else if (this->shape->HasType(MAP_SHAPE))
-  {
-    msg.mutable_geometry()->set_type(msgs::Geometry::IMAGE);
-  }
-
-  else if (this->shape->HasType(PLANE_SHAPE))
-  {
-    msg.mutable_geometry()->set_type(msgs::Geometry::PLANE);
-  }
-  else if (this->shape->HasType(TRIMESH_SHAPE))
-  {
-    TrimeshShape *msh = static_cast<TrimeshShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
-    math::Vector3 size = msh->GetSize();
-    msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
-    geom->mutable_mesh()->set_filename(msh->GetFilename());
-  }
-  else
-    gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
-
+  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
 
   return msg;
 }
@@ -414,4 +367,17 @@ CollisionState Collision::GetState()
 void Collision::SetState(const CollisionState &_state)
 {
   this->SetRelativePose(_state.GetPose());
+}
+
+/////////////////////////////////////////////////
+void Collision::SetMaxContacts(double _maxContacts)
+{
+  this->maxContacts = static_cast<int>(_maxContacts);
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+int Collision::GetMaxContacts()
+{
+  return this->maxContacts;
 }

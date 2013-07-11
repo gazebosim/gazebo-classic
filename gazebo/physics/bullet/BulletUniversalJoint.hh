@@ -22,9 +22,9 @@
 #ifndef _BULLETUNIVERSALJOINT_HH_
 #define _BULLETUNIVERSALJOINT_HH_
 
-#include "physics/UniversalJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/UniversalJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btUniversalConstraint;
 
@@ -99,7 +99,8 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btUniversalConstraint *btUniversal;
+      /// \brief Pointer to bullet universal constraint
+      private: btUniversalConstraint *bulletUniversal;
     };
 
     /// \}

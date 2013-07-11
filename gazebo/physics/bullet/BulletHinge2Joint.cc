@@ -19,13 +19,14 @@
  * Date: 21 May 2003
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletHinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -34,7 +35,9 @@ using namespace physics;
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
     : Hinge2Joint<BulletJoint>(_parent)
 {
-  this->world = _world;
+  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  this->bulletWorld = _world;
+  this->bulletHinge2 = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -54,9 +57,9 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
@@ -71,15 +74,16 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   btVector3 baxis1(axis1.x, axis1.y, axis1.z);
   btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 
-  this->btHinge2 = new btHinge2Constraint(
+  this->bulletHinge2 = new btHinge2Constraint(
       *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
       banchor, baxis1, baxis2);
 
-  this->constraint = this->btHinge2;
+  this->constraint = this->bulletHinge2;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint, true);
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  this->bulletWorld->addConstraint(this->constraint, true);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
@@ -94,14 +98,14 @@ math::Vector3 BulletHinge2Joint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 {
-  btVector3 vec = this->btHinge2->getAxis1();
+  btVector3 vec = this->bulletHinge2->getAxis1();
   return math::Vector3(vec.getX(), vec.getY(), vec.getZ());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetAngle(int /*_index*/) const
 {
-  return this->btHinge2->getAngle1();
+  return this->bulletHinge2->getAngle1();
 }
 
 //////////////////////////////////////////////////
@@ -162,20 +166,20 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btHinge2->setUpperLimit(_angle.Radian());
+  this->bulletHinge2->setUpperLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btHinge2->setLowerLimit(_angle.Radian());
+  this->bulletHinge2->setLowerLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    this->btHinge2->getRotationalLimitMotor(_index);
+    this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -187,7 +191,7 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    this->btHinge2->getRotationalLimitMotor(_index);
+    this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 

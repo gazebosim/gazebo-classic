@@ -25,6 +25,7 @@
 #include <string>
 
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -67,29 +68,61 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
+      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \return Type of the physics engine.
+      public: virtual std::string GetType() const = 0;
+
       /// \brief Set the random number seed for the physics engine.
       /// \param[in] _seed The random number seed.
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(uint32_t _seed) = 0;
 
       /// \brief Set the simulation update rate.
+      /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
       /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value);
+      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation update rate.
+      /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
       /// \return Update rate.
-      public: double GetUpdateRate();
+      public: double GetUpdateRate() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
 
       /// \brief Set the simulation step time.
+      /// This funciton is deprecated, use World::SetMaxStepSize.
       /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) = 0;
+      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the simulation step time.
+      /// This funciton is deprecated, use World::GetMaxStepSize.
       /// \return Simulation step time.
-      public: virtual double GetStepTime() = 0;
+      public: virtual double GetStepTime() GAZEBO_DEPRECATED(1.5);
+
+      /// \brief Get target real time factor
+      /// \return Target real time factor
+      public: double GetTargetRealTimeFactor() const;
+
+      /// \brief Get real time update rate
+      /// \return Update rate
+      public: double GetRealTimeUpdateRate() const;
+
+      /// \brief Get max step size.
+      /// \return Max step size.
+      public: double GetMaxStepSize() const;
+
+      /// \brief Set target real time factor
+      /// \param[in] _factor Target real time factor
+      public: void SetTargetRealTimeFactor(double _factor);
+
+      /// \brief Set real time update rate
+      /// \param[in] _rate Update rate
+      public: void SetRealTimeUpdateRate(double _rate);
+
+      /// \brief Set max step size.
+      /// \param[in] _stepSize Max step size.
+      public: void SetMaxStepSize(double _stepSize);
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
@@ -120,7 +153,7 @@ namespace gazebo
       /// \param[in] _type Type of joint to create.
       /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
-                                           ModelPtr _parent) = 0;
+                                           ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
@@ -239,6 +272,17 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual int GetMaxContacts() {return 0;}
 
+      /// \brief Set a parameter of the physics engine
+      /// \param[in] _key String key
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(std::string _key,
+                  const boost::any &_value);
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr String key
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(std::string _key) const;
+
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 
@@ -284,9 +328,14 @@ namespace gazebo
       /// engine.
       protected: ContactManager *contactManager;
 
-      /// \brief Store the value of the updateRate parameter in double form.
-      /// To improve efficiency.
-      private: double updateRateDouble;
+      /// \brief Real time update rate.
+      protected: double realTimeUpdateRate;
+
+      /// \brief Target real time factor.
+      protected: double targetRealTimeFactor;
+
+      /// \brief Real time update rate.
+      protected: double maxStepSize;
     };
     /// \}
   }

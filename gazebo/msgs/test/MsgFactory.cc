@@ -66,13 +66,13 @@ TEST(MsgFactory, NewMsg)
   goodMsg.SerializeToString(&serializedData);
 
   gazebo::msgs::Vector3dPtr msg =
-    boost::shared_dynamic_cast<gazebo::msgs::Vector3d>(
+    boost::dynamic_pointer_cast<gazebo::msgs::Vector3d>(
         gazebo::msgs::MsgFactory::NewMsg("gazebo.msgs.Vector3d"));
 
   msg->ParseFromString(serializedData);
-  EXPECT_EQ(msg->x(), 1.1);
-  EXPECT_EQ(msg->y(), 2.2);
-  EXPECT_EQ(msg->z(), 3.3);
+  EXPECT_NEAR(msg->x(), 1.1, 1e-6);
+  EXPECT_NEAR(msg->y(), 2.2, 1e-6);
+  EXPECT_NEAR(msg->z(), 3.3, 1e-6);
 }
 
 /////////////////////////////////////////////////

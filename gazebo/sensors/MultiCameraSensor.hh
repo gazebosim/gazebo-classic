@@ -88,17 +88,25 @@ namespace gazebo
       /// \sa MultiCameraSensor::GetCameraCount
       public: bool SaveFrame(const std::vector<std::string> &_filenames);
 
-      // Documentation inherited
+      // Documentation inherited.
+      public: virtual bool IsActive();
+
+      // Documentation inherited.
       protected: virtual void UpdateImpl(bool _force);
 
-      // Documentation inherited
+      // Documentation inherited.
       protected: virtual void Fini();
 
-      /// \brief All the cameras
+      /// \brief All the cameras.
       private: std::vector<rendering::CameraPtr> cameras;
 
-      /// \brief Publishes messages of type msgs::ImagesStamped
+      /// \brief Mutex to protect the cameras list.
+      private: mutable boost::mutex cameraMutex;
+
+      /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
+
+      private: rendering::ScenePtr scene;
     };
     /// \}
   }

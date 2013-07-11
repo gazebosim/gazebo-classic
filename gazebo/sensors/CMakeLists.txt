@@ -4,6 +4,7 @@ set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
+  GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
   RaySensor.cc
@@ -19,6 +20,7 @@ set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
+  GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
   RaySensor.hh
@@ -31,10 +33,25 @@ set (headers
   SensorManager.hh
 )
 
+set (gtest_sources
+  RaySensor_TEST.cc
+  ImuSensor_TEST.cc
+  Sensor_TEST.cc
+)
+
+gz_build_tests(${gtest_sources})
+
+set (gtest_sources_dri
+  SensorManager_TEST.cc
+  GpuRaySensor_TEST.cc
+)
+
+gz_build_dri_tests(${gtest_sources_dri})
+
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(sensors_headers "sensors headers"
-    "#include \"sensors/${hdr}\"\n")
+    "#include \"gazebo/sensors/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 

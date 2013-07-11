@@ -19,12 +19,12 @@
  * Date: 21 May 2009
  */
 
-#include "common/Mesh.hh"
+#include "gazebo/common/Mesh.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletTrimeshShape.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -53,7 +53,7 @@ void BulletTrimeshShape::Init()
   TrimeshShape::Init();
 
   BulletCollisionPtr bParent =
-    boost::shared_static_cast<BulletCollision>(this->collisionParent);
+    boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
   float *vertices = NULL;
   int *indices = NULL;
@@ -92,7 +92,9 @@ void BulletTrimeshShape::Init()
     mTriMesh->addTriangle(bv0, bv1, bv2);
   }
 
-  bParent->SetCollisionShape(new btConvexTriangleMeshShape(mTriMesh, true));
+  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
+  convexShape->setMargin(0.001f);
+  bParent->SetCollisionShape(convexShape);
 
   delete [] vertices;
   delete [] indices;

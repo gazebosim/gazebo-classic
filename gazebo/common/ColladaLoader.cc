@@ -21,20 +21,20 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "math/Helpers.hh"
-#include "math/Angle.hh"
-#include "math/Vector2d.hh"
-#include "math/Vector3.hh"
-#include "math/Matrix4.hh"
-#include "math/Quaternion.hh"
-#include "common/Console.hh"
-#include "common/Material.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/ColladaLoader.hh"
-#include "common/SystemPaths.hh"
-#include "common/Exception.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -53,6 +53,9 @@ ColladaLoader::~ColladaLoader()
 //////////////////////////////////////////////////
 Mesh *ColladaLoader::Load(const std::string &_filename)
 {
+  // reset scale
+  this->meter = 1.0;
+
   TiXmlDocument xmlDoc;
 
   this->path.clear();
@@ -124,6 +127,11 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
 
   math::Matrix4 transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
+
+  if (_elem->Attribute("name"))
+  {
+    this->currentNodeName = _elem->Attribute("name");
+  }
 
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
@@ -761,8 +769,8 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     const std::string &_id)
 {
   std::string id = _id;
-  if (id.find("#") != std::string::npos)
-    id.erase(id.find("#"), 1);
+  if (id.length() > 0 && id[0] == '#')
+    id.erase(0, 1);
 
   if ((id.empty() && _parent->Value() == _name) ||
       (_parent->Attribute("id") && _parent->Attribute("id") == id) ||
@@ -849,7 +857,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadNormals(const std::string &_id,
-    const math::Matrix4 &_transform,
+    const math::Matrix4 &/*_transform*/,
     std::vector<math::Vector3> &_values)
 {
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
@@ -873,11 +881,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     math::Vector3 vec;
     iss >> vec.x >> vec.y >> vec.z;
     if (iss)
-    {
-      vec = _transform * vec;
-      vec.Normalize();
       _values.push_back(vec);
-    }
   } while (iss);
 }
 
@@ -1004,8 +1008,8 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     if (lambertXml)
     {
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
-      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
+      this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1021,9 +1025,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (phongXml)
     {
       this->LoadColorOrTexture(phongXml, "ambient", mat);
-      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       this->LoadColorOrTexture(phongXml, "emission", mat);
       this->LoadColorOrTexture(phongXml, "specular", mat);
+      this->LoadColorOrTexture(phongXml, "diffuse", mat);
       if (phongXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
@@ -1040,9 +1044,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     else if (blinnXml)
     {
       this->LoadColorOrTexture(blinnXml, "ambient", mat);
-      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       this->LoadColorOrTexture(blinnXml, "emission", mat);
       this->LoadColorOrTexture(blinnXml, "specular", mat);
+      this->LoadColorOrTexture(blinnXml, "diffuse", mat);
       if (blinnXml->FirstChildElement("shininess"))
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));
@@ -1093,7 +1097,6 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
-
     TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
     if (textureXml)
     {
@@ -1121,6 +1124,10 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
         }
       }
     }
+    else
+    {
+      imageXml = this->GetElementId("image", textureName);
+    }
 
     if (imageXml && imageXml->FirstChildElement("init_from"))
     {
@@ -1141,6 +1148,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1311,6 +1319,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   Mesh *_mesh)
 {
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1439,6 +1448,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
     Mesh *_mesh)
 {
   SubMesh *subMesh = new SubMesh;
+  subMesh->SetName(this->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
   TiXmlElement *inputXml = _xml->FirstChildElement("input");

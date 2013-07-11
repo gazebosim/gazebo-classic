@@ -22,19 +22,19 @@
 
 #include <boost/bind.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Light.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -265,8 +265,7 @@ void Light::CreateVisual()
 
     this->line->setMaterial("Gazebo/LightOn");
 
-    this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
-                                   GZ_VISIBILITY_GUI);
+    this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
     this->visual->SetVisible(true);
 

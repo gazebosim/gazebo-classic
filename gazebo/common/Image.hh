@@ -28,8 +28,8 @@
 #include <FreeImage.h>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {
@@ -70,7 +70,7 @@ namespace gazebo
       /// \brief Pixel formats enumeration
       public: enum PixelFormat
               {
-                UNKNOWN_PIXEL_FORMAT,
+                UNKNOWN_PIXEL_FORMAT = 0,
                 L_INT8,
                 L_INT16,
                 RGB_INT8,

@@ -15,14 +15,15 @@
  *
 */
 #include <boost/thread.hpp>
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "Rendering.hh"
 
 using namespace gazebo;
 
+//////////////////////////////////////////////////
 bool rendering::load()
 {
   bool result = true;
@@ -40,6 +41,7 @@ bool rendering::load()
   return result;
 }
 
+//////////////////////////////////////////////////
 bool rendering::init()
 {
   bool result = true;
@@ -58,40 +60,44 @@ bool rendering::init()
   return result;
 }
 
+//////////////////////////////////////////////////
 bool rendering::fini()
 {
   rendering::RenderEngine::Instance()->Fini();
   return true;
 }
 
+//////////////////////////////////////////////////
 rendering::ScenePtr rendering::get_scene(const std::string &_name)
 {
   return rendering::RenderEngine::Instance()->GetScene(_name);
 }
 
+//////////////////////////////////////////////////
 rendering::ScenePtr rendering::create_scene(const std::string &_name,
                                             bool _enableVisualizations)
 {
-  ScenePtr scene;
+  ScenePtr scene = get_scene(_name);
 
-  // Create a default scene for the gui
-  try
+  if (!scene)
   {
-    scene = rendering::RenderEngine::Instance()->CreateScene(_name,
-        _enableVisualizations);
-  }
-  catch(common::Exception &e)
-  {
-    gzerr << "Failed to create a scene in the Rendering engine" << e;
+    // Create a default scene for the gui
+    try
+    {
+      scene = rendering::RenderEngine::Instance()->CreateScene(_name,
+          _enableVisualizations);
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "Failed to create a scene in the Rendering engine" << e;
+    }
   }
 
   return scene;
 }
 
+//////////////////////////////////////////////////
 void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
 }
-
-
-

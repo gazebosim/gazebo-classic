@@ -27,7 +27,7 @@ using namespace rendering;
 Road2d::Road2d()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
   this->sub = this->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
 
   this->connections.push_back(
@@ -256,12 +256,28 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   float texCoord = 0.0;
 
+  // length for each texture tile, same as road width as texture is square
+  // (if texture size should change or made custom in a future version
+  // there needs to be code to handle this)
+  double texMaxLen = this->width;
+
+  // current road length
+  double curLen = 0.0;
+
   // Generate the triangles for the road
   for (unsigned int i = 0; i < this->points.size(); ++i)
   {
     factor = 1.0;
 
-    texCoord = i / static_cast<float>(this->points.size());
+    // update current road length
+    if (i > 0)
+    {
+      curLen += this->points[i].Distance(this->points[i-1]);
+    }
+
+    // assign texture coordinate as percentage of texture tile size
+    // and let ogre/opengl handle the texture wrapping
+    texCoord = curLen/texMaxLen;
 
     // Start point is a special case
     if (i == 0)

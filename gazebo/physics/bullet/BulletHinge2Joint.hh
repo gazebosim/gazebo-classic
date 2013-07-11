@@ -22,11 +22,11 @@
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/Hinge2Joint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/Hinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btHinge2Constraint;
 
@@ -104,7 +104,8 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btHinge2Constraint *btHinge2;
+      /// \brief Pointer to bullet hinge2 constraint
+      private: btHinge2Constraint *bulletHinge2;
     };
 
   /// \}

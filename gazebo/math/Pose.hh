@@ -24,8 +24,8 @@
 
 #include <iostream>
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -71,6 +71,11 @@ namespace gazebo
       /// \param[in] _rot The rotation.
       public: void Set(const Vector3 &_pos, const Quaternion &_rot);
 
+      /// \brief Set the pose from  pos and rpy vectors
+      /// \param[in] _pos The position.
+      /// \param[in] _rpy The rotation expressed as Euler angles.
+      public: void Set(const Vector3 &_pos, const Vector3 &_rpy);
+
       /// \brief Set the pose from a six tuple.
       /// \param[in] _x x position in meters.
       /// \param[in] _y y position in meters.
@@ -96,6 +101,9 @@ namespace gazebo
       public: Pose GetInverse() const;
 
       /// \brief Addition operator
+      /// A is the transform from O to P specified in frame O
+      /// B is the transform from P to Q specified in frame P
+      /// then, B + A is the transform from O to Q specified in frame O
       /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: Pose operator+(const Pose &_pose) const;
@@ -106,6 +114,8 @@ namespace gazebo
       public: const Pose &operator+=(const Pose &_pose);
 
       /// \brief Negation operator
+      /// A is the transform from O to P in frame O
+      /// then -A is transform from P to O specified in frame P
       /// \return The resulting pose
       public: inline Pose operator-() const
               {
@@ -113,6 +123,9 @@ namespace gazebo
               }
 
       /// \brief Subtraction operator
+      /// A is the transform from O to P in frame O
+      /// B is the transform from O to Q in frame O
+      /// B - A is the transform from P to Q in frame P
       /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
       public: inline Pose operator-(const Pose &_pose) const

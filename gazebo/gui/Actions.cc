@@ -15,7 +15,7 @@
  *
  */
 
-#include "gui/Actions.hh"
+#include "gazebo/gui/Actions.hh"
 
 QAction *gazebo::gui::g_arrowAct = 0;
 QAction *gazebo::gui::g_translateAct = 0;
@@ -27,16 +27,14 @@ QAction *gazebo::gui::g_saveAct = 0;
 QAction *gazebo::gui::g_saveAsAct = 0;
 QAction *gazebo::gui::g_aboutAct = 0;
 QAction *gazebo::gui::g_quitAct = 0;
+QAction *gazebo::gui::g_dataLoggerAct = 0;
+
 
 QAction *gazebo::gui::g_newModelAct = 0;
 QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
 QAction *gazebo::gui::g_editBuildingAct = 0;
-
-QAction *gazebo::gui::g_buildingEditorSaveAct = 0;
-QAction *gazebo::gui::g_buildingEditorDiscardAct = 0;
-QAction *gazebo::gui::g_buildingEditorDoneAct = 0;
-QAction *gazebo::gui::g_buildingEditorExitAct = 0;
+QAction *gazebo::gui::g_editTerrainAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
@@ -50,12 +48,15 @@ QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 QAction *gazebo::gui::g_spotLghtCreateAct = 0;
 QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
+QAction *gazebo::gui::g_screenshotAct = 0;
+
 QAction *gazebo::gui::g_showCollisionsAct = 0;
 QAction *gazebo::gui::g_showGridAct = 0;
 QAction *gazebo::gui::g_showContactsAct = 0;
 QAction *gazebo::gui::g_showJointsAct = 0;
 QAction *gazebo::gui::g_showCOMAct = 0;
 QAction *gazebo::gui::g_transparentAct = 0;
+QAction *gazebo::gui::g_viewWireframeAct = 0;
 
 QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;
@@ -63,5 +64,7 @@ QAction *gazebo::gui::g_fpsAct = 0;
 QAction *gazebo::gui::g_orbitAct = 0;
 
 QAction *gazebo::gui::g_topicVisAct = 0;
+
+QAction *gazebo::gui::g_diagnosticsAct = 0;
 
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;

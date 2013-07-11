@@ -35,16 +35,25 @@ set (headers
 set (transport_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(transport_headers "Transport Headers"
-    "#include \"transport/${hdr}\"\n")
+    "#include \"gazebo/transport/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/transport.hh )
 
 
 gz_add_library(gazebo_transport ${sources})
-target_link_libraries(gazebo_transport gazebo_common 
-                                       gazebo_msgs 
-                                       ${Boost_LIBRARIES})
+target_link_libraries(gazebo_transport
+  gazebo_common 
+  gazebo_msgs 
+  ${Boost_LIBRARIES}
+  ${TBB_LIBRARIES} 
+)
 
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
+
+# unit tests
+set (gtest_sources
+  Connection_TEST.cc
+)
+gz_build_tests(${gtest_sources})

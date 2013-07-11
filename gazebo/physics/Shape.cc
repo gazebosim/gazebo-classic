@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 using namespace gazebo;
 using namespace physics;

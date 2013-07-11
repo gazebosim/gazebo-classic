@@ -6,12 +6,15 @@ add_definitions(${QT_DEFINITIONS})
 
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
-  ${PROJECT_SOURCE_DIR}/gazebo 
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-add_subdirectory(test)
+set (test_sources 
+  gzlog_TEST.cc 
+)
+
+gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
 target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)

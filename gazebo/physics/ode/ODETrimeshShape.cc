@@ -19,13 +19,13 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -51,7 +51,7 @@ ODETrimeshShape::~ODETrimeshShape()
 void ODETrimeshShape::Update()
 {
   ODECollisionPtr ocollision =
-    boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+    boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
   /// FIXME: use below to update trimesh geometry for collision without
   // using above Ogre codes
@@ -102,19 +102,26 @@ void ODETrimeshShape::Init()
     return;
 
   ODECollisionPtr pcollision =
-    boost::shared_static_cast<ODECollision>(this->collisionParent);
+    boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   /// This will hold the vertex data of the triangle mesh
   if (this->odeData == NULL)
     this->odeData = dGeomTriMeshDataCreate();
 
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
+  unsigned int numVertices = this->submesh ? this->submesh->GetVertexCount() :
+    this->mesh->GetVertexCount();
+
+  unsigned int numIndices = this->submesh ? this->submesh->GetIndexCount() :
+    this->mesh->GetIndexCount();
+
   this->vertices = NULL;
   this->indices = NULL;
 
   // Get all the vertex and index data
-  this->mesh->FillArrays(&this->vertices, &this->indices);
+  if (!this->submesh)
+    this->mesh->FillArrays(&this->vertices, &this->indices);
+  else
+    this->submesh->FillArrays(&this->vertices, &this->indices);
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)

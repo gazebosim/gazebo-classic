@@ -11,6 +11,21 @@ execute_process(COMMAND pkg-config --modversion protobuf
   RESULT_VARIABLE protobuf_modversion_failed)
 
 ########################################
+# 1. can not use BUILD_TYPE_PROFILE is defined after include this module
+# 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
+if (CMAKE_BUILD_TYPE)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)
+  if ("${TMP_CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+    include (${gazebo_cmake_dir}/FindGooglePerfTools.cmake)
+    if (GOOGLE_PERFTOOLS_FOUND)
+      message(STATUS "Include google-perftools")
+    else()
+      BUILD_ERROR("Need google/heap-profiler.h (libgoogle-perftools-dev) tools to compile in Profile mode")
+    endif()
+  endif()
+endif()
+
+########################################
 if (PROTOBUF_VERSION LESS 2.3.0)
   BUILD_ERROR("Incorrect version: Gazebo requires protobuf version 2.3.0 or greater")
 endif()
@@ -89,7 +104,7 @@ if (PKG_CONFIG_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
       set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
     else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI" FORCE)
+      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -97,7 +112,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet)
+  pkg_check_modules(BULLET bullet>=2.81)
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
   else()
@@ -205,7 +220,6 @@ if (PKG_CONFIG_FOUND)
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
 
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
@@ -243,9 +257,13 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find urdfdom and urdfdom_headers
+  # look for the cmake modules first, and .pc pkg_config second
   find_package(urdfdom_headers QUIET)
   if (NOT urdfdom_headers_FOUND)
-    BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
+    pkg_check_modules(urdfdom_headers urdfdom_headers)
+    if (NOT urdfdom_headers_FOUND)
+      BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (urdfdom_headers_FOUND)
     set (HAVE_URDFDOM_HEADERS TRUE)
@@ -253,7 +271,10 @@ if (PKG_CONFIG_FOUND)
 
   find_package(urdfdom QUIET)
   if (NOT urdfdom_FOUND)
-    BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
+    pkg_check_modules(urdfdom urdfdom)
+    if (NOT urdfdom_FOUND)
+      BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (urdfdom_FOUND)
     set (HAVE_URDFDOM TRUE)
@@ -261,7 +282,10 @@ if (PKG_CONFIG_FOUND)
 
   find_package(console_bridge QUIET)
   if (NOT console_bridge_FOUND)
-    BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
+    pkg_check_modules(console_bridge console_bridge)
+    if (NOT console_bridge_FOUND)
+      BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
+    endif ()
   endif ()
   if (console_bridge_FOUND)
     set (HAVE_CONSOLE_BRIDGE TRUE)
@@ -480,3 +504,34 @@ if (libdl_library AND libdl_include_dir)
 else (libdl_library AND libdl_include_dir)
   SET (HAVE_DL FALSE)
 endif ()
+
+########################################
+# Find QWT (QT graphing library)
+#find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
+#  /usr/include
+#  /usr/local/include
+#  "$ENV{LIB_DIR}/include" 
+#  "$ENV{INCLUDE}" 
+#  PATH_SUFFIXES qwt-qt4 qwt qwt5
+#  )
+#
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#  /usr/lib
+#  /usr/local/lib
+#  "$ENV{LIB_DIR}/lib" 
+#  "$ENV{LIB}/lib" 
+#  )
+#
+#if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+#  set(HAVE_QWT TRUE)
+#endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+#
+#if (HAVE_QWT)
+#  if (NOT QWT_FIND_QUIETLY)
+#    message(STATUS "Found Qwt: ${QWT_LIBRARY}")
+#  endif (NOT QWT_FIND_QUIETLY)
+#else ()
+#  if (QWT_FIND_REQUIRED)
+#    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
+#  endif (QWT_FIND_REQUIRED)
+#endif ()

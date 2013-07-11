@@ -15,16 +15,16 @@
  *
 */
 
-#include "common/Console.hh"
+#include "gazebo/common/Console.hh"
 
-#include "transport/Transport.hh"
+#include "gazebo/transport/Transport.hh"
 
-#include "rendering/Rendering.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/SensorManager.hh"
-#include "sensors/Sensor.hh"
-#include "sensors/Sensors.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
 
 using namespace gazebo;
 
@@ -79,7 +79,13 @@ void sensors::remove_sensor(const std::string &_sensorName)
 /////////////////////////////////////////////////
 void sensors::run()
 {
-  sensors::SensorManager::Instance()->Run();
+  sensors::run_threads();
+}
+
+/////////////////////////////////////////////////
+void sensors::run_threads()
+{
+  sensors::SensorManager::Instance()->RunThreads();
 }
 
 /////////////////////////////////////////////////

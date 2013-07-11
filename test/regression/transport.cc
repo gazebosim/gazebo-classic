@@ -16,7 +16,6 @@
 */
 
 #include <unistd.h>
-
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -25,24 +24,10 @@ class TransportTest : public ServerFixture
 {
 };
 
-TEST_F(TransportTest, Load)
-{
-  for (unsigned int i = 0; i < 2; i++)
-  {
-    Load("worlds/empty.world");
-    Unload();
-  }
-}
-
 bool g_worldStatsMsg2 = false;
 bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
-
-std::vector<int> g_bwBytes;
-std::vector<common::Time> g_bwTime;
-
-boost::mutex g_mutex;
 
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
@@ -68,13 +53,15 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
-void BandwidthMsg(const std::string &_msg)
-{
-  boost::mutex::scoped_lock lock(g_mutex);
-  g_bwBytes.push_back(_msg.size());
-  g_bwTime.push_back(common::Time::GetWallTime());
-}
 
+TEST_F(TransportTest, Load)
+{
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    Load("worlds/empty.world");
+    Unload();
+  }
+}
 
 TEST_F(TransportTest, PubSub)
 {
@@ -95,7 +82,7 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
@@ -105,7 +92,6 @@ TEST_F(TransportTest, PubSub)
   pubs.clear();
   subs.clear();
 }
-
 
 TEST_F(TransportTest, Errors)
 {
@@ -117,9 +103,6 @@ TEST_F(TransportTest, Errors)
   transport::SubscriberPtr statsSub =
     testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
-
-  transport::SubscriberPtr statsSubDebug =
-    testNode->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
 
   // This generates a warning message
   // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
@@ -143,12 +126,6 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("~/factory",
                testNode->EncodeTopicName("/gazebo/default/factory").c_str());
 
-  msgs::Scene sceneMsg;
-  EXPECT_THROW(scenePub->Publish(sceneMsg), common::Exception);
-
-  msgs::Factory factoryMsg;
-  EXPECT_THROW(scenePub->Publish(factoryMsg), common::Exception);
-
   // Get the original URI
   char *uri = getenv("GAZEBO_MASTER_URI");
   std::string origURI = "GAZEBO_MASTER_URI=";
@@ -162,8 +139,6 @@ TEST_F(TransportTest, Errors)
     ++i;
   }
   EXPECT_LT(i, 20);
-
-
 
   putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
   std::string masterHost;
@@ -186,50 +161,6 @@ TEST_F(TransportTest, Errors)
   scenePub.reset();
   statsSub.reset();
   testNode.reset();
-}
-
-TEST_F(TransportTest, Bandwidth)
-{
-  Load("worlds/pr2.world");
-
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
-
-  std::string topic = "/gazebo/default/pose/info";
-
-  transport::SubscriberPtr sub = node->Subscribe(topic, BandwidthMsg);
-
-  while (true)
-  {
-    common::Time::MSleep(100);
-    {
-      boost::mutex::scoped_lock lock(g_mutex);
-      if (g_bwBytes.size() >= 100)
-      {
-        std::sort(g_bwBytes.begin(), g_bwBytes.end());
-
-        float sumSize = 0;
-        unsigned int count = g_bwBytes.size();
-        common::Time dt = g_bwTime[count - 1] - g_bwTime[0];
-
-        for (unsigned int i = 0; i < count; ++i)
-          sumSize += g_bwBytes[i];
-
-        float meanSize = sumSize / count;
-        float totalBw = sumSize / dt.Double();
-
-        printf("Bandwidth:\n");
-        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
-               totalBw, meanSize, count, dt.Double());
-
-        EXPECT_GT(totalBw, 1000.0);
-        g_bwBytes.clear();
-        g_bwTime.clear();
-
-        break;
-      }
-    }
-  }
 }
 
 // This test creates a child process to test interprocess communication

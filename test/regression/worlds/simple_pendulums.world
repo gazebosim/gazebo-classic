@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
   <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-25 -15 12.053900 0.000000 0.2 0.352194</pose>
+      </camera>
+    </gui>
     <scene>
       <ambient>0.5 0.5 0.5 1</ambient>
       <background>0.5 0.5 0.5 1</background>
@@ -31,12 +36,12 @@
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0</ixx>
+            <ixx>1e-1</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0</iyy>
+            <iyy>1e-1</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0</izz>
+            <izz>1e-1</izz>
           </inertia>
           <mass>5.0</mass>
         </inertial>
@@ -83,12 +88,12 @@
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0</ixx>
+            <ixx>1e-1</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0</iyy>
+            <iyy>1e-1</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0</izz>
+            <izz>1e-1</izz>
           </inertia>
           <mass>5.0</mass>
         </inertial>
@@ -143,12 +148,12 @@
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0</ixx>
+            <ixx>1e-1</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0</iyy>
+            <iyy>1e-1</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0</izz>
+            <izz>1e-1</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>
@@ -199,12 +204,12 @@
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0</ixx>
+            <ixx>1e-1</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0</iyy>
+            <iyy>1e-1</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0</izz>
+            <izz>1e-1</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>

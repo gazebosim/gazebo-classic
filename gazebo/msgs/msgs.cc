@@ -18,17 +18,17 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "math/Vector3.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Plane.hh"
-#include "math/Rand.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Rand.hh"
 
-#include "common/Common.hh"
-#include "common/Image.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -398,6 +398,142 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::MeshGeom result;
+
+      if (_sdf->GetName() != "mesh")
+      {
+        gzerr << "Cannot create a mesh message from an "
+          << _sdf->GetName() << " SDF element.\n";
+        return result;
+      }
+
+        msgs::Set(result.mutable_scale(), _sdf->GetValueVector3("scale"));
+
+        result.set_filename(_sdf->GetValueString("uri"));
+
+        if (_sdf->HasElement("submesh"))
+        {
+          sdf::ElementPtr submeshElem = _sdf->GetElement("submesh");
+          if (submeshElem->HasElement("name") &&
+              submeshElem->GetValueString("name") != "__default__")
+          {
+            result.set_submesh(submeshElem->GetValueString("name"));
+
+            if (submeshElem->HasElement("center"))
+              result.set_center_submesh(submeshElem->GetValueBool("center"));
+          }
+        }
+
+      return result;
+    }
+
+
+    /////////////////////////////////////////////////
+    msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Geometry result;
+
+      if (_sdf->GetName() != "geometry")
+      {
+        gzerr << "Cannot create a geometry message from an "
+          << _sdf->GetName() << " SDF element.\n";
+        return result;
+      }
+
+      // Load the geometry
+      sdf::ElementPtr geomElem = _sdf->GetFirstElement();
+      if (!geomElem)
+        gzthrow("Invalid geometry element");
+
+      if (geomElem->GetName() == "box")
+      {
+        result.set_type(msgs::Geometry::BOX);
+        msgs::Set(result.mutable_box()->mutable_size(),
+            geomElem->GetValueVector3("size"));
+      }
+      else if (geomElem->GetName() == "cylinder")
+      {
+        result.set_type(msgs::Geometry::CYLINDER);
+        result.mutable_cylinder()->set_radius(
+            geomElem->GetValueDouble("radius"));
+        result.mutable_cylinder()->set_length(
+            geomElem->GetValueDouble("length"));
+      }
+      else if (geomElem->GetName() == "sphere")
+      {
+        result.set_type(msgs::Geometry::SPHERE);
+        result.mutable_sphere()->set_radius(
+            geomElem->GetValueDouble("radius"));
+      }
+      else if (geomElem->GetName() == "plane")
+      {
+        result.set_type(msgs::Geometry::PLANE);
+        msgs::Set(result.mutable_plane()->mutable_normal(),
+            geomElem->GetValueVector3("normal"));
+        msgs::Set(result.mutable_plane()->mutable_size(),
+            geomElem->GetValueVector2d("size"));
+      }
+      else if (geomElem->GetName() == "image")
+      {
+        result.set_type(msgs::Geometry::IMAGE);
+        result.mutable_image()->set_scale(
+            geomElem->GetValueDouble("scale"));
+        result.mutable_image()->set_height(
+            geomElem->GetValueDouble("height"));
+        result.mutable_image()->set_uri(
+            geomElem->GetValueString("uri"));
+      }
+      else if (geomElem->GetName() == "heightmap")
+      {
+        result.set_type(msgs::Geometry::HEIGHTMAP);
+        msgs::Set(result.mutable_heightmap()->mutable_size(),
+            geomElem->GetValueVector3("size"));
+        msgs::Set(result.mutable_heightmap()->mutable_origin(),
+            geomElem->GetValueVector3("pos"));
+
+        common::Image img(geomElem->GetValueString("uri"));
+        msgs::Set(result.mutable_heightmap()->mutable_image(), img);
+
+        sdf::ElementPtr textureElem = geomElem->GetElement("texture");
+        msgs::HeightmapGeom::Texture *tex;
+        while (textureElem)
+        {
+          tex = result.mutable_heightmap()->add_texture();
+          tex->set_diffuse(textureElem->GetValueString("diffuse"));
+          tex->set_normal(textureElem->GetValueString("normal"));
+          tex->set_size(textureElem->GetValueDouble("size"));
+          textureElem = textureElem->GetNextElement("texture");
+        }
+
+        sdf::ElementPtr blendElem = geomElem->GetElement("blend");
+        msgs::HeightmapGeom::Blend *blend;
+        while (blendElem)
+        {
+          blend = result.mutable_heightmap()->add_blend();
+
+          blend->set_min_height(blendElem->GetValueDouble("min_height"));
+          blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
+          blendElem = blendElem->GetNextElement("blend");
+        }
+      }
+      else if (geomElem->GetName() == "mesh")
+      {
+        result.set_type(msgs::Geometry::MESH);
+        result.mutable_mesh()->CopyFrom(MeshFromSDF(geomElem));
+      }
+      else if (geomElem->GetName() == "empty")
+      {
+        result.set_type(msgs::Geometry::EMPTY);
+      }
+      else
+        gzthrow("Unknown geometry type\n");
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Visual result;
@@ -416,102 +552,8 @@ namespace gazebo
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
-        sdf::ElementPtr geomElem =
-          _sdf->GetElement("geometry")->GetFirstElement();
-        if (!geomElem)
-          gzthrow("Invalid geometry element");
-
-        math::Vector3 scale(1, 1, 1);
         msgs::Geometry *geomMsg = result.mutable_geometry();
-
-        if (geomElem->GetName() == "box")
-        {
-          geomMsg->set_type(msgs::Geometry::BOX);
-          msgs::Set(geomMsg->mutable_box()->mutable_size(),
-              geomElem->GetValueVector3("size"));
-        }
-        else if (geomElem->GetName() == "cylinder")
-        {
-          geomMsg->set_type(msgs::Geometry::CYLINDER);
-          geomMsg->mutable_cylinder()->set_radius(
-              geomElem->GetValueDouble("radius"));
-          geomMsg->mutable_cylinder()->set_length(
-              geomElem->GetValueDouble("length"));
-        }
-        else if (geomElem->GetName() == "sphere")
-        {
-          geomMsg->set_type(msgs::Geometry::SPHERE);
-          geomMsg->mutable_sphere()->set_radius(
-              geomElem->GetValueDouble("radius"));
-        }
-        else if (geomElem->GetName() == "plane")
-        {
-          geomMsg->set_type(msgs::Geometry::PLANE);
-          msgs::Set(geomMsg->mutable_plane()->mutable_normal(),
-                    geomElem->GetValueVector3("normal"));
-          msgs::Set(geomMsg->mutable_plane()->mutable_size(),
-                    geomElem->GetValueVector2d("size"));
-        }
-        else if (geomElem->GetName() == "image")
-        {
-          geomMsg->set_type(msgs::Geometry::IMAGE);
-          geomMsg->mutable_image()->set_scale(
-              geomElem->GetValueDouble("scale"));
-          geomMsg->mutable_image()->set_height(
-              geomElem->GetValueDouble("height"));
-          geomMsg->mutable_image()->set_uri(
-              geomElem->GetValueString("uri"));
-        }
-        else if (geomElem->GetName() == "heightmap")
-        {
-          geomMsg->set_type(msgs::Geometry::HEIGHTMAP);
-          msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
-              geomElem->GetValueVector3("size"));
-          msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
-              geomElem->GetValueVector3("pos"));
-
-          common::Image img(geomElem->GetValueString("uri"));
-          msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
-
-          sdf::ElementPtr textureElem = geomElem->GetElement("texture");
-          msgs::HeightmapGeom::Texture *tex;
-          while (textureElem)
-          {
-            tex = geomMsg->mutable_heightmap()->add_texture();
-            tex->set_diffuse(textureElem->GetValueString("diffuse"));
-            tex->set_normal(textureElem->GetValueString("normal"));
-            tex->set_size(textureElem->GetValueDouble("size"));
-            textureElem = textureElem->GetNextElement("texture");
-          }
-
-          sdf::ElementPtr blendElem = geomElem->GetElement("blend");
-          msgs::HeightmapGeom::Blend *blend;
-          while (blendElem)
-          {
-            blend = geomMsg->mutable_heightmap()->add_blend();
-
-            blend->set_min_height(blendElem->GetValueDouble("min_height"));
-            blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
-            blendElem = blendElem->GetNextElement("blend");
-          }
-        }
-        else if (geomElem->GetName() == "mesh")
-        {
-          geomMsg->set_type(msgs::Geometry::MESH);
-          msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
-              geomElem->GetValueVector3("scale"));
-
-          geomMsg->mutable_mesh()->set_filename(
-              geomElem->GetValueString("uri"));
-        }
-        else if (geomElem->GetName() == "empty")
-        {
-          geomMsg->set_type(msgs::Geometry::EMPTY);
-          // msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
-              // geomElem->GetValueVector3("scale"));
-        }
-        else
-          gzthrow("Unknown geometry type\n");
+        geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
       }
 
       /// Load the material
@@ -586,6 +628,15 @@ namespace gazebo
           plgnMsg->set_name(elem->GetValueString("name"));
         // if (elem->HasElement("filename"))
           plgnMsg->set_filename(elem->GetValueString("filename"));
+
+        std::stringstream ss;
+        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
+            innerElem;
+            innerElem = innerElem->GetNextElement(""))
+        {
+          ss << innerElem->ToString("");
+        }
+        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;

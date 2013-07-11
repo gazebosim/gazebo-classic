@@ -60,6 +60,13 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
+  state = new ViewState(this, "set_wireframe", "set_solid");
+  state->action = new QAction(tr("Wireframe"), this);
+  state->action->setStatusTip(tr("Wireframe mode"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
   state = new ViewState(this, "show_collision", "hide_collision");
   state->action = new QAction(tr("Collisions"), this);
   state->action->setStatusTip(tr("Show collision objects"));

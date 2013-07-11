@@ -22,8 +22,8 @@
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/ScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
 
 class btSliderConstraint;
 
@@ -59,6 +59,9 @@ namespace gazebo
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
+      /// \copydoc ScrewJoint::GetThreadPitch
+      public: virtual double GetThreadPitch(unsigned int _index);
+
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
@@ -70,9 +73,6 @@ namespace gazebo
 
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int _index);
-
-      /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngle(int _index) const;
 
       /// \brief Get the rate of change
       public: virtual double GetVelocity(int _index) const;
@@ -95,7 +95,8 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btSliderConstraint *btScrew;
+      /// \brief Pointer to bullet screw constraint
+      private: btSliderConstraint *bulletScrew;
     };
     /// \}
   }

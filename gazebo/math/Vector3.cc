@@ -19,13 +19,17 @@
  * Date: 4 Apr 2007
  */
 
-#include "math/Helpers.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace math;
 
 const Vector3 Vector3::Zero = math::Vector3(0, 0, 0);
+const Vector3 Vector3::One = math::Vector3(1, 1, 1);
+const Vector3 Vector3::UnitX = math::Vector3(1, 0, 0);
+const Vector3 Vector3::UnitY = math::Vector3(0, 1, 0);
+const Vector3 Vector3::UnitZ = math::Vector3(0, 0, 1);
 
 //////////////////////////////////////////////////
 Vector3::Vector3()

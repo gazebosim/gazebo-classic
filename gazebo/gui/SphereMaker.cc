@@ -16,16 +16,16 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/SphereMaker.hh"
+#include "gazebo/gui/SphereMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -157,8 +157,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 std::string SphereMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
-
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='unit_sphere_" << counter << "'>"
     << "  <pose>0 0 0.5 0 0 0</pose>"
     << "  <link name='link'>"

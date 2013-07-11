@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <gazebo_config.h>
+#include <gazebo/gazebo_config.h>
 #ifdef HAVE_DL
 #include <dlfcn.h>
 #elif HAVE_LTDL
@@ -31,15 +31,15 @@
 #include <list>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -116,10 +116,10 @@ namespace gazebo
               if (!found)
                 fullname = _filename;
 
+#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
-#ifdef HAVE_DL
               void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
               if (!handle)
               {
@@ -141,6 +141,8 @@ namespace gazebo
               result.reset(registerFunc.func());
 
 #elif HAVE_LTDL
+              fptr_union_t registerFunc;
+              std::string registerName = "RegisterPlugin";
 
               static bool init_done = false;
 

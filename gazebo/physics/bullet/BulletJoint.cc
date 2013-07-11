@@ -19,12 +19,12 @@
  * Date: 15 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -34,14 +34,14 @@ BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->constraint = NULL;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
-  this->world = NULL;
+  this->bulletWorld = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -67,10 +67,10 @@ LinkPtr BulletJoint::GetJointLink(int _index) const
   if (_index == 0 || _index == 1)
   {
     BulletLinkPtr bulletLink1 =
-      boost::shared_static_cast<BulletLink>(this->childLink);
+      boost::static_pointer_cast<BulletLink>(this->childLink);
 
     BulletLinkPtr bulletLink2 =
-      boost::shared_static_cast<BulletLink>(this->parentLink);
+      boost::static_pointer_cast<BulletLink>(this->parentLink);
 
     btRigidBody rigidLink = this->constraint->getRigidBodyA();
 
@@ -97,12 +97,19 @@ void BulletJoint::Detach()
 {
   this->childLink.reset();
   this->parentLink.reset();
-
+  if (this->constraint && this->bulletWorld)
+    this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
 }
 
 //////////////////////////////////////////////////
-JointWrench BulletJoint::GetForceTorque(int /*_index*/)
+JointWrench BulletJoint::GetForceTorque(int _index)
+{
+  return this->GetForceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
   return wrench;

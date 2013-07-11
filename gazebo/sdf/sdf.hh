@@ -18,9 +18,9 @@
 #ifndef _SDF_HH_
 #define _SDF_HH_
 
-#include "sdf/interface/SDF.hh"
-#include "sdf/interface/Param.hh"
-#include "sdf/interface/parser.hh"
-#include "sdf/interface/Converter.hh"
+#include "gazebo/sdf/interface/SDF.hh"
+#include "gazebo/sdf/interface/Param.hh"
+#include "gazebo/sdf/interface/parser.hh"
+#include "gazebo/sdf/interface/Converter.hh"
 
 #endif

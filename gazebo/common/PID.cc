@@ -18,7 +18,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 #include "PID.hh"
 
 using namespace gazebo;
@@ -103,8 +103,6 @@ void PID::Reset()
   this->iErr = 0.0;
   this->dErr = 0.0;
   this->cmd = 0.0;
-  this->cmdMax = 0.0;
-  this->cmdMin = 0.0;
 }
 
 /////////////////////////////////////////////////

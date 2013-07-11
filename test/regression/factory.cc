@@ -15,22 +15,60 @@
  *
 */
 #include <string.h>
-#include "math/Helpers.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/Camera.hh"
-#include "sensors/Sensors.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
-
 
 using namespace gazebo;
 class FactoryTest : public ServerFixture
 {
 };
+
+///////////////////////////////////////////////////
+// Verify that sdf is retained by entities spawned
+// via factory messages. A change between 1.6, 1.7
+// caused entities to lose their sdf data
+// (see issue #651)
+TEST_F(FactoryTest, BoxSdf)
+{
+  math::Pose setPose, testPose;
+  Load("worlds/empty.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  unsigned int entityCount = 6;
+
+  for (unsigned int i = 0; i < entityCount; ++i)
+  {
+    std::ostringstream name;
+    name << "test_box_" << i;
+    setPose.Set(math::Vector3(0, 0, i+0.5), math::Quaternion(0, 0, 0));
+    SpawnBox(name.str(), math::Vector3(1, 1, 1), setPose.pos,
+        setPose.rot.GetAsEuler());
+  }
+
+  // This loop must be separate from the previous loop to cause
+  // the failure.
+  for (unsigned int i = 0; i < entityCount; ++i)
+  {
+    std::ostringstream name;
+    name << "test_box_" << i;
+
+    physics::ModelPtr model = world->GetModel(name.str());
+    ASSERT_TRUE(model != NULL);
+    msgs::Model msg;
+    model->FillMsg(msg);
+    EXPECT_TRUE(msg.has_pose());
+    // gzerr << msg.DebugString() << '\n';
+  }
+}
 
 TEST_F(FactoryTest, Box)
 {

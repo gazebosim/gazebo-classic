@@ -26,7 +26,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/model_editor/BuildingEditorWidget.hh"
+#include "gazebo/gui/building/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -73,6 +73,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_pointLghtCreateAct);
   toolbar->addAction(g_spotLghtCreateAct);
   toolbar->addAction(g_dirLghtCreateAct);
+  toolbar->addSeparator();
+  toolbar->addAction(g_screenshotAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);
@@ -86,36 +88,68 @@ RenderWidget::RenderWidget(QWidget *_parent)
       QSizePolicy::Expanding);
   this->buildingEditorWidget->hide();
 
-  this->viewOnlyLabel = new QLabel("Building is View Only", this->glWidget);
-  this->viewOnlyLabel->resize(
-      viewOnlyLabel->fontMetrics().width(this->viewOnlyLabel->text()),
-      viewOnlyLabel->fontMetrics().height());
-  this->viewOnlyLabel->setStyleSheet(
+  this->msgOverlayLabel = new QLabel(this->glWidget);
+  this->msgOverlayLabel->setStyleSheet(
       "QLabel { background-color : white; color : gray; }");
-  this->viewOnlyLabel->setVisible(false);
+  this->msgOverlayLabel->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
   TimePanel *timePanel = new TimePanel(this);
-
-  QHBoxLayout *playControlLayout = new QHBoxLayout;
-  playControlLayout->setContentsMargins(0, 0, 0, 0);
 
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
+  QSpinBox *stepSpinBox = new QSpinBox;
+  stepSpinBox->setRange(1, 9999);
+  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
+      SLOT(OnStepValueChanged(int)));
+
+  QWidget *stepWidget = new QWidget;
+  QLabel *stepLabel = new QLabel(tr("Steps:"));
+  QVBoxLayout *stepLayout = new QVBoxLayout;
+  stepLayout->addWidget(stepLabel);
+  stepLayout->addWidget(stepSpinBox);
+  stepWidget->setLayout(stepLayout);
+
+  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
+
+  QMenu *stepMenu = new QMenu;
+  this->stepButton = new QToolButton;
+  this->stepButton->setMaximumSize(35, stepButton->height());
+  QWidgetAction *stepAction = new QWidgetAction(stepMenu);
+  stepAction->setDefaultWidget(stepWidget);
+  stepMenu->addAction(stepAction);
+  this->stepButton->setMenu(stepMenu);
+  this->stepButton->setPopupMode(QToolButton::InstantPopup);
+  this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+  this->stepButton->setContentsMargins(0, 0, 0, 0);
+  this->OnStepValueChanged(1);
+
+  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
+      SLOT(hide()));
+
   QFrame *playFrame = new QFrame;
-  QToolBar *playToolbar = new QToolBar;
   playFrame->setFrameShape(QFrame::NoFrame);
   playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   playFrame->setFixedHeight(25);
+  QToolBar *playToolbar = new QToolBar;
   playToolbar->addAction(g_playAct);
   playToolbar->addAction(g_pauseAct);
+
+  QLabel *emptyLabel = new QLabel(tr("  "));
+  playToolbar->addWidget(emptyLabel);
   playToolbar->addAction(g_stepAct);
-  playControlLayout->addWidget(playToolbar);
+  playToolbar->addWidget(stepToolBarLabel);
+  playToolbar->addWidget(this->stepButton);
+
+  QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
+  playControlLayout->addWidget(playToolbar);
+  playControlLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
+                             QSizePolicy::Minimum));
   playFrame->setLayout(playControlLayout);
 
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
@@ -191,7 +225,7 @@ void RenderWidget::update()
 
   rendering::UserCameraPtr cam = this->glWidget->GetCamera();
 
-  if (!cam || !cam->IsInitialized())
+  if (!cam || !cam->GetInitialized())
   {
     event::Events::preRender();
     return;
@@ -247,13 +281,15 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->buildingEditorWidget->show();
-    this->viewOnlyLabel->setVisible(true);
+    this->baseOverlayMsg = "Building is View Only";
+    this->OnClearOverlayMsg();
     this->bottomFrame->hide();
   }
   else
   {
     this->buildingEditorWidget->hide();
-    this->viewOnlyLabel->setVisible(false);
+    this->baseOverlayMsg = "";
+    this->OnClearOverlayMsg();
     this->bottomFrame->show();
   }
 }
@@ -270,4 +306,50 @@ void RenderWidget::CreateScene(const std::string &_name)
 {
   this->create = true;
   this->createName = _name;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
+{
+  std::string msg = this->baseOverlayMsg.empty() ? _msg
+      : this->baseOverlayMsg + "\n" + _msg;
+  this->msgOverlayLabel->setText(tr(msg.c_str()));
+  if (msg.empty())
+  {
+    this->msgOverlayLabel->setVisible(false);
+    return;
+  }
+  this->msgOverlayLabel->resize(
+      this->msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
+      this->msgOverlayLabel->fontMetrics().height());
+  this->msgOverlayLabel->setVisible(true);
+
+  if (_duration > 0)
+    QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
+}
+
+/////////////////////////////////////////////////
+std::string RenderWidget::GetOverlayMsg() const
+{
+  return this->msgOverlayLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::OnClearOverlayMsg()
+{
+  this->DisplayOverlayMsg("");
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::OnStepValueChanged(int _value)
+{
+  // text formating and resizing for better presentation
+  std::string numStr = QString::number(_value).toStdString();
+  QFont stepFont = this->stepButton->font();
+  stepFont.setPointSizeF(11 - numStr.size()/2.0);
+  this->stepButton->setFont(stepFont);
+  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
+  this->stepButton->setText(tr(numStr.c_str()));
+
+  emit gui::Events::inputStepSize(_value);
 }

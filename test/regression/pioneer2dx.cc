@@ -15,8 +15,8 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "common/Time.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Time.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
@@ -31,14 +31,9 @@ TEST_F(Pioneer2dx, StraightLine)
       "~/pioneer2dx/vel_cmd");
 
   int i = 0;
-  while (!this->HasEntity("pioneer2dx") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-
-  if (i > 20)
-    gzthrow("Unable to get pioneer2dx");
+  for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
+    common::Time::MSleep(500);
+  ASSERT_LT(i, 1000);
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
@@ -68,8 +63,8 @@ TEST_F(Pioneer2dx, StraightLine)
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;
-  std::cout << "DIst[" << dist << "]\n";
-  std::cout << "EnPose.x[" << endPose.pos.x << "]\n";
+  std::cout << "Dist[" << dist << "]\n";
+  std::cout << "EndPose.x[" << endPose.pos.x << "]\n";
   EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
   EXPECT_LT(fabs(endPose.pos.y), 0.5);
   EXPECT_LT(fabs(endPose.pos.z), 0.01);

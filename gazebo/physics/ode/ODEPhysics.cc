@@ -22,10 +22,12 @@
 #include <tbb/blocked_range.h>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/util/Diagnostics.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -113,7 +115,7 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), maxContacts(0)
 {
   // Collision detection init
   dInitODE2(0);
@@ -128,6 +130,10 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   this->contactGroup = dJointGroupCreate(0);
 
   this->colliders.resize(100);
+
+  // Set random seed for physics engine based on gazebo's random seed.
+  // Note: this was moved from physics::PhysicsEngine constructor.
+  this->SetSeed(math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -163,10 +169,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
+  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->SetMaxContacts(this->maxContacts);
+
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-  this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
@@ -232,9 +240,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-    physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
-    physicsMsg.set_dt(this->stepTimeDouble);
+    // min_step_size is defined but not yet used
+    physicsMsg.set_min_step_size(
+        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+    physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -244,6 +254,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
         this->GetContactMaxCorrectingVel());
     physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
+    physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -254,29 +267,24 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_dt())
-  {
-    this->SetStepTime(_msg->dt());
-  }
-
-  if (_msg->has_update_rate())
-    this->SetUpdateRate(_msg->update_rate());
-
   if (_msg->has_solver_type())
   {
     sdf::ElementPtr solverElem =
       this->sdf->GetElement("ode")->GetElement("solver");
     if (_msg->solver_type() == "quick")
     {
-      solverElem->GetAttribute("type")->Set("quick");
+      solverElem->GetElement("type")->Set("quick");
       this->physicsStepFunc = &dWorldQuickStep;
     }
     else if (_msg->solver_type() == "world")
     {
-      solverElem->GetAttribute("type")->Set("world");
+      solverElem->GetElement("type")->Set("world");
       this->physicsStepFunc = &dWorldStep;
     }
   }
+
+  if (_msg->has_precon_iters())
+    this->SetSORPGSPreconIters(_msg->precon_iters());
 
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());
@@ -302,6 +310,30 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+  else if (_msg->has_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->update_rate());
+    gzwarn <<
+        "Physics update rate is deprecated by real time update rate\n";
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+  else if (_msg->has_dt())
+  {
+    this->SetMaxStepSize(_msg->dt());
+    gzwarn << "Physics dt is deprecated by max step size\n";
+  }
+
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
 }
@@ -322,10 +354,10 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    dJointGroupEmpty(this->contactGroup);
-  }
+  DIAG_TIMER_START("ODEPhysics::UpdateCollision");
+
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  dJointGroupEmpty(this->contactGroup);
 
   unsigned int i = 0;
   this->collidersCount = 0;
@@ -337,6 +369,7 @@ void ODEPhysics::UpdateCollision()
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
+  DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
@@ -344,6 +377,7 @@ void ODEPhysics::UpdateCollision()
     this->Collide(this->colliders[i].first,
         this->colliders[i].second, this->contactCollisions);
   }
+  DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideShapes");
 
   // Generate trimesh collision.
   // This must happen in this thread sequentially
@@ -353,45 +387,57 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
+  DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
+
+  DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
+  DIAG_TIMER_START("ODEPhysics::UpdatePhysics");
+
   // need to lock, otherwise might conflict with world resetting
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
-    (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+    (*physicsStepFunc)(this->worldId, this->maxStepSize);
+
+    math::Vector3 f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
     {
+      Contact *contactFeedback = this->jointFeedbacks[i]->contact;
+      Collision *col1 = contactFeedback->collisionPtr1;
+      Collision *col2 = contactFeedback->collisionPtr2;
+
+      GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
+      GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
+
       for (int j = 0; j < this->jointFeedbacks[i]->count; ++j)
       {
-        this->jointFeedbacks[i]->contact->wrench[j].body1Force.Set(
-            this->jointFeedbacks[i]->feedbacks[j].f1[0],
-            this->jointFeedbacks[i]->feedbacks[j].f1[1],
-            this->jointFeedbacks[i]->feedbacks[j].f1[2]);
+        dJointFeedback fb = this->jointFeedbacks[i]->feedbacks[j];
+        f1.Set(fb.f1[0], fb.f1[1], fb.f1[2]);
+        f2.Set(fb.f2[0], fb.f2[1], fb.f2[2]);
+        t1.Set(fb.t1[0], fb.t1[1], fb.t1[2]);
+        t2.Set(fb.t2[0], fb.t2[1], fb.t2[2]);
 
-        this->jointFeedbacks[i]->contact->wrench[j].body2Force.Set(
-            this->jointFeedbacks[i]->feedbacks[j].f2[0],
-            this->jointFeedbacks[i]->feedbacks[j].f2[1],
-            this->jointFeedbacks[i]->feedbacks[j].f2[2]);
-
-        this->jointFeedbacks[i]->contact->wrench[j].body1Torque.Set(
-            this->jointFeedbacks[i]->feedbacks[j].t1[0],
-            this->jointFeedbacks[i]->feedbacks[j].t1[1],
-            this->jointFeedbacks[i]->feedbacks[j].t1[2]);
-
-        this->jointFeedbacks[i]->contact->wrench[j].body2Torque.Set(
-            this->jointFeedbacks[i]->feedbacks[j].t2[0],
-            this->jointFeedbacks[i]->feedbacks[j].t2[1],
-            this->jointFeedbacks[i]->feedbacks[j].t2[2]);
+        // set force torque in link frame
+        this->jointFeedbacks[i]->contact->wrench[j].body1Force =
+             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+        this->jointFeedbacks[i]->contact->wrench[j].body2Force =
+             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+        this->jointFeedbacks[i]->contact->wrench[j].body1Torque =
+             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+        this->jointFeedbacks[i]->contact->wrench[j].body2Torque =
+             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
       }
     }
   }
+
+  DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
 }
 
 //////////////////////////////////////////////////
@@ -406,21 +452,6 @@ void ODEPhysics::Reset()
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetStepTime(double _value)
-{
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetElement("dt")->Set(_value);
-
-  this->stepTimeDouble = _value;
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::GetStepTime()
-{
-  return this->stepTimeDouble;
 }
 
 //////////////////////////////////////////////////
@@ -460,7 +491,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   ODECollisionPtr collision =
-    boost::shared_dynamic_cast<ODECollision>(_collision);
+    boost::dynamic_pointer_cast<ODECollision>(_collision);
 
   if (_type == "sphere")
     shape.reset(new ODESphereShape(collision));
@@ -511,7 +542,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement("solver")->
-    GetElement("percon_iters")->Set(_iters);
+    GetElement("precon_iters")->Set(_iters);
 
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
 }
@@ -571,8 +602,8 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "max_contacts")->GetValue()->Set(_maxContacts);
+  this->maxContacts = _maxContacts;
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
@@ -628,7 +659,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetElement("max_contacts")->GetValueInt();
+  return this->maxContacts;
 }
 
 //////////////////////////////////////////////////
@@ -770,13 +801,36 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
+  // Filter collisions based on contact bitmask if collide_without_contact is
+  // on.The bitmask is set mainly for speed improvements otherwise a collision
+  // with collide_without_contact may potentially generate a large number of
+  // contacts.
+  if (_collision1->GetSurface()->collideWithoutContact ||
+      _collision2->GetSurface()->collideWithoutContact)
+  {
+    if ((_collision1->GetSurface()->collideWithoutContactBitmask &
+        _collision2->GetSurface()->collideWithoutContactBitmask) == 0)
+      return;
+  }
+
   int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
-  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
+
+  // max_contacts specified globally
+  if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
+
+  // over-ride with minimum of max_contacts from both collisions
+  if (_collision1->GetMaxContacts() >= 0 &&
+      _collision1->GetMaxContacts() < maxCollide)
+    maxCollide = _collision1->GetMaxContacts();
+
+  if (_collision2->GetMaxContacts() >= 0 &&
+      _collision2->GetMaxContacts() < maxCollide)
+    maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
@@ -822,10 +876,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
   double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
-  contact.surface.soft_erp = (this->stepTimeDouble * kp) /
-                             (this->stepTimeDouble * kp + kd);
+  contact.surface.soft_erp = (this->maxStepSize * kp) /
+                             (this->maxStepSize * kp + kd);
 
-  contact.surface.soft_cfm = 1.0 / (this->stepTimeDouble * kp + kd);
+  contact.surface.soft_cfm = 1.0 / (this->maxStepSize * kp + kd);
 
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);
@@ -833,8 +887,40 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd =
-    (_collision1->GetSurface()->fdir1 + _collision2->GetSurface()->fdir1) * 0.5;
+  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  if (fd != math::Vector3::Zero)
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = (_collision1->GetRelativePose() +
+      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+  }
+
+  /// \TODO: Better treatment when both surfaces have fdir1 specified.
+  /// Ideally, we want to use fdir1 specified by surface with
+  /// a smaller friction coefficient, but it's not clear how
+  /// that can be determined with friction pyramid approximations.
+  /// As a hack, we'll simply compare mu1 from
+  /// both surfaces for now, and use fdir1 specified by
+  /// surface with smaller mu1.
+  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+  {
+    // fdir1 is in body local frame, rotate it into world frame
+    /// \TODO: once issue #624 is fixed, switch to below:
+    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd = (_collision2->GetRelativePose() +
+      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    /// \TODO: uncomment gzlog below once we confirm it does not affect
+    /// performance
+    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    ///       _collision1->surface->mu1 > _collision2->surface->mu1)
+    ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
+    ///         << " comparing mu1 from both surfaces, and use fdir1"
+    ///         << " from surface with smaller mu1\n";
+  }
 
   if (fd != math::Vector3::Zero)
   {
@@ -927,8 +1013,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       jointFeedback->count++;
     }
 
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    // Attach the contact joint if collideWithoutContact flags aren't set.
+    if (!_collision1->GetSurface()->collideWithoutContact &&
+        !_collision2->GetSurface()->collideWithoutContact)
+      dJointAttach(contactJoint, b1, b2);
   }
 }
 
@@ -1011,4 +1099,294 @@ void ODEPhysics::DebugPrint() const
 void ODEPhysics::SetSeed(uint32_t _seed)
 {
   dRandSetSeed(_seed);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
+{
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+
+  switch (_param)
+  {
+    case SOLVER_TYPE:
+    {
+      std::string value;
+      try
+      {
+        value = boost::any_cast<std::string>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
+      odeElem->GetElement("solver")->GetElement("type")->Set(value);
+      this->stepType = value;
+      break;
+    }
+    case GLOBAL_CFM:
+    {
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
+      odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+      dWorldSetCFM(this->worldId, value);
+      break;
+    }
+    case GLOBAL_ERP:
+    {
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return;
+      }
+      odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
+      dWorldSetERP(this->worldId, value);
+      break;
+    }
+    case SOR_PRECON_ITERS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
+      dWorldSetQuickStepPreconIterations(this->worldId, value);
+      break;
+    }
+    case PGS_ITERS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("solver")->GetElement("iters")->Set(value);
+      dWorldSetQuickStepNumIterations(this->worldId, value);
+      break;
+    }
+    case SOR:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("sor")->Set(value);
+      dWorldSetQuickStepW(this->worldId, value);
+      break;
+    }
+    case CONTACT_SURFACE_LAYER:
+    {
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_surface_layer")->Set(value);
+      dWorldSetContactSurfaceLayer(this->worldId, value);
+      break;
+    }
+    case CONTACT_MAX_CORRECTING_VEL:
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_max_correcting_vel")->Set(value);
+      dWorldSetContactMaxCorrectingVel(this->worldId, value);
+      break;
+    }
+    case MAX_CONTACTS:
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("max_contacts")->GetValue()->Set(value);
+      break;
+    }
+    case MIN_STEP_SIZE:
+    {
+      /// TODO: Implement min step size param
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+      break;
+    }
+    default:
+    {
+      gzwarn << "Param not supported in ode" << std::endl;
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  ODEParam param;
+
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
+    param = GLOBAL_CFM;
+  else if (_key == "erp")
+    param = GLOBAL_ERP;
+  else if (_key == "precon_iters")
+    param = SOR_PRECON_ITERS;
+  else if (_key == "iters")
+    param = PGS_ITERS;
+  else if (_key == "sor")
+    param = SOR;
+  else if (_key == "contact_max_correcting_vel")
+    param = CONTACT_MAX_CORRECTING_VEL;
+  else if (_key == "contact_surface_layer")
+    param = CONTACT_SURFACE_LAYER;
+  else if (_key == "max_contacts")
+    param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
+    return;
+  }
+  this->SetParam(param, _value);
+}
+
+//////////////////////////////////////////////////
+boost::any ODEPhysics::GetParam(ODEParam _param) const
+{
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+
+  boost::any value = 0;
+  switch (_param)
+  {
+    case SOLVER_TYPE:
+    {
+      value = odeElem->GetElement("solver")->GetValueString("type");
+      break;
+    }
+    case GLOBAL_CFM:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble("cfm");
+      break;
+    }
+    case GLOBAL_ERP:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble("erp");
+      break;
+    }
+    case SOR_PRECON_ITERS:
+    {
+      value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
+      break;
+    }
+    case PGS_ITERS:
+    {
+      value = odeElem->GetElement("solver")->GetValueInt("iters");
+      break;
+    }
+    case SOR:
+    {
+      value = odeElem->GetElement("solver")->GetValueDouble("sor");
+      break;
+    }
+    case CONTACT_MAX_CORRECTING_VEL:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble(
+          "contact_max_correcting_vel");
+      break;
+    }
+    case CONTACT_SURFACE_LAYER:
+    {
+      value = odeElem->GetElement("constraints")->GetValueDouble(
+          "contact_surface_layer");
+      break;
+    }
+    case MAX_CONTACTS:
+    {
+      value = odeElem->GetElement("max_contacts")->GetValueInt();
+      break;
+    }
+    case MIN_STEP_SIZE:
+    {
+      value = odeElem->GetElement("solver")->GetValueDouble("min_step_size");
+      break;
+    }
+    default:
+    {
+      gzwarn << "Attribute not supported in bullet" << std::endl;
+      break;
+    }
+  }
+  return value;
+}
+
+//////////////////////////////////////////////////
+boost::any ODEPhysics::GetParam(const std::string &_key) const
+{
+  ODEParam param;
+
+  if (_key == "type")
+    param = SOLVER_TYPE;
+  else if (_key == "cfm")
+    param = GLOBAL_CFM;
+  else if (_key == "erp")
+    param = GLOBAL_ERP;
+  else if (_key == "precon_iters")
+    param = SOR_PRECON_ITERS;
+  else if (_key == "iters")
+    param = PGS_ITERS;
+  else if (_key == "sor")
+    param = SOR;
+  else if (_key == "contact_max_correcting_vel")
+    param = CONTACT_MAX_CORRECTING_VEL;
+  else if (_key == "contact_surface_layer")
+    param = CONTACT_SURFACE_LAYER;
+  else if (_key == "max_contacts")
+    param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
+    return 0;
+  }
+  return this->GetParam(param);
 }

@@ -22,9 +22,9 @@
 #include <math.h>
 #include <algorithm>
 
-#include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Color.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Color.hh"
 
 using namespace gazebo;
 using namespace common;

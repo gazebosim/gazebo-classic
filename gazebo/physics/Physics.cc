@@ -15,11 +15,11 @@
  *
 */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/Physics.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Physics.hh"
 #include "gazebo_config.h"
 
 using namespace gazebo;
@@ -90,11 +90,11 @@ void physics::init_worlds()
 }
 
 /////////////////////////////////////////////////
-void physics::run_worlds()
+void physics::run_worlds(unsigned int _steps)
 {
   std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
-    (*iter)->Run();
+    (*iter)->Run(_steps);
 }
 
 /////////////////////////////////////////////////
@@ -126,9 +126,9 @@ void physics::init_world(WorldPtr _world)
 }
 
 /////////////////////////////////////////////////
-void physics::run_world(WorldPtr _world)
+void physics::run_world(WorldPtr _world, unsigned int _iterations)
 {
-  _world->Run();
+  _world->Run(_iterations);
 }
 
 /////////////////////////////////////////////////
@@ -156,4 +156,15 @@ void physics::remove_worlds()
   g_worlds.clear();
 }
 
+/////////////////////////////////////////////////
+bool physics::worlds_running()
+{
+  for (std::vector<WorldPtr>::const_iterator iter = g_worlds.begin();
+      iter != g_worlds.end(); ++iter)
+  {
+    if ((*iter)->GetRunning())
+      return true;
+  }
 
+  return false;
+}

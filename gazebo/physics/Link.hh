@@ -25,6 +25,9 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -69,6 +72,9 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
+      /// \brief Reset the link.
+      public: void ResetPhysicsStates();
+
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
@@ -95,7 +101,7 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GetGravityMode() = 0;
+      public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -178,6 +184,39 @@ namespace gazebo
       /// \param[in] _torque Torque value to add.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
 
+      /// \brief Get the pose of the body's center of gravity in the world
+      ///        coordinate frame.
+      /// \return Pose of the body's center of gravity in the world coordinate
+      ///         frame.
+      public: math::Pose GetWorldCoGPose() const;
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in a body-fixed frame. If
+      ///        no offset is given, the velocity at the origin of the Link
+      ///        frame will be returned.
+      /// \param[in] _offset Offset of the point from the origin of the Link
+      ///                    frame, expressed in the body-fixed frame.
+      /// \return Linear velocity of the point on the body
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in an arbitrary frame.
+      /// \param[in] _offset Offset from the origin of the link frame expressed
+      ///                    in a frame defined by _q.
+      /// \param[in] _q Describes the rotation of a reference frame relative to
+      ///               the world reference frame.
+      /// \return Linear velocity of the point on the body in the world frame.
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const = 0;
+
+      /// \brief Get the linear velocity at the body's center of gravity in the
+      ///        world frame.
+      /// \return Linear velocity at the body's center of gravity in the world
+      ///         frame.
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const = 0;
+
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
       public: math::Vector3 GetRelativeLinearVel() const;
@@ -231,10 +270,13 @@ namespace gazebo
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
 
+      /// \cond
+      /// This is an internal function
       /// \brief Get a collision by id.
       /// \param[in] _id Id of the collision object to find.
       /// \return Pointer to the collision, NULL if the id is invalid.
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
@@ -332,11 +374,19 @@ namespace gazebo
 
       /// \brief Remove Joints that have this Link as a parent Link.
       /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint);
+      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Remove Joints that have this Link as a child Link
       /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint);
+      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
+
+      /// \brief Remove Joints that have this Link as a child Link.
+      /// \param[in] _jointName Parent Joint name.
+      public: void RemoveParentJoint(const std::string &_jointName);
+
+      /// \brief Remove Joints that have this Link as a parent Link
+      /// \param[in] _jointName Child Joint name.
+      public: void RemoveChildJoint(const std::string &_jointName);
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
@@ -376,6 +426,13 @@ namespace gazebo
       /// \brief Returns a vector of parent Links connected by joints.
       /// \return Vector of parent Links connected by joints.
       public: Link_V GetParentJointsLinks() const;
+
+      /// \brief Enable/Disable link data publishing
+      /// \param[in] _enable True to enable publishing, false to stop publishing
+      public: void SetPublishData(bool _enable);
+
+      /// \brief Publish timestamped link data such as velocity.
+      private: void PublishData();
 
       /// \brief Load a new collision helper function.
       /// \param[in] _sdf SDF element used to load the collision.
@@ -420,6 +477,21 @@ namespace gazebo
 
       /// \brief All the attached models.
       private: std::vector<ModelPtr> attachedModels;
+
+      /// \brief Link data publisher
+      private: transport::PublisherPtr dataPub;
+
+      /// \brief Link data message
+      private: msgs::LinkData linkDataMsg;
+
+      /// \brief Event connections
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief True to publish data, false otherwise
+      private: bool publishData;
+
+      /// \brief Mutex to protect the publishData variable
+      private: boost::recursive_mutex *publishDataMutex;
     };
     /// \}
   }

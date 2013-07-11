@@ -18,11 +18,11 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Camera.hh"
-#include "rendering/CameraVisual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/CameraVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

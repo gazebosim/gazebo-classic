@@ -40,7 +40,7 @@ set (sources
   TrimeshShape.cc
   World.cc
   WorldState.cc
-) 
+)
 
 set (headers
   Actor.hh
@@ -50,6 +50,7 @@ set (headers
   Collision.hh
   CollisionState.hh
   Contact.hh
+  ContactManager.hh
   CylinderShape.hh
   Entity.hh
   HeightmapShape.hh
@@ -88,7 +89,7 @@ set (headers
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers
-    "Physics Headers" "#include \"physics/${hdr}\"\n")
+    "Physics Headers" "#include \"gazebo/physics/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
@@ -96,11 +97,12 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
 gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
-  gazebo_common 
+  gazebo_common
+  gazebo_util
   gazebo_sdf_interface
   gazebo_physics_ode
-  ${TBB_LIBRARIES} 
-  ${libtool_library} 
+  ${TBB_LIBRARIES}
+  ${libtool_library}
   ${Boost_LIBRARIES}
 )
 
@@ -109,15 +111,24 @@ if (HAVE_BULLET)
 endif()
 
 gz_add_executable(gzphysics server.cc)
-target_link_libraries(gzphysics gazebo_common
-                                gazebo_transport
-                                gazebo_physics
-                                gazebo_sensors
-                                gazebo_sdf_interface
-                                gazebo_msgs
-                                pthread
-                                )
+target_link_libraries(gzphysics
+  gazebo_common
+  gazebo_util
+  gazebo_transport
+  gazebo_physics
+  gazebo_sensors
+  gazebo_sdf_interface
+  gazebo_msgs
+  pthread
+  )
 
 gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
+
+# unit tests
+set (gtest_sources
+  PhysicsEngine_TEST.cc
+  Inertial_TEST.cc
+  Joint_TEST.cc)
+gz_build_tests(${gtest_sources})

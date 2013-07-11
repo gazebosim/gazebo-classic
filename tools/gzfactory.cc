@@ -17,7 +17,7 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 #include <string>
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 namespace po = boost::program_options;
@@ -37,7 +37,7 @@ void help()
 void Spawn(po::variables_map &_vm)
 {
   std::string filename, modelName;
-  std::string worldName = "default";
+  std::string worldName;
 
   if (!_vm.count("sdf"))
   {
@@ -103,14 +103,16 @@ void Spawn(po::variables_map &_vm)
     rpy.z = _vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
 
-  std::cout << "Spawning " << modelName << " into "
-            << worldName  << " world.\n";
+  if (!transport::init())
+    return;
 
-  transport::init();
   transport::run();
 
   transport::NodePtr node(new transport::Node());
-  node->Init();
+  node->Init(worldName);
+
+  std::cout << "Spawning " << modelName << " into "
+            << node->GetTopicNamespace()  << " world.\n";
 
   transport::PublisherPtr pub = node->Advertise<msgs::Factory>("~/factory");
   pub->WaitForConnection();
@@ -142,7 +144,9 @@ void Delete(po::variables_map &vm)
 
   msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
 
-  transport::init();
+  if (!transport::init())
+    return;
+
   transport::run();
 
   transport::NodePtr node(new transport::Node());

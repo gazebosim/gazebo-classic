@@ -35,8 +35,8 @@
 #include <string>
 #include <list>
 
-#include "common/CommonTypes.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -100,6 +100,10 @@ namespace gazebo
       /// \param[in] _path the directory to add
       public: void AddGazeboPaths(const std::string &_path);
 
+      /// \brief Add colon delimited paths to modelPaths
+      /// \param[in] _path the directory to add
+      public: void AddModelPaths(const std::string &_path);
+
       /// \brief Add colon delimited paths to ogre install
       /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
@@ -110,6 +114,8 @@ namespace gazebo
 
       /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+      /// \brief clear out SystemPaths#modelPaths
+      public: void ClearModelPaths();
       /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
       /// \brief clear out SystemPaths#pluginPaths

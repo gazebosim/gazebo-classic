@@ -20,11 +20,12 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
 
-#include "gui/qt.h"
-#include "common/Event.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
-    class BuildingEditorPalette;
+    class Editor;
 
     class MainWindow : public QMainWindow
     {
@@ -48,10 +49,31 @@ namespace gazebo
       public: unsigned int GetEntityId(const std::string &_name);
       public: bool HasEntityName(const std::string &_name);
 
+      /// \brief Add a widget to the left column stack of widgets.
+      /// \param[in] _name Name of the widget
+      /// \param[in] _widget Pointer to the widget to add.
+      public: void AddToLeftColumn(const std::string &_name, QWidget *_widget);
+
+      /// \brief Show a widget in the left column.
+      /// \sa AddToLeftColumn
+      /// \param[in] _name Name of the widge to show. The widget must have
+      /// been added using AddToLeftColumn. The string "default" will show
+      /// the main tab.
+      public: void ShowLeftColumnWidget(const std::string &_name = "default");
+
+      /// \brief Get a pointer to the render widget.
+      /// \return A pointer to the render widget.
+      public: RenderWidget *GetRenderWidget() const;
+
+      /// \brief Play simulation.
+      public slots: void Play();
+
+      /// \brief Pause simulation.
+      public slots: void Pause();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
-
 
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
@@ -60,10 +82,7 @@ namespace gazebo
       private slots: void Save();
       private slots: void SaveAs();
       private slots: void About();
-      private slots: void Play();
-      private slots: void Pause();
       private slots: void Step();
-
       private slots: void NewModel();
       private slots: void Arrow();
       private slots: void Translate();
@@ -76,6 +95,10 @@ namespace gazebo
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
+
+      /// \brief Qt callback when the screenshot action is triggered
+      private slots: void CaptureScreenshot();
+
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();
@@ -89,33 +112,43 @@ namespace gazebo
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
-      private slots: void OnEditBuilding();
+      private slots: void SetWireframe();
 
-      /// \brief Qt callback when the building editor's save action is
-      /// triggered.
-      private slots: void BuildingEditorSave();
+      /// \brief Qt call back when the play action state changes
+      private slots: void OnPlayActionChanged();
 
-      /// \brief Qt callback when the building editor's discard action is
-      /// triggered.
-      private slots: void BuildingEditorDiscard();
-
-      /// \brief Qt callback when the building editor's done action is
-      /// triggered.
-      private slots: void BuildingEditorDone();
-
-      /// \brief Qt callback when the building editor's exit action is
-      /// triggered.
-      private slots: void BuildingEditorExit();
+      /// \brief QT slot to open the data logger utility
+      private slots: void DataLogger();
 
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
+      /// \brief Callback for diagnostics action.
+      private slots: void Diagnostics();
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 
+      /// \brief Create most of the actions.
       private: void CreateActions();
+
+      /// \brief Create menus.
       private: void CreateMenus();
+
+      /// \brief Create the toolbars.
       private: void CreateToolbars();
+
+      /// \brief Create the main menu bar.
+      private: void CreateMenuBar();
+
+      /// \brief Create all the editors.
+      private: void CreateEditors();
+
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
       private: void OnResponse(ConstResponsePtr &_msg);
@@ -125,9 +158,9 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-      /// \brief Callback from the building editor when the building model
-      /// has been completed.
-      private: void OnFinishBuilding();
+      /// \brief Handle event for changing the manual step size.
+      /// \param[in] _value New input step size.
+      private: void OnInputStepSizeChanged(int _value);
 
       private: QToolBar *playToolbar;
 
@@ -153,43 +186,34 @@ namespace gazebo
       // A map that associates physics_id's with entity names
       private: std::map<std::string, unsigned int> entities;
 
+      /// \brief Message used to field requests.
       private: msgs::Request *requestMsg;
 
-      // private: QTreeWidget *treeWidget;
-
-      /// \brief Building editor palette that contains different drawing modes
-      private: BuildingEditorPalette *buildingEditorPalette;
-
-      /// \brief Tab widget that holds the building editor palette
-      private: QTabWidget *buildingEditorTabWidget;
-
-      /// \brief Building editor's own separate menu bar of actions, e.g. save.
-      private: QMenuBar *buildingEditorMenuBar;
-
+      /// \brief The left-hand tab widget
       private: QTabWidget *tabWidget;
+
+      /// \brief Mainwindow's menubar
       private: QMenuBar *menuBar;
 
-      /// \brief Frame layout that contains the menu bar.
+      /// \brief A layout for the menu bar.
       private: QHBoxLayout *menuLayout;
+
+      /// \brief Used to control size of each pane.
+      private: QStackedWidget *leftColumn;
+
+      /// \brief Map of names to widgets in the leftColumn QStackedWidget
+      private: std::map<std::string, int> leftColumnStack;
 
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
       private: std::string saveFilename;
-    };
 
-    class TreeViewDelegate: public QItemDelegate
-    {
-      Q_OBJECT
-      public: TreeViewDelegate(QTreeView *_view, QWidget *_parent);
+      /// \brief User specified step size for manually stepping the world
+      private: int inputStepSize;
 
-      public: void paint(QPainter *painter, const QStyleOptionViewItem &option,
-                         const QModelIndex &index) const;
-
-      public: virtual QSize sizeHint(const QStyleOptionViewItem &_opt,
-                                     const QModelIndex &_index) const;
-      private: QTreeView *view;
+      /// \brief List of all the editors.
+      private: std::list<Editor*> editors;
     };
   }
 }
-
 #endif

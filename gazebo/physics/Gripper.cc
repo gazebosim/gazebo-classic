@@ -15,16 +15,16 @@
  *
 */
 
-#include "common/Events.hh"
+#include "gazebo/common/Events.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-#include "physics/Contact.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Gripper.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Gripper.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -71,7 +71,6 @@ void Gripper::Load(sdf::ElementPtr _sdf)
           << "] not found!\n";
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
-
 
   while (gripperLinkElem)
   {
@@ -151,13 +150,13 @@ void Gripper::HandleAttach()
 
     if (this->collisions.find(name1) == this->collisions.end())
     {
-      cc[name1] = boost::shared_dynamic_cast<Collision>(
+      cc[name1] = boost::dynamic_pointer_cast<Collision>(
           this->world->GetEntity(this->contacts[i].collision1));
       contactCounts[name1] += 1;
     }
     if (this->collisions.find(name2) == this->collisions.end())
     {
-      cc[name2] = boost::shared_dynamic_cast<Collision>(
+      cc[name2] = boost::dynamic_pointer_cast<Collision>(
           this->world->GetEntity(this->contacts[i].collision2));
       contactCounts[name2] += 1;
     }
@@ -212,10 +211,10 @@ void Gripper::HandleDetach()
 void Gripper::OnContact(const std::string &/*_collisionName*/,
                         const physics::Contact &_contact)
 {
-  CollisionPtr collision1 = boost::shared_dynamic_cast<Collision>(
+  CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
         this->world->GetEntity(_contact.collision1));
 
-  CollisionPtr collision2 = boost::shared_dynamic_cast<Collision>(
+  CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
         this->world->GetEntity(_contact.collision1));
 
   if ((collision1 && collision1->IsStatic()) ||

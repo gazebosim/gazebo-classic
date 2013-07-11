@@ -18,6 +18,7 @@
 #define _TRANSPORT_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <google/protobuf/message.h>
 
 /// \file
 /// \ingroup gazebo_transport
@@ -32,6 +33,10 @@ namespace gazebo
     class Subscriber;
     class SubscriptionTransport;
     class Node;
+
+    /// \def MessagePtr
+    /// \brief Shared_ptr to protobuf message
+    typedef boost::shared_ptr<google::protobuf::Message> MessagePtr;
 
     /// \def PublisherPtr
     /// \brief Shared_ptr to Publisher object

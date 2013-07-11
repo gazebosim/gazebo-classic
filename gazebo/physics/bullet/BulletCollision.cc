@@ -19,8 +19,9 @@
  * Date: 13 Feb 2006
  */
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -46,27 +47,45 @@ BulletCollision::~BulletCollision()
 void BulletCollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
+
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 }
 
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  /*
   math::Pose pose = this->GetRelativePose();
-  BulletLink *bbody = static_cast<BulletLink*>(this->body);
+  BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
-  bbody->SetCollisionRelativePose(this, pose);
-  */
+  // bbody->motionState.setWorldTransform(this, pose);
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int /*_bits*/)
+void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
+void BulletCollision::SetCollideBits(unsigned int _bits)
 {
+  this->collideBits = _bits;
+}
+
+//////////////////////////////////////////////////
+unsigned int BulletCollision::GetCategoryBits() const
+{
+  return this->categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int BulletCollision::GetCollideBits() const
+{
+  return this->collideBits;
 }
 
 //////////////////////////////////////////////////
@@ -92,8 +111,10 @@ math::Box BulletCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
+void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
+    bool _placeable)
 {
+  Collision::SetCollision(_placeable);
   this->collisionShape = _shape;
 
   // btmath::Vector3 vec;

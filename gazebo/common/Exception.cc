@@ -20,8 +20,8 @@
  * Date: 07 May 2007
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -38,6 +38,7 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
   this->file = _file;
   this->line = _line;
   this->str = _msg;
+  this->Print();
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +72,7 @@ InternalError::InternalError()
 
 //////////////////////////////////////////////////
 InternalError::InternalError(const char *_file, int _line,
-                             const std::string _msg) :
+                             const std::string &_msg) :
   Exception(_file, _line, _msg)
 {
 }
@@ -84,9 +85,9 @@ InternalError::~InternalError()
 //////////////////////////////////////////////////
 AssertionInternalError::AssertionInternalError(
     const char * _file, int _line,
-    const std::string _expr,
-    const std::string _function,
-    const std::string _msg) :
+    const std::string &_expr,
+    const std::string &_function,
+    const std::string &_msg) :
   InternalError(_file, _line,
       "GAZEBO ASSERTION                     \n" +
       _msg                               + "\n" +

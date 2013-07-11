@@ -47,6 +47,8 @@ std::vector<common::Time> bwTime;
 
 boost::mutex mutex;
 
+boost::shared_ptr<google::protobuf::Message> g_echoMsg;
+
 /////////////////////////////////////////////////
 void help()
 {
@@ -110,20 +112,30 @@ transport::ConnectionPtr connect_to_master()
 
   // Connect to the master
   transport::ConnectionPtr connection(new transport::Connection());
-  connection->Connect(host, port);
 
-  // Read the verification message
-  connection->Read(data);
-  connection->Read(namespacesData);
-  connection->Read(publishersData);
-
-  packet.ParseFromString(data);
-  if (packet.type() == "init")
+  if (connection->Connect(host, port))
   {
-    msgs::GzString msg;
-    msg.ParseFromString(packet.serialized_data());
-    if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
-      std::cerr << "Conflicting gazebo versions\n";
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
   }
 
   return connection;
@@ -139,27 +151,29 @@ void list()
 
   transport::ConnectionPtr connection = connect_to_master();
 
-  request.set_id(0);
-  request.set_request("get_publishers");
-  connection->EnqueueMsg(msgs::Package("request", request), true);
-  connection->Read(data);
-
-  packet.ParseFromString(data);
-  pubs.ParseFromString(packet.serialized_data());
-
-  // This list is used to filter topic output.
-  std::list<std::string> listed;
-
-  for (int i = 0; i < pubs.publisher_size(); i++)
+  if (connection)
   {
-    const msgs::Publish &p = pubs.publisher(i);
-    if (p.topic().find("__dbg") == std::string::npos &&
-        std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
-    {
-      std::cout << p.topic() << std::endl;
+    request.set_id(0);
+    request.set_request("get_publishers");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->Read(data);
 
-      // Record the topics that have been listed to prevent duplicates.
-      listed.push_back(p.topic());
+    packet.ParseFromString(data);
+    pubs.ParseFromString(packet.serialized_data());
+
+    // This list is used to filter topic output.
+    std::list<std::string> listed;
+
+    for (int i = 0; i < pubs.publisher_size(); i++)
+    {
+      const msgs::Publish &p = pubs.publisher(i);
+      if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+      {
+        std::cout << p.topic() << std::endl;
+
+        // Record the topics that have been listed to prevent duplicates.
+        listed.push_back(p.topic());
+      }
     }
   }
 
@@ -167,9 +181,10 @@ void list()
 }
 
 /////////////////////////////////////////////////
-void echo_cb(ConstGzStringPtr &_data)
+void echoCB(const std::string &_data)
 {
-  std::cout << _data->data() << "\n";
+  g_echoMsg->ParseFromString(_data);
+  std::cout << g_echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -182,7 +197,7 @@ void bwCB(const std::string &_data)
 }
 
 /////////////////////////////////////////////////
-void hz_cb(ConstGzStringPtr &/*_data*/)
+void hzCB(const std::string &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
 
@@ -251,15 +266,35 @@ void echo()
     return;
   }
 
-  transport::init();
+  std::string topic = params[1];
+
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  std::string topic = params[1];
-  topic +=  "/__dbg";
+  // Get the message type on the topic.
+  std::string msgTypeName = gazebo::transport::getTopicMsgType(
+      node->DecodeTopicName(topic));
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, echo_cb);
+  if (msgTypeName.empty())
+  {
+    gzerr << "Unable to get message type for topic[" << topic << "]\n";
+    transport::fini();
+    return;
+  }
+
+  g_echoMsg = msgs::MsgFactory::NewMsg(msgTypeName);
+
+  if (!g_echoMsg)
+  {
+    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    transport::fini();
+    return;
+  }
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, echoCB);
 
   // Run the transport loop: starts a new thread
   transport::run();
@@ -279,7 +314,8 @@ void bw()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -296,7 +332,7 @@ void bw()
     common::Time::MSleep(100);
     {
       boost::mutex::scoped_lock lock(mutex);
-      if (bwBytes.size() >= 100)
+      if (bwBytes.size() >= 10)
       {
         std::sort(bwBytes.begin(), bwBytes.end());
 
@@ -371,15 +407,15 @@ void hz()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
 
   std::string topic = params[1];
-  topic +=  "/__dbg";
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
+  transport::SubscriberPtr sub = node->Subscribe(topic, hzCB);
 
   // Run the transport loop: starts a new thread
   transport::run();

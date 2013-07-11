@@ -26,11 +26,11 @@
 #include <string>
 #include <vector>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo_config.h"
 
-#include "rendering/Camera.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {

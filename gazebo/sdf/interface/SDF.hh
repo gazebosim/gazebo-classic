@@ -22,9 +22,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "sdf/interface/Param.hh"
+#include "gazebo/sdf/interface/Param.hh"
 
-#define SDF_VERSION "1.3"
+#define SDF_VERSION "1.4"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser
@@ -169,6 +169,15 @@ namespace sdf
     public: ElementPtr GetElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);
+
+    /// \brief Remove this element from its parent.
+    public: void RemoveFromParent();
+
+    /// \brief Remove a child element.
+    /// \param[in] _child Pointer to the child to remove.
+    public: void RemoveChild(ElementPtr _child);
+
+    /// \brief Remove all child elements.
     public: void ClearElements();
 
     public: void Update();

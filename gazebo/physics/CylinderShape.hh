@@ -22,7 +22,7 @@
 #ifndef _CYLINDERSHAPE_HH_
 #define _CYLINDERSHAPE_HH_
 
-#include "physics/Shape.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {

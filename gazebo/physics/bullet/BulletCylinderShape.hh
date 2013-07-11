@@ -22,8 +22,8 @@
 #ifndef _BULLETCYLINDERSHAPE_HH_
 #define _BULLETCYLINDERSHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/CylinderShape.hh"
 
 namespace gazebo
 {
@@ -44,15 +44,57 @@ namespace gazebo
       public: virtual ~BulletCylinderShape() {}
 
       /// \brief Set the size of the cylinder
+      /// \param[in] _radius Cylinder radius
+      /// \param[in] _length Cylinder length
       public: void SetSize(double _radius, double _length)
               {
+                if (_radius < 0)
+                {
+                    gzerr << "Cylinder shape does not support negative"
+                          << " radius\n";
+                    return;
+                }
+                if (_length < 0)
+                {
+                    gzerr << "Cylinder shape does not support negative"
+                          << " length\n";
+                    return;
+                }
+                if (math::equal(_radius, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  _radius = 1e-4;
+                }
+                if (math::equal(_length, 0.0))
+                {
+                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  _length = 1e-4;
+                }
+
                 CylinderShape::SetSize(_radius, _length);
                 BulletCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
-                bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btVector3(_radius, _radius, _length * 0.5)));
+                btCollisionShape *shape = bParent->GetCollisionShape();
+                if (!shape)
+                {
+                  bParent->SetCollisionShape(new btCylinderShapeZ(
+                      btVector3(_radius, _radius, _length * 0.5)));
+                }
+                else
+                {
+                  btVector3 scale = shape->getLocalScaling();
+                  double cylinderRadius = this->GetRadius();
+                  double cylinderLength = this->GetLength();
+                  scale.setX(_radius / cylinderRadius);
+                  scale.setY(scale.x());
+                  scale.setZ(_length / cylinderLength);
+                  shape->setLocalScaling(scale);
+                }
               }
     };
     /// \}

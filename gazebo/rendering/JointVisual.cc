@@ -18,11 +18,11 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Scene.hh"
-#include "rendering/AxisVisual.hh"
-#include "rendering/JointVisual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/JointVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -48,8 +48,8 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
-  this->SetWorldPosition(msgs::Convert(_msg->pose().position()));
-  this->SetWorldRotation(msgs::Convert(_msg->pose().orientation()));
+  this->SetPosition(msgs::Convert(_msg->pose().position()));
+  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
   if (math::equal(_msg->axis1().xyz().x(), 1.0))
     this->axisVisual->ShowRotation(0);

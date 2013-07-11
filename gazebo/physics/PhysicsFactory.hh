@@ -26,7 +26,7 @@
 #include <string>
 #include <map>
 
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -58,6 +58,11 @@ namespace gazebo
       /// \param[in] _world World to pass to the created physics engine.
       public: static PhysicsEnginePtr NewPhysicsEngine(
                   const std::string &_className, WorldPtr _world);
+
+      /// \brief Check if a physics engine is registered.
+      /// \param[in] _name Name of the physics engine.
+      /// \return True if physics engine is registered, false otherwise.
+      public: static bool IsRegistered(const std::string &_name);
 
       /// \brief A list of registered physics classes.
       private: static std::map<std::string, PhysicsFactoryFn> engines;

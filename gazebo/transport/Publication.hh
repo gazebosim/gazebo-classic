@@ -18,14 +18,16 @@
 #ifndef _PUBLICATION_HH_
 #define _PUBLICATION_HH_
 
+#include <utility>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <list>
 #include <string>
 #include <vector>
 
-#include "transport/CallbackHelper.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/PublicationTransport.hh"
 
 namespace gazebo
 {
@@ -54,7 +56,7 @@ namespace gazebo
 
       /// \brief Subscribe a callback to our topic
       /// \param[in] _callback The callback
-      public: void AddSubscription(const CallbackHelperPtr &_callback);
+      public: void AddSubscription(const CallbackHelperPtr _callback);
 
       /// \brief Subscribe a node to our topic
       /// \param[in] _node The node
@@ -108,10 +110,11 @@ namespace gazebo
 
       /// \brief Publish data to remote subscribers
       /// \param[in] _msg Message to be published
-      /// \param[in] _cb If non-null, callback to be invoked after publishing
+      /// \param[in] _cb Callback to be invoked after publishing
       /// is completed
-      public: void Publish(const google::protobuf::Message &_msg,
-                           const boost::function<void()> &_cb = NULL);
+      public: void Publish(MessagePtr _msg,
+                  boost::function<void(uint32_t)> _cb,
+                  uint32_t _id);
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
@@ -128,26 +131,52 @@ namespace gazebo
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Remove nodes that have been marked for removal
+      private: void RemoveNodes();
+
+      /// \brief Unique if of the publication.
       private: unsigned int id;
+
+      /// \brief Counter to produce unique IDs
       private: static unsigned int idCounter;
+
+      /// \brief Name of the topic messages are output on.
       private: std::string topic;
+
+      /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages
+      /// \brief Remote nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
-      /// \brief Local nodes that recieve messages
+      /// \brief Local nodes that recieve messages.
       private: std::list<NodePtr> nodes;
 
+      /// \brief List of node IDs to remove from nodes list.
+      private: std::list<unsigned int> removeNodes;
+
+      /// \brief List of host and port callbacks to remove.
+      private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
+
+      /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 
+      /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
 
+      /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex nodeMutex;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex callbackMutex;
+
+      /// \brief Mutex to protect the list of nodes id for removed.
+      private: mutable boost::mutex nodeRemoveMutex;
     };
     /// \}
   }
 }
 #endif
-
-

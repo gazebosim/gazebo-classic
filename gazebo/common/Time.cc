@@ -22,15 +22,21 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
-#include "math/Helpers.hh"
-#include "common/Time.hh"
-#include "common/Console.hh"
+#include <boost/date_time.hpp>
+
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
 
 Time Time::wallTime;
-struct timespec Time::clock_resolution;
+std::string Time::wallTimeISO;
+
+struct timespec Time::clockResolution;
+
+const Time Time::Zero = common::Time(0, 0);
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -39,8 +45,8 @@ Time::Time()
   this->nsec = 0;
 
   // get clock resolution, skip sleep if resolution is larger then
-  // requested sleep tiem
-  clock_getres(CLOCK_REALTIME, &clock_resolution);
+  // requested sleep time
+  clock_getres(CLOCK_REALTIME, &clockResolution);
 }
 
 /////////////////////////////////////////////////
@@ -91,6 +97,15 @@ const Time &Time::GetWallTime()
 }
 
 /////////////////////////////////////////////////
+const std::string &Time::GetWallTimeAsISOString()
+{
+  wallTimeISO = boost::posix_time::to_iso_extended_string(
+      boost::posix_time::microsec_clock::local_time());
+
+  return wallTimeISO;
+}
+
+/////////////////////////////////////////////////
 void Time::SetToWallTime()
 {
   *this = this->GetWallTime();
@@ -127,16 +142,31 @@ float Time::Float() const
 }
 
 /////////////////////////////////////////////////
-Time Time::MSleep(unsigned int _ms)
+Time Time::Sleep(const common::Time &_time)
 {
   Time result;
 
-  if (Time(0, _ms*1000000) >= clock_resolution)
+  if (_time >= clockResolution)
   {
     struct timespec interval;
     struct timespec remainder;
-    interval.tv_sec = _ms / 1000;
-    interval.tv_nsec = (_ms % 1000) * 1000000;
+    interval.tv_sec = _time.sec;
+    interval.tv_nsec = _time.nsec;
+
+    // Sleeping for negative time doesn't make sense
+    if (interval.tv_sec < 0)
+    {
+      gzerr << "Cannot sleep for negative time[" << _time << "]\n";
+      return result;
+    }
+
+    // This assert conforms to the manpage for nanosleep
+    if (interval.tv_nsec < 0 || interval.tv_nsec > 999999999)
+    {
+      gzerr << "Nanoseconds of [" << interval.tv_nsec
+            << "] must be in the range0 to 999999999.\n";
+      return result;
+    }
 
     if (nanosleep(&interval, &remainder) == -1)
     {
@@ -146,62 +176,29 @@ Time Time::MSleep(unsigned int _ms)
   }
   else
   {
-    /// \TODO: warn user about skipping sleep because clock resolution too big
+    /// \TODO Make this a gzlog
+    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+Time Time::MSleep(unsigned int _ms)
+{
+  return Time::Sleep(Time(0, _ms*1000000));
 }
 
 /////////////////////////////////////////////////
 Time Time::NSleep(unsigned int _ns)
 {
-  Time result;
-
-  if (Time(0, _ns) >= clock_resolution)
-  {
-    struct timespec nsleep;
-    struct timespec remainder;
-    nsleep.tv_sec = 0;
-    nsleep.tv_nsec = _ns;
-
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
-    {
-      result.sec = remainder.tv_sec;
-      result.nsec = remainder.tv_nsec;
-    }
-  }
-  else
-  {
-    /// \TODO: warn user about skipping sleep because clock resolution too big
-  }
-
-  return result;
+  return Time::Sleep(Time(0, _ns));
 }
 
 /////////////////////////////////////////////////
 Time Time::NSleep(Time _time)
 {
-  Time result;
-
-  if (_time >= clock_resolution)
-  {
-    struct timespec nsleep;
-    struct timespec remainder;
-    nsleep.tv_sec = _time.sec;
-    nsleep.tv_nsec = _time.nsec;
-
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
-    {
-      result.sec = remainder.tv_sec;
-      result.nsec = remainder.tv_nsec;
-    }
-  }
-  else
-  {
-    /// \TODO: warn user about skipping sleep because clock resolution too big
-  }
-
-  return result;
+  return Time::Sleep(_time);
 }
 
 /////////////////////////////////////////////////
@@ -419,7 +416,7 @@ Time Time::operator /(const Time &_time) const
 {
   Time result(*this);
 
-  if (math::equal(_time.Double(), 0.0))
+  if (_time.sec == 0 && _time.nsec == 0)
     gzerr << "Time divide by zero\n";
   else
     result.Set(this->Double() / _time.Double());

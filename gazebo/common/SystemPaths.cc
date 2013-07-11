@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -266,9 +267,15 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     {
       path = boost::filesystem::path(*iter) / suffix;
       if (boost::filesystem::exists(path))
+      {
+        filename = path.string();
         break;
+      }
     }
-    filename = path.string();
+
+    // Try to download the model if it wasn't found.
+    if (filename.empty())
+      filename = ModelDatabase::Instance()->GetModelPath(_uri, true);
   }
   else if (prefix.empty() || prefix == "file")
   {
@@ -302,8 +309,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    path = boost::filesystem::operator/(boost::filesystem::current_path(),
-                                        _filename);
+    try
+    {
+      path = boost::filesystem::operator/(boost::filesystem::current_path(),
+          _filename);
+    }
+    catch(boost::filesystem::filesystem_error &_e)
+    {
+      gzerr << "Filesystem error[" << _e.what() << "]\n";
+      return std::string();
+    }
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {
@@ -378,6 +393,12 @@ void SystemPaths::ClearPluginPaths()
 }
 
 /////////////////////////////////////////////////
+void SystemPaths::ClearModelPaths()
+{
+  this->modelPaths.clear();
+}
+
+/////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
   std::string delim(":");
@@ -421,6 +442,21 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPaths(const std::string &_path)
+{
+  std::string delim(":");
+  size_t pos1 = 0;
+  size_t pos2 = _path.find(delim);
+  while (pos2 != std::string::npos)
+  {
+    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
+    pos1 = pos2+1;
+    pos2 = _path.find(delim, pos2+1);
+  }
+  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }
 
 /////////////////////////////////////////////////

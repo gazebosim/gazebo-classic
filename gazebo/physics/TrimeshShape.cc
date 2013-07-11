@@ -19,15 +19,15 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Common.hh"
-#include "common/MeshManager.hh"
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/TrimeshShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/TrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -36,6 +36,7 @@ using namespace physics;
 TrimeshShape::TrimeshShape(CollisionPtr _parent)
   : Shape(_parent)
 {
+  this->submesh = NULL;
   this->AddType(Base::TRIMESH_SHAPE);
 }
 
@@ -63,6 +64,28 @@ void TrimeshShape::Init()
 
   if ((this->mesh = meshManager->Load(filename)) == NULL)
     gzerr << "Unable to load mesh from file[" << filename << "]\n";
+
+  if (this->submesh)
+    delete this->submesh;
+  this->submesh = NULL;
+
+  if (this->sdf->HasElement("submesh"))
+  {
+    sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
+    this->submesh = new common::SubMesh(
+      this->mesh->GetSubMesh(submeshElem->GetValueString("name")));
+
+    if (!this->submesh)
+      gzthrow("Unable to get submesh with name[" +
+          submeshElem->GetValueString("name") + "]");
+
+    // Center the submesh if specified in SDF.
+    if (submeshElem->HasElement("center") &&
+        submeshElem->GetValueBool("center"))
+    {
+      this->submesh->Center();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -80,20 +103,37 @@ math::Vector3 TrimeshShape::GetSize() const
 //////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
+  return this->GetMeshURI();
+}
+
+//////////////////////////////////////////////////
+std::string TrimeshShape::GetMeshURI() const
+{
   return this->sdf->GetValueString("uri");
 }
 
 //////////////////////////////////////////////////
 void TrimeshShape::SetFilename(const std::string &_filename)
 {
-  if (_filename.find("://") == std::string::npos)
+  this->SetMesh(_filename);
+}
+
+//////////////////////////////////////////////////
+void TrimeshShape::SetMesh(const std::string &_uri,
+                           const std::string &_submesh,
+                           bool _center)
+{
+  if (_uri.find("://") == std::string::npos)
   {
-    gzerr << "Invalid filename[" << _filename
-          << "]. Must use a URI, like file://" << _filename << "\n";
+    gzerr << "Invalid URI[" << _uri
+          << "]. Must use a URI, like file://" << _uri << "\n";
     return;
   }
 
-  this->sdf->GetElement("uri")->Set(_filename);
+  this->sdf->GetElement("uri")->Set(_uri);
+  this->sdf->GetElement("submesh")->GetElement("name")->Set(_submesh);
+  this->sdf->GetElement("submesh")->GetElement("center")->Set(_center);
+
   this->Init();
 }
 
@@ -101,13 +141,14 @@ void TrimeshShape::SetFilename(const std::string &_filename)
 void TrimeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
-  _msg.mutable_mesh()->set_filename(this->GetFilename());
-  msgs::Set(_msg.mutable_mesh()->mutable_scale(), this->GetSize());
+  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
 }
 
 //////////////////////////////////////////////////
 void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
-  this->SetFilename(_msg.mesh().filename());
+  this->SetMesh(_msg.mesh().filename(),
+      _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
+      _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);
 }

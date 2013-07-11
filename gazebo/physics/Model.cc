@@ -45,7 +45,7 @@
 
 #include "gazebo/sensors/SensorManager.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -115,7 +115,7 @@ void Model::LoadLinks()
     {
       // Create a new link
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::shared_static_cast<Model>(shared_from_this()));
+          boost::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
@@ -180,9 +180,9 @@ void Model::Init()
        iter!= this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
-      boost::shared_static_cast<Link>(*iter)->Init();
+      boost::static_pointer_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
-      boost::shared_static_cast<Model>(*iter)->Init();
+      boost::static_pointer_cast<Model>(*iter)->Init();
   }
 
   // Initialize the joints last.
@@ -190,6 +190,12 @@ void Model::Init()
        iter != this->joints.end(); ++iter)
   {
     (*iter)->Init();
+    // The following message used to be filled and sent in Model::LoadJoint
+    // It is moved here, after Joint::Init, so that the joint properties
+    // can be included in the message.
+    msgs::Joint msg;
+    (*iter)->FillMsg(msg);
+    this->jointPub->Publish(msg);
   }
 
   for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
@@ -252,10 +258,11 @@ void Model::Update()
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(const std::string &_jointName, double _position)
+void Model::SetJointPosition(
+  const std::string &_jointName, double _position, int _index)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position);
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
@@ -328,7 +335,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(
+      LinkPtr link = boost::dynamic_pointer_cast<Link>(
           this->GetChild(linkElem->GetValueString("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -341,7 +348,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -366,6 +373,14 @@ void Model::Reset()
     (*iter)->Reset();
   }
 
+  // reset link velocities when resetting model
+  Link_V links = this->GetLinks();
+  for (Link_V::iterator liter = links.begin();
+       liter!= links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
+  }
+
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter!= this->joints.end(); ++jiter)
   {
@@ -381,7 +396,7 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       link->SetEnabled(true);
       link->SetLinearVel(_vel);
     }
@@ -397,7 +412,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       link->SetEnabled(true);
       link->SetAngularVel(_vel);
     }
@@ -413,7 +428,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       link->SetEnabled(true);
       link->SetLinearAccel(_accel);
     }
@@ -429,7 +444,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       link->SetEnabled(true);
       link->SetAngularAccel(_accel);
     }
@@ -523,7 +538,7 @@ math::Box Model::GetBoundingBox() const
     if (*iter && (*iter)->HasType(LINK))
     {
       math::Box linkBox;
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       linkBox = link->GetBoundingBox();
       box += linkBox;
     }
@@ -574,7 +589,7 @@ JointPtr Model::GetJoint(const std::string &_name)
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -585,7 +600,7 @@ Link_V Model::GetLinks() const
   {
     if (this->GetChild(i)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
+      LinkPtr link = boost::static_pointer_cast<Link>(this->GetChild(i));
       if (link)
         links.push_back(link);
       else
@@ -613,7 +628,7 @@ LinkPtr Model::GetLink(const std::string &_name) const
       if (((*biter)->GetScopedName() == _name) ||
           ((*biter)->GetName() == _name))
       {
-        result = boost::shared_dynamic_cast<Link>(*biter);
+        result = boost::dynamic_pointer_cast<Link>(*biter);
         break;
       }
     }
@@ -630,11 +645,11 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   std::string stype = _sdf->GetValueString("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
-     boost::shared_static_cast<Model>(shared_from_this()));
+     boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
     gzthrow("Unable to create joint of type[" + stype + "]\n");
 
-  joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
+  joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
   joint->Load(_sdf);
@@ -642,15 +657,11 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   if (this->GetJoint(joint->GetScopedName()) != NULL)
     gzthrow("can't have two joint with the same name");
 
-  msgs::Joint msg;
-  joint->FillMsg(msg);
-  this->jointPub->Publish(msg);
-
   this->joints.push_back(joint);
 
   if (!this->jointController)
     this->jointController.reset(new JointController(
-        boost::shared_dynamic_cast<Model>(shared_from_this())));
+        boost::dynamic_pointer_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
 
@@ -658,7 +669,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
   Gripper *gripper = new Gripper(
-      boost::shared_static_cast<Model>(shared_from_this()));
+      boost::static_pointer_cast<Model>(shared_from_this()));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
 }
@@ -739,20 +750,22 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
+  std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
+  gazebo::ModelPluginPtr plugin =
+    gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
     {
       gzerr << "Model[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+            << "Plugin filename[" << filename << "] name["
+            << pluginName << "]\n";
       return;
     }
 
-    ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
+    ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
@@ -768,7 +781,7 @@ void Model::SetGravityMode(const bool &_v)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::shared_static_cast<Link>(*iter)->SetGravityMode(_v);
+      boost::static_pointer_cast<Link>(*iter)->SetGravityMode(_v);
     }
   }
 }
@@ -782,7 +795,7 @@ void Model::SetCollideMode(const std::string &_m)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::shared_static_cast<Link>(*iter)->SetCollideMode(_m);
+      boost::static_pointer_cast<Link>(*iter)->SetCollideMode(_m);
     }
   }
 }
@@ -796,7 +809,7 @@ void Model::SetLaserRetro(const float _retro)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
+       boost::static_pointer_cast<Link>(*iter)->SetLaserRetro(_retro);
     }
   }
 }
@@ -816,7 +829,7 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
+      LinkPtr link = boost::dynamic_pointer_cast<Link>(this->GetChild(j));
       link->FillMsg(*_msg.add_link());
     }
   }
@@ -925,24 +938,25 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  // For now we don't use the link state values to set the state of
-  // simulation.
-  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  LinkState_M linkStates = _state.GetLinkStates();
+  for (LinkState_M::iterator iter = linkStates.begin();
+       iter != linkStates.end(); ++iter)
   {
-    LinkState linkState = _state.GetLinkState(i);
-    LinkPtr link = this->GetLink(linkState.GetName());
+    LinkPtr link = this->GetLink(iter->first);
     if (link)
-      link->SetState(linkState);
+      link->SetState(iter->second);
     else
-      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }*/
-
-  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
-  {
-    JointState jointState = _state.GetJointState(i);
-    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
-                           jointState.GetAngle(0).Radian());
+      gzerr << "Unable to find link[" << iter->first << "]\n";
   }
+
+  // For now we don't use the joint state values to set the state of
+  // simulation.
+  // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  // {
+  //   JointState jointState = _state.GetJointState(i);
+  //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+  //                          jointState.GetAngle(0).Radian());
+  // }
 }
 
 /////////////////////////////////////////////////
@@ -993,4 +1007,3 @@ bool Model::GetAutoDisable() const
 {
   return this->sdf->GetValueBool("allow_auto_disable");
 }
-

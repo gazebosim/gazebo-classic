@@ -283,12 +283,12 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelFile(filename);
     if (sdf::readDoc(&doc, _sdf, "urdf file"))
     {
-      gzwarn << "parse from urdf file [" << filename << "].\n";
+      gzlog << "parse from urdf file [" << filename << "].\n";
       return true;
     }
     else
     {
-      gzerr << "parse as old deprecated model file failed.\n";
+      gzerr << "parse as old urdf model file failed.\n";
       return false;
     }
 #endif
@@ -311,12 +311,12 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     TiXmlDocument doc = u2g.InitModelString(_xmlString);
     if (sdf::readDoc(&doc, _sdf, "urdf string"))
     {
-      gzwarn << "parse from urdf.\n";
+      gzlog << "Parsing from urdf.\n";
       return true;
     }
     else
     {
-      gzerr << "parse as old deprecated model file failed.\n";
+      gzerr << "parse as old urdf model file failed.\n";
       return false;
     }
 #endif
@@ -374,14 +374,14 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "SDF has no <sdf> element in file["
+      gzlog << "SDF has no <sdf> element in file["
              << _source << "]\n";
     else if (!gazeboNode->Attribute("version"))
-      gzwarn << "SDF element has no version in file["
+      gzlog << "SDF element has no version in file["
              << _source << "]\n";
     else if (strcmp(gazeboNode->Attribute("version"),
                     SDF::version.c_str()) != 0)
-      gzwarn << "SDF version ["
+      gzlog << "SDF version ["
             << gazeboNode->Attribute("version")
             << "] is not " << SDF::version << "\n";
     return false;
@@ -432,7 +432,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "x SDF has no <sdf> element\n";
+      gzwarn << "SDF has no <sdf> element\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "<sdf> element has no version\n";
     else if (strcmp(gazeboNode->Attribute("version"),
@@ -564,14 +564,31 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             }
           }
 
-          std::string manifest = modelPath + "/manifest.xml";
+          boost::filesystem::path manifestPath = modelPath;
+
+          // First try to get the GZ_MODEL_MANIFEST_FILENAME.
+          // If that file doesn't exist, try to get the deprecated version.
+          if (boost::filesystem::exists(
+                manifestPath / GZ_MODEL_MANIFEST_FILENAME))
+          {
+            manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
+          }
+          else
+          {
+            gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+                   << "Please rename manifest.xml to "
+                   << GZ_MODEL_MANIFEST_FILENAME << ".\n";
+
+            manifestPath /= "manifest.xml";
+          }
 
           TiXmlDocument manifestDoc;
-          if (manifestDoc.LoadFile(manifest))
+          if (manifestDoc.LoadFile(manifestPath.string()))
           {
             TiXmlElement *modelXML = manifestDoc.FirstChildElement("model");
             if (!modelXML)
-              gzerr << "No <model> element in manifest[" << manifest << "]\n";
+              gzerr << "No <model> element in manifest["
+                    << manifestPath << "]\n";
             else
             {
               TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
@@ -632,6 +649,13 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
           includeSDF->root->GetElement("model")->GetElement(
               "pose")->GetValue()->SetFromString(
                 elemXml->FirstChildElement("pose")->GetText());
+        }
+
+        if (elemXml->FirstChildElement("static"))
+        {
+          includeSDF->root->GetElement("model")->GetElement(
+              "static")->GetValue()->SetFromString(
+                elemXml->FirstChildElement("static")->GetText());
         }
 
         for (TiXmlElement *childElemXml = elemXml->FirstChildElement();

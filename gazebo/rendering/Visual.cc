@@ -19,26 +19,27 @@
  * Date: 14 Dec 2007
  */
 
-#include "rendering/ogre_gazebo.h"
-#include "sdf/sdf.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/sdf/sdf.hh"
 
-#include "msgs/msgs.hh"
-#include "common/Events.hh"
-#include "common/Common.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Common.hh"
 
-#include "rendering/WireBox.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/Scene.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/RenderEngine.hh"
-#include "common/MeshManager.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Mesh.hh"
-#include "common/Skeleton.hh"
-#include "rendering/Material.hh"
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/WireBox.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
@@ -167,7 +168,9 @@ void Visual::Fini()
   {
     this->sceneNode->removeChild((*iter)->GetSceneNode());
     (*iter)->parent.reset();
+    (*iter).reset();
   }
+
   this->children.clear();
 
   if (this->sceneNode != NULL)
@@ -242,6 +245,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+
   this->initialized = true;
 }
 
@@ -281,6 +285,18 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
       elem->GetElement("uri")->Set(_msg->geometry().mesh().filename());
+
+      if (_msg->geometry().mesh().has_submesh())
+      {
+        elem->GetElement("submesh")->GetElement("name")->Set(
+            _msg->geometry().mesh().submesh());
+      }
+
+      if (_msg->geometry().mesh().has_center_submesh())
+      {
+        elem->GetElement("submesh")->GetElement("center")->Set(
+            _msg->geometry().mesh().center_submesh());
+      }
     }
   }
 
@@ -349,6 +365,12 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetAttribute("name")->Set(_msg->plugin().name());
     if (_msg->plugin().has_filename())
       elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+    if (_msg->plugin().has_innerxml())
+    {
+      TiXmlDocument innerXML;
+      innerXML.Parse(_msg->plugin().innerxml().c_str());
+      sdf::copyChildren(elem, innerXML.RootElement());
+    }
   }
 
   this->Load();
@@ -378,6 +400,8 @@ void Visual::Load()
   pose = this->sdf->GetValuePose("pose");
 
   std::string meshName = this->GetMeshName();
+  std::string subMeshName = this->GetSubMeshName();
+  bool centerSubMesh = this->GetCenterSubMesh();
 
   if (!meshName.empty())
   {
@@ -385,12 +409,14 @@ void Visual::Load()
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-      obj = this->AttachMesh(meshName, stream.str());
+      obj = this->AttachMesh(meshName, subMeshName, centerSubMesh,
+          stream.str());
     }
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzthrow("Unable to create a mesh from " + meshName);
+      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
+      return;
     }
   }
 
@@ -629,6 +655,8 @@ void Visual::MakeStatic()
 
 //////////////////////////////////////////////////
 Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
+                                        const std::string &_subMesh,
+                                        bool _centerSubmesh,
                                         const std::string &_objName)
 {
   if (_meshName.empty())
@@ -636,13 +664,16 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 
   Ogre::MovableObject *obj;
   std::string objName = _objName;
-  if (objName.empty())
-    objName = this->sceneNode->getName() + "_ENTITY_" + _meshName;
+  std::string meshName = _meshName;
+  meshName += _subMesh.empty() ? "" : "::" + _subMesh;
 
-  this->InsertMesh(_meshName);
+  if (objName.empty())
+    objName = this->sceneNode->getName() + "_ENTITY_" + meshName;
+
+  this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(objName, _meshName));
+    (this->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -1026,6 +1057,53 @@ void Visual::AttachAxes()
 
 
 //////////////////////////////////////////////////
+void Visual::SetWireframe(bool _show)
+{
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetWireframe(_show);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          if (_show)
+            pass->setPolygonMode(Ogre::PM_WIREFRAME);
+          else
+            pass->setPolygonMode(Ogre::PM_SOLID);
+        }
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
   if (math::equal(_trans, this->transparency))
@@ -1223,12 +1301,14 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom = NULL;
     // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
 }
@@ -1293,7 +1373,7 @@ math::Pose Visual::GetWorldPose() const
   pose.pos.y = vpos.y;
   pose.pos.z = vpos.z;
 
-  vquatern = this->sceneNode->getOrientation();
+  vquatern = this->sceneNode->_getDerivedOrientation();
   pose.rot.w = vquatern.w;
   pose.rot.x = vquatern.x;
   pose.rot.y = vquatern.y;
@@ -1331,8 +1411,14 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetElement("material")->GetElement(
+  std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValueString();
+
+  std::string uriFile = common::find_file(file);
+  if (!uriFile.empty())
+    file = uriFile;
+
+  return file;
 }
 
 //////////////////////////////////////////////////
@@ -1514,23 +1600,26 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 }
 
 //////////////////////////////////////////////////
-void Visual::InsertMesh(const std::string &_meshName)
+void Visual::InsertMesh(const std::string &_meshName,
+                        const std::string &_subMesh,
+                        bool _centerSubmesh)
 {
   const common::Mesh *mesh;
   if (!common::MeshManager::Instance()->HasMesh(_meshName))
   {
     mesh = common::MeshManager::Instance()->Load(_meshName);
-    if (mesh)
-      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-    else
-      gzthrow("Unable to create a mesh from " + _meshName);
+    if (!mesh)
+    {
+      gzerr << "Unable to create a mesh from " << _meshName << "\n";
+      return;
+    }
   }
   else
   {
     mesh = common::MeshManager::Instance()->GetMesh(_meshName);
   }
 
-  this->InsertMesh(mesh);
+  this->InsertMesh(mesh, _subMesh, _centerSubmesh);
 
   // Add the mesh into OGRE
   /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
@@ -1543,9 +1632,14 @@ void Visual::InsertMesh(const std::string &_meshName)
 }
 
 //////////////////////////////////////////////////
-void Visual::InsertMesh(const common::Mesh *_mesh)
+void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
+    bool _centerSubmesh)
 {
   Ogre::MeshPtr ogreMesh;
+
+  GZ_ASSERT(_mesh != NULL, "Unable to insert a NULL mesh");
+
+  RenderEngine::Instance()->AddResourcePath(_mesh->GetPath());
 
   if (_mesh->GetSubMeshCount() == 0)
   {
@@ -1562,8 +1656,18 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   try
   {
     // Create a new mesh specifically for manual definition.
-    ogreMesh = Ogre::MeshManager::getSingleton().createManual(_mesh->GetName(),
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    if (_subMesh.empty())
+    {
+      ogreMesh = Ogre::MeshManager::getSingleton().createManual(
+          _mesh->GetName(),
+          Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    }
+    else
+    {
+      ogreMesh = Ogre::MeshManager::getSingleton().createManual(
+          _mesh->GetName() + "::" + _subMesh,
+          Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    }
 
     Ogre::SkeletonPtr ogreSkeleton;
 
@@ -1594,8 +1698,12 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       }
       ogreMesh->setSkeletonName(_mesh->GetName() + "_skeleton");
     }
+
     for (unsigned int i = 0; i < _mesh->GetSubMeshCount(); i++)
     {
+      if (!_subMesh.empty() && _mesh->GetSubMesh(i)->GetName() != _subMesh)
+        continue;
+
       Ogre::SubMesh *ogreSubMesh;
       Ogre::VertexData *vertexData;
       Ogre::VertexDeclaration* vertexDecl;
@@ -1606,25 +1714,31 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
 
       size_t currOffset = 0;
 
-      const common::SubMesh *subMesh = _mesh->GetSubMesh(i);
+      // Copy the original submesh. We may need to modify the vertices, and
+      // we don't want to change the original.
+      common::SubMesh subMesh(_mesh->GetSubMesh(i));
+
+      // Recenter the vertices if requested.
+      if (_centerSubmesh)
+        subMesh.Center();
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
-      if (subMesh->GetPrimitiveType() == common::SubMesh::TRIANGLES)
+      if (subMesh.GetPrimitiveType() == common::SubMesh::TRIANGLES)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINES)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::LINES)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_LIST;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINESTRIPS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::LINESTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_STRIP;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRIFANS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::TRIFANS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRISTRIPS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::TRISTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
-      else if (subMesh->GetPrimitiveType() == common::SubMesh::POINTS)
+      else if (subMesh.GetPrimitiveType() == common::SubMesh::POINTS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_POINT_LIST;
       else
         gzerr << "Unknown primitive type["
-              << subMesh->GetPrimitiveType() << "]\n";
+              << subMesh.GetPrimitiveType() << "]\n";
 
       ogreSubMesh->vertexData = new Ogre::VertexData();
       vertexData = ogreSubMesh->vertexData;
@@ -1639,7 +1753,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       // TODO: blending weights
 
       // normals
-      if (subMesh->GetNormalCount() > 0)
+      if (subMesh.GetNormalCount() > 0)
       {
         vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3,
                                Ogre::VES_NORMAL);
@@ -1651,7 +1765,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       // TODO: specular colors
 
       // two dimensional texture coordinates
-      if (subMesh->GetTexCoordCount() > 0)
+      if (subMesh.GetTexCoordCount() > 0)
       {
         vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
             Ogre::VES_TEXTURE_COORDINATES, 0);
@@ -1659,7 +1773,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       }
 
       // allocate the vertex buffer
-      vertexData->vertexCount = subMesh->GetVertexCount();
+      vertexData->vertexCount = subMesh.GetVertexCount();
 
       vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
                  vertexDecl->getVertexSize(0),
@@ -1674,9 +1788,9 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       if (_mesh->HasSkeleton())
       {
         common::Skeleton *skel = _mesh->GetSkeleton();
-        for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
+        for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
         {
-          common::NodeAssignment na = subMesh->GetNodeAssignment(j);
+          common::NodeAssignment na = subMesh.GetNodeAssignment(j);
           Ogre::VertexBoneAssignment vba;
           vba.vertexIndex = na.vertexIndex;
           vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
@@ -1687,7 +1801,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       }
 
       // allocate index buffer
-      ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
+      ogreSubMesh->indexData->indexCount = subMesh.GetIndexCount();
 
       ogreSubMesh->indexData->indexBuffer =
         Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
@@ -1703,32 +1817,32 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
       unsigned int j;
 
       // Add all the vertices
-      for (j = 0; j < subMesh->GetVertexCount(); j++)
+      for (j = 0; j < subMesh.GetVertexCount(); j++)
       {
-        *vertices++ = subMesh->GetVertex(j).x;
-        *vertices++ = subMesh->GetVertex(j).y;
-        *vertices++ = subMesh->GetVertex(j).z;
+        *vertices++ = subMesh.GetVertex(j).x;
+        *vertices++ = subMesh.GetVertex(j).y;
+        *vertices++ = subMesh.GetVertex(j).z;
 
-        if (subMesh->GetNormalCount() > 0)
+        if (subMesh.GetNormalCount() > 0)
         {
-          *vertices++ = subMesh->GetNormal(j).x;
-          *vertices++ = subMesh->GetNormal(j).y;
-          *vertices++ = subMesh->GetNormal(j).z;
+          *vertices++ = subMesh.GetNormal(j).x;
+          *vertices++ = subMesh.GetNormal(j).y;
+          *vertices++ = subMesh.GetNormal(j).z;
         }
 
-        if (subMesh->GetTexCoordCount() > 0)
+        if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh->GetTexCoord(j).x;
-          *vertices++ = subMesh->GetTexCoord(j).y;
+          *vertices++ = subMesh.GetTexCoord(j).x;
+          *vertices++ = subMesh.GetTexCoord(j).y;
         }
       }
 
       // Add all the indices
-      for (j = 0; j < subMesh->GetIndexCount(); j++)
-        *indices++ = subMesh->GetIndex(j);
+      for (j = 0; j < subMesh.GetIndexCount(); j++)
+        *indices++ = subMesh.GetIndex(j);
 
       const common::Material *material;
-      material = _mesh->GetMaterial(subMesh->GetMaterialIndex());
+      material = _mesh->GetMaterial(subMesh.GetMaterialIndex());
       if (material)
       {
         rendering::Material::Update(material);
@@ -1765,7 +1879,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh)
   }
   catch(Ogre::Exception &e)
   {
-    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << "]" << std::endl;
   }
 }
 
@@ -1946,7 +2060,17 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      filename = common::find_file(tmpElem->GetValueString("uri"));
+      std::string uri = tmpElem->GetValueString("uri");
+      if (uri.empty())
+      {
+        gzerr << "<uri> element missing for geometry element:\n";
+        geomElem->PrintValues("  ");
+
+        return std::string();
+      }
+
+      filename = common::find_file(uri);
+
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";
 
@@ -1955,6 +2079,44 @@ std::string Visual::GetMeshName() const
   }
 
   return std::string();
+}
+
+//////////////////////////////////////////////////
+std::string Visual::GetSubMeshName() const
+{
+  std::string result;
+
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+    if (geomElem->HasElement("mesh"))
+    {
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      if (tmpElem->HasElement("submesh"))
+        result = tmpElem->GetElement("submesh")->GetValueString("name");
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetCenterSubMesh() const
+{
+  bool result = false;
+
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+    if (geomElem->HasElement("mesh"))
+    {
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      if (tmpElem->HasElement("submesh"))
+        result = tmpElem->GetElement("submesh")->GetValueBool("center");
+    }
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

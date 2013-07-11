@@ -24,9 +24,11 @@
 #include <vector>
 #include <string>
 
-#include "common/Console.hh"
-#include "msgs/msgs.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -54,7 +56,16 @@ namespace gazebo
       /// \brief Process new incoming data
       /// \param[in] _newdata Incoming data to be processed
       /// \return true if successfully processed; false otherwise
-      public: virtual bool HandleData(const std::string &_newdata) = 0;
+      /// \param[in] _cb If non-null, callback to be invoked which signals
+      /// that transmission is complete.
+      /// \param[in] _id ID associated with the message data.
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id) = 0;
+
+      /// \brief Process new incoming message
+      /// \param[in] _newMsg Incoming message to be processed
+      /// \return true if successfully processed; false otherwise
+      public: virtual bool HandleMessage(MessagePtr _newMsg) = 0;
 
       /// \brief Is the callback local?
       /// \return true if the callback is local, false if the callback
@@ -119,11 +130,21 @@ namespace gazebo
               }
 
       // documentation inherited
-      public: virtual bool HandleData(const std::string &_newdata)
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
                 boost::shared_ptr<M> m(new M);
                 m->ParseFromString(_newdata);
                 this->callback(m);
+                if (!_cb.empty())
+                  _cb(_id);
+                return true;
+              }
+
+      // documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg)
+              {
+                this->callback(boost::dynamic_pointer_cast<M>(_newMsg));
                 return true;
               }
 
@@ -161,11 +182,24 @@ namespace gazebo
               }
 
       // documentation inherited
-      public: virtual bool HandleData(const std::string &_newdata)
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
                 this->callback(_newdata);
+                if (!_cb.empty())
+                  _cb(_id);
                 return true;
               }
+
+      // documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg)
+              {
+                std::string data;
+                _newMsg->SerializeToString(&data);
+                this->callback(data);
+                return true;
+              }
+
 
       // documentation inherited
       public: virtual bool IsLocal() const

@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.hh"
+#include "gazebo/common/common.hh"
 
 using namespace gazebo;
 class FileHandling : public ServerFixture
@@ -25,6 +25,10 @@ class FileHandling : public ServerFixture
 
 TEST_F(FileHandling, Save)
 {
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::create_directories("/tmp/gazebo_test");
+
   Load("worlds/empty.world");
 
   transport::PublisherPtr serverControlPub =
@@ -41,7 +45,7 @@ TEST_F(FileHandling, Save)
   do
   {
     filename.str("");
-    filename << "/tmp/test_" << i << ".world";
+    filename << "/tmp/gazebo_test/test_" << i << ".world";
     i++;
   } while ((file = fopen(filename.str().c_str(), "r")) != NULL);
 
@@ -60,6 +64,9 @@ TEST_F(FileHandling, Save)
   fclose(file);
 
   EXPECT_LT(i, 10);
+
+  // Cleanup test directory.
+  boost::filesystem::remove_all("/tmp/gazebo_test");
 }
 
 int main(int argc, char **argv)

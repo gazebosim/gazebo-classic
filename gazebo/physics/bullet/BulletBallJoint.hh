@@ -22,9 +22,9 @@
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
-#include "physics/BallJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/BallJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btPoint2PointConstraint;
 
@@ -88,7 +88,8 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btPoint2PointConstraint *btBall;
+      /// \brief Pointer to Bullet ball constraint
+      private: btPoint2PointConstraint *bulletBall;
     };
 
     /// \}

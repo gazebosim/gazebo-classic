@@ -18,22 +18,22 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "sdf/sdf.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/ModelDatabase.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
 
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/InsertModelWidget.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -175,6 +175,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   QList<QTreeWidgetItem *> matchList = this->fileTreeWidget->findItems(qpath,
       Qt::MatchExactly);
 
+  boost::filesystem::path dir(_path);
+
   // Create a top-level tree item for the path
   if (matchList.size() == 0)
   {
@@ -183,7 +185,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     this->fileTreeWidget->addTopLevelItem(topItem);
 
     // Add the new path to the directory watcher
-    this->watcher->addPath(qpath);
+    if (boost::filesystem::exists(dir))
+      this->watcher->addPath(qpath);
   }
   else
     topItem = matchList.first();
@@ -191,7 +194,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  boost::filesystem::path dir(_path);
   std::list<boost::filesystem::path> resultSet;
 
   if (boost::filesystem::exists(dir) &&
@@ -211,7 +213,48 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
     {
       std::string modelName;
       boost::filesystem::path fullPath = _path / dIter->filename();
-      boost::filesystem::path manifest = fullPath / "manifest.xml";
+      boost::filesystem::path manifest = fullPath;
+
+      if (!boost::filesystem::is_directory(fullPath))
+      {
+        if (dIter->filename() == "manifest.xml")
+        {
+          boost::filesystem::path tmpPath = boost::filesystem::path(_path) /
+            "database.config";
+          gzwarn << "manifest.xml for a model database is deprecated. "
+                 << "Please rename " << fullPath <<  " to "
+                 << tmpPath << "\n";
+        }
+        else if (dIter->filename() != "database.config")
+        {
+          gzlog << "Invalid filename or directory[" << fullPath
+            << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
+            << "files in a GAZEBO_MODEL_PATH because the file structure may"
+            << " be modified by Gazebo.\n";
+        }
+        continue;
+      }
+
+      // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
+      // exist, try to get the deprecated version.
+      if (boost::filesystem::exists(manifest / GZ_MODEL_MANIFEST_FILENAME))
+        manifest /= GZ_MODEL_MANIFEST_FILENAME;
+      else if (boost::filesystem::exists(manifest / "manifest.xml"))
+      {
+        gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
+          << "Please rename manifest.xml to "
+          << GZ_MODEL_MANIFEST_FILENAME << " for model "
+          << (*dIter) << "\n";
+
+        manifest /= "manifest.xml";
+      }
+
+      if (!boost::filesystem::exists(manifest) || manifest == fullPath)
+      {
+        gzlog << "model.config file is missing in directory["
+              << fullPath << "]\n";
+        continue;
+      }
 
       TiXmlDocument xmlDoc;
       if (xmlDoc.LoadFile(manifest.string()))

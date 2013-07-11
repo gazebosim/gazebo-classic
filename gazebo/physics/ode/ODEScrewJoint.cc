@@ -24,6 +24,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODEScrewJoint.hh"
 
@@ -55,7 +56,11 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 {
   dVector3 result;
-  dJointGetScrewAxis(this->jointId, result);
+
+  if (this->jointId)
+    dJointGetScrewAxis(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -66,6 +71,8 @@ math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
   math::Angle result;
   if (this->jointId)
     result = dJointGetScrewPosition(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -73,7 +80,12 @@ math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 //////////////////////////////////////////////////
 double ODEScrewJoint::GetVelocity(int /*index*/) const
 {
-  double result = dJointGetScrewPositionRate(this->jointId);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetScrewPositionRate(this->jointId);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -90,45 +102,93 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  dJointSetScrewAxis(this->jointId, _axis.x, _axis.y, _axis.z);
-}
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
 
-//////////////////////////////////////////////////
-void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // dJointSetDamping(this->jointId, this->dampingCoefficient);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+  if (this->jointId)
+    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 {
-  dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  if (this->jointId)
+    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForce(int _index, double _force)
+double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  ODEJoint::SetForce(_index, _force);
+  gzerr << "not yet implemented\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetForce(int _index, double _effort)
+{
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEScrewJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0.0)
+    _effort = math::clamp(_effort,
+      -this->effortLimit[_index], this->effortLimit[_index]);
+
+  ODEJoint::SetForce(_index, _effort);
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
-  // dJointAddScrewForce(this->jointId, _force);
-  dJointAddScrewTorque(this->jointId, _force);
+
+  if (this->jointId)
+  {
+    // dJointAddScrewForce(this->jointId, _effort);
+    dJointAddScrewTorque(this->jointId, _effort);
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
-  dJointSetScrewParam(this->jointId, _parameter, _value);
+  if (this->jointId)
+    dJointSetScrewParam(this->jointId, _parameter, _value);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 double ODEScrewJoint::GetParam(int _parameter) const
 {
-  double result = dJointGetScrewParam(this->jointId, _parameter);
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetScrewParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -144,8 +204,3 @@ double ODEScrewJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }
-
-
-
-
-

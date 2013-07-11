@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -64,6 +64,13 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
+void Pose::Set(const Vector3 &_pos, const Vector3 &_rpy)
+{
+  this->pos = _pos;
+  this->rot.SetFromEuler(_rpy);
+}
+
+//////////////////////////////////////////////////
 void Pose::Set(double _x, double _y, double _z,
                double _roll, double _pitch, double _yaw)
 {
@@ -85,12 +92,12 @@ Pose Pose::GetInverse() const
 }
 
 //////////////////////////////////////////////////
-Pose Pose::operator+(const Pose &obj) const
+Pose Pose::operator+(const Pose &_obj) const
 {
   Pose result;
 
-  result.pos = this->CoordPositionAdd(obj);
-  result.rot = this->CoordRotationAdd(obj.rot);
+  result.pos = this->CoordPositionAdd(_obj);
+  result.rot = this->CoordRotationAdd(_obj.rot);
 
   return result;
 }

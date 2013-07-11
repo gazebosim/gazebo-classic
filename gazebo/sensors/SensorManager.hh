@@ -26,10 +26,13 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <vector>
+#include <list>
 
-#include "common/SingletonT.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -37,6 +40,50 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    /// \cond
+    /// \brief A simulation time event
+    class SimTimeEvent
+    {
+      /// \brief The time at which to trigger the condition.
+      public: common::Time time;
+
+      /// \brief The condition to notify.
+      public: boost::condition_variable *condition;
+    };
+
+    /// \brief Monitors simulation time, and notifies conditions when
+    /// a specified time has been reached.
+    class SimTimeEventHandler
+    {
+      /// \brief Constructor
+      public: SimTimeEventHandler();
+
+      /// \brief Destructor
+      public: virtual ~SimTimeEventHandler();
+
+      /// \brief Add a new event to the handler.
+      /// \param[in] _time Time of the new event. The current sim time will
+      /// be add to this time.
+      /// \param[in] _var Condition to notify when the time has been
+      /// reached.
+      public: void AddRelativeEvent(const common::Time &_time,
+                  boost::condition_variable *_var);
+
+      /// \brief Called when the world is updated.
+      /// \param[in] _info Update timing information.
+      private: void OnUpdate(const common::UpdateInfo &_info);
+
+      /// \brief Mutex to mantain thread safety.
+      private: boost::mutex mutex;
+
+      /// \brief The list of events to handle.
+      private: std::list<SimTimeEvent*> events;
+
+      /// \brief Connect to the World::UpdateBegin event.
+      private: event::ConnectionPtr updateConnection;
+    };
+    /// \endcond
+
     /// \addtogroup gazebo_sensors
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
@@ -60,8 +107,13 @@ namespace gazebo
       /// \brief Init all the sensors
       public: void Init();
 
-      /// \brief Run the sensor manager update in a new thread
-      public: void Run();
+      /// \brief Deprecated
+      /// \sa RunThreads
+      public: void Run() GAZEBO_DEPRECATED(1.5);
+
+      /// \brief Run sensor updates in separate threads.
+      /// This will only run non-image based sensor updates.
+      public: void RunThreads();
 
       /// \brief Stop the run thread
       public: void Stop();
@@ -87,7 +139,7 @@ namespace gazebo
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
       /// \return A pointer to the sensor. NULL if not found.
-      public: SensorPtr GetSensor(const std::string &_name);
+      public: SensorPtr GetSensor(const std::string &_name) const;
 
       /// \brief Get all the sensors.
       /// \return Vector of all the sensors.
@@ -104,34 +156,137 @@ namespace gazebo
       /// i.e. all sensors managed by SensorManager have been initialized
       public: bool SensorsInitialized();
 
-      /// \brief Update loop
-      private: void RunLoop();
+      /// \brief Reset last update times in all sensors.
+      public: void ResetLastUpdateTimes();
 
-      /// \brief If True the sensor manager stop processing sensors.
-      private: bool stop;
+      /// \brief Add a new sensor to a sensor container.
+      /// \param[in] _sensor Pointer to a sensor to add.
+      private: void AddSensor(SensorPtr _sensor);
+
+      /// \cond
+      /// \brief A container for sensors of a specific type. This is used to
+      /// separate sensors which rely on the rendering engine from those
+      /// that do not.
+      /// This is a private embedded class because only the SensorManager
+      /// should have access to SensorContainers.
+      private: class SensorContainer
+               {
+                 /// \brief Constructor
+                 public: SensorContainer();
+
+                 /// \brief Destructor
+                 public: virtual ~SensorContainer();
+
+                 /// \brief Initialize all sensors in this container.
+                 public: void Init();
+
+                 /// \brief Finalize all sensors in this container.
+                 public: void Fini();
+
+                 /// \brief Run the sensor updates in a separate thread.
+                 public: void Run();
+
+                 /// \brief Stop the run thread.
+                 public: void Stop();
+
+                 /// \brief Update the sensors.
+                 /// \param[in] _force True to force the sensors to update,
+                 /// even if they are not active.
+                 public: virtual void Update(bool _force = false);
+
+                 /// \brief Add a new sensor to this container.
+                 /// \param[in] _sensor Pointer to a sensor to add.
+                 public: void AddSensor(SensorPtr _sensor);
+
+                 /// \brief Get a sensor by name.
+                 /// \param[in] _useLeafName False indicates that _name
+                 /// should be compared against the scoped name of a sensor.
+                 /// \return Pointer to the matching sensor. NULL if no
+                 /// sensor is found.
+                 public: SensorPtr GetSensor(const std::string &_name,
+                                             bool _useLeafName = false) const;
+
+                 /// \brief Remove a sensor by name.
+                 /// \param[in] _name Name of the sensor to remove, which
+                 /// must be a scoped name.
+                 public: bool RemoveSensor(const std::string &_name);
+
+                 /// \brief Remove all sensors.
+                 public: void RemoveSensors();
+
+                 /// \brief Reset last update times in all sensors.
+                 public: void ResetLastUpdateTimes();
+
+                 /// \brief A loop to update the sensor. Used by the
+                 /// runThread.
+                 private: void RunLoop();
+
+                 /// \brief The set of sensors to maintain.
+                 public: Sensor_V sensors;
+
+                 /// \brief Flag to inidicate when to stop the runThread.
+                 private: bool stop;
+
+                 /// \brief Flag to indicate that the sensors have been
+                 /// initialized.
+                 private: bool initialized;
+
+                 /// \brief A thread to update the sensors.
+                 private: boost::thread *runThread;
+
+                 /// \brief A mutex to manage access to the sensors vector.
+                 private: mutable boost::recursive_mutex mutex;
+
+                 /// \brief Condition used to block the RunLoop if no
+                 /// sensors are present.
+                 private: boost::condition_variable runCondition;
+               };
+      /// \endcond
+
+      /// \cond
+      /// \brief Image based sensors need a special update. So we subclass
+      /// the SensorContainer.
+      private: class ImageSensorContainer : public SensorContainer
+               {
+                 /// \brief The special update for image based sensors.
+                 /// \param[in] _force True to force the sensors to update,
+                 /// even if they are not active.
+                 public: virtual void Update(bool _force = false);
+               };
+      /// \endcond
 
       /// \brief True if SensorManager::Init has been called
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
-      /// \brief The thread to run sensor updates in.
-      private: boost::thread *runThread;
+      /// \brief True removes all sensors from all sensor containers.
+      private: bool removeAllSensors;
 
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex mutex;
-
-      /// \brief The list of initialized sensors.
-      private: Sensor_V sensors;
+      private: mutable boost::recursive_mutex mutex;
 
       /// \brief List of sensors that require initialization.
       private: Sensor_V initSensors;
 
+      /// \brief List of sensors that require initialization.
+      private: Sensor_V removeSensors;
+
+      /// \brief A vector of SensorContainer pointers.
+      private: typedef std::vector<SensorContainer*> SensorContainer_V;
+
+      /// \brief The sensor manager's vector of sensor containers.
+      private: SensorContainer_V sensorContainers;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;
+
+      /// \brief Allow access to sensorTimeMutex member var.
+      private: friend class SensorContainer;
+
+      /// \brief Pointer to the sim time event handler.
+      private: SimTimeEventHandler *simTimeEventHandler;
     };
     /// \}
   }
 }
 #endif
-
-
