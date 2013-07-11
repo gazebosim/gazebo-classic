@@ -40,6 +40,9 @@ ModelManipulator::ModelManipulator()
   this->initialized = false;
   this->selectionObj.reset();
   this->mouseMoveVis.reset();
+
+  this->manipMode = "";
+  this->selectionMode = "";
 }
 
 /////////////////////////////////////////////////
@@ -73,6 +76,8 @@ void ModelManipulator::Init()
   this->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->scene->GetWorldVisual()));
   this->selectionObj->Load();
+
+  this->selectionMode = "model";
 
   this->initialized = true;
 }
@@ -116,7 +121,8 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 //  gzerr << " rptAmt " << rpyAmt << " rpy " << rpy << std::endl;
   math::Quaternion rot(_axis, angle);
 
-  _vis->SetRotation(this->mouseMoveVisStartPose.rot * rot);
+//  _vis->SetRotation(this->mouseMoveVisStartPose.rot * rot);
+  _vis->SetWorldRotation(this->mouseMoveVisStartPose.rot * rot);
 }
 
 /////////////////////////////////////////////////
@@ -251,7 +257,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-  math::Pose pose = _vis->GetPose();
+//  math::Pose pose = _vis->GetPose();
+  math::Pose pose = _vis->GetWorldPose();
 
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
@@ -354,9 +361,9 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
   }
 
   if (!(_axis.z > 0) && !_local)
-    pose.pos.z = _vis->GetPose().pos.z;
+    pose.pos.z = _vis->GetWorldPose().pos.z;
 
-  _vis->SetPose(pose);
+  _vis->SetWorldPose(pose);
 }
 
 /////////////////////////////////////////////////
@@ -426,7 +433,10 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    vis = vis->GetRootVisual();
+
+    if (this->selectionMode != "part")
+      vis = vis->GetRootVisual();
+
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
     this->SetMouseMoveVisual(vis);
@@ -437,7 +447,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
     {
       this->selectionObj->Attach(this->mouseMoveVis);
-      this->selectionObj->SetMode(this->state);
+      this->selectionObj->SetMode(this->manipMode);
     }
     else
     {
@@ -543,7 +553,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->mouseMoveVis)
     {
-      if (this->state == "scale")
+      if (this->manipMode == "scale")
       {
         this->PublishVisualScale(this->mouseMoveVis);
         this->mouseMoveVis->SetScale(this->mouseVisualScale);
@@ -575,20 +585,25 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelManipulator::SetMode(const std::string &_mode)
+void ModelManipulator::SetManipulationMode(const std::string &_mode)
 {
-  this->state = _mode;
+  this->manipMode = _mode;
   if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE)
   {
-    this->selectionObj->SetMode(this->state);
+    this->selectionObj->SetMode(this->manipMode);
   }
 /*  if (this->selectedVis && !this->selectedVis->IsPlane())
   {
     this->selectionObj->Attach(this->selectedVis);
-    this->selectionObj->SetMode(this->state);
+    this->selectionObj->SetMode(this->manipMode);
   }*/
 }
 
+//////////////////////////////////////////////////
+void ModelManipulator::SetSelectionMode(const std::string &_mode)
+{
+  this->selectionMode = _mode;
+}
 
 /////////////////////////////////////////////////
 void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
@@ -604,8 +619,8 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
 {
   this->keyEvent = _event;
   // reset mouseMoveVisStartPose if in manipulation mode.
-  if (this->state == "translate" || this->state == "rotate"
-      || this->state == "scale")
+  if (this->manipMode == "translate" || this->manipMode == "rotate"
+      || this->manipMode == "scale")
   {
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
         || _event.key == Qt::Key_Z)
@@ -624,8 +639,8 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
 {
   this->keyEvent = _event;
   // reset mouseMoveVisStartPose if in manipulation mode.
-  if (this->state == "translate" || this->state == "rotate"
-      || this->state == "scale")
+  if (this->manipMode == "translate" || this->manipMode == "rotate"
+      || this->manipMode == "scale")
   {
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
         || _event.key == Qt::Key_Z)
@@ -640,10 +655,11 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-// Migrated from GLWidget.cc and commented out since it doesn't seem like
-// it's currently used
 /*void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
 {
+  // Function migrated here from GLWidget.cc and commented out since it doesn't
+  // seem like it's currently used but kept for future references
+
   if (!this->mouseEvent.dragging)
     return;
 

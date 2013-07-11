@@ -384,6 +384,7 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
       || this->state == "scale")
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
 
+
   return true;
 }
 
@@ -801,7 +802,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  ModelManipulator::Instance()->SetMode(_mode);
+  ModelManipulator::Instance()->SetManipulationMode(_mode);
 }
 
 /////////////////////////////////////////////////

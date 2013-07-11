@@ -45,7 +45,9 @@ namespace gazebo
 
       public: void Init();
 
-      public: void SetMode(const std::string &_mode);
+      public: void SetManipulationMode(const std::string &_mode);
+
+      public: void SetSelectionMode(const std::string &_mode);
 
       /// \brief Process an object translate mouse press event.
       public: void OnMousePressEvent(const common::MouseEvent &_event);
@@ -95,7 +97,8 @@ namespace gazebo
 
       private: rendering::SelectionObjPtr selectionObj;
 
-      private: std::string state;
+      private: std::string manipMode;
+      private: std::string selectionMode;
 
       private: math::Pose mouseMoveVisStartPose;
 
