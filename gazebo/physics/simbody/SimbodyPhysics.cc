@@ -399,6 +399,23 @@ void SimbodyPhysics::ConvertMass(void * /*_engineMass*/,
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
+  
+  if (!math::equal(_gravity.GetLength(), 0.0))
+  {
+    if (this->simbodyPhysicsInitialized)
+      this->gravity.setGravityVector(this->integ->updAdvancedState(),
+         SimbodyPhysics::Vector3ToVec3(_gravity));
+    else
+      this->gravity.setDefaultGravityVector(
+        SimbodyPhysics::Vector3ToVec3(_gravity));
+  }
+  else
+  {
+    if (this->simbodyPhysicsInitialized)
+      this->gravity.setMagnitude(this->integ->updAdvancedState(), 0.0);
+    else
+      this->gravity.setDefaultMagnitude(0.0);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -492,15 +509,13 @@ void SimbodyPhysics::CreateMultibodyGraph(
 // would not be needed in Gazebo since it does its own visualization.
 void SimbodyPhysics::InitSimbodySystem()
 {
-  math::Vector3 gzGravity = this->GetGravity();
-  const SimTK::Vec3 g(gzGravity.x, gzGravity.y, gzGravity.z);
-
   // Set stiction max slip velocity to make it less stiff.
   this->contact.setTransitionVelocity(0.01);
 
   // Specify gravity (read in above from world).
-  if (!math::equal(g.norm(), 0.0))
-    this->gravity.setDefaultGravityVector(g);
+  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+    this->gravity.setDefaultGravityVector(
+      SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
   else
     this->gravity.setDefaultMagnitude(0.0);
 }
@@ -558,13 +573,16 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     SimbodyLink* gzInb = static_cast<SimbodyLink*>(mob.getInboardBodyRef());
     SimbodyLink* gzOutb = static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
+    const MassProperties massProps = 
+        gzOutb->GetEffectiveMassProps(mob.getNumFragments());
+
     if (gzInb)
       gzerr << "debug: Inb: " << gzInb->GetName() << "\n";
     if (gzOutb)
-      gzerr << "debug: Outb: " << gzOutb->GetName() << "\n";
-
-    const MassProperties massProps = 
-        gzOutb->GetEffectiveMassProps(mob.getNumFragments());
+      gzerr << "debug: Outb: " << gzOutb->GetName()
+            << " mass: " << gzOutb->GetInertial()->GetMass()
+            << " efm: " << massProps
+            << "\n";
 
     // This will reference the new mobilized body once we create it.
     MobilizedBody mobod; 
