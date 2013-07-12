@@ -296,22 +296,42 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
+      ///
+      ///   The force and torque values are returned in  a JointWrench
+      ///   data structure.  Where JointWrench.body1Force contains the
+      ///   force applied by the parent Link on the Joint specified in
+      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the force applied by the child Link on the Joint specified
+      ///   in the child Link frame.  Note that this sign convention
+      ///   is opposite of the reaction forces of the Joint on the Links.
+      /// 
+      ///   Note that for ODE you must set
+      ///     <provide_feedback>true<provide_feedback>
+      ///   in the joint sdf to use this.
+      ///
+      /// \param[in] _index Not used right now
+      /// \return The force and torque at the joint, see above for details
+      /// on conventions.
       public: virtual JointWrench GetForceTorque(int _index)
         GAZEBO_DEPRECATED(1.5) = 0;
 
-      /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
+      /// \brief get internal force and torque values at a joint.
+      ///
+      ///   The force and torque values are returned in  a JointWrench
+      ///   data structure.  Where JointWrench.body1Force contains the
+      ///   force applied by the parent Link on the Joint specified in
+      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the force applied by the child Link on the Joint specified
+      ///   in the child Link frame.  Note that this sign convention
+      ///   is opposite of the reaction forces of the Joint on the Links.
+      /// 
+      ///   Note that for ODE you must set
+      ///     <provide_feedback>true<provide_feedback>
+      ///   in the joint sdf to use this.
+      ///
+      /// \param[in] _index Not used right now
+      /// \return The force and torque at the joint, see above for details
+      /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).
