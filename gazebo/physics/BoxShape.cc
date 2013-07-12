@@ -54,6 +54,12 @@ math::Vector3 BoxShape::GetSize() const
 //////////////////////////////////////////////////
 void BoxShape::SetScale(const math::Vector3 &_scale)
 {
+  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  {
+    gzerr << "Cannot set negative scale" << std::endl;
+    return;
+  }
+
   if (_scale == this->scale)
     return;
 

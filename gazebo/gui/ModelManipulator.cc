@@ -416,6 +416,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 
       msgs::Set(msg.mutable_scale(), _vis->GetScale());
       this->modelPub->Publish(msg);
+      _vis->SetScale(this->mouseVisualScale);
     }
   }
 }
@@ -606,7 +607,6 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (this->manipMode == "scale")
       {
         this->PublishVisualScale(this->mouseMoveVis);
-        this->mouseMoveVis->SetScale(this->mouseVisualScale);
       }
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());

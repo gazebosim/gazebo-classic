@@ -56,10 +56,20 @@ double SphereShape::GetRadius() const
 //////////////////////////////////////////////////
 void SphereShape::SetScale(const math::Vector3 &_scale)
 {
+  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  {
+    gzerr << "Cannot set negative scale" << std::endl;
+    return;
+  }
+
   if (_scale == this->scale)
     return;
 
-  this->SetRadius((_scale.x/this->scale.x)*this->GetRadius());
+  double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+  double oldRadius = std::max(this->scale.z,
+      std::max(this->scale.x, this->scale.y));
+
+  this->SetRadius((newRadius/oldRadius)*this->GetRadius());
 
   this->scale = _scale;
 }
