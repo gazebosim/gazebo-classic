@@ -98,7 +98,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     this->Reset();
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Box_" << this->boxCounter++;
+  linkNameStream << "unit_box_" << this->boxCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
@@ -140,7 +140,7 @@ std::string ModelCreator::AddSphere(double _radius,
     this->Reset();
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Sphere_" << this->sphereCounter++;
+  linkNameStream << "unit_sphere_" << this->sphereCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
@@ -183,7 +183,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
     this->Reset();
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Cylinder_" << this->cylinderCounter++;
+  linkNameStream << "unit_cylinder_" << this->cylinderCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +

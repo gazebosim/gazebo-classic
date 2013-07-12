@@ -183,11 +183,15 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (this->hoverVis && this->hoverVis != this->selectedVis)
       this->hoverVis->SetHighlighted(false);
 
-    this->hoverVis = vis;
-    if (!this->hoverVis->IsPlane())
+    // only highlight editor parts
+    if (!gui::get_entity_id(vis->GetName()))
     {
-      this->hoverVis->SetHighlighted(true);
-//    event::Events::setSelectedEntity(vis->GetName(), "normal");
+      this->hoverVis = vis;
+      if (!this->hoverVis->IsPlane())
+      {
+        this->hoverVis->SetHighlighted(true);
+  //    event::Events::setSelectedEntity(vis->GetName(), "normal");
+      }
     }
   }
 
