@@ -18,9 +18,10 @@
 #ifndef _SPHERICALCOORDINATES_HH_
 #define _SPHERICALCOORDINATES_HH_
 
+#include <string>
+
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -33,37 +34,52 @@ namespace gazebo
     /// \brief Convert spherical coordinates for planetary surfaces.
     class SphericalCoordinates
     {
-      /// \enum SurfaceModelType
-      /// \brief Unique identifies for planetary surface models.
-      public: enum SurfaceModelType {
+      /// \enum SurfaceType
+      /// \brief Unique identifiers for planetary surface models.
+      public: enum SurfaceType {
                 /// \brief Model of reference ellipsoid for earth, based on
                 /// WGS 84 standard. see wikipedia: World_Geodetic_System
                 EARTH_WGS84 = 1
               };
 
       /// \brief Constructor.
-      public: explicit SphericalCoordinates();
+      public: SphericalCoordinates();
+
+      /// \brief Constructor with surface model input.
+      /// \param[in] _model SurfaceModel specification.
+      public: SphericalCoordinates(const SurfaceType _model);
+
+      /// \brief Constructor with surface model and angle inputs.
+      /// \param[in] _model SurfaceModel specification.
+      /// \param[in] _latitude Reference latitude.
+      /// \param[in] _longitude Reference longitude.
+      /// \param[in] _heading Heading offset.
+      public: SphericalCoordinates(const SurfaceType _model,
+                                   const math::Angle &_latitude,
+                                   const math::Angle &_longitude,
+                                   const math::Angle &_heading);
 
       /// \brief Destructor.
       public: ~SphericalCoordinates();
-
-      /// \brief Load using SDF parameters.
-      /// \param[in] _sdf SDF parameters.
-      public: void Load(sdf::ElementPtr _sdf);
-
-      // Documentation inherited.
-      public: void Init();
 
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude (m).
       public: math::Vector3 Convert(const math::Vector3 &_xyz) const;
 
-      /// \brief The SDF values for this object.
-      private: sdf::ElementPtr sdf;
+      public: static SurfaceType Convert(const std::string &_str);
+      public: SurfaceType GetSurfaceModel() const;
+      public: math::Angle GetLatitudeReference() const;
+      public: math::Angle GetLongitudeReference() const;
+      public: math::Angle GetHeadingOffset() const;
+      public: void SetSurfaceModel(const SurfaceType &_model);
+      public: bool SetSurfaceModel(const std::string &_str);
+      public: void SetLatitudeReference(const math::Angle &_angle);
+      public: void SetLongitudeReference(const math::Angle &_angle);
+      public: void SetHeadingOffset(const math::Angle &_angle);
 
       /// \brief Type of surface model being used.
-      private: SurfaceModelType surfaceModel;
+      private: SurfaceType surfaceModel;
 
       /// \brief Latitude of reference point.
       private: math::Angle latitudeReference;
@@ -74,19 +90,6 @@ namespace gazebo
       /// \brief Heading offset, expressed as angle from East to
       ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
       private: math::Angle headingOffset;
-
-      /// \brief Cosine of heading offset angle.
-      private: double headingCosine;
-
-      /// \brief Sine of heading offset angle.
-      private: double headingSine;
-
-      /// \brief Meridional radius of curvature of earth at reference latitude.
-      private: double radiusMeridional;
-
-      /// \brief Radius of curvature of earth at reference latitude computed
-      ///        as ellipsoidal normal.
-      private: double radiusNormal;
     };
     /// \}
   }

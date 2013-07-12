@@ -18,13 +18,13 @@
 #ifndef _GPSSENSOR_HH_
 #define _GPSSENSOR_HH_
 
-#include <vector>
 #include <string>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -59,16 +59,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Returns pose of tag in world coordinate.
-      /// \return Pose of object.
-      public: math::Pose GetTagPose() const
-              {return entity->GetWorldPose();}
-
       /// \brief Parent entity of this sensor.
       private: physics::EntityPtr parentEntity;
 
-      /// \brief Publisher for tag pose messages.
-      private: transport::PublisherPtr scanPub;
+      /// \brief Pointer to SphericalCoordinates converter.
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
     };
     /// \}
   }

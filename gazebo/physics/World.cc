@@ -210,11 +210,20 @@ void World::Load(sdf::ElementPtr _sdf)
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
 
   // This should also come before loading of entities
-  this->sphericalCoordinates.reset(new common::SphericalCoordinates());
+  sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
+  common::SphericalCoordinates::SurfaceType surfaceModel =
+    common::SphericalCoordinates::Convert(
+      spherical->GetValueString("surface_model"));
+  math::Angle latitude, longitude, heading;
+  latitude.SetFromDegree(spherical->GetValueDouble("latitude_deg"));
+  longitude.SetFromDegree(spherical->GetValueDouble("longitude_deg"));
+  heading.SetFromDegree(spherical->GetValueDouble("heading_deg"));
+    
+  this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+    surfaceModel, latitude, longitude, heading));
+
   if (this->sphericalCoordinates == NULL)
     gzthrow("Unable to create spherical coordinates data structure\n");
-  this->sphericalCoordinates->Load(
-    this->sdf->GetElement("spherical_coordinates"));
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
@@ -292,8 +301,6 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
-
-  this->sphericalCoordinates->Init();
 
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
@@ -694,6 +701,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+{
+  return this->sphericalCoordinates;
 }
 
 //////////////////////////////////////////////////

@@ -18,8 +18,8 @@
 #include <string>
 #include <math.h>
 
-#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+
 #include "SphericalCoordinates.hh"
 
 using namespace gazebo;
@@ -35,12 +35,34 @@ const double g_earth_wgs84_axis_polar = 6356752.314245;
 const double g_earth_wgs84_flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
+SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(const std::string &_str)
+{
+  if ("EARTH_WGS84" == _str)
+    return EARTH_WGS84;
+  // else
+  gzerr << "SurfaceModel string not recognized, "
+        << "EARTH_WGS84 returned by default" << std::endl;
+  return EARTH_WGS84;
+}
+
+//////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates() :
-      surfaceModel(EARTH_WGS84),
-      headingCosine(1.0),
-      headingSine(0.0),
-      radiusMeridional(1.0),
-      radiusNormal(1.0)
+      surfaceModel(EARTH_WGS84)
+{
+}
+
+//////////////////////////////////////////////////
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _model) :
+      surfaceModel(_model)
+{
+}
+
+//////////////////////////////////////////////////
+SphericalCoordinates::SphericalCoordinates(
+    const SurfaceType _model, const math::Angle &_latitude,
+    const math::Angle &_longitude, const math::Angle &_heading) :
+      surfaceModel(_model), latitudeReference(_latitude),
+      longitudeReference(_longitude), headingOffset(_heading)
 {
 }
 
@@ -50,34 +72,61 @@ SphericalCoordinates::~SphericalCoordinates()
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::Load(sdf::ElementPtr _sdf)
+SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceModel() const
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
-
-  this->sdf = _sdf;
-
-  // Identify surface model type
-  std::string surfaceModelStr = _sdf->GetValueString("surface_model");
-
-  if ("EARTH_WGS84" == surfaceModelStr)
-    this->surfaceModel = EARTH_WGS84;
-  else
-  {
-    gzwarn << "surface_model parameter not recognized, "
-           << "EARTH_WGS84 will be used by default\n";
-    this->surfaceModel = EARTH_WGS84;
-  }
-
-  this->latitudeReference.SetFromDegree(_sdf->GetValueDouble("latitude_deg"));
-  this->longitudeReference.SetFromDegree(_sdf->GetValueDouble("longitude_deg"));
-  this->headingOffset.SetFromDegree(_sdf->GetValueDouble("heading_deg"));
-  this->headingCosine = cos(this->headingOffset.Radian());
-  this->headingSine = sin(this->headingOffset.Radian());
+  return this->surfaceModel;
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::Init()
+math::Angle SphericalCoordinates::GetLatitudeReference() const
 {
+  return this->latitudeReference;
+}
+
+//////////////////////////////////////////////////
+math::Angle SphericalCoordinates::GetLongitudeReference() const
+{
+  return this->longitudeReference;
+}
+
+//////////////////////////////////////////////////
+math::Angle SphericalCoordinates::GetHeadingOffset() const
+{
+  return this->headingOffset;
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetSurfaceModel(const SurfaceType &_model)
+{
+  this->surfaceModel = _model;
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetLatitudeReference(const math::Angle &_angle)
+{
+  this->latitudeReference.SetFromRadian(_angle.Radian());
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetLongitudeReference(const math::Angle &_angle)
+{
+  this->longitudeReference.SetFromRadian(_angle.Radian());
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
+{
+  this->headingOffset.SetFromRadian(_angle.Radian());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
+{
+  double radiusMeridional = 1.0;
+  double radiusNormal = 1.0;
+  double headingSine = sin(this->headingOffset.Radian());
+  double headingCosine = cos(this->headingOffset.Radian());
+
   switch (this->surfaceModel)
   {
     case EARTH_WGS84:
@@ -90,31 +139,27 @@ void SphericalCoordinates::Init()
         double cosLat = cos(this->latitudeReference.Radian());
         double sinLat = sin(this->latitudeReference.Radian());
         double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
-        this->radiusMeridional = ab*ab / denom / sqrt(denom);
-        this->radiusNormal = a*a / sqrt(denom);
+        radiusMeridional = ab*ab / denom / sqrt(denom);
+        radiusNormal = a*a / sqrt(denom);
       }
       break;
 
     default:
       break;
   }
-}
 
-//////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
-{
   math::Vector3 spherical;
-  double east  = _xyz.x * this->headingCosine - _xyz.y * this->headingSine;
-  double north = _xyz.x * this->headingSine   + _xyz.y * this->headingCosine;
+  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
+  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
   // Assumes small changes in latitude / longitude.
   // May not work well near the north / south poles.
-  math::Angle deltaLatitude(north / this->radiusMeridional);
-  math::Angle deltaLongitude(east / this->radiusNormal);
+  math::Angle deltaLatitude(north / radiusMeridional);
+  math::Angle deltaLongitude(east / radiusNormal);
   // geodetic latitude in degrees
   spherical.x = this->latitudeReference.Degree() + deltaLatitude.Degree();
   // geodetic longitude in degrees
   spherical.y = this->longitudeReference.Degree() + deltaLongitude.Degree();
   // geodetic altitude
-  spherical.z = this->radiusNormal + _xyz.z;
+  spherical.z = radiusNormal + _xyz.z;
   return spherical;
 }
