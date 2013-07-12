@@ -118,6 +118,14 @@ TEST(BoxShapeTest, Scale)
   EXPECT_DOUBLE_EQ(size.x, 0.5);
   EXPECT_DOUBLE_EQ(size.y, 1.0);
   EXPECT_DOUBLE_EQ(size.z, 2.5);
+
+  // Test scaling with negative components
+  // This should fail and size should remain the same as before
+  box->SetScale(math::Vector3(-1.0, -2.0, -3.0));
+  size = box->GetSize();
+  EXPECT_DOUBLE_EQ(size.x, 0.5);
+  EXPECT_DOUBLE_EQ(size.y, 1.0);
+  EXPECT_DOUBLE_EQ(size.z, 2.5);
 }
 
 int main(int argc, char **argv)

@@ -123,6 +123,14 @@ TEST(CylinderShapeTest, Scale)
   // radius should be multiplied by max of (0.5, 1.0)
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 2.5);
+
+  // Test scaling with negative components
+  // This should fail and radius and length should remain the same as before
+  cylinder->SetScale(math::Vector3(-1.0, -2.0, -3.0));
+  radius = cylinder->GetRadius();
+  length = cylinder->GetLength();
+  EXPECT_DOUBLE_EQ(radius, 0.5);
+  EXPECT_DOUBLE_EQ(length, 2.5);
 }
 
 int main(int argc, char **argv)

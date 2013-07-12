@@ -100,6 +100,12 @@ TEST(SphereShapeTest, Scale)
   radius = sphere->GetRadius();
   // radius should be multiplied by max of (0.5, 1.0, 2.5)
   EXPECT_DOUBLE_EQ(radius, 1.25);
+
+  // Test scaling with negative components
+  // This should fail and radius should remain the same as before
+  sphere->SetScale(math::Vector3(-1.0, -2.0, -3.0));
+  radius = sphere->GetRadius();
+  EXPECT_DOUBLE_EQ(radius, 1.25);
 }
 
 int main(int argc, char **argv)
