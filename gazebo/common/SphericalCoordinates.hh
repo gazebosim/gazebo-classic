@@ -67,7 +67,10 @@ namespace gazebo
       ///         altitude (m).
       public: math::Vector3 Convert(const math::Vector3 &_xyz) const;
 
+      // TODO: finish doxygen comments
+      /// \brief Convert a string to a SurfaceType.
       public: static SurfaceType Convert(const std::string &_str);
+
       public: SurfaceType GetSurfaceModel() const;
       public: math::Angle GetLatitudeReference() const;
       public: math::Angle GetLongitudeReference() const;
