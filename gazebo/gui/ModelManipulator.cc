@@ -84,16 +84,21 @@ void ModelManipulator::Init()
 
 /////////////////////////////////////////////////
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool /*_local*/)
+    const math::Vector3 &_axis, bool _local)
 {
   math::Vector3 normal;
 
-  if (_axis.x > 0)
-    normal = mouseMoveVisStartPose.rot.GetXAxis();
-  else if (_axis.y > 0)
-    normal = mouseMoveVisStartPose.rot.GetYAxis();
-  else if (_axis.z > 0)
-    normal = mouseMoveVisStartPose.rot.GetZAxis();
+  if (_local)
+  {
+    if (_axis.x > 0)
+      normal = mouseMoveVisStartPose.rot.GetXAxis();
+    else if (_axis.y > 0)
+      normal = mouseMoveVisStartPose.rot.GetYAxis();
+    else if (_axis.z > 0)
+      normal = mouseMoveVisStartPose.rot.GetZAxis();
+  }
+  else
+    normal = _axis;
 
   double offset = this->mouseMoveVisStartPose.pos.Dot(normal);
 
@@ -121,8 +126,12 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 //  gzerr << " rptAmt " << rpyAmt << " rpy " << rpy << std::endl;
   math::Quaternion rot(_axis, angle);
 
-//  _vis->SetRotation(this->mouseMoveVisStartPose.rot * rot);
-  _vis->SetWorldRotation(this->mouseMoveVisStartPose.rot * rot);
+  if (_local)
+    rot = this->mouseMoveVisStartPose.rot * rot;
+  else
+    rot = rot * this->mouseMoveVisStartPose.rot;
+
+  _vis->SetWorldRotation(rot);
 }
 
 /////////////////////////////////////////////////
