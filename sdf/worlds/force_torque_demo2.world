@@ -33,7 +33,7 @@
     </physics>
     <!-- test contributed by jesper -->
     <model name="boxes">
-      <pose>0 0 0 0 0 1.57</pose>
+      <pose>0 0 0 0 0 0</pose>
       <link name="link1">
         <collision name="collision">
           <pose>0.5 0 0.5 0 0 0</pose>
@@ -71,9 +71,9 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyz>0.0</iyz>
+            <ixy>0.05</ixy>
+            <ixz>0.05</ixz>
+            <iyz>0.05</iyz>
           </inertia>
         </inertial>
       </link>
@@ -102,9 +102,9 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyz>0.0</iyz>
+            <ixy>0.05</ixy>
+            <ixz>0.05</ixz>
+            <iyz>0.05</iyz>
           </inertia>
         </inertial>
       </link>
@@ -133,12 +133,36 @@
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyz>0.0</iyz>
+            <ixy>0.05</ixy>
+            <ixz>0.05</ixz>
+            <iyz>0.05</iyz>
           </inertia>
         </inertial>
       </link>
+
+      <!-- debug
+     -->
+      <joint name="joint0" type="revolute">
+        <physics>
+          <ode>
+            <provide_feedback>true</provide_feedback>
+            <cfm_damping>true</cfm_damping>
+          </ode>
+        </physics>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-1e-6</lower>
+            <upper>1e-6</upper>
+          </limit>
+          <dynamics>
+            <damping>100.000000</damping>
+          </dynamics>
+        </axis>
+        <parent>world</parent>
+        <child>link1</child>
+      </joint>
+
       <joint name="joint1" type="revolute">
         <physics>
           <ode>
@@ -148,8 +172,14 @@
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
+          <!--
+          <limit>
+            <lower>-1e-6</lower>
+            <upper>1e-6</upper>
+          </limit>
+          -->
           <dynamics>
-            <damping>100.000000</damping>
+            <damping>30.000000</damping>
           </dynamics>
         </axis>
         <parent>link1</parent>
