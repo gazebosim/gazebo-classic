@@ -21,6 +21,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #define PHYSICS_TOL 1e-2
+#define NUMERICAL_TOL 1e-8
 using namespace gazebo;
 
 class PhysicsTest : public ServerFixture
@@ -324,8 +325,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_EQ(vel1.x, 0);
-      EXPECT_EQ(vel1.y, 0);
+      EXPECT_NEAR(vel1.x, 0, NUMERICAL_TOL);
+      EXPECT_NEAR(vel1.y, 0, NUMERICAL_TOL);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);

@@ -30,6 +30,7 @@
 #include <deque>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/math/Angle.hh"
@@ -682,6 +683,15 @@ namespace gazebo
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Position PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
+      private: common::PID trackVisualYawPID;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType
