@@ -196,44 +196,83 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
   SimTK::SpatialVec reactionForceOnChildBodyInGround =
     this->mobod.findMobilizerReactionOnBodyAtMInGround(state);
 
-  // re-express in link frame
-  SimTK::Vec3 reactionTorqueOnChildBody =
-    this->mobod.expressGroundVectorInBodyFrame(
-    state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
-  SimTK::Vec3 reactionForceOnChildBody =
-    this->mobod.expressGroundVectorInBodyFrame(
-    state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+  // gzerr << "name [" << this->GetName() << "]\n";
+  // gzerr << "  rx on parent body in ground ["
+  //       << reactionForceOnParentBodyInGround << "]\n";
+  // gzerr << "  rx on child body in ground ["
+  //       << reactionForceOnChildBodyInGround << "]\n";
 
-  SimTK::Vec3 reactionTorqueOnParentBody =
-    this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
-    state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
-  SimTK::Vec3 reactionForceOnParentBody =
-    this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
-    state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+  // FIXME: if we are re-expressing in perspective link frame
+  // SimTK::Vec3 reactionTorqueOnParentBody =
+  //   this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
+  //   state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
+  // SimTK::Vec3 reactionForceOnParentBody =
+  //   this->mobod.getParentMobilizedBody().expressGroundVectorInBodyFrame(
+  //   state, reactionForceOnParentBodyInGround[1]);   // [1] force element
 
-  if (!this->isReversed)
+  if (this->isReversed)
   {
+    // simbody and gazebo disagree on child link and parent link
+    SimTK::MobilizedBody targetLinkFrame = this->mobod.getParentMobilizedBody();
+    // re-express in gazebo child link frame
+    //   (parent link in simbody since reversed)
+    SimTK::Vec3 reactionTorqueOnChildBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnChildBodyInGround[0]);   // [0] torque element
+    SimTK::Vec3 reactionForceOnChildBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnChildBodyInGround[1]);   // [1] force element
+
+    SimTK::Vec3 reactionTorqueOnParentBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
+    SimTK::Vec3 reactionForceOnParentBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+
+    // gzerr << "reversed\n";
+    // Note minus sign indicates these are reaction forces
+    // by the Link on the Joint in the target Link frame.
     wrench.body1Force =
-      SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
     wrench.body1Torque =
-      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
 
     wrench.body2Force =
-      SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
     wrench.body2Torque =
-      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
   }
   else
   {
+    // simbody and gazebo agree on child link and parent link
+    SimTK::MobilizedBody targetLinkFrame = this->mobod;
+    // re-express in child link frame
+    SimTK::Vec3 reactionTorqueOnChildBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnChildBodyInGround[0]);   // [0] torque element
+    SimTK::Vec3 reactionForceOnChildBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnChildBodyInGround[1]);   // [1] force element
+
+    SimTK::Vec3 reactionTorqueOnParentBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
+    SimTK::Vec3 reactionForceOnParentBody =
+      targetLinkFrame.expressGroundVectorInBodyFrame(
+      state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+
+    // Note minus sign indicates these are reaction forces
+    // by the Link on the Joint in the target Link frame.
     wrench.body1Force =
-      SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
     wrench.body1Torque =
-      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
 
     wrench.body2Force =
-      SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
     wrench.body2Torque =
-      SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+      -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
   }
   return wrench;
 }
