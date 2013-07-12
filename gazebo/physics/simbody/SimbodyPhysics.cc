@@ -661,7 +661,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             double high = gzJoint->GetUpperLimit(0u).Radian();
             gzJoint->limitForce.reset(
               new Force::MobilityLinearStop(this->forces, mobod,
-              SimTK::MobilizerQIndex(0), 1.0e7, 50.0, low, high));
+              SimTK::MobilizerQIndex(0), 1.0e8, 1.0, low, high));
 
             if (gzJoint->GetDampingCoefficient() > 0.0)
             {
