@@ -266,8 +266,10 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
   // Cast two rays from the camera into the world
   this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
       this->mouseEvent.pos.y, origin1, dir1);
-  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
-      this->mouseEvent.pressPos.y, origin2, dir2);
+  this->userCamera->GetCameraToViewportRay(this->mouseStart.x,
+      this->mouseStart.y, origin2, dir2);
+//  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
+//      this->mouseEvent.pressPos.y, origin2, dir2);
 
   math::Vector3 planeNorm(0, 0, 0);
   math::Vector3 projNorm(0, 0, 0);
@@ -414,6 +416,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
+  this->mouseStart = _event.pressPos;
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
@@ -433,8 +436,9 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-
-    if (this->selectionMode != "part")
+//    if (this->selectionMode != "part")
+//      vis = vis->GetRootVisual();
+    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
       vis = vis->GetRootVisual();
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
@@ -469,49 +473,57 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     if (this->mouseMoveVis &&
         this->mouseEvent.button == common::MouseEvent::LEFT)
     {
-      if (this->selectionObj->GetState()
-          == rendering::SelectionObj::TRANS_X)
+      if (this->selectionObj->GetState() == rendering::SelectionObj::TRANS_X
+          || this->keyEvent.key == Qt::Key_X)
       {
         this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::TRANS_Y)
+          == rendering::SelectionObj::TRANS_Y
+          || this->keyEvent.key == Qt::Key_Y)
       {
         this->TranslateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::TRANS_Z)
+          == rendering::SelectionObj::TRANS_Z
+          || this->keyEvent.key == Qt::Key_Z)
       {
         this->TranslateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::ROT_X)
+          == rendering::SelectionObj::ROT_X
+          || this->keyEvent.key == Qt::Key_X)
       {
         this->RotateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::ROT_Y)
+          == rendering::SelectionObj::ROT_Y
+          || this->keyEvent.key == Qt::Key_Y)
       {
         this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::ROT_Z)
+          == rendering::SelectionObj::ROT_Z
+          || this->keyEvent.key == Qt::Key_Z)
       {
         this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::SCALE_X)
+          == rendering::SelectionObj::SCALE_X
+          || this->keyEvent.key == Qt::Key_X)
       {
         this->ScaleEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
 
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::SCALE_Y)
+          == rendering::SelectionObj::SCALE_Y
+          || this->keyEvent.key == Qt::Key_Y)
       {
         this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
       }
       else if (this->selectionObj->GetState()
-          == rendering::SelectionObj::SCALE_Z)
+          == rendering::SelectionObj::SCALE_Z
+          || this->keyEvent.key == Qt::Key_Z)
       {
         this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
       }
@@ -622,10 +634,11 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
   if (this->manipMode == "translate" || this->manipMode == "rotate"
       || this->manipMode == "scale")
   {
-    if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
+    if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->mouseEvent.pressPos = this->mouseEvent.pos;
+//      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      this->mouseStart = this->mouseEvent.pos;
       if (this->mouseMoveVis)
       {
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
@@ -642,16 +655,18 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   if (this->manipMode == "translate" || this->manipMode == "rotate"
       || this->manipMode == "scale")
   {
-    if (_event.key == Qt::Key_X || _event.key == Qt::Key_X
+    if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->mouseEvent.pressPos = this->mouseEvent.pos;
+//      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      this->mouseStart = this->mouseEvent.pos;
       if (this->mouseMoveVis)
       {
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
       }
     }
   }
+  this->keyEvent.key = 0;
 }
 
 /////////////////////////////////////////////////

@@ -98,9 +98,11 @@ namespace gazebo
       private: rendering::SelectionObjPtr selectionObj;
 
       private: std::string manipMode;
+
       private: std::string selectionMode;
 
       private: math::Pose mouseMoveVisStartPose;
+      private: math::Vector2i mouseStart;
 
       private: rendering::VisualPtr selectedVis, mouseMoveVis;
 

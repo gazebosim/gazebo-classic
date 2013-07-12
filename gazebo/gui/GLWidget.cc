@@ -302,7 +302,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
-  ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
+  ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
