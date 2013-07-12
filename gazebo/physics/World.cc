@@ -55,7 +55,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/SphericalCoordinates.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -210,7 +210,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
 
   // This should also come before loading of entities
-  this->sphericalCoordinates.reset(new SphericalCoordinates());
+  this->sphericalCoordinates.reset(new common::SphericalCoordinates());
   if (this->sphericalCoordinates == NULL)
     gzthrow("Unable to create spherical coordinates data structure\n");
   this->sphericalCoordinates->Load(
