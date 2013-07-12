@@ -309,8 +309,7 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 /////////////////////////////////////////////////
 SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
-  if (this->simbodyPhysics->simbodyPhysicsInitialized &&
-     !this->IsStatic())
+  if (!this->IsStatic())
   {
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
