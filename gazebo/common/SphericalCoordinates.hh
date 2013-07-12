@@ -24,12 +24,12 @@
 
 namespace gazebo
 {
-  namespace physics
+  namespace common
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_common
     /// \{
 
-    /// \class SphericalCoordinates SphericalCoordinates.hh physics/physcs.hh
+    /// \class SphericalCoordinates SphericalCoordinates.hh commmon/common.hh
     /// \brief Convert spherical coordinates for planetary surfaces.
     class SphericalCoordinates
     {

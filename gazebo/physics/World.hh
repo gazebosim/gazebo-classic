@@ -123,7 +123,7 @@ namespace gazebo
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
-      public: SphericalCoordinatesPtr GetSphericalCoordinates() const;
+      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -454,7 +454,7 @@ namespace gazebo
       private: PhysicsEnginePtr physicsEngine;
 
       /// \brief Pointer the spherical coordinates data.
-      private: SphericalCoordinatesPtr sphericalCoordinates;
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;

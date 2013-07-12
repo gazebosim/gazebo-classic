@@ -23,7 +23,7 @@
 #include "SphericalCoordinates.hh"
 
 using namespace gazebo;
-using namespace physics;
+using namespace common;
 
 // Parameters for EARTH_WGS84 model
 // a: Semi-major equatorial axis (meters)
