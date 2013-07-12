@@ -300,11 +300,16 @@ namespace gazebo
       ///   The force and torque values are returned in  a JointWrench
       ///   data structure.  Where JointWrench.body1Force contains the
       ///   force applied by the parent Link on the Joint specified in
-      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the child Link frame, and JointWrench.body2Force contains
       ///   the force applied by the child Link on the Joint specified
       ///   in the child Link frame.  Note that this sign convention
       ///   is opposite of the reaction forces of the Joint on the Links.
       /// 
+      ///   FIXME TODO: change name of this function to something like:
+      ///     GetNegatedForceTorqueInChildLinkFrame
+      ///   and make GetForceTorque call return non-negated reaction forces
+      ///   in perspective Link frames.
+      ///
       ///   Note that for ODE you must set
       ///     <provide_feedback>true<provide_feedback>
       ///   in the joint sdf to use this.
@@ -320,11 +325,16 @@ namespace gazebo
       ///   The force and torque values are returned in  a JointWrench
       ///   data structure.  Where JointWrench.body1Force contains the
       ///   force applied by the parent Link on the Joint specified in
-      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the child Link frame, and JointWrench.body2Force contains
       ///   the force applied by the child Link on the Joint specified
       ///   in the child Link frame.  Note that this sign convention
       ///   is opposite of the reaction forces of the Joint on the Links.
-      /// 
+      ///
+      ///   FIXME TODO: change name of this function to something like:
+      ///     GetNegatedForceTorqueInChildLinkFrame
+      ///   and make GetForceTorque call return non-negated reaction forces
+      ///   in perspective Link frames.
+      ///
       ///   Note that for ODE you must set
       ///     <provide_feedback>true<provide_feedback>
       ///   in the joint sdf to use this.
