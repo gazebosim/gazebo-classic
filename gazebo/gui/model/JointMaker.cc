@@ -74,7 +74,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       this->jointLine->AddPoint(math::Vector3(0, 0, 0));
       this->jointLine->AddPoint(math::Vector3(0, 0, 0.01));
 
-      switch (this->createJointType)
+      switch (this->jointType)
       {
         case JOINT_FIXED:
         {
@@ -115,8 +115,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
           break;
 
       }
-
-//      this->jointLines.push_back(jointLine);
     }
     else if (this->selectedVis != vis)
     {
@@ -126,7 +124,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       if (this->selectedVis)
         this->selectedVis->SetHighlighted(false);
       // create the joint by publishing to server!?
-
+      this->child = vis;
       this->selectedVis.reset();
       this->hoverVis.reset();
       this->jointVis.reset();
@@ -142,7 +140,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::CreateJoint(JointMaker::JointType _type)
 {
-  this->createJointType = _type;
+  this->jointType = _type;
   if (_type != JointMaker::JOINT_NONE)
   {
     // Add an event filter, which allows the TerrainEditor to capture

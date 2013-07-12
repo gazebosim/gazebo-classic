@@ -3,6 +3,7 @@ include (${QT_USE_FILE})
 
 
 set (sources
+  JointInspector.cc
   JointMaker.cc
   ModelEditor.cc
   ModelCreator.cc
@@ -10,6 +11,7 @@ set (sources
 )
 
 set (qt_headers
+  JointInspector.hh
   ModelEditor.hh
   ModelEditorPalette.hh
 )

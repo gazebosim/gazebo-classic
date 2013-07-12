@@ -26,6 +26,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class JointData;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -96,8 +98,8 @@ namespace gazebo
       /// \brief Visual line used to represent joint connecting parent and child
       private: rendering::DynamicLines *jointLine;
 
-      /// \brief Keep track of joint type that
-      private: JointMaker::JointType createJointType;
+      /// \brief Type of joint created
+      private: JointMaker::JointType jointType;
 
 //      private: rendering::UserCameraPtr userCamera;
 
@@ -107,11 +109,14 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Visual that is currently being drawn
+      /// \brief Visual containing the dynamic line
       private: rendering::VisualPtr jointVis;
 
-      /// \brief Currently selected visual
+      /// \brief Parent visual the joint is connected to.
       private: rendering::VisualPtr parent;
+
+      /// \brief Child visual the joint is connected to.
+      private: rendering::VisualPtr child;
     };
     /// \}
   }
