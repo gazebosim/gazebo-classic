@@ -30,3 +30,4 @@ event::EventT<void ()> Events::orbit;
 event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
 event::EventT<void (int)> Events::inputStepSize;
+event::EventT<void (const std::string &)> Events::follow;

@@ -30,6 +30,7 @@ set (sources
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
+  KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
   MeshMaker.cc
@@ -69,6 +70,7 @@ set (headers
   EntityMaker.hh
   Gui.hh
   GuiEvents.hh
+  KeyEventHandler.hh
   LightMaker.hh
   MeshMaker.hh
   MouseEventHandler.hh
