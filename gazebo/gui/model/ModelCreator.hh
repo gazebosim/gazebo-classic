@@ -120,6 +120,11 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseMovePart(const common::MouseEvent &_event);
 
+      /// \brief Mouse event filter callback when mouse is double clicked.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
+
       // Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 

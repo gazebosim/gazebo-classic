@@ -69,6 +69,9 @@ namespace gazebo
       /// \param[_type] Type of joint to be created
       public: void CreateJoint(JointType _type);
 
+      /// \brief Update callback on PreRender.
+      public: void Update();
+
       /// \brief Mouse event filter callback when mouse button is pressed in
       /// create joint mode.
       /// \param[in] _event The mouse event.
@@ -95,10 +98,10 @@ namespace gazebo
       public: void SetChild(rendering::VisualPtr _child,
           math::Vector3 _offset = math::Vector3::Zero);*/
 
-      /// \brief Visual line used to represent joint connecting parent and child
-      private: rendering::DynamicLines *jointLine;
+      /// \brief Helper method to create hotspot visual for mouse interaction.
+      private: void CreateHotSpot();
 
-      /// \brief Type of joint created
+      /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
 //      private: rendering::UserCameraPtr userCamera;
@@ -109,16 +112,36 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Visual containing the dynamic line
-      private: rendering::VisualPtr jointVis;
+      /// \brief All joints created by joint maker.
+      private: std::vector<JointData *> joints;
 
-      /// \brief Parent visual the joint is connected to.
-      private: rendering::VisualPtr parent;
+      /// \brief All the event connections.
+      private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Child visual the joint is connected to.
-      private: rendering::VisualPtr child;
+      /// \brief Flag set to true when a joint has been connected.
+      private: bool newJointCreated;
     };
     /// \}
+
+    /// \class JointData JointData.hh
+    /// \brief Helper class to store joint data
+    class JointData
+    {
+      /// \brieft Visual containing the dynamic line
+      public: rendering::VisualPtr visual;
+
+      /// \brief Parent visual the joint is connected to.
+      public: rendering::VisualPtr parent;
+
+      /// \brief Child visual the joint is connected to.
+      public: rendering::VisualPtr child;
+
+      /// \brief Visual line used to represent joint connecting parent and child
+      public: rendering::DynamicLines *line;
+
+      /// \brief Type of joint
+      public: JointMaker::JointType type;
+    };
   }
 }
 #endif

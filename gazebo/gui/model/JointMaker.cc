@@ -21,6 +21,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
@@ -33,12 +34,16 @@ using namespace gui;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&JointMaker::Update, this)));
+
+  this->newJointCreated = false;
 }
 
 /////////////////////////////////////////////////
 JointMaker::~JointMaker()
 {
-  delete this->jointLine;
   this->hoverVis.reset();
 }
 
@@ -58,57 +63,66 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 
   if (this->hoverVis)
   {
+    if (this->hoverVis->IsPlane())
+      return false;
+
     if (!this->selectedVis)
     {
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
-      rendering::VisualPtr joint(
+      rendering::VisualPtr jointVis(
           new rendering::Visual(this->selectedVis->GetName() +
           "_JOINTCREATOR_VISUAL_", this->selectedVis));
-      this->jointVis = joint;
-      this->jointVis->Load();
-      this->parent = this->selectedVis;
-      this->jointLine =
+      jointVis->Load();
+      rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      this->jointLine->AddPoint(math::Vector3(0, 0, 0));
-      this->jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+      jointLine->AddPoint(math::Vector3(0, 0, 0));
+      jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+
+
+      JointData *jointData = new JointData;
+      jointData->visual = jointVis;
+      jointData->parent = this->selectedVis;
+//      jointData->line = NULL;
+      jointData->line = jointLine;
+      joints.push_back(jointData);
 
       switch (this->jointType)
       {
         case JOINT_FIXED:
         {
-          this->jointLine->setMaterial("Gazebo/Red");
+          jointLine->setMaterial("Gazebo/Red");
           break;
         }
         case JOINT_HINGE:
         {
-          this->jointLine->setMaterial("Gazebo/Orange");
+          jointLine->setMaterial("Gazebo/Orange");
           break;
         }
         case JOINT_HINGE2:
         {
-          this->jointLine->setMaterial("Gazebo/Yellow");
+          jointLine->setMaterial("Gazebo/Yellow");
           break;
         }
         case JOINT_SLIDER:
         {
-          this->jointLine->setMaterial("Gazebo/Green");
+          jointLine->setMaterial("Gazebo/Green");
           break;
         }
         case JOINT_SCREW:
         {
-          this->jointLine->setMaterial("Gazebo/Black");
+          jointLine->setMaterial("Gazebo/Black");
           break;
         }
         case JOINT_UNIVERSAL:
         {
-          this->jointLine->setMaterial("Gazebo/Blue");
+          jointLine->setMaterial("Gazebo/Blue");
           break;
         }
         case JOINT_BALL:
         {
-          this->jointLine->setMaterial("Gazebo/Purple");
+          jointLine->setMaterial("Gazebo/Purple");
           break;
         }
         default:
@@ -118,18 +132,15 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     }
     else if (this->selectedVis != vis)
     {
-      this->jointLine = NULL;
       if (this->hoverVis)
         this->hoverVis->SetHighlighted(false);
       if (this->selectedVis)
         this->selectedVis->SetHighlighted(false);
-      // create the joint by publishing to server!?
-      this->child = vis;
+      this->joints.back()->child = vis;
       this->selectedVis.reset();
       this->hoverVis.reset();
-      this->jointVis.reset();
-      this->parent.reset();
       this->CreateJoint(JointMaker::JOINT_NONE);
+      this->newJointCreated = true;
     }
   }
 
@@ -163,7 +174,8 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != common::MouseEvent::LEFT ||
+      _event.dragging)
     return false;
 
   // Get the active camera and scene.
@@ -195,14 +207,15 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 
   // Case when a parent part is already selected and currently
   // extending the joint line to a child part
-  if (this->selectedVis && this->hoverVis && this->jointLine)
+  if (this->selectedVis && this->hoverVis
+      && this->joints.back()->line)
   {
     math::Vector3 parentPos;
     if (!this->hoverVis->IsPlane())
     {
-      if (this->parent)
-        parentPos = this->parent->GetWorldPose().pos;
-      this->jointLine->SetPoint(1,
+      if (this->joints.back()->parent)
+        parentPos = this->joints.back()->parent->GetWorldPose().pos;
+      this->joints.back()->line->SetPoint(1,
           this->hoverVis->GetWorldPose().pos - parentPos);
     }
     else
@@ -212,13 +225,54 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           math::Plane(math::Vector3(0, 0, 1)), pt);
 
 //      this->jointLine->SetChild(this->hoverVis, pt);
-      if (this->parent)
-        parentPos = this->parent->GetWorldPose().pos;
-      this->jointLine->SetPoint(1,
+      if (this->joints.back()->parent)
+        parentPos = this->joints.back()->parent->GetWorldPose().pos;
+      this->joints.back()->line->SetPoint(1,
           this->hoverVis->GetWorldPose().pos - parentPos + pt);
     }
   }
-
-
   return true;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::CreateHotSpot()
+{
+  if (this->joints.size() == 0 || !this->joints.back()->parent
+      || !this->joints.back()->child)
+    return;
+
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+
+  rendering::VisualPtr hotspotVisual(
+      new rendering::Visual(this->joints.back()->visual->GetName() + "_hotspot",
+//      camera->GetScene()));
+      this->joints.back()->visual));
+
+ hotspotVisual->InsertMesh("unit_box");
+
+
+
+  Ogre::MovableObject *hotspotObj =
+      (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
+      "__HOTSPOT__" + this->joints.back()->visual->GetName(), "unit_box"));
+  hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
+  hotspotVisual->SetMaterial("Gazebo/RedTransparent");
+  hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
+
+  hotspotVisual->SetWorldPosition(
+      this->joints.back()->parent->GetWorldPose().pos +
+      (this->joints.back()->child->GetWorldPose().pos -
+      this->joints.back()->parent->GetWorldPose().pos)/2.0);
+
+  gzerr << "hotspot " << hotspotVisual->GetWorldPose().pos << std::endl;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::Update()
+{
+  if (this->newJointCreated)
+  {
+    this->CreateHotSpot();
+    this->newJointCreated = false;
+  }
 }

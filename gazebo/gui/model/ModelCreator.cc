@@ -281,6 +281,15 @@ void ModelCreator::Reset()
     this->RemovePart(this->allParts.begin()->first);
   }
   this->allParts.clear();
+
+  MouseEventHandler::Instance()->AddPressFilter("model_part",
+      boost::bind(&ModelCreator::OnMousePressPart, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_part",
+      boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
+      boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -369,11 +378,11 @@ void ModelCreator::CreatePart(PartType _type)
   {
     // Add an event filter, which allows the TerrainEditor to capture
     // mouse events.
-    MouseEventHandler::Instance()->AddPressFilter("model_part",
+/*    MouseEventHandler::Instance()->AddPressFilter("model_part",
         boost::bind(&ModelCreator::OnMousePressPart, this, _1));
 
     MouseEventHandler::Instance()->AddMoveFilter("model_part",
-        boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
+        boost::bind(&ModelCreator::OnMouseMovePart, this, _1));*/
 
     switch (_type)
     {
@@ -399,8 +408,8 @@ void ModelCreator::CreatePart(PartType _type)
   else
   {
     // Remove the event filters.
-    MouseEventHandler::Instance()->RemovePressFilter("model_part");
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_part");
+//    MouseEventHandler::Instance()->RemovePressFilter("model_part");
+//    MouseEventHandler::Instance()->RemoveMoveFilter("model_part");
   }
 }
 
@@ -408,13 +417,14 @@ void ModelCreator::CreatePart(PartType _type)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (!this->mouseVisual || _event.button != common::MouseEvent::LEFT)
     return false;
-
-  this->mouseVisual.reset();
-  this->CreatePart(PART_NONE);
-  return true;
-
+  else
+  {
+    this->mouseVisual.reset();
+    this->CreatePart(PART_NONE);
+    return true;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -464,6 +474,24 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   this->mouseVisual->SetWorldPose(pose);
 
   return true;
+}
+
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
+{
+
+//  gzerr << " double down! " << std::endl;
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (!gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /*

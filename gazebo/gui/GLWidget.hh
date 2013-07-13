@@ -121,6 +121,11 @@ namespace gazebo
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
+      /// \brief Callback for a mouse double click event.
+      /// \param[in] _event The mouse double click event
+      /// \return True if handled by this function.
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
+
       private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void SmartMoveVisual(rendering::VisualPtr _vis);
