@@ -38,7 +38,28 @@
           <update_rate>10.0</update_rate>
           <topic>gpu_scan</topic>
           <gps>
-            
+            <position>
+              <horizontal>
+                <noise>
+                  <type>gaussian_quantized</type>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>0.5</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise>
+                  <type>gaussian_quantized</type>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>1.0</precision>
+                </noise>
+              </vertical>
+            </position>
           </gps>
         </sensor>
       </link>

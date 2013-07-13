@@ -210,17 +210,19 @@ void World::Load(sdf::ElementPtr _sdf)
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
 
   // This should also come before loading of entities
-  sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
-  common::SphericalCoordinates::SurfaceType surfaceModel =
-    common::SphericalCoordinates::Convert(
-      spherical->GetValueString("surface_model"));
-  math::Angle latitude, longitude, heading;
-  latitude.SetFromDegree(spherical->GetValueDouble("latitude_deg"));
-  longitude.SetFromDegree(spherical->GetValueDouble("longitude_deg"));
-  heading.SetFromDegree(spherical->GetValueDouble("heading_deg"));
-    
-  this->sphericalCoordinates.reset(new common::SphericalCoordinates(
-    surfaceModel, latitude, longitude, heading));
+  {
+    sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
+    common::SphericalCoordinates::SurfaceType surfaceModel =
+      common::SphericalCoordinates::Convert(
+        spherical->GetValueString("surface_model"));
+    math::Angle latitude, longitude, heading;
+    latitude.SetFromDegree(spherical->GetValueDouble("latitude_deg"));
+    longitude.SetFromDegree(spherical->GetValueDouble("longitude_deg"));
+    heading.SetFromDegree(spherical->GetValueDouble("heading_deg"));
+      
+    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceModel, latitude, longitude, heading));
+  }
 
   if (this->sphericalCoordinates == NULL)
     gzthrow("Unable to create spherical coordinates data structure\n");
