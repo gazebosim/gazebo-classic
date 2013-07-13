@@ -39,7 +39,6 @@ GpsSensor::~GpsSensor()
 void GpsSensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_worldName, _sdf);
-  // Todo: parse sdf noise parameters
 }
 
 /////////////////////////////////////////////////
@@ -48,6 +47,8 @@ void GpsSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->parentEntity = this->world->GetEntity(this->parentName);
+
+  // Todo: parse sdf noise parameters
 }
 
 /////////////////////////////////////////////////

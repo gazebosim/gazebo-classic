@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface GPS
+/// \brief Data from a GPS sensor
+
+
+import "time.proto";
+import "vector3d.proto";
+
+message IMU
+{
+  required Time stamp                   = 1;
+  required string entity_name           = 2;
+  required double latitude_deg          = 3;
+  required double longitude_deg         = 4;
+  required double altitude              = 5;
+}
