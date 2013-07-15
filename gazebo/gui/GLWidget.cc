@@ -430,7 +430,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
-  if (vis)
+  if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
   {
     if (vis->IsPlane())
     {
@@ -453,6 +453,9 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
       this->userCamera->MoveToVisual(vis);
     }
   }
+  else
+    return false;
+
   return true;
 }
 
@@ -464,6 +467,8 @@ void GLWidget::OnMousePressTranslate()
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
+      /// TODO for testing without gui_interaction, remove me later
+    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
     vis = vis->GetRootVisual();
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 

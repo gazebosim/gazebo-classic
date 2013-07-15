@@ -127,7 +127,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     _pose.pos.z + _size.z/2));
   }
 
-  this->allParts[linkName] = linkVisual;
+  this->allParts[visVisual->GetName()] = visVisual;
   this->mouseVisual = linkVisual;
   return linkName;
 }
@@ -169,7 +169,7 @@ std::string ModelCreator::AddSphere(double _radius,
     _pose.pos.z + _radius));
   }
 
-  this->allParts[linkName] = linkVisual;
+  this->allParts[visVisual->GetName()] = visVisual;
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -214,7 +214,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
     _pose.pos.z + _length/2));
   }
 
-  this->allParts[linkName] = linkVisual;
+  this->allParts[visVisual->GetName()] = visVisual;
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -480,17 +480,16 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
 {
-
-//  gzerr << " double down! " << std::endl;
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {
-    if (!gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    if (this->allParts.find(vis->GetName()) !=
+        this->allParts.end())
     {
+      gzerr << " got model part " << vis->GetName() <<  std::endl;
       return true;
     }
   }
-
   return false;
 }
 

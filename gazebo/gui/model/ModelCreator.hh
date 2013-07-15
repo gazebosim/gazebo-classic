@@ -20,7 +20,9 @@
 #include <list>
 #include <string>
 #include <vector>
-#include <map>
+
+#include <boost/unordered/unordered_map.hpp>
+
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
@@ -203,7 +205,7 @@ namespace gazebo
       private: PartType createPartType;
 
       /// \brief A map of model part names to and their visuals.
-      private: std::map<std::string, rendering::VisualPtr> allParts;
+      private: boost::unordered_map<std::string, rendering::VisualPtr> allParts;
     };
     /// \}
   }

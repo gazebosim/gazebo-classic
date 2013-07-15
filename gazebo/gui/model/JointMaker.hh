@@ -19,22 +19,29 @@
 #define _JOINTMAKER_HH_
 
 #include <string>
+#include <boost/unordered/unordered_map.hpp>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
     class JointData;
+    class JointInspector;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class JointMaker JointMaker.hh
     /// \brief Joint visualization
-    class JointMaker
+    class JointMaker : public QObject
     {
+      Q_OBJECT
+
       /// \enum Joint types
       /// \brief Unique identifiers for joint types that can be created.
       public: enum JointType
@@ -72,17 +79,20 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
-      /// \brief Mouse event filter callback when mouse button is pressed in
-      /// create joint mode.
+      /// \brief Mouse event filter callback when mouse button is pressed .
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
       private: bool OnMousePress(const common::MouseEvent &_event);
 
-      /// \brief Mouse event filter callback when mouse is moved in create
-      /// joint mode.
+      /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
       private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is double clicked.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
 /*      /// \brief Set parent of joint.
       /// \param[in] _parent Pointer to parent visual.
@@ -100,6 +110,10 @@ namespace gazebo
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
+
+      /// \brief Qt Callback when joint inspector configurations are to be
+      /// applied.
+      private slots: void OnApply();
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
@@ -120,6 +134,12 @@ namespace gazebo
 
       /// \brief Flag set to true when a joint has been connected.
       private: bool newJointCreated;
+
+      private: boost::unordered_map<JointMaker::JointType, std::string>
+          jointMaterials;
+
+      /// \brief Inspector for configuring joint properties.
+      private: JointInspector *inspector;
     };
     /// \}
 
@@ -127,8 +147,11 @@ namespace gazebo
     /// \brief Helper class to store joint data
     class JointData
     {
-      /// \brieft Visual containing the dynamic line
+      /// \brieft Visual of the dynamic line
       public: rendering::VisualPtr visual;
+
+      /// \brieft Visual of the hotspot
+      public: rendering::VisualPtr hotspot;
 
       /// \brief Parent visual the joint is connected to.
       public: rendering::VisualPtr parent;
@@ -141,6 +164,9 @@ namespace gazebo
 
       /// \brief Type of joint
       public: JointMaker::JointType type;
+
+      /// \brief True if the joint visual needs update.
+      public: bool dirty;
     };
   }
 }

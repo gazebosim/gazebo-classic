@@ -12,12 +12,12 @@ set (sources
 
 set (qt_headers
   JointInspector.hh
+  JointMaker.hh
   ModelEditor.hh
   ModelEditorPalette.hh
 )
 
 set (headers
-  JointMaker.hh
   ModelCreator.hh
 )
 

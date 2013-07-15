@@ -34,50 +34,12 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   QLabel *jointLabel = new QLabel(tr("Joint Name:"));
   this->jointNameLabel = new QLabel(tr(""));
 
-  std::string jointTypeStr;
-  int axisCount = 0;
-  if (this->jointType == JointMaker::JOINT_FIXED)
-  {
-    jointTypeStr = "Fixed";
-    axisCount = 0;
-  }
-  else if (this->jointType == JointMaker::JOINT_SLIDER)
-  {
-    jointTypeStr = "Prismatic";
-    axisCount = 1;
-  }
-  else if (this->jointType == JointMaker::JOINT_HINGE)
-  {
-    jointTypeStr = "Revolute";
-    axisCount = 1;
-  }
-  else if (this->jointType == JointMaker::JOINT_HINGE2)
-  {
-    jointTypeStr = "Revolute2";
-    axisCount = 2;
-  }
-  else if (this->jointType == JointMaker::JOINT_SCREW)
-  {
-    jointTypeStr = "Screw";
-    axisCount = 1;
-  }
-  else if (this->jointType == JointMaker::JOINT_UNIVERSAL)
-  {
-    jointTypeStr = "Universal";
-    axisCount = 2;
-  }
-  else if (this->jointType == JointMaker::JOINT_BALL)
-  {
-    jointTypeStr = "Ball";
-    axisCount = 0;
-  }
-
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(jointLabel);
   nameLayout->addWidget(jointNameLabel);
 
   QLabel *typeLabel = new QLabel(tr("Type: "));
-  this->jointTypeLabel = new QLabel(tr(jointTypeStr.c_str()));
+  this->jointTypeLabel = new QLabel("");
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
   typeLayout->addWidget(this->jointTypeLabel);
@@ -115,7 +77,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   QGroupBox *anchorGroupBox = new QGroupBox(tr("Anchor"));
   anchorGroupBox->setLayout(anchorLayout);
 
-  std::vector<QGroupBox *> axisGroupBoxes;
+  int axisCount = 2;
   for (int i = 0; i < axisCount; ++i)
   {
     QLabel *axisXLabel = new QLabel(tr("x: "));
@@ -155,7 +117,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     ss << "Axis" << (i+1);
     QGroupBox *axisGroupBox = new QGroupBox(tr(ss.str().c_str()));
     axisGroupBox->setLayout(axisLayout);
-    axisGroupBoxes.push_back(axisGroupBox);
+    this->axisGroupBoxes.push_back(axisGroupBox);
   }
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
@@ -175,9 +137,15 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   mainLayout->addLayout(nameLayout);
   mainLayout->addWidget(anchorGroupBox);
   for (unsigned int i = 0; i < axisGroupBoxes.size(); ++i)
-    mainLayout->addWidget(axisGroupBoxes[i]);
+  {
+    mainLayout->addWidget(this->axisGroupBoxes[i]);
+    this->axisGroupBoxes[i]->setVisible(false);
+  }
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+
+  if (this->jointType)
+    this->SetType(this->jointType);
 }
 
 /////////////////////////////////////////////////
@@ -210,6 +178,54 @@ math::Vector3 JointInspector::GetAxis(int _index) const
 JointMaker::JointType JointInspector::GetType() const
 {
   return this->jointType;
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetType(JointMaker::JointType _type)
+{
+  this->jointType =  _type;
+
+  std::string jointTypeStr = "";
+  int axisCount = 0;
+  if (this->jointType == JointMaker::JOINT_FIXED)
+  {
+    jointTypeStr = "Fixed";
+    axisCount = 0;
+  }
+  else if (this->jointType == JointMaker::JOINT_SLIDER)
+  {
+    jointTypeStr = "Prismatic";
+    axisCount = 1;
+  }
+  else if (this->jointType == JointMaker::JOINT_HINGE)
+  {
+    jointTypeStr = "Revolute";
+    axisCount = 1;
+  }
+  else if (this->jointType == JointMaker::JOINT_HINGE2)
+  {
+    jointTypeStr = "Revolute2";
+    axisCount = 2;
+  }
+  else if (this->jointType == JointMaker::JOINT_SCREW)
+  {
+    jointTypeStr = "Screw";
+    axisCount = 1;
+  }
+  else if (this->jointType == JointMaker::JOINT_UNIVERSAL)
+  {
+    jointTypeStr = "Universal";
+    axisCount = 2;
+  }
+  else if (this->jointType == JointMaker::JOINT_BALL)
+  {
+    jointTypeStr = "Ball";
+    axisCount = 0;
+  }
+  this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
+
+  for (int i = 0; i < axisCount; ++i)
+    this->axisGroupBoxes[i]->setVisible(true);
 }
 
 /////////////////////////////////////////////////

@@ -112,6 +112,9 @@ namespace gazebo
 
       /// \brief Type of joint.
       private: JointMaker::JointType jointType;
+
+      /// \brief A list of group boxes for configuring joint axis properties.
+      private: std::vector<QGroupBox *> axisGroupBoxes;
     };
     /// \}
   }
