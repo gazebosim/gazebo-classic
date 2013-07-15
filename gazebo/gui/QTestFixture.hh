@@ -27,7 +27,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qt_test.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "test_config.h"
 
 /// \brief Base class for all Gazebo GUI unit tests.

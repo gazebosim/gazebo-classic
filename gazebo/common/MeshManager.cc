@@ -27,7 +27,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/STLLoader.hh"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/MeshCSG.hh"
