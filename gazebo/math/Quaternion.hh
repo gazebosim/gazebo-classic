@@ -164,7 +164,8 @@ namespace gazebo
     /// \param[in] _z z
     public: void Set(double _u, double _x, double _y, double _z);
 
-    /// \brief Set the quaternion from Euler angles
+    /// \brief Set the quaternion from Euler angles. The order of operations
+    /// are roll, pitch, yaw.
     /// \param[in] vec  Euler angle
     public: void SetFromEuler(const Vector3 &_vec);
 

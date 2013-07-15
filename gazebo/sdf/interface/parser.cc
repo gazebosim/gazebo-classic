@@ -23,7 +23,7 @@
 #include "gazebo/sdf/interface/SDF.hh"
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"

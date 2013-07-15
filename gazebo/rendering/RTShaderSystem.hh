@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/common/SingletonT.hh"

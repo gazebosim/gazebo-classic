@@ -6,10 +6,6 @@ include_directories(SYSTEM
   ${SDF_INCLUDE_DIRS}
 )
 
-include_directories(
-  ${PROJECT_BINARY_DIR}/gazebo
-)
-
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}

@@ -20,7 +20,6 @@ set (sources GazeboDriver.cc
 include_directories( 
   ${SDF_INCLUDE_DIRS} 
   ${PLAYER_INCLUDE_DIRS} 
-  ${PROJECT_BINARY_DIR}/gazebo 
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}

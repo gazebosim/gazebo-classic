@@ -48,7 +48,7 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 
 #include "test_config.h"

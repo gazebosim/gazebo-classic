@@ -1,6 +1,5 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}
-  ${PROJECT_BINARY_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
 )
