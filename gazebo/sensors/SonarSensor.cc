@@ -243,6 +243,8 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
   math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
   math::Vector3 pos;
 
+  this->sonarMsg.mutable_sonar()->set_range(-1);
+
   // Iterate over all the contact messages
   for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();
       iter != this->incomingContacts.end(); ++iter)
@@ -253,8 +255,6 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
       // Debug output:
       // std::cout << "Collision1[" << (*iter)->contact(i).collision1() << "]"
       //  << "C2[" << (*iter)->contact(i).collision2() << "]\n";
-
-      this->sonarMsg.mutable_sonar()->set_range(-1);
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
