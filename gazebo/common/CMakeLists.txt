@@ -103,6 +103,12 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 
 gz_add_library(gazebo_common ${sources})
 
+# It should suffice to call set_source_files_properties specifically on
+# SystemPaths.cc, but that didn't work for me.
+add_definitions(-DGAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}")
+add_definitions(-DGAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}")
+add_definitions(-DGAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}")
+
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
                                     ${Boost_LIBRARIES}
