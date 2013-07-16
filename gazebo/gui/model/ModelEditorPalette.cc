@@ -147,15 +147,14 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   ballJointButton->setChecked(false);
   connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
 
-
-  QButtonGroup *jointsButtonGroup = new QButtonGroup;
-  jointsButtonGroup->addButton(fixedJointButton);
-  jointsButtonGroup->addButton(sliderJointButton);
-  jointsButtonGroup->addButton(hingeJointButton);
-  jointsButtonGroup->addButton(hinge2JointButton);
-  jointsButtonGroup->addButton(screwJointButton);
-  jointsButtonGroup->addButton(universalJointButton);
-  jointsButtonGroup->addButton(ballJointButton);
+  jointsButtonGroup = new QButtonGroup;
+  this->jointsButtonGroup->addButton(fixedJointButton);
+  this->jointsButtonGroup->addButton(sliderJointButton);
+  this->jointsButtonGroup->addButton(hingeJointButton);
+  this->jointsButtonGroup->addButton(hinge2JointButton);
+  this->jointsButtonGroup->addButton(screwJointButton);
+  this->jointsButtonGroup->addButton(universalJointButton);
+  this->jointsButtonGroup->addButton(ballJointButton);
 
   jointsLayout->addWidget(jointsLabel, 0, 0);
   jointsLayout->addWidget(fixedJointButton, 1, 0);
@@ -181,6 +180,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->modelCreator = new ModelCreator();
   this->jointMaker = new JointMaker();
+
+  connect(jointMaker, SIGNAL(JointCreated()), this, SLOT(OnJointCreated()));
 
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
@@ -277,4 +278,13 @@ void ModelEditorPalette::OnUniversalJoint()
 void ModelEditorPalette::OnBallJoint()
 {
   this->jointMaker->CreateJoint(JointMaker::JOINT_BALL);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointCreated()
+{
+  this->jointsButtonGroup->setExclusive(false);
+  if (this->jointsButtonGroup->checkedButton())
+    this->jointsButtonGroup->checkedButton()->setChecked(false);
+  this->jointsButtonGroup->setExclusive(true);
 }

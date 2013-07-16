@@ -41,7 +41,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-  ModelCreator::ModelCreator() : EntityMaker()
+ModelCreator::ModelCreator() : EntityMaker()
 {
   this->modelName = "";
 

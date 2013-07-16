@@ -100,17 +100,23 @@ namespace gazebo
       /// \brief Qt callback when universal joint button is clicked.
       private slots: void OnBallJoint();
 
+      /// \brief Qt callback when a joint has been created.
+      private slots: void OnJointCreated();
+
       /// \brief Widget that display model properties.
       private: QTreeWidget *modelTreeWidget;
 
-      /// \brief Model settings item
+      /// \brief Model settings item in the tree widget.
       private: QTreeWidgetItem *modelSettingsItem;
 
-      /// \brief Model settings item
+      /// \brief Model parts item in the tree widget.
       private: QTreeWidgetItem *modelItem;
 
-      /// \brief Plugin item
+      /// \brief Plugin item in the tree widget.
       private: QTreeWidgetItem *pluginItem;
+
+      /// \brief Joints button group.
+      private: QButtonGroup *jointsButtonGroup;
 
       /// \brief Visual line used to represent joint connecting parent and child
       // private: rendering::DynamicLines *jointLine;

@@ -126,6 +126,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       this->hoverVis.reset();
       this->CreateJoint(JointMaker::JOINT_NONE);
       this->newJointCreated = true;
+      emit JointCreated();
     }
   }
 

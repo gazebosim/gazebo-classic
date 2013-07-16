@@ -111,6 +111,9 @@ namespace gazebo
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
 
+      /// \brief Qt signal when the joint creation process has ended.
+      Q_SIGNALS: void JointCreated();
+
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.
       private slots: void OnApply();
