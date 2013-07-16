@@ -50,6 +50,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load();
 
+      /// \brief Update the Visual
+      private: void Update();
+
       /// \brief Callback when sonar data is received.
       private: void OnMsg(ConstSonarStampedPtr &_msg);
 
@@ -64,6 +67,18 @@ namespace gazebo
 
       /// \brief Renders the sonar cone.
       private: Ogre::SceneNode *coneNode;
+
+      /// \brief The current sonar message.
+      private: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;
+
+      /// \brief All the event connections.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      /// \brief True if we have received a message.
+      private: bool receivedMsg;
     };
     /// \}
   }
