@@ -403,7 +403,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.
