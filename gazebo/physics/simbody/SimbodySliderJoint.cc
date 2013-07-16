@@ -87,7 +87,7 @@ void SimbodySliderJoint::SetVelocity(int /*_index*/, double _angle)
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented in simbody\n";
+  gzdbg << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
