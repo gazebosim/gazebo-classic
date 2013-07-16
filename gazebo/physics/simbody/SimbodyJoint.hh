@@ -109,6 +109,9 @@ namespace gazebo
       protected: SimTK::MultibodySystem *world;
 
       // Documentation inherited.
+      void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
 
       // Documentation inherited.

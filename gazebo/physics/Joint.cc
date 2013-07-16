@@ -214,36 +214,6 @@ void Joint::Init()
     }
   }
 
-  if (this->parentLink)
-  {
-    math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
-
-    // Set joint axis
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
-    }
-
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
-    }
-  }
-  else
-  {
-    // if parentLink is NULL, it's name be the world
-    this->sdf->GetElement("parent")->Set("world");
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-    }
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-    }
-  }
   // \TODO: this requres Joint::GetGlobalAxis, which breaks Simbody's
   // Init order, state has not been created yet.
   // this->ComputeInertiaRatio();
