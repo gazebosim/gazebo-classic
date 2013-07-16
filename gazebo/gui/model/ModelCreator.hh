@@ -43,8 +43,9 @@ namespace gazebo
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a building.
-    class ModelCreator : public EntityMaker
+    class ModelCreator : public QObject
     {
+      Q_OBJECT
 
       /// \enum Joint types
       /// \brief Unique identifiers for joint types that can be created.
@@ -127,12 +128,6 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
 
-      // Documentation inherited
-      public: virtual void Start(const rendering::UserCameraPtr _camera);
-
-      // Documentation inherited
-      public: virtual void Stop();
-
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
 
@@ -151,6 +146,9 @@ namespace gazebo
 
       /// \brief Get a template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
+
+      /// \brief Qt signal when the a part has been added.
+      Q_SIGNALS: void PartAdded();
 
 /*      /// \brief Callback for saving the model.
       private: void OnSave();
@@ -206,6 +204,14 @@ namespace gazebo
 
       /// \brief A map of model part names to and their visuals.
       private: boost::unordered_map<std::string, rendering::VisualPtr> allParts;
+
+      /// \brief Transport node
+      private: transport::NodePtr node;
+
+      /// \brief Publisher that publishes msg to the server once the model is
+      /// created.
+      private: transport::PublisherPtr makerPub;
+
     };
     /// \}
   }

@@ -112,7 +112,7 @@ namespace gazebo
       private: void CreateHotSpot();
 
       /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void JointCreated();
+      Q_SIGNALS: void JointAdded();
 
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.

@@ -91,10 +91,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
-  QButtonGroup *partsButtonGroup = new QButtonGroup;
-  partsButtonGroup->addButton(cylinderButton);
-  partsButtonGroup->addButton(sphereButton);
-  partsButtonGroup->addButton(boxButton);
+  this->partsButtonGroup = new QButtonGroup;
+  this->partsButtonGroup->addButton(cylinderButton);
+  this->partsButtonGroup->addButton(sphereButton);
+  this->partsButtonGroup->addButton(boxButton);
 
   partsLayout->addWidget(partsLabel, 0, 0);
   partsLayout->addWidget(cylinderButton, 1, 0);
@@ -181,7 +181,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelCreator = new ModelCreator();
   this->jointMaker = new JointMaker();
 
-  connect(jointMaker, SIGNAL(JointCreated()), this, SLOT(OnJointCreated()));
+  connect(jointMaker, SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
+  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
@@ -281,10 +282,19 @@ void ModelEditorPalette::OnBallJoint()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointCreated()
+void ModelEditorPalette::OnJointAdded()
 {
   this->jointsButtonGroup->setExclusive(false);
   if (this->jointsButtonGroup->checkedButton())
     this->jointsButtonGroup->checkedButton()->setChecked(false);
   this->jointsButtonGroup->setExclusive(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnPartAdded()
+{
+  this->partsButtonGroup->setExclusive(false);
+  if (this->partsButtonGroup->checkedButton())
+    this->partsButtonGroup->checkedButton()->setChecked(false);
+  this->partsButtonGroup->setExclusive(true);
 }

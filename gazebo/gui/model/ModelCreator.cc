@@ -41,7 +41,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelCreator::ModelCreator() : EntityMaker()
+ModelCreator::ModelCreator() /*: EntityMaker()*/
 {
   this->modelName = "";
 
@@ -70,13 +70,17 @@ ModelCreator::ModelCreator() : EntityMaker()
   this->cylinderCounter = 0;
   this->sphereCounter = 0;
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+
   this->Reset();
 }
 
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
-  this->camera.reset();
+//  this->camera.reset();
 /*  if (this->saveDialog)
     delete this->saveDialog;
   if (this->finishDialog)
@@ -129,6 +133,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   this->allParts[visVisual->GetName()] = visVisual;
   this->mouseVisual = linkVisual;
+
   return linkName;
 }
 
@@ -242,17 +247,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::Stop()
-{
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::Reset()
 {
   this->saved = false;
@@ -321,7 +315,7 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
 void ModelCreator::FinishModel()
 {
   this->CreateTheEntity();
-  this->Stop();
+//  this->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -421,6 +415,7 @@ bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
     return false;
   else
   {
+    emit PartAdded();
     this->mouseVisual.reset();
     this->CreatePart(PART_NONE);
     return true;
