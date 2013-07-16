@@ -127,7 +127,10 @@ namespace gazebo
       private: rendering::VisualPtr selectedVis;
 
       /// \brief All joints created by joint maker.
-      private: std::vector<JointData *> joints;
+      private: boost::unordered_map<std::string, JointData *> joints;
+
+      /// \brief Joint currently being created.
+      private: JointData *mouseJoint;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;

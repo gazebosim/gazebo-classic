@@ -31,7 +31,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
 
   this->jointType = _jointType;
 
-  QLabel *jointLabel = new QLabel(tr("Joint Name:"));
+  QLabel *jointLabel = new QLabel(tr("Name:"));
   this->jointNameLabel = new QLabel(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
@@ -135,6 +135,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
+  mainLayout->addLayout(typeLayout);
   mainLayout->addWidget(anchorGroupBox);
   for (unsigned int i = 0; i < axisGroupBoxes.size(); ++i)
   {
@@ -226,6 +227,9 @@ void JointInspector::SetType(JointMaker::JointType _type)
 
   for (int i = 0; i < axisCount; ++i)
     this->axisGroupBoxes[i]->setVisible(true);
+
+  for (int i = axisCount; i < 2; ++i)
+    this->axisGroupBoxes[i]->setVisible(false);
 }
 
 /////////////////////////////////////////////////

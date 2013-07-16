@@ -41,6 +41,7 @@ JointMaker::JointMaker()
         boost::bind(&JointMaker::Update, this)));
 
   this->newJointCreated = false;
+  this->mouseJoint = NULL;
 
   this->jointMaterials[JOINT_FIXED] = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE] = "Gazebo/Orange";
@@ -86,12 +87,15 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 
     if (!this->selectedVis)
     {
+      if (this->mouseJoint)
+        return false;
+
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
       rendering::VisualPtr jointVis(
           new rendering::Visual(this->selectedVis->GetName() +
-          "_JOINTCREATOR_VISUAL_", this->selectedVis));
+          "_JOINT_", this->selectedVis));
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -105,7 +109,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       jointData->parent = this->selectedVis;
       jointData->line = jointLine;
       jointData->type = this->jointType;
-      joints.push_back(jointData);
+      this->mouseJoint = jointData;
       jointData->line->setMaterial(this->jointMaterials[jointData->type]);
 
     }
@@ -115,7 +119,9 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
         this->hoverVis->SetHighlighted(false);
       if (this->selectedVis)
         this->selectedVis->SetHighlighted(false);
-      this->joints.back()->child = vis;
+      this->mouseJoint->child = vis;
+
+      // reset variables.
       this->selectedVis.reset();
       this->hoverVis.reset();
       this->CreateJoint(JointMaker::JOINT_NONE);
@@ -184,15 +190,15 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Case when a parent part is already selected and currently
   // extending the joint line to a child part
   if (this->selectedVis && this->hoverVis
-      && this->joints.back()->line)
+      && this->mouseJoint && this->mouseJoint->line)
   {
     math::Vector3 parentPos;
     // Set end point to center of child part
     if (!this->hoverVis->IsPlane())
     {
-      if (this->joints.back()->parent)
-        parentPos = this->joints.back()->parent->GetWorldPose().pos;
-      this->joints.back()->line->SetPoint(1,
+      if (this->mouseJoint->parent)
+        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+      this->mouseJoint->line->SetPoint(1,
           this->hoverVis->GetWorldPose().pos - parentPos);
     }
     else
@@ -201,9 +207,9 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       math::Vector3 pt;
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
-      if (this->joints.back()->parent)
-        parentPos = this->joints.back()->parent->GetWorldPose().pos;
-      this->joints.back()->line->SetPoint(1,
+      if (this->mouseJoint->parent)
+        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+      this->mouseJoint->line->SetPoint(1,
           this->hoverVis->GetWorldPose().pos - parentPos + pt);
     }
   }
@@ -218,8 +224,12 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    gzerr << "got it " << vis->GetName() << std::endl;
-//    this->inspector->SetType(this->joints[);
+    JointData *joint = this->joints[vis->GetName()];
+    if (joint)
+    {
+      this->inspector->SetType(joint->type);
+      this->inspector->SetName(joint->visual->GetName());
+    }
     this->inspector->show();
     return true;
   }
@@ -230,11 +240,10 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void JointMaker::CreateHotSpot()
 {
-  if (this->joints.size() == 0 || !this->joints.back()->parent
-      || !this->joints.back()->child)
+  if (!this->mouseJoint)
     return;
 
-  JointData *joint = joints.back();
+  JointData *joint = this->mouseJoint;
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
@@ -262,6 +271,9 @@ void JointMaker::CreateHotSpot()
 
   camera->GetScene()->AddVisual(hotspotVisual);
   joint->hotspot = hotspotVisual;
+
+  this->joints[hotspotVisual->GetName()] = this->mouseJoint;
+  this->mouseJoint = NULL;
   joint->dirty = true;
 }
 
@@ -274,18 +286,20 @@ void JointMaker::Update()
     this->newJointCreated = false;
   }
 
-  for (unsigned int i = 0; i < this->joints.size(); ++i)
+  boost::unordered_map<std::string, JointData *>::iterator it;
+  for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
-    if (joints[i]->dirty)
+    JointData *joint = it->second;
+    if (joint->dirty)
     {
-      this->joints[i]->line->SetPoint(1,
-            this->joints[i]->child->GetWorldPose().pos -
-            this->joints[i]->parent->GetWorldPose().pos);
+      joint->line->SetPoint(1,
+            joint->child->GetWorldPose().pos -
+            joint->parent->GetWorldPose().pos);
 
-      this->joints[i]->hotspot->SetWorldPosition(
-          this->joints[i]->parent->GetWorldPose().pos +
-          (this->joints[i]->child->GetWorldPose().pos -
-          this->joints[i]->parent->GetWorldPose().pos)/2.0);
+      joint->hotspot->SetWorldPosition(
+          joint->parent->GetWorldPose().pos +
+          (joint->child->GetWorldPose().pos -
+          joint->parent->GetWorldPose().pos)/2.0);
     }
   }
 }
