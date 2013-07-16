@@ -243,7 +243,7 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
   math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
   math::Vector3 pos;
 
-  this->sonarMsg.mutable_sonar()->set_range(-1);
+  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
   // Iterate over all the contact messages
   for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();
@@ -268,8 +268,7 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
         //  << (*iter)->contact(i).depth(j) << "]\n";
 
         // Copy the contact message.
-        if (this->sonarMsg.sonar().range() < 0 ||
-            len < this->sonarMsg.sonar().range())
+        if (len < this->sonarMsg.sonar().range())
         {
           this->sonarMsg.mutable_sonar()->set_range(len);
         }
