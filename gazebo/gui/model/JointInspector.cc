@@ -191,37 +191,37 @@ void JointInspector::SetType(JointMaker::JointType _type)
   if (this->jointType == JointMaker::JOINT_FIXED)
   {
     jointTypeStr = "Fixed";
-    axisCount = 0;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_FIXED);
   }
   else if (this->jointType == JointMaker::JOINT_SLIDER)
   {
     jointTypeStr = "Prismatic";
-    axisCount = 1;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_SLIDER);
   }
   else if (this->jointType == JointMaker::JOINT_HINGE)
   {
     jointTypeStr = "Revolute";
-    axisCount = 1;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_HINGE);
   }
   else if (this->jointType == JointMaker::JOINT_HINGE2)
   {
     jointTypeStr = "Revolute2";
-    axisCount = 2;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_HINGE2);
   }
   else if (this->jointType == JointMaker::JOINT_SCREW)
   {
     jointTypeStr = "Screw";
-    axisCount = 1;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_SCREW);
   }
   else if (this->jointType == JointMaker::JOINT_UNIVERSAL)
   {
     jointTypeStr = "Universal";
-    axisCount = 2;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_UNIVERSAL);
   }
   else if (this->jointType == JointMaker::JOINT_BALL)
   {
     jointTypeStr = "Ball";
-    axisCount = 0;
+    axisCount = JointMaker::GetJointAxisCount(JointMaker::JOINT_BALL);
   }
   this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
 

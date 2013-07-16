@@ -53,10 +53,6 @@ JointMaker::JointMaker()
 
   MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-
-  this->inspector = new JointInspector(JointMaker::JOINT_NONE);
-  this->inspector->setModal(false);
-  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 }
 
 /////////////////////////////////////////////////
@@ -85,6 +81,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     if (this->hoverVis->IsPlane())
       return false;
 
+    // Pressed parent part
     if (!this->selectedVis)
     {
       if (this->mouseJoint)
@@ -109,10 +106,19 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       jointData->parent = this->selectedVis;
       jointData->line = jointLine;
       jointData->type = this->jointType;
+      jointData->inspector = new JointInspector(JointMaker::JOINT_NONE);
+      jointData->inspector->setModal(false);
+      connect(jointData->inspector, SIGNAL(Applied()),
+          jointData, SLOT(OnApply()));
+
+      int axisCount = JointMaker::GetJointAxisCount(jointData->type);
+      for (int i = 0; i < axisCount; ++i)
+        jointData->axis[i] = math::Vector3::UnitX;
+      jointData->anchor = math::Vector3::Zero;
       this->mouseJoint = jointData;
       jointData->line->setMaterial(this->jointMaterials[jointData->type]);
-
     }
+    // Pressed child part
     else if (this->selectedVis != vis)
     {
       if (this->hoverVis)
@@ -129,10 +135,8 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       emit JointAdded();
     }
   }
-
   return true;
 }
-
 
 /////////////////////////////////////////////////
 void JointMaker::CreateJoint(JointMaker::JointType _type)
@@ -228,10 +232,14 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
     JointData *joint = this->joints[vis->GetName()];
     if (joint)
     {
-      this->inspector->SetType(joint->type);
-      this->inspector->SetName(joint->visual->GetName());
+      joint->inspector->SetType(joint->type);
+      joint->inspector->SetName(joint->visual->GetName());
+      joint->inspector->SetAnchor(0, joint->anchor);
+      int axisCount = JointMaker::GetJointAxisCount(joint->type);
+      for (int i = 0; i < axisCount; ++i)
+        joint->inspector->SetAxis(i, joint->axis[i]);
     }
-    this->inspector->show();
+    joint->inspector->show();
     return true;
   }
   else
@@ -294,8 +302,8 @@ void JointMaker::Update()
     if (joint->dirty)
     {
       joint->line->SetPoint(1,
-            joint->child->GetWorldPose().pos -
-            joint->parent->GetWorldPose().pos);
+          joint->child->GetWorldPose().pos -
+          joint->parent->GetWorldPose().pos);
 
       joint->hotspot->SetWorldPosition(
           joint->parent->GetWorldPose().pos +
@@ -306,6 +314,33 @@ void JointMaker::Update()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnApply()
+int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
+  if (_type == JOINT_FIXED)
+    return 0;
+  else if (_type == JOINT_HINGE)
+    return 1;
+  else if (_type == JOINT_HINGE2)
+    return 2;
+  else if (_type == JOINT_SLIDER)
+    return 1;
+  else if (_type == JOINT_SCREW)
+    return 1;
+  else if (_type == JOINT_UNIVERSAL)
+    return 2;
+  else if (_type == JOINT_BALL)
+    return 0;
+
+  return 0;
+}
+
+/////////////////////////////////////////////////
+void JointData::OnApply()
+{
+  this->anchor = this->inspector->GetAnchor(0);
+  this->type = this->inspector->GetType();
+  int axisCount = JointMaker::GetJointAxisCount(this->type);
+  for (int i = 0; i < axisCount; ++i)
+    this->axis[i] = this->inspector->GetAxis(i);
+
 }

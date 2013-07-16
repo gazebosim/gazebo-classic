@@ -79,6 +79,10 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
+      /// \brief Get the axis count for joint type.
+      /// \param[in] _type Type of joint.
+      public: static int GetJointAxisCount(JointMaker::JointType _type);
+
       /// \brief Mouse event filter callback when mouse button is pressed .
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -114,10 +118,6 @@ namespace gazebo
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
-      /// \brief Qt Callback when joint inspector configurations are to be
-      /// applied.
-      private slots: void OnApply();
-
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
@@ -143,16 +143,15 @@ namespace gazebo
 
       private: boost::unordered_map<JointMaker::JointType, std::string>
           jointMaterials;
-
-      /// \brief Inspector for configuring joint properties.
-      private: JointInspector *inspector;
     };
     /// \}
 
     /// \class JointData JointData.hh
     /// \brief Helper class to store joint data
-    class JointData
+    class JointData : public QObject
     {
+      Q_OBJECT
+
       /// \brieft Visual of the dynamic line
       public: rendering::VisualPtr visual;
 
@@ -168,11 +167,24 @@ namespace gazebo
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
 
-      /// \brief Type of joint
+      /// \brief Type of joint.
       public: JointMaker::JointType type;
+
+      /// \brief Joint axis direction.
+      public: math::Vector3 axis[2];
+
+      /// \brief Joint anchor point.
+      public: math::Vector3 anchor;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;
+
+      /// \brief Inspector for configuring joint properties.
+      public: JointInspector *inspector;
+
+      /// \brief Qt Callback when joint inspector configurations are to be
+      /// applied.
+      private slots: void OnApply();
     };
   }
 }
