@@ -220,10 +220,8 @@ void SystemPaths::UpdateOgrePaths()
   char *pathCStr = getenv("OGRE_RESOURCE_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
-    //  << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    pathCStr = OGRE_RESOURCE_PATH;
   }
   path = pathCStr;
 

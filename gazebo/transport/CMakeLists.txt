@@ -40,6 +40,12 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/transport.hh )
 
+# It should suffice to call set_source_files_properties specifically on
+# Transport.cc, but that didn't work for me.
+add_definitions(-DGAZEBO_DEFAULT_MASTER_HOST="${GAZEBO_DEFAULT_MASTER_HOST}")
+# No quotes around the port because we want the preprocessor symbol to be an
+# integer.
+add_definitions(-DGAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT})
 
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport
