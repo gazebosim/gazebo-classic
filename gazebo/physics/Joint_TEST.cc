@@ -32,12 +32,12 @@ class Joint_TEST : public ServerFixture
     const std::string &_physicsEngine);
 };
 
-//TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbodyDELETEME)
-//{
-//  GetForceTorqueWithAppliedForce("ode");
-//}
+TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODEDELETEME)
+{
+  GetForceTorqueWithAppliedForce("ode");
+}
 
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbodyDELETEME2)
+TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbodyDELETEME)
 {
   GetForceTorqueWithAppliedForce("simbody");
 }
@@ -272,7 +272,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-  gzerr << "start\n"; getchar();
+  gzerr << "press enter to start\n"; getchar();
   for (unsigned int i = 0; i < 3388; ++i)
   {
     // pd control
@@ -343,7 +343,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
             << "] force2 [" << wrench_12.body2Force
             << "] torque2 [" << wrench_12.body2Torque
             << "]\n";
-      getchar();
+      gzerr << " press enter to continue:"; getchar();
     }
     gzerr << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
           << "] 2[" << joint_12->GetAngle(0)

@@ -7,6 +7,7 @@
     <include>
       <uri>model://sun</uri>
     </include>
+
     <scene>
       <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
       <background>0.500000 0.500000 0.500000 1.000000</background>
@@ -17,7 +18,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>250</iters>
+          <iters>1000</iters>
           <precon_iters>0</precon_iters>
           <sor>1.400000</sor>
         </solver>
@@ -31,9 +32,10 @@
       <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
+
     <!-- test contributed by jesper -->
     <model name="boxes">
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 0 1.57</pose>
       <link name="link1">
         <collision name="collision">
           <pose>0.5 0 0.5 0 0 0</pose>
@@ -140,8 +142,7 @@
         </inertial>
       </link>
 
-      <!-- debug
-     -->
+      <!-- simbody debug: pin base link to world
       <joint name="joint0" type="revolute">
         <physics>
           <ode>
@@ -162,6 +163,7 @@
         <parent>world</parent>
         <child>link1</child>
       </joint>
+     -->
 
       <joint name="joint1" type="revolute">
         <physics>
@@ -172,14 +174,14 @@
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
-          <!--
+          <!-- simbody debug: limit joint angle
           <limit>
             <lower>-1e-6</lower>
             <upper>1e-6</upper>
           </limit>
           -->
           <dynamics>
-            <damping>30.000000</damping>
+            <damping>100.000000</damping>
           </dynamics>
         </axis>
         <parent>link1</parent>
