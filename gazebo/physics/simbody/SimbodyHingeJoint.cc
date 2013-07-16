@@ -58,7 +58,7 @@ math::Vector3 SimbodyHingeJoint::GetAnchor(int /*_index*/) const
 void SimbodyHingeJoint::SetAnchor(int /*_index*/,
                                  const math::Vector3 &/*_anchor*/)
 {
-  gzerr << "SetAnchor Not implemented...\n";
+  gzdbg << "SetAnchor Not implemented...\n";
   // The anchor (pivot in Simbody lingo), can only be set on creation
 }
 
@@ -67,7 +67,7 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  gzerr << "SetAxis Not implemented...\n";
+  gzdbg << "SetAxis Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
