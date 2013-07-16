@@ -175,7 +175,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   SimTK::State state = this->system.realizeTopology();
-  gzerr << "realizeTopology\n";
+  // gzerr << "realizeTopology\n";
 
   this->integ->initialize(state);
   Link_V links = _model->GetLinks();
@@ -191,7 +191,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
-  gzerr << "realize system\n";
+  // gzerr << "realize system\n";
 
   // mark links as initialized
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
@@ -576,6 +576,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     const MassProperties massProps = 
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());
 
+/* debug
     if (gzInb)
       gzerr << "debug: Inb: " << gzInb->GetName() << "\n";
     if (gzOutb)
@@ -583,6 +584,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             << " mass: " << gzOutb->GetInertial()->GetMass()
             << " efm: " << massProps
             << "\n";
+*/
 
     // This will reference the new mobilized body once we create it.
     MobilizedBody mobod; 
@@ -665,9 +667,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
             if (gzJoint->GetDampingCoefficient() > 0.0)
             {
-              gzerr << "SimbodyPhysics SetDamping ("
-                    << gzJoint->GetDampingCoefficient()
-                    << ")\n";
+              // gzdbg << "SimbodyPhysics SetDamping ("
+              //       << gzJoint->GetDampingCoefficient()
+              //       << ")\n";
               Force::MobilityLinearDamper(this->forces,mobod,0,
                                          gzJoint->GetDampingCoefficient());
             }
