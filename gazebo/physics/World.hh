@@ -461,9 +461,6 @@ namespace gazebo
       /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
 
-      /// \brief Incoming message buffer.
-      private: std::vector<google::protobuf::Message> messages;
-
       /// \brief Name of the world.
       private: std::string name;
 
