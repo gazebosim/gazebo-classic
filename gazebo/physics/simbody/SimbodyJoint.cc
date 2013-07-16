@@ -176,6 +176,44 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
+void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
+{
+  if (this->parentLink)
+  {
+    math::Pose parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+
+    // Set joint axis
+    // assuming incoming axis is defined in the model frame, so rotate them
+    // into the inertial frame
+    // TODO: switch so the incoming axis is defined in the child frame.
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, parentModelPose.rot.RotateVector(
+            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+    }
+
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, parentModelPose.rot.RotateVector(
+            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+    }
+  }
+  else
+  {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->Set("world");
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+    }
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 JointWrench SimbodyJoint::GetForceTorque(int _index)
 {
   return this->GetForceTorque(static_cast<unsigned int>(_index));
