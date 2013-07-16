@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
-      ///         altitude (m).
+      ///         altitude above sea level (m).
       public: math::Vector3 Convert(const math::Vector3 &_xyz) const;
 
       // TODO: finish doxygen comments

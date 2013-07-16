@@ -159,7 +159,7 @@ math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
   spherical.x = this->latitudeReference.Degree() + deltaLatitude.Degree();
   // geodetic longitude in degrees
   spherical.y = this->longitudeReference.Degree() + deltaLongitude.Degree();
-  // geodetic altitude
-  spherical.z = radiusNormal + _xyz.z;
+  // altitude relative to sea level
+  spherical.z = _xyz.z;
   return spherical;
 }

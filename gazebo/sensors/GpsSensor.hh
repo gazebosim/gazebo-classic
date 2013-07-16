@@ -22,8 +22,8 @@
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/gzmath.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
@@ -59,11 +59,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
+      /// \brief GPS data publisher.
+      private: transport::PublisherPtr gpsPub;
+
+      /// \brief Topic name for GPS data publisher.
+      private: std::string topicName;
+
       /// \brief Parent entity of this sensor.
       private: physics::EntityPtr parentEntity;
 
       /// \brief Pointer to SphericalCoordinates converter.
       private: common::SphericalCoordinatesPtr sphericalCoordinates;
+
+      /// \brief Stores most recent GPS sensor data.
+      private: msgs::GPS lastGpsMsg;
     };
     /// \}
   }

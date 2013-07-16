@@ -8,9 +8,9 @@ package gazebo.msgs;
 import "time.proto";
 import "vector3d.proto";
 
-message IMU
+message GPS
 {
-  required Time stamp                   = 1;
+  required Time time                    = 1;
   required string entity_name           = 2;
   required double latitude_deg          = 3;
   required double longitude_deg         = 4;
