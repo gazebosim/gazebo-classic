@@ -19,6 +19,7 @@
 #define _SONARVISUAL_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"

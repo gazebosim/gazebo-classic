@@ -125,5 +125,4 @@ void SonarVisual::Update()
           (rangeDelta * 0.5) - this->sonarMsg->sonar().range()));
   }
   this->receivedMsg = false;
-
 }
