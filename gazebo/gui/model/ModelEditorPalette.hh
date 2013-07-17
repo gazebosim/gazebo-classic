@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief Qt callback when box button is clicked.
       private slots: void OnBox();
 
+      /// \brief Qt callback when custom button is clicked.
+      private slots: void OnCustom();
+
       /// \brief Qt callback when fixed joint button is clicked.
       private slots: void OnFixedJoint();
 

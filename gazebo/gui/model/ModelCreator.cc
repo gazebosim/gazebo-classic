@@ -32,7 +32,6 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Gui.hh"
-//#include "gazebo/gui/EntityMaker.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -42,30 +41,12 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelCreator::ModelCreator() /*: EntityMaker()*/
+ModelCreator::ModelCreator()
 {
   this->modelName = "";
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&ModelCreator::OnSave, this)));
-  this->connections.push_back(
-  gui::editor::Events::ConnectDiscardBuildingEditor(
-    boost::bind(&ModelCreator::OnDiscard, this)));
-  this->connections.push_back(
-  gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&ModelCreator::OnDone, this)));
-  this->connections.push_back(
-  gui::editor::Events::ConnectExitBuildingEditor(
-    boost::bind(&ModelCreator::OnExit, this)));
-
-  this->saveDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
-  this->finishDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);*/
 
   this->boxCounter = 0;
   this->cylinderCounter = 0;
@@ -83,11 +64,6 @@ ModelCreator::ModelCreator() /*: EntityMaker()*/
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
-//  this->camera.reset();
-/*  if (this->saveDialog)
-    delete this->saveDialog;
-  if (this->finishDialog)
-    delete this->finishDialog;*/
 }
 
 /////////////////////////////////////////////////
@@ -264,7 +240,15 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
+  this->jointMaker->Reset();
+
+  this->modelName = "default";
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  while (this->allParts.size() > 0)
+    this->RemovePart(this->allParts.begin()->first);
+  this->allParts.clear();
 
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
@@ -276,12 +260,6 @@ void ModelCreator::Reset()
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
   scene->AddVisual(this->modelVisual);
-
-  while (this->allParts.size() > 0)
-  {
-    this->RemovePart(this->allParts.begin()->first);
-  }
-  this->allParts.clear();
 
   MouseEventHandler::Instance()->AddPressFilter("model_part",
       boost::bind(&ModelCreator::OnMousePressPart, this, _1));
@@ -326,13 +304,13 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
 void ModelCreator::FinishModel()
 {
   this->CreateTheEntity();
+  this->Reset();
 //  this->Stop();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
-  this->GenerateSDF();
   msgs::Factory msg;
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
@@ -538,115 +516,45 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(visual->GetName());
+    newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
     modelElem->InsertElement(newLinkElem);
+
+    visualElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
+        + "_Visual");
+    collisionElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
+        + "_Collision");
+    visualElem->GetElement("pose")->Set(visual->GetPose());
+    collisionElem->GetElement("pose")->Set(visual->GetPose());
+
+    sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+    geomElem->ClearElements();
+
+    math::Vector3 scale = visual->GetScale();
+    if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
+    {
+      sdf::ElementPtr boxElem = geomElem->AddElement("box");
+      (boxElem->GetElement("size"))->Set(scale);
+    }
+    else if (visual->GetParent()->GetName().find("unit_cylinder")
+       != std::string::npos)
+    {
+      sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
+      (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
+      (cylinderElem->GetElement("length"))->Set(scale.z);
+    }
+    else if (visual->GetParent()->GetName().find("unit_sphere")
+        != std::string::npos)
+    {
+      sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
+      (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
+    }
+    sdf::ElementPtr geomElemClone = geomElem->Clone();
+    geomElem =  collisionElem->GetElement("geometry");
+    geomElem->ClearElements();
+    geomElem->InsertElement(geomElemClone->GetFirstElement());
   }
 //  (modelElem->AddElement("static"))->Set("true");
   // qDebug() << this->modelSDF->ToString().c_str();
 }
-
-/*
-/////////////////////////////////////////////////
-void ModelCreator::OnDiscard()
-{
-  int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      break;
-    case QMessageBox::Cancel:
-    // Do nothing
-    break;
-    default:
-    break;
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::OnSave()
-{
-  if (this->saved)
-  {
-    this->SetModelName(this->modelName);
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
-  }
-  else
-  {
-    this->saveDialog->SetModelName(this->modelName);
-    this->saveDialog->SetSaveLocation(this->saveLocation);
-    if (this->saveDialog->exec() == QDialog::Accepted)
-    {
-      this->modelName = this->saveDialog->GetModelName();
-      this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
-      this->GenerateSDF();
-      this->SaveToSDF(this->saveLocation);
-      this->saved = true;
-    }
-  }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::OnDone()
-{
-  this->finishDialog->SetModelName(this->modelName);
-  this->finishDialog->SetSaveLocation(this->saveLocation);
-  if (this->finishDialog->exec() == QDialog::Accepted)
-  {
-    this->modelName = this->finishDialog->GetModelName();
-    this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
-    this->FinishModel();
-    gui::editor::Events::discardBuildingModel();
-    gui::editor::Events::finishBuildingModel();
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::OnExit()
-{
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
-      this->OnSave();
-      gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
-  }
-}*/

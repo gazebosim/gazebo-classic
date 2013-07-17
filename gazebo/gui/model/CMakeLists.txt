@@ -3,6 +3,7 @@ include (${QT_USE_FILE})
 
 
 set (sources
+  ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
   ModelEditor.cc
@@ -11,6 +12,7 @@ set (sources
 )
 
 set (qt_headers
+  ImportDialog.hh
   JointInspector.hh
   JointMaker.hh
   ModelCreator.hh

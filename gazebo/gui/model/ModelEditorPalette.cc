@@ -28,6 +28,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
+#include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 
@@ -93,15 +94,23 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
+  // Box button
+  QPushButton *customButton = new QPushButton(tr("Custom"), this);
+  customButton->setCheckable(true);
+  customButton->setChecked(false);
+  connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
+
   this->partsButtonGroup = new QButtonGroup;
   this->partsButtonGroup->addButton(cylinderButton);
   this->partsButtonGroup->addButton(sphereButton);
   this->partsButtonGroup->addButton(boxButton);
+  this->partsButtonGroup->addButton(customButton);
 
   partsLayout->addWidget(partsLabel, 0, 0);
   partsLayout->addWidget(cylinderButton, 1, 0);
   partsLayout->addWidget(sphereButton, 1, 1);
-  partsLayout->addWidget(boxButton, 1, 2);
+  partsLayout->addWidget(boxButton, 2, 0);
+  partsLayout->addWidget(customButton, 2, 1);
 
   QGridLayout *jointsLayout = new QGridLayout;
   QLabel *jointsLabel = new QLabel(tr("Joints"));
@@ -159,13 +168,13 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->jointsButtonGroup->addButton(ballJointButton);
 
   jointsLayout->addWidget(jointsLabel, 0, 0);
-  jointsLayout->addWidget(fixedJointButton, 1, 0);
-  jointsLayout->addWidget(sliderJointButton, 1, 1);
-  jointsLayout->addWidget(hingeJointButton, 1, 2);
+//  jointsLayout->addWidget(fixedJointButton, 1, 0);
+  jointsLayout->addWidget(sliderJointButton, 1, 0);
+  jointsLayout->addWidget(hingeJointButton, 1, 1);
   jointsLayout->addWidget(hinge2JointButton, 2, 0);
   jointsLayout->addWidget(screwJointButton, 2, 1);
-  jointsLayout->addWidget(universalJointButton, 2, 2);
-  jointsLayout->addWidget(ballJointButton, 3, 0);
+  jointsLayout->addWidget(universalJointButton, 3, 0);
+  jointsLayout->addWidget(ballJointButton, 3, 1);
 
   modelLayout->addLayout(partsLayout);
   modelLayout->addLayout(jointsLayout);
@@ -212,7 +221,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default_model";
+  this->modelName = "default";
 }
 
 /////////////////////////////////////////////////
@@ -262,6 +271,23 @@ void ModelEditorPalette::OnBox()
 {
   this->modelCreator->AddPart(ModelCreator::PART_BOX);
 }
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnCustom()
+{
+  ImportDialog importDialog;
+  if (importDialog.exec() == QDialog::Accepted)
+  {
+/*    this->modelName = importDialog.GetSaveName();
+    this->saveLocation = saveDialog.GetSaveLocation();
+    this->modelCreator->SetModelName(this->modelName);
+    this->modelCreator->GenerateSDF();
+    this->modelCreator->SaveToSDF(this->saveLocation);*/
+  }
+//  OnCustom
+//  this->modelCreator->AddPart(ModelCreator::PART_CUSTOM);
+}
+
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
@@ -336,7 +362,7 @@ void ModelEditorPalette::OnSave()
     this->saveLocation = saveDialog.GetSaveLocation();
     this->modelCreator->SetModelName(this->modelName);
     this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation + "/" + this->modelName);
+    this->modelCreator->SaveToSDF(this->saveLocation);
   }
 }
 
@@ -349,5 +375,6 @@ void ModelEditorPalette::OnDiscard()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnDone()
 {
-//  this->modelCreator->Save();
+  this->OnSave();
+  this->modelCreator->FinishModel();
 }

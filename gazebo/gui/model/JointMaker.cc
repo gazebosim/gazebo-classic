@@ -63,6 +63,49 @@ JointMaker::~JointMaker()
 }
 
 /////////////////////////////////////////////////
+void JointMaker::Reset()
+{
+ if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+    return;
+
+  this->newJointCreated = false;
+  if (mouseJoint)
+  {
+    delete mouseJoint;
+    mouseJoint = NULL;
+  }
+
+  this->jointType = JointMaker::JOINT_NONE;
+  this->selectedVis.reset();
+  this->hoverVis.reset();
+
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  while (this->joints.size() > 0)
+    this->RemoveJoint(this->joints.begin()->first);
+  this->joints.clear();
+
+}
+
+/////////////////////////////////////////////////
+void JointMaker::RemoveJoint(const std::string &_jointName)
+{
+  JointData *joint = this->joints[_jointName];
+  if (joint)
+  {
+    joint->visual.reset();
+    rendering::ScenePtr scene = joint->hotspot->GetScene();
+    scene->RemoveVisual(joint->hotspot);
+    joint->hotspot.reset();
+    joint->parent.reset();
+    joint->child.reset();
+    delete joint->line;
+    delete joint->inspector;
+    this->joints.erase(_jointName);
+  }
+}
+
+/////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)

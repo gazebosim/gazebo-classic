@@ -72,12 +72,19 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~JointMaker();
 
+      /// \brief Reset the joint maker;
+      public: void Reset();
+
       /// \brief Create a joint
       /// \param[_type] Type of joint to be created
       public: void CreateJoint(JointType _type);
 
       /// \brief Update callback on PreRender.
       public: void Update();
+
+      /// \brief Remove joint by name
+      /// \param[in] _jointName Name of joint to be removed.
+      public: void RemoveJoint(const std::string &_jointName);
 
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
