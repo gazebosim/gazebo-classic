@@ -278,11 +278,12 @@ void ModelEditorPalette::OnCustom()
   ImportDialog importDialog;
   if (importDialog.exec() == QDialog::Accepted)
   {
-/*    this->modelName = importDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);*/
+    this->modelCreator->AddCustom(importDialog.GetImportPath());
+  }
+  else
+  {
+    // this unchecks the custom button
+    this->OnPartAdded();
   }
 //  OnCustom
 //  this->modelCreator->AddPart(ModelCreator::PART_CUSTOM);

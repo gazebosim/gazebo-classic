@@ -212,6 +212,54 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   return linkName;
 }
 
+/////////////////////////////////////////////////
+std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_scale,
+    const math::Pose &_pose)
+{
+  if (!this->modelVisual)
+    this->Reset();
+
+  std::string path = _path;
+
+  std::ostringstream linkNameStream;
+  linkNameStream << "custom_" << this->customCounter++;
+  std::string linkName = linkNameStream.str();
+
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
+        linkName, this->modelVisual));
+  linkVisual->Load();
+
+  std::ostringstream visualName;
+  visualName << this->modelName << "::" << linkName << "::Visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+
+  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+  meshElem->GetElement("scale")->Set(_scale);
+  meshElem->GetElement("uri")->Set(path);
+  visVisual->Load(visualElem);
+
+  linkVisual->SetPose(_pose);
+  if (_pose == math::Pose::Zero)
+  {
+    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    _pose.pos.z + _scale.z/2));
+  }
+
+  this->allParts[visVisual->GetName()] = visVisual;
+  this->mouseVisual = linkVisual;
+
+//  this->GenerateSDF();
+//  gzerr << this->modelSDF->ToString() << std::endl;
+
+  return linkName;
+}
 
 /////////////////////////////////////////////////
 void ModelCreator::RemovePart(const std::string &_partName)
@@ -390,7 +438,6 @@ void ModelCreator::AddPart(PartType _type)
   }
 }
 
-
 /////////////////////////////////////////////////
 bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
 {
@@ -549,6 +596,14 @@ void ModelCreator::GenerateSDF()
     {
       sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
       (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
+    }
+    else if (visual->GetParent()->GetName().find("custom")
+        != std::string::npos)
+    {
+      sdf::ElementPtr customElem = geomElem->AddElement("mesh");
+      (customElem->GetElement("scale"))->Set(scale);
+      (customElem->GetElement("uri"))->Set(visual->GetMeshName());
+      gzerr << "visual->GetMeshName() "<< visual->GetMeshName() << std::endl;
     }
     sdf::ElementPtr geomElemClone = geomElem->Clone();
     geomElem =  collisionElem->GetElement("geometry");

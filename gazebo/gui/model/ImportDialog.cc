@@ -32,8 +32,8 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
       "SolidWorks. It will apear as a part in the\n"
       "3D View."));
 
-  this->locationLineEdit = new QLineEdit;
-  this->locationLineEdit->setText(QDir::homePath());
+  this->pathLineEdit = new QLineEdit;
+  this->pathLineEdit->setText(QDir::homePath());
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
@@ -54,7 +54,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addWidget(this->locationLineEdit, 0, 0);
+  gridLayout->addWidget(this->pathLineEdit, 0, 0);
   gridLayout->addWidget(browseButton, 0, 1);
   gridLayout->addWidget(nameLabel, 1, 0);
   gridLayout->addWidget(nameLineEdit, 1, 1);
@@ -79,9 +79,9 @@ std::string ImportDialog::GetPartName() const
 }
 
 /////////////////////////////////////////////////
-std::string ImportDialog::GetImportLocation() const
+std::string ImportDialog::GetImportPath() const
 {
-  return this->locationLineEdit->text().toStdString();
+  return this->pathLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
@@ -91,9 +91,9 @@ void ImportDialog::SetPartName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void ImportDialog::SetImportLocation(const std::string &_location)
+void ImportDialog::SetImportPath(const std::string &_path)
 {
-  this->locationLineEdit->setText(tr(_location.c_str()));
+  this->pathLineEdit->setText(tr(_path.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -105,11 +105,10 @@ void ImportDialog::SetTitle(const std::string &_title)
 /////////////////////////////////////////////////
 void ImportDialog::OnBrowse()
 {
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    QDir::homePath(), QFileDialog::ShowDirsOnly
-    | QFileDialog::DontResolveSymlinks);
+  QString dir = QFileDialog::getOpenFileName(this, tr("Import Part"),
+    QDir::homePath(), tr("Mesh (*.dae *.stl)"));
   if (!dir.isEmpty())
-    this->locationLineEdit->setText(dir);
+    this->pathLineEdit->setText(dir);
 }
 
 /////////////////////////////////////////////////

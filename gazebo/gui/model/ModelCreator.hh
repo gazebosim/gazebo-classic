@@ -101,6 +101,15 @@ namespace gazebo
       public: std::string AddCylinder(double _radius = 0.5,
           double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
 
+      /// \brief Add a custom part to the model
+      /// \param[in] _name Name of the custom part.
+      /// \param[in] _scale Scale of the custom part.
+      /// \param[in] _pose Pose of the custom part.
+      /// \return Name of the custom that has been added.
+      public: std::string AddCustom(std::string _name,
+          const math::Vector3 &_scale = math::Vector3::One,
+          const math::Pose &_pose = math::Pose::Zero);
+
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
       /// \return Name of the joint that has been added.
@@ -194,6 +203,9 @@ namespace gazebo
 
       /// \brief Counter for the number of spheres in the model.
       private: int sphereCounter;
+
+      /// \brief Counter for the number of custom parts in the model.
+      private: int customCounter;
 
       /// \brief Type of part being added.
       private: PartType addPartType;

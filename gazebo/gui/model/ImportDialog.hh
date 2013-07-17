@@ -45,17 +45,17 @@ namespace gazebo
       /// \return The name of file.
       public: std::string GetPartName() const;
 
-      /// \brief Get the import location of the custom part.
+      /// \brief Get the import path of the custom part.
       /// \return Path of the custom location.
-      public: std::string GetImportLocation() const;
+      public: std::string GetImportPath() const;
 
       /// \brief Set the name of the custom part.
       /// \param[in] _name Name of file.
       public: void SetPartName(const std::string &_name);
 
-      /// \brief Set the import location of the custom part.
-      /// \param[in] _location Location to import the custom part.
-      public: void SetImportLocation(const std::string &_location);
+      /// \brief Set the import path of the custom part.
+      /// \param[in] _path Path to import the custom part.
+      public: void SetImportPath(const std::string &_path);
 
       /// \brief Set the message to be displayed.
       /// \param[in] _msg Message to be displayed.
@@ -81,7 +81,7 @@ namespace gazebo
       private: QLineEdit* nameLineEdit;
 
       /// \brief Editable line that holds the import location.
-      private: QLineEdit* locationLineEdit;
+      private: QLineEdit* pathLineEdit;
 
       /// \brief Message displayed in the dialog.
       private: QLabel *messageLabel;
