@@ -50,7 +50,7 @@ void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHingeJoint::GetAnchor(int /*_index*/) const
 {
-  gzerr << "Not implemented...\n";
+  gzdbg << "SimbodyHingeJoint::GetAnchor Not implemented...\n";
   return math::Vector3();
 }
 
@@ -140,7 +140,7 @@ void SimbodyHingeJoint::SetHighStop(int _index,
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized.\n";
+      gzwarn << "SetHighStop: State not initialized.\n";
     }
   }
   else
@@ -169,7 +169,7 @@ void SimbodyHingeJoint::SetLowStop(int _index,
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized.\n";
+      gzwarn << "SetLowStop: State not initialized.\n";
     }
   }
   else
@@ -209,7 +209,11 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
   }
   else
   {
-    gzerr << "index out of bound\n";
+    if (_index >= static_cast<int>(this->GetAngleCount()))
+      gzerr << "index out of bound\n";
+    else
+      gzwarn << "Simbody::GetGlobalAxis() sibmody physics"
+             << " engine not initialized yet.\n";
     return math::Vector3();
   }
 }
@@ -224,7 +228,7 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
         this->simbodyPhysics->integ->getState(), _index));
     else
     {
-      gzwarn << "simbody not yet initialized\n";
+      gzwarn << "Simbody::GetAngleImpl() simbody not yet initialized\n";
       return math::Angle();
     }
   }

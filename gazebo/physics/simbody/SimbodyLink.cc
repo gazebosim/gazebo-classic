@@ -107,7 +107,6 @@ void SimbodyLink::SetGravityMode(bool _mode)
   this->gravityMode = _mode;
   if (this->physicsInitialized)
   {
-    gzerr << "success physics SetGravityMode\n";
     this->simbodyPhysics->gravity.setBodyIsExcluded(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->masterMobod, !_mode);
