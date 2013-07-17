@@ -103,9 +103,6 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 
 gz_add_library(gazebo_common ${sources})
 
-# It should suffice to call set_source_files_properties specifically on
-# SystemPaths.cc, but that didn't work for me.
-
 set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
   PROPERTY COMPILE_DEFINITIONS
