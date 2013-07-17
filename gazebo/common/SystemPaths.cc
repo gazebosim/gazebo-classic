@@ -171,9 +171,10 @@ void SystemPaths::UpdateGazeboPaths()
   if (!pathCStr || *pathCStr == '\0')
   {
     // No env var; take the compile-time default.
-    pathCStr = GAZEBO_RESOURCE_PATH;
+    path = GAZEBO_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -196,9 +197,10 @@ void SystemPaths::UpdatePluginPaths()
   if (!pathCStr || *pathCStr == '\0')
   {
     // No env var; take the compile-time default.
-    pathCStr = GAZEBO_PLUGIN_PATH;
+    path = GAZEBO_PLUGIN_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -221,9 +223,10 @@ void SystemPaths::UpdateOgrePaths()
   if (!pathCStr || *pathCStr == '\0')
   {
     // No env var; take the compile-time default.
-    pathCStr = OGRE_RESOURCE_PATH;
+    path = OGRE_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);

@@ -105,10 +105,15 @@ gz_add_library(gazebo_common ${sources})
 
 # It should suffice to call set_source_files_properties specifically on
 # SystemPaths.cc, but that didn't work for me.
-add_definitions(-DGAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}")
-add_definitions(-DGAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}")
-add_definitions(-DGAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}")
-add_definitions(-DOGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}")
+
+set_property(
+  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
+  GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
+  OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
 
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
