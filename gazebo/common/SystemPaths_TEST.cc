@@ -16,11 +16,12 @@
 */
 #include <gtest/gtest.h>
 
-#include "gazebo/common/SystemPaths.hh"
 #include <string>
 #include <vector>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
+#include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
 

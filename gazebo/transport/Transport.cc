@@ -64,7 +64,8 @@ bool transport::get_master_uri(std::string &_masterHost,
   if (lastColon == std::string::npos)
   {
     gzerr << "Port missing in master URI[" << masterURI
-          << "]. Using default value of " << GAZEBO_DEFAULT_MASTER_PORT << ".\n";
+          << "]. Using default value of " << GAZEBO_DEFAULT_MASTER_PORT
+          << ".\n";
     _masterPort = GAZEBO_DEFAULT_MASTER_PORT;
   }
   else
