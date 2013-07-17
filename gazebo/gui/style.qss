@@ -543,6 +543,7 @@ QTabBar::tab:!selected
 
 QTabWidget#mainTab::pane,
 QTabWidget#buildingEditorTab::pane,
+QTabWidget#modelEditorTab::pane,
 QTabWidget#terrainEditorTab::pane
 {
   border-left: 1px solid #101010;
@@ -584,6 +585,7 @@ QWidget#toolsWidget
 QWidget#modelList > QFrame,
 QWidget#insertModel > QFrame,
 QWidget#jointControl > QFrame,
+QWidget#modelEditorPalette > QFrame,
 QWidget#toolsWidget > QFrame
 {
   padding: 4px;
@@ -605,6 +607,7 @@ QWidget#renderWidget > QWidget
 }
 
 QWidget#buildingEditorWidget > QWidget,
+QWidget#modelEditorWidget > QWidget
 QWidget#terrainEditorWidget > QWidget
 {
   padding: 2px;

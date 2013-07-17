@@ -39,6 +39,8 @@ using namespace gui;
 ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
     : QWidget(_parent)
 {
+  this->setObjectName("modelEditorPalette");
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   this->modelTreeWidget = new QTreeWidget();
@@ -53,7 +55,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   frameLayout->addWidget(this->modelTreeWidget, 0);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);*/
-  mainLayout->addWidget(this->modelTreeWidget);
+//  mainLayout->addWidget(this->modelTreeWidget);
 
   // Create a top-level tree item for the path
   this->modelSettingsItem =
@@ -205,7 +207,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
-  mainLayout->addLayout(buttonsLayout);
+//  mainLayout->addLayout(buttonsLayout);
 
   this->modelCreator = new ModelCreator();
 
@@ -213,9 +215,17 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       SLOT(OnJointAdded()));
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
-  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+//  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-  this->setObjectName("modelEditorPalette");
+
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(this->modelTreeWidget, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
+
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
