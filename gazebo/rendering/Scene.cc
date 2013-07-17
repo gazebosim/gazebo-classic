@@ -1874,7 +1874,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
   Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->name());
+  iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
   if (iter == this->visuals.end())
   {
@@ -1888,7 +1888,8 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     if (!childVis)
       return false;
 
-    JointVisualPtr jointVis(new JointVisual(_msg->name(), childVis));
+    JointVisualPtr jointVis(new JointVisual(_msg->name() + "_JOINT_VISUAL__",
+        childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
     jointVis->GetSceneNode()->_setDerivedOrientation(
