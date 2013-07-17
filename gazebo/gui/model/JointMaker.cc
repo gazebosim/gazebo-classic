@@ -142,6 +142,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       jointLine->AddPoint(math::Vector3(0, 0, 0));
       jointLine->AddPoint(math::Vector3(0, 0, 0.01));
       jointVis->GetSceneNode()->setInheritScale(false);
+      jointVis->GetSceneNode()->setInheritOrientation(false);
 
 
       JointData *jointData = new JointData;
@@ -346,6 +347,7 @@ void JointMaker::Update()
     JointData *joint = it->second;
     if (joint->dirty)
     {
+//      joint->visual->SetWorldRotation(math::Vector::Zero);
       joint->line->SetPoint(1,
           joint->child->GetWorldPose().pos -
           joint->parent->GetWorldPose().pos);
