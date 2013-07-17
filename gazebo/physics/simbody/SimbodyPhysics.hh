@@ -226,6 +226,41 @@ namespace gazebo
       /// \brief helper function for building SimbodySystem
       private: void AddCollisionsToLink(const physics::SimbodyLink* _link,
         SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
+
+      
+      /// \brief contact material stiffness.  See sdf description for details.
+      private: double contactMaterialStiffness;
+
+      /// \brief contact material dissipation.  See sdf description for details.
+      private: double contactMaterialDissipation;
+
+      /// \brief contact material plastic coefficient of restitution.
+      /// See sdf description for details.
+      private: double contactMaterialPlasticCoefRestitution;
+
+      /// \brief contact material plastic impact velocity.
+      /// See sdf description for details.
+      private: double contactMaterialPlasticImpactVelocity;
+
+      /// \brief contact material static friction.
+      /// See sdf description for details.
+      private: double contactMaterialStaticFriction;
+
+      /// \brief contact material dynamic friction.
+      /// See sdf description for details.
+      private: double contactMaterialDynamicFriction;
+
+      /// \brief contact material viscous friction.
+      /// See sdf description for details.
+      private: double contactMaterialViscousFriction;
+
+      /// \brief contact impact capture velocity.
+      /// See sdf description for details.
+      private: double contactImpactCaptureVelocity;
+
+      /// \brief contact stiction transition velocity
+      /// See sdf description for details.
+      private: double contactStictionTransitionVelocity;
     };
 
   /// \}

@@ -15,6 +15,17 @@
     </scene>
     <physics type="simbody">
       <gravity>0.000000 0.000000 -9.810000</gravity>
+      <simbody>
+        <accuracy>0.01</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>100</dissipation>
+          <static_friction>1.0</static_friction>
+          <dynamic_friction>1.0</dynamic_friction>
+          <viscous_friction>0.5</viscous_friction>
+        </contact>
+      </simbody>
       <ode>
         <solver>
           <type>quick</type>

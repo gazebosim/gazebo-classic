@@ -95,8 +95,6 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // this->integ = new SimTK::RungeKutta3Integrator(system);
   // this->integ = new SimTK::RungeKutta2Integrator(system);
   this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
-  /// \TODO:  make sdf parameter
-  this->integ->setAccuracy(0.001);
   this->simbodyPhysicsInitialized = false;
   this->simbodyPhysicsStepped = false;
 }
@@ -122,9 +120,41 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
+  this->stepTimeDouble = this->GetStepTime();
+
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
-  this->stepTimeDouble = this->GetStepTime();
+  // Set integrator accuracy (measured with Richardson Extrapolation)
+  this->integ->setAccuracy(
+    simbodyElem->GetValueDouble("accuracy"));
+
+  // Set stiction max slip velocity to make it less stiff.
+  this->contact.setTransitionVelocity(
+    simbodyElem->GetValueDouble("max_transient_velocity"));
+
+  sdf::ElementPtr simbodyContactElem = simbodyElem->GetElement("contact");
+
+  // system wide contact properties, assigned in AddCollisionsToLink()
+  this->contactMaterialStiffness =
+    simbodyContactElem->GetValueDouble("stiffness");
+  this->contactMaterialDissipation =
+    simbodyContactElem->GetValueDouble("dissipation");
+  this->contactMaterialStaticFriction =
+    simbodyContactElem->GetValueDouble("static_friction");
+  this->contactMaterialDynamicFriction =
+    simbodyContactElem->GetValueDouble("dynamic_friction");
+  this->contactMaterialViscousFriction =
+    simbodyContactElem->GetValueDouble("viscous_friction");
+
+  // below are not used yet, but should work it into the system
+  this->contactMaterialViscousFriction =
+    simbodyContactElem->GetValueDouble("plastic_coef_restitution");
+  this->contactMaterialPlasticCoefRestitution =
+    simbodyContactElem->GetValueDouble("plastic_impact_velocity");
+  this->contactMaterialPlasticImpactVelocity =
+    simbodyContactElem->GetValueDouble("override_impact_capture_velocity");
+  this->contactImpactCaptureVelocity =
+    simbodyContactElem->GetValueDouble("override_stiction_transition_velocity");
 }
 
 //////////////////////////////////////////////////
@@ -136,8 +166,7 @@ void SimbodyPhysics::Reset()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Init()
 {
-  gzerr << "SimbodyPhysics::Init\n";
-
+  gzdbg << "SimbodyPhysics::Init\n";
   this->simbodyPhysicsInitialized = true;
 }
 
@@ -510,7 +539,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
 void SimbodyPhysics::InitSimbodySystem()
 {
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(0.01);
+  // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
   if (!math::equal(this->GetGravity().GetLength(), 0.0))
@@ -832,11 +861,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
   // use stiffness of 1e8 and dissipation of 1000.0 to approximate inelastic
   // collision. but 1e6 and 10 seems sufficient when TransitionVelocity is
   // reduced from 0.1 to 0.01
-  SimTK::ContactMaterial material(1e8,   // stiffness
-                                  100.0,  // dissipation
-                                  1.0,   // mu_static
-                                  1.0,   // mu_dynamic
-                                  0.5);  // mu_viscous
+  SimTK::ContactMaterial material(this->contactMaterialStiffness,
+                                  this->contactMaterialDissipation,
+                                  this->contactMaterialStaticFriction,
+                                  this->contactMaterialDynamicFriction,
+                                  this->contactMaterialViscousFriction);
   // works for SpawnDrop
   // SimTK::ContactMaterial material(1e6,   // stiffness
   //                                 10.0,  // dissipation

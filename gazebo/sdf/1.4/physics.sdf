@@ -34,9 +34,87 @@
     <element name="min_step_size" type="double" default="0.0001" required="0">
       <description>TBD</description>
     </element>
-    <element name="accuracy" type="double" default="0.01" required="0">
+    <element name="accuracy" type="double"
+             default="0.01" required="0">
       <description>Roughly the relative error of the system.
-        -LOG(accuracy) is roughly the number of significant digits.</description>
+      -LOG(accuracy) is roughly the number of significant digits in
+      the solution.</description>
+    </element>
+    <element name="max_transient_velocity" type="double"
+             default="0.01" required="0">
+      <description>Tolerable "slip" velocity allowed by the solver when static
+        friction is supposed to hold object in place.</description>
+    </element>
+    <element name="contact" required="0">
+      <description>
+        Relationship among dissipation, coef. restitution, etc.
+        d = dissipation coefficient (1/velocity)
+        vc = capture velocity (velocity where e=e_max)
+        vp = plastic velocity (smallest v where e=e_min) > vc
+        Assume real COR=1 when v=0.
+        e_min = given minimum COR, at v >= vp (a.k.a. plastic_coef_restitution)
+        d = slope = (1-e_min)/vp
+        OR, e_min = 1 - d*vp
+        e_max = maximum COR = 1-d*vc, reached at v=vc
+        e = 0,                       v <= vc
+          = 1 - d*v,               vc < v < vp
+          = e_min,                   v >= vp
+  
+        dissipation factor = d*min(v,vp)   [compliant]
+        cor = e                            [rigid]
+  
+        Combining rule e = 0,               e1==e2==0
+                         = 2*e1*e2/(e1+e2), otherwise
+      </description>
+
+      <element name="stiffness" type="double" default="1e8" required="0">
+        <description>Default contact material stiffness
+                     (force/dist or torque/radian).</description>
+      </element>
+      <element name="dissipation" type="double" default="0.5" required="0">
+        <description>dissipation coefficient to be used in compliant contact;
+    if not given it is (1-min_cor)/plastic_impact_velocity</description>
+      </element>
+    
+      <element name="plastic_coef_restitution" type="double"
+               default="0.5" required="0">
+        <description>this is the COR to be used at high velocities for rigid
+    impacts; if not given it is 1 - dissipation*plastic_impact_velocity
+        </description>
+      </element>
+
+      <element name="plastic_impact_velocity" type="double"
+               default="0.5" required="0">
+        <description>smallest impact velocity at which min COR is reached; set
+      to zero if you want the min COR always to be used</description>
+      </element>
+
+      <element name="static_friction" type="double" default="0.9" required="0">
+        <description></description>
+      </element>
+      <element name="dynamic_friction" type="double" default="0.9" required="0">
+        <description></description>
+      </element>
+      <element name="viscous_friction" type="double" default="0.6" required="0">
+        <description></description>
+      </element>
+
+      <element name="override_impact_capture_velocity" type="double"
+               default="0.001" required="0">
+        <description>for rigid impacts only, impact velocity at which
+          COR is set to zero; normally inherited from global default but can
+          be overridden here. Combining rule: use larger velocity</description>
+      </element>
+
+      <element name="override_stiction_transition_velocity" type="double"
+               default="0.001" required="0">
+        <description>This is the largest slip velocity at which
+           we'll consider a transition to stiction. Normally inherited
+           from a global default setting. For a continuous friction model
+           this is the velocity at which the max static friction force
+           is reached.  Combining rule: use larger velocity</description>
+      </element>
+
     </element>
   </element>
 
