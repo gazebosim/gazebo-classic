@@ -40,3 +40,9 @@ target_link_libraries(gzfactory gazebo_common gazebo_transport ${Boost_LIBRARIES
 gz_install_executable(gzfactory)
 
 install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+
+manpage(gzfactory)
+manpage(gzlog)
+manpage(gzsdf)
+manpage(gzstats)
+manpage(gztopic)

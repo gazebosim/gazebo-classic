@@ -1,0 +1,43 @@
+.TH GAZEBO 1
+
+.SH NAME
+
+gzlog \- tool to introspect Gazebo log files
+
+.SH SYNOPSIS
+
+.B gzlog [command] <options> [log file]
+
+.SH DESCRIPTION
+
+Introspect Gazebo log files.
+
+.SH COMMANDS
+.TP 5
+help
+Output this help message.
+.TP 5
+info
+Display statistical information about a log file.
+.TP 5
+echo
+Output the contents of a log file to screen.
+.TP 5
+step
+Step through the contents of a log file.
+
+.SH OPTIONS
+
+.TP 5
+\-\-help,\-h
+Produce help message.
+.TP 5
+\-\-file,\-f arg
+Path to log file.
+.TP 5
+\-\-filter arg
+Filter output. Valid only for the echo and step commands.
+
+.SH AUTHOR
+
+The Open Source Robotics Foundation

@@ -1,0 +1,61 @@
+.TH GAZEBO 1
+
+.SH NAME
+
+gzfactory \- spawn or delete models from simulation
+
+.SH SYNOPSIS
+
+This tool for spawning or deleting models into or from a running
+Gazebo simulation.
+
+.B gzfactory spawn | delete [OPTIONS]
+
+.SH ACTIONS
+.TP 5
+spawn
+Spawn a new model. Must specify a SDF model file.
+.TP 5
+delete
+Delete existing model. Must specify model name.
+
+.SH DESCRIPTION
+
+Run a gazebo client.
+
+.SH OPTIONS
+
+.TP 5
+\-\-help,\-h
+Produce help message.
+.TP 5
+\-\-sdf,\-f
+SDF model file.
+.TP 5
+\-\-world-name,\-w arg
+Name of Gazebo world.
+.TP 5
+\-\-model-name,\-m arg
+Model name.
+.TP 5
+\-\-pose-x,\-x arg
+Set model X position.
+.TP 5
+\-\-pose-y,\-y arg
+Set model Y position.
+.TP 5
+\-\-pose-z,\-z arg
+Set model Z position.
+.TP 5
+\-\-pose-R,\-R arg
+Set model roll orientation in radians.
+.TP 5
+\-\-pose-P,\-P arg
+Set model pitch orientation in radians.
+.TP 5
+\-\-pose-Y,\-Y arg
+Set model yaw orientation in radians.
+
+.SH AUTHOR
+
+The Open Source Robotics Foundation
