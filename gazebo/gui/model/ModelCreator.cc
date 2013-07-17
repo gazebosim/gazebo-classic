@@ -32,8 +32,9 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Gui.hh"
-#include "gazebo/gui/EntityMaker.hh"
+//#include "gazebo/gui/EntityMaker.hh"
 
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
 
@@ -74,6 +75,8 @@ ModelCreator::ModelCreator() /*: EntityMaker()*/
   this->node->Init();
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
 
+  this->jointMaker = new JointMaker();
+
   this->Reset();
 }
 
@@ -92,6 +95,14 @@ std::string ModelCreator::CreateModel()
 {
   this->Reset();
   return this->modelName;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::AddJoint(JointMaker::JointType _type)
+{
+  if (this->jointMaker)
+    this->jointMaker->CreateJoint(_type);
+
 }
 
 /////////////////////////////////////////////////
@@ -249,10 +260,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
 /////////////////////////////////////////////////
 void ModelCreator::Reset()
 {
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default_model";
-
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
     return;
@@ -299,13 +306,17 @@ void ModelCreator::SetModelName(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
+std::string ModelCreator::GetModelName() const
+{
+  return this->modelName;
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::SaveToSDF(const std::string &_savePath)
 {
-  this->saveLocation = _savePath;
   std::ofstream savefile;
   boost::filesystem::path path;
-  path = boost::filesystem::operator/(this->saveLocation,
-      this->modelName + ".sdf");
+  path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -316,12 +327,6 @@ void ModelCreator::FinishModel()
 {
   this->CreateTheEntity();
 //  this->Stop();
-}
-
-/////////////////////////////////////////////////
-void ModelCreator::GenerateSDF()
-{
-
 }
 
 /////////////////////////////////////////////////
@@ -365,9 +370,9 @@ std::string ModelCreator::GetTemplateSDFString()
 
 
 /////////////////////////////////////////////////
-void ModelCreator::CreatePart(PartType _type)
+void ModelCreator::AddPart(PartType _type)
 {
-  this->createPartType = _type;
+  this->addPartType = _type;
   if (_type != PART_NONE)
   {
     // Add an event filter, which allows the TerrainEditor to capture
@@ -417,7 +422,7 @@ bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
   {
     emit PartAdded();
     this->mouseVisual.reset();
-    this->CreatePart(PART_NONE);
+    this->AddPart(PART_NONE);
     return true;
   }
 }
@@ -486,6 +491,60 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+JointMaker *ModelCreator::GetJointMaker() const
+{
+  return this->jointMaker;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::GenerateSDF()
+{
+  sdf::ElementPtr modelElem;
+  sdf::ElementPtr linkElem;
+  sdf::ElementPtr visualElem;
+  sdf::ElementPtr collisionElem;
+
+  this->modelSDF.reset(new sdf::SDF);
+  this->modelSDF->SetFromString(this->GetTemplateSDFString());
+
+  modelElem = this->modelSDF->root->GetElement("model");
+
+  linkElem = modelElem->GetElement("link");
+  sdf::ElementPtr templateLinkElem = linkElem->Clone();
+  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+      "visual")->Clone();
+  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+      "collision")->Clone();
+  modelElem->ClearElements();
+  std::stringstream visualNameStream;
+  std::stringstream collisionNameStream;
+
+  modelElem->GetAttribute("name")->Set(this->modelName);
+
+  boost::unordered_map<std::string, rendering::VisualPtr>::iterator partsIt;
+
+  // loop through all parts
+  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
+      ++partsIt)
+  {
+    visualNameStream.str("");
+    collisionNameStream.str("");
+
+    std::string name = partsIt->first;
+    rendering::VisualPtr visual = partsIt->second;
+    sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
+    visualElem = newLinkElem->GetElement("visual");
+    collisionElem = newLinkElem->GetElement("collision");
+    newLinkElem->GetAttribute("name")->Set(visual->GetName());
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+
+    modelElem->InsertElement(newLinkElem);
+  }
+//  (modelElem->AddElement("static"))->Set("true");
+  // qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /*

@@ -27,6 +27,8 @@
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
 
+#include "gazebo/gui/model/JointMaker.hh"
+
 namespace gazebo
 {
   namespace msgs
@@ -36,13 +38,11 @@ namespace gazebo
 
   namespace gui
   {
-    class EntityMaker;
-
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class ModelCreator ModelCreator.hh
-    /// \brief Create and manage 3D visuals of a building.
+    /// \brief Create and manage 3D visuals of a model with parts and joints.
     class ModelCreator : public QObject
     {
       Q_OBJECT
@@ -69,9 +69,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelCreator();
 
-      /// \brief Set the name of this building model.
+      /// \brief Set the name of the model.
       /// \param[in] _modelName Name of the model to set to.
       public: void SetModelName(const std::string &_modelName);
+
+      /// \brief Get the name of the model.
+      public: std::string GetModelName() const;
 
       /// \brief Finish the model and create the entity on the gzserver.
        public: void FinishModel();
@@ -98,6 +101,11 @@ namespace gazebo
       public: std::string AddCylinder(double _radius = 0.5,
           double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
 
+      /// \brief Add a joint to the model.
+      /// \param[in] _type Type of joint to add.
+      /// \return Name of the joint that has been added.
+      public: void AddJoint(JointMaker::JointType _type);
+
       /// \brief Remove a part from the model.
       /// \param[in] _partName Name of the part to remove
       public: void RemovePart(const std::string &_partName);
@@ -106,12 +114,19 @@ namespace gazebo
       /// \param[in] _savePath Path to save the SDF to.
       public: void SaveToSDF(const std::string &_savePath);
 
-      /// \brief Reset the building maker and the SDF.
+      /// \brief Reset the model creator and the SDF.
       public: void Reset();
 
-      /// \brief Create a part
-      /// \param[_type] Type of part to be created
-      public: void CreatePart(PartType _type);
+      /// \brief Get joint maker
+      /// \return Joint maker
+      public: JointMaker *GetJointMaker() const;
+
+      /// \brief Add a part to the model
+      /// \param[in] _type Type of part to be added
+      public: void AddPart(PartType _type);
+
+      /// \brief Generate the SDF from model part and joint visuals.
+      public: void GenerateSDF();
 
       /// \brief Mouse event filter callback when mouse button is pressed
       /// \param[in] _event The mouse event.
@@ -127,9 +142,6 @@ namespace gazebo
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
       private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
-
-      /// \brief Generate the SDF from building part visuals.
-      public: void GenerateSDF();
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -150,26 +162,16 @@ namespace gazebo
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
 
-/*      /// \brief Callback for saving the model.
-      private: void OnSave();
-
-      /// \brief Callback for discarding the model.
-      private: void OnDiscard();
-
-      /// \brief Callback when the model is to be finished and uploaded on to
-      /// the server.
-      private: void OnDone();
-
       /// \brief Callback received when exiting the editor mode.
-      private: void OnExit();*/
+//      private: void OnExit();
 
-      /// \brief The building model in SDF format.
+      /// \brief The model in SDF format.
       private: sdf::SDFPtr modelSDF;
 
       /// \brief A template SDF of a simple box model.
       private: sdf::SDFPtr modelTemplateSDF;
 
-      /// \brief Name of the building model.
+      /// \brief Name of the model.
       private: std::string modelName;
 
       /// \brief The root visual of the model.
@@ -178,14 +180,8 @@ namespace gazebo
       /// \brief The root visual of the model.
       private: rendering::VisualPtr mouseVisual;
 
-      /// \brief The pose of the building model.
+      /// \brief The pose of the model.
       private: math::Pose modelPose;
-
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
 
       /// \brief A list of gui editor events connected to the model creator.
       private: std::vector<event::ConnectionPtr> connections;
@@ -199,8 +195,8 @@ namespace gazebo
       /// \brief Counter for the number of spheres in the model.
       private: int sphereCounter;
 
-      /// \brief
-      private: PartType createPartType;
+      /// \brief Type of part being added.
+      private: PartType addPartType;
 
       /// \brief A map of model part names to and their visuals.
       private: boost::unordered_map<std::string, rendering::VisualPtr> allParts;
@@ -212,6 +208,8 @@ namespace gazebo
       /// created.
       private: transport::PublisherPtr makerPub;
 
+      /// \brief Joint maker.
+      private: JointMaker *jointMaker;
     };
     /// \}
   }

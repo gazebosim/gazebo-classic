@@ -26,6 +26,8 @@
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SaveDialog.hh"
+
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 
@@ -178,10 +180,28 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
         QStringList(QString("Plugin")));
     this->modelTreeWidget->addTopLevelItem(this->pluginItem);
 
-  this->modelCreator = new ModelCreator();
-  this->jointMaker = new JointMaker();
+  // save buttons
+  QPushButton *discardButton = new QPushButton(tr("Discard"));
+  connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
 
-  connect(jointMaker, SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
+  this->saveButton = new QPushButton(tr("Save As"));
+  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+
+  QPushButton *doneButton = new QPushButton(tr("Done"));
+  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
+
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(discardButton);
+  buttonsLayout->addWidget(this->saveButton);
+  buttonsLayout->addWidget(doneButton);
+  buttonsLayout->setAlignment(Qt::AlignCenter);
+
+  mainLayout->addLayout(buttonsLayout);
+
+  this->modelCreator = new ModelCreator();
+
+  connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
+      SLOT(OnJointAdded()));
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
@@ -189,6 +209,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->setObjectName("modelEditorPalette");
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
+
+  this->saved = false;
+  this->saveLocation = QDir::homePath().toStdString();
+  this->modelName = "default_model";
 }
 
 /////////////////////////////////////////////////
@@ -224,61 +248,61 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
-  this->modelCreator->CreatePart(ModelCreator::PART_CYLINDER);
+  this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
-  this->modelCreator->CreatePart(ModelCreator::PART_SPHERE);
+  this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
-  this->modelCreator->CreatePart(ModelCreator::PART_BOX);
+  this->modelCreator->AddPart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_FIXED);
+  this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHingeJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_HINGE);
+  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHinge2Joint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_HINGE2);
+  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSliderJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_SLIDER);
+  this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnScrewJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_SCREW);
+  this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnUniversalJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_UNIVERSAL);
+  this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBallJoint()
 {
-  this->jointMaker->CreateJoint(JointMaker::JOINT_BALL);
+  this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
 }
 
 /////////////////////////////////////////////////
@@ -297,4 +321,33 @@ void ModelEditorPalette::OnPartAdded()
   if (this->partsButtonGroup->checkedButton())
     this->partsButtonGroup->checkedButton()->setChecked(false);
   this->partsButtonGroup->setExclusive(true);
+}
+
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSave()
+{
+  SaveDialog saveDialog;
+  saveDialog.SetSaveName(this->modelCreator->GetModelName());
+  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
+  if (saveDialog.exec() == QDialog::Accepted)
+  {
+    this->modelName = saveDialog.GetSaveName();
+    this->saveLocation = saveDialog.GetSaveLocation();
+    this->modelCreator->SetModelName(this->modelName);
+    this->modelCreator->GenerateSDF();
+    this->modelCreator->SaveToSDF(this->saveLocation + "/" + this->modelName);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnDiscard()
+{
+//  this->modelCreator->Discard();
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnDone()
+{
+//  this->modelCreator->Save();
 }
