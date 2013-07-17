@@ -156,6 +156,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->joints.clear();
   this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
