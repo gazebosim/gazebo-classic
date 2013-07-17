@@ -262,10 +262,10 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
       state, reactionForceOnChildBodyInGround[1]);   // [1] force element
 
     SimTK::Vec3 reactionTorqueOnParentBody =
-      targetLinkFrame.expressGroundVectorInBodyFrame(
+      this->mobod.expressGroundVectorInBodyFrame(
       state, reactionForceOnParentBodyInGround[0]);   // [0] torque element
     SimTK::Vec3 reactionForceOnParentBody =
-      targetLinkFrame.expressGroundVectorInBodyFrame(
+      this->mobod.expressGroundVectorInBodyFrame(
       state, reactionForceOnParentBodyInGround[1]);   // [1] force element
 
     // gzerr << "reversed\n";
@@ -287,11 +287,13 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
     SimTK::MobilizedBody targetLinkFrame = this->mobod;
     // re-express in child link frame
     SimTK::Vec3 reactionTorqueOnChildBody =
-      targetLinkFrame.expressGroundVectorInBodyFrame(
+      this->mobod.expressGroundVectorInBodyFrame(
       state, reactionForceOnChildBodyInGround[0]);   // [0] torque element
     SimTK::Vec3 reactionForceOnChildBody =
-      targetLinkFrame.expressGroundVectorInBodyFrame(
+      this->mobod.expressGroundVectorInBodyFrame(
       state, reactionForceOnChildBodyInGround[1]);   // [1] force element
+    gzerr << "child 0: " << reactionForceOnChildBodyInGround[0] << "\n";
+    gzerr << "child 1: " << reactionForceOnChildBodyInGround[1] << "\n";
 
     SimTK::Vec3 reactionTorqueOnParentBody =
       targetLinkFrame.expressGroundVectorInBodyFrame(
@@ -299,6 +301,8 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
     SimTK::Vec3 reactionForceOnParentBody =
       targetLinkFrame.expressGroundVectorInBodyFrame(
       state, reactionForceOnParentBodyInGround[1]);   // [1] force element
+    gzerr << "parent 0: " << reactionForceOnParentBodyInGround[0] << "\n";
+    gzerr << "parent 1: " << reactionForceOnParentBodyInGround[1] << "\n";
 
     // Note minus sign indicates these are reaction forces
     // by the Link on the Joint in the target Link frame.
