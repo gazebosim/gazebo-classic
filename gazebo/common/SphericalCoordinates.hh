@@ -49,14 +49,16 @@ namespace gazebo
       /// \param[in] _model SurfaceModel specification.
       public: SphericalCoordinates(const SurfaceType _model);
 
-      /// \brief Constructor with surface model and angle inputs.
+      /// \brief Constructor with surface model, angle, and elevation inputs.
       /// \param[in] _model SurfaceModel specification.
       /// \param[in] _latitude Reference latitude.
       /// \param[in] _longitude Reference longitude.
+      /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
       public: SphericalCoordinates(const SurfaceType _model,
                                    const math::Angle &_latitude,
                                    const math::Angle &_longitude,
+                                   double _elevation,
                                    const math::Angle &_heading);
 
       /// \brief Destructor.
@@ -74,11 +76,13 @@ namespace gazebo
       public: SurfaceType GetSurfaceModel() const;
       public: math::Angle GetLatitudeReference() const;
       public: math::Angle GetLongitudeReference() const;
+      public: double GetElevationReference() const;
       public: math::Angle GetHeadingOffset() const;
       public: void SetSurfaceModel(const SurfaceType &_model);
       public: bool SetSurfaceModel(const std::string &_str);
       public: void SetLatitudeReference(const math::Angle &_angle);
       public: void SetLongitudeReference(const math::Angle &_angle);
+      public: void SetElevationReference(double _elevation);
       public: void SetHeadingOffset(const math::Angle &_angle);
 
       /// \brief Type of surface model being used.
@@ -89,6 +93,9 @@ namespace gazebo
 
       /// \brief Longitude of reference point.
       private: math::Angle longitudeReference;
+
+      /// \brief Elevation of reference point relative to sea level.
+      private: double elevationReference;
 
       /// \brief Heading offset, expressed as angle from East to
       ///        gazebo x-axis, or equivalently from North to gazebo y-axis.

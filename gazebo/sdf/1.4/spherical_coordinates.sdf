@@ -22,6 +22,12 @@
     </description>
   </element>
 
+  <element name="elevation" type="double" default="0.0" required="1">
+    <description>
+      Elevation of origin of gazebo reference frame, specified in meters.
+    </description>
+  </element>
+
   <element name="heading_deg" type="double" default="0.0" required="1">
     <description>
       Heading offset of gazebo reference frame, measured as angle between

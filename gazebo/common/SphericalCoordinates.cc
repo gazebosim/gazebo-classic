@@ -47,7 +47,8 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(const std::strin
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates() :
-      surfaceModel(EARTH_WGS84)
+      surfaceModel(EARTH_WGS84),
+      elevationReference(0.0)
 {
 }
 
@@ -60,9 +61,11 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _model) :
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(
     const SurfaceType _model, const math::Angle &_latitude,
-    const math::Angle &_longitude, const math::Angle &_heading) :
+    const math::Angle &_longitude, double _elevation,
+    const math::Angle &_heading) :
       surfaceModel(_model), latitudeReference(_latitude),
-      longitudeReference(_longitude), headingOffset(_heading)
+      longitudeReference(_longitude), elevationReference(_elevation),
+      headingOffset(_heading)
 {
 }
 
@@ -90,6 +93,12 @@ math::Angle SphericalCoordinates::GetLongitudeReference() const
 }
 
 //////////////////////////////////////////////////
+double SphericalCoordinates::GetElevationReference() const
+{
+  return this->elevationReference;
+}
+
+//////////////////////////////////////////////////
 math::Angle SphericalCoordinates::GetHeadingOffset() const
 {
   return this->headingOffset;
@@ -111,6 +120,12 @@ void SphericalCoordinates::SetLatitudeReference(const math::Angle &_angle)
 void SphericalCoordinates::SetLongitudeReference(const math::Angle &_angle)
 {
   this->longitudeReference.SetFromRadian(_angle.Radian());
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetElevationReference(double _elevation)
+{
+  this->elevationReference = _elevation;
 }
 
 //////////////////////////////////////////////////
@@ -160,6 +175,6 @@ math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
   // geodetic longitude in degrees
   spherical.y = this->longitudeReference.Degree() + deltaLongitude.Degree();
   // altitude relative to sea level
-  spherical.z = _xyz.z;
+  spherical.z = this->elevationReference + _xyz.z;
   return spherical;
 }

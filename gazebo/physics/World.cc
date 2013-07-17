@@ -216,12 +216,13 @@ void World::Load(sdf::ElementPtr _sdf)
       common::SphericalCoordinates::Convert(
         spherical->GetValueString("surface_model"));
     math::Angle latitude, longitude, heading;
+    double elevation = spherical->GetValueDouble("elevation");
     latitude.SetFromDegree(spherical->GetValueDouble("latitude_deg"));
     longitude.SetFromDegree(spherical->GetValueDouble("longitude_deg"));
     heading.SetFromDegree(spherical->GetValueDouble("heading_deg"));
       
     this->sphericalCoordinates.reset(new common::SphericalCoordinates(
-      surfaceModel, latitude, longitude, heading));
+      surfaceModel, latitude, longitude, elevation, heading));
   }
 
   if (this->sphericalCoordinates == NULL)
