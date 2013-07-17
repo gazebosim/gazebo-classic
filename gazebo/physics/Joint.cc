@@ -415,6 +415,10 @@ void Joint::FillMsg(msgs::Joint &_msg)
       msgs::Sensor *sensorMsg =_msg.add_sensor();
       sensor->FillMsg(*sensorMsg);
     }
+    else
+    {
+      gzlog << "Joint::FillMsg: sensor [" << *iter << "] not found.\n";
+    }
   }
 }
 
