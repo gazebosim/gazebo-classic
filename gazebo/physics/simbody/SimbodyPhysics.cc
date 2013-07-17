@@ -866,7 +866,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
                                   this->contactMaterialStaticFriction,
                                   this->contactMaterialDynamicFriction,
                                   this->contactMaterialViscousFriction);
-  // works for SpawnDrop
+  // Debug: works for SpawnDrop
   // SimTK::ContactMaterial material(1e6,   // stiffness
   //                                 10.0,  // dissipation
   //                                 0.7,   // mu_static

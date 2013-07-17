@@ -184,7 +184,8 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
     v = this->masterMobod.findStationVelocityInGround(
     this->simbodyPhysics->integ->getState(), station);
   else
-    gzerr << "debug: simbody physics not yet initialized\n";
+    gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
+           << " not yet initialized\n";
 
   return SimbodyPhysics::Vec3ToVector3(v);
 }
