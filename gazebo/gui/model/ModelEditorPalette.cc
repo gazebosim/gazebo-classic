@@ -207,7 +207,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
-//  mainLayout->addLayout(buttonsLayout);
+  mainLayout->addLayout(buttonsLayout);
 
   this->modelCreator = new ModelCreator();
 
@@ -216,7 +216,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
 //  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
