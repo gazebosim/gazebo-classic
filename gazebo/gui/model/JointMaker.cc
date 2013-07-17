@@ -141,6 +141,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
       jointLine->AddPoint(math::Vector3(0, 0, 0));
       jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+      jointVis->GetSceneNode()->setInheritScale(false);
 
 
       JointData *jointData = new JointData;
@@ -320,6 +321,7 @@ void JointMaker::CreateHotSpot()
       joint->parent->GetWorldPose().pos)/2.0);
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   camera->GetScene()->AddVisual(hotspotVisual);
   joint->hotspot = hotspotVisual;
