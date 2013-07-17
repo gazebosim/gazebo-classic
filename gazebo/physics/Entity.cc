@@ -64,6 +64,8 @@ Entity::Entity(BasePtr _parent)
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////

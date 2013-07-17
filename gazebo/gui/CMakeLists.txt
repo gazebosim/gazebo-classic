@@ -33,6 +33,7 @@ set (sources
   KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
@@ -74,6 +75,7 @@ set (headers
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
+  ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh

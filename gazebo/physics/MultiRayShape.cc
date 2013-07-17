@@ -103,6 +103,20 @@ void MultiRayShape::Init()
 }
 
 //////////////////////////////////////////////////
+void MultiRayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  for (unsigned int i = 0; i < this->rays.size(); ++i)
+  {
+    this->rays[i]->SetScale(this->scale);
+  }
+}
+
+//////////////////////////////////////////////////
 double MultiRayShape::GetRange(int _index)
 {
   if (_index < 0 || _index >= static_cast<int>(this->rays.size()))

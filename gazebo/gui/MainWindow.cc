@@ -548,6 +548,12 @@ void MainWindow::Rotate()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Scale()
+{
+  gui::Events::manipMode("scale");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -873,6 +879,13 @@ void MainWindow::CreateActions()
   g_rotateAct->setChecked(false);
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
   this->CreateDisabledIcon(":/images/rotate.png", g_rotateAct);
+
+  g_scaleAct = new QAction(QIcon(":/images/scale.png"),
+      tr("Scale Mode"), this);
+  g_scaleAct->setStatusTip(tr("Scale an object"));
+  g_scaleAct->setCheckable(true);
+  g_scaleAct->setChecked(false);
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));

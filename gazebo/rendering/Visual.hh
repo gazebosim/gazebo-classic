@@ -552,6 +552,9 @@ namespace gazebo
 
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
+
+      /// \brief Scale of visual.
+      private: math::Vector3 scale;
     };
     /// \}
   }

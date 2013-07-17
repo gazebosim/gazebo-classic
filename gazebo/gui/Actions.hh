@@ -72,6 +72,7 @@ namespace gazebo
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+    extern QAction *g_scaleAct;
 
     extern QAction *g_topicVisAct;
 

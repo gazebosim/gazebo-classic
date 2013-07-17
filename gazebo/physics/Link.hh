@@ -82,6 +82,10 @@ namespace gazebo
       /// \brief Update the body.
       public: virtual void Update();
 
+      /// \brief Set the scale of the link.
+      /// \param[in] _scale Scale to set the link to.
+      public: void SetScale(const math::Vector3 _scale);
+
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
       public: virtual void SetEnabled(bool _enable) const = 0;
@@ -107,7 +111,6 @@ namespace gazebo
       /// model.
       /// \param[in] _collid True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
-
 
       /// \brief Set the collide mode of the body.
       /// \param[in] _mode Collision Mode,

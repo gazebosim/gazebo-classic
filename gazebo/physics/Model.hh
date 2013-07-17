@@ -238,10 +238,13 @@ namespace gazebo
       /// \sa Model::AttachStaticModel.
       public: void DetachStaticModel(const std::string &_model);
 
-
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
       public: void SetState(const ModelState &_state);
+
+      /// \brief Set the scale of model.
+      /// \param[in] _scale Scale to set the model to.
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.

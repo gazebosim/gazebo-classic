@@ -54,6 +54,10 @@ namespace gazebo
       /// \return Radius of the sphere.
       public: double GetRadius() const;
 
+      /// \brief Set the scale of the sphere.
+      /// \param[in] _scale Scale to set the sphere to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
       public: virtual void FillMsg(msgs::Geometry &_msg);
