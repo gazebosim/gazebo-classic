@@ -335,4 +335,3 @@ namespace gazebo
   }
 }
 #endif
-
