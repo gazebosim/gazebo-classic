@@ -42,7 +42,6 @@ ModelManipulator::ModelManipulator()
   this->mouseMoveVis.reset();
 
   this->manipMode = "";
-  this->selectionMode = "";
 }
 
 /////////////////////////////////////////////////
@@ -76,8 +75,6 @@ void ModelManipulator::Init()
   this->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->scene->GetWorldVisual()));
   this->selectionObj->Load();
-
-  this->selectionMode = "model";
 
   this->initialized = true;
 }
@@ -632,12 +629,6 @@ void ModelManipulator::SetManipulationMode(const std::string &_mode)
   {
     this->selectionObj->SetMode(this->manipMode);
   }
-}
-
-//////////////////////////////////////////////////
-void ModelManipulator::SetSelectionMode(const std::string &_mode)
-{
-  this->selectionMode = _mode;
 }
 
 /////////////////////////////////////////////////
