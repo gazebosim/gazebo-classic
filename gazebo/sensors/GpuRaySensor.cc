@@ -435,7 +435,7 @@ double GpuRaySensor::GetRangeResolution() const
 //////////////////////////////////////////////////
 int GpuRaySensor::GetRayCount() const
 {
-  return this->horzElem->GetValueUInt("samples");
+  return this->horzElem->Get<unsigned int>("samples");
 }
 
 //////////////////////////////////////////////////
@@ -449,7 +449,7 @@ int GpuRaySensor::GetRangeCount() const
 int GpuRaySensor::GetVerticalRayCount() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueUInt("samples");
+    return this->vertElem->Get<unsigned int>("samples");
   else
     return 1;
 }

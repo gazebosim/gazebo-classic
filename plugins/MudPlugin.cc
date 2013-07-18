@@ -73,7 +73,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("contact_surface_bitmask"))
   {
     this->contactSurfaceBitmask =
-        _sdf->GetValueUInt("contact_surface_bitmask");
+        _sdf->Get<unsigned int>("contact_surface_bitmask");
   }
 
   if (_sdf->HasElement("link_name"))

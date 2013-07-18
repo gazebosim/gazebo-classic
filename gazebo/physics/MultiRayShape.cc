@@ -64,14 +64,14 @@ void MultiRayShape::Init()
     this->vertElem = this->scanElem->GetElement("vertical");
     vertMinAngle = this->vertElem->Get<double>("min_angle");
     vertMaxAngle = this->vertElem->Get<double>("max_angle");
-    vertSamples = this->vertElem->GetValueUInt("samples");
+    vertSamples = this->vertElem->Get<unsigned int>("samples");
     // vertResolution = this->vertElem->Get<double>("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
   horzMinAngle = this->horzElem->Get<double>("min_angle");
   horzMaxAngle = this->horzElem->Get<double>("max_angle");
-  horzSamples = this->horzElem->GetValueUInt("samples");
+  horzSamples = this->horzElem->Get<unsigned int>("samples");
   // horzResolution = this->horzElem->Get<double>("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
@@ -203,7 +203,7 @@ double MultiRayShape::GetResRange() const
 //////////////////////////////////////////////////
 int MultiRayShape::GetSampleCount() const
 {
-  return this->horzElem->GetValueUInt("samples");
+  return this->horzElem->Get<unsigned int>("samples");
 }
 
 //////////////////////////////////////////////////
@@ -228,7 +228,7 @@ math::Angle MultiRayShape::GetMaxAngle() const
 int MultiRayShape::GetVerticalSampleCount() const
 {
   if (this->vertElem)
-    return this->vertElem->GetValueUInt("samples");
+    return this->vertElem->Get<unsigned int>("samples");
   else
     return 1;
 }

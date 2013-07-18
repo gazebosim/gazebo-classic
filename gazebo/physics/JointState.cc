@@ -90,7 +90,7 @@ void JointState::Load(const sdf::ElementPtr _elem)
     sdf::ElementPtr childElem = _elem->GetElement("angle");
     while (childElem)
     {
-      unsigned int axis = childElem->GetValueUInt("axis");
+      unsigned int axis = childElem->Get<unsigned int>("axis");
       if (axis+1 > this->angles.size())
         this->angles.resize(axis+1, math::Angle(0.0));
       this->angles[axis] = childElem->Get<double>();
