@@ -61,7 +61,7 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->GetValueVector3("normal");
+  return this->sdf->Get<math::Vector3>("normal");
 }
 
 //////////////////////////////////////////////////

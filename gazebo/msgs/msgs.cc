@@ -383,7 +383,7 @@ namespace gazebo
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->GetValueVector3("direction")));
+            Convert(_sdf->Get<math::Vector3>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -409,7 +409,7 @@ namespace gazebo
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->GetValueVector3("scale"));
+        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 
@@ -451,7 +451,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::BOX);
         msgs::Set(result.mutable_box()->mutable_size(),
-            geomElem->GetValueVector3("size"));
+            geomElem->Get<math::Vector3>("size"));
       }
       else if (geomElem->GetName() == "cylinder")
       {
@@ -471,7 +471,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::PLANE);
         msgs::Set(result.mutable_plane()->mutable_normal(),
-            geomElem->GetValueVector3("normal"));
+            geomElem->Get<math::Vector3>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
             geomElem->GetValueVector2d("size"));
       }
@@ -489,9 +489,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
         msgs::Set(result.mutable_heightmap()->mutable_size(),
-            geomElem->GetValueVector3("size"));
+            geomElem->Get<math::Vector3>("size"));
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
-            geomElem->GetValueVector3("pos"));
+            geomElem->Get<math::Vector3>("pos"));
 
         common::Image img(geomElem->Get<std::string>("uri"));
         msgs::Set(result.mutable_heightmap()->mutable_image(), img);

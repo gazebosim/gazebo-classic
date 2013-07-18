@@ -57,7 +57,7 @@ void Road::Init()
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector3 point = pointElem->GetValueVector3();
+    math::Vector3 point = pointElem->Get<math::Vector3>();
     pointElem = pointElem->GetNextElement("point");
 
     msgs::Vector3d *ptMsg = msg.add_point();

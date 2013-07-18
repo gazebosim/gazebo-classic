@@ -198,7 +198,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
 
-  math::Vector3 g = this->sdf->GetValueVector3("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
 
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";

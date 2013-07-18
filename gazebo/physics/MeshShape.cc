@@ -100,7 +100,7 @@ void MeshShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MeshShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("scale");
+  return this->sdf->Get<math::Vector3>("scale");
 }
 
 //////////////////////////////////////////////////

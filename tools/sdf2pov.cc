@@ -244,7 +244,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   if (_elem->HasElement("direction"))
   {
     gazebo::math::Vector3 dir =
-      _elem->GetElement("direction")->GetValueVector3("xyz");
+      _elem->GetElement("direction")->Get<math::Vector3>("xyz");
     gazebo::math::Plane plane(gazebo::math::Vector3(0, 0, 1));
 
     double d = plane.Distance(pose.pos, dir);
@@ -298,7 +298,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   if (_elem->HasElement("plane"))
   {
     sdf::ElementPtr planeElem = _elem->GetElement("plane");
-    gazebo::math::Vector3 normal = planeElem->GetValueVector3("normal");
+    gazebo::math::Vector3 normal = planeElem->Get<math::Vector3>("normal");
     printf("plane {\n");
     printf("  <%f, %f, %f>, 0\n", normal.x, normal.y, normal.z);
     printf("  texture {pigment { color Yellow } }\n");
@@ -307,7 +307,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   else if (_elem->HasElement("box"))
   {
     sdf::ElementPtr boxElem = _elem->GetElement("box");
-    gazebo::math::Vector3 size = boxElem->GetValueVector3("size");
+    gazebo::math::Vector3 size = boxElem->Get<math::Vector3>("size");
     printf("box {\n");
     gazebo::math::Vector3 corner1 = _pose.pos - (size/2.0);
     gazebo::math::Vector3 corner2 = _pose.pos + (size/2.0);

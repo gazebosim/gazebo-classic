@@ -214,13 +214,13 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("size");
+  return this->sdf->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->GetValueVector3("pos");
+  return this->sdf->Get<math::Vector3>("pos");
 }
 
 //////////////////////////////////////////////////

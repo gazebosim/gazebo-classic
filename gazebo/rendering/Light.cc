@@ -113,7 +113,7 @@ void Light::Update()
   this->SetSpecularColor(
       this->sdf->GetElement("specular")->GetValueColor());
   this->SetDirection(
-      this->sdf->GetValueVector3("direction"));
+      this->sdf->Get<math::Vector3>("direction"));
 
   if (this->sdf->HasElement("attenuation"))
   {
@@ -501,7 +501,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
   math::Vector3 vec = _dir;
   vec.Normalize();
 
-  if (this->sdf->GetValueVector3("direction") != vec)
+  if (this->sdf->Get<math::Vector3>("direction") != vec)
     this->sdf->GetElement("direction")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);
@@ -510,7 +510,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
 //////////////////////////////////////////////////
 math::Vector3 Light::GetDirection() const
 {
-  return this->sdf->GetValueVector3("direction");
+  return this->sdf->Get<math::Vector3>("direction");
 }
 
 //////////////////////////////////////////////////

@@ -69,7 +69,7 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
 
       this->slip1 = frictionOdeElem->Get<double>("slip1");
       this->slip2 = frictionOdeElem->Get<double>("slip2");
-      this->fdir1 = frictionOdeElem->GetValueVector3("fdir1");
+      this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
     }
   }
 

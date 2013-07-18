@@ -59,9 +59,9 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
   this->joints[0] = _model->GetJoint(
     _sdf->GetElement("steer")->Get<std::string>());
   this->jointPIDs[0] = common::PID(
-    _sdf->GetElement("steer_pid")->GetValueVector3().x,
-    _sdf->GetElement("steer_pid")->GetValueVector3().y,
-    _sdf->GetElement("steer_pid")->GetValueVector3().z,
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().z,
     _sdf->GetElement("steer_ilim")->GetValueVector2d().y,
     _sdf->GetElement("steer_ilim")->GetValueVector2d().x);
   this->jointPositions[0] =
@@ -74,9 +74,9 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
   this->joints[1] = _model->GetJoint(
     _sdf->GetElement("right")->Get<std::string>());
   this->jointPIDs[1] = common::PID(
-    _sdf->GetElement("right_pid")->GetValueVector3().x,
-    _sdf->GetElement("right_pid")->GetValueVector3().y,
-    _sdf->GetElement("right_pid")->GetValueVector3().z,
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().z,
     _sdf->GetElement("right_ilim")->GetValueVector2d().y,
     _sdf->GetElement("right_ilim")->GetValueVector2d().x);
   this->jointPositions[1] =
@@ -89,9 +89,9 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
   this->joints[2] = _model->GetJoint(
     _sdf->GetElement("left")->Get<std::string>());
   this->jointPIDs[2] = common::PID(
-    _sdf->GetElement("left_pid")->GetValueVector3().x,
-    _sdf->GetElement("left_pid")->GetValueVector3().y,
-    _sdf->GetElement("left_pid")->GetValueVector3().z,
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().z,
     _sdf->GetElement("left_ilim")->GetValueVector2d().y,
     _sdf->GetElement("left_ilim")->GetValueVector2d().x);
   this->jointPositions[2] =

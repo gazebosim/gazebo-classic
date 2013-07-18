@@ -198,7 +198,7 @@ void Joint::Init()
   if (this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -222,7 +222,7 @@ void Joint::Init()
   if (this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -250,11 +250,11 @@ void Joint::Init()
   // Set axis in physics engines
   if (this->sdf->HasElement("axis"))
   {
-    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+    this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
   }
   if (this->sdf->HasElement("axis2"))
   {
-    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+    this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
   }
 
   this->ComputeInertiaRatio();
@@ -266,9 +266,9 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   math::Vector3 vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;

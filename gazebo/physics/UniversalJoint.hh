@@ -56,9 +56,9 @@ namespace gazebo
                 T::Load(_sdf);
 
                 this->SetAxis(0,
-                    this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+                    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
                 this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
               }
     };
     /// \}

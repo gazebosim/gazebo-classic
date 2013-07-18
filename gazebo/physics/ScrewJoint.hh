@@ -70,7 +70,7 @@ namespace gazebo
                    if (_sdf->HasElement("axis"))
                    {
                      sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
                        sdf::ElementPtr limitElem =

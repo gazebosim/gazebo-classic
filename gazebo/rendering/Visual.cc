@@ -709,7 +709,7 @@ math::Vector3 Visual::GetScale()
 
     if (geomElem->HasElement("box"))
     {
-      result = geomElem->GetElement("box")->GetValueVector3("size");
+      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
@@ -730,7 +730,7 @@ math::Vector3 Visual::GetScale()
     }
     else if (geomElem->HasElement("mesh"))
     {
-      result = geomElem->GetElement("mesh")->GetValueVector3("scale");
+      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
   }
 
