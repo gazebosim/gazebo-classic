@@ -6,7 +6,7 @@ if (HAVE_GTS)
   add_definitions(${gts_CFLAGS})
 endif()
 
-set (sources 
+set (sources
   Animation.cc
   Assert.cc
   Base64.cc
@@ -35,7 +35,7 @@ set (sources
   Video.cc
 )
 
-set (headers 
+set (headers
   Animation.hh
   Assert.hh
   Base64.hh
@@ -113,17 +113,17 @@ set_property(
 )
 
 target_link_libraries(gazebo_common gazebo_math
-                                    ${libdl_library}
-                                    ${Boost_LIBRARIES}
-                                    ${freeimage_library}
-                                    ${tinyxml_libraries}
-                                    ${libavcodec_LIBRARIES}
-                                    ${libavformat_LIBRARIES}
-                                    ${CURL_LIBRARIES}
-                                    ${libswscale_LIBRARIES}
-                                    ${libtar_libraries}
-                                    rt
-                                    )
+  ${libdl_library}
+  ${Boost_LIBRARIES}
+  ${freeimage_library}
+  ${tinyxml_libraries}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  ${libtar_libraries}
+  rt
+)
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
