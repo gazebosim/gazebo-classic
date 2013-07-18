@@ -473,7 +473,7 @@ namespace gazebo
         msgs::Set(result.mutable_plane()->mutable_normal(),
             geomElem->Get<math::Vector3>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
-            geomElem->GetValueVector2d("size"));
+            geomElem->Get<math::Vector2d>("size"));
       }
       else if (geomElem->GetName() == "image")
       {

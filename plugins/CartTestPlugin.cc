@@ -62,8 +62,8 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("steer_pid")->Get<math::Vector3>().x,
     _sdf->GetElement("steer_pid")->Get<math::Vector3>().y,
     _sdf->GetElement("steer_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("steer_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("steer_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[0] =
     _sdf->GetElement("steer_pos")->Get<double>();
   this->jointVelocities[0] =
@@ -77,8 +77,8 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("right_pid")->Get<math::Vector3>().x,
     _sdf->GetElement("right_pid")->Get<math::Vector3>().y,
     _sdf->GetElement("right_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("right_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("right_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[1] =
     _sdf->GetElement("right_pos")->Get<double>();
   this->jointVelocities[1] =
@@ -92,8 +92,8 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("left_pid")->Get<math::Vector3>().x,
     _sdf->GetElement("left_pid")->Get<math::Vector3>().y,
     _sdf->GetElement("left_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("left_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("left_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[2] =
     _sdf->GetElement("left_pos")->Get<double>();
   this->jointVelocities[2] =

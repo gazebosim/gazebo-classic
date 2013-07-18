@@ -73,7 +73,7 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
-  return this->sdf->GetValueVector2d("size");
+  return this->sdf->Get<math::Vector2d>("size");
 }
 
 //////////////////////////////////////////////////

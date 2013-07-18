@@ -725,7 +725,7 @@ math::Vector3 Visual::GetScale()
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
-        geomElem->GetElement("plane")->GetValueVector2d("size");
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
       result.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
