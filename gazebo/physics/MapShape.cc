@@ -66,11 +66,11 @@ void MapShape::Load(sdf::ElementPtr _sdf)
   std::string imageFilename = _sdf->Get<std::string>("uri");
 
   // Make sure they are ok
-  if (_sdf->GetValueDouble("scale") <= 0)
+  if (_sdf->Get<double>("scale") <= 0)
     _sdf->GetElement("scale")->Set(0.1);
   if (this->sdf->GetValueInt("threshold") <= 0)
     _sdf->GetElement("threshold")->Set(200);
-  if (this->sdf->GetValueDouble("height") <= 0)
+  if (this->sdf->Get<double>("height") <= 0)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
@@ -123,7 +123,7 @@ std::string MapShape::GetURI() const
 //////////////////////////////////////////////////
 double MapShape::GetScale() const
 {
-  return this->sdf->GetValueDouble("scale");
+  return this->sdf->Get<double>("scale");
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +135,7 @@ int MapShape::GetThreshold() const
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
-  return this->sdf->GetValueDouble("height");
+  return this->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
@@ -161,12 +161,12 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
-    float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
-    float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
-    float z = this->sdf->GetValueDouble("height") / 2.0;
-    float xSize = (node->width) * this->sdf->GetValueDouble("scale");
-    float ySize = (node->height) * this->sdf->GetValueDouble("scale");
-    float zSize = this->sdf->GetValueDouble("height");
+    float x = (node->x + node->width / 2.0) * this->sdf->Get<double>("scale");
+    float y = (node->y + node->height / 2.0) * this->sdf->Get<double>("scale");
+    float z = this->sdf->Get<double>("height") / 2.0;
+    float xSize = (node->width) * this->sdf->Get<double>("scale");
+    float ySize = (node->height) * this->sdf->Get<double>("scale");
+    float zSize = this->sdf->Get<double>("height");
 
     char collisionName[256];
     sprintf(collisionName, "map_collision_%d", collisionCounter++);

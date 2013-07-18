@@ -36,8 +36,8 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   math::Vector3 topLeft = _sdf->GetValueVector3("top_left");
   math::Vector3 minSize = _sdf->GetValueVector3("min_size");
   math::Vector3 maxSize = _sdf->GetValueVector3("max_size");
-  double minMass = _sdf->GetValueDouble("min_mass");
-  double maxMass = _sdf->GetValueDouble("max_mass");
+  double minMass = _sdf->Get<double>("min_mass");
+  double maxMass = _sdf->Get<double>("max_mass");
   unsigned int count = _sdf->GetValueUInt("count");
 
   std::vector<CompoundObj> objects;

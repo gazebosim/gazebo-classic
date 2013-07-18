@@ -218,7 +218,7 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->GetValueDouble();
+    double angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI)
     {
       gzthrow("Camera horizontal field of view invalid.");
@@ -235,8 +235,8 @@ void Camera::Load()
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->GetValueDouble("mean");
-      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseMean = noiseElem->Get<double>("mean");
+      this->noiseStdDev = noiseElem->Get<double>("stddev");
       this->noiseActive = true;
       this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
@@ -648,9 +648,9 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    this->camera->setNearClipDistance(clipElem->GetValueDouble("near"));
-    this->camera->setFarClipDistance(clipElem->GetValueDouble("far"));
-    this->camera->setRenderingDistance(clipElem->GetValueDouble("far"));
+    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
+    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
     gzerr << "Setting clip distances failed -- no camera yet\n";
@@ -676,7 +676,7 @@ void Camera::SetHFOV(math::Angle _angle)
 //////////////////////////////////////////////////
 math::Angle Camera::GetHFOV() const
 {
-  return math::Angle(this->sdf->GetValueDouble("horizontal_fov"));
+  return math::Angle(this->sdf->Get<double>("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////

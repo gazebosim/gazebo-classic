@@ -54,7 +54,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
       _sdf->GetElement("right_joint")->Get<std::string>());
 
   if (_sdf->HasElement("torque"))
-    this->torque = _sdf->GetElement("torque")->GetValueDouble();
+    this->torque = _sdf->GetElement("torque")->Get<double>();
   else
   {
     gzwarn << "No torque value set for the DiffDrive plugin.\n";

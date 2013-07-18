@@ -806,9 +806,9 @@ void Link::FillMsg(msgs::Link &_msg)
     msgs::Projector *proj = _msg.add_projector();
     proj->set_name(this->GetScopedName() + "::" + elem->Get<std::string>("name"));
     proj->set_texture(elem->Get<std::string>("texture"));
-    proj->set_fov(elem->GetValueDouble("fov"));
-    proj->set_near_clip(elem->GetValueDouble("near_clip"));
-    proj->set_far_clip(elem->GetValueDouble("far_clip"));
+    proj->set_fov(elem->Get<double>("fov"));
+    proj->set_near_clip(elem->Get<double>("near_clip"));
+    proj->set_far_clip(elem->Get<double>("far_clip"));
     msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
   }
 }
@@ -943,7 +943,7 @@ void Link::SetState(const LinkState &_state)
 double Link::GetLinearDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("linear");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
   else
     return 0.0;
 }
@@ -952,7 +952,7 @@ double Link::GetLinearDamping() const
 double Link::GetAngularDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("angular");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("angular");
   else
     return 0.0;
 }

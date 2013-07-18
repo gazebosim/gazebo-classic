@@ -96,10 +96,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       if (noiseElem->HasElement("rate"))
       {
         sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
-        this->rateNoiseMean = rateElem->GetValueDouble("mean");
-        this->rateNoiseStdDev = rateElem->GetValueDouble("stddev");
-        double rateBiasMean = rateElem->GetValueDouble("bias_mean");
-        double rateBiasStddev = rateElem->GetValueDouble("bias_stddev");
+        this->rateNoiseMean = rateElem->Get<double>("mean");
+        this->rateNoiseStdDev = rateElem->Get<double>("stddev");
+        double rateBiasMean = rateElem->Get<double>("bias_mean");
+        double rateBiasStddev = rateElem->Get<double>("bias_stddev");
         // Sample the bias that we'll use later
         this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
         // With equal probability, we pick a negative bias (by convention,
@@ -114,10 +114,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       if (noiseElem->HasElement("accel"))
       {
         sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
-        this->accelNoiseMean = accelElem->GetValueDouble("mean");
-        this->accelNoiseStdDev = accelElem->GetValueDouble("stddev");
-        double accelBiasMean = accelElem->GetValueDouble("bias_mean");
-        double accelBiasStddev = accelElem->GetValueDouble("bias_stddev");
+        this->accelNoiseMean = accelElem->Get<double>("mean");
+        this->accelNoiseStdDev = accelElem->Get<double>("stddev");
+        double accelBiasMean = accelElem->Get<double>("bias_mean");
+        double accelBiasStddev = accelElem->Get<double>("bias_stddev");
         // Sample the bias that we'll use later
         this->accelBias = math::Rand::GetDblNormal(accelBiasMean,
                                                    accelBiasStddev);

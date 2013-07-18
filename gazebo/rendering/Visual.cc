@@ -429,7 +429,7 @@ void Visual::Load()
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
     {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
-          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
+          this->sdf->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
     }
   }
 
@@ -713,13 +713,13 @@ math::Vector3 Visual::GetScale()
     }
     else if (geomElem->HasElement("sphere"))
     {
-      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      double r = geomElem->GetElement("sphere")->Get<double>("radius");
       result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
-      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
-      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
+      double l = geomElem->GetElement("cylinder")->Get<double>("length");
       result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))

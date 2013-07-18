@@ -59,7 +59,7 @@ namespace gazebo
                    if (_sdf->HasElement("thread_pitch"))
                    {
                      this->threadPitch =
-                       _sdf->GetElement("thread_pitch")->GetValueDouble();
+                       _sdf->GetElement("thread_pitch")->Get<double>();
                    }
                    else
                    {
@@ -79,9 +79,9 @@ namespace gazebo
                        // Perform this three step ordering to ensure the
                        // parameters are set properly. This is taken from
                        // the ODE wiki.
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                       this->SetHighStop(0, limitElem->Get<double>("upper"));
+                       this->SetLowStop(0, limitElem->Get<double>("lower"));
+                       this->SetHighStop(0, limitElem->Get<double>("upper"));
                      }
                    }
                  }

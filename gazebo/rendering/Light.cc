@@ -119,18 +119,18 @@ void Light::Update()
   {
     sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
 
-    this->SetAttenuation(elem->GetValueDouble("constant"),
-                         elem->GetValueDouble("linear"),
-                         elem->GetValueDouble("quadratic"));
-    this->SetRange(elem->GetValueDouble("range"));
+    this->SetAttenuation(elem->Get<double>("constant"),
+                         elem->Get<double>("linear"),
+                         elem->Get<double>("quadratic"));
+    this->SetRange(elem->Get<double>("range"));
   }
 
   if (this->sdf->HasElement("spot"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    this->SetSpotInnerAngle(elem->GetValueDouble("inner_angle"));
-    this->SetSpotOuterAngle(elem->GetValueDouble("outer_angle"));
-    this->SetSpotFalloff(elem->GetValueDouble("falloff"));
+    this->SetSpotInnerAngle(elem->Get<double>("inner_angle"));
+    this->SetSpotOuterAngle(elem->Get<double>("outer_angle"));
+    this->SetSpotFalloff(elem->Get<double>("falloff"));
   }
 }
 
@@ -534,7 +534,7 @@ void Light::SetAttenuation(double constant, double linear, double quadratic)
   elem->GetElement("quadratic")->Set(quadratic);
 
   // Set attenuation
-  this->light->setAttenuation(elem->GetValueDouble("range"),
+  this->light->setAttenuation(elem->Get<double>("range"),
                               constant, linear, quadratic);
 }
 
@@ -546,10 +546,10 @@ void Light::SetRange(const double &_range)
 
   elem->GetElement("range")->Set(_range);
 
-  this->light->setAttenuation(elem->GetValueDouble("range"),
-                              elem->GetValueDouble("constant"),
-                              elem->GetValueDouble("linear"),
-                              elem->GetValueDouble("quadratic"));
+  this->light->setAttenuation(elem->Get<double>("range"),
+                              elem->Get<double>("constant"),
+                              elem->Get<double>("linear"),
+                              elem->Get<double>("quadratic"));
 }
 
 //////////////////////////////////////////////////
@@ -576,9 +576,9 @@ void Light::SetSpotInnerAngle(const double &_angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")),
-        Ogre::Radian(elem->GetValueDouble("outer_angle")),
-        elem->GetValueDouble("falloff"));
+        Ogre::Radian(elem->Get<double>("inner_angle")),
+        Ogre::Radian(elem->Get<double>("outer_angle")),
+        elem->Get<double>("falloff"));
   }
 }
 
@@ -591,9 +591,9 @@ void Light::SetSpotOuterAngle(const double &_angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")),
-        Ogre::Radian(elem->GetValueDouble("outer_angle")),
-        elem->GetValueDouble("falloff"));
+        Ogre::Radian(elem->Get<double>("inner_angle")),
+        Ogre::Radian(elem->Get<double>("outer_angle")),
+        elem->Get<double>("falloff"));
   }
 }
 
@@ -606,9 +606,9 @@ void Light::SetSpotFalloff(const double &_angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")),
-        Ogre::Radian(elem->GetValueDouble("outer_angle")),
-        elem->GetValueDouble("falloff"));
+        Ogre::Radian(elem->Get<double>("inner_angle")),
+        Ogre::Radian(elem->Get<double>("outer_angle")),
+        elem->Get<double>("falloff"));
   }
 }
 
@@ -635,16 +635,16 @@ void Light::FillMsg(msgs::Light &_msg) const
   _msg.set_cast_shadows(this->light->getCastShadows());
 
   sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-  _msg.set_attenuation_constant(elem->GetValueDouble("constant"));
-  _msg.set_attenuation_linear(elem->GetValueDouble("linear"));
-  _msg.set_attenuation_quadratic(elem->GetValueDouble("quadratic"));
-  _msg.set_range(elem->GetValueDouble("range"));
+  _msg.set_attenuation_constant(elem->Get<double>("constant"));
+  _msg.set_attenuation_linear(elem->Get<double>("linear"));
+  _msg.set_attenuation_quadratic(elem->Get<double>("quadratic"));
+  _msg.set_range(elem->Get<double>("range"));
 
   if (lightType == "spot")
   {
     elem = this->sdf->GetElement("spot");
-    _msg.set_spot_inner_angle(elem->GetValueDouble("inner_angle"));
-    _msg.set_spot_outer_angle(elem->GetValueDouble("outer_angle"));
-    _msg.set_spot_falloff(elem->GetValueDouble("falloff"));
+    _msg.set_spot_inner_angle(elem->Get<double>("inner_angle"));
+    _msg.set_spot_outer_angle(elem->Get<double>("outer_angle"));
+    _msg.set_spot_falloff(elem->Get<double>("falloff"));
   }
 }

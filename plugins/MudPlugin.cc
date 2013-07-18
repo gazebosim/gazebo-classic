@@ -65,10 +65,10 @@ void MudPlugin::Load(physics::ModelPtr _model,
   }
 
   if (_sdf->HasElement("stiffness"))
-    this->stiffness = _sdf->GetValueDouble("stiffness");
+    this->stiffness = _sdf->Get<double>("stiffness");
 
   if (_sdf->HasElement("damping"))
-    this->damping = _sdf->GetValueDouble("damping");
+    this->damping = _sdf->Get<double>("damping");
 
   if (_sdf->HasElement("contact_surface_bitmask"))
   {

@@ -89,7 +89,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
-    this->SetLaserRetro(this->sdf->GetElement("laser_retro")->GetValueDouble());
+    this->SetLaserRetro(this->sdf->GetElement("laser_retro")->Get<double>());
 
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
 

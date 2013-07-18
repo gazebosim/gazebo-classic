@@ -326,10 +326,10 @@ namespace gazebo
       result.set_name(_sdf->Get<std::string>("name"));
 
       if (_sdf->HasElement("min_dist"))
-        result.set_min_dist(_sdf->GetElement("min_dist")->GetValueDouble());
+        result.set_min_dist(_sdf->GetElement("min_dist")->Get<double>());
 
       if (_sdf->HasElement("max_dist"))
-        result.set_max_dist(_sdf->GetElement("max_dist")->GetValueDouble());
+        result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
       return result;
     }
@@ -374,10 +374,10 @@ namespace gazebo
       if (_sdf->HasElement("attenuation"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("attenuation");
-        result.set_attenuation_constant(elem->GetValueDouble("constant"));
-        result.set_attenuation_linear(elem->GetValueDouble("linear"));
-        result.set_attenuation_quadratic(elem->GetValueDouble("quadratic"));
-        result.set_range(elem->GetValueDouble("range"));
+        result.set_attenuation_constant(elem->Get<double>("constant"));
+        result.set_attenuation_linear(elem->Get<double>("linear"));
+        result.set_attenuation_quadratic(elem->Get<double>("quadratic"));
+        result.set_range(elem->Get<double>("range"));
       }
 
       if (_sdf->HasElement("direction"))
@@ -389,9 +389,9 @@ namespace gazebo
       if (_sdf->HasElement("spot"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("spot");
-        result.set_spot_inner_angle(elem->GetValueDouble("inner_angle"));
-        result.set_spot_outer_angle(elem->GetValueDouble("outer_angle"));
-        result.set_spot_falloff(elem->GetValueDouble("falloff"));
+        result.set_spot_inner_angle(elem->Get<double>("inner_angle"));
+        result.set_spot_outer_angle(elem->Get<double>("outer_angle"));
+        result.set_spot_falloff(elem->Get<double>("falloff"));
       }
 
       return result;
@@ -457,15 +457,15 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::CYLINDER);
         result.mutable_cylinder()->set_radius(
-            geomElem->GetValueDouble("radius"));
+            geomElem->Get<double>("radius"));
         result.mutable_cylinder()->set_length(
-            geomElem->GetValueDouble("length"));
+            geomElem->Get<double>("length"));
       }
       else if (geomElem->GetName() == "sphere")
       {
         result.set_type(msgs::Geometry::SPHERE);
         result.mutable_sphere()->set_radius(
-            geomElem->GetValueDouble("radius"));
+            geomElem->Get<double>("radius"));
       }
       else if (geomElem->GetName() == "plane")
       {
@@ -479,9 +479,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::IMAGE);
         result.mutable_image()->set_scale(
-            geomElem->GetValueDouble("scale"));
+            geomElem->Get<double>("scale"));
         result.mutable_image()->set_height(
-            geomElem->GetValueDouble("height"));
+            geomElem->Get<double>("height"));
         result.mutable_image()->set_uri(
             geomElem->Get<std::string>("uri"));
       }
@@ -503,7 +503,7 @@ namespace gazebo
           tex = result.mutable_heightmap()->add_texture();
           tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
           tex->set_normal(textureElem->Get<std::string>("normal"));
-          tex->set_size(textureElem->GetValueDouble("size"));
+          tex->set_size(textureElem->Get<double>("size"));
           textureElem = textureElem->GetNextElement("texture");
         }
 
@@ -513,8 +513,8 @@ namespace gazebo
         {
           blend = result.mutable_heightmap()->add_blend();
 
-          blend->set_min_height(blendElem->GetValueDouble("min_height"));
-          blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
+          blend->set_min_height(blendElem->Get<double>("min_height"));
+          blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
           blendElem = blendElem->GetNextElement("blend");
         }
       }
@@ -544,10 +544,10 @@ namespace gazebo
         result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
 
       if (_sdf->HasElement("transparency"))
-        result.set_transparency(_sdf->GetValueDouble("transparency"));
+        result.set_transparency(_sdf->Get<double>("transparency"));
 
       if (_sdf->HasElement("laser_retro"))
-        result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
+        result.set_laser_retro(_sdf->Get<double>("laser_retro"));
 
       // Load the geometry
       if (_sdf->HasElement("geometry"))
@@ -659,9 +659,9 @@ namespace gazebo
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
       result.mutable_color()->CopyFrom(Convert(_sdf->GetValueColor("color")));
-      result.set_density(_sdf->GetValueDouble("density"));
-      result.set_start(_sdf->GetValueDouble("start"));
-      result.set_end(_sdf->GetValueDouble("end"));
+      result.set_density(_sdf->Get<double>("density"));
+      result.set_start(_sdf->Get<double>("start"));
+      result.set_end(_sdf->Get<double>("end"));
       return result;
     }
 
@@ -689,19 +689,19 @@ namespace gazebo
       if (_sdf->HasElement("sky"))
       {
         msgs::Sky *skyMsg = result.mutable_sky();
-        skyMsg->set_time(_sdf->GetElement("sky")->GetValueDouble("time"));
-        skyMsg->set_sunrise(_sdf->GetElement("sky")->GetValueDouble("sunrise"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
+        skyMsg->set_time(_sdf->GetElement("sky")->Get<double>("time"));
+        skyMsg->set_sunrise(_sdf->GetElement("sky")->Get<double>("sunrise"));
+        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
+        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
 
         if (_sdf->GetElement("sky")->HasElement("clouds"))
         {
           sdf::ElementPtr cloudsElem =
             _sdf->GetElement("sky")->GetElement("clouds");
-          skyMsg->set_wind_speed(cloudsElem->GetValueDouble("speed"));
-          skyMsg->set_wind_direction(cloudsElem->GetValueDouble("direction"));
-          skyMsg->set_humidity(cloudsElem->GetValueDouble("humidity"));
-          skyMsg->set_mean_cloud_size(cloudsElem->GetValueDouble("mean_size"));
+          skyMsg->set_wind_speed(cloudsElem->Get<double>("speed"));
+          skyMsg->set_wind_direction(cloudsElem->Get<double>("direction"));
+          skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
+          skyMsg->set_mean_cloud_size(cloudsElem->Get<double>("mean_size"));
           msgs::Set(skyMsg->mutable_cloud_ambient(),
                     cloudsElem->GetValueColor("ambient"));
         }

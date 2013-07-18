@@ -129,11 +129,11 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  this->maxSpeed = _sdf->GetValueDouble("max_speed");
-  this->aeroLoad = _sdf->GetValueDouble("aero_load");
-  this->tireAngleRange = _sdf->GetValueDouble("tire_angle_range");
-  this->frontPower = _sdf->GetValueDouble("front_power");
-  this->rearPower = _sdf->GetValueDouble("rear_power");
+  this->maxSpeed = _sdf->Get<double>("max_speed");
+  this->aeroLoad = _sdf->Get<double>("aero_load");
+  this->tireAngleRange = _sdf->Get<double>("tire_angle_range");
+  this->frontPower = _sdf->Get<double>("front_power");
+  this->rearPower = _sdf->Get<double>("rear_power");
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&VehiclePlugin::OnUpdate, this)));

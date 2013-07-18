@@ -71,7 +71,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr skinSdf = _sdf->GetElement("skin");
   this->skinFile = skinSdf->Get<std::string>("filename");
-  this->skinScale = skinSdf->GetValueDouble("scale");
+  this->skinScale = skinSdf->Get<double>("scale");
 
   MeshManager::Instance()->Load(this->skinFile);
   std::string actorName = _sdf->Get<std::string>("name");
@@ -204,7 +204,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 void Actor::LoadScript(sdf::ElementPtr _sdf)
 {
   this->loop = _sdf->GetValueBool("loop");
-  this->startDelay = _sdf->GetValueDouble("delay_start");
+  this->startDelay = _sdf->Get<double>("delay_start");
   this->autoStart = _sdf->GetValueBool("auto_start");
   this->active = this->autoStart;
 
@@ -242,7 +242,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         sdf::ElementPtr wayptSdf = trajSdf->GetElement("waypoint");
         while (wayptSdf)
         {
-          points[wayptSdf->GetValueDouble("time")] =
+          points[wayptSdf->Get<double>("time")] =
                                           wayptSdf->GetValuePose("pose");
           wayptSdf = wayptSdf->GetNextElement("waypoint");
         }
@@ -328,7 +328,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     std::string animFile = _sdf->Get<std::string>("filename");
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
-    double scale = _sdf->GetValueDouble("scale");
+    double scale = _sdf->Get<double>("scale");
     Skeleton *skel = NULL;
 
     if (extension == "bvh")

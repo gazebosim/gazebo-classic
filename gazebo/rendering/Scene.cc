@@ -277,9 +277,9 @@ void Scene::Init()
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->GetValueColor("color"),
-                 fogElem->GetValueDouble("density"),
-                 fogElem->GetValueDouble("start"),
-                 fogElem->GetValueDouble("end"));
+                 fogElem->Get<double>("density"),
+                 fogElem->Get<double>("start"),
+                 fogElem->Get<double>("end"));
   }
 
   // Create ray scene query
@@ -1361,9 +1361,9 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
     this->SetFog(elem->Get<std::string>("type"),
                  elem->GetValueColor("color"),
-                 elem->GetValueDouble("density"),
-                 elem->GetValueDouble("start"),
-                 elem->GetValueDouble("end"));
+                 elem->Get<double>("density"),
+                 elem->Get<double>("start"),
+                 elem->Get<double>("end"));
   }
 
   return true;

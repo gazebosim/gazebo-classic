@@ -208,12 +208,12 @@ void ProcessLight(sdf::ElementPtr _elem)
   diffuse = _elem->GetValueColor("diffuse");
   specular = _elem->GetValueColor("specular");
   // double fadeDist =
-  // _elem->GetElement("attenuation")->GetValueDouble("range");
+  // _elem->GetElement("attenuation")->Get<double>("range");
   // double constant =
-  // _elem->GetElement("attenuation")->GetValueDouble("constant");
-  // double linear = _elem->GetElement("attenuation")->GetValueDouble("linear");
+  // _elem->GetElement("attenuation")->Get<double>("constant");
+  // double linear = _elem->GetElement("attenuation")->Get<double>("linear");
   // double quadratic =
-  // _elem->GetElement("attenuation")->GetValueDouble("quadratic");
+  // _elem->GetElement("attenuation")->Get<double>("quadratic");
 
   printf("light_source {\n");
   printf("  <%f, %f, %f>, rgb <%f, %f, %f>\n",
@@ -232,9 +232,9 @@ void ProcessLight(sdf::ElementPtr _elem)
   else if (type == "spot")
   {
     double innerAngle, outerAngle, falloff;
-    innerAngle = _elem->GetElement("spot")->GetValueDouble("inner_angle");
-    outerAngle = _elem->GetElement("spot")->GetValueDouble("outer_angle");
-    falloff = _elem->GetElement("spot")->GetValueDouble("falloff");
+    innerAngle = _elem->GetElement("spot")->Get<double>("inner_angle");
+    outerAngle = _elem->GetElement("spot")->Get<double>("outer_angle");
+    falloff = _elem->GetElement("spot")->Get<double>("falloff");
     printf("  spotlight\n");
     printf("  radius %f\n", RTOD(innerAngle));
     printf("  falloff %f\n", RTOD(outerAngle));
@@ -320,8 +320,8 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   else if (_elem->HasElement("cylinder"))
   {
     sdf::ElementPtr cylinderElem = _elem->GetElement("cylinder");
-    double radius = cylinderElem->GetValueDouble("radius");
-    double length = cylinderElem->GetValueDouble("length");
+    double radius = cylinderElem->Get<double>("radius");
+    double length = cylinderElem->Get<double>("length");
     gazebo::math::Vector3 capPoint = _pose.pos;
     capPoint.z += length;
     capPoint = _pose.rot.RotateVector(capPoint);
@@ -334,7 +334,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   else if (_elem->HasElement("sphere"))
   {
     sdf::ElementPtr sphereElem = _elem->GetElement("sphere");
-    double radius = sphereElem->GetValueDouble("radius");
+    double radius = sphereElem->Get<double>("radius");
 
     printf("sphere {\n");
     printf("  <%f, %f, %f> %f\n",

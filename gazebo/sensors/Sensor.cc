@@ -97,7 +97,7 @@ void Sensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+  this->SetUpdateRate(this->sdf->Get<double>("update_rate"));
 
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
