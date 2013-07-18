@@ -148,7 +148,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetValuePose("pose");
+    this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 

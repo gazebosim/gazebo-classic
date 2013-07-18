@@ -243,7 +243,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         while (wayptSdf)
         {
           points[wayptSdf->Get<double>("time")] =
-                                          wayptSdf->GetValuePose("pose");
+                                          wayptSdf->Get<math::Pose>("pose");
           wayptSdf = wayptSdf->GetNextElement("waypoint");
         }
 

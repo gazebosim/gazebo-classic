@@ -105,7 +105,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
+    pose = _sdf->Get<math::Pose>("pose");
 
   if (_sdf->HasElement("texture_name"))
     textureName = _sdf->Get<std::string>("texture_name");

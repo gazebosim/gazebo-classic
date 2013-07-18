@@ -148,7 +148,7 @@ bool ModelMaker::Init()
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->GetValuePose("pose");
+    modelPose = modelElem->Get<math::Pose>("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
     modelElem->Get<std::string>("name");
@@ -173,7 +173,7 @@ bool ModelMaker::Init()
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->GetValuePose("pose");
+          linkPose = linkElem->Get<math::Pose>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -192,7 +192,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->GetValuePose("pose");
+            visualPose = visualElem->Get<math::Pose>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 

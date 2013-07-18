@@ -87,7 +87,7 @@ void Spawn(po::variables_map &_vm)
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->GetValuePose("pose");
+  math::Pose pose = modelElem->Get<math::Pose>("pose");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (_vm.count("pose-x"))
     pose.pos.x = _vm["pose-x"].as<double>();

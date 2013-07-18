@@ -397,7 +397,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->GetValuePose("pose");
+  pose = this->sdf->Get<math::Pose>("pose");
 
   std::string meshName = this->GetMeshName();
   std::string subMeshName = this->GetSubMeshName();

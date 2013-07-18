@@ -299,7 +299,7 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->GetValuePose("pose"));
+          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -356,7 +356,7 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->GetValuePose("pose")));
+        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
@@ -616,7 +616,7 @@ namespace gazebo
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->GetValuePose("pose"));
+        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
       }
 
       // Set plugins of the visual

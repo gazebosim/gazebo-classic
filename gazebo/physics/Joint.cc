@@ -136,7 +136,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->GetValuePose("pose");
+  this->anchorPose = _sdf->Get<math::Pose>("pose");
   this->LoadImpl(this->anchorPose);
 }
 

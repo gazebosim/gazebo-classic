@@ -204,7 +204,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   gazebo::math::Pose pose;
   gazebo::common::Color diffuse, specular;
 
-  pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
+  pose = _elem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
   diffuse = _elem->Get<common::color>("diffuse");
   specular = _elem->Get<common::color>("specular");
   // double fadeDist =
@@ -401,12 +401,12 @@ int main(int argc, char **argv)
     sdf::ElementPtr modelElem = worldElem->GetElement("model");
     while (modelElem)
     {
-      modelPose = modelElem->GetOrCreateElement("origin")->GetValuePose("pose");
+      modelPose = modelElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
 
       sdf::ElementPtr linkElem = modelElem->GetElement("link");
       while (linkElem)
       {
-        linkPose = linkElem->GetOrCreateElement("origin")->GetValuePose("pose");
+        linkPose = linkElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
 
         if (linkElem->HasElement("visual"))
         {
@@ -414,7 +414,7 @@ int main(int argc, char **argv)
           while (visualElem)
           {
             visualPose =
-              visualElem->GetOrCreateElement("origin")->GetValuePose("pose");
+              visualElem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
             // visualPose = (visualPose + linkPose) + modelPose;
             visualPose = modelPose + (linkPose + visualPose);
             // visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;

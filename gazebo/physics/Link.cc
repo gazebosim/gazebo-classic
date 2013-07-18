@@ -245,8 +245,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -809,7 +809,7 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));
     proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
+    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
 }
 
