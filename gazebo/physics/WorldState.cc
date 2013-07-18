@@ -119,9 +119,9 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   }
 
   // Copy the name and time information
-  this->SetSimTime(_elem->GetValueTime("sim_time"));
-  this->SetWallTime(_elem->GetValueTime("wall_time"));
-  this->SetRealTime(_elem->GetValueTime("real_time"));
+  this->SetSimTime(_elem->Get<common::Time>("sim_time"));
+  this->SetWallTime(_elem->Get<common::Time>("wall_time"));
+  this->SetRealTime(_elem->Get<common::Time>("real_time"));
 }
 
 /////////////////////////////////////////////////
