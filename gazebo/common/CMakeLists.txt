@@ -112,8 +112,10 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-target_link_libraries(gazebo_common gazebo_math
+target_link_libraries(gazebo_common
+  gazebo_math
   ${libdl_library}
+  ${libtool_library}
   ${Boost_LIBRARIES}
   ${freeimage_library}
   ${tinyxml_libraries}
@@ -122,7 +124,9 @@ target_link_libraries(gazebo_common gazebo_math
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
+  ${TBB_LIBRARIES}
   rt
+  pthread
 )
 
 if (HAVE_GTS)
