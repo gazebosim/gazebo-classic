@@ -50,6 +50,9 @@ namespace gazebo
       /// \param[in] _mode Manipulation mode: translate, rotate, or scale.
       public: void SetManipulationMode(const std::string &_mode);
 
+      /// \brief Set the visual to be manipulated by the model manipulator.
+      public: void SetAttachedVisual(rendering::VisualPtr _vis);
+
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.
       public: void OnMousePressEvent(const common::MouseEvent &_event);

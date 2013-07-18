@@ -457,7 +457,6 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       this->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
       this->selectionObj->Detach();
     }
-
   }
   else
     this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -625,10 +624,30 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 void ModelManipulator::SetManipulationMode(const std::string &_mode)
 {
   this->manipMode = _mode;
-  if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE)
+  if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE
+      ||  this->mouseMoveVis)
   {
     this->selectionObj->SetMode(this->manipMode);
+    if (this->manipMode != "translate" && this->manipMode != "rotate"
+        && this->manipMode != "scale")
+      this->SetMouseMoveVisual(rendering::VisualPtr());
   }
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
+{
+  rendering::VisualPtr vis = _vis;
+
+  if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    vis = vis->GetRootVisual();
+
+  this->mouseMoveVisStartPose = vis->GetWorldPose();
+
+  this->SetMouseMoveVisual(vis);
+
+  if (this->mouseMoveVis && !this->mouseMoveVis->IsPlane())
+    this->selectionObj->Attach(this->mouseMoveVis);
 }
 
 /////////////////////////////////////////////////
