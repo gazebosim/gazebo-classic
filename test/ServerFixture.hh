@@ -269,9 +269,6 @@ class ServerFixture : public testing::Test
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
                {
-                 if (_msg->pose(i).name() == "pioneer2dx")
-                   std::cout << "Model[" << _msg->pose(i).name() << "] P[" <<
-                     msgs::Convert(_msg->pose(i)) << "]\n";
                  this->poses[_msg->pose(i).name()] =
                    msgs::Convert(_msg->pose(i));
                }
