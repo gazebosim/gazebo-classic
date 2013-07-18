@@ -170,14 +170,14 @@ namespace gazebo
       public: virtual double GetAttribute(const std::string &_key,
                                                 unsigned int _index);
 
+      // Documentation inherited.
+      public: virtual void SetProvideFeedback(bool _enable);
+
       /// \brief This is our ODE ID
       protected: dJointID jointId;
 
       /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
-
-      /// \brief Provide Feedback data for contact forces
-      private: bool provideFeedback;
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);

@@ -53,6 +53,7 @@ set (msgs
   planegeom.proto
   pid.proto
   plugin.proto
+  pointcloud.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto
@@ -63,6 +64,8 @@ set (msgs
   publishers.proto
   publish.proto
   quaternion.proto
+  sonar.proto
+  sonar_stamped.proto
   raysensor.proto
   request.proto
   response.proto
@@ -88,6 +91,8 @@ set (msgs
   world_reset.proto
   world_stats.proto
   world_modify.proto
+  wrench.proto
+  wrench_stamped.proto
 )
 
 set (msgs_tests_sources
