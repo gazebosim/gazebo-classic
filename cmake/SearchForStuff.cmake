@@ -507,7 +507,7 @@ endif ()
 
 ########################################
 # Include man pages stuff
-include (${gazebo_cmake_dir}/Pod2Man.cmake)
+include (${gazebo_cmake_dir}/Ronn2Man.cmake)
 add_manpage_target()
 
 ########################################
