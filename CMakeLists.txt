@@ -149,11 +149,6 @@ else()
   message (STATUS "High memory tests: disabled, low memory versions will be used")
 endif()
 
-#####################################
-# Macro for manpages
-include (${gazebo_cmake_dir}/Pod2Man.cmake)
-add_manpage_target()
-
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
