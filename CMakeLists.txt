@@ -153,6 +153,21 @@ message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
+# Define some variables that are going to be used in two places:
+# 1. In CMake code to pass preprocessor definitions to certain source files
+# (especially in common/CMakeLists.txt).
+# 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
+set(GAZEBO_DEFAULT_MASTER_HOST localhost)
+set(GAZEBO_DEFAULT_MASTER_PORT 11345)
+set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/share/gazebo_models)
+set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
+set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
+# Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
+# we pass it to the compiler later.
+string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
+
+
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
 endif()
