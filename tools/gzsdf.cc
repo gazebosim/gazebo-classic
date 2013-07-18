@@ -36,7 +36,7 @@ void help()
   std::cout << "    doc [SDF version]          Print HTML SDF.\n";
   std::cout << "    check [file] [SDF version] Check the SDF format for the";
   std::cout << " given file.\n";
-  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
+  std::cout << "    print [SDF version]         Prints SDF, useful for ";
   std::cout << " debugging and as a conversion tool.\n\n";
 }
 

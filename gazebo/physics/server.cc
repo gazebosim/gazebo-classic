@@ -26,7 +26,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/sdf/sdf.hh"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 // Command line options
 std::string config_filename = "";

@@ -158,10 +158,20 @@ void Link::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-                               this->GetScopedName());
-      this->sensors.push_back(sensorName);
+      /// \todo This if statement is a hack to prevent Links from creating
+      /// a force torque sensor. We should make this more generic.
+      if (sensorElem->GetValueString("type") == "force_torque")
+      {
+        gzerr << "A link cannot load a [" <<
+          sensorElem->GetValueString("type") << "] sensor.\n";
+      }
+      else
+      {
+        std::string sensorName =
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName());
+        this->sensors.push_back(sensorName);
+      }
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
@@ -758,7 +768,8 @@ void Link::FillMsg(msgs::Link &_msg)
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)
   {
-    if (this->GetChild(j)->HasType(Base::COLLISION))
+    if (this->GetChild(j)->HasType(Base::COLLISION) &&
+       !this->GetChild(j)->HasType(Base::SENSOR_COLLISION))
     {
       CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(j));

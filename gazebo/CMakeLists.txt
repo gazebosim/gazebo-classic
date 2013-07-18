@@ -5,10 +5,6 @@ include_directories(SYSTEM
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-include_directories(
-  ${PROJECT_BINARY_DIR}/gazebo
-)
-
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
