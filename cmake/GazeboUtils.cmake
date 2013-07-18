@@ -143,8 +143,9 @@ link_directories(${PROJECT_BINARY_DIR}/test)
 include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 
 #################################################
-# Hack: extra sources to build binaries can be supplied to gz_build_tests in the variable
-#       GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up at the end of the function
+# Hack: extra sources to build binaries can be supplied to gz_build_tests in
+# the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
+# at the end of the function
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
@@ -156,19 +157,6 @@ macro (gz_build_tests)
 
     add_dependencies(${BINARY_NAME}
       gtest gtest_main
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport)
-  
-    target_link_libraries(${BINARY_NAME}
-      libgtest.a
-      libgtest_main.a
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -176,10 +164,40 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      libgazebo
-      pthread
       )
-  
+
+
+    if (NOT HAVE_SDF)
+      target_link_libraries(${BINARY_NAME}
+        libgtest.a
+        libgtest_main.a
+        gazebo_sdf_interface
+        gazebo_common
+        gazebo_sdf_interface
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        libgazebo
+        pthread)
+    else()
+      target_link_libraries(${BINARY_NAME}
+        libgtest.a
+        libgtest_main.a
+        gazebo_common
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        libgazebo
+        pthread
+        )
+    endif()
+
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
   
@@ -223,18 +241,6 @@ if (VALID_DISPLAY)
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport)
-
-    target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_sdf_interface
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -242,16 +248,45 @@ if (VALID_DISPLAY)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      libgazebo
-      pthread
-      ${QT_QTTEST_LIBRARY}
-      ${QT_LIBRARIES}
       )
+
+    if (NOT HAVE_SDF)
+      target_link_libraries(${BINARY_NAME}
+        gazebo_gui
+        gazebo_sdf_interface
+        gazebo_common
+        gazebo_sdf_interface
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        libgazebo
+        pthread
+        ${QT_QTTEST_LIBRARY}
+        ${QT_LIBRARIES}
+        )
+    else()
+      target_link_libraries(${BINARY_NAME}
+        gazebo_gui
+        gazebo_common
+        gazebo_math
+        gazebo_physics
+        gazebo_sensors
+        gazebo_rendering
+        gazebo_msgs
+        gazebo_transport
+        libgazebo
+        pthread
+        ${QT_QTTEST_LIBRARY}
+        ${QT_LIBRARIES}
+        )
+    endif()
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	-xml -o ${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
-
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 

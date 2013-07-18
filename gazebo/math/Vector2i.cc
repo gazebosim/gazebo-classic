@@ -71,117 +71,118 @@ void Vector2i::Set(int _x, int _y)
   this->y = _y;
 }
 
-
 //////////////////////////////////////////////////
-Vector2i &Vector2i::operator =(const Vector2i &pt)
+Vector2i &Vector2i::operator =(const Vector2i &_pt)
 {
-  this->x = pt.x;
-  this->y = pt.y;
-
-  return *this;
-}
-
-//////////////////////////////////////////////////
-const Vector2i &Vector2i::operator =(int value)
-{
-  this->x = value;
-  this->y = value;
-
-  return *this;
-}
-
-
-
-//////////////////////////////////////////////////
-Vector2i Vector2i::operator+(const Vector2i &pt) const
-{
-  return Vector2i(this->x + pt.x, this->y + pt.y);
-}
-
-const Vector2i &Vector2i::operator+=(const Vector2i &pt)
-{
-  this->x += pt.x;
-  this->y += pt.y;
+  this->x = _pt.x;
+  this->y = _pt.y;
 
   return *this;
 }
 
 //////////////////////////////////////////////////
-Vector2i Vector2i::operator-(const Vector2i &pt) const
+const Vector2i &Vector2i::operator =(int _value)
 {
-  return Vector2i(this->x - pt.x, this->y - pt.y);
-}
-
-const Vector2i &Vector2i::operator-=(const Vector2i &pt)
-{
-  this->x -= pt.x;
-  this->y -= pt.y;
-
-  return *this;
-}
-
-
-//////////////////////////////////////////////////
-
-const Vector2i Vector2i::operator/(const Vector2i &pt) const
-{
-  return Vector2i(this->x / pt.x, this->y / pt.y);
-}
-
-const Vector2i &Vector2i::operator/=(const Vector2i &pt)
-{
-  this->x /= pt.x;
-  this->y /= pt.y;
-
-  return *this;
-}
-
-const Vector2i Vector2i::operator/(int v) const
-{
-  return Vector2i(this->x / v, this->y / v);
-}
-
-const Vector2i &Vector2i::operator/=(int v)
-{
-  this->x /= v;
-  this->y /= v;
-
-  return *this;
-}
-
-
-
-//////////////////////////////////////////////////
-const Vector2i Vector2i::operator*(const Vector2i &pt) const
-{
-  return Vector2i(this->x * pt.x, this->y * pt.y);
-}
-
-const Vector2i &Vector2i::operator*=(const Vector2i &pt)
-{
-  this->x *= pt.x;
-  this->y *= pt.y;
-
-  return *this;
-}
-
-const Vector2i Vector2i::operator*(int v) const
-{
-  return Vector2i(this->x * v, this->y * v);
-}
-
-const Vector2i &Vector2i::operator*=(int v)
-{
-  this->x *= v;
-  this->y *= v;
+  this->x = _value;
+  this->y = _value;
 
   return *this;
 }
 
 //////////////////////////////////////////////////
-bool Vector2i::operator ==(const Vector2i &pt) const
+Vector2i Vector2i::operator+(const Vector2i &_pt) const
 {
-  return this->x == pt.x && this->y == pt.y;
+  return Vector2i(this->x + _pt.x, this->y + _pt.y);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator+=(const Vector2i &_pt)
+{
+  this->x += _pt.x;
+  this->y += _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Vector2i Vector2i::operator-(const Vector2i &_pt) const
+{
+  return Vector2i(this->x - _pt.x, this->y - _pt.y);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator-=(const Vector2i &_pt)
+{
+  this->x -= _pt.x;
+  this->y -= _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+const Vector2i Vector2i::operator/(const Vector2i &_pt) const
+{
+  return Vector2i(this->x / _pt.x, this->y / _pt.y);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator/=(const Vector2i &_pt)
+{
+  this->x /= _pt.x;
+  this->y /= _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+const Vector2i Vector2i::operator/(int _v) const
+{
+  return Vector2i(this->x / _v, this->y / _v);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator/=(int _v)
+{
+  this->x /= _v;
+  this->y /= _v;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+const Vector2i Vector2i::operator*(const Vector2i &_pt) const
+{
+  return Vector2i(this->x * _pt.x, this->y * _pt.y);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator*=(const Vector2i &_pt)
+{
+  this->x *= _pt.x;
+  this->y *= _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+const Vector2i Vector2i::operator*(int _v) const
+{
+  return Vector2i(this->x * _v, this->y * _v);
+}
+
+//////////////////////////////////////////////////
+const Vector2i &Vector2i::operator*=(int _v)
+{
+  this->x *= _v;
+  this->y *= _v;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+bool Vector2i::operator ==(const Vector2i &_pt) const
+{
+  return this->x == _pt.x && this->y == _pt.y;
 }
 
 //////////////////////////////////////////////////
@@ -204,4 +205,21 @@ int Vector2i::operator[](unsigned int index) const
   }
 }
 
+/*
+#ifdef HAVE_SDF
+//////////////////////////////////////////////////
+Vector2i::Vector2i(const sdf::Vector2i &_pt)
+  : x(_pt.x), y(_pt.y)
+{
+}
 
+//////////////////////////////////////////////////
+Vector2i &Vector2i::operator =(const sdf::Vector2i &_pt)
+{
+  this->x = _pt.x;
+  this->y = _pt.y;
+
+  return *this;
+}
+#endif
+*/

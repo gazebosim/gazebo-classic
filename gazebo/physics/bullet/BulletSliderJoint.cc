@@ -162,8 +162,8 @@ void BulletSliderJoint::Init()
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->GetValueDouble("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->GetValueDouble("upper"));
+  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
+  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
 
   this->constraint = this->bulletSlider;
 

@@ -24,6 +24,12 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+// Remove the gazebo_config and ifdefs in Gazebo 2.0
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -224,6 +230,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }
@@ -262,6 +269,9 @@ class ServerFixture : public testing::Test
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
                {
+                 if (_msg->pose(i).name() == "pioneer2dx")
+                   std::cout << "Model[" << _msg->pose(i).name() << "] P[" <<
+                     msgs::Convert(_msg->pose(i)) << "]\n";
                  this->poses[_msg->pose(i).name()] =
                    msgs::Convert(_msg->pose(i));
                }
@@ -1066,7 +1076,7 @@ class ServerFixture : public testing::Test
                  // Timeout of 30 seconds (3000 * 10 ms)
                  int waitCount = 0, maxWaitCount = 3000;
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
-                 std::string name = model->GetValueString("name");
+                 std::string name = model->Get<std::string>("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
                    common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);

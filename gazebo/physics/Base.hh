@@ -26,7 +26,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 

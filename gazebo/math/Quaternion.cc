@@ -68,10 +68,14 @@ Quaternion::Quaternion(const Quaternion &_qt)
   this->z = _qt.z;
 }
 
+
+
 //////////////////////////////////////////////////
 Quaternion::~Quaternion()
 {
 }
+
+
 
 //////////////////////////////////////////////////
 Quaternion &Quaternion::operator =(const Quaternion &qt)
@@ -598,3 +602,27 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     return t;
   }
 }
+
+/*
+#ifdef HAVE_SDF
+//////////////////////////////////////////////////
+Quaternion::Quaternion(const sdf::Quaternion &_qt)
+{
+  this->w = _qt.w;
+  this->x = _qt.x;
+  this->y = _qt.y;
+  this->z = _qt.z;
+}
+
+//////////////////////////////////////////////////
+Quaternion &Quaternion::operator =(const sdf::Quaternion &_qt)
+{
+  this->w = _qt.w;
+  this->x = _qt.x;
+  this->y = _qt.y;
+  this->z = _qt.z;
+
+  return *this;
+}
+#endif
+*/

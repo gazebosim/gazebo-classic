@@ -19,12 +19,20 @@
  * Date: 08 May 2009
  */
 
-#ifndef GAZEBO_COLOR_HH
-#define GAZEBO_COLOR_HH
+#ifndef _GAZEBO_COLOR_HH_
+#define _GAZEBO_COLOR_HH_
 
 #include <iostream>
-#include "gazebo/common/CommonTypes.hh"
+
+// Remove in gazebo 2.0
+/*#include <gazebo/gazebo_config.h>
+#if HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+*/
+
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -81,6 +89,19 @@ namespace gazebo
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
       public: Color(const Color &_clr);
+/*
+#ifdef HAVE_SDF
+      /// Deprecated
+      public: Color(const sdf::Color &_clr) GAZEBO_DEPRECATED(1.9);
+
+      /// Deprecated
+      public: Color &operator =(const sdf::Color &_clr) GAZEBO_DEPRECATED(1.9);
+
+      /// Deprecated
+      public: bool operator!=(
+                  const sdf::Color &_pt) const GAZEBO_DEPRECATED(1.9);
+#endif
+*/
 
       /// \brief Destructor
       public: virtual ~Color();

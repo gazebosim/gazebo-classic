@@ -15,7 +15,7 @@ set (GAZEBO_MINOR_VERSION 9)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 0)
+set (GAZEBO_PATCH_VERSION 5)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -302,21 +302,26 @@ else (build_errors)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/unversioned/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
+  # This is only needed for backward compatibility with the internal
+  # version of SDF
+  if (NOT HAVE_SDF)
+    include_directories(${PROJECT_SOURCE_DIR}/gazebo)
+  endif()
   
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
-    add_subdirectory(sdf)
     add_subdirectory(media)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
+    add_subdirectory(sdf)
   endif (BUILD_GAZEBO)
 
   ########################################
@@ -331,8 +336,14 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
-  set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_sdf_interface gazebo_msgs gazebo_transport)
-  set(PKG_DEPENDS Boost Protobuf)
+  if (HAVE_SDF)
+    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport)
+    set(PKG_DEPENDS Boost Protobuf SDF)
+  else()
+    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport gazebo_sdf_interface)
+    set(PKG_DEPENDS Boost Protobuf)
+  endif()
+
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)

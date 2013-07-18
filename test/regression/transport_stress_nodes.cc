@@ -17,11 +17,10 @@
 
 #include <boost/thread.hpp>
 #include "ServerFixture.hh"
-#include "RAMLibrary.hh"
 
 using namespace gazebo;
 
-class TransportStressTest : public ServerFixture
+class TransportStressTestNodes : public ServerFixture
 {
 };
 
@@ -42,83 +41,9 @@ void LocalPublishCB(ConstImagePtr & /*_msg*/)
 }
 
 /////////////////////////////////////////////////
-// Test for local publication. This test will create a large image and
-// publish it to a local subscriber. Serialization should be bypassed,
-// resulting fast publication.
-TEST_F(TransportStressTest, LocalPublish)
-{
-  Load("worlds/empty.world");
-
-  // Number of messages to publish
-  g_localPublishMessageCount = 1000000;
-
-  /// Expected number of messages to receive
-  g_totalExpectedMsgCount = g_localPublishMessageCount;
-
-  // Reset the received message counter
-  g_localPublishCount = 0;
-
-  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
-  testNode->Init("default");
-
-  transport::PublisherPtr pub = testNode->Advertise<msgs::Image>(
-      "~/test/local_publish__", g_localPublishMessageCount);
-
-  transport::SubscriberPtr sub = testNode->Subscribe("~/test/local_publish__",
-      &LocalPublishCB);
-
-  unsigned int width = 2048;
-  unsigned int height = 2048;
-  unsigned char *fakeData = new unsigned char[width * height];
-
-  // Create a large image message with fake data
-  msgs::Image fakeMsg;
-  fakeMsg.set_width(width);
-  fakeMsg.set_height(height);
-  fakeMsg.set_pixel_format(0);
-  fakeMsg.set_step(1);
-  fakeMsg.set_data(fakeData, width*height);
-
-  // Get the start time
-  common::Time startTime = common::Time::GetWallTime();
-
-  // Publish the messages many times
-  for (unsigned int i = 0; i < g_localPublishMessageCount; ++i)
-  {
-    pub->Publish(fakeMsg);
-  }
-  gzmsg << "Publish Complete" << std::endl;
-
-  // Wait for all the messages
-  int waitCount = 0;
-  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 50)
-  {
-    common::Time::MSleep(1000);
-    waitCount++;
-  }
-
-  // Time it took to publish the messages.
-  common::Time diff = g_localPublishEndTime - startTime;
-
-  EXPECT_LT(waitCount, 50);
-
-  // Make sure we received all the messages.
-  EXPECT_EQ(g_totalExpectedMsgCount, g_localPublishCount);
-
-  // The total duration should always be very short.
-  EXPECT_LT(diff.sec, g_localPublishMessageCount * 0.0008);
-
-  // Out time time for human testing purposes
-  gzmsg << "Time to publish " << g_localPublishCount  << " messages = "
-    << diff << "\n";
-
-  delete [] fakeData;
-}
-
-/////////////////////////////////////////////////
 // Create a lot of nodes, each with a publisher and subscriber. Then send
 // out a few large messages.
-TEST_F(TransportStressTest, ManyNodes)
+TEST_F(TransportStressTestNodes, ManyNodes)
 {
   Load("worlds/empty.world");
 
@@ -127,25 +52,8 @@ TEST_F(TransportStressTest, ManyNodes)
   std::list<transport::SubscriberPtr> subs;
   std::list<transport::PublisherPtr> pubs;
 
-  // The number of nodes to create.
-  #ifdef USE_LOW_MEMORY_TESTS
-    // 1k nodes publish 10 times needs about 400Mb of RAM
-    unsigned int nodeCount = 500;
-    unsigned int requiredMB = 400;
-  #else
-    // 2k nodes publish 10 times needs about 1.7Gb of RAM
-    unsigned int nodeCount = 1000;
-    unsigned int requiredMB = 1700;
-  #endif
-
-  // Check if there is enough memory available
-  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
-  {
-    gzdbg << "Skipped test since " << requiredMB <<
-              "Mb of RAM were not available \n";
-    SUCCEED();
-    return;
-  }
+  // The number of nodes to create
+  unsigned int nodeCount = 2000;
 
   // The number of messages to send
   g_localPublishMessageCount = 10;
@@ -199,7 +107,7 @@ TEST_F(TransportStressTest, ManyNodes)
 
   // Wait for all the messages
   int waitCount = 0;
-  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 100)
+  while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 50)
   {
     common::Time::MSleep(1000);
     waitCount++;
@@ -211,7 +119,7 @@ TEST_F(TransportStressTest, ManyNodes)
   // Time it took to received the messages.
   common::Time receiveDiff = g_localPublishEndTime - startTime;
 
-  EXPECT_LT(waitCount, 100);
+  EXPECT_LT(waitCount, 50);
 
   // Make sure we received all the messages.
   EXPECT_EQ(g_totalExpectedMsgCount, g_localPublishCount);
@@ -219,12 +127,11 @@ TEST_F(TransportStressTest, ManyNodes)
   // The total publish duration should always be very short.
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
-  // We used to check against 1 sec. However, the time can occasionally jump
-  // depending on the system and its usage.
-  EXPECT_LE(pubDiff.sec, 2);
+  EXPECT_LT(static_cast<unsigned int>(pubDiff.nsec),
+      (g_localPublishMessageCount * nodes.size()) * 1500);
 
   // The total receive duration will be longer.
-  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
+  EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-6);
 
   // Out time time for human testing purposes
   gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()

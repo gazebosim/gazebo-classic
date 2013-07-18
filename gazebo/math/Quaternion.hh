@@ -26,6 +26,14 @@
 #include <iostream>
 #include <cmath>
 
+/*
+// Remove the gazebo_confif and ifdefs in Gazebo 1.8
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include "sdf/sdf.hh"
+#endif
+*/
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
@@ -73,6 +81,16 @@ namespace gazebo
     /// \brief Copy constructor
     /// \param qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
+
+            /*
+#ifdef HAVE_SDF
+    /// Deprecated
+    public: Quaternion(const sdf::Quaternion &_qt) __attribute__((deprecated));
+
+    /// Deprecated
+    public: Quaternion &operator =(const sdf::Quaternion &_qt);
+#endif
+*/
 
     /// \brief Destructor
     public: ~Quaternion();

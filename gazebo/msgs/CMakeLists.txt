@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_subdirectory(test)
-
 set (msgs
   axis.proto
   boxgeom.proto
@@ -97,6 +95,7 @@ set (msgs
 
 set (msgs_tests_sources
   msgs_TEST.cc
+  MsgFactory_TEST.cc
 )
 gz_build_tests(${msgs_tests_sources})
 
@@ -128,7 +127,16 @@ endforeach()
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
-target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY} gazebo_sdf_interface)
+target_link_libraries(gazebo_msgs
+  gazebo_common
+  gazebo_math
+  ${PROTOBUF_LIBRARY}
+)
+
+if (NOT HAVE_SDF)
+  target_link_libraries(gazebo_msgs gazebo_sdf_interface)
+endif()
+
 add_dependencies(gazebo_msgs gazebomsgs_out)
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
