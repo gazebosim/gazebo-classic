@@ -48,6 +48,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~WrenchVisual();
 
+      /// \brief Load the visual based on a message
+      /// \param[in] _msg Joint message
+      public: void Load(ConstJointPtr &_msg);
+
       /// \brief Set to true to enable wrench visualization.
       /// \param[in] _enabled True to show wrenches, false to hide.
       public: void SetEnabled(bool _enabled);

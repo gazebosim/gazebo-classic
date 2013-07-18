@@ -31,6 +31,8 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(_name, _vis)
 {
+  this->receivedMsg = false;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
@@ -53,6 +55,10 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
     this->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
   this->coneNode->attachObject(coneObj);
   this->coneNode->setPosition(0, 0, 0);
+
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&SonarVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
@@ -73,6 +79,19 @@ void SonarVisual::Load()
 /////////////////////////////////////////////////
 void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->sonarMsg = _msg;
+  this->receivedMsg = true;
+}
+
+/////////////////////////////////////////////////
+void SonarVisual::Update()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  if (!this->sonarMsg || !this->receivedMsg)
+    return;
+
   // Skip the update if the user is moving the sonar.
   if (this->GetScene()->GetSelectedVisual() &&
       this->GetRootVisual()->GetName() ==
@@ -81,8 +100,9 @@ void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
     return;
   }
 
-  float rangeDelta = _msg->sonar().range_max() - _msg->sonar().range_min();
-  float radiusScale = _msg->sonar().radius()*2.0;
+  float rangeDelta = this->sonarMsg->sonar().range_max()
+      - this->sonarMsg->sonar().range_min();
+  float radiusScale = this->sonarMsg->sonar().radius()*2.0;
 
   if (!math::equal(this->coneNode->getScale().z, rangeDelta) ||
       !math::equal(this->coneNode->getScale().x, radiusScale))
@@ -91,17 +111,18 @@ void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
     this->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(_msg->sonar().world_pose());
+  math::Pose pose = msgs::Convert(this->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
-  if (_msg->sonar().has_contact())
+  if (this->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(_msg->sonar().contact());
+    math::Vector3 pos = msgs::Convert(this->sonarMsg->sonar().contact());
     this->sonarRay->SetPoint(1, pos);
   }
   else
   {
     this->sonarRay->SetPoint(1, math::Vector3(0, 0,
-          (rangeDelta * 0.5) - _msg->sonar().range()));
+          (rangeDelta * 0.5) - this->sonarMsg->sonar().range()));
   }
+  this->receivedMsg = false;
 }

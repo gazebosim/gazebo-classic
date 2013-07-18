@@ -110,6 +110,14 @@ WrenchVisual::~WrenchVisual()
 }
 
 /////////////////////////////////////////////////
+void WrenchVisual::Load(ConstJointPtr &_msg)
+{
+  Visual::Load();
+  this->SetPosition(msgs::Convert(_msg->pose().position()));
+  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+}
+
+/////////////////////////////////////////////////
 void WrenchVisual::Update()
 {
   boost::mutex::scoped_lock lock(this->mutex);

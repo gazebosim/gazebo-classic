@@ -155,6 +155,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->joints.clear();
   this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
@@ -196,6 +197,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
+  this->joints.clear();
   this->linkMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
@@ -1768,13 +1770,20 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (this->visuals.find(wrenchVisualName + "_wrench_vis") ==
         this->visuals.end())
     {
-      VisualPtr parentVis = this->GetVisual(_msg->parent());
+      ConstJointPtr jointMsg = this->joints[_msg->parent()];
+
+      if (!jointMsg)
+        return false;
+
+      VisualPtr parentVis = this->GetVisual(jointMsg->child());
+
       if (!parentVis)
         return false;
 
       WrenchVisualPtr wrenchVis(new WrenchVisual(
-            wrenchVisualName+"_GUIONLY_wrench_vis", parentVis, _msg->topic()));
-      wrenchVis->Load();
+            wrenchVisualName+"_GUIONLY_wrench_vis", parentVis,
+            _msg->topic()));
+      wrenchVis->Load(jointMsg);
       this->visuals[wrenchVisualName+"_wrench_vis"] = wrenchVis;
     }
   }
@@ -1874,8 +1883,10 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
+  this->joints[_msg->name()] = _msg;
+
   Visual_M::iterator iter;
-  iter = this->visuals.find(_msg->name());
+  iter = this->visuals.find(_msg->name() + "_JOINT_VISUAL__");
 
   if (iter == this->visuals.end())
   {
@@ -1889,7 +1900,8 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     if (!childVis)
       return false;
 
-    JointVisualPtr jointVis(new JointVisual(_msg->name(), childVis));
+    JointVisualPtr jointVis(new JointVisual(_msg->name() + "_JOINT_VISUAL__",
+        childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
     jointVis->GetSceneNode()->_setDerivedOrientation(
@@ -1897,6 +1909,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 
     this->visuals[jointVis->GetName()] = jointVis;
   }
+
   return true;
 }
 
