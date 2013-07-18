@@ -174,12 +174,11 @@ void SystemPaths::UpdateGazeboPaths()
   char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -201,12 +200,11 @@ void SystemPaths::UpdatePluginPaths()
   char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist."
-    //  << "Set GAZEBO_PLUGIN_PATH to Ogre's installation path."
-    //  << " ...or are you loading via SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_PLUGIN_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
@@ -228,12 +226,11 @@ void SystemPaths::UpdateOgrePaths()
   char *pathCStr = getenv("OGRE_RESOURCE_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
-    //  << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = OGRE_RESOURCE_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
