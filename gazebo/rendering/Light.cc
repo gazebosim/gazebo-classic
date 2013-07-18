@@ -107,7 +107,7 @@ void Light::Update()
 {
   this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
 
-  this->SetLightType(this->sdf->GetValueString("type"));
+  this->SetLightType(this->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(
       this->sdf->GetElement("diffuse")->GetValueColor());
   this->SetSpecularColor(
@@ -241,13 +241,13 @@ void Light::SetName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Light::GetName() const
 {
-  return this->sdf->GetValueString("name");
+  return this->sdf->Get<std::string>("name");
 }
 
 //////////////////////////////////////////////////
 std::string Light::GetType() const
 {
-  return this->sdf->GetValueString("type");
+  return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -296,7 +296,7 @@ void Light::CreateVisual()
     visSceneNode->setScale(0.25, 0.25, 0.25);
   }
 
-  std::string lightType = this->sdf->GetValueString("type");
+  std::string lightType = this->sdf->Get<std::string>("type");
 
   if (lightType == "directional")
   {
@@ -454,7 +454,7 @@ void Light::SetLightType(const std::string &_type)
     gzerr << "Unknown light type[" << _type << "]\n";
   }
 
-  if (this->sdf->GetValueString("type") != _type)
+  if (this->sdf->Get<std::string>("type") != _type)
     this->sdf->GetAttribute("type")->Set(_type);
 
   this->CreateVisual();
@@ -615,7 +615,7 @@ void Light::SetSpotFalloff(const double &_angle)
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg) const
 {
-  std::string lightType = this->sdf->GetValueString("type");
+  std::string lightType = this->sdf->Get<std::string>("type");
 
   _msg.set_name(this->GetName());
 

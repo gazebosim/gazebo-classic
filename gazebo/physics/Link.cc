@@ -160,10 +160,10 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       /// \todo This if statement is a hack to prevent Links from creating
       /// a force torque sensor. We should make this more generic.
-      if (sensorElem->GetValueString("type") == "force_torque")
+      if (sensorElem->Get<std::string>("type") == "force_torque")
       {
         gzerr << "A link cannot load a [" <<
-          sensorElem->GetValueString("type") << "] sensor.\n";
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
       }
       else
       {
@@ -355,7 +355,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     while (collisionElem)
     {
       CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
-          this->GetChild(collisionElem->GetValueString("name")));
+          this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
         collision->UpdateParameters(collisionElem);
@@ -804,8 +804,8 @@ void Link::FillMsg(msgs::Link &_msg)
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + elem->GetValueString("name"));
-    proj->set_texture(elem->GetValueString("texture"));
+    proj->set_name(this->GetScopedName() + "::" + elem->Get<std::string>("name"));
+    proj->set_texture(elem->Get<std::string>("texture"));
     proj->set_fov(elem->GetValueDouble("fov"));
     proj->set_near_clip(elem->GetValueDouble("near_clip"));
     proj->set_far_clip(elem->GetValueDouble("far_clip"));

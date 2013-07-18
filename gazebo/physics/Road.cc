@@ -37,7 +37,7 @@ Road::~Road()
 void Road::Load(sdf::ElementPtr _elem)
 {
   Base::Load(_elem);
-  this->SetName(_elem->GetValueString("name"));
+  this->SetName(_elem->Get<std::string>("name"));
 }
 
 /////////////////////////////////////////////////

@@ -336,7 +336,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     while (linkElem)
     {
       LinkPtr link = boost::dynamic_pointer_cast<Link>(
-          this->GetChild(linkElem->GetValueString("name")));
+          this->GetChild(linkElem->Get<std::string>("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
     }
@@ -348,7 +348,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -642,7 +642,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
-  std::string stype = _sdf->GetValueString("type");
+  std::string stype = _sdf->Get<std::string>("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
      boost::static_pointer_cast<Model>(shared_from_this()));
@@ -750,8 +750,8 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   gazebo::ModelPluginPtr plugin =
     gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)

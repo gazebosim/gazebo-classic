@@ -105,7 +105,7 @@ void RaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;

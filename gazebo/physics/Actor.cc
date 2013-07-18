@@ -70,11 +70,11 @@ Actor::~Actor()
 void Actor::Load(sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr skinSdf = _sdf->GetElement("skin");
-  this->skinFile = skinSdf->GetValueString("filename");
+  this->skinFile = skinSdf->Get<std::string>("filename");
   this->skinScale = skinSdf->GetValueDouble("scale");
 
   MeshManager::Instance()->Load(this->skinFile);
-  std::string actorName = _sdf->GetValueString("name");
+  std::string actorName = _sdf->Get<std::string>("name");
 
 /*  double radius = 1.0;
   unsigned int pointNum = 32;
@@ -213,17 +213,17 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     sdf::ElementPtr trajSdf = _sdf->GetElement("trajectory");
     while (trajSdf)
     {
-      if (this->skelAnimation.find(trajSdf->GetValueString("type")) ==
+      if (this->skelAnimation.find(trajSdf->Get<std::string>("type")) ==
               this->skelAnimation.end())
       {
         gzwarn << "Resource not found for trajectory of type " <<
-                  trajSdf->GetValueString("type") << "\n";
+                  trajSdf->Get<std::string>("type") << "\n";
         continue;
       }
 
       TrajectoryInfo tinfo;
       tinfo.id = trajSdf->GetValueInt("id");
-      tinfo.type = trajSdf->GetValueString("type");
+      tinfo.type = trajSdf->Get<std::string>("type");
       std::vector<TrajectoryInfo>::iterator iter = this->trajInfo.begin();
       while (iter != this->trajInfo.end())
       {
@@ -310,7 +310,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 {
-  std::string animName = _sdf->GetValueString("name");
+  std::string animName = _sdf->Get<std::string>("name");
 
   if (animName == "__default__")
   {
@@ -325,7 +325,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   }
   else
   {
-    std::string animFile = _sdf->GetValueString("filename");
+    std::string animFile = _sdf->Get<std::string>("filename");
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
     double scale = _sdf->GetValueDouble("scale");

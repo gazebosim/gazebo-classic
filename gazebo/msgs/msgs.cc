@@ -295,7 +295,7 @@ namespace gazebo
         sdf::ElementPtr camSDF = _sdf->GetElement("camera");
         msgs::GUICamera *guiCam = result.mutable_camera();
 
-        guiCam->set_name(camSDF->GetValueString("name"));
+        guiCam->set_name(camSDF->Get<std::string>("name"));
 
         if (camSDF->HasElement("pose"))
         {
@@ -305,7 +305,7 @@ namespace gazebo
         if (camSDF->HasElement("view_controller"))
         {
           guiCam->set_view_controller(
-              camSDF->GetValueString("view_controller"));
+              camSDF->Get<std::string>("view_controller"));
         }
 
         if (camSDF->HasElement("track_visual"))
@@ -323,7 +323,7 @@ namespace gazebo
     {
       msgs::TrackVisual result;
 
-      result.set_name(_sdf->GetValueString("name"));
+      result.set_name(_sdf->Get<std::string>("name"));
 
       if (_sdf->HasElement("min_dist"))
         result.set_min_dist(_sdf->GetElement("min_dist")->GetValueDouble());
@@ -340,10 +340,10 @@ namespace gazebo
     {
       msgs::Light result;
 
-      std::string type = _sdf->GetValueString("type");
+      std::string type = _sdf->Get<std::string>("type");
       std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
-      result.set_name(_sdf->GetValueString("name"));
+      result.set_name(_sdf->Get<std::string>("name"));
 
       result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
 
@@ -411,15 +411,15 @@ namespace gazebo
 
         msgs::Set(result.mutable_scale(), _sdf->GetValueVector3("scale"));
 
-        result.set_filename(_sdf->GetValueString("uri"));
+        result.set_filename(_sdf->Get<std::string>("uri"));
 
         if (_sdf->HasElement("submesh"))
         {
           sdf::ElementPtr submeshElem = _sdf->GetElement("submesh");
           if (submeshElem->HasElement("name") &&
-              submeshElem->GetValueString("name") != "__default__")
+              submeshElem->Get<std::string>("name") != "__default__")
           {
-            result.set_submesh(submeshElem->GetValueString("name"));
+            result.set_submesh(submeshElem->Get<std::string>("name"));
 
             if (submeshElem->HasElement("center"))
               result.set_center_submesh(submeshElem->GetValueBool("center"));
@@ -483,7 +483,7 @@ namespace gazebo
         result.mutable_image()->set_height(
             geomElem->GetValueDouble("height"));
         result.mutable_image()->set_uri(
-            geomElem->GetValueString("uri"));
+            geomElem->Get<std::string>("uri"));
       }
       else if (geomElem->GetName() == "heightmap")
       {
@@ -493,7 +493,7 @@ namespace gazebo
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->GetValueVector3("pos"));
 
-        common::Image img(geomElem->GetValueString("uri"));
+        common::Image img(geomElem->Get<std::string>("uri"));
         msgs::Set(result.mutable_heightmap()->mutable_image(), img);
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
@@ -501,8 +501,8 @@ namespace gazebo
         while (textureElem)
         {
           tex = result.mutable_heightmap()->add_texture();
-          tex->set_diffuse(textureElem->GetValueString("diffuse"));
-          tex->set_normal(textureElem->GetValueString("normal"));
+          tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
+          tex->set_normal(textureElem->Get<std::string>("normal"));
           tex->set_size(textureElem->GetValueDouble("size"));
           textureElem = textureElem->GetNextElement("texture");
         }
@@ -538,7 +538,7 @@ namespace gazebo
     {
       msgs::Visual result;
 
-      result.set_name(_sdf->GetValueString("name"));
+      result.set_name(_sdf->Get<std::string>("name"));
 
       if (_sdf->HasElement("cast_shadows"))
         result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
@@ -566,12 +566,12 @@ namespace gazebo
         {
           sdf::ElementPtr scriptElem = elem->GetElement("script");
           matMsg->mutable_script()->set_name(
-              scriptElem->GetValueString("name"));
+              scriptElem->Get<std::string>("name"));
 
           sdf::ElementPtr uriElem = scriptElem->GetElement("uri");
           while (uriElem)
           {
-            matMsg->mutable_script()->add_uri(uriElem->GetValueString());
+            matMsg->mutable_script()->add_uri(uriElem->Get<std::string>());
             uriElem = uriElem->GetNextElement("uri");
           }
         }
@@ -580,23 +580,23 @@ namespace gazebo
         {
           sdf::ElementPtr shaderElem = elem->GetElement("shader");
 
-          if (shaderElem->GetValueString("type") == "pixel")
+          if (shaderElem->Get<std::string>("type") == "pixel")
             matMsg->set_shader_type(msgs::Material::PIXEL);
-          else if (shaderElem->GetValueString("type") == "vertex")
+          else if (shaderElem->Get<std::string>("type") == "vertex")
             matMsg->set_shader_type(msgs::Material::VERTEX);
-          else if (shaderElem->GetValueString("type") ==
+          else if (shaderElem->Get<std::string>("type") ==
               "normal_map_object_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
-          else if (shaderElem->GetValueString("type") ==
+          else if (shaderElem->Get<std::string>("type") ==
               "normal_map_tangent_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
           else
             gzthrow(std::string("Unknown shader type[") +
-                shaderElem->GetValueString("type") + "]");
+                shaderElem->Get<std::string>("type") + "]");
 
           if (shaderElem->HasElement("normal_map"))
             matMsg->set_normal_map(
-                shaderElem->GetElement("normal_map")->GetValueString());
+                shaderElem->GetElement("normal_map")->Get<std::string>());
         }
 
         if (elem->HasElement("ambient"))
@@ -625,9 +625,9 @@ namespace gazebo
         sdf::ElementPtr elem = _sdf->GetElement("plugin");
         msgs::Plugin *plgnMsg = result.mutable_plugin();
         // if (elem->HasElement("name"))
-          plgnMsg->set_name(elem->GetValueString("name"));
+          plgnMsg->set_name(elem->Get<std::string>("name"));
         // if (elem->HasElement("filename"))
-          plgnMsg->set_filename(elem->GetValueString("filename"));
+          plgnMsg->set_filename(elem->Get<std::string>("filename"));
 
         std::stringstream ss;
         for (sdf::ElementPtr innerElem = elem->GetFirstElement();
@@ -646,7 +646,7 @@ namespace gazebo
     {
       msgs::Fog result;
 
-      std::string type = _sdf->GetValueString("type");
+      std::string type = _sdf->Get<std::string>("type");
       if (type == "linear")
         result.set_type(msgs::Fog::LINEAR);
       else if (type == "exp")

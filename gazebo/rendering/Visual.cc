@@ -455,13 +455,13 @@ void Visual::Load()
       // Add all the URI paths to the render engine
       while (uriElem)
       {
-        std::string matUri = uriElem->GetValueString();
+        std::string matUri = uriElem->Get<std::string>();
         if (!matUri.empty())
           RenderEngine::Instance()->AddResourcePath(matUri);
         uriElem = uriElem->GetNextElement("uri");
       }
 
-      std::string matName = scriptElem->GetValueString("name");
+      std::string matName = scriptElem->Get<std::string>("name");
 
       if (!matName.empty())
         this->SetMaterial(matName);
@@ -1412,7 +1412,7 @@ void Visual::DisableTrackVisual()
 std::string Visual::GetNormalMap() const
 {
   std::string file = this->sdf->GetElement("material")->GetElement(
-      "shader")->GetElement("normal_map")->GetValueString();
+      "shader")->GetElement("normal_map")->Get<std::string>();
 
   std::string uriFile = common::find_file(file);
   if (!uriFile.empty())
@@ -1434,7 +1434,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 std::string Visual::GetShaderType() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->GetValueString("type");
+      "shader")->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -2060,7 +2060,7 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      std::string uri = tmpElem->GetValueString("uri");
+      std::string uri = tmpElem->Get<std::string>("uri");
       if (uri.empty())
       {
         gzerr << "<uri> element missing for geometry element:\n";
@@ -2093,7 +2093,7 @@ std::string Visual::GetSubMeshName() const
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
-        result = tmpElem->GetElement("submesh")->GetValueString("name");
+        result = tmpElem->GetElement("submesh")->Get<std::string>("name");
     }
   }
 
@@ -2396,7 +2396,7 @@ void Visual::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void Visual::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }

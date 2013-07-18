@@ -100,7 +100,7 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
 void LinkState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the link name
   if (_elem->HasElement("pose"))

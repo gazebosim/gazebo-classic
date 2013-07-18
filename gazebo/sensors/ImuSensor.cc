@@ -61,11 +61,11 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
-      this->sdf->GetElement("imu")->GetValueString("topic")
+      this->sdf->GetElement("imu")->Get<std::string>("topic")
       != "__default_topic__")
   {
     this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetElement("imu")->GetValueString("topic"), 500);
+        this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
   }
   else
   {
@@ -82,7 +82,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   if (imuElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseActive = true;

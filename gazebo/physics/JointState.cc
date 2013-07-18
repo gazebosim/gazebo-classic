@@ -81,7 +81,7 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
 void JointState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the angles
   this->angles.clear();

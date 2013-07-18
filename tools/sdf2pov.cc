@@ -89,7 +89,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
   const gazebo::common::Mesh *mesh;
 
   mesh = gazebo::common::MeshManager::Instance()->Load(
-      _elem->GetValueString("filename"));
+      _elem->Get<std::string>("filename"));
 
   const_cast<gazebo::common::Mesh*>(mesh)->RecalculateNormals();
 
@@ -220,7 +220,7 @@ void ProcessLight(sdf::ElementPtr _elem)
       pose.pos.x, pose.pos.y, pose.pos.z,
       diffuse.r, diffuse.g, diffuse.b);
 
-  std::string type = _elem->GetValueString("type");
+  std::string type = _elem->Get<std::string>("type");
   if (type == "point")
   {
     // printf("  pointlight\n");

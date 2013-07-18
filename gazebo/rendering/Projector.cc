@@ -108,7 +108,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
     pose = _sdf->GetValuePose("pose");
 
   if (_sdf->HasElement("texture_name"))
-    textureName = _sdf->GetValueString("texture_name");
+    textureName = _sdf->Get<std::string>("texture_name");
 
   if (_sdf->HasElement("near_clip"))
     nearClip = _sdf->GetValueDouble("near_clip");
@@ -119,7 +119,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("fov"))
     fov = _sdf->GetValueDouble("fov");
 
-  this->Load(_sdf->GetValueString("name"), pose, textureName,
+  this->Load(_sdf->Get<std::string>("name"), pose, textureName,
              nearClip, farClip, fov);
 }
 

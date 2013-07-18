@@ -65,9 +65,9 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->detachSteps = grasp_check->GetValueInt("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
-  this->palmLink = this->model->GetLink(palmLinkElem->GetValueString());
+  this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
   if (!this->palmLink)
-    gzerr << "palm link [" << palmLinkElem->GetValueString()
+    gzerr << "palm link [" << palmLinkElem->Get<std::string>()
           << "] not found!\n";
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
@@ -75,7 +75,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   while (gripperLinkElem)
   {
     physics::LinkPtr gripperLink
-      = this->model->GetLink(gripperLinkElem->GetValueString());
+      = this->model->GetLink(gripperLinkElem->Get<std::string>());
     for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
     {
       physics::CollisionPtr collision = gripperLink->GetCollision(j);

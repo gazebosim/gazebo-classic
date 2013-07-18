@@ -83,7 +83,7 @@ void Spawn(po::variables_map &_vm)
 
   // Get/Set the model name
   if (modelName.empty())
-    modelName = modelElem->GetValueString("name");
+    modelName = modelElem->Get<std::string>("name");
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 

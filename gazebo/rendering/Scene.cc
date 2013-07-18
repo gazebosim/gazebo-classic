@@ -275,7 +275,7 @@ void Scene::Init()
   if (this->sdf->HasElement("fog"))
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
-    this->SetFog(fogElem->GetValueString("type"),
+    this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->GetValueColor("color"),
                  fogElem->GetValueDouble("density"),
                  fogElem->GetValueDouble("start"),
@@ -1359,7 +1359,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       elem->GetElement("type")->Set(type);
     }
 
-    this->SetFog(elem->GetValueString("type"),
+    this->SetFog(elem->Get<std::string>("type"),
                  elem->GetValueColor("color"),
                  elem->GetValueDouble("density"),
                  elem->GetValueDouble("start"),

@@ -175,7 +175,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-  this->stepType = solverElem->GetValueString("type");
+  this->stepType = solverElem->Get<std::string>("type");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
@@ -719,7 +719,7 @@ dSpaceID ODEPhysics::GetSpaceId() const
 std::string ODEPhysics::GetStepType() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
-  return elem->GetValueString("type");
+  return elem->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -1312,7 +1312,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
   {
     case SOLVER_TYPE:
     {
-      value = odeElem->GetElement("solver")->GetValueString("type");
+      value = odeElem->GetElement("solver")->Get<std::string>("type");
       break;
     }
     case GLOBAL_CFM:

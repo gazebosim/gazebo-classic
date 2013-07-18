@@ -680,7 +680,7 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
   {
     case SOLVER_TYPE:
     {
-      value = bulletElem->GetElement("solver")->GetValueString("type");
+      value = bulletElem->GetElement("solver")->Get<std::string>("type");
       break;
     }
     case GLOBAL_CFM:

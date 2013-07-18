@@ -151,7 +151,7 @@ bool ModelMaker::Init()
     modelPose = modelElem->GetValuePose("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
-    modelElem->GetValueString("name");
+    modelElem->Get<std::string>("name");
 
   this->modelVisual.reset(new rendering::Visual(modelName,
                           scene->GetWorldVisual()));
@@ -171,7 +171,7 @@ bool ModelMaker::Init()
     {
       while (linkElem)
       {
-        std::string linkName = linkElem->GetValueString("name");
+        std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
           linkPose = linkElem->GetValuePose("pose");
         else
@@ -343,14 +343,14 @@ void ModelMaker::CreateTheEntity()
       isLight = true;
     }
 
-    std::string modelName = modelElem->GetValueString("name");
+    std::string modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
     int i = 0;
     while ((isModel && has_entity_name(modelName)) ||
         (isLight && scene->GetLight(modelName)))
     {
-      modelName = modelElem->GetValueString("name") + "_" +
+      modelName = modelElem->Get<std::string>("name") + "_" +
         boost::lexical_cast<std::string>(i++);
     }
 

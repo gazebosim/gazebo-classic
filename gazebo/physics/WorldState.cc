@@ -102,7 +102,7 @@ void WorldState::Load(const WorldPtr _world)
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name
-  this->name = _elem->GetValueString("world_name");
+  this->name = _elem->Get<std::string>("world_name");
 
   // Add the model states
   this->modelStates.clear();
@@ -113,7 +113,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
     while (childElem)
     {
       this->modelStates.insert(std::make_pair(
-            childElem->GetValueString("name"), ModelState(childElem)));
+            childElem->Get<std::string>("name"), ModelState(childElem)));
       childElem = childElem->GetNextElement("model");
     }
   }

@@ -63,7 +63,7 @@ void MapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string imageFilename = _sdf->GetValueString("uri");
+  std::string imageFilename = _sdf->Get<std::string>("uri");
 
   // Make sure they are ok
   if (_sdf->GetValueDouble("scale") <= 0)
@@ -117,7 +117,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////

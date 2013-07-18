@@ -57,7 +57,7 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
 
   // get all joints
   this->joints[0] = _model->GetJoint(
-    _sdf->GetElement("steer")->GetValueString());
+    _sdf->GetElement("steer")->Get<std::string>());
   this->jointPIDs[0] = common::PID(
     _sdf->GetElement("steer_pid")->GetValueVector3().x,
     _sdf->GetElement("steer_pid")->GetValueVector3().y,
@@ -72,7 +72,7 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("steer_eff")->GetValueDouble();
 
   this->joints[1] = _model->GetJoint(
-    _sdf->GetElement("right")->GetValueString());
+    _sdf->GetElement("right")->Get<std::string>());
   this->jointPIDs[1] = common::PID(
     _sdf->GetElement("right_pid")->GetValueVector3().x,
     _sdf->GetElement("right_pid")->GetValueVector3().y,
@@ -87,7 +87,7 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("right_eff")->GetValueDouble();
 
   this->joints[2] = _model->GetJoint(
-    _sdf->GetElement("left")->GetValueString());
+    _sdf->GetElement("left")->Get<std::string>());
   this->jointPIDs[2] = common::PID(
     _sdf->GetElement("left_pid")->GetValueVector3().x,
     _sdf->GetElement("left_pid")->GetValueVector3().y,

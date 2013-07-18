@@ -81,7 +81,7 @@ void Base::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
 
   if (this->sdf->HasAttribute("name"))
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
   else
     this->name.clear();
 
