@@ -205,8 +205,8 @@ void ProcessLight(sdf::ElementPtr _elem)
   gazebo::common::Color diffuse, specular;
 
   pose = _elem->GetOrCreateElement("origin")->Get<math::Pose>("pose");
-  diffuse = _elem->Get<common::color>("diffuse");
-  specular = _elem->Get<common::color>("specular");
+  diffuse = _elem->Get<common::Color>("diffuse");
+  specular = _elem->Get<common::Color>("specular");
   // double fadeDist =
   // _elem->GetElement("attenuation")->Get<double>("range");
   // double constant =
@@ -264,13 +264,13 @@ void ProcessScene(sdf::ElementPtr _elem)
   gazebo::common::Color color;
   if (_elem->HasElement("background"))
   {
-    color = _elem->Get<common::color>("background");
+    color = _elem->Get<common::Color>("background");
     printf("background { rgb <%f, %f, %f> }\n", color.r, color.g, color.b);
   }
 
   if (_elem->HasElement("ambient"))
   {
-    color = _elem->Get<common::color>("ambient");
+    color = _elem->Get<common::Color>("ambient");
     // printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
         // color.R(), color.G(), color.B());
   }

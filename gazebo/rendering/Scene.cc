@@ -276,7 +276,7 @@ void Scene::Init()
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
-                 fogElem->Get<common::color>("color"),
+                 fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -395,7 +395,7 @@ void Scene::SetAmbientColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  return this->sdf->Get<common::color>("ambient");
+  return this->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
@@ -427,7 +427,7 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  return this->sdf->Get<common::color>("background");
+  return this->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -1360,7 +1360,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     }
 
     this->SetFog(elem->Get<std::string>("type"),
-                 elem->Get<common::color>("color"),
+                 elem->Get<common::Color>("color"),
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
