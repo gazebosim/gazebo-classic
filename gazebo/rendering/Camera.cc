@@ -195,8 +195,8 @@ void Camera::Load()
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   if (imgElem)
   {
-    this->imageWidth = imgElem->GetValueInt("width");
-    this->imageHeight = imgElem->GetValueInt("height");
+    this->imageWidth = imgElem->Get<int>("width");
+    this->imageHeight = imgElem->Get<int>("height");
     this->imageFormat = this->GetOgrePixelFormat(
         imgElem->Get<std::string>("format"));
   }
@@ -717,7 +717,7 @@ unsigned int Camera::GetImageWidth() const
   else
   {
     sdf::ElementPtr elem = this->sdf->GetElement("image");
-    width = elem->GetValueInt("width");
+    width = elem->Get<int>("width");
   }
   return width;
 }
@@ -733,7 +733,7 @@ unsigned int Camera::GetImageHeight() const
   else
   {
     sdf::ElementPtr elem = this->sdf->GetElement("image");
-    height = elem->GetValueInt("height");
+    height = elem->Get<int>("height");
   }
   return height;
 }
@@ -785,8 +785,8 @@ unsigned int Camera::GetTextureHeight() const
 size_t Camera::GetImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return this->GetImageByteSize(elem->GetValueInt("width"),
-                                elem->GetValueInt("height"),
+  return this->GetImageByteSize(elem->Get<int>("width"),
+                                elem->Get<int>("height"),
                                 this->GetImageFormat());
 }
 

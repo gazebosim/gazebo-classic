@@ -169,7 +169,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->maxContacts = _sdf->GetElement("max_contacts")->Get<int>();
   this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
@@ -610,13 +610,13 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 int ODEPhysics::GetSORPGSPreconIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetValueInt("precon_iters");
+      "solver")->Get<int>("precon_iters");
 }
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetValueInt("iters");
+      "solver")->Get<int>("iters");
 }
 
 //////////////////////////////////////////////////
@@ -1327,12 +1327,12 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case SOR_PRECON_ITERS:
     {
-      value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
+      value = odeElem->GetElement("solver")->Get<int>("precon_iters");
       break;
     }
     case PGS_ITERS:
     {
-      value = odeElem->GetElement("solver")->GetValueInt("iters");
+      value = odeElem->GetElement("solver")->Get<int>("iters");
       break;
     }
     case SOR:
@@ -1354,7 +1354,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case MAX_CONTACTS:
     {
-      value = odeElem->GetElement("max_contacts")->GetValueInt();
+      value = odeElem->GetElement("max_contacts")->Get<int>();
       break;
     }
     case MIN_STEP_SIZE:

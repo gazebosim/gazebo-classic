@@ -222,7 +222,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       }
 
       TrajectoryInfo tinfo;
-      tinfo.id = trajSdf->GetValueInt("id");
+      tinfo.id = trajSdf->Get<int>("id");
       tinfo.type = trajSdf->Get<std::string>("type");
       std::vector<TrajectoryInfo>::iterator iter = this->trajInfo.begin();
       while (iter != this->trajInfo.end())

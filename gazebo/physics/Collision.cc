@@ -85,7 +85,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->maxContacts = _sdf->GetElement("max_contacts")->Get<int>();
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))

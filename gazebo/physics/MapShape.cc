@@ -68,7 +68,7 @@ void MapShape::Load(sdf::ElementPtr _sdf)
   // Make sure they are ok
   if (_sdf->Get<double>("scale") <= 0)
     _sdf->GetElement("scale")->Set(0.1);
-  if (this->sdf->GetValueInt("threshold") <= 0)
+  if (this->sdf->Get<int>("threshold") <= 0)
     _sdf->GetElement("threshold")->Set(200);
   if (this->sdf->Get<double>("height") <= 0)
     _sdf->GetElement("height")->Set(1.0);
@@ -129,7 +129,7 @@ double MapShape::GetScale() const
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
-  return this->sdf->GetValueInt("threshold");
+  return this->sdf->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
@@ -141,7 +141,7 @@ double MapShape::GetHeight() const
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
-  return this->sdf->GetValueInt("granularity");
+  return this->sdf->Get<int>("granularity");
 }
 
 //////////////////////////////////////////////////
@@ -321,7 +321,7 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->sdf->GetValueInt("granularity"))
+      this->sdf->Get<int>("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -406,7 +406,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
       // if (this->sdf->Get<bool>("negative"))
         // v = 255 - v;
 
-      if (v > this->sdf->GetValueInt("threshold"))
+      if (v > this->sdf->Get<int>("threshold"))
         freePixels++;
       else
         occPixels++;

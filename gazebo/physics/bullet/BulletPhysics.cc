@@ -695,7 +695,7 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
     }
     case PGS_ITERS:
     {
-      value = bulletElem->GetElement("solver")->GetValueInt("iters");
+      value = bulletElem->GetElement("solver")->Get<int>("iters");
       break;
     }
     case SOR:
@@ -711,7 +711,7 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
     }
     case MAX_CONTACTS:
     {
-      value = bulletElem->GetElement("max_contacts")->GetValueInt();
+      value = bulletElem->GetElement("max_contacts")->Get<int>();
       break;
     }
     case MIN_STEP_SIZE:
