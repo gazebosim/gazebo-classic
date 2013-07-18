@@ -467,13 +467,13 @@ void Visual::Load()
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->GetValueColor("ambient"));
+      this->SetAmbient(matElem->Get<common::color>("ambient"));
     else if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->GetValueColor("diffuse"));
+      this->SetDiffuse(matElem->Get<common::color>("diffuse"));
     else if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->GetValueColor("specular"));
+      this->SetSpecular(matElem->Get<common::color>("specular"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->GetValueColor("emissive"));
+      this->SetEmissive(matElem->Get<common::color>("emissive"));
   }
 
   // Allow the mesh to cast shadows

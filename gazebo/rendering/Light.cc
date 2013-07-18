@@ -109,9 +109,9 @@ void Light::Update()
 
   this->SetLightType(this->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(
-      this->sdf->GetElement("diffuse")->GetValueColor());
+      this->sdf->GetElement("diffuse")->Get<common::color>());
   this->SetSpecularColor(
-      this->sdf->GetElement("specular")->GetValueColor());
+      this->sdf->GetElement("specular")->Get<common::color>());
   this->SetDirection(
       this->sdf->Get<math::Vector3>("direction"));
 
@@ -465,7 +465,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("diffuse");
 
-  if (elem->GetValueColor() != _color)
+  if (elem->Get<common::color>() != _color)
     elem->Set(_color);
 
   this->light->setDiffuseColour(_color.r, _color.g, _color.b);
@@ -474,13 +474,13 @@ void Light::SetDiffuseColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Light::GetDiffuseColor() const
 {
-  return this->sdf->GetElement("diffuse")->GetValueColor();
+  return this->sdf->GetElement("diffuse")->Get<common::color>();
 }
 
 //////////////////////////////////////////////////
 common::Color Light::GetSpecularColor() const
 {
-  return this->sdf->GetElement("specular")->GetValueColor();
+  return this->sdf->GetElement("specular")->Get<common::color>();
 }
 
 //////////////////////////////////////////////////
@@ -488,7 +488,7 @@ void Light::SetSpecularColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("specular");
 
-  if (elem->GetValueColor() != _color)
+  if (elem->Get<common::color>() != _color)
     elem->Set(_color);
 
   this->light->setSpecularColour(_color.r, _color.g, _color.b);
