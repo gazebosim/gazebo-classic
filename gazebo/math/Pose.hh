@@ -24,14 +24,6 @@
 
 #include <iostream>
 
-/*
-// Remove the gazebo_config and ifdefs in Gazebo 2.0
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
-#include "sdf/sdf.hh"
-#endif
-*/
-
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 
@@ -70,17 +62,6 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
-
-              /*
-#ifdef HAVE_SDF
-      /// Deprecated
-      public: Pose(const sdf::Pose &_pose) __attribute__((deprecated));
-
-      /// Deprecated
-      public: Pose &operator=(const sdf::Pose &_pose)
-              __attribute__((deprecated));
-#endif
-*/
 
       /// \brief Destructor
       public: virtual ~Pose();

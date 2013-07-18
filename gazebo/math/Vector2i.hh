@@ -26,16 +26,6 @@
 #include <iostream>
 #include <fstream>
 
-/*
-// Remove in gazebo 2.0
-#include <gazebo/gazebo_config.h>
-#if HAVE_SDF
-#include <sdf/sdf.hh>
-#endif
-*/
-
-#include "gazebo/gazebo_config.h"
-
 namespace gazebo
 {
   namespace math
@@ -58,16 +48,6 @@ namespace gazebo
       /// \brief Copy onstructor
       /// \param[in] _pt a point
       public: Vector2i(const Vector2i &_pt);
-
-              /*
-#ifdef HAVE_SDF
-      /// Deprecated
-      public: Vector2i(const sdf::Vector2i &_pt) __attribute__((deprecated));
-
-      /// Deprecated
-      public: Vector2i &operator =(const sdf::Vector2i &_v)
-              __attribute__((deprecated));
-#endif*/
 
       /// \brief Destructor
       public: virtual ~Vector2i();
