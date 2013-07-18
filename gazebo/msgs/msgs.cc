@@ -287,7 +287,7 @@ namespace gazebo
     {
       msgs::GUI result;
 
-      result.set_fullscreen(_sdf->GetValueBool("fullscreen"));
+      result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
 
       if (_sdf->HasElement("camera"))
@@ -345,7 +345,7 @@ namespace gazebo
 
       result.set_name(_sdf->Get<std::string>("name"));
 
-      result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
+      result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
 
       if (type == "point")
         result.set_type(msgs::Light::POINT);
@@ -422,7 +422,7 @@ namespace gazebo
             result.set_submesh(submeshElem->Get<std::string>("name"));
 
             if (submeshElem->HasElement("center"))
-              result.set_center_submesh(submeshElem->GetValueBool("center"));
+              result.set_center_submesh(submeshElem->Get<bool>("center"));
           }
         }
 
@@ -541,7 +541,7 @@ namespace gazebo
       result.set_name(_sdf->Get<std::string>("name"));
 
       if (_sdf->HasElement("cast_shadows"))
-        result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
+        result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
 
       if (_sdf->HasElement("transparency"))
         result.set_transparency(_sdf->Get<double>("transparency"));
@@ -672,7 +672,7 @@ namespace gazebo
       Init(result, "scene");
 
       if (_sdf->HasElement("grid"))
-        result.set_grid(_sdf->GetValueBool("grid"));
+        result.set_grid(_sdf->Get<bool>("grid"));
       else
         result.set_grid(true);
 
@@ -711,7 +711,7 @@ namespace gazebo
         result.mutable_fog()->CopyFrom(FogFromSDF(_sdf->GetElement("fog")));
 
       if (_sdf->HasElement("shadows"))
-        result.set_shadows(_sdf->GetValueBool("shadows"));
+        result.set_shadows(_sdf->Get<bool>("shadows"));
 
       return result;
     }

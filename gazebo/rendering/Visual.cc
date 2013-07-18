@@ -477,7 +477,7 @@ void Visual::Load()
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
 }
 
@@ -2112,7 +2112,7 @@ bool Visual::GetCenterSubMesh() const
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
-        result = tmpElem->GetElement("submesh")->GetValueBool("center");
+        result = tmpElem->GetElement("submesh")->Get<bool>("center");
     }
   }
 

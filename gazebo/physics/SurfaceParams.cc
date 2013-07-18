@@ -78,7 +78,7 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     GZ_ASSERT(contactElem, "Surface sdf member is NULL");
     {
       this->collideWithoutContact =
-        contactElem->GetValueBool("collide_without_contact");
+        contactElem->Get<bool>("collide_without_contact");
       this->collideWithoutContactBitmask =
           contactElem->GetValueUInt("collide_without_contact_bitmask");
       sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");

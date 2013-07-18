@@ -105,7 +105,7 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
-  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
 
   this->SetLightType(this->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(

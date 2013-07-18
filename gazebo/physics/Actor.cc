@@ -203,9 +203,9 @@ void Actor::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Actor::LoadScript(sdf::ElementPtr _sdf)
 {
-  this->loop = _sdf->GetValueBool("loop");
+  this->loop = _sdf->Get<bool>("loop");
   this->startDelay = _sdf->Get<double>("delay_start");
-  this->autoStart = _sdf->GetValueBool("auto_start");
+  this->autoStart = _sdf->Get<bool>("auto_start");
   this->active = this->autoStart;
 
   if (_sdf->HasElement("trajectory"))
@@ -381,7 +381,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       {
         this->skelAnimation[animName] =
             skel->GetAnimation(0);
-        this->interpolateX[animName] = _sdf->GetValueBool("interpolate_x");
+        this->interpolateX[animName] = _sdf->Get<bool>("interpolate_x");
         this->skelNodesMap[animName] = skelMap;
       }
     }

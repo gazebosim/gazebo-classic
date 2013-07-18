@@ -82,7 +82,7 @@ void Sensor::Load(const std::string &_worldName)
     this->pose = this->sdf->GetValuePose("pose");
   }
 
-  if (this->sdf->GetValueBool("always_on"))
+  if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
@@ -257,7 +257,7 @@ std::string Sensor::GetType() const
 //////////////////////////////////////////////////
 bool Sensor::GetVisualize() const
 {
-  return this->sdf->GetValueBool("visualize");
+  return this->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////

@@ -205,7 +205,7 @@ void Camera::Load()
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") &&
-      this->sdf->GetElement("save")->GetValueBool("enabled"))
+      this->sdf->GetElement("save")->Get<bool>("enabled"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("save");
     std::string command;
@@ -525,7 +525,7 @@ void Camera::PostRender()
     }
 
     if (this->sdf->HasElement("save") &&
-        this->sdf->GetElement("save")->GetValueBool("enabled"))
+        this->sdf->GetElement("save")->Get<bool>("enabled"))
     {
       this->SaveFrame(this->GetFrameFilename());
     }
@@ -848,7 +848,7 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
   elem->GetElement("path")->Set(_pathname);
 
   // Create the directory to store frames
-  if (elem->GetValueBool("enabled"))
+  if (elem->Get<bool>("enabled"))
   {
     std::string command;
     command = "mkdir -p " + _pathname + " 2>>/dev/null";

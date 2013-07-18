@@ -2500,7 +2500,7 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  return this->sdf->GetValueBool("shadows");
+  return this->sdf->Get<bool>("shadows");
 }
 
 /////////////////////////////////////////////////

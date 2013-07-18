@@ -84,7 +84,7 @@ void MeshShape::Init()
 
     // Center the submesh if specified in SDF.
     if (submeshElem->HasElement("center") &&
-        submeshElem->GetValueBool("center"))
+        submeshElem->Get<bool>("center"))
     {
       this->submesh->Center();
     }
