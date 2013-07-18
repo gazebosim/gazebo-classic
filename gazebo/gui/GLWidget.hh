@@ -28,6 +28,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Event.hh"
 
 #include "gazebo/math/Pose.hh"
@@ -167,6 +168,9 @@ namespace gazebo
       private: rendering::ScenePtr scene;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
+
+      /// \brief The most recent keyboard event.
+      private: common::KeyEvent keyEvent;
 
       private: std::vector<event::ConnectionPtr> connections;
 

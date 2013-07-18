@@ -19,24 +19,24 @@
  * Date: 16 Oct 2009
  */
 
-#ifndef _ODETRIMESHSHAPE_HH_
-#define _ODETRIMESHSHAPE_HH_
+#ifndef _ODEMESHSHAPE_HH_
+#define _ODEMESHSHAPE_HH_
 
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Triangle mesh collision.
-    class ODETrimeshShape : public TrimeshShape
+    class ODEMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
-      public: explicit ODETrimeshShape(CollisionPtr _parent);
+      public: explicit ODEMeshShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODETrimeshShape();
+      public: virtual ~ODEMeshShape();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
