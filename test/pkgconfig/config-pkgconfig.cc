@@ -21,9 +21,9 @@ TEST(PkgConfig, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cd %s/..; cmake %s", SOURCE_DIR, SOURCE_DIR);
+  snprintf(cmd, sizeof(cmd), "cmake %s", SOURCE_DIR);
   ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "cd %s/..; make", SOURCE_DIR);
+  snprintf(cmd, sizeof(cmd), "make");
   ASSERT_EQ(system(cmd), 0);
 }
 

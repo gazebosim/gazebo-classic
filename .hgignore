@@ -1,10 +1,5 @@
 syntax: glob
 
-CMakeFiles
-CMakeCache*
-*.so
-cmake_install.cmake
-test/pkgconfig/Makefile
 build
 build_*
 Ogre.log
