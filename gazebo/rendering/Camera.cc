@@ -220,7 +220,7 @@ void Camera::Load()
     double angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI)
     {
-      gzthrow("Camera horizontal field of veiw invalid.");
+      gzthrow("Camera horizontal field of view invalid.");
     }
     this->SetHFOV(angle);
   }
