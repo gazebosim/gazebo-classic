@@ -57,8 +57,7 @@
           <gps>
             <position>
               <horizontal>
-                <noise>
-                  <type>gaussian_quantized</type>
+                <noise type="gaussian_quantized">
                   <mean>0</mean>
                   <stddev>1</stddev>
                   <bias_mean>3</bias_mean>
@@ -67,8 +66,7 @@
                 </noise>
               </horizontal>
               <vertical>
-                <noise>
-                  <type>gaussian_quantized</type>
+                <noise type="gaussian_quantized">
                   <mean>0</mean>
                   <stddev>1</stddev>
                   <bias_mean>3</bias_mean>

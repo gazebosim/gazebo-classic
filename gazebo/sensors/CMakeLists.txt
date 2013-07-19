@@ -8,6 +8,7 @@ set (sources
   GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
+  Noise.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -25,6 +26,7 @@ set (headers
   GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
+  Noise.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
