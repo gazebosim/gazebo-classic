@@ -206,7 +206,6 @@ const Mesh *MeshManager::GetMesh(const std::string &_name) const
   if (iter != this->meshes.end())
     return iter->second;
 
-  gzerr << "Unable to find mesh with name[" << _name << "]\n";
   return NULL;
 }
 

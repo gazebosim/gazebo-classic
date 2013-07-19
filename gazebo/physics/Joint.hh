@@ -23,6 +23,7 @@
 #define _JOINT_HH_
 
 #include <string>
+#include <vector>
 
 #include <boost/any.hpp>
 
@@ -413,27 +414,17 @@ namespace gazebo
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetLowerLimit(unsigned int _index) const
-        {
-          if (_index < this->GetAngleCount())
-            return this->lowerLimit[_index];
-
-          gzwarn << "requesting lower limit of joint index out of bound\n";
-          return math::Angle();
-        }
+      public: math::Angle GetLowerLimit(unsigned int _index) const;
 
       /// \brief:  get the joint lower limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetUpperLimit(unsigned int _index) const
-        {
-          if (_index < this->GetAngleCount())
-            return this->upperLimit[_index];
+      public: math::Angle GetUpperLimit(unsigned int _index) const;
 
-          gzwarn << "requesting upper limit of joint index out of bound\n";
-          return math::Angle();
-        }
+      /// \brief Set whether the joint should generate feedback.
+      /// \param[in] _enable True to enable joint feedback.
+      public: virtual void SetProvideFeedback(bool _enable);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -477,14 +468,8 @@ namespace gazebo
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 
-      /// \brief Joint update event.
-      private: event::EventT<void ()> jointUpdate;
-
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
-
-      /// \brief Angle used when the joint is paret of a static model.
-      private: math::Angle staticAngle;
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
@@ -513,6 +498,18 @@ namespace gazebo
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief Provide Feedback data for contact forces
+      protected: bool provideFeedback;
+
+      /// \brief Names of all the sensors attached to the link.
+      private: std::vector<std::string> sensors;
+
+      /// \brief Joint update event.
+      private: event::EventT<void ()> jointUpdate;
+
+      /// \brief Angle used when the joint is parent of a static model.
+      private: math::Angle staticAngle;
     };
     /// \}
   }

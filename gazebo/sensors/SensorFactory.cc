@@ -34,6 +34,8 @@ void RegisterImuSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
+void RegisterSonarSensor();
+void RegisterForceTorqueSensor();
 
 using namespace gazebo;
 using namespace sensors;
@@ -53,6 +55,8 @@ void SensorFactory::RegisterAll()
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
+  RegisterSonarSensor();
+  RegisterForceTorqueSensor();
 }
 
 /////////////////////////////////////////////////

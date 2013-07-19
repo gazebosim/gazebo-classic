@@ -48,8 +48,6 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[0] = 0;
   this->dStable[1] = 0;
   this->dStable[2] = 0;
-
-  this->provideFeedback = false;
 }
 
 //////////////////////////////////////////////////
@@ -74,7 +72,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("provide_feedback"))
     {
-      this->provideFeedback = elem->GetValueBool("provide_feedback");
+      this->SetProvideFeedback(elem->GetValueBool("provide_feedback"));
     }
 
     if (elem->HasElement("cfm_damping"))
@@ -140,16 +138,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
         gzlog << "joint friction not implemented\n";
       }
     }
-  }
-
-  if (this->provideFeedback)
-  {
-    this->feedback = new dJointFeedback;
-
-    if (this->jointId)
-      dJointSetFeedback(this->jointId, this->feedback);
-    else
-      gzerr << "ODE Joint ID is invalid\n";
   }
 }
 
@@ -1072,7 +1060,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
   else
   {
     // forgot to set provide_feedback?
-    gzwarn << "GetForceTorque: forget to set <provide_feedback>?\n";
+    gzwarn << "GetForceTorque: forgot to set <provide_feedback>?\n";
   }
 
   return wrench;
@@ -1190,5 +1178,21 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
       this->applyDamping = physics::Joint::ConnectJointUpdate(
         boost::bind(&ODEJoint::ApplyDamping, this));
     this->dampingInitialized = true;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetProvideFeedback(bool _enable)
+{
+  Joint::SetProvideFeedback(_enable);
+
+  if (this->provideFeedback)
+  {
+    this->feedback = new dJointFeedback;
+
+    if (this->jointId)
+      dJointSetFeedback(this->jointId, this->feedback);
+    else
+      gzerr << "ODE Joint ID is invalid\n";
   }
 }

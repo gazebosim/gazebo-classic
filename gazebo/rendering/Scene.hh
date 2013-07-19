@@ -23,6 +23,7 @@
 #include <list>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -785,6 +786,14 @@ namespace gazebo
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
+
+      /// \def JointMsgs_M
+      /// \brief Map of joint names to joint messages.
+      typedef boost::unordered_map<std::string,
+          boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
+
+      /// \brief Keep track of data of joints.
+      private: JointMsgs_M joints;
     };
     /// \}
   }
