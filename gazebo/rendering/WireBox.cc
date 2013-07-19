@@ -101,5 +101,5 @@ void WireBox::Init(const math::Box &_box)
 /////////////////////////////////////////////////
 void WireBox::SetVisible(bool _visible)
 {
-//  this->lines->setVisible(_visible);
+  this->lines->setVisible(_visible);
 }

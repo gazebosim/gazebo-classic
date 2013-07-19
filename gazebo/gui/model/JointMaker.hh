@@ -21,6 +21,7 @@
 #include <string>
 #include <boost/unordered/unordered_map.hpp>
 
+#include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -86,9 +87,17 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
+      /// \brief Generate SDF for all joints.
+      public: void GenerateSDF();
+
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
       public: static int GetJointAxisCount(JointMaker::JointType _type);
+
+      /// \brief Get the joint type in string.
+      /// \param[in] _type Type of joint.
+      /// \return Joint type in string.
+      public: static std::string GetTypeAsString(JointMaker::JointType _type);
 
       /// \brief Mouse event filter callback when mouse button is pressed .
       /// \param[in] _event The mouse event.
@@ -148,8 +157,12 @@ namespace gazebo
       /// \brief Flag set to true when a joint has been connected.
       private: bool newJointCreated;
 
+      /// \brief A map of joint type to its corresponding material.
       private: boost::unordered_map<JointMaker::JointType, std::string>
           jointMaterials;
+
+      /// \brief The SDF element pointer to the model that contains the joints.
+      private: sdf::ElementPtr modelSDF;
     };
     /// \}
 

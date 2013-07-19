@@ -347,7 +347,6 @@ void JointMaker::Update()
     JointData *joint = it->second;
     if (joint->dirty)
     {
-//      joint->visual->SetWorldRotation(math::Vector::Zero);
       joint->line->SetPoint(1,
           joint->child->GetWorldPose().pos -
           joint->parent->GetWorldPose().pos);
@@ -358,6 +357,83 @@ void JointMaker::Update()
           joint->parent->GetWorldPose().pos)/2.0);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::GenerateSDF()
+{
+  sdf::ElementPtr jointElem;
+  sdf::ElementPtr parentElem;
+  sdf::ElementPtr childElem;
+  sdf::ElementPtr axisElem[2];
+  sdf::ElementPtr poseElem;
+
+  this->modelSDF.reset(new sdf::Element);
+  sdf::initFile("model.sdf", this->modelSDF);
+//  jointSdf.reset(new sdf::Element);
+
+  jointElem = this->modelSDF->GetElement("joint");
+
+  boost::unordered_map<std::string, JointData *>::iterator jointsIt;
+  // loop through all parts
+  for (jointsIt = this->joints.begin(); jointsIt != this->joints.end();
+      ++jointsIt)
+  {
+    JointData *joint = jointsIt->second;
+
+    jointElem->GetAttribute("name")->Set(joint->visual->GetName());
+    jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
+    parentElem = jointElem->GetElement("parent");
+    parentElem->Set(joint->parent->GetName());
+    childElem = jointElem->GetElement("child");
+    parentElem->Set(joint->child->GetName());
+    int axisCount = GetJointAxisCount(joint->type);
+    for (int i = 0; i < axisCount; ++i)
+    {
+      std::stringstream ss;
+      ss << "axis" << (i+1);
+      axisElem[i] = jointElem->GetElement(ss.str());
+      axisElem[i]->Set(joint->axis[i]);
+    }
+    this->modelSDF->InsertElement(jointElem->Clone());
+  }
+}
+
+/////////////////////////////////////////////////
+std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
+{
+  std::string jointTypeStr = "";
+
+  if (_type == JointMaker::JOINT_FIXED)
+  {
+    jointTypeStr = "fixed";
+  }
+  else if (_type == JointMaker::JOINT_SLIDER)
+  {
+    jointTypeStr = "prismatic";
+  }
+  else if (_type == JointMaker::JOINT_HINGE)
+  {
+    jointTypeStr = "revolute";
+  }
+  else if (_type == JointMaker::JOINT_HINGE2)
+  {
+    jointTypeStr = "revolute2";
+  }
+  else if (_type == JointMaker::JOINT_SCREW)
+  {
+    jointTypeStr = "screw";
+  }
+  else if (_type == JointMaker::JOINT_UNIVERSAL)
+  {
+    jointTypeStr = "universal";
+  }
+  else if (_type == JointMaker::JOINT_BALL)
+  {
+    jointTypeStr = "ball";
+  }
+
+  return jointTypeStr;
 }
 
 /////////////////////////////////////////////////
