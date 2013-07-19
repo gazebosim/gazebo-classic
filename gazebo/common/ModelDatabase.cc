@@ -618,11 +618,6 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     if (modelXML)
     {
       TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
-      if (!sdfXML)
-      {
-        sdfXML = modelXML->FirstChildElement("sdf");
-      }
-
       TiXmlElement *sdfSearch = sdfXML;
 
       // Find the SDF element that matches our current SDF version.
