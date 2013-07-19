@@ -2064,8 +2064,6 @@ std::string Visual::GetMeshName() const
       if (uri.empty())
       {
         gzerr << "<uri> element missing for geometry element:\n";
-        geomElem->PrintValues("  ");
-
         return std::string();
       }
 

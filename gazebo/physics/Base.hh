@@ -27,6 +27,7 @@
 #include <string>
 
 #include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 

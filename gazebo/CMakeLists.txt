@@ -38,6 +38,7 @@ add_dependencies(gazebo_physics_ode gazebo_msgs)
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
+
 if(HAVE_BULLET)
   add_dependencies(gazebo_physics_bullet gazebo_msgs)
 endif()
@@ -48,7 +49,6 @@ endif()
 gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
-
 
 target_link_libraries(gzmaster
   gazebo_common

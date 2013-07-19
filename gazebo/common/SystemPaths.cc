@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"

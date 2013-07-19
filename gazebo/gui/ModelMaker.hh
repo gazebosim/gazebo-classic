@@ -19,8 +19,8 @@
 
 #include <list>
 #include <string>
-
 #include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo

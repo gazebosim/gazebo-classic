@@ -19,8 +19,8 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#ifndef GAZEBO_RAY_PLUGIN_HH
-#define GAZEBO_RAY_PLUGIN_HH
+#ifndef _GAZEBO_RAY_PLUGIN_HH_
+#define _GAZEBO_RAY_PLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"

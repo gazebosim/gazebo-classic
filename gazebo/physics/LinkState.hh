@@ -25,6 +25,7 @@
 #include <string>
 
 #include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/math/Pose.hh"

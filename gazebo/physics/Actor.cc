@@ -19,6 +19,8 @@
 #include <limits>
 #include <algorithm>
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -31,8 +33,6 @@
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/BVHLoader.hh"
-
-#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 

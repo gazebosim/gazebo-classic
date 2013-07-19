@@ -20,8 +20,8 @@
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <iostream>
+
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -29,6 +29,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"

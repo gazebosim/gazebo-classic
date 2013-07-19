@@ -27,10 +27,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -734,7 +735,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   else
   {
     gzerr << "SDF is missing the <model> tag:\n";
-    _sdf->PrintValues("  ");
   }
 
   this->PublishModelPose(model);

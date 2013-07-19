@@ -16,11 +16,10 @@
 */
 
 #include "gazebo/math/Vector3.hh"
-#include "BoxShape.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 BoxShape::BoxShape(CollisionPtr _parent) : Shape(_parent)

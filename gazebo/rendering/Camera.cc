@@ -278,8 +278,11 @@ void Camera::Init()
 void Camera::Fini()
 {
   if (this->gaussianNoiseCompositorListener)
+  {
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
+  }
+
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
   this->renderTarget->removeAllViewports();
 
@@ -551,7 +554,7 @@ void Camera::PostRender()
     }
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
-        this->GetImageFormat());
+                    this->GetImageFormat());
   }
 
   this->newData = false;
@@ -1245,8 +1248,8 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       0,
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET)).getPointer();
-  this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
+  this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
   this->initialized = true;
 }
 

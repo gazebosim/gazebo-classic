@@ -22,8 +22,11 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/math/gzmath.hh"
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Exception.hh"
@@ -184,7 +187,6 @@ void HeightmapShape::FillHeightMap()
       px3 = static_cast<int>(data[y2 * pitch + x1 * bpp]) / 255.0;
       px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       h2 = (px3 - ((px3 - px4) * dx));
-
 
       h = (h1 - ((h1 - h2) * dy)) * this->scale.z;
 

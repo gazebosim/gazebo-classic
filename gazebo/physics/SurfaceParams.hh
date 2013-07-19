@@ -22,8 +22,9 @@
 #ifndef _SURFACEPARAMS_HH_
 #define _SURFACEPARAMS_HH_
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/sdf/sdf.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {

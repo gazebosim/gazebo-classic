@@ -465,7 +465,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("diffuse");
 
-  if (elem->GetValueColor() != _color)
+  if (_color != elem->GetValueColor())
     elem->Set(_color);
 
   this->light->setDiffuseColour(_color.r, _color.g, _color.b);
@@ -501,7 +501,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
   math::Vector3 vec = _dir;
   vec.Normalize();
 
-  if (this->sdf->GetValueVector3("direction") != vec)
+  if (vec != this->sdf->GetValueVector3("direction"))
     this->sdf->GetElement("direction")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);

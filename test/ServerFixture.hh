@@ -224,6 +224,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }

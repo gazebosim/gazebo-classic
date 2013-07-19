@@ -35,5 +35,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     ${tinyxml_libraries}
     ${PLAYER_LINK_LIBS}
     )
+
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 endforeach()

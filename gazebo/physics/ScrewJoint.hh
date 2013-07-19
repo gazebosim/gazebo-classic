@@ -89,8 +89,7 @@ namespace gazebo
       /// \brief Set the anchor.
       /// \param[in] _index Index of the axis. Not Used.
       /// \param[in] _anchor Anchor value for the joint.
-      public: virtual void SetAnchor(int _index,
-                                     const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Get the anchor.
       /// \param[in] _index Index of the axis. Not Used.

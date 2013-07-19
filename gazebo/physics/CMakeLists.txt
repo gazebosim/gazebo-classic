@@ -111,6 +111,7 @@ if (HAVE_BULLET)
 endif()
 
 gz_add_executable(gzphysics server.cc)
+
 target_link_libraries(gzphysics
   gazebo_common
   gazebo_util
