@@ -92,14 +92,14 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   linkNameStream << "unit_box_" << this->boxCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
+      this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << linkName << "_visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
+      linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
@@ -135,12 +135,12 @@ std::string ModelCreator::AddSphere(double _radius,
   linkNameStream << "unit_sphere_" << this->sphereCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << linkName << "_visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -178,12 +178,12 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   linkNameStream << "unit_cylinder_" << this->cylinderCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << linkName << "_visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -230,7 +230,7 @@ std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_sca
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << linkName << "_visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -351,8 +351,8 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
-  this->CreateTheEntity();
   this->Reset();
+  this->CreateTheEntity();
 //  this->Stop();
 }
 
@@ -569,9 +569,9 @@ void ModelCreator::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
 
     visualElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_Visual");
+        + "_visual");
     collisionElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_Collision");
+        + "_collision");
     visualElem->GetElement("pose")->Set(visual->GetPose());
     collisionElem->GetElement("pose")->Set(visual->GetPose());
 
