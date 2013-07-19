@@ -1,43 +1,48 @@
-.TH GAZEBO 1
+gzlog -- Tool to instrospect Gazebo log files
+=============================================
 
-.SH NAME
+## SYNOPSIS
 
-gzlog \- tool to introspect Gazebo log files
+gzlog [command] <options> [log file]
 
-.SH SYNOPSIS
+## DESCRIPTION
 
-.B gzlog [command] <options> [log file]
+Introspect Gazebo log files through different commands
 
-.SH DESCRIPTION
-
-Introspect Gazebo log files.
-
-.SH COMMANDS
-.TP 5
-help
+## COMMAND ELEMENTS
+* **help**:
 Output this help message.
-.TP 5
-info
+* **info**:
 Display statistical information about a log file.
-.TP 5
-echo
+* **echo**:
 Output the contents of a log file to screen.
-.TP 5
-step
+* **step**:
 Step through the contents of a log file.
 
-.SH OPTIONS
+## OPTIONS
 
-.TP 5
-\-\-help,\-h
-Produce help message.
-.TP 5
-\-\-file,\-f arg
-Path to log file.
-.TP 5
-\-\-filter arg
-Filter output. Valid only for the echo and step commands.
+* -h, --help :
+  Output this help message.
+* -r, --raw :
+  Output the data from echo and step without XML formatting.
+* -s, --stamp <arg>:
+  Add a timestamp to each line of output. Valid values are (sim,real,wall)
+* -z, --hz <arg>:
+ Filter output to the specified Hz rate.  Only valid for echo and step commands.
+* -f, --file <arg>:
+ Path to a log file.
+* --filter <arg>:
+ Filter output. Valid only for the echo and step commands
 
-.SH AUTHOR
+## SEE ALSO
 
-The Open Source Robotics Foundation
+Example and more information can be found at: http://gazebosim.org/wiki/Tools#Data_Log_Tool
+
+## AUTHOR
+  Open Source Robotics Foundation
+
+## COPYRIGHT
+  Copyright 2013 Open Source Robotics Foundation
+   
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.

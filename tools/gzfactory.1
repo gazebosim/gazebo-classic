@@ -1,61 +1,49 @@
-.TH GAZEBO 1
+gzfactory -- Tool to spawn or delete models from simulation
+=============================================================
 
-.SH NAME
+## SYNOPSIS
+ `gzfactory` <spawn|delete> [OPTIONS]
 
-gzfactory \- spawn or delete models from simulation
+## DESCRIPTION
+This tool for spawning or deleting models into or from a running Gazebo simulation.
 
-.SH SYNOPSIS
-
-This tool for spawning or deleting models into or from a running
-Gazebo simulation.
-
-.B gzfactory spawn | delete [OPTIONS]
-
-.SH ACTIONS
-.TP 5
-spawn
+## ACTIONS
+* **spawn**:
 Spawn a new model. Must specify a SDF model file.
-.TP 5
-delete
+* **delete**:
 Delete existing model. Must specify model name.
 
-.SH DESCRIPTION
-
-Run a gazebo client.
-
-.SH OPTIONS
-
-.TP 5
-\-\-help,\-h
-Produce help message.
-.TP 5
-\-\-sdf,\-f
-SDF model file.
-.TP 5
-\-\-world-name,\-w arg
-Name of Gazebo world.
-.TP 5
-\-\-model-name,\-m arg
+##  OPTIONS
+*  -h, --help:
+produce this help message
+*  -f, --sdf <arg>:
+SDF model file
+*  -w, --world-name <arg>:
+Name of Gazebo world
+*  -m, --model-name <arg>:
 Model name.
-.TP 5
-\-\-pose-x,\-x arg
-Set model X position.
-.TP 5
-\-\-pose-y,\-y arg
-Set model Y position.
-.TP 5
-\-\-pose-z,\-z arg
-Set model Z position.
-.TP 5
-\-\-pose-R,\-R arg
-Set model roll orientation in radians.
-.TP 5
-\-\-pose-P,\-P arg
-Set model pitch orientation in radians.
-.TP 5
-\-\-pose-Y,\-Y arg
-Set model yaw orientation in radians.
+*  -x, --pose-x <arg>:
+set model x position
+*  -y, --pose-y <arg>:
+set model y position.
+*  -z, --pose-z <arg>:
+set model z positione.
+*  -R, --pose-R <arg>:
+set model roll orientation in radians.
+*  -P, --pose-P <arg>:
+set model pitch orientation in radians.
+*  -Y, --pose-Y <arg>:
+set model yaw orientation in radians.
 
-.SH AUTHOR
+## SEE ALSO
+Example and more information about gazebo gzfactory and other command
+line tools can be found at:
+http://gazebosim.org/user_guide/started__commandlinetools.html
 
-The Open Source Robotics Foundation
+## AUTHOR
+  Open Source Robotics Foundation
+## COPYRIGHT
+  Copyright 2013 Open Source Robotics Foundation
+   
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
