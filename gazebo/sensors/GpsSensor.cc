@@ -15,13 +15,15 @@
  *
 */
 
-#include "gazebo/sensors/GpsSensor.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 
 #include "gazebo/common/common.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/transport/transport.hh"
+
+#include "gazebo/sensors/GpsSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -32,11 +34,15 @@ GZ_REGISTER_STATIC_SENSOR("gps", GpsSensor)
 GpsSensor::GpsSensor()
 : Sensor(sensors::OTHER)
 {
+  this->horizontalPositionNoise = NoisePtr(new Noise());
+  this->verticalPositionNoise = NoisePtr(new Noise());
 }
 
 /////////////////////////////////////////////////
 GpsSensor::~GpsSensor()
 {
+  this->horizontalPositionNoise.reset();
+  this->verticalPositionNoise.reset();
 }
 
 /////////////////////////////////////////////////
@@ -61,6 +67,24 @@ void GpsSensor::Load(const std::string &_worldName)
   this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
 
   // Todo: parse sdf noise parameters
+  sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
+  if (gpsElem)
+  {
+    sdf::ElementPtr posElem = gpsElem->GetElement("position");
+    if (posElem)
+    {
+      {
+        sdf::ElementPtr horElem = posElem->GetElement("horizontal");
+        if (horElem)
+          this->horizontalPositionNoise->Load(horElem->GetElement("noise"));
+      }
+      {
+        sdf::ElementPtr vertElem = posElem->GetElement("vertical");
+        if (vertElem)
+          this->verticalPositionNoise->Load(vertElem->GetElement("noise"));
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -86,6 +110,12 @@ void GpsSensor::UpdateImpl(bool /*_force*/)
   if (this->parentEntity)
   {
     math::Pose gpsPose = this->pose + this->parentEntity->GetWorldPose();
+
+    // Apply position noise
+    gpsPose.pos.x = this->horizontalPositionNoise->Apply(gpsPose.pos.x);
+    gpsPose.pos.y = this->horizontalPositionNoise->Apply(gpsPose.pos.y);
+    gpsPose.pos.z = this->verticalPositionNoise->Apply(gpsPose.pos.z);
+
     math::Vector3 spherical = this->sphericalCoordinates->Convert(gpsPose.pos);
     this->lastGpsMsg.set_latitude_deg(spherical.x);
     this->lastGpsMsg.set_longitude_deg(spherical.y);

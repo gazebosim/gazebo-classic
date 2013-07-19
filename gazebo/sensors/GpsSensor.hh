@@ -20,11 +20,13 @@
 
 #include <string>
 
+#include "gazebo/sdf/sdf.hh"
+
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -58,6 +60,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Fini();
+
+      /// \brief Noise attributes for horizontal position measurement.
+      private: NoisePtr horizontalPositionNoise;
+
+      /// \brief Noise attributes for vertical position measurement.
+      private: NoisePtr verticalPositionNoise;
 
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;
