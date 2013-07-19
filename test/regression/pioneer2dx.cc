@@ -53,13 +53,13 @@ TEST_F(Pioneer2dx, StraightLine)
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
   */
-
-  while (currTime - startTime < common::Time(100, 0))
+  while (currTime - startTime < common::Time(20, 0))
   {
     // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }
+
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;

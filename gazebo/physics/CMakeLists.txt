@@ -37,7 +37,7 @@ set (sources
   SphereShape.cc
   State.cc
   SurfaceParams.cc
-  TrimeshShape.cc
+  MeshShape.cc
   World.cc
   WorldState.cc
 )
@@ -81,7 +81,7 @@ set (headers
   SphereShape.hh
   State.hh
   SurfaceParams.hh
-  TrimeshShape.hh
+  MeshShape.hh
   UniversalJoint.hh
   World.hh
   WorldState.hh)

@@ -32,7 +32,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
