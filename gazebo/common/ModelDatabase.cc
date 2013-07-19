@@ -114,7 +114,10 @@ std::string ModelDatabase::GetURI()
   if (uriStr)
     result = uriStr;
   else
-    gzwarn << "GAZEBO_MODEL_DATABASE_URI not set\n";
+  {
+    // No env var.  Take compile-time default.
+    result = GAZEBO_MODEL_DATABASE_URI;
+  }
 
   if (result[result.size()-1] != '/')
     result += '/';

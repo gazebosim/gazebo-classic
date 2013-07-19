@@ -75,9 +75,10 @@ Base::~Base()
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  if (_sdf)
+    this->sdf = _sdf;
 
-  this->sdf = _sdf;
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
 
   if (this->sdf->HasAttribute("name"))
     this->name = this->sdf->GetValueString("name");

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
