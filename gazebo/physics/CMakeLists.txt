@@ -133,4 +133,4 @@ set (gtest_sources
   Joint_TEST.cc)
 gz_build_tests(${gtest_sources})
 
-manpage(gzphysics)
+manpage(gzphysics 1)

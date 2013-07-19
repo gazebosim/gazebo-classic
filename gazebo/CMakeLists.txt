@@ -117,6 +117,6 @@ set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
 gz_install_includes("" ${headers})
 
 # Man pages
-manpage(gazebo)
-manpage(gzserver)
+manpage(gazebo 1)
+manpage(gzserver 1)
 
