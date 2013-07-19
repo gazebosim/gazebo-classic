@@ -469,8 +469,6 @@ void GLWidget::OnMousePressNormal()
 
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-//  this->SetMouseMoveVisual(rendering::VisualPtr());
-
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
@@ -843,7 +841,6 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
     else
     {
       this->SetSelectedVisual(rendering::VisualPtr());
-//      this->SetMouseMoveVisual(rendering::VisualPtr());
     }
   }
 }
@@ -868,6 +865,9 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
+
+  if (this->selectedVis)
+    ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
 }
