@@ -71,18 +71,10 @@ bool init(SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
-  std::string sdfFilename;
   std::string filename = find_file(_filename);
 
-  // This can be removed in gazebo 2.0
-  if (_filename.find(".sdf") == _filename.size()-4)
-  {
-    sdfFilename = _filename.substr(0, _filename.find(".sdf")) + ".sdf";
-    sdfFilename = find_file(sdfFilename);
-  }
-
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(filename) || xmlDoc.LoadFile(sdfFilename))
+  if (xmlDoc.LoadFile(filename))
   {
     return initDoc(&xmlDoc, _sdf);
   }
@@ -95,23 +87,13 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
-  std::string sdfFilename;
   std::string filename = find_file(_filename);
 
-  // This can be removed in gazebo 2.0
-  if (_filename.find(".sdf") == _filename.size()-4)
-  {
-    sdfFilename = _filename.substr(0, _filename.find(".sdf")) + ".sdf";
-    sdfFilename = find_file(sdfFilename);
-  }
-
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(filename) || xmlDoc.LoadFile(sdfFilename))
-  {
+  if (xmlDoc.LoadFile(filename))
     return initDoc(&xmlDoc, _sdf);
-  }
   else
-    gzerr << "Unable to load file[" << _filename << "]\n";
+    gzerr << "Unable to load file[" << filename << "]\n";
 
   return false;
 }
@@ -341,12 +323,8 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
 
   // check sdf version, use old parser if necessary
   TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
-
-  if (!sdfNode && _xmlDoc->FirstChildElement("sdf"))
-  {
-    Converter::Convert(_xmlDoc, SDF::version);
-    sdfNode = _xmlDoc->FirstChildElement("sdf");
-  }
+  if (!sdfNode)
+    sdfNode = _xmlDoc->FirstChildElement("gazebo");
 
   if (sdfNode && sdfNode->Attribute("version"))
   {
@@ -396,12 +374,8 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
 
   /* check gazebo version, use old parser if necessary */
   TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
-
-  if (!sdfNode && _xmlDoc->FirstChildElement("sdf"))
-  {
-    Converter::Convert(_xmlDoc, SDF::version);
-    sdfNode = _xmlDoc->FirstChildElement("sdf");
-  }
+  if (!sdfNode)
+    sdfNode = _xmlDoc->FirstChildElement("gazebo");
 
   if (sdfNode && sdfNode->Attribute("version"))
   {
@@ -590,11 +564,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             else
             {
               TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
-              if (!sdfXML)
-              {
-                sdfXML =  modelXML->FirstChildElement("sdf");
-              }
-
               TiXmlElement *sdfSearch = sdfXML;
 
               // Find the SDF element that matches our current SDF version.
