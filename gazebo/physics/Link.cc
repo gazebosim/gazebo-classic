@@ -61,14 +61,14 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  std::vector<Entity*>::iterator iter;
+  std::vector<std::string>::iterator iter;
 
   this->attachedModels.clear();
 
-  for (unsigned int i = 0; i < this->visuals.size(); i++)
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
   {
     msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
+    msg.set_name(*iter);
     if (this->parent)
       msg.set_parent_name(this->parent->GetScopedName());
     else
@@ -78,12 +78,12 @@ Link::~Link()
   }
   this->visuals.clear();
 
-  if (this->cgVisuals.size() > 0)
+  if (!this->cgVisuals.empty())
   {
-    for (unsigned int i = 0; i < this->cgVisuals.size(); i++)
+    for (iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
     {
       msgs::Visual msg;
-      msg.set_name(this->cgVisuals[i]);
+      msg.set_name(*iter);
       if (this->parent)
         msg.set_parent_name(this->parent->GetScopedName());
       else

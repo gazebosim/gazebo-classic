@@ -1271,7 +1271,7 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->deleteEntity.empty())
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
@@ -1775,7 +1775,6 @@ void World::ProcessMessages()
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-    msgs::Pose *poseMsg;
 
     if (this->posePub && this->posePub->HasConnections() &&
         this->publishModelPoses.size() > 0)
@@ -1788,7 +1787,7 @@ void World::ProcessMessages()
       for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
           iter != this->publishModelPoses.end(); ++iter)
       {
-        poseMsg = msg.add_pose();
+        msgs::Pose *poseMsg = msg.add_pose();
 
         // Publish the model's relative pose
         poseMsg->set_name((*iter)->GetScopedName());

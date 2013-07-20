@@ -19,8 +19,6 @@
  * Date: 19 Jun 2008
  */
 
-#include <sstream>
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -50,8 +48,6 @@ using namespace rendering;
 UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
-  std::stringstream stream;
-
   this->gui = new GUIOverlay();
 
   this->orbitViewController = NULL;

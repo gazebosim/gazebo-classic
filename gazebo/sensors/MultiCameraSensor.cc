@@ -186,7 +186,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
-  if (this->cameras.size() == 0)
+  if (this->cameras.empty())
     return;
 
   bool publish = this->imagePub->HasConnections();
