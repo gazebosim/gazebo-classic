@@ -306,6 +306,8 @@ void SimbodyPhysics::UpdatePhysics()
     }
   }
 
+  // FIXME:  this needs to happen before forces are applied for the next step
+  // FIXME:  but after we've gotten everything from current state
   this->discreteForces.clearAllForces(this->integ->updAdvancedState());
 }
 
@@ -686,10 +688,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 direction);
             mobod = pinJoint;
 
-            gzdbg << "Setting limitForce for [" << gzJoint->GetName()
-                  << "]\n";
+            gzdbg << "Setting limitForce for [" << gzJoint->GetName() << "]\n";
+
             double low = gzJoint->GetLowerLimit(0u).Radian();
             double high = gzJoint->GetUpperLimit(0u).Radian();
+
+            /// \TODO: make stop stiffness, damping with parameters
+            /// FIXME: remove hardcoded values.
             gzJoint->limitForce.reset(
               new Force::MobilityLinearStop(this->forces, mobod,
               SimTK::MobilizerQIndex(0), 1.0e8, 1.0, low, high));
