@@ -36,6 +36,8 @@ GpsSensor::GpsSensor()
 {
   this->horizontalPositionNoise = NoisePtr(new Noise());
   this->verticalPositionNoise = NoisePtr(new Noise());
+  this->horizontalVelocityNoise = NoisePtr(new Noise());
+  this->verticalVelocityNoise = NoisePtr(new Noise());
 }
 
 /////////////////////////////////////////////////
@@ -43,6 +45,8 @@ GpsSensor::~GpsSensor()
 {
   this->horizontalPositionNoise.reset();
   this->verticalPositionNoise.reset();
+  this->horizontalVelocityNoise.reset();
+  this->verticalVelocityNoise.reset();
 }
 
 /////////////////////////////////////////////////
@@ -56,8 +60,10 @@ void GpsSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->parentEntity = this->world->GetEntity(this->parentName);
-  this->lastGpsMsg.set_entity_name(this->parentName);
+  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+
+  this->lastGpsMsg.set_link_name(this->parentName);
 
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
@@ -70,18 +76,38 @@ void GpsSensor::Load(const std::string &_worldName)
   sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
   if (gpsElem)
   {
-    sdf::ElementPtr posElem = gpsElem->GetElement("position");
-    if (posElem)
+    // Load Position noise parameters
     {
+      sdf::ElementPtr posElem = gpsElem->GetElement("position");
+      if (posElem)
       {
-        sdf::ElementPtr horElem = posElem->GetElement("horizontal");
-        if (horElem)
-          this->horizontalPositionNoise->Load(horElem->GetElement("noise"));
+        {
+          sdf::ElementPtr horElem = posElem->GetElement("horizontal");
+          if (horElem)
+            this->horizontalPositionNoise->Load(horElem->GetElement("noise"));
+        }
+        {
+          sdf::ElementPtr vertElem = posElem->GetElement("vertical");
+          if (vertElem)
+            this->verticalPositionNoise->Load(vertElem->GetElement("noise"));
+        }
       }
+    }
+    // Load Velocity noise parameters
+    {
+      sdf::ElementPtr posElem = gpsElem->GetElement("velocity");
+      if (posElem)
       {
-        sdf::ElementPtr vertElem = posElem->GetElement("vertical");
-        if (vertElem)
-          this->verticalPositionNoise->Load(vertElem->GetElement("noise"));
+        {
+          sdf::ElementPtr horElem = posElem->GetElement("horizontal");
+          if (horElem)
+            this->horizontalVelocityNoise->Load(horElem->GetElement("noise"));
+        }
+        {
+          sdf::ElementPtr vertElem = posElem->GetElement("vertical");
+          if (vertElem)
+            this->verticalVelocityNoise->Load(vertElem->GetElement("noise"));
+        }
       }
     }
   }
@@ -91,7 +117,7 @@ void GpsSensor::Load(const std::string &_worldName)
 void GpsSensor::Fini()
 {
   Sensor::Fini();
-  this->parentEntity.reset();
+  this->parentLink.reset();
   this->sphericalCoordinates.reset();
 }
 
@@ -107,19 +133,43 @@ void GpsSensor::Init()
 void GpsSensor::UpdateImpl(bool /*_force*/)
 {
   // Get latest pose information
-  if (this->parentEntity)
+  if (this->parentLink)
   {
-    math::Pose gpsPose = this->pose + this->parentEntity->GetWorldPose();
+    // Measure position and apply noise
+    {
+      // Get postion in Cartesian gazebo frame
+      math::Pose gpsPose = this->pose + this->parentLink->GetWorldPose();
 
-    // Apply position noise
-    gpsPose.pos.x = this->horizontalPositionNoise->Apply(gpsPose.pos.x);
-    gpsPose.pos.y = this->horizontalPositionNoise->Apply(gpsPose.pos.y);
-    gpsPose.pos.z = this->verticalPositionNoise->Apply(gpsPose.pos.z);
+      // Apply position noise before converting to global frame
+      gpsPose.pos.x = this->horizontalPositionNoise->Apply(gpsPose.pos.x);
+      gpsPose.pos.y = this->horizontalPositionNoise->Apply(gpsPose.pos.y);
+      gpsPose.pos.z = this->verticalPositionNoise->Apply(gpsPose.pos.z);
 
-    math::Vector3 spherical = this->sphericalCoordinates->Convert(gpsPose.pos);
-    this->lastGpsMsg.set_latitude_deg(spherical.x);
-    this->lastGpsMsg.set_longitude_deg(spherical.y);
-    this->lastGpsMsg.set_altitude(spherical.z);
+      // Convert to global frames
+      math::Vector3 spherical = this->sphericalCoordinates->
+        SphericalFromLocal(gpsPose.pos);
+      this->lastGpsMsg.set_latitude_deg(spherical.x);
+      this->lastGpsMsg.set_longitude_deg(spherical.y);
+      this->lastGpsMsg.set_altitude(spherical.z);
+    }
+
+    // Measure velocity and apply noise
+    {
+      math::Vector3 gpsVelocity =
+        this->parentLink->GetWorldLinearVel(this->pose.pos);
+
+      // Convert to global frame
+      gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
+
+      // Apply noise after converting to global frame
+      gpsVelocity.x = this->horizontalVelocityNoise->Apply(gpsVelocity.x);
+      gpsVelocity.y = this->horizontalVelocityNoise->Apply(gpsVelocity.y);
+      gpsVelocity.z = this->verticalVelocityNoise->Apply(gpsVelocity.z);
+
+      this->lastGpsMsg.set_velocity_east(gpsVelocity.x);
+      this->lastGpsMsg.set_velocity_north(gpsVelocity.y);
+      this->lastGpsMsg.set_velocity_up(gpsVelocity.z);
+    }
   }
   this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->lastGpsMsg.mutable_time(), this->lastMeasurementTime);

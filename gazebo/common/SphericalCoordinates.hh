@@ -67,7 +67,14 @@ namespace gazebo
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      public: math::Vector3 Convert(const math::Vector3 &_xyz) const;
+      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz)
+              const;
+
+      /// \brief Convert a Cartesian velocity vector in the local gazebo frame
+      ///        to a global Cartesian frame with components East, North, Up.
+      /// \return Rotated vector with components (x,y,z): (East, North, Up).
+      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
+              const;
 
       // TODO: finish doxygen comments
       /// \brief Convert a string to a SurfaceType.

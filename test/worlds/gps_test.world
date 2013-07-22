@@ -15,6 +15,7 @@
       <surface_model>EARTH_WGS84</surface_model>
       <latitude_deg>37.4</latitude_deg>
       <longitude_deg>-122.1</longitude_deg>
+      <elevation>0.0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
 
@@ -75,6 +76,26 @@
                 </noise>
               </vertical>
             </position>
+            <velocity>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity>
           </gps>
         </sensor>
       </link>
@@ -137,6 +158,26 @@
                 </noise>
               </vertical>
             </position>
+            <velocity>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity> 
           </gps>
         </sensor>
       </link>

@@ -99,7 +99,7 @@ double Noise::Apply(double _in)
       // Apply this->precision
       if (!math::equal(this->precision, 0.0, 1e-6))
       {
-        output = boost::math::round(output * this->precision) / this->precision;
+        output = boost::math::round(output / this->precision) * this->precision;
       }
     }
   }

@@ -67,14 +67,20 @@ namespace gazebo
       /// \brief Noise attributes for vertical position measurement.
       private: NoisePtr verticalPositionNoise;
 
+      /// \brief Noise attributes for horizontal velocity measurement.
+      private: NoisePtr horizontalVelocityNoise;
+
+      /// \brief Noise attributes for vertical velocity measurement.
+      private: NoisePtr verticalVelocityNoise;
+
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;
 
       /// \brief Topic name for GPS data publisher.
       private: std::string topicName;
 
-      /// \brief Parent entity of this sensor.
-      private: physics::EntityPtr parentEntity;
+      /// \brief Parent link of this sensor.
+      private: physics::LinkPtr parentLink;
 
       /// \brief Pointer to SphericalCoordinates converter.
       private: common::SphericalCoordinatesPtr sphericalCoordinates;

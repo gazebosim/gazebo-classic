@@ -135,7 +135,8 @@ void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
+math::Vector3 SphericalCoordinates::SphericalFromLocal(
+                                      const math::Vector3 &_xyz) const
 {
   double radiusMeridional = 1.0;
   double radiusNormal = 1.0;
@@ -177,4 +178,15 @@ math::Vector3 SphericalCoordinates::Convert(const math::Vector3 &_xyz) const
   // altitude relative to sea level
   spherical.z = this->elevationReference + _xyz.z;
   return spherical;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
+  const
+{
+  double headingSine = sin(this->headingOffset.Radian());
+  double headingCosine = cos(this->headingOffset.Radian());
+  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
+  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
+  return math::Vector3(east, north, _xyz.z);
 }
