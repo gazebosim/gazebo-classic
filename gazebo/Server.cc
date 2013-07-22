@@ -95,9 +95,9 @@ bool Server::ParseArgs(int argc, char **argv)
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
-     "Compression encoding format for log data.")
+     "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
-     "Aboslute path in which to store state data")
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
