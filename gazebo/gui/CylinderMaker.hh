@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "math/Vector2i.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {

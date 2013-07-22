@@ -29,6 +29,7 @@ set (sources
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
+  KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
   MeshMaker.cc
@@ -68,6 +69,7 @@ set (headers
   EntityMaker.hh
   Gui.hh
   GuiEvents.hh
+  KeyEventHandler.hh
   LightMaker.hh
   MeshMaker.hh
   MouseEventHandler.hh
@@ -143,7 +145,7 @@ add_definitions(${QT_DEFINITIONS})
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(gui_headers
-    "GUI Headers" "#include \"gui/${hdr}\"\n")
+    "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 

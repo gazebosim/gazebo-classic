@@ -1,6 +1,4 @@
 include_directories(
-  ${PROJECT_BINARY_DIR}/gazebo
-  ${PROJECT_SOURCE_DIR}/gazebo
   ${PROTOBUF_INCLUDE_DIR}
 )
 
@@ -17,19 +15,21 @@ endif(HAVE_CONSOLE_BRIDGE)
 
 set (plugins
   CameraPlugin
-  DepthCameraPlugin
-  GpuRayPlugin
-  ContactPlugin
   CartTestPlugin
+  ContactPlugin
+  DepthCameraPlugin
+  DiffDrivePlugin
   ForceTorquePlugin
+  GpuRayPlugin
+  JointTrajectoryPlugin
   ModelTrajectoryTestPlugin
   MudPlugin
+  PressurePlugin
   RayPlugin
   RubblePlugin
-  SpringTestPlugin
-  DiffDrivePlugin
   SkidSteerDrivePlugin
-  JointTrajectoryPlugin
+  SonarPlugin
+  SpringTestPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})

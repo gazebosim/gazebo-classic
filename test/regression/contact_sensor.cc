@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 
 #define TOL 1e-4
@@ -201,23 +201,35 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         if (body1)
         {
-          actualForce.x = contacts[k].contact(i).wrench(j).body_1_force().x();
-          actualForce.y = contacts[k].contact(i).wrench(j).body_1_force().y();
-          actualForce.z = contacts[k].contact(i).wrench(j).body_1_force().z();
+          actualForce.x =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().x();
+          actualForce.y =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().y();
+          actualForce.z =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().z();
 
-          actualTorque.x = contacts[k].contact(i).wrench(j).body_1_torque().x();
-          actualTorque.y = contacts[k].contact(i).wrench(j).body_1_torque().y();
-          actualTorque.z = contacts[k].contact(i).wrench(j).body_1_torque().z();
+          actualTorque.x =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().x();
+          actualTorque.y =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().y();
+          actualTorque.z =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().z();
         }
         else
         {
-          actualForce.x = contacts[k].contact(i).wrench(j).body_2_force().x();
-          actualForce.y = contacts[k].contact(i).wrench(j).body_2_force().y();
-          actualForce.z = contacts[k].contact(i).wrench(j).body_2_force().z();
+          actualForce.x =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().x();
+          actualForce.y =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().y();
+          actualForce.z =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().z();
 
-          actualTorque.x = contacts[k].contact(i).wrench(j).body_2_torque().x();
-          actualTorque.y = contacts[k].contact(i).wrench(j).body_2_torque().y();
-          actualTorque.z = contacts[k].contact(i).wrench(j).body_2_torque().z();
+          actualTorque.x =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().x();
+          actualTorque.y =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().y();
+          actualTorque.z =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().z();
         }
 
         // Find the dominant force vector component and verify the value has
@@ -364,15 +376,21 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
       if (body1)
       {
-        actualTorque.x = contacts.contact(i).wrench(j).body_1_torque().x();
-        actualTorque.y = contacts.contact(i).wrench(j).body_1_torque().y();
-        actualTorque.z = contacts.contact(i).wrench(j).body_1_torque().z();
+        actualTorque.x =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().x();
+        actualTorque.y =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().y();
+        actualTorque.z =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().z();
       }
       else
       {
-        actualTorque.x = contacts.contact(i).wrench(j).body_2_torque().x();
-        actualTorque.y = contacts.contact(i).wrench(j).body_2_torque().y();
-        actualTorque.z = contacts.contact(i).wrench(j).body_2_torque().z();
+        actualTorque.x =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().x();
+        actualTorque.y =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().y();
+        actualTorque.z =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().z();
       }
       // contact sensor should have positive x torque and relatively large
       // compared to y and z

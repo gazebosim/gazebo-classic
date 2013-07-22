@@ -17,9 +17,9 @@
 #ifndef ENTITYMAKER_HH
 #define ENTITYMAKER_HH
 
-#include "rendering/RenderTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "math/Vector3.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

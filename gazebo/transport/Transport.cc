@@ -19,10 +19,10 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
-#include "transport/Subscriber.hh"
-#include "transport/ConnectionManager.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/transport/ConnectionManager.hh"
 #include "Transport.hh"
 
 using namespace gazebo;
@@ -35,8 +35,6 @@ bool g_minimalComms = false;
 
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
-
-#define DEFAULT_MASTER_PORT 11345
 
 /////////////////////////////////////////////////
 void dummy_callback_fn(uint32_t)
@@ -52,8 +50,8 @@ bool transport::get_master_uri(std::string &_masterHost,
   // Set to default host and port
   if (!charURI || strlen(charURI) == 0)
   {
-    _masterHost = "localhost";
-    _masterPort = DEFAULT_MASTER_PORT;
+    _masterHost = GAZEBO_DEFAULT_MASTER_HOST;
+    _masterPort = GAZEBO_DEFAULT_MASTER_PORT;
     return false;
   }
 
@@ -66,8 +64,9 @@ bool transport::get_master_uri(std::string &_masterHost,
   if (lastColon == std::string::npos)
   {
     gzerr << "Port missing in master URI[" << masterURI
-          << "]. Using default value of " << DEFAULT_MASTER_PORT << ".\n";
-    _masterPort = DEFAULT_MASTER_PORT;
+          << "]. Using default value of " << GAZEBO_DEFAULT_MASTER_PORT
+          << ".\n";
+    _masterPort = GAZEBO_DEFAULT_MASTER_PORT;
   }
   else
   {

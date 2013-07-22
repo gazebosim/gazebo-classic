@@ -22,7 +22,9 @@
 #ifndef SDF_PARAM_HH
 #define SDF_PARAM_HH
 
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/lexical_cast.hpp>
+#endif
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
@@ -31,14 +33,14 @@
 #include <string>
 #include <vector>
 
-#include "common/Console.hh"
-#include "common/Color.hh"
-#include "common/Time.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2i.hh"
-#include "math/Vector2d.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace sdf
 {

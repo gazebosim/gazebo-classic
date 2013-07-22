@@ -15,16 +15,16 @@
  *
 */
 
-#include "common/Events.hh"
+#include "gazebo/common/Events.hh"
 
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-#include "physics/Contact.hh"
-#include "physics/Model.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Gripper.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Gripper.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -145,19 +145,20 @@ void Gripper::HandleAttach()
 
   for (unsigned int i = 0; i < this->contacts.size(); ++i)
   {
-    std::string name1 = this->contacts[i].collision1;
-    std::string name2 = this->contacts[i].collision2;
+    std::string name1 = this->contacts[i].collision1->GetScopedName();
+    std::string name2 = this->contacts[i].collision2->GetScopedName();
 
     if (this->collisions.find(name1) == this->collisions.end())
     {
       cc[name1] = boost::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(this->contacts[i].collision1));
+          this->world->GetEntity(name1));
       contactCounts[name1] += 1;
     }
+
     if (this->collisions.find(name2) == this->collisions.end())
     {
       cc[name2] = boost::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(this->contacts[i].collision2));
+          this->world->GetEntity(name2));
       contactCounts[name2] += 1;
     }
   }
@@ -212,10 +213,10 @@ void Gripper::OnContact(const std::string &/*_collisionName*/,
                         const physics::Contact &_contact)
 {
   CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1));
+        this->world->GetEntity(_contact.collision1->GetScopedName()));
 
   CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1));
+        this->world->GetEntity(_contact.collision2->GetScopedName()));
 
   if ((collision1 && collision1->IsStatic()) ||
       (collision2 && collision2->IsStatic()))

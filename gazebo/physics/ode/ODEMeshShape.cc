@@ -19,20 +19,20 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/Mesh.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODEMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
+ODEMeshShape::ODEMeshShape(CollisionPtr _parent) : MeshShape(_parent)
 {
   this->odeData = NULL;
   this->vertices = NULL;
@@ -40,7 +40,7 @@ ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
 }
 
 //////////////////////////////////////////////////
-ODETrimeshShape::~ODETrimeshShape()
+ODEMeshShape::~ODEMeshShape()
 {
   delete [] this->vertices;
   delete [] this->indices;
@@ -48,7 +48,7 @@ ODETrimeshShape::~ODETrimeshShape()
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Update()
+void ODEMeshShape::Update()
 {
   ODECollisionPtr ocollision =
     boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
@@ -89,15 +89,15 @@ void ODETrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
+void ODEMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  TrimeshShape::Load(_sdf);
+  MeshShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Init()
+void ODEMeshShape::Init()
 {
-  TrimeshShape::Init();
+  MeshShape::Init();
   if (!this->mesh)
     return;
 

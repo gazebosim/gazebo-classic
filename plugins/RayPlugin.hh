@@ -22,10 +22,10 @@
 #ifndef GAZEBO_RAY_PLUGIN_HH
 #define GAZEBO_RAY_PLUGIN_HH
 
-#include "common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/RaySensor.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/RaySensor.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
@@ -38,9 +38,8 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RayPlugin();
 
-    // update callback
+    /// \brief Update callback
     public: virtual void OnNewLaserScans();
-    private: event::ConnectionPtr newLaserScansConnection;
 
     /// \brief Load the plugin
     /// \param take in SDF root element
@@ -51,8 +50,9 @@ namespace gazebo
 
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
+
+    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    private: event::ConnectionPtr newLaserScansConnection;
   };
 }
-
 #endif
-

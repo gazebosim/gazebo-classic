@@ -19,38 +19,38 @@
  * Date: 21 May 2009
  */
 
-#include "common/Mesh.hh"
+#include "gazebo/common/Mesh.hh"
 
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletTrimeshShape.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletTrimeshShape::BulletTrimeshShape(CollisionPtr _parent)
-  : TrimeshShape(_parent)
+BulletMeshShape::BulletMeshShape(CollisionPtr _parent)
+  : MeshShape(_parent)
 {
 }
 
 
 //////////////////////////////////////////////////
-BulletTrimeshShape::~BulletTrimeshShape()
+BulletMeshShape::~BulletMeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-void BulletTrimeshShape::Load(sdf::ElementPtr _sdf)
+void BulletMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  TrimeshShape::Load(_sdf);
+  MeshShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void BulletTrimeshShape::Init()
+void BulletMeshShape::Init()
 {
-  TrimeshShape::Init();
+  MeshShape::Init();
 
   BulletCollisionPtr bParent =
     boost::static_pointer_cast<BulletCollision>(this->collisionParent);

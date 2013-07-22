@@ -15,8 +15,6 @@
  *
 */
 #include <urdf_parser/urdf_parser.h>
-#include <sdf/interface/parser_urdf.hh>
-#include <sdf/sdf.hh>
 
 #include <fstream>
 #include <sstream>
@@ -25,6 +23,8 @@
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/sdf/interface/parser_urdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace urdf2gazebo
 {
@@ -76,9 +76,10 @@ URDF2Gazebo::URDF2Gazebo()
     // default options
     this->enforceLimits = true;
     this->reduceFixedJoints = true;
+    this->initialRobotPoseValid = false;
 
     // for compatibility with old gazebo, consider changing to "_collision"
-    this->collisionExt = "_geom";
+    this->collisionExt = "_collision";
     this->visualExt = "_visual";
 }
 
@@ -280,18 +281,22 @@ void URDF2Gazebo::ParseRobotOrigin(TiXmlDocument &_urdfXml)
       originXml->Attribute("xyz"));
     urdf::Vector3 rpy = this->ParseVector3(originXml->Attribute("rpy"));
     this->initialRobotPose.rotation.setFromRPY(rpy.x, rpy.y, rpy.z);
+    this->initialRobotPoseValid = true;
   }
 }
 
 void URDF2Gazebo::InsertRobotOrigin(TiXmlElement *_elem)
 {
-  /* set transform */
-  double pose[6];
-  pose[0] = this->initialRobotPose.position.x;
-  pose[1] = this->initialRobotPose.position.y;
-  pose[2] = this->initialRobotPose.position.z;
-  this->initialRobotPose.rotation.getRPY(pose[3], pose[4], pose[5]);
-  this->AddKeyValue(_elem, "pose", this->Values2str(6, pose));
+  if (this->initialRobotPoseValid)
+  {
+    /* set transform */
+    double pose[6];
+    pose[0] = this->initialRobotPose.position.x;
+    pose[1] = this->initialRobotPose.position.y;
+    pose[2] = this->initialRobotPose.position.z;
+    this->initialRobotPose.rotation.getRPY(pose[3], pose[4], pose[5]);
+    this->AddKeyValue(_elem, "pose", this->Values2str(6, pose));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -509,7 +514,7 @@ void URDF2Gazebo::ParseGazeboExtension(TiXmlDocument &_urdfXml)
 
           std::ostringstream origStream;
           origStream << *childElem;
-          gzdbg << "extension [" << origStream.str() <<
+          gzlog << "extension [" << origStream.str() <<
                 "] not converted from URDF, probably already in SDF format.\n";
           xmlNewDoc.Parse(origStream.str().c_str());
 
@@ -1394,7 +1399,7 @@ void URDF2Gazebo::CreateLink(TiXmlElement *_root,
     _currentTransform = localTransform * _currentTransform;
   }
   else
-    gzdbg << "[" << _link->name << "] has no parent joint\n";
+    gzlog << "[" << _link->name << "] has no parent joint\n";
 
   // create origin tag for this element
   this->AddTransform(elem, _currentTransform);

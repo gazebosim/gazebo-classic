@@ -19,8 +19,6 @@ set (sources GazeboDriver.cc
 
 include_directories( 
   ${PLAYER_INCLUDE_DIRS} 
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${PROJECT_BINARY_DIR}/gazebo 
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}

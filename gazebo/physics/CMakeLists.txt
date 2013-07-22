@@ -37,7 +37,7 @@ set (sources
   SphereShape.cc
   State.cc
   SurfaceParams.cc
-  TrimeshShape.cc
+  MeshShape.cc
   World.cc
   WorldState.cc
 )
@@ -81,7 +81,7 @@ set (headers
   SphereShape.hh
   State.hh
   SurfaceParams.hh
-  TrimeshShape.hh
+  MeshShape.hh
   UniversalJoint.hh
   World.hh
   WorldState.hh)
@@ -89,7 +89,7 @@ set (headers
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers
-    "Physics Headers" "#include \"physics/${hdr}\"\n")
+    "Physics Headers" "#include \"gazebo/physics/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)

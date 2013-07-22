@@ -32,6 +32,7 @@
 
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
@@ -126,6 +127,13 @@ void GpuRaySensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void GpuRaySensor::Init()
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "Unable to create GpuRaySensor. Rendering is disabled.\n";
+    return;
+  }
+
   std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
