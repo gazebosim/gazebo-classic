@@ -170,15 +170,6 @@ bool LogPlay::Step(std::string &_data)
 
   if (start == std::string::npos || end == std::string::npos)
   {
-    startMarker = "<sdf ";
-    endMarker = "</sdf>";
-
-    start = this->currentChunk.find(startMarker);
-    end = this->currentChunk.find(endMarker);
-  }
-
-  if (start == std::string::npos || end == std::string::npos)
-  {
     this->currentChunk.clear();
 
     if (this->logCurrXml == this->logStartXml)

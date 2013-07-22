@@ -694,7 +694,6 @@ namespace gazebo
         skyMsg->set_time(_sdf->GetElement("sky")->Get<double>("time"));
         skyMsg->set_sunrise(_sdf->GetElement("sky")->Get<double>("sunrise"));
         skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
 
         if (_sdf->GetElement("sky")->HasElement("clouds"))
         {
