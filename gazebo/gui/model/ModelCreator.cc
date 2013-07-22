@@ -55,6 +55,7 @@ ModelCreator::ModelCreator()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->jointMaker = new JointMaker();
 
@@ -351,6 +352,7 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
+  event::Events::setSelectedEntity("", "normal");
   this->Reset();
   this->CreateTheEntity();
 //  this->Stop();

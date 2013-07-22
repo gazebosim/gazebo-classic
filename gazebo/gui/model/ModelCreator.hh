@@ -220,6 +220,10 @@ namespace gazebo
       /// created.
       private: transport::PublisherPtr makerPub;
 
+      /// \brief Publisher that publishes delete entity msg to remove the
+      /// editor visual.
+      private: transport::PublisherPtr requestPub;
+
       /// \brief Joint maker.
       private: JointMaker *jointMaker;
     };

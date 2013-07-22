@@ -207,8 +207,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
-
-
   this->modelCreator = new ModelCreator();
 
   connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
