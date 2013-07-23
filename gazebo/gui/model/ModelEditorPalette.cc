@@ -50,18 +50,44 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
-/*  QFrame *frame = new QFrame;
-  QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frame->setLayout(frameLayout);*/
-//  mainLayout->addWidget(this->modelTreeWidget);
-
   // Create a top-level tree item for the path
   this->modelSettingsItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Model Settings")));
   this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+
+  QTreeWidgetItem *modelSettingsChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->modelSettingsItem->addChild(modelSettingsChildItem);
+
+  QWidget *modelSettingsWidget = new QWidget;
+  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
+  QGridLayout *dynamicsLayout = new QGridLayout;
+
+  QLabel *staticLabel = new QLabel(tr("Static:"));
+  this->staticCheck = new QCheckBox;
+  this->staticCheck->setText(tr("False"));
+  this->staticCheck->setChecked(false);
+  connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
+
+  QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
+  this->autoDisableCheck = new QCheckBox;
+  this->autoDisableCheck->setText(tr("True"));
+  this->autoDisableCheck->setChecked(true);
+  connect(this->autoDisableCheck, SIGNAL(clicked()), this,
+      SLOT(OnAutoDisable()));
+
+  dynamicsLayout->addWidget(staticLabel, 0, 0);
+  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
+  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
+  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
+
+  modelSettingsLayout->addLayout(dynamicsLayout);
+  modelSettingsWidget->setLayout(modelSettingsLayout);
+  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
+    modelSettingsWidget);
+  this->modelSettingsItem->setExpanded(true);
+  modelSettingsChildItem->setExpanded(true);
 
   this->modelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
@@ -358,6 +384,21 @@ void ModelEditorPalette::OnPartAdded()
   this->partsButtonGroup->setExclusive(true);
 }
 
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnAutoDisable()
+{
+  std::string text = this->autoDisableCheck->isChecked() ? "True" : "False";
+  this->autoDisableCheck->setText(tr(text.c_str()));
+  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnStatic()
+{
+  std::string text = this->staticCheck->isChecked() ? "True" : "False";
+  this->staticCheck->setText(tr(text.c_str()));
+  this->modelCreator->SetStatic(this->staticCheck->isChecked());
+}
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSave()
@@ -384,6 +425,17 @@ void ModelEditorPalette::OnDiscard()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnDone()
 {
-  this->OnSave();
-  this->modelCreator->FinishModel();
+  SaveDialog saveDialog;
+  saveDialog.SetSaveName(this->modelCreator->GetModelName());
+  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
+  if (saveDialog.exec() == QDialog::Accepted)
+  {
+    this->modelName = saveDialog.GetSaveName();
+    this->saveLocation = saveDialog.GetSaveLocation();
+    this->modelCreator->SetModelName(this->modelName);
+    this->modelCreator->GenerateSDF();
+    this->modelCreator->SaveToSDF(this->saveLocation);
+    this->modelCreator->FinishModel();
+  }
+
 }

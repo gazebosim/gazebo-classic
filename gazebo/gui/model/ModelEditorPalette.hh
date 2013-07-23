@@ -109,6 +109,12 @@ namespace gazebo
       /// \brief Qt callback when a part has been added.
       private slots: void OnPartAdded();
 
+      /// \brief Qt callback when the model is to be made static.
+      private slots: void OnStatic();
+
+      /// \brief Qt callback when the model is allowed to auto disable at rest.
+      private slots: void OnAutoDisable();
+
       /// \brief Qt callback when the model is to be saved.
       private slots: void OnSave();
 
@@ -151,6 +157,12 @@ namespace gazebo
       /// \brief Name of model being edited.
       private: std::string modelName;
 
+      /// \brief Static checkbox, true to create a static model.
+      private: QCheckBox *staticCheck;
+
+      /// \brief Auto disable checkbox, true to allow model to auto-disable at
+      /// rest.
+      private: QCheckBox *autoDisableCheck;
     };
   }
 }

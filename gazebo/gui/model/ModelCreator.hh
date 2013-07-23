@@ -119,6 +119,14 @@ namespace gazebo
       /// \param[in] _partName Name of the part to remove
       public: void RemovePart(const std::string &_partName);
 
+      /// \brief Set the model to be static
+      /// \param[in] _static True to make the model static.
+      public: void SetStatic(bool _static);
+
+      /// \brief Set the model to allow auto disable at rest.
+      /// \param[in] _auto True to allow the model to auto disable.
+      public: void SetAutoDisable(bool _auto);
+
       /// \brief Save model to SDF format.
       /// \param[in] _savePath Path to save the SDF to.
       public: void SaveToSDF(const std::string &_savePath);
@@ -191,6 +199,12 @@ namespace gazebo
 
       /// \brief The pose of the model.
       private: math::Pose modelPose;
+
+      /// \brief True to create a static model.
+      private: bool isStatic;
+
+      /// \brief True to auto disable model when it is at rest.
+      private: bool autoDisable;
 
       /// \brief A list of gui editor events connected to the model creator.
       private: std::vector<event::ConnectionPtr> connections;

@@ -295,6 +295,9 @@ void ModelCreator::Reset()
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
+  this->isStatic = false;
+  this->autoDisable = true;
+
   while (this->allParts.size() > 0)
     this->RemovePart(this->allParts.begin()->first);
   this->allParts.clear();
@@ -336,6 +339,18 @@ void ModelCreator::SetModelName(const std::string &_modelName)
 std::string ModelCreator::GetModelName() const
 {
   return this->modelName;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetStatic(bool _static)
+{
+  this->isStatic = _static;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::SetAutoDisable(bool _auto)
+{
+  this->autoDisable = _auto;
 }
 
 /////////////////////////////////////////////////
@@ -542,7 +557,7 @@ void ModelCreator::GenerateSDF()
 
   boost::unordered_map<std::string, rendering::VisualPtr>::iterator partsIt;
 
-  // loop through all parts
+  // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
       ++partsIt)
   {
@@ -602,14 +617,20 @@ void ModelCreator::GenerateSDF()
     geomElem->InsertElement(geomElemClone->GetFirstElement());
   }
 
+  // Add joints sdf
   this->jointMaker->GenerateSDF();
   sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
-  sdf::ElementPtr jointElem = jointsElem->GetElement("joint");
+  sdf::ElementPtr jointElem;
+  if (jointsElem->HasElement("joint"))
+    jointElem = jointsElem->GetElement("joint");
   while (jointElem)
   {
     modelElem->InsertElement(jointElem);
     jointElem = jointElem->GetNextElement("joint");
   }
-//  (modelElem->AddElement("static"))->Set("true");
+
+  // Model settings
+  modelElem->GetElement("static")->Set(this->isStatic);
+  modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 //   qDebug() << this->modelSDF->ToString().c_str();
 }
