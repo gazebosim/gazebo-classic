@@ -150,6 +150,7 @@ macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
     string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+    set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
@@ -198,14 +199,14 @@ macro (gz_build_tests)
     endif()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
+	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
@@ -233,6 +234,7 @@ if (VALID_DISPLAY)
    foreach(QTEST_SOURCE_file ${ARGN})
      string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
      string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
+     set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
      QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
      add_executable(${BINARY_NAME}
@@ -284,14 +286,14 @@ if (VALID_DISPLAY)
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	-xml -o ${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
+	-xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
     endforeach()
   endmacro()
 endif()
