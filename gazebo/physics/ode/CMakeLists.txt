@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+
 link_directories(
   ${CCD_LIBRARY_DIRS}
 )
@@ -51,7 +52,13 @@ set (gtest_sources
 gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_physics_ode ${sources})
-target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+target_link_libraries(gazebo_physics_ode
+  gazebo_ode
+  gazebo_opcode
+  gazebo_math
+  gazebo_common
+  ${TBB_LIBRARIES}
+)
 
 gz_install_library(gazebo_physics_ode)
 
