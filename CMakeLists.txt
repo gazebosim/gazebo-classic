@@ -212,7 +212,7 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "Release" CACHE STRING 
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING 
         "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with 
