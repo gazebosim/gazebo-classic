@@ -403,14 +403,6 @@ void ModelCreator::AddPart(PartType _type)
   this->addPartType = _type;
   if (_type != PART_NONE)
   {
-    // Add an event filter, which allows the TerrainEditor to capture
-    // mouse events.
-/*    MouseEventHandler::Instance()->AddPressFilter("model_part",
-        boost::bind(&ModelCreator::OnMousePressPart, this, _1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("model_part",
-        boost::bind(&ModelCreator::OnMouseMovePart, this, _1));*/
-
     switch (_type)
     {
       case PART_BOX:
@@ -434,9 +426,6 @@ void ModelCreator::AddPart(PartType _type)
   }
   else
   {
-    // Remove the event filters.
-//    MouseEventHandler::Instance()->RemovePressFilter("model_part");
-//    MouseEventHandler::Instance()->RemoveMoveFilter("model_part");
   }
 }
 
@@ -612,6 +601,15 @@ void ModelCreator::GenerateSDF()
     geomElem->ClearElements();
     geomElem->InsertElement(geomElemClone->GetFirstElement());
   }
+
+  this->jointMaker->GenerateSDF();
+  sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
+  sdf::ElementPtr jointElem = jointsElem->GetElement("joint");
+  while (jointElem)
+  {
+    modelElem->InsertElement(jointElem);
+    jointElem = jointElem->GetNextElement("joint");
+  }
 //  (modelElem->AddElement("static"))->Set("true");
-  // qDebug() << this->modelSDF->ToString().c_str();
+//   qDebug() << this->modelSDF->ToString().c_str();
 }

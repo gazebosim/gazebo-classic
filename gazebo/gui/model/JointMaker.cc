@@ -42,6 +42,8 @@ JointMaker::JointMaker()
 
   this->newJointCreated = false;
   this->mouseJoint = NULL;
+  this->modelSDF.reset();
+  this->jointCounter = 0;
 
   this->jointMaterials[JOINT_FIXED] = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE] = "Gazebo/Orange";
@@ -133,9 +135,10 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
+      std::stringstream ss;
+      ss << this->selectedVis->GetName() << "_JOINT_" << this->jointCounter++;
       rendering::VisualPtr jointVis(
-          new rendering::Visual(this->selectedVis->GetName() +
-          "_JOINT_", this->selectedVis));
+          new rendering::Visual(ss.str(), this->selectedVis));
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -370,9 +373,10 @@ void JointMaker::GenerateSDF()
 
   this->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->modelSDF);
-//  jointSdf.reset(new sdf::Element);
 
   jointElem = this->modelSDF->GetElement("joint");
+  jointElem = jointElem->Clone();
+  this->modelSDF->ClearElements();
 
   boost::unordered_map<std::string, JointData *>::iterator jointsIt;
   // loop through all parts
@@ -384,19 +388,27 @@ void JointMaker::GenerateSDF()
     jointElem->GetAttribute("name")->Set(joint->visual->GetName());
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
     parentElem = jointElem->GetElement("parent");
-    parentElem->Set(joint->parent->GetName());
+    parentElem->Set(joint->parent->GetParent()->GetName());
     childElem = jointElem->GetElement("child");
-    parentElem->Set(joint->child->GetName());
+    childElem->Set(joint->child->GetParent()->GetName());
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
       std::stringstream ss;
-      ss << "axis" << (i+1);
+      ss << "axis";
+      if (i > 0)
+        ss << (i+1);
       axisElem[i] = jointElem->GetElement(ss.str());
       axisElem[i]->Set(joint->axis[i]);
     }
     this->modelSDF->InsertElement(jointElem->Clone());
   }
+}
+
+/////////////////////////////////////////////////
+sdf::ElementPtr JointMaker::GetSDF() const
+{
+  return this->modelSDF;
 }
 
 /////////////////////////////////////////////////

@@ -90,6 +90,9 @@ namespace gazebo
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
 
+      /// \brief Generate SDF for all joints.
+      public: sdf::ElementPtr GetSDF() const;
+
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
       public: static int GetJointAxisCount(JointMaker::JointType _type);
@@ -163,6 +166,9 @@ namespace gazebo
 
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
+
+      /// \brief Counter for the number of joints in the model.
+      private: int jointCounter;
     };
     /// \}
 
