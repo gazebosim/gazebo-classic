@@ -215,12 +215,12 @@ void World::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
-        spherical->GetValueString("surface_model"));
+        spherical->Get<std::string>("surface_model"));
     math::Angle latitude, longitude, heading;
-    double elevation = spherical->GetValueDouble("elevation");
-    latitude.SetFromDegree(spherical->GetValueDouble("latitude_deg"));
-    longitude.SetFromDegree(spherical->GetValueDouble("longitude_deg"));
-    heading.SetFromDegree(spherical->GetValueDouble("heading_deg"));
+    double elevation = spherical->Get<double>("elevation");
+    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
+    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
+    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
       
     this->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));

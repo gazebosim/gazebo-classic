@@ -19,6 +19,8 @@
 #include <boost/math/special_functions/round.hpp>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/sensors/Noise.hh"
@@ -46,7 +48,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
-  std::string type = this->sdf->GetValueString("type");
+  std::string type = this->sdf->Get<std::string>("type");
   if (type == "none")
     this->noiseType = NONE;
   else if (type == "gaussian")
@@ -63,11 +65,11 @@ void Noise::Load(sdf::ElementPtr _sdf)
   if (this->noiseType == GAUSSIAN ||
       this->noiseType == GAUSSIAN_QUANTIZED)
   {
-    this->mean = this->sdf->GetValueDouble("mean");
-    this->stdDev = this->sdf->GetValueDouble("stddev");
+    this->mean = this->sdf->Get<double>("mean");
+    this->stdDev = this->sdf->Get<double>("stddev");
     // Sample the bias
-    double biasMean = this->sdf->GetValueDouble("bias_mean");
-    double biasStdDev = this->sdf->GetValueDouble("bias_stddev");
+    double biasMean = this->sdf->Get<double>("bias_mean");
+    double biasStdDev = this->sdf->Get<double>("bias_stddev");
     this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
     // With equal probability, we pick a negative bias (by convention,
     // rateBiasMean should be positive, though it would work fine if
@@ -80,7 +82,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
   }
 
   if (this->noiseType == GAUSSIAN_QUANTIZED)
-    this->precision = this->sdf->GetValueDouble("precision");
+    this->precision = this->sdf->Get<double>("precision");
 }
 
 //////////////////////////////////////////////////

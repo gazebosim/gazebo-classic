@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 namespace gazebo
 {

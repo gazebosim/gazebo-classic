@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/common/CommonTypes.hh"
