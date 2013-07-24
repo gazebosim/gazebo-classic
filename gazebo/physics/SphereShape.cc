@@ -38,7 +38,7 @@ SphereShape::~SphereShape()
 //////////////////////////////////////////////////
 void SphereShape::Init()
 {
-  this->SetRadius(this->sdf->GetValueDouble("radius"));
+  this->SetRadius(this->sdf->Get<double>("radius"));
 }
 
 //////////////////////////////////////////////////
@@ -50,7 +50,7 @@ void SphereShape::SetRadius(double _radius)
 //////////////////////////////////////////////////
 double SphereShape::GetRadius() const
 {
-  return this->sdf->GetValueDouble("radius");
+  return this->sdf->Get<double>("radius");
 }
 
 //////////////////////////////////////////////////

@@ -123,6 +123,14 @@ namespace gazebo
       public: std::string CreateFilter(const std::string &_topic,
                   const std::vector<std::string> &_collisions);
 
+      /// \brief Create a filter for contacts. A new publisher will be created
+      /// that publishes contacts associated to the input collision.
+      /// param[in] _name Filter name.
+      /// param[in] _collision A collision name used for filtering.
+      /// \return New topic where filtered messages will be published to.
+      public: std::string CreateFilter(const std::string &_topic,
+                  const std::string &_collision);
+
       private: std::vector<Contact*> contacts;
 
       private: unsigned int contactIndex;

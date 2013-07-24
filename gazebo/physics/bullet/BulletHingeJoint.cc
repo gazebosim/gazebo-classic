@@ -156,8 +156,8 @@ void BulletHingeJoint::Init()
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
-    this->angleOffset + limitElem->GetValueDouble("lower"),
-    this->angleOffset + limitElem->GetValueDouble("upper"));
+    this->angleOffset + limitElem->Get<double>("lower"),
+    this->angleOffset + limitElem->Get<double>("upper"));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");

@@ -18,7 +18,9 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
-#include "Server.hh"
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/Server.hh"
 #include "gazebo/gui/Gui.hh"
 
 bool sig_killed = false;

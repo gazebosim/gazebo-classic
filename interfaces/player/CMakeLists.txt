@@ -18,11 +18,15 @@ set (sources GazeboDriver.cc
              #ImuInterface.cc
 
 include_directories( 
+  ${SDF_INCLUDE_DIRS} 
   ${PLAYER_INCLUDE_DIRS} 
-  ${PROJECT_BINARY_DIR}/gazebo 
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+)
+
+link_directories( 
+  ${SDF_LIBRARY_DIRS} 
 )
 
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
