@@ -23,7 +23,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/transport/ConnectionManager.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
 
