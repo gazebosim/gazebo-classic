@@ -11,7 +11,7 @@ set (sources
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
-  Sensors.cc
+  SensorsIface.cc
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
@@ -29,7 +29,7 @@ set (headers
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
-  Sensors.hh
+  SensorsIface.hh
   Sensor.hh
   SensorTypes.hh
   SensorFactory.hh

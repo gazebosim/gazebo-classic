@@ -19,7 +19,7 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportIface.hh"
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 

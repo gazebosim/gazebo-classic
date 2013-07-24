@@ -34,7 +34,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"

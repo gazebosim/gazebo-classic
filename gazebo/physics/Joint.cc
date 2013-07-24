@@ -23,7 +23,7 @@
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
