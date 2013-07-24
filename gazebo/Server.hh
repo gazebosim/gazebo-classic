@@ -52,6 +52,10 @@ namespace gazebo
     public: void PrintUsage();
     public: bool ParseArgs(int argc, char **argv);
 
+    /// \brief Preload the server.
+    /// \return True if load was successfull.
+    public: bool PreLoad();
+
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.
     /// \param[in] _physics Type of physics engine to use (ode|bullet).
