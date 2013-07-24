@@ -39,7 +39,7 @@ set (sources
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
-  Rendering.cc
+  RenderingIface.cc
   Road2d.cc
   RFIDVisual.cc
   RFIDTagVisual.cc
@@ -80,7 +80,7 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
-  Rendering.hh
+  RenderingIface.hh
   RenderTypes.hh
   Road2d.hh
   RFIDVisual.hh

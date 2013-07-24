@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/physics/World.hh"

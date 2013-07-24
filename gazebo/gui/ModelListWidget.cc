@@ -30,7 +30,7 @@
 
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"

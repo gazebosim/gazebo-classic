@@ -24,7 +24,7 @@
 
 #include "gazebo/physics/PhysicsIface.hh"
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"

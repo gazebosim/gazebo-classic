@@ -24,7 +24,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/RenderEngine.hh"
