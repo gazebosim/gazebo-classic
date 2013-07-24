@@ -66,7 +66,6 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      ${ogre_ldflags}
                                      )
 
-add_executable(gzsensor server.cc ../gazebo.cc)
 target_link_libraries( gzsensor gazebo_common
                                 gazebo_transport
                                 gazebo_sensors
@@ -74,8 +73,5 @@ target_link_libraries( gzsensor gazebo_common
                                 gazebo_msgs
                                 pthread)
 
-gz_install_executable( gzsensor )
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
-
-manpage(gzsensor 1)
