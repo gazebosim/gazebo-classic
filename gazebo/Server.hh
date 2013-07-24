@@ -53,7 +53,7 @@ namespace gazebo
     public: bool ParseArgs(int argc, char **argv);
 
     /// \brief Preload the server.
-    /// \return True if load was successfull.
+    /// \return True if load was successful.
     public: bool PreLoad();
 
     /// \brief Load a world file and optionally override physics engine type.
