@@ -101,7 +101,7 @@ set (headers
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
-                          "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
+    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
@@ -114,7 +114,6 @@ gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
   gazebo_common 
-  gazebo_sdf_interface
   gazebo_skyx
   gazebo_selection_buffer
   ${ogre_libraries} 

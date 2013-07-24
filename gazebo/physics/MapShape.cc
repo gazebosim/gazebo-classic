@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -63,14 +64,14 @@ void MapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string imageFilename = _sdf->GetValueString("uri");
+  std::string imageFilename = _sdf->Get<std::string>("uri");
 
   // Make sure they are ok
-  if (_sdf->GetValueDouble("scale") <= 0)
+  if (_sdf->Get<double>("scale") <= 0)
     _sdf->GetElement("scale")->Set(0.1);
-  if (this->sdf->GetValueInt("threshold") <= 0)
+  if (this->sdf->Get<int>("threshold") <= 0)
     _sdf->GetElement("threshold")->Set(200);
-  if (this->sdf->GetValueDouble("height") <= 0)
+  if (this->sdf->Get<double>("height") <= 0)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
@@ -117,31 +118,31 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetScale() const
 {
-  return this->sdf->GetValueDouble("scale");
+  return this->sdf->Get<double>("scale");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
-  return this->sdf->GetValueInt("threshold");
+  return this->sdf->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
-  return this->sdf->GetValueDouble("height");
+  return this->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
-  return this->sdf->GetValueInt("granularity");
+  return this->sdf->Get<int>("granularity");
 }
 
 //////////////////////////////////////////////////
@@ -161,12 +162,12 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
-    float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
-    float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
-    float z = this->sdf->GetValueDouble("height") / 2.0;
-    float xSize = (node->width) * this->sdf->GetValueDouble("scale");
-    float ySize = (node->height) * this->sdf->GetValueDouble("scale");
-    float zSize = this->sdf->GetValueDouble("height");
+    float x = (node->x + node->width / 2.0) * this->sdf->Get<double>("scale");
+    float y = (node->y + node->height / 2.0) * this->sdf->Get<double>("scale");
+    float z = this->sdf->Get<double>("height") / 2.0;
+    float xSize = (node->width) * this->sdf->Get<double>("scale");
+    float ySize = (node->height) * this->sdf->Get<double>("scale");
+    float zSize = this->sdf->Get<double>("height");
 
     char collisionName[256];
     sprintf(collisionName, "map_collision_%d", collisionCounter++);
@@ -321,7 +322,7 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->sdf->GetValueInt("granularity"))
+      this->sdf->Get<int>("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -403,10 +404,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
-      // if (this->sdf->GetValueBool("negative"))
+      // if (this->sdf->Get<bool>("negative"))
         // v = 255 - v;
 
-      if (v > this->sdf->GetValueInt("threshold"))
+      if (v > this->sdf->Get<int>("threshold"))
         freePixels++;
       else
         occPixels++;
