@@ -469,6 +469,7 @@ int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   return 0;
 }
 
+
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {

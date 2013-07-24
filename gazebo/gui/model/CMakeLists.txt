@@ -6,9 +6,12 @@ set (sources
   ImportDialog.cc
   JointInspector.cc
   JointMaker.cc
-  ModelEditor.cc
   ModelCreator.cc
+#  ModelData.cc
+  ModelEditor.cc
   ModelEditorPalette.cc
+  PartGeneralTab.cc
+  PartInspector.cc
 )
 
 set (qt_headers
@@ -16,8 +19,11 @@ set (qt_headers
   JointInspector.hh
   JointMaker.hh
   ModelCreator.hh
+#  ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  PartGeneralTab.hh
+  PartInspector.hh
 )
 
 set (headers

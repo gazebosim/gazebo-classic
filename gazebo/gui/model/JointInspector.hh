@@ -20,8 +20,9 @@
 
 #include <string>
 
-#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model/JointMaker.hh"
+
 
 namespace gazebo
 {

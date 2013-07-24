@@ -23,11 +23,12 @@
 
 #include <boost/unordered/unordered_map.hpp>
 
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sdf/sdf.hh"
-#include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/gui/model/PartInspector.hh"
 
 namespace gazebo
 {
@@ -38,6 +39,8 @@ namespace gazebo
 
   namespace gui
   {
+    class PartData;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -160,8 +163,9 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
 
-      // Documentation inherited
-      public: virtual bool IsActive() const;
+      /// \brief Create part with default properties from a visual
+      /// \param[in] _visual Visual used to create the part.
+      private: void CreatePart(rendering::VisualPtr _visual);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -225,7 +229,7 @@ namespace gazebo
       private: PartType addPartType;
 
       /// \brief A map of model part names to and their visuals.
-      private: boost::unordered_map<std::string, rendering::VisualPtr> allParts;
+      private: boost::unordered_map<std::string, PartData *> allParts;
 
       /// \brief Transport node
       private: transport::NodePtr node;
@@ -242,6 +246,64 @@ namespace gazebo
       private: JointMaker *jointMaker;
     };
     /// \}
+
+    /// \class SensorData SensorData.hh
+    /// \brief Helper class to store sensor data
+    class SensorData
+    {
+      /// \brief Name of sensor.
+      public: std::string name;
+
+      /// \brief Type of sensor.
+      public: std::string type;
+
+      /// \brief Pose of sensor.
+      public: math::Vector3 pose;
+
+      /// \brief True to visualize sensor.
+      public: bool visualize;
+
+      /// \brief True to set sensor to be always on.
+      public: bool alwaysOn;
+
+      /// \brief Sensor topic name.
+      public: std::string topicName;
+    };
+
+    /// \class PartData PartData.hh
+    /// \brief Helper class to store part data
+    class PartData : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Name of part.
+      public: std::string name;
+
+      /// \brief Visuals of the part.
+      public: std::vector<rendering::VisualPtr> visuals;
+
+      /// \brief True to enable gravity on part.
+      public: bool gravity;
+
+      /// \brief True to allow self collision.
+      public: bool selfCollide;
+
+      /// \brief True to make part kinematic.
+      public: bool kinematic;
+
+      /// \brief Pose of part.
+      public: math::Pose pose;
+
+      /// \brief Sensor data
+      public: SensorData *sensorData;
+
+      /// \brief Inspector for configuring part properties.
+      public: PartInspector *inspector;
+
+      /// \brief Qt Callback when part inspector configurations are to be
+      /// applied.
+      private slots: void OnApply();
+    };
   }
 }
 #endif

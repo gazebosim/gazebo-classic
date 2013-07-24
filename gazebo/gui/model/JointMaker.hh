@@ -24,7 +24,6 @@
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -172,13 +171,14 @@ namespace gazebo
     };
     /// \}
 
+
     /// \class JointData JointData.hh
     /// \brief Helper class to store joint data
     class JointData : public QObject
     {
       Q_OBJECT
 
-      /// \brieft Visual of the dynamic line
+      /// \brief Visual of the dynamic line
       public: rendering::VisualPtr visual;
 
       /// \brieft Visual of the hotspot
@@ -212,6 +212,7 @@ namespace gazebo
       /// applied.
       private slots: void OnApply();
     };
+    /// \}
   }
 }
 #endif

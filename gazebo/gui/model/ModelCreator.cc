@@ -33,6 +33,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Gui.hh"
 
+#include "gazebo/gui/model/PartInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
@@ -119,7 +120,8 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     _pose.pos.z + _size.z/2));
   }
 
-  this->allParts[visVisual->GetName()] = visVisual;
+  this->CreatePart(visVisual);
+
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -162,7 +164,7 @@ std::string ModelCreator::AddSphere(double _radius,
     _pose.pos.z + _radius));
   }
 
-  this->allParts[visVisual->GetName()] = visVisual;
+  this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -207,7 +209,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
     _pose.pos.z + _length/2));
   }
 
-  this->allParts[visVisual->GetName()] = visVisual;
+  this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -253,13 +255,30 @@ std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_sca
     _pose.pos.z + _scale.z/2));
   }
 
-  this->allParts[visVisual->GetName()] = visVisual;
+  this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
-//  this->GenerateSDF();
-//  gzerr << this->modelSDF->ToString() << std::endl;
-
   return linkName;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::CreatePart(rendering::VisualPtr _visual)
+{
+  PartData *part = new PartData;
+  part->name = _visual->GetName();
+  part->visuals.push_back(_visual);
+
+  part->gravity = true;
+  part->selfCollide = false;
+  part->kinematic = false;
+  part->inspector = new PartInspector;
+  part->inspector->setModal(false);
+  connect(part->inspector, SIGNAL(Applied()),
+      part, SLOT(OnApply()));
+
+  part->sensorData = new SensorData;
+
+  this->allParts[part->name] = part;
 }
 
 /////////////////////////////////////////////////
@@ -268,17 +287,26 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!this->modelVisual)
     this->Reset();
 
-  rendering::VisualPtr vis = this->allParts[_partName];
-  if (!vis)
+  PartData *part = this->allParts[_partName];
+  if (!part)
   {
     gzerr << _partName << " does not exist\n";
     return;
   }
-  rendering::VisualPtr visParent = vis->GetParent();
-  rendering::ScenePtr scene = vis->GetScene();
-  scene->RemoveVisual(vis);
-  if (visParent)
-    scene->RemoveVisual(visParent);
+
+  for (unsigned int i = 0; i < part->visuals.size(); ++i)
+  {
+    rendering::VisualPtr vis = part->visuals[i];
+    rendering::VisualPtr visParent = vis->GetParent();
+    rendering::ScenePtr scene = vis->GetScene();
+    scene->RemoveVisual(vis);
+    if (visParent)
+      scene->RemoveVisual(visParent);
+  }
+
+  delete part->inspector;
+  delete part->sensorData;
+
   this->allParts.erase(_partName);
 }
 
@@ -321,12 +349,6 @@ void ModelCreator::Reset()
 
   MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
       boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
-}
-
-/////////////////////////////////////////////////
-bool ModelCreator::IsActive() const
-{
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -517,7 +539,15 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetName()) !=
         this->allParts.end())
     {
+
+      PartData *part = this->allParts[vis->GetName()];
+      part->inspector->show();
       gzerr << " got model part " << vis->GetName() <<  std::endl;
+
+/*      PartInspector inspector;
+      if (inspector.exec() == QDialog::Accepted)
+      {
+      }*/
       return true;
     }
   }
@@ -555,7 +585,7 @@ void ModelCreator::GenerateSDF()
 
   modelElem->GetAttribute("name")->Set(this->modelName);
 
-  boost::unordered_map<std::string, rendering::VisualPtr>::iterator partsIt;
+  boost::unordered_map<std::string, PartData *>::iterator partsIt;
 
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
@@ -565,7 +595,7 @@ void ModelCreator::GenerateSDF()
     collisionNameStream.str("");
 
     std::string name = partsIt->first;
-    rendering::VisualPtr visual = partsIt->second;
+    rendering::VisualPtr visual = (partsIt->second)->visuals[0];
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
@@ -633,4 +663,10 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 //   qDebug() << this->modelSDF->ToString().c_str();
+}
+
+
+/////////////////////////////////////////////////
+void PartData::OnApply()
+{
 }
