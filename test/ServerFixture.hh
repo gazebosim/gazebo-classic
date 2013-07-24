@@ -44,7 +44,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"

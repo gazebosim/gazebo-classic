@@ -23,7 +23,7 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/Transport.hh"
 

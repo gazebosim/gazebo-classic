@@ -22,7 +22,7 @@
 
 #include <unistd.h>
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/rendering/Rendering.hh"
 

@@ -19,7 +19,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
