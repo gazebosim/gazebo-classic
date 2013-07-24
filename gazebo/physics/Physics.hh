@@ -18,9 +18,9 @@
 #define _PHYSICS_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

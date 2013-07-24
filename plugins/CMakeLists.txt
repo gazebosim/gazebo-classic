@@ -1,17 +1,12 @@
 include_directories(
+  ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDF_INCLUDE_DIRS}
 )
 
-if(HAVE_URDFDOM_HEADERS)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS})
-endif(HAVE_URDFDOM_HEADERS)
-
-if(HAVE_CONSOLE_BRIDGE)
-  link_directories(
-    ${console_bridge_LIBRARY_DIRS})
-endif(HAVE_CONSOLE_BRIDGE)
+link_directories(
+  ${SDF_LIBRARY_DIRS}
+)
 
 set (plugins
   CameraPlugin

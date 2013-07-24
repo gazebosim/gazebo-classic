@@ -99,11 +99,7 @@ gz_add_library(gazebo_physics ${sources})
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
-  gazebo_sdf_interface
   gazebo_physics_ode
-  ${TBB_LIBRARIES}
-  ${libtool_library}
-  ${Boost_LIBRARIES}
 )
 
 if (HAVE_BULLET)
@@ -116,9 +112,7 @@ target_link_libraries(gzphysics
   gazebo_transport
   gazebo_physics
   gazebo_sensors
-  gazebo_sdf_interface
   gazebo_msgs
-  pthread
   )
 
 gz_install_library(gazebo_physics)
