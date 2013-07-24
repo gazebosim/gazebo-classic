@@ -45,17 +45,17 @@ namespace gazebo
       /// \brief Constructor.
       public: SphericalCoordinates();
 
-      /// \brief Constructor with surface model input.
-      /// \param[in] _model SurfaceModel specification.
-      public: SphericalCoordinates(const SurfaceType _model);
+      /// \brief Constructor with surface type input.
+      /// \param[in] _type SurfaceType specification.
+      public: SphericalCoordinates(const SurfaceType _type);
 
-      /// \brief Constructor with surface model, angle, and elevation inputs.
-      /// \param[in] _model SurfaceModel specification.
+      /// \brief Constructor with surface type, angle, and elevation inputs.
+      /// \param[in] _type SurfaceType specification.
       /// \param[in] _latitude Reference latitude.
       /// \param[in] _longitude Reference longitude.
       /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
-      public: SphericalCoordinates(const SurfaceType _model,
+      public: SphericalCoordinates(const SurfaceType _type,
                                    const math::Angle &_latitude,
                                    const math::Angle &_longitude,
                                    double _elevation,
@@ -76,24 +76,55 @@ namespace gazebo
       public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
               const;
 
-      // TODO: finish doxygen comments
       /// \brief Convert a string to a SurfaceType.
+      /// \param[in] _str String to convert.
+      /// \return Conversion to SurfaceType.
       public: static SurfaceType Convert(const std::string &_str);
 
-      public: SurfaceType GetSurfaceModel() const;
+      /// \brief Get SurfaceType currently in use.
+      /// \return Current SurfaceType value.
+      public: SurfaceType GetSurfaceType() const;
+
+      /// \brief Get reference geodetic latitude.
+      /// \return Reference geodetic latitude.
       public: math::Angle GetLatitudeReference() const;
+
+      /// \brief Get reference longitude.
+      /// \return Reference longitude.
       public: math::Angle GetLongitudeReference() const;
+
+      /// \brief Get reference elevation in meters.
+      /// \return Reference elevation.
       public: double GetElevationReference() const;
+
+      /// \brief Get heading offset for gazebo reference frame, expressed as
+      ///        angle from East to gazebo x-axis, or equivalently
+      ///        from North to gazebo y-axis.
+      /// \return Heading offset of gazebo reference frame.
       public: math::Angle GetHeadingOffset() const;
-      public: void SetSurfaceModel(const SurfaceType &_model);
-      public: bool SetSurfaceModel(const std::string &_str);
+
+      /// \brief Set SurfaceType for planetary surface model.
+      /// \param[in] _type SurfaceType value.
+      public: void SetSurfaceType(const SurfaceType &_type);
+
+      /// \brief Set reference geodetic latitude.
+      /// \param[in] _angle Reference geodetic latitude.
       public: void SetLatitudeReference(const math::Angle &_angle);
+
+      /// \brief Set reference longitude.
+      /// \param[in] _angle Reference longitude.
       public: void SetLongitudeReference(const math::Angle &_angle);
+
+      /// \brief Set reference elevation above sea level in meters.
+      /// \param[in] _elevation Reference elevation.
       public: void SetElevationReference(double _elevation);
+
+      /// \brief Set heading angle offset for gazebo frame.
+      /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const math::Angle &_angle);
 
-      /// \brief Type of surface model being used.
-      private: SurfaceType surfaceModel;
+      /// \brief Type of surface being used.
+      private: SurfaceType surfaceType;
 
       /// \brief Latitude of reference point.
       private: math::Angle latitudeReference;
@@ -101,7 +132,7 @@ namespace gazebo
       /// \brief Longitude of reference point.
       private: math::Angle longitudeReference;
 
-      /// \brief Elevation of reference point relative to sea level.
+      /// \brief Elevation of reference point relative to sea level in meters.
       private: double elevationReference;
 
       /// \brief Heading offset, expressed as angle from East to

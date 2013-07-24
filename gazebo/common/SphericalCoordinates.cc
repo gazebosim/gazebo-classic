@@ -40,30 +40,30 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(const std::strin
   if ("EARTH_WGS84" == _str)
     return EARTH_WGS84;
   // else
-  gzerr << "SurfaceModel string not recognized, "
+  gzerr << "SurfaceType string not recognized, "
         << "EARTH_WGS84 returned by default" << std::endl;
   return EARTH_WGS84;
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates() :
-      surfaceModel(EARTH_WGS84),
+      surfaceType(EARTH_WGS84),
       elevationReference(0.0)
 {
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(const SurfaceType _model) :
-      surfaceModel(_model)
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _type) :
+      surfaceType(_type)
 {
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(
-    const SurfaceType _model, const math::Angle &_latitude,
+    const SurfaceType _type, const math::Angle &_latitude,
     const math::Angle &_longitude, double _elevation,
     const math::Angle &_heading) :
-      surfaceModel(_model), latitudeReference(_latitude),
+      surfaceType(_type), latitudeReference(_latitude),
       longitudeReference(_longitude), elevationReference(_elevation),
       headingOffset(_heading)
 {
@@ -75,9 +75,9 @@ SphericalCoordinates::~SphericalCoordinates()
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceModel() const
+SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 {
-  return this->surfaceModel;
+  return this->surfaceType;
 }
 
 //////////////////////////////////////////////////
@@ -105,9 +105,9 @@ math::Angle SphericalCoordinates::GetHeadingOffset() const
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetSurfaceModel(const SurfaceType &_model)
+void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 {
-  this->surfaceModel = _model;
+  this->surfaceType = _type;
 }
 
 //////////////////////////////////////////////////
@@ -143,7 +143,7 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
   double headingSine = sin(this->headingOffset.Radian());
   double headingCosine = cos(this->headingOffset.Radian());
 
-  switch (this->surfaceModel)
+  switch (this->surfaceType)
   {
     case EARTH_WGS84:
       // Currently uses radius of curvature equations from wikipedia
