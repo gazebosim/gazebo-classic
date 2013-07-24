@@ -4,6 +4,7 @@ set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
+  ForceTorqueSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
@@ -14,12 +15,14 @@ set (sources
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
+  SonarSensor.cc
 ) 
 
 set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
+  ForceTorqueSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
@@ -31,12 +34,15 @@ set (headers
   SensorTypes.hh
   SensorFactory.hh
   SensorManager.hh
+  SonarSensor.hh
 )
 
 set (gtest_sources
   RaySensor_TEST.cc
   ImuSensor_TEST.cc
   Sensor_TEST.cc
+  SonarSensor_TEST.cc
+  ForceTorqueSensor_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})

@@ -31,6 +31,7 @@ set (sources
   Heightmap.cc
   JointVisual.cc
   LaserVisual.cc
+  SonarVisual.cc
   Light.cc
   Material.cc
   MovableText.cc
@@ -50,6 +51,7 @@ set (sources
   Visual.cc
   WireBox.cc
   WindowManager.cc
+  WrenchVisual.cc
 )
 
 set (headers
@@ -70,6 +72,7 @@ set (headers
   Heightmap.hh
   JointVisual.hh
   LaserVisual.hh
+  SonarVisual.hh
   Light.hh
   Material.hh
   MovableText.hh
@@ -90,6 +93,7 @@ set (headers
   Visual.hh
   WireBox.hh
   WindowManager.hh
+  WrenchVisual.hh
   ogre_gazebo.h
   cegui.h
 )
