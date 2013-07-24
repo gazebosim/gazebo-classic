@@ -13,7 +13,7 @@ set (sources
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
-  Common.cc
+  CommonIface.cc
   Console.cc
   Event.cc
   Events.cc
@@ -41,7 +41,7 @@ set (headers
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
-  Common.hh
+  CommonIface.hh
   CommonTypes.hh
   Color.hh
   Console.hh

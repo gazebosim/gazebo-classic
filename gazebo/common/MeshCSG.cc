@@ -18,7 +18,7 @@
 #include <string>
 #include <gts.h>
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
