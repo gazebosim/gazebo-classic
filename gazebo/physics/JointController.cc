@@ -201,9 +201,18 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetScopedName());
-    if (jiter != _jointPositions.end())
-      this->SetJointPosition(iter->second, jiter->second);
+    // First try name without scope, i.e. joint_name
+    jiter = _jointPositions.find(iter->second->GetName());
+
+    if (jiter == _jointPositions.end())
+    {
+      // Second try name with scope, i.e. model_name::joint_name
+      jiter = _jointPositions.find(iter->second->GetScopedName());
+      if (jiter == _jointPositions.end())
+        continue;
+    }
+
+    this->SetJointPosition(iter->second, jiter->second);
   }
 }
 
