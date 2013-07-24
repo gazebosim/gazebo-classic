@@ -30,7 +30,7 @@
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"

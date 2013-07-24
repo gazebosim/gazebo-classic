@@ -19,7 +19,7 @@
  * Date: 21 May 2003
  */
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/sensors/Sensor.hh"

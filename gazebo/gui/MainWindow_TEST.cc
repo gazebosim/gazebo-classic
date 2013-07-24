@@ -17,7 +17,7 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/MainWindow.hh"

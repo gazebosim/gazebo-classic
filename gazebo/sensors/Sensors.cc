@@ -17,7 +17,7 @@
 
 #include "gazebo/common/Console.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
 
