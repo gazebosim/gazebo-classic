@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSORS_HH_
-#define _SENSORS_HH_
+#ifndef _GAZEBO_SENSORS_HH_
+#define _GAZEBO_SENSORS_HH_
 
 // Deprecated header file for case-sensitive filesystems
 #warning The gazebo/sensors/Sensors.hh header file is deprecated \

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _TRANSPORT_HH_
-#define _TRANSPORT_HH_
+#ifndef _GAZEBO_TRANSPORT_HH_
+#define _GAZEBO_TRANSPORT_HH_
 
 // Deprecated header file for case-sensitive filesystems
 #warning The gazebo/transport/Transport.hh header file is deprecated \
