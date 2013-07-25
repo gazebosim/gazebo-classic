@@ -22,6 +22,7 @@
 #ifndef _SCREWJOINT_HH_
 #define _SCREWJOINT_HH_
 
+#include <sdf/sdf.hh>
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
 
