@@ -34,7 +34,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"

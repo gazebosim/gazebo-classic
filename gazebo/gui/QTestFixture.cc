@@ -30,7 +30,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/gazebo.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
 
 /////////////////////////////////////////////////

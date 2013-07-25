@@ -36,7 +36,7 @@
 #include "gazebo/rendering/RenderEvents.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"

@@ -21,7 +21,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"

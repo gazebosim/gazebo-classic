@@ -19,7 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
