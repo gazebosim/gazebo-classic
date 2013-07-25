@@ -129,6 +129,12 @@ endif()
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
+# Deprecated Rendering.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  gz_install_includes("rendering" Rendering.hh)
+endif()
+
 # unit tests
 set (gtest_sources
   GpuLaser_TEST.cc)

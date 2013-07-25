@@ -121,6 +121,12 @@ gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
+# Deprecated Physics.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  gz_install_includes("physics" Physics.hh)
+endif()
+
 # unit tests
 set (gtest_sources
   PhysicsEngine_TEST.cc

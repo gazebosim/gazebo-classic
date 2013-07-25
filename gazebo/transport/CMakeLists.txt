@@ -59,6 +59,12 @@ target_link_libraries(gazebo_transport
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
 
+# Deprecated Transport.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  gz_install_includes("transport" Transport.hh)
+endif()
+
 # unit tests
 set (gtest_sources
   Connection_TEST.cc

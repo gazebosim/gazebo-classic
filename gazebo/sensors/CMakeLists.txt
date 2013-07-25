@@ -83,3 +83,9 @@ target_link_libraries( gzsensor gazebo_common
 gz_install_executable( gzsensor )
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
+
+# Deprecated Sensors.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  gz_install_includes("sensors" Sensors.hh)
+endif()
