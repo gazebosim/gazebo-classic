@@ -69,6 +69,14 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(SDF sdformat)
+  if (NOT SDF_FOUND)
+    BUILD_WARNING ("Missing: SDF. Required for reading and writing SDF files. The deprecated SDF version will be used. Pay attention to this warning, because it will become an error in Gazebo 2.0.")
+    set (HAVE_SDF FALSE)
+  else()
+    set (HAVE_SDF TRUE)
+  endif()
+
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -113,7 +121,7 @@ if (PKG_CONFIG_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
       set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
     else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI" FORCE)
+      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -267,49 +275,13 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
-  # Find urdfdom and urdfdom_headers
-  # look for the cmake modules first, and .pc pkg_config second
-  find_package(urdfdom_headers QUIET)
-  if (NOT urdfdom_headers_FOUND)
-    pkg_check_modules(urdfdom_headers urdfdom_headers)
-    if (NOT urdfdom_headers_FOUND)
-      BUILD_WARNING ("urdfdom_headers not found, urdf parser will not be built.")
-    endif ()
-  endif ()
-  if (urdfdom_headers_FOUND)
-    set (HAVE_URDFDOM_HEADERS TRUE)
-  endif ()
-
-  find_package(urdfdom QUIET)
-  if (NOT urdfdom_FOUND)
-    pkg_check_modules(urdfdom urdfdom)
-    if (NOT urdfdom_FOUND)
-      BUILD_WARNING ("urdfdom not found, urdf parser will not be built.")
-    endif ()
-  endif ()
-  if (urdfdom_FOUND)
-    set (HAVE_URDFDOM TRUE)
-  endif ()
-
-  find_package(console_bridge QUIET)
-  if (NOT console_bridge_FOUND)
-    pkg_check_modules(console_bridge console_bridge)
-    if (NOT console_bridge_FOUND)
-      BUILD_WARNING ("console_bridge not found, urdf parser will not be built.")
-    endif ()
-  endif ()
-  if (console_bridge_FOUND)
-    set (HAVE_CONSOLE_BRIDGE TRUE)
-  endif ()
-
-  ########################################
   # Find Player
   pkg_check_modules(PLAYER playercore>=3.0 playerc++)
   if (NOT PLAYER_FOUND)
-    set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
+    set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player")
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")
   else (NOT PLAYER_FOUND)
-    set (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player" FORCE)
+    set (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player")
     set (PLAYER_INCLUDE_DIRS ${PLAYER_INCLUDE_DIRS} CACHE INTERNAL
          "Player include directory")
     set (PLAYER_LINK_DIRS ${PLAYER_LINK_DIRS} CACHE INTERNAL
@@ -357,77 +329,6 @@ if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
-
-########################################
-# Find urdfdom_headers
-IF (NOT HAVE_URDFDOM_HEADERS)
-  SET (urdfdom_search_path /usr/include)
-  FIND_PATH(URDFDOM_HEADERS_PATH urdf_model/model.h ${urdfdom_search_path})
-  IF (NOT URDFDOM_HEADERS_PATH)
-    MESSAGE (STATUS "Looking for urdf_model/model.h - not found")
-    BUILD_WARNING ("model.h not found. urdf parser will not be built")
-  ELSE (NOT URDFDOM_HEADERS_PATH)
-    MESSAGE (STATUS "Looking for model.h - found")
-    SET (HAVE_URDFDOM_HEADERS TRUE)
-    SET (URDFDOM_HEADERS_PATH /usr/include)
-  ENDIF (NOT URDFDOM_HEADERS_PATH)
-
-ELSE (NOT HAVE_URDFDOM_HEADERS)
-
-  SET (URDFDOM_HEADERS_PATH /usr/include)
-  MESSAGE (STATUS "found urdf_model/model.h - found")
-
-ENDIF (NOT HAVE_URDFDOM_HEADERS)
-
-########################################
-# Find urdfdom
-IF (NOT HAVE_URDFDOM)
-  SET (urdfdom_search_path
-    /usr/include /usr/local/include
-    /usr/include/urdf_parser
-  )
-
-  FIND_PATH(URDFDOM_PATH urdf_parser.h ${urdfdom_search_path})
-  IF (NOT URDFDOM_PATH)
-    MESSAGE (STATUS "Looking for urdf_parser/urdf_parser.h - not found")
-    BUILD_WARNING ("urdf_parser.h not found. urdf parser will not be built")
-    SET (URDFDOM_PATH /usr/include)
-  ELSE (NOT URDFDOM_PATH)
-    MESSAGE (STATUS "Looking for urdf_parser.h - found")
-    SET (HAVE_URDFDOM TRUE)
-    SET (URDFDOM_PATH /usr/include)
-  ENDIF (NOT URDFDOM_PATH)
-
-ELSE (NOT HAVE_URDFDOM)
-
-  MESSAGE (STATUS "found urdf_parser/urdf_parser.h - found")
-
-ENDIF (NOT HAVE_URDFDOM)
-
-########################################
-# Find console_bridge
-IF (NOT HAVE_CONSOLE_BRIDGE)
-  SET (console_bridge_search_path
-    /usr/include /usr/local/include
-  )
-
-  FIND_PATH(CONSOLE_BRIDGE_PATH console_bridge/console.h ${console_bridge_search_path})
-  IF (NOT CONSOLE_BRIDGE_PATH)
-    MESSAGE (STATUS "Looking for console_bridge/console.h - not found")
-    BUILD_WARNING ("console.h not found. urdf parser (depends on console_bridge) will not be built")
-    SET (CONSOLE_BRIDGE_PATH /usr/include)
-  ELSE (NOT CONSOLE_BRIDGE_PATH)
-    MESSAGE (STATUS "Looking for console.h - found")
-    SET (HAVE_CONSOLE_BRIDGE TRUE)
-    SET (CONSOLE_BRIDGE_PATH /usr/include)
-  ENDIF (NOT CONSOLE_BRIDGE_PATH)
-
-ELSE (NOT HAVE_CONSOLE_BRIDGE)
-
-  MESSAGE (STATUS "found console_bridge/console.h - found")
-
-ENDIF (NOT HAVE_CONSOLE_BRIDGE)
-
 
 ########################################
 # Find avformat and avcodec

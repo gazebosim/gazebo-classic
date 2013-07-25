@@ -19,12 +19,12 @@
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
 
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Projector.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Projector.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -105,21 +105,21 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
+    pose = _sdf->Get<math::Pose>("pose");
 
   if (_sdf->HasElement("texture_name"))
-    textureName = _sdf->GetValueString("texture_name");
+    textureName = _sdf->Get<std::string>("texture_name");
 
   if (_sdf->HasElement("near_clip"))
-    nearClip = _sdf->GetValueDouble("near_clip");
+    nearClip = _sdf->Get<double>("near_clip");
 
   if (_sdf->HasElement("far_clip"))
-    farClip = _sdf->GetValueDouble("far_clip");
+    farClip = _sdf->Get<double>("far_clip");
 
   if (_sdf->HasElement("fov"))
-    fov = _sdf->GetValueDouble("fov");
+    fov = _sdf->Get<double>("fov");
 
-  this->Load(_sdf->GetValueString("name"), pose, textureName,
+  this->Load(_sdf->Get<std::string>("name"), pose, textureName,
              nearClip, farClip, fov);
 }
 

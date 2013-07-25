@@ -27,10 +27,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -57,8 +58,8 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -159,11 +160,11 @@ void World::Load(sdf::ElementPtr _sdf)
   this->loaded = false;
   this->sdf = _sdf;
 
-  if (this->sdf->GetValueString("name").empty())
+  if (this->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -199,7 +200,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -430,7 +431,7 @@ void World::LogStep()
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->GetValueString());
+                                    nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
@@ -735,7 +736,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   else
   {
     gzerr << "SDF is missing the <model> tag:\n";
-    _sdf->PrintValues("  ");
   }
 
   this->PublishModelPose(model);
@@ -1233,8 +1233,8 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
 
@@ -1263,7 +1263,7 @@ void World::ProcessEntityMsgs()
     if (this->sdf->HasElement("model"))
     {
       sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->GetValueString("name") != (*iter))
+      while (childElem && childElem->Get<std::string>("name") != (*iter))
         childElem = childElem->GetNextElement("model");
       if (childElem)
         this->sdf->RemoveChild(childElem);

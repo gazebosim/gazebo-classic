@@ -16,6 +16,7 @@
  */
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"

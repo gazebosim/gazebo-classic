@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 
 #define LASER_TOL 1e-5
@@ -282,6 +282,8 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
     boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+
+  EXPECT_TRUE(raySensor != NULL);
 
   raySensor->Init();
   raySensor->Update(true);

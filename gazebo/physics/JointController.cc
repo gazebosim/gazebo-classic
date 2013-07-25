@@ -15,14 +15,14 @@
  *
 */
 
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/JointController.hh"
-#include "physics/PhysicsEngine.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -201,9 +201,18 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetScopedName());
-    if (jiter != _jointPositions.end())
-      this->SetJointPosition(iter->second, jiter->second);
+    // First try name without scope, i.e. joint_name
+    jiter = _jointPositions.find(iter->second->GetName());
+
+    if (jiter == _jointPositions.end())
+    {
+      // Second try name with scope, i.e. model_name::joint_name
+      jiter = _jointPositions.find(iter->second->GetScopedName());
+      if (jiter == _jointPositions.end())
+        continue;
+    }
+
+    this->SetJointPosition(iter->second, jiter->second);
   }
 }
 

@@ -22,10 +22,10 @@
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
 #cmakedefine INCLUDE_RTSHADER 1
-#cmakedefine HAVE_URDFDOM 1
 #cmakedefine HAVE_GTS 1
 #cmakedefine HAVE_QWT 1
 #cmakedefine ENABLE_DIAGNOSTICS 1
+#cmakedefine HAVE_SDF 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>

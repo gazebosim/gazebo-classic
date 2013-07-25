@@ -26,7 +26,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -123,8 +124,11 @@ namespace gazebo
                 PLANE_SHAPE     = 0x00100000,
                 /// \brief SphereShape type
                 SPHERE_SHAPE    = 0x00200000,
-                /// \brief TrimeshShape type
-                TRIMESH_SHAPE   = 0x00400000
+                /// \brief MeshShape type
+                MESH_SHAPE   = 0x00400000,
+
+                /// \brief Indicates a collision shape used for sensing
+                SENSOR_COLLISION   = 0x00800000
               };
 
       /// \brief Constructor
