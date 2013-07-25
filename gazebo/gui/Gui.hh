@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_HH_
-#define _GUI_HH_
+#ifndef _GAZEBO_GUI_HH_
+#define _GAZEBO_GUI_HH_
 
 // Deprecated header file for case-sensitive filesystems
 #warning The gazebo/gui/Gui.hh header file is deprecated \
