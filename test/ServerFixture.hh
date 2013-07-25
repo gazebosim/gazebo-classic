@@ -24,6 +24,12 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+// Remove the gazebo_config and ifdefs in Gazebo 2.0
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -33,6 +39,7 @@
 
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
@@ -129,6 +136,11 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
+               // We must set the findFile callback here,
+               // before the server loads the file (server->LoadFile).
+               sdf::setFindCallback(
+                   boost::bind(&gazebo::common::find_file, _1));
+
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -224,6 +236,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }
@@ -1066,7 +1079,7 @@ class ServerFixture : public testing::Test
                  // Timeout of 30 seconds (3000 * 10 ms)
                  int waitCount = 0, maxWaitCount = 3000;
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
-                 std::string name = model->GetValueString("name");
+                 std::string name = model->Get<std::string>("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
                    common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);

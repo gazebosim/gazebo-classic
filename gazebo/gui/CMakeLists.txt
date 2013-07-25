@@ -110,37 +110,39 @@ gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_msgs)
 
-target_link_libraries(gazebo_gui gazebo_common
-                                 gazebo_transport
-                                 gazebo_sdf_interface
-                                 gazebo_rendering
-                                 gazebo_sensors
-                                 gazebo_msgs
-                                 gazebo_gui_building
-                                 gazebo_gui_terrain
-                                 gazebo_gui_viewers
-                                 gzqtpropertybrowser
-                                 libgazebo
-                                 ${QT_LIBRARIES}
-                                 ${ogre_libraries}
-                                 ${Boost_LIBRARIES}
-                                 pthread)
+target_link_libraries(gazebo_gui
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
-target_link_libraries(gzclient  gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_rendering
-                                gazebo_sensors
-                                gazebo_msgs
-                                gazebo_gui_building
-                                gazebo_gui_terrain
-                                gazebo_gui_viewers
-                                gzqtpropertybrowser
-                                libgazebo
-                                ${QT_LIBRARIES}
-                                ${ogre_libraries}
-                                ${Boost_LIBRARIES}
-                                pthread)
+target_link_libraries(gzclient
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
 add_definitions(${QT_DEFINITIONS})
 

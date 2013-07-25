@@ -27,7 +27,6 @@
 #include <fstream>
 
 #include "gazebo/math/Helpers.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -336,4 +335,3 @@ namespace gazebo
   }
 }
 #endif
-

@@ -85,13 +85,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->maxContacts = _sdf->Get<int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
-    this->SetLaserRetro(this->sdf->GetElement("laser_retro")->GetValueDouble());
+    this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -120,7 +120,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->GetValuePose("pose"));
+    this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////

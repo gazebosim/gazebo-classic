@@ -16,11 +16,10 @@
 */
 
 #include "gazebo/math/Vector3.hh"
-#include "BoxShape.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 BoxShape::BoxShape(CollisionPtr _parent) : Shape(_parent)
@@ -36,7 +35,7 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->GetValueVector3("size"));
+  this->SetSize(this->sdf->Get<math::Vector3>("size"));
 }
 
 //////////////////////////////////////////////////
@@ -48,18 +47,12 @@ void BoxShape::SetSize(const math::Vector3 &_size)
 //////////////////////////////////////////////////
 math::Vector3 BoxShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("size");
+  return this->sdf->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////
 void BoxShape::SetScale(const math::Vector3 &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
-  {
-    gzerr << "Cannot set negative scale" << std::endl;
-    return;
-  }
-
   if (_scale == this->scale)
     return;
 

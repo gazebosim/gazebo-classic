@@ -20,7 +20,6 @@
  */
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
@@ -398,7 +397,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->GetValuePose("pose");
+  pose = this->sdf->Get<math::Pose>("pose");
 
   std::string meshName = this->GetMeshName();
   std::string subMeshName = this->GetSubMeshName();
@@ -430,7 +429,7 @@ void Visual::Load()
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
     {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
-          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
+          this->sdf->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
     }
   }
 
@@ -448,28 +447,28 @@ void Visual::Load()
 
     if (geomElem->HasElement("box"))
     {
-      this->scale = geomElem->GetElement("box")->GetValueVector3("size");
+      this->scale = geomElem->GetElement("box")->Get<math::Vector3>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
-      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      double r = geomElem->GetElement("sphere")->Get<double>("radius");
       this->scale.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
-      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
-      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
+      double l = geomElem->GetElement("cylinder")->Get<double>("length");
       this->scale.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
-        geomElem->GetElement("plane")->GetValueVector2d("size");
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
       this->scale.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      this->scale = geomElem->GetElement("mesh")->GetValueVector3("scale");
+      this->scale = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
   }
 
@@ -487,29 +486,29 @@ void Visual::Load()
       // Add all the URI paths to the render engine
       while (uriElem)
       {
-        std::string matUri = uriElem->GetValueString();
+        std::string matUri = uriElem->Get<std::string>();
         if (!matUri.empty())
           RenderEngine::Instance()->AddResourcePath(matUri);
         uriElem = uriElem->GetNextElement("uri");
       }
 
-      std::string matName = scriptElem->GetValueString("name");
+      std::string matName = scriptElem->Get<std::string>("name");
 
       if (!matName.empty())
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->GetValueColor("ambient"));
+      this->SetAmbient(matElem->Get<common::Color>("ambient"));
     else if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->GetValueColor("diffuse"));
+      this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
     else if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->GetValueColor("specular"));
+      this->SetSpecular(matElem->Get<common::Color>("specular"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->GetValueColor("emissive"));
+      this->SetEmissive(matElem->Get<common::Color>("emissive"));
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
 }
 
@@ -751,28 +750,28 @@ math::Vector3 Visual::GetScale()
 
     if (geomElem->HasElement("box"))
     {
-      result = geomElem->GetElement("box")->GetValueVector3("size");
+      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
-      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      double r = geomElem->GetElement("sphere")->Get<double>("radius");
       result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
-      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
-      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
+      double l = geomElem->GetElement("cylinder")->Get<double>("length");
       result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
-        geomElem->GetElement("plane")->GetValueVector2d("size");
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
       result.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      result = geomElem->GetElement("mesh")->GetValueVector3("scale");
+      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
   }
 
@@ -1454,7 +1453,7 @@ void Visual::DisableTrackVisual()
 std::string Visual::GetNormalMap() const
 {
   std::string file = this->sdf->GetElement("material")->GetElement(
-      "shader")->GetElement("normal_map")->GetValueString();
+      "shader")->GetElement("normal_map")->Get<std::string>();
 
   std::string uriFile = common::find_file(file);
   if (!uriFile.empty())
@@ -1476,7 +1475,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 std::string Visual::GetShaderType() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->GetValueString("type");
+      "shader")->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -2111,12 +2110,10 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      std::string uri = tmpElem->GetValueString("uri");
+      std::string uri = tmpElem->Get<std::string>("uri");
       if (uri.empty())
       {
         gzerr << "<uri> element missing for geometry element:\n";
-        geomElem->PrintValues("  ");
-
         return std::string();
       }
 
@@ -2144,7 +2141,7 @@ std::string Visual::GetSubMeshName() const
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
-        result = tmpElem->GetElement("submesh")->GetValueString("name");
+        result = tmpElem->GetElement("submesh")->Get<std::string>("name");
     }
   }
 
@@ -2163,7 +2160,7 @@ bool Visual::GetCenterSubMesh() const
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       if (tmpElem->HasElement("submesh"))
-        result = tmpElem->GetElement("submesh")->GetValueBool("center");
+        result = tmpElem->GetElement("submesh")->Get<bool>("center");
     }
   }
 
@@ -2447,7 +2444,7 @@ void Visual::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void Visual::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
