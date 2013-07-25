@@ -456,7 +456,6 @@ void SelectionObj::CreateScaleVisual()
   this->scaleVisual.reset(new rendering::Visual(
       this->name + "__SELECTION_OBJ_SCALE__",
       shared_from_this()));
-//      this->rotVisual));
 
   this->scaleXVisual.reset(
       new rendering::Visual(
@@ -494,7 +493,6 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadXNode->setPosition(0, 0, 0.21);
   scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
   scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
-
 
   Ogre::MovableObject *scaleShaftYObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(

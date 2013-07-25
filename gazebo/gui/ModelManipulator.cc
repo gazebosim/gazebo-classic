@@ -117,7 +117,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  if (this->mouseEvent.shift)
+  if (this->mouseEvent.control)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
   math::Quaternion rot(_axis, angle);
@@ -252,7 +252,30 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     }
   }
 
-  _vis->SetScale(this->mouseVisualScale * scale);
+  math::Vector3 newScale = this->mouseVisualScale * scale;
+
+  if (this->mouseEvent.control)
+  {
+    if (ceil(newScale.x) - newScale.x <= .4)
+        newScale.x = ceil(newScale.x);
+    else if (newScale.x - floor(newScale.x) <= .4)
+      newScale.x = floor(newScale.x);
+
+    if (ceil(newScale.y) - newScale.y <= .4)
+        newScale.y = ceil(newScale.y);
+    else if (newScale.y - floor(newScale.y) <= .4)
+      newScale.y = floor(newScale.y);
+
+    if (_axis.z > 0.0)
+    {
+      if (ceil(newScale.z) - newScale.z <= .4)
+        newScale.z = ceil(newScale.z);
+      else if (newScale.z - floor(newScale.z) <= .4)
+        newScale.z = floor(newScale.z);
+    }
+  }
+
+  _vis->SetScale(newScale);
 }
 
 /////////////////////////////////////////////////
@@ -301,7 +324,6 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     planeNormOther.x = 1;
   }
 
-
   if (_local)
   {
     planeNorm = pose.rot.RotateVector(planeNorm);
@@ -341,7 +363,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
   pose.pos = this->mouseMoveVisStartPose.pos + distance;
 
-  if (this->mouseEvent.shift)
+  if (this->mouseEvent.control)
   {
     if (ceil(pose.pos.x) - pose.pos.x <= .4)
         pose.pos.x = ceil(pose.pos.x);
