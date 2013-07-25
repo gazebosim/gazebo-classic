@@ -136,11 +136,6 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
-               // We must set the findFile callback here,
-               // before the server loads the file (server->LoadFile).
-               sdf::setFindCallback(
-                   boost::bind(&gazebo::common::find_file, _1));
-
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
