@@ -173,7 +173,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  // pose pub for server size, mainly used for updating and timestamping
+  // pose pub for server side, mainly used for updating and timestamping
   // Scene, which in turn will be used by rendering sensors.
   // TODO: replace local communication with shared memory efficiency
   this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
@@ -1784,7 +1784,6 @@ void World::ProcessMessages()
   {
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
     msgs::Pose *poseMsg;
-
 
     if ((this->posePub && this->posePub->HasConnections()) ||
         (this->poseLocalPub && this->poseLocalPub->HasConnections()))
