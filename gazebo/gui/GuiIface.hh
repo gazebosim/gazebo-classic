@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_HH_
-#define _GAZEBO_GUI_HH_
+#ifndef _GAZEBO_GUIIFACE_HH_
+#define _GAZEBO_GUIIFACE_HH_
 
 #include <string>
 #include "gazebo/rendering/RenderingIface.hh"
