@@ -208,7 +208,7 @@ namespace gazebo
                   return;
                 }
 
-                void (Connection::*f)(const boost::system::error_code &,
+                void (Connection::*f)(const boost::system::error_code,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
                 this->inboundHeader.resize(HEADER_LENGTH);
@@ -227,7 +227,7 @@ namespace gazebo
       /// \param[in] _e Error code, if any, associated with the read
       /// \param[in] _handler Callback to invoke on received data
       private: template<typename Handler>
-               void OnReadHeader(const boost::system::error_code &_e,
+               void OnReadHeader(const boost::system::error_code _e,
                                  boost::tuple<Handler> _handler)
               {
                 if (_e)
