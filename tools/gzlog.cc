@@ -664,10 +664,10 @@ void help(po::options_description &_options)
             << "  info\t Display statistical information about a log file.\n"
             << "  echo\t Output the contents of a log file to screen.\n"
             << "  step\t Step through the contents of a log file.\n";
-            //<< "  start\t Start recording a log file on an active Gazebo "
-            //<< "server.\n"
-            //<< "  stop\t Stop recording a log file on an active Gazebo "
-            //<< "server.\n";
+            // << "  start\t Start recording a log file on an active Gazebo "
+            // << "server.\n"
+            // << "  stop\t Stop recording a log file on an active Gazebo "
+            // << "server.\n";
   std::cerr << "\n";
 
   std::cerr << _options << "\n";
