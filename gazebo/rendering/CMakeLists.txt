@@ -132,6 +132,9 @@ gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering
 # Deprecated Rendering.hh
 # Install until gazebo 2.0 on case-sensitive filesystems
 if (FILESYSTEM_CASE_SENSITIVE)
+  if (${GAZEBO_VERSION} VERSION_EQUAL 2.0)
+    message(WARNING "Installing deprecated Rendering.hh. This should be removed in Gazebo 2.0 and later.")
+  endif()
   gz_install_includes("rendering" Rendering.hh)
 endif()
 

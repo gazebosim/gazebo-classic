@@ -62,6 +62,9 @@ gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport
 # Deprecated Transport.hh
 # Install until gazebo 2.0 on case-sensitive filesystems
 if (FILESYSTEM_CASE_SENSITIVE)
+  if (${GAZEBO_VERSION} VERSION_EQUAL 2.0)
+    message(WARNING "Installing deprecated Transport.hh. This should be removed in Gazebo 2.0 and later.")
+  endif()
   gz_install_includes("transport" Transport.hh)
 endif()
 
