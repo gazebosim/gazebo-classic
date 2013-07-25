@@ -859,10 +859,11 @@ void MainWindow::CreateActions()
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
-      tr("Translation Mode"), this);
+      tr("&Translation Mode"), this);
   g_translateAct->setStatusTip(tr("Translate an object"));
   g_translateAct->setCheckable(true);
   g_translateAct->setChecked(false);
+  g_translateAct->setToolTip(tr("Translation Mode (T)"));
   connect(g_translateAct, SIGNAL(triggered()), this, SLOT(Translate()));
   this->CreateDisabledIcon(":/images/translate.png", g_translateAct);
 
@@ -871,6 +872,7 @@ void MainWindow::CreateActions()
   g_rotateAct->setStatusTip(tr("Rotate an object"));
   g_rotateAct->setCheckable(true);
   g_rotateAct->setChecked(false);
+  g_rotateAct->setToolTip(tr("Rotation Mode (R)"));
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
   this->CreateDisabledIcon(":/images/rotate.png", g_rotateAct);
 
@@ -879,6 +881,7 @@ void MainWindow::CreateActions()
   g_scaleAct->setStatusTip(tr("Scale an object"));
   g_scaleAct->setCheckable(true);
   g_scaleAct->setChecked(false);
+  g_scaleAct->setToolTip(tr("Scale Mode (S)"));
   connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);

@@ -617,6 +617,13 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     {
       if (this->manipMode == "scale")
       {
+        math::Vector3 bboxSize =
+            this->mouseMoveVis->GetBoundingBox().GetSize()
+            * this->mouseMoveVis->GetScale();
+        double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+        max = std::min(std::max(0.5, max), 3.0);
+        this->selectionObj->SetScale(math::Vector3(max, max, max));
+
         this->PublishVisualScale(this->mouseMoveVis);
       }
       this->PublishVisualPose(this->mouseMoveVis);
