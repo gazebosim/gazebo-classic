@@ -118,12 +118,12 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add_options()
-    ("help,h", "print help message")
-    ("plot,p", "output comma-separated values, useful for processing and "
-               "plotting")
-    ("world-name,w", po::value<std::string>(), "the Gazebo world to monitor");
+    ("help,h", "Print help message.")
+    ("plot,p", "Output comma-separated values, useful for processing and "
+               "plotting.")
+    ("world-name,w", po::value<std::string>(), "The Gazebo world to monitor.");
   po::variables_map vm;
 
   try
@@ -141,9 +141,20 @@ int main(int argc, char **argv)
 
   if (vm.count("help"))
   {
-    std::cerr << "This tool displays statistics about a running Gazebo world.\n"
-              << "Usage: gzstats [options]\n"
-              << desc << std::endl;
+    std::cerr << "gzstats -- This tool displays statistics about a "
+      "running Gazebo world\n\n";
+
+    std::cerr << "`gzstats` [options]\n\n";
+
+    std::cerr << "This tool displays statistics about a running "
+      "Gazebo world.\n\n";
+
+    std::cerr << desc << "\n";
+
+    std::cerr << "See also:\n"
+      << "Examples and more information can be found at: "
+      << "http://gazebosim.org/wiki/Tools#World_Statistics\n";
+
     return 1;
   }
 

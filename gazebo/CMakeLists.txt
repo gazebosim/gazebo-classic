@@ -45,15 +45,6 @@ endif()
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
-target_link_libraries(gzmaster
-  gazebo_common
-  gazebo_util                  
-  gazebo_transport
-  gazebo_msgs
-  pthread
-)
-
-
 target_link_libraries(gzserver
   gazebo_common
   gazebo_util
@@ -81,8 +72,6 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
 
-
-gz_install_executable(gzmaster)
 gz_install_executable(gzserver)
 gz_install_executable(gazebo)
 
@@ -105,7 +94,6 @@ if (NOT HAVE_SDF)
   target_link_libraries(libgazebo gazebo_sdf_interface)
   target_link_libraries(gazebo gazebo_sdf_interface)
   target_link_libraries(gzserver gazebo_sdf_interface)
-  target_link_libraries(gzmaster gazebo_sdf_interface)
 endif()
 
 add_dependencies(libgazebo gazebo_msgs)
@@ -113,8 +101,3 @@ gz_install_library(libgazebo)
 
 set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
 gz_install_includes("" ${headers})
-
-# Man pages
-manpage(gazebo 1)
-manpage(gzserver 1)
-

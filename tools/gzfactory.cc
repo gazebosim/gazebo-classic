@@ -23,14 +23,26 @@ using namespace gazebo;
 namespace po = boost::program_options;
 
 /////////////////////////////////////////////////
-void help()
+void help(po::options_description &_options)
 {
-  std::cerr << "This tool for spawning or deleting models into or from a "
-            << "running Gazebo simulation.\n\n"
-            << "  gzfactory <spawn|delete> [options]\n"
-            << "    spawn   : Spawn new model. Must specify a SDF model file.\n"
-            << "    delete  : Delete existing model. Must specify model name.\n"
-            << "\n\n";
+  std::cerr << "gzfactory -- Tool to spawn or delete models from "
+    << " simulation\n\n";
+
+  std::cerr << "`gzfactory` <spawn|delete> [options]\n\n";
+
+  std::cerr << "Spawn or delete models into or from a "
+    << "running Gazebo simulation.\n\n";
+
+  std::cerr << "Commands:\n"
+    << "    spawn   Spawn new model. Must specify a SDF model file.\n"
+    << "    delete  Delete existing model. Must specify model name.\n\n";
+
+  std::cerr << _options << "\n\n";
+
+  std::cerr << "See also:\n"
+    << "Example and more information about gazebo gzfactory and "
+    << "other command line tools can be found at:"
+    << "http://gazebosim.org/user_guide/started__commandlinetools.html\n";
 }
 
 /////////////////////////////////////////////////
@@ -163,7 +175,7 @@ void Delete(po::variables_map &vm)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
     ("help,h", "produce this help message")
     ("sdf,f", po::value<std::string>(), "SDF model file.")
@@ -180,7 +192,7 @@ int main(int argc, char **argv)
   h_desc.add_options()
     ("command", po::value<std::string>(), "<spawn|delete>");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc).add(h_desc);
 
   po::positional_options_description p_desc;
@@ -201,8 +213,7 @@ int main(int argc, char **argv)
 
   if (vm.count("help") || argc < 2)
   {
-    help();
-    std::cout << v_desc << "\n";
+    help(v_desc);
     return -1;
   }
 

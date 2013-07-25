@@ -64,20 +64,14 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY
 
 add_library(gazebo_sensors SHARED ${sources})
 
-target_link_libraries(gazebo_sensors gazebo_common 
-                                     gazebo_rendering
-                                     gazebo_physics
-                                     ${libtool_library} 
-                                     ${Boost_LIBRARIES}
-                                     ${ogre_ldflags}
-                                     )
-
-target_link_libraries( gzsensor gazebo_common
-                                gazebo_transport
-                                gazebo_sensors
-                                gazebo_rendering
-                                gazebo_msgs
-                                pthread)
+target_link_libraries(gazebo_sensors
+  gazebo_common 
+  gazebo_rendering
+  gazebo_physics
+  ${libtool_library} 
+  ${Boost_LIBRARIES}
+  ${ogre_ldflags}
+  )
 
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)

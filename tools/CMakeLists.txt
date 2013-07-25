@@ -42,9 +42,3 @@ target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
 install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
-
-manpage(gzfactory 1)
-manpage(gzlog 1)
-manpage(gzsdf 1)
-manpage(gzstats 1)
-manpage(gztopic 1)
