@@ -29,10 +29,13 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/physics/Inertial.hh"
+
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Gui.hh"
 
+#include "gazebo/gui/model/PartGeneralTab.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -271,11 +274,15 @@ void ModelCreator::CreatePart(rendering::VisualPtr _visual)
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
+  part->pose = _visual->GetParent()->GetWorldPose();
+
   part->inspector = new PartInspector;
   part->inspector->setModal(false);
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
 
+
+  part->inertial = new physics::Inertial;
   part->sensorData = new SensorData;
 
   this->allParts[part->name] = part;
@@ -305,6 +312,7 @@ void ModelCreator::RemovePart(const std::string &_partName)
   }
 
   delete part->inspector;
+  delete part->inertial;
   delete part->sensorData;
 
   this->allParts.erase(_partName);
@@ -541,13 +549,20 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     {
 
       PartData *part = this->allParts[vis->GetName()];
+      PartGeneralTab *general = part->inspector->GetGeneral();
+      general->SetGravity(part->gravity);
+      general->SetSelfCollide(part->selfCollide);
+      general->SetKinematic(part->kinematic);
+      general->SetPose(part->pose);
+      general->SetMass(part->inertial->GetMass());
+      general->SetInertialPose(part->inertial->GetPose());
+      general->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
+          part->inertial->GetIZZ(), part->inertial->GetIXY(),
+          part->inertial->GetIXZ(), part->inertial->GetIYZ());
+
       part->inspector->show();
       gzerr << " got model part " << vis->GetName() <<  std::endl;
 
-/*      PartInspector inspector;
-      if (inspector.exec() == QDialog::Accepted)
-      {
-      }*/
       return true;
     }
   }
@@ -595,12 +610,26 @@ void ModelCreator::GenerateSDF()
     collisionNameStream.str("");
 
     std::string name = partsIt->first;
-    rendering::VisualPtr visual = (partsIt->second)->visuals[0];
+    PartData *part = partsIt->second;
+    rendering::VisualPtr visual = part->visuals[0];
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
-    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+    newLinkElem->GetElement("pose")->Set(part->pose);
+    newLinkElem->GetElement("gravity")->Set(part->gravity);
+    newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
+    newLinkElem->GetElement("kinematic")->Set(part->kinematic);
+    sdf::ElementPtr inertialElem = newLinkElem->GetElement("inertial");
+    inertialElem->GetElement("mass")->Set(part->inertial->GetMass());
+    inertialElem->GetElement("pose")->Set(part->inertial->GetPose());
+    sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+    inertiaElem->GetElement("ixx")->Set(part->inertial->GetIXX());
+    inertiaElem->GetElement("iyy")->Set(part->inertial->GetIYY());
+    inertiaElem->GetElement("izz")->Set(part->inertial->GetIZZ());
+    inertiaElem->GetElement("ixy")->Set(part->inertial->GetIXY());
+    inertiaElem->GetElement("ixz")->Set(part->inertial->GetIXZ());
+    inertiaElem->GetElement("iyz")->Set(part->inertial->GetIYZ());
 
     modelElem->InsertElement(newLinkElem);
 
@@ -669,4 +698,18 @@ void ModelCreator::GenerateSDF()
 /////////////////////////////////////////////////
 void PartData::OnApply()
 {
+  PartGeneralTab *general = this->inspector->GetGeneral();
+  this->gravity = general->GetGravity();
+  this->selfCollide = general->GetSelfCollide();
+  this->kinematic = general->GetKinematic();
+
+  this->inertial->SetMass(general->GetMass());
+  this->inertial->SetCoG(general->GetInertialPose());
+  this->inertial->SetInertiaMatrix(
+      general->GetInertiaIXX(), general->GetInertiaIYY(),
+      general->GetInertiaIZZ(), general->GetInertiaIXY(),
+      general->GetInertiaIXZ(), general->GetInertiaIYZ());
+  this->pose = general->GetPose();
+  this->visuals[0]->GetParent()->SetWorldPose(this->pose);
+
 }

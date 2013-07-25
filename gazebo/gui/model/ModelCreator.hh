@@ -23,6 +23,8 @@
 
 #include <boost/unordered/unordered_map.hpp>
 
+#include "gazebo/physics/PhysicsTypes.hh"
+
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/gui/qt.h"
@@ -293,6 +295,12 @@ namespace gazebo
 
       /// \brief Pose of part.
       public: math::Pose pose;
+
+      /// \brief Name of part.
+      public: physics::Inertial *inertial;
+
+      /// \brief Name of part.
+      public: std::vector<physics::CollisionPtr> collisions;
 
       /// \brief Sensor data
       public: SensorData *sensorData;

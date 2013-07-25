@@ -239,16 +239,16 @@ PartGeneralTab::PartGeneralTab()
   QGridLayout *inertiaGroupLayout = new QGridLayout;
   inertiaGroupLayout->addWidget(inertiaIXXLabel, 0, 0);
   inertiaGroupLayout->addWidget(inertiaIXXSpinBox, 0, 1);
-  inertiaGroupLayout->addWidget(inertiaIXYLabel, 0, 2);
-  inertiaGroupLayout->addWidget(inertiaIXYSpinBox, 0, 3);
-  inertiaGroupLayout->addWidget(inertiaIXZLabel, 0, 4);
-  inertiaGroupLayout->addWidget(inertiaIXZSpinBox, 0, 5);
-  inertiaGroupLayout->addWidget(inertiaIYYLabel, 1, 0);
-  inertiaGroupLayout->addWidget(inertiaIYYSpinBox, 1, 1);
-  inertiaGroupLayout->addWidget(inertiaIYZLabel, 1, 2);
-  inertiaGroupLayout->addWidget(inertiaIYZSpinBox, 1, 3);
-  inertiaGroupLayout->addWidget(inertiaIZZLabel, 1, 4);
-  inertiaGroupLayout->addWidget(inertiaIZZSpinBox, 1, 5);
+  inertiaGroupLayout->addWidget(inertiaIYYLabel, 0, 2);
+  inertiaGroupLayout->addWidget(inertiaIYYSpinBox, 0, 3);
+  inertiaGroupLayout->addWidget(inertiaIZZLabel, 0, 4);
+  inertiaGroupLayout->addWidget(inertiaIZZSpinBox, 0, 5);
+  inertiaGroupLayout->addWidget(inertiaIXYLabel, 1, 0);
+  inertiaGroupLayout->addWidget(inertiaIXYSpinBox, 1, 1);
+  inertiaGroupLayout->addWidget(inertiaIXZLabel, 1, 2);
+  inertiaGroupLayout->addWidget(inertiaIXZSpinBox, 1, 3);
+  inertiaGroupLayout->addWidget(inertiaIYZLabel, 1, 4);
+  inertiaGroupLayout->addWidget(inertiaIYZSpinBox, 1, 5);
 
   QGroupBox *inertiaGroupBox = new QGroupBox(tr("Inertia"));
   inertiaGroupBox->setLayout(inertiaGroupLayout);
@@ -363,15 +363,51 @@ math::Pose PartGeneralTab::GetInertialPose() const
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetInertia(double _ixx, double _ixy, double _ixz,
-    double _iyy, double _iyz, double _izz)
+void PartGeneralTab::SetInertia(double _ixx, double _iyy, double _izz,
+    double _ixy, double _ixz, double _iyz)
 {
   this->inertiaIXXSpinBox->setValue(_ixx);
+  this->inertiaIYYSpinBox->setValue(_iyy);
+  this->inertiaIZZSpinBox->setValue(_izz);
   this->inertiaIXYSpinBox->setValue(_ixy);
   this->inertiaIXZSpinBox->setValue(_ixz);
-  this->inertiaIYYSpinBox->setValue(_iyy);
   this->inertiaIYZSpinBox->setValue(_iyz);
-  this->inertiaIZZSpinBox->setValue(_izz);
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIXX() const
+{
+  return this->inertiaIXXSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIYY() const
+{
+  return this->inertiaIYYSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIZZ() const
+{
+  return this->inertiaIZZSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIXY() const
+{
+  return this->inertiaIXYSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIXZ() const
+{
+  return this->inertiaIXZSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double PartGeneralTab::GetInertiaIYZ() const
+{
+  return this->inertiaIYZSpinBox->value();
 }
 
 /////////////////////////////////////////////////

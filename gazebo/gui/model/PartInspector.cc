@@ -69,6 +69,12 @@ PartInspector::~PartInspector()
 }
 
 /////////////////////////////////////////////////
+PartGeneralTab *PartInspector::GetGeneral()
+{
+  return this->generalTab;
+}
+
+/////////////////////////////////////////////////
 void PartInspector::OnCancel()
 {
   this->close();

@@ -94,13 +94,13 @@ namespace gazebo
 
       /// \brief Set the part inertia.
       /// \param[in] _ixx Inertia IXX value.
+      /// \param[in] _iyy Inertia IYY value.
+      /// \param[in] _izz Inertia IZZ value.
       /// \param[in] _ixy Inertia IXY value.
       /// \param[in] _ixz Inertia IXZ value.
-      /// \param[in] _iyy Inertia IYY value.
       /// \param[in] _iyz Inertia IYZ value.
-      /// \param[in] _izz Inertia IZZ value.
-      public: void SetInertia(double _ixx, double _ixy, double _ixz,
-          double _iyy, double _iyz, double _izz);
+      public: void SetInertia(double _ixx, double _iyy, double _izz,
+          double _ixy, double _ixz, double _iyz);
 
       /// \brief Get IXX
       /// \return Inertia IXX value
