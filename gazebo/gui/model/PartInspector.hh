@@ -27,6 +27,7 @@ namespace gazebo
   namespace gui
   {
     class PartGeneralTab;
+    class PartVisualTab;
 
     class PartInspector : public QDialog
     {
@@ -41,7 +42,11 @@ namespace gazebo
 
       /// \brief Get general properties of the part.
       /// \return Tab widget with general properties.
-      public: PartGeneralTab *GetGeneral();
+      public: PartGeneralTab *GetGeneral() const;
+
+      /// \brief Get visual properties of the part.
+      /// \return Tab widget with visual properties.
+      public: PartVisualTab *GetVisual() const;
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
@@ -67,6 +72,9 @@ namespace gazebo
 
       /// \brief Tab widget with configurable general properties.
       private: PartGeneralTab *generalTab;
+
+      /// \brief Tab widget with configurable visual properties.
+      private: PartVisualTab *visualTab;
     };
     /// \}
   }

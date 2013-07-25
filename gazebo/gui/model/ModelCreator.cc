@@ -36,6 +36,7 @@
 #include "gazebo/gui/Gui.hh"
 
 #include "gazebo/gui/model/PartGeneralTab.hh"
+#include "gazebo/gui/model/PartVisualTab.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -547,7 +548,6 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetName()) !=
         this->allParts.end())
     {
-
       PartData *part = this->allParts[vis->GetName()];
       PartGeneralTab *general = part->inspector->GetGeneral();
       general->SetGravity(part->gravity);

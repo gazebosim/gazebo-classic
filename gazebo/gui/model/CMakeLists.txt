@@ -7,11 +7,11 @@ set (sources
   JointInspector.cc
   JointMaker.cc
   ModelCreator.cc
-#  ModelData.cc
   ModelEditor.cc
   ModelEditorPalette.cc
   PartGeneralTab.cc
   PartInspector.cc
+  PartVisualTab.cc
 )
 
 set (qt_headers
@@ -19,11 +19,11 @@ set (qt_headers
   JointInspector.hh
   JointMaker.hh
   ModelCreator.hh
-#  ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
   PartGeneralTab.hh
   PartInspector.hh
+  PartVisualTab.hh
 )
 
 set (headers

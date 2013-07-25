@@ -18,6 +18,7 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/model/PartGeneralTab.hh"
+#include "gazebo/gui/model/PartVisualTab.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 
 using namespace gazebo;
@@ -37,11 +38,13 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   nameLayout->addWidget(partNameLabel);
 
   this->generalTab = new PartGeneralTab;
+  this->visualTab = new PartVisualTab;
 
   // Create the main tab widget for all components in a part
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("partInspectorTab");
-  this->tabWidget->addTab(generalTab, "General");
+  this->tabWidget->addTab(this->generalTab, "General");
+  this->tabWidget->addTab(this->visualTab, "Visual");
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -69,10 +72,17 @@ PartInspector::~PartInspector()
 }
 
 /////////////////////////////////////////////////
-PartGeneralTab *PartInspector::GetGeneral()
+PartGeneralTab *PartInspector::GetGeneral() const
 {
   return this->generalTab;
 }
+
+/////////////////////////////////////////////////
+PartVisualTab *PartInspector::GetVisual() const
+{
+  return this->visualTab;
+}
+
 
 /////////////////////////////////////////////////
 void PartInspector::OnCancel()
