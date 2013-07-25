@@ -16,4 +16,3 @@ message Factory
   optional string edit_name                 = 4;
   optional string clone_model_name          = 5;
 }
-

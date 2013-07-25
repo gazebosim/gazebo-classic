@@ -22,6 +22,9 @@
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/Sensors.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -59,6 +62,12 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
 }
 
 //////////////////////////////////////////////////
@@ -104,8 +113,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(parentElem, "Parent element is NULL");
   GZ_ASSERT(childElem, "Child element is NULL");
 
-  std::string parentName = parentElem->GetValueString();
-  std::string childName = childElem->GetValueString();
+  std::string parentName = parentElem->Get<std::string>();
+  std::string childName = childElem->Get<std::string>();
 
   if (this->model)
   {
@@ -127,7 +136,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->GetValuePose("pose");
+  this->anchorPose = _sdf->Get<math::Pose>("pose");
   this->LoadImpl(this->anchorPose);
 }
 
@@ -155,6 +164,27 @@ void Joint::LoadImpl(const math::Pose &_pose)
   // otherwise set anchor relative to world frame
   else
     this->anchorPos = _pose.pos;
+
+  if (this->sdf->HasElement("sensor"))
+  {
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      /// \todo This if statement is a hack to prevent Joints from creating
+      /// other sensors. We should make this more generic.
+      if (sensorElem->Get<std::string>("type") == "force_torque")
+      {
+        std::string sensorName =
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName());
+        this->sensors.push_back(sensorName);
+      }
+      else
+        gzerr << "A joint cannot load a [" <<
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -168,14 +198,14 @@ void Joint::Init()
   if (this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->GetValueDouble("upper");
-      this->lowerLimit[0] = limitElem->GetValueDouble("lower");
+      this->upperLimit[0] = limitElem->Get<double>("upper");
+      this->lowerLimit[0] = limitElem->Get<double>("lower");
 
       // Perform this three step ordering to ensure the
       // parameters are set properly.
@@ -184,22 +214,22 @@ void Joint::Init()
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
 
-      this->effortLimit[0] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[0] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[0] = limitElem->Get<double>("effort");
+      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
 
   if (this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->GetValueDouble("upper");
-      this->lowerLimit[1] = limitElem->GetValueDouble("lower");
+      this->upperLimit[1] = limitElem->Get<double>("upper");
+      this->lowerLimit[1] = limitElem->Get<double>("lower");
 
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
@@ -208,8 +238,8 @@ void Joint::Init()
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
 
-      this->effortLimit[1] = limitElem->GetValueDouble("effort");
-      this->velocityLimit[1] = limitElem->GetValueDouble("velocity");
+      this->effortLimit[1] = limitElem->Get<double>("effort");
+      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -220,11 +250,11 @@ void Joint::Init()
   // Set axis in physics engines
   if (this->sdf->HasElement("axis"))
   {
-    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+    this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
   }
   if (this->sdf->HasElement("axis2"))
   {
-    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+    this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
   }
 
   this->ComputeInertiaRatio();
@@ -236,9 +266,9 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   math::Vector3 vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
@@ -375,6 +405,21 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_child(this->GetChild()->GetScopedName());
   else
     _msg.set_child("world");
+
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+       iter != this->sensors.end(); ++iter)
+  {
+    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
+    if (sensor)
+    {
+      msgs::Sensor *sensorMsg =_msg.add_sensor();
+      sensor->FillMsg(*sensorMsg);
+    }
+    else
+    {
+      gzlog << "Joint::FillMsg: sensor [" << *iter << "] not found.\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -429,12 +474,13 @@ void Joint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(int /*index*/, math::Angle _angle)
+void Joint::SetAngle(int _index, math::Angle _angle)
 {
   if (this->model->IsStatic())
     this->staticAngle = _angle;
   else
-    this->model->SetJointPosition(this->GetScopedName(), _angle.Radian());
+    this->model->SetJointPosition(
+      this->GetScopedName(), _angle.Radian(), _index);
 }
 
 //////////////////////////////////////////////////
@@ -563,4 +609,30 @@ double Joint::GetInertiaRatio(unsigned int _index) const
 double Joint::GetDamping(int /*_index*/)
 {
   return this->dampingCoefficient;
+}
+
+//////////////////////////////////////////////////
+math::Angle Joint::GetLowerLimit(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+    return this->lowerLimit[_index];
+
+  gzwarn << "requesting lower limit of joint index out of bound\n";
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle Joint::GetUpperLimit(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+    return this->upperLimit[_index];
+
+  gzwarn << "requesting upper limit of joint index out of bound\n";
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+void Joint::SetProvideFeedback(bool _enable)
+{
+  this->provideFeedback = _enable;
 }

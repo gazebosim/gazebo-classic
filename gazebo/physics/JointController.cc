@@ -15,14 +15,14 @@
  *
 */
 
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/Joint.hh"
-#include "physics/Link.hh"
-#include "physics/JointController.hh"
-#include "physics/PhysicsEngine.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -181,11 +181,11 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 
 //////////////////////////////////////////////////
 void JointController::SetJointPosition(const std::string &_name,
-                                       double _position)
+                                       double _position, int _index)
 {
   std::map<std::string, JointPtr>::iterator jiter = this->joints.find(_name);
   if (jiter != this->joints.end())
-    this->SetJointPosition(jiter->second, _position);
+    this->SetJointPosition(jiter->second, _position, _index);
   else
     gzwarn << "SetJointPosition [" << _name << "] not found\n";
 }
@@ -201,18 +201,28 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetScopedName());
-    if (jiter != _jointPositions.end())
-      this->SetJointPosition(iter->second, jiter->second);
+    // First try name without scope, i.e. joint_name
+    jiter = _jointPositions.find(iter->second->GetName());
+
+    if (jiter == _jointPositions.end())
+    {
+      // Second try name with scope, i.e. model_name::joint_name
+      jiter = _jointPositions.find(iter->second->GetScopedName());
+      if (jiter == _jointPositions.end())
+        continue;
+    }
+
+    this->SetJointPosition(iter->second, jiter->second);
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::SetJointPosition(JointPtr _joint, double _position)
+void JointController::SetJointPosition(
+  JointPtr _joint, double _position, int _index)
 {
   // truncate position by joint limits
-  double lower = _joint->GetLowStop(0).Radian();
-  double upper = _joint->GetHighStop(0).Radian();
+  double lower = _joint->GetLowStop(_index).Radian();
+  double upper = _joint->GetHighStop(_index).Radian();
   _position = _position < lower? lower : (_position > upper? upper : _position);
 
   // keep track of updatd links, make sure each is upated only once
@@ -220,7 +230,9 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
   // only deal with hinge and revolute joints in the user
   // request joint_names list
-  if (_joint->HasType(Base::HINGE_JOINT) || _joint->HasType(Base::SLIDER_JOINT))
+  if (_joint->HasType(Base::HINGE_JOINT) ||
+      _joint->HasType(Base::UNIVERSAL_JOINT) ||
+      _joint->HasType(Base::SLIDER_JOINT))
   {
     LinkPtr parentLink = _joint->GetParent();
     LinkPtr childLink = _joint->GetChild();
@@ -232,7 +244,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       // transform about the current anchor, about the axis
       // rotate child (childLink) about anchor point, by delta-angle
       // along axis
-      double dposition = _position - _joint->GetAngle(0).Radian();
+      double dposition = _position - _joint->GetAngle(_index).Radian();
 
       math::Vector3 anchor;
       math::Vector3 axis;
@@ -242,13 +254,13 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
         math::Pose linkWorldPose = childLink->GetWorldPose();
         /// \TODO: we want to get axis in global frame, but GetGlobalAxis
         /// not implemented for static models yet.
-        axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+        axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(_index));
         anchor = linkWorldPose.pos;
       }
       else
       {
-        anchor = _joint->GetAnchor(0);
-        axis = _joint->GetGlobalAxis(0);
+        anchor = _joint->GetAnchor(_index);
+        axis = _joint->GetGlobalAxis(_index);
       }
 
       // we don't want to move the parent link
@@ -272,7 +284,8 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 {
   if (!this->ContainsLink(this->updatedLinks, _link))
   {
-    if (_joint->HasType(Base::HINGE_JOINT))
+    if (_joint->HasType(Base::HINGE_JOINT) ||
+        _joint->HasType(Base::UNIVERSAL_JOINT))
     {
       math::Pose linkWorldPose = _link->GetWorldPose();
 
@@ -390,7 +403,7 @@ void JointController::AddConnectedLinks(Link_V &_linksOut,
     {
       // catch additional roots by looping
       // through all parents of childLink,
-      // but skip parent link is self (_link)
+      // but skip parent link itself (_link)
       Link_V parentLinks = (*childLink)->GetParentJointsLinks();
       for (Link_V::iterator parentLink = parentLinks.begin();
                                           parentLink != parentLinks.end();

@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
@@ -112,7 +112,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
@@ -158,10 +158,20 @@ void Link::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-                               this->GetScopedName());
-      this->sensors.push_back(sensorName);
+      /// \todo This if statement is a hack to prevent Links from creating
+      /// a force torque sensor. We should make this more generic.
+      if (sensorElem->Get<std::string>("type") == "force_torque")
+      {
+        gzerr << "A link cannot load a [" <<
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
+      }
+      else if (sensorElem->Get<std::string>("type") != "__default__")
+      {
+        std::string sensorName =
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName());
+        this->sensors.push_back(sensorName);
+      }
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
@@ -235,8 +245,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -312,13 +322,13 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
-  if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
-    this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
+    this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   // before loading child collsiion, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
 
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -345,7 +355,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     while (collisionElem)
     {
       CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
-          this->GetChild(collisionElem->GetValueString("name")));
+          this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
         collision->UpdateParameters(collisionElem);
@@ -412,7 +422,7 @@ bool Link::GetSelfCollide()
 {
   GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
   if (this->sdf->HasElement("self_collide"))
-    return this->sdf->GetValueBool("self_collide");
+    return this->sdf->Get<bool>("self_collide");
   else
     return false;
 }
@@ -758,7 +768,8 @@ void Link::FillMsg(msgs::Link &_msg)
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)
   {
-    if (this->GetChild(j)->HasType(Base::COLLISION))
+    if (this->GetChild(j)->HasType(Base::COLLISION) &&
+       !this->GetChild(j)->HasType(Base::SENSOR_COLLISION))
     {
       CollisionPtr coll = boost::dynamic_pointer_cast<Collision>(
           this->GetChild(j));
@@ -793,12 +804,13 @@ void Link::FillMsg(msgs::Link &_msg)
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + elem->GetValueString("name"));
-    proj->set_texture(elem->GetValueString("texture"));
-    proj->set_fov(elem->GetValueDouble("fov"));
-    proj->set_near_clip(elem->GetValueDouble("near_clip"));
-    proj->set_far_clip(elem->GetValueDouble("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
+    proj->set_name(
+        this->GetScopedName() + "::" + elem->Get<std::string>("name"));
+    proj->set_texture(elem->Get<std::string>("texture"));
+    proj->set_fov(elem->Get<double>("fov"));
+    proj->set_near_clip(elem->Get<double>("near_clip"));
+    proj->set_far_clip(elem->Get<double>("far_clip"));
+    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
 }
 
@@ -932,7 +944,7 @@ void Link::SetState(const LinkState &_state)
 double Link::GetLinearDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("linear");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
   else
     return 0.0;
 }
@@ -941,7 +953,7 @@ double Link::GetLinearDamping() const
 double Link::GetAngularDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("angular");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("angular");
   else
     return 0.0;
 }

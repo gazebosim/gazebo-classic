@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/CollisionState.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/CollisionState.hh"
+#include "gazebo/physics/Entity.hh"
 
 namespace gazebo
 {
@@ -227,7 +227,7 @@ namespace gazebo
       /// \brief The laser retro value.
       private: float laserRetro;
 
-      /// \brief Collision state.
+      /// \brief Stores collision state information.
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.

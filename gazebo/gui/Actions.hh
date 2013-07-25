@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

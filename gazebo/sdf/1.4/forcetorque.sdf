@@ -1,0 +1,6 @@
+<element name="force_torque" required="0">
+  <description>These elements are specific to the force torque sensor.</description>
+  <element name="frame" type="string" default="parent" required="0">
+    <description>Frame in which to report the wrench values.</description>
+  </element> 
+</element>

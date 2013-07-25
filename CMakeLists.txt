@@ -7,14 +7,15 @@ endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 8)
+set (GAZEBO_MINOR_VERSION 9)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 6)
+set (GAZEBO_PATCH_VERSION 5)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -152,6 +153,21 @@ message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
+# Define some variables that are going to be used in two places:
+# 1. In CMake code to pass preprocessor definitions to certain source files
+# (especially in common/CMakeLists.txt).
+# 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
+set(GAZEBO_DEFAULT_MASTER_HOST localhost)
+set(GAZEBO_DEFAULT_MASTER_PORT 11345)
+set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/share/gazebo_models)
+set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
+set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
+# Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
+# we pass it to the compiler later.
+string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
+
+
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
 endif()
@@ -196,7 +212,7 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "Release" CACHE STRING 
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING 
         "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with 
@@ -286,21 +302,26 @@ else (build_errors)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/unversioned/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
+  # This is only needed for backward compatibility with the internal
+  # version of SDF
+  if (NOT HAVE_SDF)
+    include_directories(${PROJECT_SOURCE_DIR}/gazebo)
+  endif()
   
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
-    add_subdirectory(sdf)
     add_subdirectory(media)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
+    add_subdirectory(sdf)
   endif (BUILD_GAZEBO)
 
   ########################################
@@ -311,6 +332,22 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
+
+  ########################################
+  # Make the cmake config files
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
+  if (HAVE_SDF)
+    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport)
+    set(PKG_DEPENDS Boost Protobuf SDFormat)
+  else()
+    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport gazebo_sdf_interface)
+    set(PKG_DEPENDS Boost Protobuf)
+  endif()
+
+  set(cmake_conf_file "cmake/gazebo-config.cmake")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
+
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,

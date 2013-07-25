@@ -14,41 +14,34 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh collisionetry
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
-#ifndef _BULLETTRIMESHSHAPE_HH_
-#define _BULLETTRIMESHSHAPE_HH_
-
-#include "physics/TrimeshShape.hh"
+#ifndef _KEYEVENT_HH_
+#define _KEYEVENT_HH_
 
 namespace gazebo
 {
-  namespace physics
+  namespace common
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \addtogroup gazebo_common
     /// \{
 
-    /// \brief Triangle mesh collision
-    class BulletTrimeshShape : public TrimeshShape
+    /// \class KeyEvent KeyEvent.hh common/common.hh
+    /// \brief Generic description of a keyboard event.
+    class KeyEvent
     {
-      /// \brief Constructor
-      public: BulletTrimeshShape(CollisionPtr _parent);
+      /// \brief Key event types enumeration.
+      public: enum EventType {NO_EVENT, PRESS, RELEASE};
 
-      /// \brief Destructor
-      public: virtual ~BulletTrimeshShape();
+      /// \brief Constructor.
+      public: KeyEvent()
+              : type(NO_EVENT), key(0)
+              {}
 
-      /// \brief Load the trimesh
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      /// \brief Event type.
+      public: EventType type;
 
-      protected: virtual void Init();
+      public: int key;
     };
-
     /// \}
   }
 }
 #endif
-

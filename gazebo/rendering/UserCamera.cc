@@ -275,10 +275,11 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 {
   Camera::TrackVisualImpl(_visual);
-  if (_visual)
+  /*if (_visual)
     this->SetViewController(OrbitViewController::GetTypeString());
   else
     this->SetViewController(FPSViewController::GetTypeString());
+    */
 
   return true;
 }
@@ -338,7 +339,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
-      this->sdf->GetValueDouble("horizontal_fov");
+      this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

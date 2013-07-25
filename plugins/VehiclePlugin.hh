@@ -18,16 +18,16 @@
  * Author: Nate Koenig
  */
 
-#ifndef __GAZEBO_VEHICLE_PLUGIN_HH__
-#define __GAZEBO_VEHICLE_PLUGIN_HH__
+#ifndef _GAZEBO_VEHICLE_PLUGIN_HH_
+#define _GAZEBO_VEHICLE_PLUGIN_HH_
 
 #include <string>
 #include <vector>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/transport.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

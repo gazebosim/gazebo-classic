@@ -15,12 +15,12 @@
  *
 */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/Physics.hh"
-#include "gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 

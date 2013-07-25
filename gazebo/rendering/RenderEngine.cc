@@ -30,30 +30,30 @@
 
 #include <boost/filesystem.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
-#include "common/Common.hh"
-#include "common/Color.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/SystemPaths.hh"
 
-#include "rendering/Material.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
-#include "rendering/Visual.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -455,9 +455,9 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
       }
     }
   }
-  catch(Ogre::Exception)
+  catch(Ogre::Exception &/*_e*/)
   {
-    gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
+    gzthrow("Unable to load Ogre Resources.\nMake sure the"
         "resources path in the world file is set correctly.");
   }
 }
@@ -535,10 +535,10 @@ void RenderEngine::SetupResources()
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
             aiter->first, "FileSystem", aiter->second);
       }
-      catch(Ogre::Exception)
+      catch(Ogre::Exception &/*_e*/)
       {
-        gzthrow(std::string("Unable to load Ogre Resources.\n") +
-            "Make sure the resources path in the world file is set correctly.");
+        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+            "in the world file is set correctly.");
       }
     }
   }

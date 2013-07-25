@@ -32,10 +32,14 @@ namespace gazebo
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
+    std::string find_file(const std::string &_file);
+
+    /// \brief search for file in common::SystemPaths
+    /// \param[in] _file Name of the file to find.
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
     std::string find_file(const std::string &_file,
-                          bool _searchLocalPath = true);
+                          bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for

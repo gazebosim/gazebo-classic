@@ -32,13 +32,13 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->world = _world;
 
-  math::Vector3 bottomRight = _sdf->GetValueVector3("bottom_right");
-  math::Vector3 topLeft = _sdf->GetValueVector3("top_left");
-  math::Vector3 minSize = _sdf->GetValueVector3("min_size");
-  math::Vector3 maxSize = _sdf->GetValueVector3("max_size");
-  double minMass = _sdf->GetValueDouble("min_mass");
-  double maxMass = _sdf->GetValueDouble("max_mass");
-  unsigned int count = _sdf->GetValueUInt("count");
+  math::Vector3 bottomRight = _sdf->Get<math::Vector3>("bottom_right");
+  math::Vector3 topLeft = _sdf->Get<math::Vector3>("top_left");
+  math::Vector3 minSize = _sdf->Get<math::Vector3>("min_size");
+  math::Vector3 maxSize = _sdf->Get<math::Vector3>("max_size");
+  double minMass = _sdf->Get<double>("min_mass");
+  double maxMass = _sdf->Get<double>("max_mass");
+  unsigned int count = _sdf->Get<unsigned int>("count");
 
   std::vector<CompoundObj> objects;
   std::vector<CompoundObj>::iterator iter;
@@ -187,7 +187,7 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pose << "</pose>"
     "<link name='link'>"
@@ -232,7 +232,7 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
   float sy = _size.y;
   float sz = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<allow_auto_disable>true</allow_auto_disable>"
     "<pose>" << _pose << "</pose>"
@@ -277,7 +277,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
   float r = _size.x * 0.5;
   float h = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"

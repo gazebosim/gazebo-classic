@@ -20,8 +20,8 @@
  */
 
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector2d.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -72,12 +72,11 @@ void Vector2d::Set(double _x, double _y)
   this->y = _y;
 }
 
-
 //////////////////////////////////////////////////
-Vector2d &Vector2d::operator =(const Vector2d &pt)
+Vector2d &Vector2d::operator =(const Vector2d &_pt)
 {
-  this->x = pt.x;
-  this->y = pt.y;
+  this->x = _pt.x;
+  this->y = _pt.y;
 
   return *this;
 }
