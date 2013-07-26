@@ -145,7 +145,7 @@ void Sensor::Update(bool _force)
       simTime = this->world->GetSimTime();
 
     if (simTime == this->lastUpdateTime && !_force)
-        return;
+      return;
 
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
