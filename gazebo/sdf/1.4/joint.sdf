@@ -119,6 +119,17 @@
         <description>Force cut in the multibody graph at this joint.</description>
       </element>
     </element>
+    <element name="simbody" required="0">
+      <element name="limit" required="0">
+        <description></description>
+        <element name="stiffness" type="double" default="1e6" required="1">
+          <description>Joint stop stiffness.</description>
+        </element>
+        <element name="dissipation" type="double" default="0.1" required="1">
+          <description>Joint stop dissipation.</description>
+        </element>
+      </element>
+    </element>
     <element name="ode" required="0">
       <description>ODE specific parameters</description>
       <element name="provide_feedback" type="bool" default="false" required="0">
