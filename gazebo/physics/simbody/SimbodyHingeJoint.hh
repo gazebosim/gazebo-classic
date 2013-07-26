@@ -48,12 +48,6 @@ namespace gazebo
       /// \brief Load the SimbodyHingeJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
       /// \brief Set the axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);
 
@@ -61,7 +55,7 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
        /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(int _index, double _rate);
 
       /// \brief Get the rotation rate
       public: virtual double GetVelocity(int _index) const;

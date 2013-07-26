@@ -48,21 +48,6 @@ void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHingeJoint::GetAnchor(int /*_index*/) const
-{
-  gzdbg << "SimbodyHingeJoint::GetAnchor Not implemented...\n";
-  return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-void SimbodyHingeJoint::SetAnchor(int /*_index*/,
-                                 const math::Vector3 &/*_anchor*/)
-{
-  gzdbg << "SetAnchor Not implemented...\n";
-  // The anchor (pivot in Simbody lingo), can only be set on creation
-}
-
-//////////////////////////////////////////////////
 void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
@@ -71,39 +56,62 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
+void SimbodyHingeJoint::SetDamping(int _index, double _damping)
 {
-  gzerr << "SetDamping Not implemented\n";
+  if (_index < this->GetAngleCount())
+  {
+    this->dampingCoefficient = _damping;
+    this->damper.setDamping(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      _damping);
+  }
+  else
+    gzerr << "SetDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void SimbodyHingeJoint::SetVelocity(int _index, double _rate)
 {
-  gzerr << "SetVelocity Not implemented...\n";
+  if (_index < this->GetAngleCount())
+    this->mobod.setOneU(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      SimTK::MobilizerUIndex(_index), _rate);
+  else
+    gzerr << "SetDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetVelocity(int _index) const
 {
   if (_index < this->GetAngleCount())
-    return this->mobod.getOneU(
-      this->simbodyPhysics->integ->getState(),
-      SimTK::MobilizerUIndex(_index));
+  {
+    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+      return this->mobod.getOneU(
+        this->simbodyPhysics->integ->getState(),
+        SimTK::MobilizerUIndex(_index));
+    else
+    {
+      gzwarn << "Simbody::GetVelocity() simbody not yet initialized\n";
+      return SimTK::NaN;
+    }
+  }
   else
+  {
     gzerr << "Invalid index for joint, returning NaN\n";
-  return SimTK::NaN;
+    return SimTK::NaN;
+  }
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetMaxForce(int /*_index*/, double _t)
 {
-  gzerr << "Not implemented...\n";
+  gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 {
-  gzerr << "Not implemented...\n";
+  gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
   return 0;
 }
 
@@ -127,16 +135,11 @@ void SimbodyHingeJoint::SetHighStop(int _index,
   {
     if (this->physicsInitialized)
     {
-      if (this->limitForce)
-        this->limitForce->setBounds(
-          this->simbodyPhysics->integ->updAdvancedState(),
-          this->limitForce->getLowerBound(
-            this->simbodyPhysics->integ->updAdvancedState()),
-          _angle.Radian()
-          );
-      else
-        gzdbg << "limitForce for joint ["
-              << this->GetName() << "] is NULL, new model added?\n";
+      this->limitForce.setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        this->limitForce.getLowerBound(
+          this->simbodyPhysics->integ->updAdvancedState()),
+        _angle.Radian());
     }
     else
     {
@@ -156,16 +159,11 @@ void SimbodyHingeJoint::SetLowStop(int _index,
   {
     if (this->physicsInitialized)
     {
-      if (this->limitForce)
-        this->limitForce->setBounds(
-          this->simbodyPhysics->integ->updAdvancedState(),
-          _angle.Radian(),
-          this->limitForce->getUpperBound(
-            this->simbodyPhysics->integ->updAdvancedState())
-          );
-      else
-        gzdbg << "limitForce for joint ["
-              << this->GetName() << "] is NULL, new model added?\n";
+      this->limitForce.setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _angle.Radian(),
+        this->limitForce.getUpperBound(
+          this->simbodyPhysics->integ->updAdvancedState()));
     }
     else
     {
@@ -177,19 +175,29 @@ void SimbodyHingeJoint::SetLowStop(int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
+math::Angle SimbodyHingeJoint::GetHighStop(int _index)
 {
-  math::Angle result;
-  // gzerr << "Not implemented...\n";
-  return result;
+  if (_index < this->GetAngleCount())
+    return math::Angle(this->limitForce.getUpperBound(
+            this->simbodyPhysics->integ->getAdvancedState()));
+  else
+  {
+    gzerr << "GetHighStop _index too large.\n";
+    return math::Angle(SimTK::NaN);
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
+math::Angle SimbodyHingeJoint::GetLowStop(int _index)
 {
-  math::Angle result;
-  // gzerr << "Not implemented...\n";
-  return result;
+  if (_index < this->GetAngleCount())
+    return math::Angle(this->limitForce.getLowerBound(
+            this->simbodyPhysics->integ->getAdvancedState()));
+  else
+  {
+    gzerr << "GetLowStop _index too large.\n";
+    return math::Angle(SimTK::NaN);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -214,7 +222,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
     else
       gzwarn << "Simbody::GetGlobalAxis() sibmody physics"
              << " engine not initialized yet.\n";
-    return math::Vector3();
+    return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
   }
 }
 
@@ -229,12 +237,12 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
     else
     {
       gzwarn << "Simbody::GetAngleImpl() simbody not yet initialized\n";
-      return math::Angle();
+      return math::Angle(SimTK::NaN);
     }
   }
   else
   {
     gzerr << "index out of bound\n";
-    return math::Angle();
+    return math::Angle(SimTK::NaN);
   }
 }

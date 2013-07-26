@@ -273,15 +273,15 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
   SimTK::Vec3 reactionForceOnParentBody =
     ~R_GP * spatialForceOnParentBodyInGround[1];
 
-  gzerr << "parent[" << this->GetName()
-        << "]: t[" << reactionTorqueOnParentBody
-        << "] f[" << reactionForceOnParentBody
-        << "]\n";
+  // gzerr << "parent[" << this->GetName()
+  //       << "]: t[" << reactionTorqueOnParentBody
+  //       << "] f[" << reactionForceOnParentBody
+  //       << "]\n";
 
-  gzerr << "child[" << this->GetName()
-        << "]: t[" << reactionTorqueOnChildBody
-        << "] f[" << reactionForceOnChildBody
-        << "]\n";
+  // gzerr << "child[" << this->GetName()
+  //       << "]: t[" << reactionTorqueOnChildBody
+  //       << "] f[" << reactionForceOnChildBody
+  //       << "]\n";
 
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.

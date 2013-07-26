@@ -131,9 +131,17 @@ namespace gazebo
       // mobilizer or a constraint, but not both. The type of either one is the
       // same as the joint type above.
 
+      /// \brief: for enforcing joint damping forces
+      /// \TODO: Make these arrays for multi-axis joints.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom dampers for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearDamper damper;
+
       /// \brief: for enforcing joint stops
-      public: boost::shared_ptr<SimTK::Force::MobilityLinearStop> limitForce;
-      // public: SimTK::Force::MobilityLinearStop limitForce;
+      /// \TODO: Make these arrays for multi-axis joints.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom dampers for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearStop limitForce;
 
       // isValid() if we used a mobilizer
       public: SimTK::MobilizedBody mobod;

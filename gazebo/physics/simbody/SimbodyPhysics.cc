@@ -693,20 +693,26 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             double low = gzJoint->GetLowerLimit(0u).Radian();
             double high = gzJoint->GetUpperLimit(0u).Radian();
 
+            /// \TODO: get these from joint.sdf
+            const double stopStiffness = 1.0e8;
+            const double stopDissipation = 1.0;
+
             /// \TODO: make stop stiffness, damping with parameters
             /// FIXME: remove hardcoded values.
-            gzJoint->limitForce.reset(
-              new Force::MobilityLinearStop(this->forces, mobod,
-              SimTK::MobilizerQIndex(0), 1.0e8, 1.0, low, high));
+            gzJoint->limitForce =
+              Force::MobilityLinearStop(this->forces, mobod,
+              SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
+              low, high);
 
-            if (gzJoint->GetDampingCoefficient() > 0.0)
-            {
-              // gzdbg << "SimbodyPhysics SetDamping ("
-              //       << gzJoint->GetDampingCoefficient()
-              //       << ")\n";
+            // gzdbg << "SimbodyPhysics SetDamping ("
+            //       << gzJoint->GetDampingCoefficient()
+            //       << ")\n";
+            // Create a damper for every joint even if damping coefficient
+            // is zero.  This will allow user to change damping coefficients
+            // on the fly.
+            gzJoint->damper =
               Force::MobilityLinearDamper(this->forces,mobod,0,
-                                         gzJoint->GetDampingCoefficient());
-            }
+                                       gzJoint->GetDampingCoefficient());
 
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
@@ -724,6 +730,27 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 massProps,              X_OM, 
                 direction);
             mobod = sliderJoint;
+
+            double low = gzJoint->GetLowerLimit(0u).Radian();
+            double high = gzJoint->GetUpperLimit(0u).Radian();
+
+            /// \TODO: get these from joint.sdf
+            const double stopStiffness = 1.0e8;
+            const double stopDissipation = 1.0;
+
+            /// \TODO: make stop stiffness, damping with parameters
+            /// FIXME: remove hardcoded values.
+            gzJoint->limitForce =
+              Force::MobilityLinearStop(this->forces, mobod,
+              SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
+              low, high);
+
+            // Create a damper for every joint even if damping coefficient
+            // is zero.  This will allow user to change damping coefficients
+            // on the fly.
+            gzJoint->damper =
+              Force::MobilityLinearDamper(this->forces,mobod,0,
+                                       gzJoint->GetDampingCoefficient());
 
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
@@ -958,8 +985,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
           (boost::shared_dynamic_cast<physics::BoxShape>(
           (*ci)->GetShape()))->GetSize())/2;
 
-        // const int resolution = 1;  // number times to chop the longest side.
-        const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
+        /// \TODO: make collision resolution an adjustable parameter
+        const int resolution = 2;  // number times to chop the longest side.
+        // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);
         const ContactGeometry::TriangleMesh triMesh(mesh);

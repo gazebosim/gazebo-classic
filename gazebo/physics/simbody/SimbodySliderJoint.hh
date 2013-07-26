@@ -48,14 +48,26 @@ namespace gazebo
       /// \brief Load the SimbodySliderJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
-
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, const double _damping);
+
+       /// \brief Set the velocity of an axis(index).
+      public: virtual void SetVelocity(int _index, double _rate);
+
+      /// \brief Get the rate of change
+      public: virtual double GetVelocity(int _index) const;
+
+      /// \brief Set the max allowed force of an axis(index).
+      public: virtual void SetMaxForce(int _index, double _t);
+
+      /// \brief Get the max allowed force of an axis(index).
+      public: virtual double GetMaxForce(int _index);
+
+      /// \brief Set the slider force
+      public: virtual void SetForce(int _index, double _force);
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
@@ -68,24 +80,6 @@ namespace gazebo
 
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int _index);
-
-      /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngle(int _index) const;
-
-      /// \brief Get the rate of change
-      public: virtual double GetVelocity(int _index) const;
-
-       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
-
-      /// \brief Set the slider force
-      public: virtual void SetForce(int _index, double _force);
-
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _t);
-
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int _index);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
