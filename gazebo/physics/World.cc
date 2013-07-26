@@ -176,7 +176,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // pose pub for server side, mainly used for updating and timestamping
   // Scene, which in turn will be used by rendering sensors.
-  // TODO: replace local communication with shared memory efficiency
+  // TODO: replace local communication with shared memory for efficiency.
   this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
     "~/pose/local/info", 10);
 
