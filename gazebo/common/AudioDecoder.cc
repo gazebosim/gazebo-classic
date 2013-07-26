@@ -62,10 +62,12 @@ void AudioDecoder::Cleanup()
 {
 #ifdef HAVE_FFMPEG
   // Close the audio file
-  avformat_close_input(&this->formatCtx);
+  if (this->formatCtx)
+    avformat_close_input(&this->formatCtx);
 
   // Close the codec
-  avcodec_close(this->codecCtx);
+  if (this->codecCtx)
+    avcodec_close(this->codecCtx);
 #endif
 }
 
@@ -99,7 +101,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     *_outBuffer = NULL;
   }
 
-  FILE *f = fopen("/home/nkoenig/Music/track2.wav", "rb");
+  FILE *f = fopen(this->filename.c_str(), "rb");
 
   if (!f)
   {
@@ -213,7 +215,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   // Retrieve some information
   if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
   {
-    gzerr << "Unable to find stream info\n";
+    gzerr << "Unable to find stream info.\n";
     return false;
   }
 
@@ -233,7 +235,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   if (this->audioStream == -1)
   {
-    gzerr << "Couldn't find audio stream\n";
+    gzerr << "Couldn't find audio stream.\n";
     return false;
   }
 
@@ -245,7 +247,7 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   if (this->codec == NULL)
   {
-    perror("couldn't find codec");
+    gzerr << "Couldn't find codec for audio stream.\n";
     return false;
   }
 
@@ -256,6 +258,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avcodec_open2(this->codecCtx, this->codec, NULL) < 0)
     perror("couldn't open codec");
 
+  this->filename = _filename;
+
   return true;
 }
 #else
@@ -264,3 +268,9 @@ bool AudioDecoder::SetFile(const std::string & /*_filename*/)
   return false;
 }
 #endif
+
+/////////////////////////////////////////////////
+std::string AudioDecoder::GetFile() const
+{
+  return this->filename;
+}

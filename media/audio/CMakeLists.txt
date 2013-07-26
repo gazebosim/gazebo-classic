@@ -1,2 +1,2 @@
-SET(files cheer.wav)
+SET(files cheer.wav cheer.ogg)
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/audio)

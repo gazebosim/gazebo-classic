@@ -89,6 +89,7 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  AudioDecoder_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc

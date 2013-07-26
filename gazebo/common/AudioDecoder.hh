@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef _AUDIO_DECODER_HH_
-#define _AUDIO_DECODER_HH_
+#ifndef _GAZEBO_AUDIO_DECODER_HH_
+#define _GAZEBO_AUDIO_DECODER_HH_
 
 #include <stdint.h>
 #include <string>
@@ -47,6 +47,11 @@ namespace gazebo
       /// \param[in] _filename Path to an audio file.
       /// \return True if the file was successfull opened.
       public: bool SetFile(const std::string &_filename);
+
+      /// \brief Get the audio filename that was set.
+      /// \return The name of the set audio file.
+      /// \sa AudioDecoder::SetFile
+      public: std::string GetFile() const;
 
       /// \brief Decode the loaded audio file.
       /// \sa AudioDecoder::SetFile
@@ -75,6 +80,9 @@ namespace gazebo
 
       /// \brief True when initialized. We just want to initialize once.
       private: static bool initialized;
+
+      /// \brief Audio file to decode.
+      private: std::string filename;
     };
   }
 }

@@ -28,6 +28,7 @@
 #include <AL/alc.h>
 #include <AL/alext.h>
 
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/AudioDecoder.hh"
@@ -52,7 +53,7 @@ OpenAL::~OpenAL()
 }
 
 /////////////////////////////////////////////////
-void OpenAL::Load()
+bool OpenAL::Load()
 {
   std::string deviceName = "default";
 
@@ -74,7 +75,7 @@ void OpenAL::Load()
   {
     gzerr << "Unable to open audio device["
       << deviceName << "]\n Audio will be disabled.\n";
-    return;
+    return false;
   }
 
   // Create the audio context
@@ -83,7 +84,7 @@ void OpenAL::Load()
   if (this->context == NULL)
   {
     gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
-    return;
+    return false;
   }
 
   // Make the context current
@@ -93,6 +94,8 @@ void OpenAL::Load()
   alGetError();
 
   alDistanceModel(AL_EXPONENT_DISTANCE);
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -240,15 +243,18 @@ OpenALSource::~OpenALSource()
 void OpenALSource::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf->HasElement("pitch"))
-    this->SetPitch(_sdf->GetValueDouble("pitch"));
+    this->SetPitch(_sdf->Get<double>("pitch"));
 
   if (_sdf->HasElement("gain"))
-    this->SetGain(_sdf->GetValueDouble("gain"));
+    this->SetGain(_sdf->Get<double>("gain"));
 
   if (_sdf->HasElement("loop"))
-    this->SetLoop(_sdf->GetValueBool("loop"));
+    this->SetLoop(_sdf->Get<bool>("loop"));
 
-  this->FillBufferFromFile("/home/nkoenig/Music/track2.wav");
+  if (_sdf->HasElement("uri"))
+    this->FillBufferFromFile(_sdf->Get<std::string>("uri"));
+  else
+    gzerr << "<audio_source> is missing <uri>...</uri> element\n";
 }
 
 /////////////////////////////////////////////////
@@ -426,7 +432,7 @@ void OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
 /////////////////////////////////////////////////
 void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 {
-  std::string fullPathAudioFile = _audioFile;
+  std::string fullPathAudioFile = common::find_file(_audioFile);
 
   // Try to open the audio file in the current directory
   FILE *testFile = fopen(fullPathAudioFile.c_str(), "r");
@@ -435,22 +441,6 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
   if (testFile == NULL)
   {
     gzerr << "Unable to open audio file[" << _audioFile << "]\n";
-
-    /*std::list<std::string>::iterator iter;
-    GazeboConfig *gzconfig = Simulator::Instance()->GetGazeboConfig();
-
-    for (iter = gzconfig->GetGazeboPaths().begin();
-        iter != gzconfig->GetGazeboPaths().end();
-        iter++)
-    {
-      fullPathAudioFile = *iter + "/Media/audio/" + audioFile;
-      testFile = fopen(fullPathAudioFile.c_str(), "r");
-
-      if (testFile)
-      {
-        break;
-      }
-    }*/
   }
 
   uint8_t *dataBuffer = NULL;

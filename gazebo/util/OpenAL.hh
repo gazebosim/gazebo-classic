@@ -18,17 +18,18 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef _OPENAL_HH_
-#define _OPENAL_HH_
+#ifndef _GAZEBO_OPENAL_HH_
+#define _GAZEBO_OPENAL_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Vector3.hh"
-
-#include "gazebo/sdf/sdf.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/common/SingletonT.hh"
 
 #include "gazebo/gazebo_config.h"
+
 #ifdef HAVE_OPENAL
 
 struct ALCcontext_struct;
@@ -50,13 +51,14 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~OpenAL();
 
-      /// \brief Load the OpenAL server
-      public: void Load();
+      /// \brief Load the OpenAL server.
+      /// \return True on success.
+      public: bool Load();
 
-      /// \brief Initialize
+      /// \brief Initialize.
       public: void Init();
 
-      /// \brief Finalize
+      /// \brief Finalize.
       public: void Fini();
 
       /// \brief Create an OpenALSource object.
