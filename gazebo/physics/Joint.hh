@@ -344,7 +344,8 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Set the max allowed force of an axis(index).
+      /// \brief Set the max allowed force of an axis(index)
+      /// given prescribed joint velocity.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.  E.g.  if you are using
       /// metric units, the unit for force is Newtons.  If using
