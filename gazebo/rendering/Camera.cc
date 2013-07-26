@@ -24,8 +24,6 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/sdf/sdf.hh"
-
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/common/Assert.hh"
