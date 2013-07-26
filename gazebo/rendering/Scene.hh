@@ -25,7 +25,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"

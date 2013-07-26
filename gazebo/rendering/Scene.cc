@@ -20,7 +20,6 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
@@ -184,6 +183,8 @@ void Scene::Clear()
 
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
+
+  this->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -284,11 +285,11 @@ void Scene::Init()
   if (this->sdf->HasElement("fog"))
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
-    this->SetFog(fogElem->GetValueString("type"),
-                 fogElem->GetValueColor("color"),
-                 fogElem->GetValueDouble("density"),
-                 fogElem->GetValueDouble("start"),
-                 fogElem->GetValueDouble("end"));
+    this->SetFog(fogElem->Get<std::string>("type"),
+                 fogElem->Get<common::Color>("color"),
+                 fogElem->Get<double>("density"),
+                 fogElem->Get<double>("start"),
+                 fogElem->Get<double>("end"));
   }
 
   // Create ray scene query
@@ -404,7 +405,7 @@ void Scene::SetAmbientColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  return this->sdf->GetValueColor("ambient");
+  return this->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
@@ -436,7 +437,7 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  return this->sdf->GetValueColor("background");
+  return this->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -1368,11 +1369,11 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       elem->GetElement("type")->Set(type);
     }
 
-    this->SetFog(elem->GetValueString("type"),
-                 elem->GetValueColor("color"),
-                 elem->GetValueDouble("density"),
-                 elem->GetValueDouble("start"),
-                 elem->GetValueDouble("end"));
+    this->SetFog(elem->Get<std::string>("type"),
+                 elem->Get<common::Color>("color"),
+                 elem->Get<double>("density"),
+                 elem->Get<double>("start"),
+                 elem->Get<double>("end"));
   }
 
   return true;
@@ -2509,7 +2510,7 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  return this->sdf->GetValueBool("shadows");
+  return this->sdf->Get<bool>("shadows");
 }
 
 /////////////////////////////////////////////////

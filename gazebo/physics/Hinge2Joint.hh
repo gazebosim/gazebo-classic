@@ -22,6 +22,8 @@
 #ifndef _HINGE2JOINT_HH_
 #define _HINGE2JOINT_HH_
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
@@ -58,10 +60,10 @@ namespace gazebo
                 T::Load(_sdf);
 
                 this->SetAxis(0,
-                    _sdf->GetElement("axis")->GetValueVector3("xyz"));
+                    _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
 
                 this->SetAxis(1,
-                    _sdf->GetElement("axis2")->GetValueVector3("xyz"));
+                    _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
               }
     };
     /// \}
