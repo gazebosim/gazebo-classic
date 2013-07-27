@@ -120,10 +120,9 @@ endmacro ()
 
 #################################################
 macro (gz_install_executable _name)
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/tools/make_ronn.py ${_name} ${CMAKE_CURRENT_BINARY_DIR}/${_name}.1.ronn)
-  manpage(${_name} 1)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION_FULL})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+  manpage(${_name} 1)
 endmacro ()
 
 #################################################
