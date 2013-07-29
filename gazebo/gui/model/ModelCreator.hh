@@ -23,12 +23,15 @@
 
 #include <boost/unordered/unordered_map.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/physics/PhysicsTypes.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sdf/sdf.hh"
-#include "gazebo/gui/qt.h"
+#include "gazebo/math/Pose.hh"
 
+#include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 

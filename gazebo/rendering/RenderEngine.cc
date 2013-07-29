@@ -136,12 +136,13 @@ void RenderEngine::Load()
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
-                                   bool _enableVisualizations)
+                                   bool _enableVisualizations,
+                                   bool _isServer)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
   this->scenes.push_back(scene);
 
   scene->Load();

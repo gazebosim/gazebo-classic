@@ -57,6 +57,7 @@ set(dri_tests
   heightmap.cc
   pr2.cc
   projector.cc
+  rendering_sensor.cc
   speed_pr2.cc
 )
 
@@ -67,8 +68,8 @@ gz_build_dri_tests(${dri_tests})
 
 if (VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
-  set_tests_properties(pr2 PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
 
   # Increase timeout, to account for model download time.
-  set_tests_properties(pioneer2dx PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
@@ -24,6 +23,15 @@
 #include "gazebo/sdf/interface/SDF.hh"
 
 using namespace sdf;
+
+void sdf::addURIPath(const std::string &/*_uri*/, const std::string &/*_path*/)
+{
+}
+
+void sdf::setFindCallback(
+    boost::function<std::string (const std::string &)> /*_cb*/)
+{
+}
 
 std::string SDF::version = SDF_VERSION;
 

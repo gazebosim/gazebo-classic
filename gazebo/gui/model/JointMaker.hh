@@ -21,7 +21,10 @@
 #include <string>
 #include <boost/unordered/unordered_map.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
