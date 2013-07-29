@@ -19,8 +19,9 @@
 
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Vector3.hh"

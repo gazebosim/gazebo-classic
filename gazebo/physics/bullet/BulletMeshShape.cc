@@ -69,9 +69,12 @@ void BulletMeshShape::Init()
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)
   {
-    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
-    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
-    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
+    vertices[j*3+0] = vertices[j*3+0] *
+      this->sdf->Get<math::Vector3>("scale").x;
+    vertices[j*3+1] = vertices[j*3+1] *
+      this->sdf->Get<math::Vector3>("scale").y;
+    vertices[j*3+2] = vertices[j*3+2] *
+      this->sdf->Get<math::Vector3>("scale").z;
   }
 
   // Create the Bullet trimesh

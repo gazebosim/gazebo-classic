@@ -57,7 +57,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_sdf, "MudPlugin _sdf pointer is NULL");
   if (_sdf->HasElement("contact_sensor_name"))
   {
-    this->contactSensorName = _sdf->GetValueString("contact_sensor_name");
+    this->contactSensorName = _sdf->Get<std::string>("contact_sensor_name");
   }
   else
   {
@@ -65,15 +65,15 @@ void MudPlugin::Load(physics::ModelPtr _model,
   }
 
   if (_sdf->HasElement("stiffness"))
-    this->stiffness = _sdf->GetValueDouble("stiffness");
+    this->stiffness = _sdf->Get<double>("stiffness");
 
   if (_sdf->HasElement("damping"))
-    this->damping = _sdf->GetValueDouble("damping");
+    this->damping = _sdf->Get<double>("damping");
 
   if (_sdf->HasElement("contact_surface_bitmask"))
   {
     this->contactSurfaceBitmask =
-        _sdf->GetValueUInt("contact_surface_bitmask");
+        _sdf->Get<unsigned int>("contact_surface_bitmask");
   }
 
   if (_sdf->HasElement("link_name"))
@@ -81,7 +81,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
     sdf::ElementPtr elem = _sdf->GetElement("link_name");
     while (elem)
     {
-      allowedLinks.push_back(elem->GetValueString());
+      allowedLinks.push_back(elem->Get<std::string>());
       links.push_back(physics::LinkPtr());
       joints.push_back(physics::JointPtr());
       elem = elem->GetNextElement("link_name");

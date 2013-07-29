@@ -105,12 +105,12 @@ void RaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->GetValueDouble("mean");
-      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseMean = noiseElem->Get<double>("mean");
+      this->noiseStdDev = noiseElem->Get<double>("stddev");
       this->noiseActive = true;
       gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
         " and stddev " << this->noiseStdDev << std::endl;

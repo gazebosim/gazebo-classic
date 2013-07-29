@@ -21,7 +21,8 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include "gazebo/gazebo_config.h"
+#include <sdf/sdf.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -169,24 +170,24 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->maxContacts = _sdf->Get<int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-  this->stepType = solverElem->GetValueString("type");
+  this->stepType = solverElem->Get<std::string>("type");
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
-      odeElem->GetElement("constraints")->GetValueDouble(
+      odeElem->GetElement("constraints")->Get<double>(
         "contact_max_correcting_vel"));
 
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId,
-       odeElem->GetElement("constraints")->GetValueDouble(
+       odeElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer"));
 
   // Enable auto-disable by default. Models with joints are excluded from
@@ -198,7 +199,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
 
-  math::Vector3 g = this->sdf->GetValueVector3("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
 
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -208,9 +209,9 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   if (odeElem->HasElement("constraints"))
   {
     dWorldSetCFM(this->worldId,
-        odeElem->GetElement("constraints")->GetValueDouble("cfm"));
+        odeElem->GetElement("constraints")->Get<double>("cfm"));
     dWorldSetERP(this->worldId,
-        odeElem->GetElement("constraints")->GetValueDouble("erp"));
+        odeElem->GetElement("constraints")->Get<double>("erp"));
   }
   else
     dWorldSetERP(this->worldId, 0.2);
@@ -610,20 +611,20 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 int ODEPhysics::GetSORPGSPreconIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetValueInt("precon_iters");
+      "solver")->Get<int>("precon_iters");
 }
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetValueInt("iters");
+      "solver")->Get<int>("iters");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetSORPGSW()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetValueDouble("sor");
+      "solver")->Get<double>("sor");
 }
 
 //////////////////////////////////////////////////
@@ -631,7 +632,7 @@ double ODEPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
-  return elem->GetValueDouble("cfm");
+  return elem->Get<double>("cfm");
 }
 
 //////////////////////////////////////////////////
@@ -639,21 +640,21 @@ double ODEPhysics::GetWorldERP()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
-  return elem->GetValueDouble("erp");
+  return elem->Get<double>("erp");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactMaxCorrectingVel()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->GetValueDouble("contact_max_correcting_vel");
+      "constraints")->Get<double>("contact_max_correcting_vel");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactSurfaceLayer()
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->GetValueDouble("contact_surface_layer");
+      "constraints")->Get<double>("contact_surface_layer");
 }
 
 //////////////////////////////////////////////////
@@ -719,7 +720,7 @@ dSpaceID ODEPhysics::GetSpaceId() const
 std::string ODEPhysics::GetStepType() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
-  return elem->GetValueString("type");
+  return elem->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -1312,54 +1313,54 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
   {
     case SOLVER_TYPE:
     {
-      value = odeElem->GetElement("solver")->GetValueString("type");
+      value = odeElem->GetElement("solver")->Get<std::string>("type");
       break;
     }
     case GLOBAL_CFM:
     {
-      value = odeElem->GetElement("constraints")->GetValueDouble("cfm");
+      value = odeElem->GetElement("constraints")->Get<double>("cfm");
       break;
     }
     case GLOBAL_ERP:
     {
-      value = odeElem->GetElement("constraints")->GetValueDouble("erp");
+      value = odeElem->GetElement("constraints")->Get<double>("erp");
       break;
     }
     case SOR_PRECON_ITERS:
     {
-      value = odeElem->GetElement("solver")->GetValueInt("precon_iters");
+      value = odeElem->GetElement("solver")->Get<int>("precon_iters");
       break;
     }
     case PGS_ITERS:
     {
-      value = odeElem->GetElement("solver")->GetValueInt("iters");
+      value = odeElem->GetElement("solver")->Get<int>("iters");
       break;
     }
     case SOR:
     {
-      value = odeElem->GetElement("solver")->GetValueDouble("sor");
+      value = odeElem->GetElement("solver")->Get<double>("sor");
       break;
     }
     case CONTACT_MAX_CORRECTING_VEL:
     {
-      value = odeElem->GetElement("constraints")->GetValueDouble(
+      value = odeElem->GetElement("constraints")->Get<double>(
           "contact_max_correcting_vel");
       break;
     }
     case CONTACT_SURFACE_LAYER:
     {
-      value = odeElem->GetElement("constraints")->GetValueDouble(
+      value = odeElem->GetElement("constraints")->Get<double>(
           "contact_surface_layer");
       break;
     }
     case MAX_CONTACTS:
     {
-      value = odeElem->GetElement("max_contacts")->GetValueInt();
+      value = odeElem->GetElement("max_contacts")->Get<int>();
       break;
     }
     case MIN_STEP_SIZE:
     {
-      value = odeElem->GetElement("solver")->GetValueDouble("min_step_size");
+      value = odeElem->GetElement("solver")->Get<double>("min_step_size");
       break;
     }
     default:
