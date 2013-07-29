@@ -299,15 +299,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     else if (_event->key() == Qt::Key_S)
       g_scaleAct->trigger();
   }
-  else
-  {
-    this->mouseEvent.control =
-      this->keyModifiers & Qt::ControlModifier ? true : false;
-    this->mouseEvent.shift =
-      this->keyModifiers & Qt::ShiftModifier ? true : false;
-    this->mouseEvent.alt =
-      this->keyModifiers & Qt::AltModifier ? true : false;
-  }
+
+  this->mouseEvent.control =
+    this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->mouseEvent.shift =
+    this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->mouseEvent.alt =
+    this->keyModifiers & Qt::AltModifier ? true : false;
+
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
@@ -390,7 +389,6 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
-
 
   return true;
 }

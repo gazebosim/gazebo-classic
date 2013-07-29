@@ -177,7 +177,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     planeNormOther.x = 1;
   }
 
-
   if (_local)
   {
     planeNorm = pose.rot.RotateVector(planeNorm);
@@ -649,7 +648,6 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
       }
     }
   }
-
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
@@ -710,8 +708,10 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
       }
     }
     else  if (this->keyEvent.key == Qt::Key_Shift)
+    {
       this->globalManip = true;
       this->selectionObj->SetGlobal(this->globalManip);
+    }
   }
 }
 
@@ -733,8 +733,10 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
       }
     }
     else  if (this->keyEvent.key == Qt::Key_Shift)
+    {
       this->globalManip = false;
       this->selectionObj->SetGlobal(this->globalManip);
+    }
   }
   this->keyEvent.key = 0;
 }
