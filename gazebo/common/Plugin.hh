@@ -142,7 +142,6 @@ namespace gazebo
               result.reset(registerFunc.func());
 
 #elif HAVE_LTDL
-              fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
               static bool init_done = false;
