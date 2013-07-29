@@ -141,7 +141,7 @@ void GpuRaySensor::Init()
     this->scene = rendering::get_scene(worldName);
 
     if (!this->scene)
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
     this->laserCam = this->scene->CreateGpuLaser(
         this->sdf->Get<std::string>("name"), false);

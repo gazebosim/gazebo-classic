@@ -57,6 +57,7 @@ set(dri_tests
   heightmap.cc
   pr2.cc
   projector.cc
+  rendering_sensor.cc
   speed_pr2.cc
 )
 
