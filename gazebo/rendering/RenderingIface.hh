@@ -18,7 +18,7 @@
 #define _RENDERINGIFACE_HH_
 
 #include <string>
-#include "RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

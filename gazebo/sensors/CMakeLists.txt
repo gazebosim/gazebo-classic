@@ -11,7 +11,7 @@ set (sources
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
-  Sensors.cc
+  SensorsIface.cc
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
@@ -83,3 +83,12 @@ target_link_libraries( gzsensor gazebo_common
 gz_install_executable( gzsensor )
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
+
+# Deprecated Sensors.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  if (${GAZEBO_VERSION} VERSION_EQUAL 2.0)
+    message(WARNING "Installing deprecated Sensors.hh. This should be removed in Gazebo 2.0 and later.")
+  endif()
+  gz_install_includes("sensors" Sensors.hh)
+endif()

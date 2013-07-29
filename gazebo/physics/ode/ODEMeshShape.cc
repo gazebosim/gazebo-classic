@@ -127,11 +127,11 @@ void ODEMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->GetValueVector3("scale").x;
+      this->sdf->Get<math::Vector3>("scale").x;
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->GetValueVector3("scale").y;
+      this->sdf->Get<math::Vector3>("scale").y;
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->GetValueVector3("scale").z;
+      this->sdf->Get<math::Vector3>("scale").z;
   }
 
   // Build the ODE triangle mesh

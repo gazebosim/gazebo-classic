@@ -16,10 +16,10 @@
 */
 
 #include <gtest/gtest.h>
-#include "test/ServerFixture.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/GpuLaser.hh"
+#include "test/ServerFixture.hh"
 
 class GpuLaser_TEST : public ServerFixture
 {

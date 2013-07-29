@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,12 @@ using namespace gazebo;
 void common::add_search_path_suffix(const std::string &_suffix)
 {
   common::SystemPaths::Instance()->AddSearchPathSuffix(_suffix);
+}
+
+/////////////////////////////////////////////////
+std::string common::find_file(const std::string &_file)
+{
+  return common::SystemPaths::Instance()->FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////

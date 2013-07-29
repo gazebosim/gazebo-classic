@@ -300,7 +300,7 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->GetValueVector3("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -322,9 +322,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // the following are undocumented members of btContactSolverInfo
   // m_globalCfm: constraint force mixing
   info.m_globalCfm =
-    bulletElem->GetElement("constraints")->GetValueDouble("cfm");
+    bulletElem->GetElement("constraints")->Get<double>("cfm");
   // m_erp: Baumgarte factor
-  info.m_erp = bulletElem->GetElement("constraints")->GetValueDouble("erp");
+  info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
       boost::any_cast<int>(this->GetParam(PGS_ITERS));
@@ -680,43 +680,43 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
   {
     case SOLVER_TYPE:
     {
-      value = bulletElem->GetElement("solver")->GetValueString("type");
+      value = bulletElem->GetElement("solver")->Get<std::string>("type");
       break;
     }
     case GLOBAL_CFM:
     {
-      value = bulletElem->GetElement("constraints")->GetValueDouble("cfm");
+      value = bulletElem->GetElement("constraints")->Get<double>("cfm");
       break;
     }
     case GLOBAL_ERP:
     {
-      value = bulletElem->GetElement("constraints")->GetValueDouble("erp");
+      value = bulletElem->GetElement("constraints")->Get<double>("erp");
       break;
     }
     case PGS_ITERS:
     {
-      value = bulletElem->GetElement("solver")->GetValueInt("iters");
+      value = bulletElem->GetElement("solver")->Get<int>("iters");
       break;
     }
     case SOR:
     {
-      value = bulletElem->GetElement("solver")->GetValueDouble("sor");
+      value = bulletElem->GetElement("solver")->Get<double>("sor");
       break;
     }
     case CONTACT_SURFACE_LAYER:
     {
-      value = bulletElem->GetElement("constraints")->GetValueDouble(
+      value = bulletElem->GetElement("constraints")->Get<double>(
           "contact_surface_layer");
       break;
     }
     case MAX_CONTACTS:
     {
-      value = bulletElem->GetElement("max_contacts")->GetValueInt();
+      value = bulletElem->GetElement("max_contacts")->Get<int>();
       break;
     }
     case MIN_STEP_SIZE:
     {
-      value = bulletElem->GetElement("solver")->GetValueDouble("min_step_size");
+      value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
       break;
     }
     default:
@@ -857,7 +857,7 @@ double BulletPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("bullet");
   elem = elem->GetElement("constraints");
-  return elem->GetValueDouble("cfm");
+  return elem->Get<double>("cfm");
 }
 
 //////////////////////////////////////////////////

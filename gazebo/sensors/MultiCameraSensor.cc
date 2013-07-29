@@ -109,13 +109,13 @@ void MultiCameraSensor::Init()
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = this->scene->CreateCamera(
-          cameraSdf->GetValueString("name"), false);
+    rendering::CameraPtr camera = scene->CreateCamera(
+          cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
     {
       gzthrow("Unable to create multicamera sensor[" +
-              cameraSdf->GetValueString("name"));
+              cameraSdf->Get<std::string>("name"));
       return;
     }
 
@@ -131,7 +131,7 @@ void MultiCameraSensor::Init()
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentName, true);
 

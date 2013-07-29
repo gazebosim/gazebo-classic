@@ -22,8 +22,6 @@
 
 #include <unistd.h>
 
-#include "gazebo/gazebo.hh"
-
 #include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
@@ -31,7 +29,8 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
 
 /////////////////////////////////////////////////

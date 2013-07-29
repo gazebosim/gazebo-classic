@@ -19,6 +19,7 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 

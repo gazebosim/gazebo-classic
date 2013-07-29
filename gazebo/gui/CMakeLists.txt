@@ -25,7 +25,7 @@ set (sources
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
-  Gui.cc
+  GuiIface.cc
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
@@ -67,7 +67,7 @@ set (headers
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
-  Gui.hh
+  GuiIface.hh
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
@@ -108,37 +108,39 @@ gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_msgs)
 
-target_link_libraries(gazebo_gui gazebo_common
-                                 gazebo_transport
-                                 gazebo_sdf_interface
-                                 gazebo_rendering
-                                 gazebo_sensors
-                                 gazebo_msgs
-                                 gazebo_gui_building
-                                 gazebo_gui_terrain
-                                 gazebo_gui_viewers
-                                 gzqtpropertybrowser
-                                 libgazebo
-                                 ${QT_LIBRARIES}
-                                 ${ogre_libraries}
-                                 ${Boost_LIBRARIES}
-                                 pthread)
+target_link_libraries(gazebo_gui
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
-target_link_libraries(gzclient  gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_rendering
-                                gazebo_sensors
-                                gazebo_msgs
-                                gazebo_gui_building
-                                gazebo_gui_terrain
-                                gazebo_gui_viewers
-                                gzqtpropertybrowser
-                                libgazebo
-                                ${QT_LIBRARIES}
-                                ${ogre_libraries}
-                                ${Boost_LIBRARIES}
-                                pthread)
+target_link_libraries(gzclient
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -152,3 +154,12 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
+
+# Deprecated Gui.hh
+# Install until gazebo 2.0 on case-sensitive filesystems
+if (FILESYSTEM_CASE_SENSITIVE)
+  if (${GAZEBO_VERSION} VERSION_EQUAL 2.0)
+    message(WARNING "Installing deprecated Gui.hh. This should be removed in Gazebo 2.0 and later.")
+  endif()
+  gz_install_includes("gui" Gui.hh)
+endif()
