@@ -201,9 +201,11 @@ bool Server::ParseArgs(int argc, char **argv)
   else
     this->params["pause"] = "false";
 
-  // We must set the findFile callback here, before potentially calling
-  // LoadFile() below.
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+  if (!this->PreLoad())
+  {
+    gzerr << "Unable to load gazebo\n";
+    return false;
+  }
 
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
@@ -314,8 +316,7 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics)
+bool Server::PreLoad()
 {
   std::string host = "";
   unsigned int port = 0;
@@ -326,10 +327,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->master->Init(port);
   this->master->RunThread();
 
-
   // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+}
 
+/////////////////////////////////////////////////
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
+{
   /// Load the sensors library
   sensors::load();
 
