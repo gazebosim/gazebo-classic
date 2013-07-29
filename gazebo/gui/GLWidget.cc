@@ -288,19 +288,26 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   {
     this->PopHistory();
   }
-  else if (_event->key() == Qt::Key_R)
-    g_rotateAct->trigger();
-  else if (_event->key() == Qt::Key_T)
-    g_translateAct->trigger();
-  else if (_event->key() == Qt::Key_S)
-    g_scaleAct->trigger();
 
-  this->mouseEvent.control =
-    this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift =
-    this->keyModifiers & Qt::ShiftModifier ? true : false;
-  this->mouseEvent.alt =
-    this->keyModifiers & Qt::AltModifier ? true : false;
+  /// Switch between RTS modes
+  if (this->keyModifiers == Qt::NoModifier)
+  {
+    if (_event->key() == Qt::Key_R)
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T)
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S)
+      g_scaleAct->trigger();
+  }
+  else
+  {
+    this->mouseEvent.control =
+      this->keyModifiers & Qt::ControlModifier ? true : false;
+    this->mouseEvent.shift =
+      this->keyModifiers & Qt::ShiftModifier ? true : false;
+    this->mouseEvent.alt =
+      this->keyModifiers & Qt::AltModifier ? true : false;
+  }
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";

@@ -59,7 +59,6 @@ void SelectionObj::Load()
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-//  this->SetVisible(false);
   this->transVisual->SetVisible(false);
   this->rotVisual->SetVisible(false);
   this->scaleVisual->SetVisible(false);
@@ -147,7 +146,6 @@ SelectionObj::SelectionMode SelectionObj::GetMode()
 {
   return this->mode;
 }
-
 
 /////////////////////////////////////////////////
 void SelectionObj::SetState(const std::string &_state)
@@ -238,6 +236,13 @@ void SelectionObj::SetState(SelectionMode _state)
     mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
       Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.7);
   }
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetGlobal(bool _global)
+{
+  this->transVisual->GetSceneNode()->setInheritOrientation(!_global);
+  this->rotVisual->GetSceneNode()->setInheritOrientation(!_global);
 }
 
 /////////////////////////////////////////////////

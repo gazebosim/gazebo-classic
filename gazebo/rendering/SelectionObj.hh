@@ -104,6 +104,9 @@ namespace gazebo
       /// \brief Get the current selection mode.
       SelectionMode GetMode();
 
+      /// \brief Set selection object to ignore local transforms.
+      void SetGlobal(bool _global);
+
       private: void CreateScaleVisual();
       private: void CreateRotateVisual();
       private: void CreateTranslateVisual();

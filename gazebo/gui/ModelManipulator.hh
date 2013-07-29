@@ -152,6 +152,8 @@ namespace gazebo
       /// \brief Scale of the visual attached to the mouse.
       private: math::Vector3 mouseVisualScale;
 
+      private: bool globalManip;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;
     };

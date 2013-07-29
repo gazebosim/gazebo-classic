@@ -42,6 +42,7 @@ ModelManipulator::ModelManipulator()
   this->mouseMoveVis.reset();
 
   this->manipMode = "";
+  this->globalManip = false;
 }
 
 /////////////////////////////////////////////////
@@ -511,19 +512,19 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::TRANS_X)
         {
           this->TranslateEntity(this->mouseMoveVis,
-              math::Vector3(1, 0, 0), true);
+              math::Vector3(1, 0, 0), !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Y)
         {
           this->TranslateEntity(this->mouseMoveVis,
-              math::Vector3(0, 1, 0), true);
+              math::Vector3(0, 1, 0), !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Z)
         {
           this->TranslateEntity(this->mouseMoveVis,
-            math::Vector3(0, 0, 1), true);
+            math::Vector3(0, 0, 1), !this->globalManip);
         }
         else
           this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 1, 0));
@@ -538,19 +539,22 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::ROT_X
             || this->keyEvent.key == Qt::Key_X)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0),
+              !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Y
             || this->keyEvent.key == Qt::Key_Y)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0),
+              !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Z
             || this->keyEvent.key == Qt::Key_Z)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1),
+              !this->globalManip);
         }
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::SCALE)
@@ -705,6 +709,9 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
       }
     }
+    else  if (this->keyEvent.key == Qt::Key_Shift)
+      this->globalManip = true;
+      this->selectionObj->SetGlobal(this->globalManip);
   }
 }
 
@@ -725,6 +732,9 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
       }
     }
+    else  if (this->keyEvent.key == Qt::Key_Shift)
+      this->globalManip = false;
+      this->selectionObj->SetGlobal(this->globalManip);
   }
   this->keyEvent.key = 0;
 }
