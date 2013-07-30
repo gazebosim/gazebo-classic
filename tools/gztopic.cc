@@ -160,7 +160,8 @@ void list()
     try
     {
       connection->Read(data);
-    } catch (...)
+    }
+    catch(...)
     {
       gzerr << "An active gzserver is probably not present.\n";
       connection.reset();
