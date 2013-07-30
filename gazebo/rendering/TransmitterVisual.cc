@@ -24,6 +24,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/DynamicPoints.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
+#include <algorithm>
 
 using namespace gazebo;
 using namespace rendering;
@@ -61,42 +62,7 @@ TransmitterVisual::~TransmitterVisual()
 void TransmitterVisual::Load()
 {
   Visual::Load();
-
-  //this->modelTemplateSDF.reset(new sdf::SDF);
-  //this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
-
-
 }
-
-/*/////////////////////////////////////////////////
-std::string TransmitterVisual::GetTemplateSDFString()
-{
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='building_template_model'>"
-    << "<pose>0 0 0.0 0 0 0</pose>"
-    << "<link name ='link'>"
-    <<   "<visual name ='visual'>"
-    <<     "<pose>0 0 0.0 0 0 0</pose>"
-    <<     "<geometry>"
-    <<       "<box>"
-    <<         "<size>1 1 1</size>"
-    <<       "</box>"
-    <<     "</geometry>"
-    <<     "<material>"
-    <<       "<script>"
-    <<         "<uri>file://media/materials/scripts/gazebo.material</uri>"
-    <<         "<name>Gazebo/Grey</name>"
-    <<       "</script>"
-    <<     "</material>"
-    <<   "</visual>"
-    << "</link>"
-    << "<static>true</static>"
-    << "</model>"
-    << "</sdf>";
-
-  return newModelStr.str();
-}*/
 
 /////////////////////////////////////////////////
 void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
@@ -138,12 +104,9 @@ void TransmitterVisual::Update()
     this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
 
     // Assuming that the Rx gain is the same as Tx gain
-    double strength = p.signal_level();
-    common::Color color(strength, strength, strength);
+    double strength = std::max(0.0, p.signal_level() / 255);
+    Ogre::ColourValue color(strength, strength, strength);
 
-    /*rendering::VisualPtr linkVisual = this->vectorLink[i];
-    linkVisual->SetPosition(math::Vector3(p.x(), p.y(), 0));
-    linkVisual->SetDiffuse(color);
-    //linkVisual->SetTransparency(0.2);*/
+    this->points->SetColor(i, color);
   }
 }

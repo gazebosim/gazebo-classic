@@ -69,6 +69,11 @@ namespace gazebo
       /// \param[in] _value math::Vector3 value to set the point to
       public: void SetPoint(unsigned int _index, const math::Vector3 &_value);
 
+      /// \brief Change the color of an existing point in the point list
+      /// \param[in] _index Index of the point to set
+      /// \param[in] _color pixelcolor color to set the point to
+      public: void SetColor(unsigned int _index, const Ogre::ColourValue _color);
+
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return math::Vector3 value of the point
@@ -94,6 +99,9 @@ namespace gazebo
 
       /// \brief List of points
       private: std::vector<math::Vector3> points;
+
+      /// \brief List of colors
+      private: std::vector<Ogre::ColourValue> colors;
 
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;

@@ -62,7 +62,10 @@ const Ogre::String &DynamicPoints::getMovableType() const
 /////////////////////////////////////////////////
 void DynamicPoints::AddPoint(const math::Vector3 &pt)
 {
+  Ogre::ColourValue defaultColor(1.0, 0.0, 0.0);
+
   this->points.push_back(pt);
+  this->colors.push_back(defaultColor);
   this->dirty = true;
 }
 
@@ -85,6 +88,12 @@ void DynamicPoints::SetPoint(unsigned int index, const math::Vector3 &value)
 
   this->points[index] = value;
 
+  this->dirty = true;
+}
+
+void DynamicPoints::SetColor(unsigned int _index, const Ogre::ColourValue _color)
+{
+  this->colors[_index] = _color;
   this->dirty = true;
 }
 
@@ -126,6 +135,9 @@ void DynamicPoints::CreateVertexDeclaration()
     this->mRenderOp.vertexData->vertexDeclaration;
 
   decl->addElement(POSITION_BINDING, 0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+
+  decl->addElement(1, 0, Ogre::VET_COLOUR, Ogre::VES_DIFFUSE);
+
 }
 
 /////////////////////////////////////////////////
@@ -157,6 +169,19 @@ void DynamicPoints::FillHardwareBuffers()
     }
   }
   vbuf->unlock();
+
+  // Update the colors
+  Ogre::HardwareVertexBufferSharedPtr cbuf =
+    this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(1);
+
+  Ogre::RGBA *colorArrayBuffer = static_cast<Ogre::RGBA*>(cbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  Ogre::RenderSystem* renderSystemForVertex = Ogre::Root::getSingleton().getRenderSystem();
+  for (int i = 0; i < size; i++)
+  {
+    Ogre::ColourValue color = this->colors[i];
+    renderSystemForVertex->convertColourValue(color, &colorArrayBuffer[i]);
+  }
+  cbuf->unlock();
 
   // need to update after mBox change, otherwise the points goes in and out
   // of scope based on old mBox
