@@ -75,6 +75,7 @@ namespace gazebo
 
       /// \brief Rotate entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Axis of rotation.
       /// \param[in] _local True to apply rotation in local frame.
       public: void RotateEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
@@ -82,6 +83,7 @@ namespace gazebo
 
       /// \brief Translate entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Axis of translation.
       /// \param[in] _local True to apply translation in local frame.
       public: void TranslateEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
@@ -89,10 +91,18 @@ namespace gazebo
 
       /// \brief Scale entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Scaling axis.
       /// \param[in] _local True to apply scaling in local frame.
       public: void ScaleEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
           bool _local = false);
+
+      /// \brief Helper function to get the distance moved by the mouse.
+      /// \param[in] _pose Pose of origin.
+      /// \param[in] _axis Movement axis.
+      /// \param[in] _local True to get distance in local frame set the _pose.
+      private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
+          const math::Vector3 &_axis, bool _local) const;
 
       /// \brief Set the visual being moved, which will highlight the
       /// visual

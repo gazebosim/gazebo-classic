@@ -131,12 +131,12 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   _vis->SetWorldRotation(rot);
 }
 
+
 /////////////////////////////////////////////////
-void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
+math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
+    const math::Vector3 &_axis, bool _local) const
 {
-  math::Box bbox = _vis->GetBoundingBox();
-  math::Pose pose = _vis->GetWorldPose();
+  math::Pose pose = _pose;
 
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
@@ -183,8 +183,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     projNorm = pose.rot.RotateVector(projNorm);
   }
 
-  // Fine tune translation
-  // Make sure we don't cast a ray parallel to planeNorm
+  // Fine tune ray casting: cast a second ray and compare the two rays' angle
+  // to plane. Use the one that is less parallel to plane for better results.
   double angle = dir1.Dot(planeNorm);
   if (_local)
     planeNormOther = pose.rot.RotateVector(planeNormOther);
@@ -195,7 +195,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     planeNorm = planeNormOther;
   }
 
-  // Compute the distance from the camera to plane of translation
+  // Compute the distance from the camera to plane
   double d = pose.pos.Dot(planeNorm);
   math::Plane plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
@@ -213,14 +213,24 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   if (!_local)
     distance *= _axis;
-  else
-    distance = pose.rot.RotateVectorReverse(distance);
+
+  return distance;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
+    const math::Vector3 &_axis, bool _local)
+{
+  math::Box bbox = _vis->GetBoundingBox();
+  math::Pose pose = _vis->GetWorldPose();
+  math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
   math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
-  math::Vector3 scale = (bboxSize + distance)/bboxSize;
+  math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
+      /bboxSize;
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
-  // to constrain the scaling dimensions.
+  // to restrict the scaling dimensions.
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -284,82 +294,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 {
 //  math::Pose pose = _vis->GetPose();
   math::Pose pose = _vis->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
-      this->mouseEvent.pos.y, origin1, dir1);
-  this->userCamera->GetCameraToViewportRay(this->mouseStart.x,
-      this->mouseStart.y, origin2, dir2);
-
-  math::Vector3 planeNorm(0, 0, 0);
-  math::Vector3 projNorm(0, 0, 0);
-
-  math::Vector3 planeNormOther(0, 0, 0);
-
-  if (_axis.x > 0 && _axis.y > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.z = 1;
-  }
-  else if (_axis.z > 0)
-  {
-    planeNorm.y = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
-  }
-  else if (_axis.x > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.y = 1;
-    planeNormOther.y = 1;
-
-  }
-  else if (_axis.y > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
-  }
-
-  if (_local)
-  {
-    planeNorm = pose.rot.RotateVector(planeNorm);
-    projNorm = pose.rot.RotateVector(projNorm);
-  }
-
-  // Fine tune translation
-  // Make sure we don't cast a ray parallel to planeNorm
-  double angle = dir1.Dot(planeNorm);
-  if (_local)
-    planeNormOther = pose.rot.RotateVector(planeNormOther);
-  double angleOther = dir1.Dot(planeNormOther);
-  if (fabs(angleOther) > fabs(angle))
-  {
-    projNorm = planeNorm;
-    planeNorm = planeNormOther;
-  }
-
-  // Compute the distance from the camera to plane of translation
-  double d = pose.pos.Dot(planeNorm);
-  math::Plane plane(planeNorm, d);
-  double dist1 = plane.Distance(origin1, dir1);
-  double dist2 = plane.Distance(origin2, dir2);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  p2 = origin2 + dir2 * dist2;
-
-  if (_local)
-    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
-
-  math::Vector3 distance = p1 - p2;
-
-  if (!_local)
-    distance *= _axis;
+  math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
   pose.pos = this->mouseMoveVisStartPose.pos + distance;
 
