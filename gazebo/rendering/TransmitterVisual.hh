@@ -67,8 +67,8 @@ namespace gazebo
       /// \brief Subscription to the laser data.
       private: transport::SubscriberPtr laserScanSub;
 
-      /// \brief Renders the laser data.
-      private: DynamicLines *rayFan;
+      /// \brief Renders the points representing the signal strength.
+      private: DynamicPoints *points;
 
       /// \brief Required for accessing to the visual elements.
       private: sdf::SDFPtr modelTemplateSDF;

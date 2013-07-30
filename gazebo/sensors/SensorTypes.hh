@@ -38,6 +38,8 @@ namespace gazebo
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
+    class SonarSensor;
+    class ForceTorqueSensor;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
@@ -77,6 +79,14 @@ namespace gazebo
     /// \def RFIDTagPtr
     /// \brief Shared pointer to RFIDTag
     typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
+
+    /// \def SonarSensorPtr
+    /// \brief Shared pointer to SonarSensor
+    typedef boost::shared_ptr<SonarSensor> SonarSensorPtr;
+
+    /// \def ForceTorqueSensorPtr
+    /// \brief Shared pointer to ForceTorqueSensor
+    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
 
     /// \def WirelessTransceiverPtr
     /// \brief Shared pointer to WirelessTransceiver

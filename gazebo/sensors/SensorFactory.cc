@@ -33,6 +33,8 @@ void RegisterImuSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
+void RegisterSonarSensor();
+void RegisterForceTorqueSensor();
 void RegisterWirelessTransmitter();
 void RegisterWirelessReceiver();
 
@@ -53,6 +55,8 @@ void SensorFactory::RegisterAll()
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
+  RegisterSonarSensor();
+  RegisterForceTorqueSensor();
   RegisterWirelessTransmitter();
   RegisterWirelessReceiver();
 }

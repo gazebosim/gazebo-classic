@@ -901,3 +901,19 @@ material Gazebo/GaussianCameraNoise
     }
   }
 }
+
+material Gazebo/PointCloud
+{
+   technique
+   {
+      pass
+      {
+         diffuse vertexcolour
+         specular vertexcolour
+         ambient vertexcolour
+         point_size 3
+         point_sprites off
+         point_size_attenuation off
+      }
+   }
+}

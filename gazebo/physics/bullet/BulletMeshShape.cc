@@ -24,33 +24,33 @@
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/physics/bullet/BulletTrimeshShape.hh"
+#include "gazebo/physics/bullet/BulletMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletTrimeshShape::BulletTrimeshShape(CollisionPtr _parent)
-  : TrimeshShape(_parent)
+BulletMeshShape::BulletMeshShape(CollisionPtr _parent)
+  : MeshShape(_parent)
 {
 }
 
 
 //////////////////////////////////////////////////
-BulletTrimeshShape::~BulletTrimeshShape()
+BulletMeshShape::~BulletMeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-void BulletTrimeshShape::Load(sdf::ElementPtr _sdf)
+void BulletMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  TrimeshShape::Load(_sdf);
+  MeshShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void BulletTrimeshShape::Init()
+void BulletMeshShape::Init()
 {
-  TrimeshShape::Init();
+  MeshShape::Init();
 
   BulletCollisionPtr bParent =
     boost::static_pointer_cast<BulletCollision>(this->collisionParent);
@@ -69,9 +69,12 @@ void BulletTrimeshShape::Init()
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)
   {
-    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
-    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
-    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
+    vertices[j*3+0] = vertices[j*3+0] *
+      this->sdf->Get<math::Vector3>("scale").x;
+    vertices[j*3+1] = vertices[j*3+1] *
+      this->sdf->Get<math::Vector3>("scale").y;
+    vertices[j*3+2] = vertices[j*3+2] *
+      this->sdf->Get<math::Vector3>("scale").z;
   }
 
   // Create the Bullet trimesh

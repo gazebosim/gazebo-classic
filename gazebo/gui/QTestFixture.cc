@@ -99,6 +99,7 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
     bool _paused, bool _createScene)
 {
   this->server = new gazebo::Server();
+  this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
   this->server->Init();
 

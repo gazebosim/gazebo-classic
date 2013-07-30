@@ -7,30 +7,7 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <scene>
-      <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
-      <background>0.500000 0.500000 0.500000 1.000000</background>
-      <shadows>0</shadows>
-    </scene>
-    <physics type="ode">
-      <gravity>0.000000 0.000000 -9.810000</gravity>
-      <ode>
-        <solver>
-          <type>quick</type>
-          <iters>250</iters>
-          <precon_iters>0</precon_iters>
-          <sor>1.400000</sor>
-        </solver>
-        <constraints>
-          <cfm>0.000000</cfm>
-          <erp>0.200000</erp>
-          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
-          <contact_surface_layer>0.00000</contact_surface_layer>
-        </constraints>
-      </ode>
-      <real_time_update_rate>0.000000</real_time_update_rate>
-      <max_step_size>0.001000</max_step_size>
-    </physics>
+
     <!-- test contributed by jesper -->
     <model name="boxes">
       <pose>0 0 0 0 0 1.57</pose>
@@ -154,6 +131,13 @@
         </axis>
         <parent>link1</parent>
         <child>link2</child>
+
+        <sensor name="force_torque" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>30</update_rate>
+        </sensor>
+
       </joint>
       <joint name="joint2" type="revolute">
         <physics>
@@ -170,6 +154,11 @@
         </axis>
         <parent>link2</parent>
         <child>link3</child>
+        <sensor name="force_torque" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>30</update_rate>
+        </sensor>
       </joint>
     </model>
   </world>

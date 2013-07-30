@@ -70,17 +70,17 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
     if (transElem->HasElement("frequency"))
     {
-      this->freq = transElem->GetValueDouble("frequency");
+      this->freq = transElem->Get<double>("frequency");
     }
 
     if (transElem->HasElement("power"))
     {
-      this->power = transElem->GetValueDouble("power");
+      this->power = transElem->Get<double>("power");
     }
 
     if (transElem->HasElement("gain"))
     {
-      this->gain = transElem->GetValueDouble("gain");
+      this->gain = transElem->Get<double>("gain");
     }
   }
 }

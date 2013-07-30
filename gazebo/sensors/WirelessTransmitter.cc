@@ -38,7 +38,7 @@ const double WirelessTransmitter::N_OBSTACLE = 15.0;
 const double WirelessTransmitter::MODEL_STD_DESV = 6.0;
 const double WirelessTransmitter::XLIMIT = 10.0;
 const double WirelessTransmitter::YLIMIT = 10.0;
-const double WirelessTransmitter::STEP = 1.0;
+const double WirelessTransmitter::STEP = 0.25;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()

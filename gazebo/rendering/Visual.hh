@@ -28,6 +28,8 @@
 #include <list>
 #include <vector>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
@@ -36,7 +38,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -322,6 +323,16 @@ namespace gazebo
       /// \param[in] _line Pointer to the line to delete.
       public: void DeleteDynamicLine(DynamicLines *_line);
 
+      /// \brief Add a point to the visual.
+      /// \param[in] _type The type of point to make.
+      /// \return A pointer to the new dynamic point.
+      public: DynamicPoints *CreateDynamicPoint(
+                  RenderOpType _type = RENDERING_POINT_LIST);
+
+      /// \brief Delete a dynamic point.
+      /// \param[in] _point Pointer to the point to delete.
+      public: void DeleteDynamicPoint(DynamicPoints *_point);
+
       /// \brief Attach a vertex of a line to the position of the visual.
       /// \param[in] _line Line to attach to this visual.
       /// \param[in] _index Index of the line vertex to attach.
@@ -528,6 +539,9 @@ namespace gazebo
 
       /// \brief Lines and their vertices connected to this visual.
       private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
+
+      /// \brief List of all the points created
+      private: std::list<DynamicPoints*> points;
 
       /// \brief Name of the visual.
       private: std::string name;
