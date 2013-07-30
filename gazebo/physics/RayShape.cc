@@ -135,7 +135,7 @@ void RayShape::SetScale(const math::Vector3 &_scale)
 
   this->scale = _scale;
 
-  ///TODO RayShape::SetScale not yet implemented.
+  /// TODO RayShape::SetScale not yet implemented.
 }
 
 //////////////////////////////////////////////////
