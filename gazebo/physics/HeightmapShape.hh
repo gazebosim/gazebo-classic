@@ -127,9 +127,6 @@ namespace gazebo
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;
 
-      /// \brief Scaling factor.
-      // protected: math::Vector3 scale;
-
       /// \brief True to flip the heights along the y direction.
       protected: bool flipY;
 
