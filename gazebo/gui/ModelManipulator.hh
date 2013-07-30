@@ -96,6 +96,7 @@ namespace gazebo
 
       /// \brief Set the visual being moved, which will highlight the
       /// visual
+      /// \param[in] _vis Pointer to visual moved by mouse.
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       /// \brief Publish visual's pose to the server
@@ -143,7 +144,7 @@ namespace gazebo
       /// \brief Current mouse event.
       private: common::MouseEvent mouseEvent;
 
-      /// \brief Current key event
+      /// \brief Current key event.
       private: common::KeyEvent keyEvent;
 
       /// \brief True if the model manipulator is initialized.
@@ -152,6 +153,7 @@ namespace gazebo
       /// \brief Scale of the visual attached to the mouse.
       private: math::Vector3 mouseVisualScale;
 
+      /// \brief True to manipulate model in global frame.
       private: bool globalManip;
 
       /// \brief This is a singleton class.

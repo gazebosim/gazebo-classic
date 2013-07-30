@@ -87,9 +87,6 @@ namespace gazebo
       /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
 
-      /// \brief Process an object translate mouse move event.
-      private: void OnMouseMoveTranslate();
-
       /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
@@ -123,8 +120,6 @@ namespace gazebo
 
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
-
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
@@ -155,8 +150,6 @@ namespace gazebo
       private: void ScaleEntity(rendering::VisualPtr &_vis,
           bool _local = false);
 
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);

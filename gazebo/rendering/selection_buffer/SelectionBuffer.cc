@@ -36,6 +36,7 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
       this->materialSwitchListener);
   this->CreateRTTBuffer();
   this->CreateRTTOverlays();
+  this->selectionDebugOverlay->show();
 }
 
 /////////////////////////////////////////////////

@@ -620,13 +620,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     {
       if (this->manipMode == "scale")
       {
-        math::Vector3 bboxSize =
-            this->mouseMoveVis->GetBoundingBox().GetSize()
-            * this->mouseMoveVis->GetScale();
-        double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
-        max = std::min(std::max(0.5, max), 3.0);
-        this->selectionObj->SetScale(math::Vector3(max, max, max));
-
+        this->selectionObj->UpdateSize();
         this->PublishVisualScale(this->mouseMoveVis);
       }
       this->PublishVisualPose(this->mouseMoveVis);
@@ -742,7 +736,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
 }
 
 // Function migrated here from GLWidget.cc and commented out since it doesn't
-// seem like it's currently used but kept for future references
+// seem like it's currently used. Kept here for future references
 /////////////////////////////////////////////////
 /*void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
 {
