@@ -45,8 +45,6 @@ namespace gazebo
         ROT,
         /// \brief Scale mode
         SCALE,
-        /// \brief Translation and Rotation mode
-        TRANS_ROT,
         /// \brief Translation in x
         TRANS_X,
         /// \brief Translation in y

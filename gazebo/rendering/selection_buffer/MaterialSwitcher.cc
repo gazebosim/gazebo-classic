@@ -70,7 +70,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
         // Make sure we keep the same depth properties so that
         // certain overlay objects can be picked by the mouse.
         Ogre::Technique *newTechnique =
-            static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);;
+            static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)
         {

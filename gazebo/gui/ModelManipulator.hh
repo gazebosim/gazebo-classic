@@ -104,8 +104,7 @@ namespace gazebo
       private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
           const math::Vector3 &_axis, bool _local) const;
 
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
+      /// \brief Set the visual being moved by the mouse.
       /// \param[in] _vis Pointer to visual moved by mouse.
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
@@ -118,7 +117,7 @@ namespace gazebo
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
       /// \brief Selection object which users can interact with to manipulate
-      /// the object
+      /// the model.
       private: rendering::SelectionObjPtr selectionObj;
 
       /// \brief The current manipulation mode.

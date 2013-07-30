@@ -440,7 +440,6 @@ void Visual::Load()
   if (obj)
     meshSize = obj->getBoundingBox().getSize();
 
-  //math::Vector3 scale = this->GetScale();
   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");

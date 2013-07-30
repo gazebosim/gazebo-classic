@@ -1,4 +1,4 @@
-  double maxScale = 3.0;/*
+/*
  * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,11 +150,6 @@ void SelectionObj::SetMode(SelectionMode _mode)
     this->rotVisual->SetVisible(true);
   else if (this->mode == SCALE)
     this->scaleVisual->SetVisible(true);
-  else if (this->mode == TRANS_ROT)
-  {
-    this->transVisual->SetVisible(true);
-    this->rotVisual->SetVisible(true);
-  }
 }
 
 /////////////////////////////////////////////////

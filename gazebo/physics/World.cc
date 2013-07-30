@@ -1442,7 +1442,6 @@ void World::ProcessModelMsgs()
       // FillMsg fills the visual components from initial sdf
       // but problem is that Visuals may have changed e.g. through ~/visual,
       // so don't publish them to subscribers.
-      //msg.clear_visual();
       for (int i = 0; i < msg.link_size(); ++i)
       {
         msg.mutable_link(i)->clear_visual();
