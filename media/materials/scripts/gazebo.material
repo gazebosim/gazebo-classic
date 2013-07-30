@@ -399,8 +399,8 @@ material Gazebo/TurquoiseGlowOutline
 
 material Gazebo/RedTransparentOverlay
 {
-	technique
-	{
+  technique
+  {
     pass
     {
       scene_blend alpha_blend
@@ -414,13 +414,13 @@ material Gazebo/RedTransparentOverlay
         alpha_op_ex source1 src_manual src_current 0.5
       }
     }
-	}
+  }
 }
 
 material Gazebo/BlueTransparentOverlay
 {
-	technique
-	{
+  technique
+  {
     pass
     {
       scene_blend alpha_blend
@@ -434,20 +434,7 @@ material Gazebo/BlueTransparentOverlay
         alpha_op_ex source1 src_manual src_current 0.5
       }
     }
-	}
-	
-  technique
-	{
-	  scheme "aaa"
-	  
-    pass
-    {
-      depth_write off
-      lighting off
-      depth_check off
-      diffuse 0 0 1
-    }
-	}
+  }
 }
 
 material Gazebo/GreenTransparentOverlay
