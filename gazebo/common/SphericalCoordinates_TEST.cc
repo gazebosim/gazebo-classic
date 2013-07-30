@@ -17,134 +17,168 @@
 
 #include <gtest/gtest.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-// Create an object, make sure it doesn't segfault
+// Test different constructors, default parameters
 TEST(SphericalCoordinatesTest, Constructor)
 {
-  common::SphericalCoordinates sc;
+  // Default surface type
+  common::SphericalCoordinates::SurfaceType st =
+    common::SphericalCoordinates::EARTH_WGS84;
+
+  // No arguments, default parameters
+  {
+    common::SphericalCoordinates sc;
+    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
+    EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
+    EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
+    EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
+  }
+
+  // SurfaceType argument, default parameters
+  {
+    common::SphericalCoordinates sc(st);
+    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
+    EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
+    EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
+    EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
+  }
+
+  // All arguments
+  {
+    math::Angle lat(0.3), lon(-1.2), heading(0.5);
+    double elev = 354.1;
+    common::SphericalCoordinates sc(st, lat, lon, elev, heading);
+    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetLatitudeReference(), lat);
+    EXPECT_EQ(sc.GetLongitudeReference(), lon);
+    EXPECT_EQ(sc.GetHeadingOffset(), heading);
+    EXPECT_NEAR(sc.GetElevationReference(), elev, 1e-6);
+  }
 }
 
 //////////////////////////////////////////////////
-// Check default parameter values
-TEST(SphericalCoordinatesTest, DefaultValues)
+// SurfaceType Convert function
+TEST(SphericalCoordinatesTest, Convert)
 {
+  // Default surface type
+  common::SphericalCoordinates::SurfaceType st =
+    common::SphericalCoordinates::EARTH_WGS84;
+
+  EXPECT_EQ(common::SphericalCoordinates::Convert("EARTH_WGS84"), st);
+}
+
+//////////////////////////////////////////////////
+// Test Set functions
+TEST(SphericalCoordinatesTest, SetFunctions)
+{
+  // Default surface type
+  common::SphericalCoordinates::SurfaceType st =
+    common::SphericalCoordinates::EARTH_WGS84;
+
+  // Default parameters
   common::SphericalCoordinates sc;
-  EXPECT_EQ(sc.GetSurfaceType(), common::EARTH_WGS84);
+  EXPECT_EQ(sc.GetSurfaceType(), st);
   EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
   EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
   EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
-  EXPECT_EQ(sc.GetElevationReference(), 0.0);
+  EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
+
+  {
+    math::Angle lat(0.3), lon(-1.2), heading(0.5);
+    double elev = 354.1;
+    sc.SetSurfaceType(st);
+    sc.SetLatitudeReference(lat);
+    sc.SetLongitudeReference(lon);
+    sc.SetHeadingOffset(heading);
+    sc.SetElevationReference(elev);
+
+    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetLatitudeReference(), lat);
+    EXPECT_EQ(sc.GetLongitudeReference(), lon);
+    EXPECT_EQ(sc.GetHeadingOffset(), heading);
+    EXPECT_NEAR(sc.GetElevationReference(), elev, 1e-6);
+  }
 }
 
-//  common::Timer timer;
-//  timer.Start();
-//  common::Time::MSleep(100);
-//  EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
-//
-//  struct timeval tv;
-//  gettimeofday(&tv, NULL);
-//  common::Time time(tv);
-//  EXPECT_EQ(time.sec, tv.tv_sec);
-//  EXPECT_EQ(time.nsec, tv.tv_usec * 1000);
-//
-//  time.SetToWallTime();
-//  EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0, 1000000));
-//
-//  time = common::Time(1, 1000) + common::Time(1.5, 1000000000);
-//  EXPECT_TRUE(time == common::Time(3.5, 1000));
-//
-//  time.Set(1, 1000);
-//  time += common::Time(1.5, 1000000000);
-//  EXPECT_TRUE(time == common::Time(3.5, 1000));
-//
-//  time.Set(1, 1000);
-//  time -= common::Time(1, 1000);
-//  EXPECT_TRUE(time == common::Time(0, 0));
-//
-//  time.Set(1, 1000);
-//  time *= common::Time(2, 2);
-//  EXPECT_TRUE(time == common::Time(2, 2002));
-//
-//  time.Set(2, 4000);
-//  time /= common::Time(2, 2);
-//  EXPECT_TRUE(time == common::Time(1, 1999));
-//  EXPECT_FALSE(time != common::Time(1, 1999));
-//
-//  time += common::Time(0, 1);
-//  tv.tv_sec = 1;
-//  tv.tv_usec = 2;
-//  EXPECT_TRUE(time == tv);
-//  EXPECT_FALSE(time != tv);
-//
-//  tv.tv_sec = 2;
-//  EXPECT_TRUE(time < tv);
-//
-//  tv.tv_sec = 0;
-//  EXPECT_TRUE(time > tv);
-//  EXPECT_TRUE(time >= tv);
-//
-//
-//  EXPECT_TRUE(time == 1.0 + 2000*1e-9);
-//  EXPECT_FALSE(time != 1.0 + 2000*1e-9);
-//  EXPECT_TRUE(time < 2.0);
-//  EXPECT_TRUE(time > 0.1);
-//  EXPECT_TRUE(time >= 0.1);
-//
-//
-//  tv.tv_sec = 2;
-//  tv.tv_usec = 1000000;
-//  time = common::Time(1, 1000) + tv;
-//  EXPECT_TRUE(time == common::Time(4.0, 1000));
-//
-//  time.Set(1, 1000);
-//  time += tv;
-//  EXPECT_TRUE(time == common::Time(4, 1000));
-//
-//  time = common::Time(1, 1000) - tv;
-//  EXPECT_TRUE(time == common::Time(-2, 1000));
-//
-//  time.Set(1, 1000);
-//  time -= tv;
-//  EXPECT_TRUE(time == common::Time(-2, 1000));
-//
-//  tv.tv_sec = 2;
-//  tv.tv_usec = 1000;
-//  time = common::Time(1, 1000) * tv;
-//  EXPECT_TRUE(time == common::Time(2, 1002001));
-//
-//  time.Set(1, 1000);
-//  time *= tv;
-//  EXPECT_TRUE(time == common::Time(2, 1002001));
-//
-//  time.Set(1, 1000);
-//  time = common::Time(1, 1000) * common::Time(2, 2);
-//  EXPECT_TRUE(time == common::Time(2, 2002));
-//
-//
-//  time = common::Time(1, 2000000) / tv;
-//  EXPECT_TRUE(time == common::Time(0, 500749625));
-//
-//  time.Set(1, 2000000);
-//  time /= tv;
-//  EXPECT_TRUE(time == common::Time(0, 500749625));
-//
-//  time.Set(1, 1000);
-//  time = common::Time(1, 1000) / common::Time(2, 2);
-//  EXPECT_TRUE(time == common::Time(0, 500000499));
-//
-//  double sec = 1.0 + 1e-9;
-//  double msec = sec * 1e3;
-//  double usec = sec * 1e6;
-//  double nsec = sec * 1e9;
-//  EXPECT_DOUBLE_EQ(nsec, common::Time::SecToNano(sec));
-//  EXPECT_DOUBLE_EQ(nsec, common::Time::MilToNano(msec));
-//  EXPECT_DOUBLE_EQ(nsec, common::Time::MicToNano(usec));
-//}
-//
+//////////////////////////////////////////////////
+// Test coordinate transformations
+TEST(SphericalCoordinatesTest, CoordinateTransforms)
+{
+  // Default surface type
+  common::SphericalCoordinates::SurfaceType st =
+    common::SphericalCoordinates::EARTH_WGS84;
+
+  {
+    // Parameters
+    math::Angle lat(0.3), lon(-1.2), heading(math::Angle::HalfPi);
+    double elev = 354.1;
+    common::SphericalCoordinates sc(st, lat, lon, elev, heading);
+
+    // Check GlobalFromLocal with heading offset of 90 degrees
+    {
+      // local frame
+      math::Vector3 xyz;
+      // east, north, up
+      math::Vector3 enu;
+
+      xyz.Set(1, 0, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+      xyz.Set(0, 1, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+      xyz.Set(1, -1, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+      xyz.Set(2243.52334, 556.35, 435.6553);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+    }
+
+    // Check SphericalFromLocal
+    {
+      // local frame
+      math::Vector3 xyz;
+      // spherical coordinates
+      math::Vector3 sph;
+
+      // No offset
+      xyz.Set(0, 0, 0);
+      sph = sc.SphericalFromLocal(xyz);
+      // latitude
+      EXPECT_NEAR(sph.x, lat.Degree(), 1e-6);
+      // longitude
+      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      // elevation
+      EXPECT_NEAR(sph.z, elev, 1e-6);
+
+      // 200 km offset in x (pi/2 heading offset means North)
+      xyz.Set(2e5, 0, 0);
+      sph = sc.SphericalFromLocal(xyz);
+      // increase in latitude about 1.8 degrees
+      EXPECT_NEAR(sph.x, lat.Degree() + 1.8, 0.008);
+      // no change in longitude
+      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      // no change in elevation
+      EXPECT_NEAR(sph.z, elev, 1e-6);
+
+    }
+  }
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
