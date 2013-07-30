@@ -75,6 +75,7 @@ namespace gazebo
 
       /// \brief Rotate entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Axis of rotation.
       /// \param[in] _local True to apply rotation in local frame.
       public: void RotateEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
@@ -82,6 +83,7 @@ namespace gazebo
 
       /// \brief Translate entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Axis of translation.
       /// \param[in] _local True to apply translation in local frame.
       public: void TranslateEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
@@ -89,13 +91,21 @@ namespace gazebo
 
       /// \brief Scale entity.
       /// \param[in] _vis Visual representing the entity.
+      /// \param[in] _axis Scaling axis.
       /// \param[in] _local True to apply scaling in local frame.
       public: void ScaleEntity(rendering::VisualPtr &_vis,
           const math::Vector3 &_axis,
           bool _local = false);
 
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
+      /// \brief Helper function to get the distance moved by the mouse.
+      /// \param[in] _pose Pose of origin.
+      /// \param[in] _axis Movement axis.
+      /// \param[in] _local True to get distance in local frame set the _pose.
+      private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
+          const math::Vector3 &_axis, bool _local) const;
+
+      /// \brief Set the visual being moved by the mouse.
+      /// \param[in] _vis Pointer to visual moved by mouse.
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       /// \brief Publish visual's pose to the server
@@ -107,7 +117,7 @@ namespace gazebo
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
       /// \brief Selection object which users can interact with to manipulate
-      /// the object
+      /// the model.
       private: rendering::SelectionObjPtr selectionObj;
 
       /// \brief The current manipulation mode.
@@ -143,7 +153,7 @@ namespace gazebo
       /// \brief Current mouse event.
       private: common::MouseEvent mouseEvent;
 
-      /// \brief Current key event
+      /// \brief Current key event.
       private: common::KeyEvent keyEvent;
 
       /// \brief True if the model manipulator is initialized.
@@ -151,6 +161,9 @@ namespace gazebo
 
       /// \brief Scale of the visual attached to the mouse.
       private: math::Vector3 mouseVisualScale;
+
+      /// \brief True to manipulate model in global frame.
+      private: bool globalManip;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;

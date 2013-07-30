@@ -87,9 +87,6 @@ namespace gazebo
       /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
 
-      /// \brief Process an object translate mouse move event.
-      private: void OnMouseMoveTranslate();
-
       /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
@@ -100,9 +97,6 @@ namespace gazebo
 
       /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
-
-      /// \brief Process an object translate mouse release event.
-      private: void OnMouseReleaseTranslate();
 
       /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
@@ -115,9 +109,6 @@ namespace gazebo
       /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
 
-      /// \brief Process an object translate mouse press event.
-      private: void OnMousePressTranslate();
-
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
@@ -127,8 +118,6 @@ namespace gazebo
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
 
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
@@ -147,26 +136,7 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      /// \brief Rotate entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply rotation in local frame.
-      private: void RotateEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
 
-      /// \brief Translate entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply translation in local frame.
-      private: void TranslateEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
-
-      /// \brief Scale entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply scaling in local frame.
-      private: void ScaleEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
-
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);

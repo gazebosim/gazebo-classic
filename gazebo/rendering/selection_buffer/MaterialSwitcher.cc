@@ -37,7 +37,7 @@ MaterialSwitcher::~MaterialSwitcher()
 /////////////////////////////////////////////////
 Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
     uint16_t /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
-    Ogre::Material * /*_originalMaterial*/, uint16_t /*_lodIndex*/,
+    Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
     const Ogre::Renderable *_rend)
 {
   if (_rend)
@@ -67,8 +67,23 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           Ogre::MaterialManager::getSingleton().load("gazebo/plain_color",
               Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        this->lastTechnique =
-          static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
+        // Make sure we keep the same depth properties so that
+        // certain overlay objects can be picked by the mouse.
+        Ogre::Technique *newTechnique =
+            static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
+        Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
+        if (originalTechnique)
+        {
+          Ogre::Pass *originalPass = originalTechnique->getPass(0);
+          Ogre::Pass *newPass = newTechnique->getPass(0);
+          if (originalPass && newPass)
+          {
+            newPass->setDepthCheckEnabled(originalPass->getDepthCheckEnabled());
+            newPass->setDepthWriteEnabled(originalPass->getDepthWriteEnabled());
+          }
+        }
+
+        this->lastTechnique = newTechnique;
 
         this->GetNextColor();
 

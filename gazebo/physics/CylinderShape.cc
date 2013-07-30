@@ -71,6 +71,9 @@ void CylinderShape::SetSize(double _radius, double _length)
 //////////////////////////////////////////////////
 void CylinderShape::SetScale(const math::Vector3 &_scale)
 {
+  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+    return;
+
   if (_scale == this->scale)
     return;
 

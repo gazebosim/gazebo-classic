@@ -435,6 +435,19 @@ material Gazebo/BlueTransparentOverlay
       }
     }
 	}
+	
+  technique
+	{
+	  scheme "aaa"
+	  
+    pass
+    {
+      depth_write off
+      lighting off
+      depth_check off
+      diffuse 0 0 1
+    }
+	}
 }
 
 material Gazebo/GreenTransparentOverlay

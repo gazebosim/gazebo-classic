@@ -42,6 +42,7 @@ ModelManipulator::ModelManipulator()
   this->mouseMoveVis.reset();
 
   this->manipMode = "";
+  this->globalManip = false;
 }
 
 /////////////////////////////////////////////////
@@ -117,7 +118,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  if (this->mouseEvent.shift)
+  if (this->mouseEvent.control)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
   math::Quaternion rot(_axis, angle);
@@ -130,12 +131,12 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   _vis->SetWorldRotation(rot);
 }
 
+
 /////////////////////////////////////////////////
-void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
+math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
+    const math::Vector3 &_axis, bool _local) const
 {
-  math::Box bbox = _vis->GetBoundingBox();
-  math::Pose pose = _vis->GetWorldPose();
+  math::Pose pose = _pose;
 
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
@@ -167,7 +168,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     planeNorm.z = 1;
     projNorm.y = 1;
     planeNormOther.y = 1;
-
   }
   else if (_axis.y > 0)
   {
@@ -176,15 +176,14 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     planeNormOther.x = 1;
   }
 
-
   if (_local)
   {
     planeNorm = pose.rot.RotateVector(planeNorm);
     projNorm = pose.rot.RotateVector(projNorm);
   }
 
-  // Fine tune translation
-  // Make sure we don't cast a ray parallel to planeNorm
+  // Fine tune ray casting: cast a second ray and compare the two rays' angle
+  // to plane. Use the one that is less parallel to plane for better results.
   double angle = dir1.Dot(planeNorm);
   if (_local)
     planeNormOther = pose.rot.RotateVector(planeNormOther);
@@ -195,7 +194,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     planeNorm = planeNormOther;
   }
 
-  // Compute the distance from the camera to plane of translation
+  // Compute the distance from the camera to plane
   double d = pose.pos.Dot(planeNorm);
   math::Plane plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
@@ -213,14 +212,24 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   if (!_local)
     distance *= _axis;
-  else
-    distance = pose.rot.RotateVectorReverse(distance);
+
+  return distance;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
+    const math::Vector3 &_axis, bool _local)
+{
+  math::Box bbox = _vis->GetBoundingBox();
+  math::Pose pose = _vis->GetWorldPose();
+  math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
   math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
-  math::Vector3 scale = (bboxSize + distance)/bboxSize;
+  math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
+      /bboxSize;
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
-  // to constrain the scaling dimensions.
+  // to restrict the scaling dimensions.
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -252,96 +261,42 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     }
   }
 
-  _vis->SetScale(this->mouseVisualScale * scale);
+  math::Vector3 newScale = this->mouseVisualScale * scale;
+
+  if (this->mouseEvent.control)
+  {
+    if (ceil(newScale.x) - newScale.x <= .4)
+        newScale.x = ceil(newScale.x);
+    else if (newScale.x - floor(newScale.x) <= .4)
+      newScale.x = floor(newScale.x);
+
+    if (ceil(newScale.y) - newScale.y <= .4)
+        newScale.y = ceil(newScale.y);
+    else if (newScale.y - floor(newScale.y) <= .4)
+      newScale.y = floor(newScale.y);
+
+    if (_axis.z > 0.0)
+    {
+      if (ceil(newScale.z) - newScale.z <= .4)
+        newScale.z = ceil(newScale.z);
+      else if (newScale.z - floor(newScale.z) <= .4)
+        newScale.z = floor(newScale.z);
+    }
+  }
+
+  _vis->SetScale(newScale);
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-//  math::Pose pose = _vis->GetPose();
   math::Pose pose = _vis->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
-      this->mouseEvent.pos.y, origin1, dir1);
-  this->userCamera->GetCameraToViewportRay(this->mouseStart.x,
-      this->mouseStart.y, origin2, dir2);
-
-  math::Vector3 planeNorm(0, 0, 0);
-  math::Vector3 projNorm(0, 0, 0);
-
-  math::Vector3 planeNormOther(0, 0, 0);
-
-  if (_axis.x > 0 && _axis.y > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.z = 1;
-  }
-  else if (_axis.z > 0)
-  {
-    planeNorm.y = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
-  }
-  else if (_axis.x > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.y = 1;
-    planeNormOther.y = 1;
-
-  }
-  else if (_axis.y > 0)
-  {
-    planeNorm.z = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
-  }
-
-
-  if (_local)
-  {
-    planeNorm = pose.rot.RotateVector(planeNorm);
-    projNorm = pose.rot.RotateVector(projNorm);
-  }
-
-  // Fine tune translation
-  // Make sure we don't cast a ray parallel to planeNorm
-  double angle = dir1.Dot(planeNorm);
-  if (_local)
-    planeNormOther = pose.rot.RotateVector(planeNormOther);
-  double angleOther = dir1.Dot(planeNormOther);
-  if (fabs(angleOther) > fabs(angle))
-  {
-    projNorm = planeNorm;
-    planeNorm = planeNormOther;
-  }
-
-  // Compute the distance from the camera to plane of translation
-  double d = pose.pos.Dot(planeNorm);
-  math::Plane plane(planeNorm, d);
-  double dist1 = plane.Distance(origin1, dir1);
-  double dist2 = plane.Distance(origin2, dir2);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  p2 = origin2 + dir2 * dist2;
-
-  if (_local)
-    p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
-
-  math::Vector3 distance = p1 - p2;
-
-  if (!_local)
-    distance *= _axis;
+  math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
   pose.pos = this->mouseMoveVisStartPose.pos + distance;
 
-  if (this->mouseEvent.shift)
+  if (this->mouseEvent.control)
   {
     if (ceil(pose.pos.x) - pose.pos.x <= .4)
         pose.pos.x = ceil(pose.pos.x);
@@ -489,19 +444,19 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::TRANS_X)
         {
           this->TranslateEntity(this->mouseMoveVis,
-              math::Vector3(1, 0, 0), true);
+              math::Vector3::UnitX, !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Y)
         {
           this->TranslateEntity(this->mouseMoveVis,
-              math::Vector3(0, 1, 0), true);
+              math::Vector3::UnitY, !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Z)
         {
           this->TranslateEntity(this->mouseMoveVis,
-            math::Vector3(0, 0, 1), true);
+            math::Vector3::UnitZ, !this->globalManip);
         }
         else
           this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 1, 0));
@@ -516,19 +471,22 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::ROT_X
             || this->keyEvent.key == Qt::Key_X)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3::UnitX,
+              !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Y
             || this->keyEvent.key == Qt::Key_Y)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3::UnitY,
+              !this->globalManip);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Z
             || this->keyEvent.key == Qt::Key_Z)
         {
-          this->RotateEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+          this->RotateEntity(this->mouseMoveVis, math::Vector3::UnitZ,
+              !this->globalManip);
         }
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::SCALE)
@@ -541,20 +499,19 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::SCALE_X
             || this->keyEvent.key == Qt::Key_X)
         {
-          this->ScaleEntity(this->mouseMoveVis, math::Vector3(1, 0, 0), true);
-
+          this->ScaleEntity(this->mouseMoveVis, math::Vector3::UnitX, true);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::SCALE_Y
             || this->keyEvent.key == Qt::Key_Y)
         {
-          this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 1, 0), true);
+          this->ScaleEntity(this->mouseMoveVis, math::Vector3::UnitY, true);
         }
         else if (this->selectionObj->GetState()
             == rendering::SelectionObj::SCALE_Z
             || this->keyEvent.key == Qt::Key_Z)
         {
-          this->ScaleEntity(this->mouseMoveVis, math::Vector3(0, 0, 1), true);
+          this->ScaleEntity(this->mouseMoveVis, math::Vector3::UnitZ, true);
         }
       }
     }
@@ -595,6 +552,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     {
       if (this->manipMode == "scale")
       {
+        this->selectionObj->UpdateSize();
         this->PublishVisualScale(this->mouseMoveVis);
       }
       this->PublishVisualPose(this->mouseMoveVis);
@@ -616,7 +574,6 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
       }
     }
   }
-
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
@@ -656,7 +613,8 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   this->mouseMoveVis = _vis;
   if (_vis)
     this->mouseVisualScale = _vis->GetScale();
-  else this->mouseVisualScale = math::Vector3::One;
+  else
+    this->mouseVisualScale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -675,6 +633,11 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
       {
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
       }
+    }
+    else  if (this->keyEvent.key == Qt::Key_Shift)
+    {
+      this->globalManip = true;
+      this->selectionObj->SetGlobal(this->globalManip);
     }
   }
 }
@@ -696,12 +659,17 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
       }
     }
+    else  if (this->keyEvent.key == Qt::Key_Shift)
+    {
+      this->globalManip = false;
+      this->selectionObj->SetGlobal(this->globalManip);
+    }
   }
   this->keyEvent.key = 0;
 }
 
 // Function migrated here from GLWidget.cc and commented out since it doesn't
-// seem like it's currently used but kept for future references
+// seem like it's currently used. Kept here for future references
 /////////////////////////////////////////////////
 /*void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
 {

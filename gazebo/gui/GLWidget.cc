@@ -92,10 +92,6 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnCreateEntity, this, _1, _2)));
 
   this->connections.push_back(
-      gui::Events::ConnectCreateJoint(
-        boost::bind(&GLWidget::OnCreateJoint, this, _1)));
-
-  this->connections.push_back(
       gui::Events::ConnectFPS(
         boost::bind(&GLWidget::OnFPS, this)));
 
@@ -301,6 +297,17 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     g_translateAct->trigger();
   else if (_event->key() == Qt::Key_S)
     g_scaleAct->trigger();
+
+  /// Switch between RTS modes
+  if (this->keyModifiers == Qt::NoModifier)
+  {
+    if (_event->key() == Qt::Key_R)
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T)
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S)
+      g_scaleAct->trigger();
+  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -792,42 +799,17 @@ void GLWidget::OnCreateEntity(const std::string &_type,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnCreateJoint(const std::string &_type)
-{
-  if (_type == "fixed")
-  {
-  }
-  else if (_type == "revolute")
-  {
-  }
-  else if (_type == "slider")
-  {
-  }
-  else if (_type == "hinge")
-  {
-  }
-  else if (_type == "screw")
-  {
-  }
-  else if (_type == "universal")
-  {
-  }
-}
-
-/////////////////////////////////////////////////
 void GLWidget::OnFPS()
 {
   this->userCamera->SetViewController(
       rendering::FPSViewController::GetTypeString());
 }
-
 /////////////////////////////////////////////////
 void GLWidget::OnOrbit()
 {
   this->userCamera->SetViewController(
       rendering::OrbitViewController::GetTypeString());
 }
-
 
 /////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
@@ -964,7 +946,5 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     {
       this->SetSelectedVisual(rendering::VisualPtr());
     }
-//    if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
-//      this->SetMouseMoveVisual(rendering::VisualPtr());
   }
 }
