@@ -15,7 +15,6 @@ else
 fi
 
 echo "unusedFunction" > /tmp/gazebo_cpp_check.suppress 
-echo "*:gazebo/common/Plugin.hh:144" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/sdf/interface/parser.cc:544" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:94" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:105" >> /tmp/gazebo_cpp_check.suppress
