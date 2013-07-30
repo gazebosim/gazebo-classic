@@ -173,7 +173,7 @@ void Scene::Clear()
   delete this->terrain;
   this->terrain = NULL;
 
-  while (this->visuals.size() > 0)
+  while (! this->visuals.empty())
     this->RemoveVisual(this->visuals.begin()->second);
   this->visuals.clear();
 
@@ -2560,7 +2560,7 @@ void Scene::RemoveVisual(VisualPtr _vis)
 /////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
-  if (_enabled && this->grids.size() == 0)
+  if (_enabled && this->grids.empty())
   {
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();

@@ -124,7 +124,7 @@ void TopicView::Update()
       }
 
       double avgDbl = 0;
-      if (this->dataTimes.size() != 0)
+      if (! this->dataTimes.empty())
         avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
 
       std::ostringstream stream;
