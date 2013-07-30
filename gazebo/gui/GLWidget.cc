@@ -902,7 +902,5 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     {
       this->SetSelectedVisual(rendering::VisualPtr());
     }
-//    if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
-//      this->SetMouseMoveVisual(rendering::VisualPtr());
   }
 }

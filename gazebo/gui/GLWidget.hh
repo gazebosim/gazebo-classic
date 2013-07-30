@@ -98,9 +98,6 @@ namespace gazebo
       /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
 
-      /// \brief Process an object translate mouse release event.
-      private: void OnMouseReleaseTranslate();
-
       /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
 
@@ -111,9 +108,6 @@ namespace gazebo
 
       /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
-
-      /// \brief Process an object translate mouse press event.
-      private: void OnMousePressTranslate();
 
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
@@ -131,24 +125,6 @@ namespace gazebo
 
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-
-      /// \brief Rotate entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply rotation in local frame.
-      private: void RotateEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
-
-      /// \brief Translate entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply translation in local frame.
-      private: void TranslateEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
-
-      /// \brief Scale entity.
-      /// \param[in] _vis Visual representing the entity.
-      /// \param[in] _local True to apply scaling in local frame.
-      private: void ScaleEntity(rendering::VisualPtr &_vis,
-          bool _local = false);
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
