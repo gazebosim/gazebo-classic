@@ -1104,7 +1104,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
                                    const std::string &_mode)
 
 {
-  std::map<std::string, unsigned int>::iterator iter;
   if (!_name.empty())
   {
     std::string name = _name;
