@@ -142,7 +142,7 @@ macro (gz_issue_775 _name)
   # Deprecated header files
   # Install until next gazebo version on case-sensitive filesystems
   if (FILESYSTEM_CASE_SENSITIVE)
-    if (${GAZEBO_VERSION} VERSION_EQUAL_GREATER 1.9)
+    if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
       message(WARNING "Installing deprecated ${_name}.hh. This should be removed after Gazebo 1.9")
     endif()
     set(generated_file "${CMAKE_CURRENT_BINARY_DIR}/${_name}.hh")
