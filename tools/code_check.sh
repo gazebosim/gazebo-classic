@@ -1,5 +1,7 @@
 #!/bin/sh
 
+scriptdir="`cd $(dirname $0);pwd`"
+
 # Jenkins will pass -xml, in which case we want to generate XML output
 xmlout=0
 if test "$1" = "-xmldir" -a -n "$2"; then
@@ -8,7 +10,7 @@ if test "$1" = "-xmldir" -a -n "$2"; then
   mkdir -p $xmldir
   rm -rf $xmldir/*.xml
   # Assuming that Jenkins called, the `build` directory is a sibling to the src dir
-  builddir=../build
+  builddir=$scriptdir/../build
 else
   # This is a heuristic guess; not every developer puts the `build` dir in the src dir
   builddir=./build
@@ -26,27 +28,27 @@ echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> /tmp/gazebo_c
 #cppcheck
 if [ $xmlout -eq 1 ]; then
   # Run most of the checks in parallel
-  (cppcheck --xml --enable=style,performance,portability,information --rule-file=./tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"`) 2> $xmldir/cppcheck.xml 
+  (cppcheck --xml --enable=style,performance,portability,information --rule-file=$scriptdir/../tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"`) 2> $xmldir/cppcheck.xml 
 
   # Unused function checking must happen in one job
-  (cppcheck --xml --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"`) 2> $xmldir/cppcheck-unused-functions.xml 
+  (cppcheck --xml --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"`) 2> $xmldir/cppcheck-unused-functions.xml 
 
   # Finally, check the configuration
-  (cppcheck --xml --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config) 2> $xmldir/cppcheck-configuration.xml
+  (cppcheck --xml --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config) 2> $xmldir/cppcheck-configuration.xml
 else
   # Run most of the checks in parallel
-  cppcheck --enable=style,performance,portability,information --rule-file=./tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` 2>&1
+  cppcheck --enable=style,performance,portability,information --rule-file=$scriptdir/../tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"` 2>&1
 
   # Unused function checking must happen in one job
-  cppcheck --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` 2>&1
+  cppcheck --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"` 2>&1
 
   # Finally, check the configuration
-  cppcheck --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config 2>&1
+  cppcheck --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find $scriptdir/../plugins $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config 2>&1
 fi
 
 # cpplint
 if [ $xmlout -eq 1 ]; then
-  (find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1) | python tools/cpplint_to_cppcheckxml.py 2> $xmldir/cpplint.xml
+  (find $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../plugins $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1) | python tools/cpplint_to_cppcheckxml.py 2> $xmldir/cpplint.xml
 else
-  find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1
+  find $scriptdir/../gazebo $scriptdir/../tools $scriptdir/../plugins $scriptdir/../examples $scriptdir/../test/regression $scriptdir/../interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1
 fi
