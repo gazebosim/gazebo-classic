@@ -150,7 +150,7 @@ macro (gz_issue_775 _name)
       COMMAND bash ${PROJECT_SOURCE_DIR}/tools/issue_775_generator.bash ${_name}
       OUTPUT_FILE ${generated_file}
     )
-    string(TOLOWER _name nameLower)
+    string(TOLOWER ${_name} nameLower)
     gz_install_includes(${nameLower} ${generated_file})
   endif()
 endmacro()
