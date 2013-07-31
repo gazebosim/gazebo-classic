@@ -179,7 +179,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  if (this->nodes.empty() && this->callbacks.empty())
   {
     this->transports.clear();
   }
