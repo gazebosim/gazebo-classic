@@ -156,10 +156,4 @@ gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 
 # Deprecated Gui.hh
-# Install until gazebo 2.0 on case-sensitive filesystems
-if (FILESYSTEM_CASE_SENSITIVE)
-  if (${GAZEBO_VERSION} VERSION_EQUAL 2.0)
-    message(WARNING "Installing deprecated Gui.hh. This should be removed in Gazebo 2.0 and later.")
-  endif()
-  gz_install_includes("gui" Gui.hh)
-endif()
+gz_issue_775("Gui")
