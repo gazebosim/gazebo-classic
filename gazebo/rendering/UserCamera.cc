@@ -448,7 +448,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   end = mid + dir*(dist - scale);
 
-  dist = start.Distance(end);
+  // dist = start.Distance(end);
   // double vel = 5.0;
   double time = 0.5;  // dist / vel;
 
