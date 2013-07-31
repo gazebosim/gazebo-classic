@@ -241,10 +241,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
-    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
-                       origPose.pos.y - _visual->GetWorldPose().pos.y);
-    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
     double pitch = 0;
