@@ -1135,7 +1135,7 @@ void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
 /////////////////////////////////////////////////
 void GLWidget::PopHistory()
 {
-  if (! this->moveHistory.empty())
+  if (!this->moveHistory.empty())
   {
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));

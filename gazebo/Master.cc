@@ -314,7 +314,7 @@ void Master::RunOnce()
   // Process the incoming message queue
   {
     boost::recursive_mutex::scoped_lock lock(this->msgsMutex);
-    while (! this->msgs.empty())
+    while (!this->msgs.empty())
     {
       this->ProcessMessage(this->msgs.front().first,
                            this->msgs.front().second);

@@ -480,7 +480,7 @@ void Element::PrintValues(std::string _prefix)
       << (*aiter)->GetAsString() << "'";
   }
 
-  if (! this->elements.empty())
+  if (!this->elements.empty())
   {
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
@@ -529,7 +529,7 @@ void Element::ToString(const std::string &_prefix,
            << (*aiter)->GetAsString() << "'";
     }
 
-    if (! this->elements.empty())
+    if (!this->elements.empty())
     {
       _out << ">\n";
       ElementPtr_V::const_iterator eiter;

@@ -295,7 +295,7 @@ void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
   {
     boost::mutex::scoped_lock lock(this->callbackMutex);
 
-    if (! this->callbacks.empty())
+    if (!this->callbacks.empty())
     {
       std::string data;
       _msg->SerializeToString(&data);

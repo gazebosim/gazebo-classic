@@ -101,7 +101,7 @@ void InsertModelWidget::Update()
 
   // If the model database has call the OnModels callback function, then
   // add all the models from the database.
-  if (! this->modelBuffer.empty())
+  if (!this->modelBuffer.empty())
   {
     std::string uri = common::ModelDatabase::Instance()->GetURI();
     this->modelDatabaseItem->setText(0,

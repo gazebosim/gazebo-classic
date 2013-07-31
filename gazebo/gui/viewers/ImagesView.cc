@@ -88,7 +88,7 @@ void ImagesView::UpdateImpl()
   }
 
   // Update the images if there are sizes
-  if (! this->images.empty())
+  if (!this->images.empty())
   {
     // Update the image output
     for (; labelIter != this->imageLabels.end(); ++labelIter, ++imageIter)

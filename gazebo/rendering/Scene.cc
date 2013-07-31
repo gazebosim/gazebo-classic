@@ -173,7 +173,7 @@ void Scene::Clear()
   delete this->terrain;
   this->terrain = NULL;
 
-  while (! this->visuals.empty())
+  while (!this->visuals.empty())
     this->RemoveVisual(this->visuals.begin()->second);
   this->visuals.clear();
 

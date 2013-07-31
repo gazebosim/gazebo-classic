@@ -70,14 +70,14 @@ void JointController::Update()
   // TODO: fix this when World::ResetTime is improved
   if (stepTime > 0)
   {
-    if (! this->forces.empty())
+    if (!this->forces.empty())
     {
       std::map<std::string, double>::iterator iter;
       for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
         this->joints[iter->first]->SetForce(0, iter->second);
     }
 
-    if (! this->positions.empty())
+    if (!this->positions.empty())
     {
       double cmd;
       std::map<std::string, double>::iterator iter;
@@ -92,7 +92,7 @@ void JointController::Update()
       }
     }
 
-    if (! this->velocities.empty())
+    if (!this->velocities.empty())
     {
       double cmd;
       std::map<std::string, double>::iterator iter;
