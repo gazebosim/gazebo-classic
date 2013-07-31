@@ -400,7 +400,7 @@ void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 
   stream << "</div>";
 
-  if (this->attributes.size() > 0)
+  if (!this->attributes.empty())
   {
     stream << "<div style='background-color: #dedede; padding-left:10px; "
            << "display:inline-block;'>\n";
