@@ -194,8 +194,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   // Remove current items.
   topItem->takeChildren();
 
-  std::list<boost::filesystem::path> resultSet;
-
   if (boost::filesystem::exists(dir) &&
       boost::filesystem::is_directory(dir))
   {
