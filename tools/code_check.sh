@@ -22,7 +22,8 @@ echo "*:gazebo/common/STLLoader.cc:149" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/Plugin.hh:145" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/Plugin.hh:118" >> /tmp/gazebo_cpp_check.suppress
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> /tmp/gazebo_cpp_check.suppress
-
+# Not defined FREEIMAGE_COLORORDER
+echo "*:gazebo/common/Image.cc:1" >> /tmp/gazebo_cpp_check.suppress
 
 #cppcheck
 if [ $xmlout -eq 1 ]; then
