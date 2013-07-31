@@ -56,13 +56,15 @@ namespace gazebo
 
       /// \brief Add a point to the point list
       /// \param[in] pt math::Vector3 point
-      public: void AddPoint(const math::Vector3 &_pt);
+      public: void AddPoint(const math::Vector3 &_pt,
+                            const Ogre::ColourValue _color = DynamicPoints::WHITE);
 
       /// \brief Add a point to the point list.
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \param[in] _z Z position.
-      public: void AddPoint(double _x, double _y, double _z);
+      public: void AddPoint(double _x, double _y, double _z,
+                            const Ogre::ColourValue _color = DynamicPoints::WHITE);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -96,6 +98,8 @@ namespace gazebo
       /// \brief Implementation DynamicRenderable, pushes point
       /// list out to hardware memory
       protected: virtual void FillHardwareBuffers();
+
+      private: static const Ogre::ColourValue WHITE;
 
       /// \brief List of points
       private: std::vector<math::Vector3> points;

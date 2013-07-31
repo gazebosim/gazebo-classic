@@ -44,7 +44,7 @@ namespace gazebo
       /// \param[in] _vis Pointer to the parent Visual.
       /// \param[in] _topicName Name of the topic that has laser data.
       public: TransmitterVisual(const std::string &_name, VisualPtr _vis,
-                                 const std::string &_topicName);
+                                const std::string &_topicName);
 
       /// \brief Destructor.
       public: virtual ~TransmitterVisual();
@@ -64,8 +64,8 @@ namespace gazebo
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;
 
-      /// \brief Subscription to the laser data.
-      private: transport::SubscriberPtr laserScanSub;
+      /// \brief Subscription to the propagation data.
+      private: transport::SubscriberPtr signalPropagationSub;
 
       /// \brief Renders the points representing the signal strength.
       private: DynamicPoints *points;

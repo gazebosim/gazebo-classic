@@ -37,7 +37,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
+  this->signalPropagationSub = this->node->Subscribe(_topicName,
       &TransmitterVisual::OnNewPropagationGrid, this);
 
   this->isFirst = true;
@@ -92,7 +92,7 @@ void TransmitterVisual::Update()
     for (int i = 0; i < gridMsg->particle_size(); i++)
     {
       p = gridMsg->particle(i);
-      this->points->AddPoint(p.x(), p.y(), 0);
+      this->points->AddPoint(p.x(), p.y(), 0.0);
     }
     this->isFirst = false;
   }

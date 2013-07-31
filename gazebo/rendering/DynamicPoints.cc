@@ -32,6 +32,7 @@ using namespace gazebo;
 using namespace rendering;
 
 enum {POSITION_BINDING, TEXCOORD_BINDING};
+const Ogre::ColourValue DynamicPoints::WHITE(1.0, 1.0, 1.0);
 
 /////////////////////////////////////////////////
 DynamicPoints::DynamicPoints(RenderOpType opType)
@@ -60,19 +61,19 @@ const Ogre::String &DynamicPoints::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicPoints::AddPoint(const math::Vector3 &pt)
+void DynamicPoints::AddPoint(const math::Vector3 &pt,
+                             const Ogre::ColourValue _color)
 {
-  Ogre::ColourValue defaultColor(1.0, 0.0, 0.0);
-
   this->points.push_back(pt);
-  this->colors.push_back(defaultColor);
+  this->colors.push_back(_color);
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
-void DynamicPoints::AddPoint(double _x, double _y, double _z)
+void DynamicPoints::AddPoint(double _x, double _y, double _z, 
+                             const Ogre::ColourValue _color)
 {
-  this->AddPoint(math::Vector3(_x, _y, _z));
+  this->AddPoint(math::Vector3(_x, _y, _z), _color);
 }
 
 /////////////////////////////////////////////////

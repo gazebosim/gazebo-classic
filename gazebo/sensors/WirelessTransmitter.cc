@@ -64,12 +64,10 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     math::Pose pos;
     double strength;
     msgs::PropagationParticle *p;
-    
-    double x = -XLIMIT;
-    double y = -YLIMIT;
-    while (x <= XLIMIT)
+
+    for (double x = -XLIMIT; x <= XLIMIT; x += STEP)
     {
-      while (y <= YLIMIT)
+      for (double y = -YLIMIT; y <= YLIMIT; y += STEP)
       {
         pos = math::Pose(x, y, 0, 0, 0, 0);
         // For the propagation model assume the receiver antenna has the same
@@ -80,13 +78,9 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
         p = msg.add_particle();
         p->set_x(x);
         p->set_y(y);
-        p->set_signal_level(strength);
-        
-        y += STEP;
+        p->set_signal_level(strength); 
       }
-      x += STEP ;
-      y = -YLIMIT;
-    }                                                                          
+    }                                                
     this->pub->Publish(msg);
   }
 }
