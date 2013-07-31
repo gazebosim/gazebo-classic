@@ -23,8 +23,8 @@ cat <<END
 
 // Deprecated header file for case-sensitive filesystems
 #warning The gazebo/$lower/$1.hh header file is deprecated \\
-  and will be removed in gazebo 2.0. Please include \\
-  gazebo/$lower/$1Iface.hh instead.
+  as of gazebo 1.9 and will be removed in the next release. \\
+  Please include gazebo/$lower/$1Iface.hh instead.
 #include "gazebo/$lower/$1Iface.hh"
 
 #endif
