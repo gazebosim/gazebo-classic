@@ -1524,7 +1524,6 @@ void Scene::PreRender()
   VisualMsgs_L visualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
-  RequestMsgs_L requestMsgsCopy;
 
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
