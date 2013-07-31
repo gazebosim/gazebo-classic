@@ -43,7 +43,6 @@ OpenAL::OpenAL()
 {
   this->context = NULL;
   this->audioDevice = NULL;
-  this->listener = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -57,7 +56,7 @@ bool OpenAL::Load()
 {
   std::string deviceName = "default";
 
-  // \todo Add back in the ability to set the hardwar device
+  // \todo Add back in the ability to set the hardware device
   // Get the audio device name
   // if (node)
   // {
@@ -65,10 +64,10 @@ bool OpenAL::Load()
   // }
 
   // Open the default audio device
-  if (deviceName == "default")
-    this->audioDevice = alcOpenDevice(NULL);
-  else
-    this->audioDevice = alcOpenDevice(deviceName.c_str());
+  // if (deviceName == "default")
+  this->audioDevice = alcOpenDevice(NULL);
+  // else
+  //  this->audioDevice = alcOpenDevice(deviceName.c_str());
 
   // Make sure that we could open the audio device
   if (this->audioDevice == NULL)
@@ -99,16 +98,12 @@ bool OpenAL::Load()
 }
 
 /////////////////////////////////////////////////
-void OpenAL::Init()
-{
-}
-
-/////////////////////////////////////////////////
 void OpenAL::Fini()
 {
   if (this->audioDevice)
   {
     alcCloseDevice(this->audioDevice);
+    this->audioDevice = NULL;
   }
 
   if (this->context)
@@ -116,18 +111,21 @@ void OpenAL::Fini()
     this->context = alcGetCurrentContext();
     alcMakeContextCurrent(NULL);
     alcDestroyContext(this->context);
+    this->context = NULL;
   }
+
+  this->sink.reset();
 }
 
 /////////////////////////////////////////////////
-OpenALSink *OpenAL::CreateListener(sdf::ElementPtr /*_sdf*/)
+OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
 {
-  OpenALSink *result = NULL;
+  OpenALSinkPtr result;
 
-  if (this->listener == NULL)
+  if (this->sink == NULL)
   {
-    this->listener = new OpenALSink;
-    result  = this->listener;
+    this->sink.reset(new OpenALSink);
+    result  = this->sink;
   }
   else
     gzerr << "An OpenALSink has already been created."
@@ -137,20 +135,26 @@ OpenALSink *OpenAL::CreateListener(sdf::ElementPtr /*_sdf*/)
 }
 
 /////////////////////////////////////////////////
-OpenALSource *OpenAL::CreateSource(sdf::ElementPtr _sdf)
+OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 {
+  OpenALSourcePtr source;
+
   // Make sure the audio device has been opened
   if (!this->audioDevice)
   {
     gzerr << "Audio device not open\n";
-    return NULL;
+    return source;
   }
 
   // Create a source
-  OpenALSource *source = new OpenALSource();
+  source.reset(new OpenALSource());
 
   // Load the source
-  source->Load(_sdf);
+  if (!source->Load(_sdf))
+  {
+    gzerr << "Unable to load OpenAL source from SDF\n";
+    source.reset();
+  }
 
   // Return a pointer to the source
   return source;
@@ -173,7 +177,7 @@ OpenALSink::~OpenALSink()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenALSink::SetPose(const math::Pose &_pose)
+bool OpenALSink::SetPose(const math::Pose &_pose)
 {
   ALenum error;
 
@@ -184,10 +188,16 @@ void OpenALSink::SetPose(const math::Pose &_pose)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Error: [" << error << "]\n";
+    gzerr << " Unable to set pose. Error code[" <<  error << "]\n";
+    return false;
   }
 
-  ALfloat orient[] = {1, 0, 0, 0, 0, 1};
+  math::Matrix3 rot = _pose.rot.GetAsMatrix3();
+
+  // The first three values are the direction vector values.
+  // The second three value are the up vector values.
+  ALfloat orient[] = {rot[0][0], rot[0][1], rot[0][2],
+                      rot[2][0], rot[2][1], rot[2][2]};
 
   // Clear error state
   alGetError();
@@ -196,12 +206,15 @@ void OpenALSink::SetPose(const math::Pose &_pose)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Error: [" << error << "]\n";
+    gzerr << " Unable to set pose. Error code[" <<  error << "]\n";
+    return false;
   }
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenALSink::SetVel(const math::Vector3 &_vel)
+bool OpenALSink::SetVelocity(const math::Vector3 &_vel)
 {
   ALenum error;
 
@@ -211,8 +224,11 @@ void OpenALSink::SetVel(const math::Vector3 &_vel)
   alListener3f(AL_VELOCITY, _vel.x, _vel.y, _vel.z);
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Error: [" <<  error << "]\n";
+    gzerr << " Unable to set velocity. Error code[" <<  error << "]\n";
+    return false;
   }
+
+  return true;
 }
 
 
@@ -240,28 +256,35 @@ OpenALSource::~OpenALSource()
 }
 
 /////////////////////////////////////////////////
-void OpenALSource::Load(sdf::ElementPtr _sdf)
+bool OpenALSource::Load(sdf::ElementPtr _sdf)
 {
-  if (_sdf->HasElement("pitch"))
-    this->SetPitch(_sdf->Get<double>("pitch"));
-
-  if (_sdf->HasElement("gain"))
-    this->SetGain(_sdf->Get<double>("gain"));
-
-  if (_sdf->HasElement("loop"))
-    this->SetLoop(_sdf->Get<bool>("loop"));
-
-  if (_sdf->HasElement("uri"))
+  if (_sdf && _sdf->HasElement("uri"))
     this->FillBufferFromFile(_sdf->Get<std::string>("uri"));
   else
+  {
     gzerr << "<audio_source> is missing <uri>...</uri> element\n";
+    return false;
+  }
+
+  bool result = true;
+
+  if (_sdf->HasElement("pitch"))
+    result = result && this->SetPitch(_sdf->Get<double>("pitch"));
+
+  if (_sdf->HasElement("gain"))
+    result = result && this->SetGain(_sdf->Get<double>("gain"));
+
+  if (_sdf->HasElement("loop"))
+    result = result && this->SetLoop(_sdf->Get<bool>("loop"));
+
+  return result;
 }
 
 /////////////////////////////////////////////////
-int OpenALSource::SetPos(const math::Vector3 &_pos)
+bool OpenALSource::SetPose(const math::Pose &_pose)
 {
-  ALfloat p[3] = {static_cast<float>(_pos.x),
-    static_cast<float>(_pos.y), static_cast<float>(_pos.z)};
+  ALfloat p[3] = {static_cast<float>(_pose.pos.x),
+    static_cast<float>(_pose.pos.y), static_cast<float>(_pose.pos.z)};
   ALenum error;
 
   // Clear error state
@@ -271,15 +294,15 @@ int OpenALSource::SetPos(const math::Vector3 &_pos)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << "Error: [" << error << "]\n";
-    return -1;
+    gzerr << " Unable to set position. Error code[" << error << "]\n";
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 /////////////////////////////////////////////////
-int OpenALSource::SetVel(const math::Vector3 &_vel)
+bool OpenALSource::SetVelocity(const math::Vector3 &_vel)
 {
   ALenum error;
   ALfloat v[3] = {static_cast<float>(_vel.x),
@@ -292,15 +315,15 @@ int OpenALSource::SetVel(const math::Vector3 &_vel)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << "Error: [" << error << "]\n";
-    return -1;
+    gzerr << " Unable to set velocity. Error code[" << error << "]\n";
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 /////////////////////////////////////////////////
-int OpenALSource::SetPitch(float _pitch)
+bool OpenALSource::SetPitch(float _pitch)
 {
   ALenum error;
 
@@ -311,15 +334,15 @@ int OpenALSource::SetPitch(float _pitch)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Error: [" << error << "]\n";
-    return -1;
+    gzerr << " Unable to set pitch. Error code[" << error << "]\n";
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 /////////////////////////////////////////////////
-int OpenALSource::SetGain(float _gain)
+bool OpenALSource::SetGain(float _gain)
 {
   ALenum error;
 
@@ -330,15 +353,15 @@ int OpenALSource::SetGain(float _gain)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << "Error: [" << error << "]\n";
-    return -1;
+    gzerr << " Unable to set gain. Error code[" << error << "]\n";
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 /////////////////////////////////////////////////
-int OpenALSource::SetLoop(bool _state)
+bool OpenALSource::SetLoop(bool _state)
 {
   ALenum error;
 
@@ -350,11 +373,11 @@ int OpenALSource::SetLoop(bool _state)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Error: [" << error << "]\n";
-    return -1;
+    gzerr << " Unable to set loop. Error code[" << error << "]\n";
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -365,9 +388,7 @@ void OpenALSource::Play()
 
   // Play the source, if it's not already playing
   if (sourceState != AL_PLAYING)
-  {
     alSourcePlay(this->alSource);
-  }
 }
 
 /////////////////////////////////////////////////
@@ -389,7 +410,7 @@ void OpenALSource::Stop()
 
   // Stop the source if it is not already stopped
   if (sourceState != AL_STOPPED)
-    alSourcePause(this->alSource);
+    alSourceStop(this->alSource);
 }
 
 /////////////////////////////////////////////////

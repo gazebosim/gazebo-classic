@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
@@ -356,10 +357,10 @@ namespace gazebo
       private: bool pluginsLoaded;
 
       /// \brief All the audio sources
-      private: std::vector<util::OpenALSource *> audioSources;
+      private: std::vector<util::OpenALSourcePtr> audioSources;
 
       /// \brief An audio sink
-      private: util::OpenALSink *audioSink;
+      private: util::OpenALSinkPtr audioSink;
     };
     /// \}
   }

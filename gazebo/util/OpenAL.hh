@@ -27,6 +27,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"
 
@@ -55,28 +56,28 @@ namespace gazebo
       /// \return True on success.
       public: bool Load();
 
-      /// \brief Initialize.
-      public: void Init();
-
       /// \brief Finalize.
       public: void Fini();
 
       /// \brief Create an OpenALSource object.
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return A pointer to an OpenALSource object.
-      public: OpenALSource *CreateSource(sdf::ElementPtr _sdf);
+      public: OpenALSourcePtr CreateSource(sdf::ElementPtr _sdf);
 
-      /// \brief Create an listener. Currenly, only one listener may be
+      /// \brief Create an audio listener. Currenly, only one listener may be
       /// created.
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return A pointer to an OpenALSink object.
-      public: OpenALSink *CreateListener(sdf::ElementPtr _sdf);
+      public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf);
 
+      /// \brief OpenAL audio context pointer.
       private: ALCcontext_struct *context;
+
+      /// \brief OpenAL audio device pointer.
       private: ALCdevice_struct *audioDevice;
 
-      /// \brief OpenAL Listener pointer.
-      private: OpenALSink *listener;
+      /// \brief OpenAL sink pointer.
+      private: OpenALSinkPtr sink;
 
       /// \brief This is a singleton
       private: friend class SingletonT<OpenAL>;
@@ -91,13 +92,15 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~OpenALSink();
 
-      /// \brief Set the position of the sink
-      /// \param[in] _pose New pose of the sink
-      public: void SetPose(const math::Pose &_pose);
+      /// \brief Set the position of the sink.
+      /// \param[in] _pose New pose of the sink.
+      /// \return True on success.
+      public: bool SetPose(const math::Pose &_pose);
 
       /// \brief Set the velocity of the sink
       /// \param[in] _vel Velocity of the sink.
-      public: void SetVel(const math::Vector3 &_vel);
+      /// \return True on success.
+      public: bool SetVelocity(const math::Vector3 &_vel);
     };
 
     /// \brief OpenAL Source. This can be thought of as a speaker.
@@ -111,23 +114,32 @@ namespace gazebo
 
       /// \brief Load the source from sdf.
       /// \param[in] _sdf SDF element parameters for an audio_source.
-      public: void Load(sdf::ElementPtr _sdf);
+      public: bool Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set the position of the source
-      /// \param[in] _pos New position of the source
-      public: int SetPos(const math::Vector3 &_pos);
+      /// \brief Set the position of the source.
+      /// \param[in] _pose New pose of the source.
+      /// \return True on success.
+      public: bool SetPose(const math::Pose &_pose);
 
       /// \brief Set the velocity of the source
-      public: int SetVel(const math::Vector3 &_vel);
+      /// \param[in] _vel New velocity of the source
+      /// \return True on success.
+      public: bool SetVelocity(const math::Vector3 &_vel);
 
       /// \brief Set the pitch of the source
-      public: int SetPitch(float _p);
+      /// \param[in] _p Pitch value.
+      /// \return True on success.
+      public: bool SetPitch(float _p);
 
       /// \brief Set the pitch of the source
-      public: int SetGain(float _g);
+      /// \param[in] _g Gain value.
+      /// \return True on success.
+      public: bool SetGain(float _g);
 
       /// \brief Set whether the source loops the audio
-      public: int SetLoop(bool _state);
+      /// \param[in] _state True to cause playback to loop.
+      /// \return True on success.
+      public: bool SetLoop(bool _state);
 
       /// \brief Play a sound
       public: void Play();

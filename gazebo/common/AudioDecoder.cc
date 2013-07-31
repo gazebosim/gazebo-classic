@@ -122,7 +122,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     {
       if (!(decodedFrame = avcodec_alloc_frame()))
       {
-        gzerr << "openAL out of memory\n";
+        gzerr << "Audio decoder out of memory\n";
         result = false;
         break;
       }

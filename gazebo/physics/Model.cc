@@ -72,7 +72,6 @@ Model::Model(BasePtr _parent)
 {
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
-  this->audioSink = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -106,7 +105,7 @@ void Model::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
     while (audioElem)
     {
-      util::OpenALSource *source = util::OpenAL::Instance()->CreateSource(
+      util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
           audioElem);
       // source->SetPos(math::Vector3(0, 0, 1));
       source->Play();
@@ -117,7 +116,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("audio_sink"))
   {
-    this->audioSink = util::OpenAL::Instance()->CreateListener(
+    this->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 }
@@ -234,17 +233,17 @@ void Model::Update()
   this->updateMutex->lock();
 
   // Update all the audio sources
-  for (std::vector<util::OpenALSource *>::iterator iter =
+  for (std::vector<util::OpenALSourcePtr>::iterator iter =
       this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
   {
-    (*iter)->SetPos(this->GetWorldPose().pos);
-    (*iter)->SetVel(this->GetWorldLinearVel());
+    (*iter)->SetPose(this->GetWorldPose());
+    (*iter)->SetVelocity(this->GetWorldLinearVel());
   }
 
   if (this->audioSink)
   {
     this->audioSink->SetPose(this->GetWorldPose());
-    this->audioSink->SetVel(this->GetWorldLinearVel());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel());
   }
 
   for (Joint_V::iterator jiter = this->joints.begin();
@@ -359,6 +358,7 @@ void Model::Fini()
   this->joints.clear();
   this->plugins.clear();
   this->canonicalLink.reset();
+  this->audioSink.reset();
 }
 
 //////////////////////////////////////////////////

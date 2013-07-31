@@ -29,10 +29,21 @@ namespace gazebo
   namespace util
   {
     class DiagnosticTimer;
+    class OpenALSink;
+    class OpenALSource;
 
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class
     typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+
+    /// \def OpenALSinkPtr
+    /// \brief boost::shared_ptr to a OpenALSink class
+    typedef boost::shared_ptr<OpenALSink> OpenALSinkPtr;
+
+    /// \def OpenALSourcePtr
+    /// \brief boost::shared_ptr to a OpenALSource class
+    typedef boost::shared_ptr<OpenALSource> OpenALSourcePtr;
+
   }
 }
 /// \}
