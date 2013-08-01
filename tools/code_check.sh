@@ -50,3 +50,10 @@ if [ $xmlout -eq 1 ]; then
 else
   find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1
 fi
+
+# msg_check.py
+if [ $xmlout -eq 1 ]; then
+  ./tools/msg_check.py xml 2> $xmldir/msg_check.xml
+else
+  ./tools/msg_check.py 2>&1
+fi
