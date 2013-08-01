@@ -189,7 +189,10 @@ string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
 
 
 if (SSE2_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2")
+  if (NOT APPLE)
+    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mfpmath=sse")
+  endif()
 endif()
 if (SSE3_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse3")
@@ -213,7 +216,13 @@ endif()
 # Check for DRI capable Display
 include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 
-set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_C_FLAGS_RELEASE "")
+if (NOT APPLE)
+  # -s doesn't work with default osx compiler clang, alternative:
+  # http://stackoverflow.com/questions/6085491/gcc-vs-clang-symbol-strippingu
+  set (CMAKE_C_FLAGS_RELEASE "-s")
+endif()
+set (CMAKE_C_FLAGS_RELEASE " ${CMAKE_C_FLAGS_RELEASE} -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
 set (CMAKE_C_FLAGS_RELWITHDEBINFO " -g -O2 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release with debug support" FORCE)

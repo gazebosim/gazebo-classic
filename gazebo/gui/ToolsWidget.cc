@@ -73,5 +73,5 @@ ToolsWidget::~ToolsWidget()
 void ToolsWidget::OnSetSelectedEntity(const std::string &_name,
                                       const std::string &/*_mode*/)
 {
-  this->jointControlWidget->SetModelName(_name);
+  // this->jointControlWidget->SetModelName(_name);
 }

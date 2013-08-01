@@ -18,9 +18,9 @@ if (HAVE_BULLET)
 endif()
 
 set(tests
-  RAMLibrary_TEST.cc
-  factory_stress.cc
-  transport_stress.cc
+#  RAMLibrary_TEST.cc
+#  factory_stress.cc
+#  transport_stress.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
