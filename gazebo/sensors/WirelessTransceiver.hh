@@ -79,9 +79,9 @@ namespace gazebo
       /// \return Receiver power (dBm).
       public: double GetPower();
 
-      /// \brief Returns the receiver sensivity (dBm).
-      /// \return Receiver sensivity (dBm).
-      public: double GetSensivity();
+      /// \brief Returns the receiver sensitivity (dBm).
+      /// \return Receiver sensitivity (dBm).
+      public: double GetSensitivity();
 
       /// \brief Parent entity
       protected: physics::EntityPtr entity;
@@ -104,8 +104,8 @@ namespace gazebo
       /// \brief Antenna's gain of the receiver (dBi).
       protected: double gain;
 
-      /// \brief Antenna's sensivity of the receiver (dBm).
-      protected: double sensivity;
+      /// \brief Antenna's sensitivity of the receiver (dBm).
+      protected: double sensitivity;
     };
     /// \}
   }

@@ -71,11 +71,9 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
         // Disgard if the frequency received is out of our frequency range, 
         // or if the received signal strengh is lower than the sensivity
         if ((txFreq < this->GetLowerFreqFiltered()) ||
-            (txFreq > this->GetHigherFreqFiltered()))// ||
-            //(rxPower < this->GetSensivity()))
+            (txFreq > this->GetHigherFreqFiltered()) ||
+            (rxPower < this->GetSensitivity()))
         {
-          std::cout << "Skipping\n";
-          std::cout << rxPower << "," << this->GetSensivity() << std::endl;
           continue;
         }
 
@@ -87,7 +85,10 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
         wirelessNode->set_frequency(txFreq);
         wirelessNode->set_signal_level(rxPower);
       }
-    }                                
-    this->pub->Publish(msg);                                               
+    }
+    if (msg.node_size() > 0)
+    {
+      this->pub->Publish(msg);                                               
+    }
   }
 }

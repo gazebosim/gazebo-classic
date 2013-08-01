@@ -104,7 +104,7 @@ void TransmitterVisual::Update()
     // Assuming that the Rx gain is the same as Tx gain
     double strength = 1.0 - (std::min(std::max(0.0, -p.signal_level()), 255.0) / 255.0);
     //if (p.signal_level() > 0)
-    std::cout << p.signal_level() << std::endl;
+    //std::cout << p.signal_level() << std::endl;
     Ogre::ColourValue color(strength, strength, strength);
 
     this->points->SetColor(i, color);

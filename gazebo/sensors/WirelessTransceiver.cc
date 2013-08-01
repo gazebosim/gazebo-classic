@@ -93,9 +93,9 @@ void WirelessTransceiver::Load(const std::string &_worldName)
       this->gain = transElem->Get<double>("gain");
     }
 
-    if (transElem->HasElement("sensivity"))
+    if (transElem->HasElement("sensitivity"))
     {
-      this->sensivity = transElem->Get<double>("sensivity");
+      this->sensitivity = transElem->Get<double>("sensitivity");
     }
   }
 }
@@ -143,7 +143,7 @@ double WirelessTransceiver::GetGain()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetSensivity()
+double WirelessTransceiver::GetSensitivity()
 {
-  return this->sensivity;
+  return this->sensitivity;
 }

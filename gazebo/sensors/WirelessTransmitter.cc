@@ -33,8 +33,8 @@ using namespace physics;
 
 GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
 
-const double WirelessTransmitter::N_EMPTY = 10;
-const double WirelessTransmitter::N_OBSTACLE = 15.0;
+const double WirelessTransmitter::N_EMPTY = 6;
+const double WirelessTransmitter::N_OBSTACLE = 12.0;
 const double WirelessTransmitter::MODEL_STD_DESV = 6.0;
 const double WirelessTransmitter::XLIMIT = 10.0;
 const double WirelessTransmitter::YLIMIT = 10.0;
@@ -132,13 +132,15 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
   testRay.reset();
 
   //ToDo: The ray intersects with my own collision model. Fix it.
-  if (dist > 0 && entityName != "")
+  if (dist > 0 && entityName != "ground_plane::link::collision" &&
+      entityName != "" && entityName != "wirelessReceiver::link::collision-box")
   {
+    std::cout << "Found obstacle\nDist: " << dist << " EntityName: " << entityName << std::endl;
     n = N_OBSTACLE;
   }
 
   double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));  
-  double x = math::Rand::GetDblNormal(0.0, MODEL_STD_DESV);
+  double x = abs(math::Rand::GetDblNormal(0.0, MODEL_STD_DESV));
   double wavelength = C / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
