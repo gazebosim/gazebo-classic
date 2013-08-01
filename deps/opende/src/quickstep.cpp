@@ -109,8 +109,8 @@ struct dxSORLCPParameters {
     const int* findex;
     dRealPtr hi;
     dRealPtr lo;
-    dRealPtr invI;
-    dRealPtr I;
+    dRealPtr invMOI;
+    dRealPtr MOI;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
     dRealMutablePtr rhs;
@@ -186,7 +186,7 @@ static void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
 // compute iMJ = inv(M)*J'
 
 static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
-  dxBody * const *body, dRealPtr invI)
+  dxBody * const *body, dRealPtr invMOI)
 {
   dRealMutablePtr iMJ_ptr = iMJ;
   dRealPtr J_ptr = J;
@@ -195,13 +195,13 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
     int b2 = jb[i*2+1];
     dReal k1 = body[b1]->invMass;
     for (int j=0; j<3; j++) iMJ_ptr[j] = k1*J_ptr[j];
-    const dReal *invIrow1 = invI + 12*b1;
-    dMultiply0_331 (iMJ_ptr + 3, invIrow1, J_ptr + 3);
+    const dReal *invMOIrow1 = invMOI + 12*b1;
+    dMultiply0_331 (iMJ_ptr + 3, invMOIrow1, J_ptr + 3);
     if (b2 >= 0) {
       dReal k2 = body[b2]->invMass;
       for (int j=0; j<3; j++) iMJ_ptr[j+6] = k2*J_ptr[j+6];
-      const dReal *invIrow2 = invI + 12*b2;
-      dMultiply0_331 (iMJ_ptr + 9, invIrow2, J_ptr + 9);
+      const dReal *invMOIrow2 = invMOI + 12*b2;
+      dMultiply0_331 (iMJ_ptr + 9, invMOIrow2, J_ptr + 9);
     }
   }
 }
@@ -293,7 +293,7 @@ static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
+  dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -301,7 +301,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
-  compute_invM_JT (m,J,iMJ,jb,body,invI);
+  compute_invM_JT (m,J,iMJ,jb,body,invMOI);
 
   dReal last_rho = 0;
   dReal *r = context->AllocateArray<dReal> (m);
@@ -401,7 +401,7 @@ static int compare_index_error (const void *a, const void *b)
 #endif
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
-                      dRealPtr I, dxBody * const *body,
+                      dRealPtr MOI, dxBody * const *body,
                       const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
@@ -423,16 +423,16 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       // tmp1 = M*v/h + fe
       //
       dReal *tmp1curr = tmp1;
-      const dReal *Irow = I;
+      const dReal *MOIrow = MOI;
       dxBody *const *const bodyend = body + nb;
-      for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, Irow+=12, bodycurr++) {
+      for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, MOIrow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         // dReal body_mass = b_ptr->mass.mass;
         for (int j=0; j<3; j++)
           tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
         dReal tmpa[3];
         for (int j=0; j<3; j++) tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
-        dMultiply0_331 (tmp1curr + 3,Irow,tmpa);
+        dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
         for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
       //
@@ -1121,7 +1121,7 @@ static void ComputeRows(
 // nb is the number of bodies in the body array.
 // J is an m*12 matrix of constraint rows
 // jb is an array of first and second body numbers for each constraint row
-// invI is the global frame inverse inertia for each body (stacked 3x3 matrices)
+// invMOI is the global frame inverse inertia for each body (stacked 3x3 matrices)
 //
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda,
@@ -1131,7 +1131,7 @@ static void ComputeRows(
 //
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
@@ -1144,7 +1144,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
-  compute_invM_JT (m,J,iMJ,jb,body,invI);
+  compute_invM_JT (m,J,iMJ,jb,body,invMOI);
 
 #ifdef WARM_STARTING
   // compute cforce=(inv(M)*J')*lambda
@@ -1385,8 +1385,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].findex = findex;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
-    params[thread_id].invI = invI;
-    params[thread_id].I= I;
+    params[thread_id].invMOI = invMOI;
+    params[thread_id].MOI= MOI;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
     params[thread_id].rhs = rhs;
@@ -1467,29 +1467,29 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
   // for all bodies, compute the inertia tensor and its inverse in the global
   // frame, and compute the rotational force and add it to the torque
-  // accumulator. I and invI are a vertical stack of 3x4 matrices, one per body.
-  dReal *invI = context->AllocateArray<dReal> (3*4*nb);
-  dReal *I = context->AllocateArray<dReal> (3*4*nb);
+  // accumulator. MOI and invMOI are a vertical stack of 3x4 matrices, one per body.
+  dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
+  dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
   {
-    dReal *invIrow = invI;
-    dReal *Irow = I;
+    dReal *invMOIrow = invMOI;
+    dReal *MOIrow = MOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invIrow += 12, Irow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
       dMatrix3 tmp;
       dxBody *b_ptr = *bodycurr;
 
       // compute inverse inertia tensor in global frame
       dMultiply2_333 (tmp,b_ptr->invI,b_ptr->posr.R);
-      dMultiply0_333 (invIrow,b_ptr->posr.R,tmp);
+      dMultiply0_333 (invMOIrow,b_ptr->posr.R,tmp);
 
-      // also store I for later use by preconditioner
+      // also store MOI for later use by preconditioner
       dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
-      dMultiply0_333 (Irow,b_ptr->posr.R,tmp);
+      dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
 
       if (b_ptr->flags & dxBodyGyroscopic) {
         // compute rotational force
-        dMultiply0_331 (tmp,Irow,b_ptr->avel);
+        dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
         dSubtractVectorCross3(b_ptr->tacc,b_ptr->avel,tmp);
       }
     }
@@ -1597,10 +1597,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
   {
     dRealMutablePtr vnewcurr = vnew;
     dxBody* const* bodyend = body + nb;
-    const dReal *invIrow = invI;
+    const dReal *invMOIrow = invMOI;
     dReal tmp_tacc[3];
     for (dxBody* const* bodycurr = body; bodycurr != bodyend;
-         invIrow += 12, vnewcurr += 6, bodycurr++) {
+         invMOIrow += 12, vnewcurr += 6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
 
       // add stepsize * invM * fe to the body velocity
@@ -1610,7 +1610,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         vnewcurr[j+3] = b_ptr->avel[j];
         tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
       }
-      dMultiplyAdd0_331 (vnewcurr+3, invIrow, tmp_tacc);
+      dMultiplyAdd0_331 (vnewcurr+3, invMOIrow, tmp_tacc);
 
     }
   }
@@ -1623,6 +1623,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *caccel_corr = context->AllocateArray<dReal> (nb*6);
 #endif
 
+  // Get Joint Information, setup Jacobians by calling getInfo2.
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
     dReal *c_v_max;
@@ -1730,6 +1731,16 @@ void dxQuickStepper (dxWorldProcessContext *context,
               findex_ofsi[j] = fival + ofsi;
           }
 
+          /// do something here for inertia tweaking:
+          ///   For now, try this only for the two non-free axial rotation constraints for hinge joints.
+          ///     a. rotate both parent and child MOI into a common joint frame.
+          ///     b. get scalar axis MOI in the constrained axis direction.
+          ///     c. get full axis MOI tensor representing the scalar axis MOI.
+          ///     d. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for constrained direction.
+          ///     e. rotate modified parent/child MOI back to their original reference frames.
+
+
+          // update index for next joint
           ofsi += infom;
         }
       }
@@ -1766,16 +1777,16 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
         dReal *tmp1curr = tmp1;
-        const dReal *invIrow = invI;
+        const dReal *invMOIrow = invMOI;
         dxBody *const *const bodyend = body + nb;
         for (dxBody *const *bodycurr = body;
              bodycurr != bodyend;
-             tmp1curr+=6, invIrow+=12, bodycurr++) {
+             tmp1curr+=6, invMOIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
             tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
-          dMultiply0_331 (tmp1curr + 3,invIrow,b_ptr->tacc);
+          dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
           for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
@@ -1802,7 +1813,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // compute rhs_precon
       if (world->qs.precon_iterations > 0)
-        computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
+        computeRHSPrecon(context,m,nb,MOI,body,stepsize1,c,J,jb,rhs_precon);
 
 
 
@@ -1860,7 +1871,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
       SOR_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,body,
-               invI,I,lambda,lambda_erp,
+               invMOI,MOI,lambda,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
@@ -1964,16 +1975,16 @@ void dxQuickStepper (dxWorldProcessContext *context,
     IFTIMING (dTimerNow ("compute velocity update"));
     // compute the velocity update:
     // add stepsize * invM * fe to the body velocity
-    const dReal *invIrow = invI;
+    const dReal *invMOIrow = invMOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invIrow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
       for (int j=0; j<3; j++) {
         b_ptr->lvel[j] += body_invMass_mul_stepsize * b_ptr->facc[j];
         b_ptr->tacc[j] *= stepsize;
       }
-      dMultiplyAdd0_331 (b_ptr->avel, invIrow, b_ptr->tacc);
+      dMultiplyAdd0_331 (b_ptr->avel, invMOIrow, b_ptr->tacc);
       // printf("fe [%f %f %f] [%f %f %f]\n"
       //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
       //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
@@ -2101,7 +2112,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       // add correction term dlambda = J*v(n+1)/dt
       // and caccel += dt*invM*JT*dlambda (dt's cancel out)
       dReal *iMJ = context->AllocateArray<dReal> (m*12);
-      compute_invM_JT (m,J,iMJ,jb,body,invI);
+      compute_invM_JT (m,J,iMJ,jb,body,invMOI);
       // compute caccel_corr=(inv(M)*J')*dlambda, correction term
       // as we change lambda.
       multiply_invM_JT (m,nb,iMJ,jb,tmp,caccel_corr);
@@ -2191,8 +2202,8 @@ size_t dxEstimateQuickStepMemoryRequirements (
 
   size_t res = 0;
 
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I (inertia) needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invMOI
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for MOI (inertia) needed by preconditioner
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
