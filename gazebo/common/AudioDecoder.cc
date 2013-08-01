@@ -100,14 +100,6 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     *_outBuffer = NULL;
   }
 
-  FILE *f = fopen(this->filename.c_str(), "rb");
-
-  if (!f)
-  {
-    gzerr << "Unable to open file\n";
-    return false;
-  }
-
   bool result = true;
 
   if (!decodedFrame)
@@ -167,6 +159,9 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   av_free_packet(&packet);
 
+  // Seek to the beginning so that it can be decoded again, if necessary.
+  av_seek_frame(this->formatCtx, this->audioStream, 0, 0);
+
   return result;
 }
 #else
@@ -199,7 +194,6 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
   {
     gzerr << "Unable to open audio file[" << _filename << "]\n";
-    avformat_close_input(&this->formatCtx);
     this->formatCtx = NULL;
     return false;
   }

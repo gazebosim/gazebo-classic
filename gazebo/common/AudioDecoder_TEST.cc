@@ -123,16 +123,44 @@ TEST(AudioDecoder, CheerFile)
   path /= "data/empty_audio.mp4";
   EXPECT_FALSE(audio.SetFile(path.string()));
 
-  path = PROJECT_SOURCE_PATH;
-  path /= "media/audio/cheer.wav";
-  EXPECT_TRUE(audio.SetFile(path.string()));
-  EXPECT_EQ(audio.GetFile(), path.string());
-  EXPECT_EQ(audio.GetSampleRate(), 48000);
-
   unsigned int dataBufferSize;
   uint8_t *dataBuffer = NULL;
-  audio.Decode(&dataBuffer, &dataBufferSize);
-  EXPECT_EQ(dataBufferSize, 5428736u);
+
+  // WAV
+  {
+    path = PROJECT_SOURCE_PATH;
+    path /= "media/audio/cheer.wav";
+    EXPECT_TRUE(audio.SetFile(path.string()));
+    EXPECT_EQ(audio.GetFile(), path.string());
+    EXPECT_EQ(audio.GetSampleRate(), 48000);
+
+    audio.Decode(&dataBuffer, &dataBufferSize);
+    EXPECT_EQ(dataBufferSize, 5428692u);
+  }
+
+  // OGG
+  {
+    path = PROJECT_SOURCE_PATH;
+    path /= "media/audio/cheer.ogg";
+    EXPECT_TRUE(audio.SetFile(path.string()));
+    EXPECT_EQ(audio.GetFile(), path.string());
+    EXPECT_EQ(audio.GetSampleRate(), 44100);
+
+    audio.Decode(&dataBuffer, &dataBufferSize);
+    EXPECT_EQ(dataBufferSize, 4989184u);
+  }
+
+  // MP3
+  {
+    path = PROJECT_SOURCE_PATH;
+    path /= "media/audio/cheer.mp3";
+    EXPECT_TRUE(audio.SetFile(path.string()));
+    EXPECT_EQ(audio.GetFile(), path.string());
+    EXPECT_EQ(audio.GetSampleRate(), 44100);
+
+    audio.Decode(&dataBuffer, &dataBufferSize);
+    EXPECT_EQ(dataBufferSize, 4995072u);
+  }
 }
 
 /////////////////////////////////////////////////
