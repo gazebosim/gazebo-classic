@@ -157,7 +157,11 @@ namespace gazebo
       public: bool IsPlaying();
 
       /// \brief Fill the OpenAL audio buffer from PCM data
-      public: void FillBufferFromPCM(uint8_t *_pcmData, unsigned int _dataCount,
+      /// \param[in] _pcmData Pointer to the PCM audio data.
+      /// \param[in] _dataCount Size of the PCM data.
+      /// \param[in] _sampleRate Sample rate for the PCM data.
+      /// \return True on success.
+      public: bool FillBufferFromPCM(uint8_t *_pcmData, unsigned int _dataCount,
                                      int _sampleRate);
 
       /// \brief Fill the OpenAL audio buffer with data from a sound file

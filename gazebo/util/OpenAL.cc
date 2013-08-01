@@ -429,7 +429,7 @@ bool OpenALSource::IsPlaying()
 }
 
 /////////////////////////////////////////////////
-void OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
+bool OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
     unsigned int _dataCount, int _sampleRate)
 {
   // First detach the buffer
@@ -446,8 +446,11 @@ void OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
 
   if (alGetError() != AL_NO_ERROR)
   {
-    gzthrow("Unable to copy data into openAL buffer\n");
+    gzerr << "Unable to copy audio data into openAL buffer.\n";
+    return false;
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -480,6 +483,7 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
   // AL_FORMAT_STEREO16
   this->FillBufferFromPCM(dataBuffer, dataBufferSize,
       audioDecoder.GetSampleRate());
+
 #else
   std::cerr << "No FFMPEG audio decoder. Missing FFMPEG libraries.\n";
 #endif

@@ -75,8 +75,7 @@ void AudioDecoder::Cleanup()
 #ifdef HAVE_FFMPEG
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
-  AVPacket packet;
-  uint8_t tmpBuf[AUDIO_INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];
+  AVPacket packet, packet1;
   int bytesDecoded = 0;
   unsigned int maxBufferSize = 0;
   AVFrame *decodedFrame = NULL;
@@ -109,69 +108,63 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
     return false;
   }
 
-  av_init_packet(&packet);
-  packet.data = tmpBuf;
-  packet.size = fread(tmpBuf, 1, AUDIO_INBUF_SIZE, f);
-
   bool result = true;
-  while (packet.size > 0)
+
+  if (!decodedFrame)
   {
-    int gotFrame = 0;
-
-    if (!decodedFrame)
+    if (!(decodedFrame = avcodec_alloc_frame()))
     {
-      if (!(decodedFrame = avcodec_alloc_frame()))
-      {
-        gzerr << "Audio decoder out of memory\n";
-        result = false;
-        break;
-      }
-    }
-    else
-      avcodec_get_frame_defaults(decodedFrame);
-
-    bytesDecoded = avcodec_decode_audio4(this->codecCtx, decodedFrame,
-        &gotFrame, &packet);
-
-    if (bytesDecoded < 0)
-      break;
-
-    if (gotFrame > 0)
-    {
-      // Resize the audio buffer as necessary
-      if (*_outBufferSize + bytesDecoded > maxBufferSize)
-      {
-        maxBufferSize += bytesDecoded * 5;
-        *_outBuffer = reinterpret_cast<uint8_t*>(realloc(*_outBuffer,
-            maxBufferSize * sizeof(*_outBuffer[0])));
-      }
-
-      memcpy(*_outBuffer + *_outBufferSize, tmpBuf, bytesDecoded);
-      *_outBufferSize += bytesDecoded;
-    }
-
-    // subtract data from whatever decode function returns
-    packet.size -= bytesDecoded;
-    packet.data += bytesDecoded;
-
-    if (packet.size < AUDIO_REFILL_THRESH)
-    {
-      // Refill the input buffer, to avoid trying to decode
-      // incomplete frames. Instead of this, one could also use
-      // a parser, or use a proper container format through
-      // libavformat.
-
-      memmove(tmpBuf, packet.data, packet.size);
-      packet.data = tmpBuf;
-      int len = fread(packet.data + packet.size, 1,
-          AUDIO_INBUF_SIZE - packet.size, f);
-
-      if (len > 0)
-        packet.size += len;
+      gzerr << "Audio decoder out of memory\n";
+      result = false;
     }
   }
+  else
+    avcodec_get_frame_defaults(decodedFrame);
 
-  fclose(f);
+  av_init_packet(&packet);
+  while (av_read_frame(this->formatCtx, &packet) == 0)
+  {
+    if (packet.stream_index == this->audioStream)
+    {
+      int gotFrame = 0;
+
+      packet1 = packet;
+      while (packet1.size)
+      {
+        // Some frames rely on multiple packets, so we have to make sure
+        // the frame is finished before we can use it
+        bytesDecoded = avcodec_decode_audio4(this->codecCtx, decodedFrame,
+            &gotFrame, &packet1);
+
+        if (gotFrame)
+        {
+          // Total size of the data. Some padding can be added to
+          // decodedFrame->data[0], which is why we can't use
+          // decodedFrame->linesize[0].
+          int size = decodedFrame->nb_samples *
+            av_get_bytes_per_sample(this->codecCtx->sample_fmt) *
+            this->codecCtx->channels;
+
+          // Resize the audio buffer as necessary
+          if (*_outBufferSize + size > maxBufferSize)
+          {
+            maxBufferSize += size * 5;
+            *_outBuffer = reinterpret_cast<uint8_t*>(realloc(*_outBuffer,
+                  maxBufferSize * sizeof(*_outBuffer[0])));
+          }
+
+          memcpy(*_outBuffer + *_outBufferSize, decodedFrame->data[0],
+              size);
+          *_outBufferSize += size;
+        }
+
+        packet1.data += bytesDecoded;
+        packet1.size -= bytesDecoded;
+      }
+    }
+    av_free_packet(&packet);
+  }
+
   av_free_packet(&packet);
 
   return result;
@@ -206,6 +199,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
   {
     gzerr << "Unable to open audio file[" << _filename << "]\n";
+    avformat_close_input(&this->formatCtx);
+    this->formatCtx = NULL;
     return false;
   }
 
@@ -216,6 +211,9 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
   {
     gzerr << "Unable to find stream info.\n";
+    avformat_close_input(&this->formatCtx);
+    this->formatCtx = NULL;
+
     return false;
   }
 
@@ -236,6 +234,9 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (this->audioStream == -1)
   {
     gzerr << "Couldn't find audio stream.\n";
+    avformat_close_input(&this->formatCtx);
+    this->formatCtx = NULL;
+
     return false;
   }
 
@@ -248,6 +249,9 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   if (this->codec == NULL)
   {
     gzerr << "Couldn't find codec for audio stream.\n";
+    avformat_close_input(&this->formatCtx);
+    this->formatCtx = NULL;
+
     return false;
   }
 
@@ -256,7 +260,13 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 
   // Open codec
   if (avcodec_open2(this->codecCtx, this->codec, NULL) < 0)
-    perror("couldn't open codec");
+  {
+    gzerr << "Couldn't open audio codec.\n";
+    avformat_close_input(&this->formatCtx);
+    this->formatCtx = NULL;
+
+    return false;
+  }
 
   this->filename = _filename;
 

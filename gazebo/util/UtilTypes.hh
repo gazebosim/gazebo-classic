@@ -43,7 +43,6 @@ namespace gazebo
     /// \def OpenALSourcePtr
     /// \brief boost::shared_ptr to a OpenALSource class
     typedef boost::shared_ptr<OpenALSource> OpenALSourcePtr;
-
   }
 }
 /// \}

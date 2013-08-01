@@ -164,8 +164,8 @@ TEST(OpenAL, SourceVelPose)
   source = util::OpenAL::Instance()->CreateSource(sdf->root);
   EXPECT_TRUE(source != NULL);
 
-  EXPECT_TRUE(source->SetVelocity(math::Vector3(1,1,1)));
-  EXPECT_TRUE(source->SetPose(math::Pose(1,1,1,0,0,0)));
+  EXPECT_TRUE(source->SetVelocity(math::Vector3(1, 1, 1)));
+  EXPECT_TRUE(source->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
 }
 
 /////////////////////////////////////////////////

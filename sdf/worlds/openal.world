@@ -9,7 +9,7 @@
     </include>
     <model name="box">
       <audio_source>
-        <uri>file://media/audio/cheer.wav</uri>
+        <uri>file://media/audio/cheer.mp3</uri>
         <pitch>2.0</pitch>
         <gain>1.0</gain>
         <loop>true</loop>
