@@ -32,7 +32,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Node.hh"
@@ -136,12 +136,13 @@ void RenderEngine::Load()
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
-                                   bool _enableVisualizations)
+                                   bool _enableVisualizations,
+                                   bool _isServer)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
   this->scenes.push_back(scene);
 
   scene->Load();

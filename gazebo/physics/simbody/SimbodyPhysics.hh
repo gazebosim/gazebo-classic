@@ -195,7 +195,7 @@ namespace gazebo
       // is more than one <pose> element, only the first one is processed.
       public: static SimTK::Transform GetPose(sdf::ElementPtr _element)
       {
-        const math::Pose pose = _element->GetValuePose("pose");
+        const math::Pose pose = _element->Get<math::Pose>("pose");
         return Pose2Transform(pose);
       }
 

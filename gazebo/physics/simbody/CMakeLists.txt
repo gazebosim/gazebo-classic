@@ -16,7 +16,7 @@ set (sources
   SimbodyModel.cc
   SimbodyLink.cc
   SimbodyCollision.cc
-  SimbodyTrimeshShape.cc
+  SimbodyMeshShape.cc
   SimbodyJoint.cc
   SimbodyHingeJoint.cc
   SimbodySliderJoint.cc

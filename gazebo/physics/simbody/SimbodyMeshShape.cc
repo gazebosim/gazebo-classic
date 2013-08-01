@@ -24,33 +24,33 @@
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyTrimeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyTrimeshShape::SimbodyTrimeshShape(CollisionPtr _parent)
-  : TrimeshShape(_parent)
+SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
+  : MeshShape(_parent)
 {
 }
 
 
 //////////////////////////////////////////////////
-SimbodyTrimeshShape::~SimbodyTrimeshShape()
+SimbodyMeshShape::~SimbodyMeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-void SimbodyTrimeshShape::Load(sdf::ElementPtr _sdf)
+void SimbodyMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  TrimeshShape::Load(_sdf);
+  MeshShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void SimbodyTrimeshShape::Init()
+void SimbodyMeshShape::Init()
 {
-  TrimeshShape::Init();
+  MeshShape::Init();
 
   SimbodyCollisionPtr bParent =
     boost::shared_static_cast<SimbodyCollision>(this->collisionParent);

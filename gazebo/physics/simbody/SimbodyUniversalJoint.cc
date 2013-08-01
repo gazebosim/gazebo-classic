@@ -53,8 +53,8 @@ void SimbodyUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
     gzthrow("Requires simbody bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axisElem->GetValueVector3("xyz");
-  math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
+  math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
+  math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
 
   // Add the joint to the world
 

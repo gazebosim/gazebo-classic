@@ -75,7 +75,8 @@ rendering::ScenePtr rendering::get_scene(const std::string &_name)
 
 //////////////////////////////////////////////////
 rendering::ScenePtr rendering::create_scene(const std::string &_name,
-                                            bool _enableVisualizations)
+                                            bool _enableVisualizations,
+                                            bool _isServer)
 {
   ScenePtr scene = get_scene(_name);
 
@@ -85,7 +86,7 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
     try
     {
       scene = rendering::RenderEngine::Instance()->CreateScene(_name,
-          _enableVisualizations);
+          _enableVisualizations, _isServer);
     }
     catch(common::Exception &e)
     {

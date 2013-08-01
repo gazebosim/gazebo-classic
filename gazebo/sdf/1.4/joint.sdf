@@ -180,4 +180,6 @@
       </element>
     </element>
   </element> <!-- End Physics -->
+
+  <include filename="sensor.sdf" required="*"/>
 </element> <!-- End Joint -->

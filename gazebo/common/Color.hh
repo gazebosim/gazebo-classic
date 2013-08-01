@@ -19,8 +19,8 @@
  * Date: 08 May 2009
  */
 
-#ifndef GAZEBO_COLOR_HH
-#define GAZEBO_COLOR_HH
+#ifndef _GAZEBO_COLOR_HH_
+#define _GAZEBO_COLOR_HH_
 
 #include <iostream>
 #include "gazebo/common/CommonTypes.hh"

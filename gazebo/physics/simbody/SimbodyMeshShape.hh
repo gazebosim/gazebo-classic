@@ -19,27 +19,27 @@
  * Date: 21 May 2009
  */
 
-#ifndef _BULLETTRIMESHSHAPE_HH_
-#define _BULLETTRIMESHSHAPE_HH_
+#ifndef _SIMBODYMESHSHAPE_HH_
+#define _SIMBODYMESHSHAPE_HH_
 
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
     /// \brief Triangle mesh collision
-    class BulletTrimeshShape : public TrimeshShape
+    class SimbodyMeshShape : public MeshShape
     {
       /// \brief Constructor
-      public: BulletTrimeshShape(CollisionPtr _parent);
+      public: SimbodyMeshShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~BulletTrimeshShape();
+      public: virtual ~SimbodyMeshShape();
 
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr _sdf);

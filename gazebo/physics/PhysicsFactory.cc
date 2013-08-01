@@ -24,7 +24,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
 

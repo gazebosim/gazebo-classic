@@ -14,7 +14,9 @@
  * limitations under the License.
  *
  */
-#include "gazebo_config.h"
+#include <sdf/sdf.hh>
+
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -45,7 +47,6 @@
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 
-#include "gazebo/sdf/sdf.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"

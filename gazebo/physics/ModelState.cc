@@ -144,11 +144,11 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
 void ModelState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetValuePose("pose");
+    this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -160,8 +160,8 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      this->linkStates.insert(std::make_pair(childElem->GetValueString("name"),
-            LinkState(childElem)));
+      this->linkStates.insert(std::make_pair(
+            childElem->Get<std::string>("name"), LinkState(childElem)));
       childElem = childElem->GetNextElement("link");
     }
   }
@@ -174,7 +174,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      this->jointStates.insert(std::make_pair(childElem->GetValueString("name"),
+      this->jointStates.insert(std::make_pair(childElem->Get<std::string>("name"),
             JointState(childElem)));
       childElem = childElem->GetNextElement("joint");
     }

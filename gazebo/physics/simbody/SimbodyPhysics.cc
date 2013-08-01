@@ -31,7 +31,7 @@
 #include "gazebo/physics/simbody/SimbodyMultiRayShape.hh"
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
-#include "gazebo/physics/simbody/SimbodyTrimeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyMeshShape.hh"
 #include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
@@ -126,35 +126,35 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
   this->integ->setAccuracy(
-    simbodyElem->GetValueDouble("accuracy"));
+    simbodyElem->Get<double>("accuracy"));
 
   // Set stiction max slip velocity to make it less stiff.
   this->contact.setTransitionVelocity(
-    simbodyElem->GetValueDouble("max_transient_velocity"));
+    simbodyElem->Get<double>("max_transient_velocity"));
 
   sdf::ElementPtr simbodyContactElem = simbodyElem->GetElement("contact");
 
   // system wide contact properties, assigned in AddCollisionsToLink()
   this->contactMaterialStiffness =
-    simbodyContactElem->GetValueDouble("stiffness");
+    simbodyContactElem->Get<double>("stiffness");
   this->contactMaterialDissipation =
-    simbodyContactElem->GetValueDouble("dissipation");
+    simbodyContactElem->Get<double>("dissipation");
   this->contactMaterialStaticFriction =
-    simbodyContactElem->GetValueDouble("static_friction");
+    simbodyContactElem->Get<double>("static_friction");
   this->contactMaterialDynamicFriction =
-    simbodyContactElem->GetValueDouble("dynamic_friction");
+    simbodyContactElem->Get<double>("dynamic_friction");
   this->contactMaterialViscousFriction =
-    simbodyContactElem->GetValueDouble("viscous_friction");
+    simbodyContactElem->Get<double>("viscous_friction");
 
   // below are not used yet, but should work it into the system
   this->contactMaterialViscousFriction =
-    simbodyContactElem->GetValueDouble("plastic_coef_restitution");
+    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->GetValueDouble("plastic_impact_velocity");
+    simbodyContactElem->Get<double>("plastic_impact_velocity");
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->GetValueDouble("override_impact_capture_velocity");
+    simbodyContactElem->Get<double>("override_impact_capture_velocity");
   this->contactImpactCaptureVelocity =
-    simbodyContactElem->GetValueDouble("override_stiction_transition_velocity");
+    simbodyContactElem->Get<double>("override_stiction_transition_velocity");
 }
 
 //////////////////////////////////////////////////
@@ -371,7 +371,7 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
   else if (_type == "cylinder")
     shape.reset(new SimbodyCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
-    shape.reset(new SimbodyTrimeshShape(collision));
+    shape.reset(new SimbodyMeshShape(collision));
   else if (_type == "heightmap")
     shape.reset(new SimbodyHeightmapShape(collision));
   else if (_type == "multiray")
