@@ -246,5 +246,8 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   return vDist.squaredLength();
 }
 
-
-
+/////////////////////////////////////////////////
+std::string DynamicRenderable::GetMovableType()
+{
+  return "gazebo::DynamicRenderable";
+}

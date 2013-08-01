@@ -137,13 +137,25 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
     n = N_OBSTACLE;
   }
 
-  double distance = txPos.pos.Distance(_receiver.pos);  
+  double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));  
   double x = math::Rand::GetDblNormal(0.0, MODEL_STD_DESV);
-  double wavelength = C / this->GetFreq();
+  double wavelength = C / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
   double rxPower = this->GetPower() + this->GetGain() + rxGain - x +
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
+
+  if (rxPower > 0)
+  {
+    std::cout << "Tx Power: " << this->GetPower() << std::endl;
+    std::cout << "Tx Gain: " << this->GetGain() << std::endl;
+    std::cout << "Rx Gain: " << rxGain << std::endl;
+    std::cout << "-x: " << -x << std::endl;
+    std::cout << "20 * log10(wavelength): " << 20 * log10(wavelength) << std::endl;
+    std::cout << "-20 * log10(4 * M_PI): " << -20 * log10(4 * M_PI) << std::endl;
+    std::cout << "Distance: " << distance << std::endl;
+    std::cout << "-10 * n * log10(distance): " << -10 * n * log10(distance) << std::endl;
+  }
 
   return rxPower;
 }

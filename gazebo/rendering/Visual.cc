@@ -29,7 +29,6 @@
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/DynamicPoints.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -138,9 +137,6 @@ Visual::~Visual()
     delete *iter;
     */
   this->lines.clear();
-
-  this->points.clear();
-
 
   if (this->sceneNode != NULL)
   {
@@ -490,7 +486,7 @@ void Visual::Update()
     return;
 
   std::list<DynamicLines*>::iterator iter;
-  std::list<DynamicPoints*>::iterator iterP;
+  //std::list<DynamicLines*>::iterator iterP;
 
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); ++iter)
@@ -504,10 +500,6 @@ void Visual::Update()
         Conversions::Convert(this->sceneNode->_getDerivedPosition()));
     liter->first->Update();
   }
-
-  // Update the points
-  for (iterP = this->points.begin(); iterP != this->points.end(); ++iterP)
-    (*iterP)->Update();
 
   if (this->animState)
   {
@@ -1519,33 +1511,6 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
     if (*iter == _line)
     {
       this->lines.erase(iter);
-      break;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-DynamicPoints *Visual::CreateDynamicPoint(RenderOpType _type)
-{
-  this->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
-
-  DynamicPoints *point = new DynamicPoints(_type);
-  this->points.push_back(point);
-  this->AttachObject(point);
-  return point;
-}
-
-//////////////////////////////////////////////////
-void Visual::DeleteDynamicPoint(DynamicPoints *_point)
-{
-  // delete instance from points vector
-  for (std::list<DynamicPoints*>::iterator iter = this->points.begin();
-       iter!= this->points.end(); ++iter)
-  {
-    if (*iter == _point)
-    {
-      this->points.erase(iter);
       break;
     }
   }

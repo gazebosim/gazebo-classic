@@ -68,7 +68,7 @@ namespace gazebo
       private: transport::SubscriberPtr signalPropagationSub;
 
       /// \brief Renders the points representing the signal strength.
-      private: DynamicPoints *points;
+      private: DynamicLines *points;
 
       /// \brief Required for accessing to the visual elements.
       private: sdf::SDFPtr modelTemplateSDF;

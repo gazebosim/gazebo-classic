@@ -66,6 +66,10 @@ namespace gazebo
       public: virtual Ogre::Real getSquaredViewDepth(
                   const Ogre::Camera *_cam) const;
 
+      /// \brief Get type of movable
+      /// \return This returns "gazebo::DynamicRenderable"
+      public: std::string GetMovableType();
+
       /// \brief Creates the vertex declaration.  @remarks Override and set
       /// mRenderOp.vertexData->vertexDeclaration here.  mRenderOp.vertexData
       /// will be created for you before this method is called.

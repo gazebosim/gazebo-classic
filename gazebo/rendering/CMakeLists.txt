@@ -23,7 +23,6 @@ set (sources
   Conversions.cc
   DepthCamera.cc
   DynamicLines.cc
-  DynamicPoints.cc
   DynamicRenderable.cc
   FPSViewController.cc
   GpuLaser.cc
@@ -66,7 +65,6 @@ set (headers
   Conversions.hh
   DepthCamera.hh
   DynamicLines.hh
-  DynamicPoints.hh
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh

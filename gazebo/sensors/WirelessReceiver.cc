@@ -62,12 +62,25 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     {
       if ((*it)->GetType() == "wirelessTransmitter")
       {
-        txEssid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetESSID();
         txFreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetFreq();
+
         rxPower = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetSignalStrength(myPos, this->GetGain());
+
+        // Disgard if the frequency received is out of our frequency range, 
+        // or if the received signal strengh is lower than the sensivity
+        if ((txFreq < this->GetLowerFreqFiltered()) ||
+            (txFreq > this->GetHigherFreqFiltered()))// ||
+            //(rxPower < this->GetSensivity()))
+        {
+          std::cout << "Skipping\n";
+          std::cout << rxPower << "," << this->GetSensivity() << std::endl;
+          continue;
+        }
+
+        txEssid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
+            GetESSID();
 
         msgs::WirelessNode *wirelessNode = msg.add_node();
         wirelessNode->set_essid(txEssid);

@@ -22,9 +22,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/DynamicPoints.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
-#include <algorithm>
 
 using namespace gazebo;
 using namespace rendering;
@@ -47,7 +45,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
       event::Events::ConnectPreRender(
         boost::bind(&TransmitterVisual::Update, this)));
 
-  this->points = this->CreateDynamicPoint(rendering::RENDERING_POINT_LIST);
+  this->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
   this->points->setMaterial("Gazebo/PointCloud");
 }
 
@@ -104,7 +102,9 @@ void TransmitterVisual::Update()
     this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
 
     // Assuming that the Rx gain is the same as Tx gain
-    double strength = std::max(0.0, p.signal_level() / 255);
+    double strength = 1.0 - (std::min(std::max(0.0, -p.signal_level()), 255.0) / 255.0);
+    //if (p.signal_level() > 0)
+    std::cout << p.signal_level() << std::endl;
     Ogre::ColourValue color(strength, strength, strength);
 
     this->points->SetColor(i, color);

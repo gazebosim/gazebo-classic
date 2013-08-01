@@ -5,12 +5,22 @@
     <description>Service set identifier (network name)</description>
   </element> <!-- End Essid -->
 
-  <element name="frequency" type="double" default="2442" required="1">
+  <element name="frequency" type="double" default="2442" required="0">
     <description>Specifies the frequency of transmission in MHz</description>
   </element> <!-- End Frequency -->
 
   <element name="power" type="double" default="14.50" required="0">
     <description>Specifies the transmission power in dBm</description>
+  </element> <!-- End Power -->
+
+  <element name="frequency_from" type="double" default="2412" required="0">
+    <description>Only a frequency range is filtered. Here we set the lower bound.
+    </description>
+  </element> <!-- End Power -->
+
+  <element name="frequency_to" type="double" default="2484" required="0">
+    <description>Only a frequency range is filtered. Here we set the upper bound.
+    </description>
   </element> <!-- End Power -->
 
   <element name="gain" type="double" default="2.5" required="1">
