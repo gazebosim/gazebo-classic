@@ -66,45 +66,45 @@ namespace gazebo
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int /*index*/,
                                       const gazebo::math::Vector3 & /*anchor*/)
-              {gzerr << "Not implement in Simbody\n";}
+              {gzdbg << "Not implement in Simbody\n";}
 
       /// \brief Set the joint damping
       public: virtual void SetDamping(int /*index*/,
                                       const double /*damping*/)
-              {gzerr << "Not implement in Simbody\n";}
+              {gzdbg << "Not implement in Simbody\n";}
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
-              {gzerr << "Not implement in Simbody\n";
+              {gzdbg << "Not implement in Simbody\n";
                return math::Vector3();}
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkForce(unsigned int /*_index*/) const
-              {gzerr << "Not implement in Simbody\n";
+              {gzdbg << "Not implement in Simbody\n";
                return math::Vector3();}
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkTorque(unsigned int /*_index*/) const
-              {gzerr << "Not implement in Simbody\n";
+              {gzdbg << "Not implement in Simbody\n";
                return math::Vector3();}
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int /*_index*/,
                                         double /*_value*/)
-              {gzerr << "Not implement in Simbody\n";}
+              {gzdbg << "Not implement in Simbody\n";}
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &/*_key*/,
                                         int /*_index*/,
                                         const boost::any &/*_value*/)
-              {gzerr << "Not implement in Simbody\n";}
+              {gzdbg << "Not implement in Simbody\n";}
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &/*_key*/,
                                                 unsigned int /*_index*/)
-              {gzerr << "Not implement in Simbody\n"; return 0;}
+              {gzdbg << "Not implement in Simbody\n"; return 0;}
 
       protected: SimTK::MultibodySystem *world;
 
