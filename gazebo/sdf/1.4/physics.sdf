@@ -34,11 +34,9 @@
     <element name="min_step_size" type="double" default="0.0001" required="0">
       <description>TBD</description>
     </element>
-    <element name="accuracy" type="double"
-             default="0.01" required="0">
+    <element name="accuracy" type="double" default="0.01" required="0">
       <description>Roughly the relative error of the system.
-      -LOG(accuracy) is roughly the number of significant digits in
-      the solution.</description>
+        -LOG(accuracy) is roughly the number of significant digits.</description>
     </element>
     <element name="max_transient_velocity" type="double"
              default="0.01" required="0">
