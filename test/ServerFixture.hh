@@ -840,6 +840,113 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 50);
              }
 
+  /// \brief Spawn an Wireless transmitter sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _essid Service set identifier (network name)
+  /// \param[in] _freq Frequency of transmission (Hz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 const std::string _essid,
+                 double _freq,
+                 double _power,
+                 double _gain)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <sensor name='" << _sensorName << "' type='wirelessTransmitter'>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>true</visualize>"
+                 << "    <transceiver>"
+                 << "      <essid>" << _essid << "</essid>"
+                 << "      <frequency>" << _freq << "</frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               waitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  /// \brief Spawn an Wireless receiver sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _freq_from Service set identifier (network name)
+  /// \param[in] _freq_to Frequency of transmission (Hz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)             
+  protected: void SpawnWirelessReceiverSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 double _freq_from,
+                 double _freq_to,
+                 double _power,
+                 double _gain,
+                 double _sensitivity)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <sensor name='" << _sensorName << "' type='wirelessTransmitter'>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>true</visualize>"
+                 << "    <transceiver>"
+                 << "      <frequency_from>" << _freq_from << "</frequency_from>"
+                 << "      <frequency_to" << _freq_to << "</frequency_to>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "      <sensitivity>" << _sensitivity << "</sensitivity>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               waitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  private: void waitUntilEntitySpawn(const std::string &_name,
+                                     unsigned int sleep_each,
+                                     int retries)
+             {
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < retries)
+               {
+                 common::Time::MSleep(sleep_each);
+                 ++i;
+               }
+               EXPECT_LT(i, retries);   
+             }
+
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  bool _static = false)
