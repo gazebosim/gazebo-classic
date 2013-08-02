@@ -94,9 +94,9 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->GetValuePose("pose");
+  math::Pose childPose = _sdf->Get<math::Pose>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->GetValuePose("pose");
+    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
 
   this->X_CB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
@@ -189,13 +189,13 @@ void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
     }
 
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
     }
   }
   else
@@ -204,11 +204,11 @@ void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
     this->sdf->GetElement("parent")->Set("world");
     if (this->sdf->HasElement("axis"))
     {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
     }
     if (this->sdf->HasElement("axis2"))
     {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
     }
   }
 }

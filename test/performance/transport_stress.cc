@@ -219,7 +219,9 @@ TEST_F(TransportStressTest, ManyNodes)
   // The total publish duration should always be very short.
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
-  EXPECT_LE(pubDiff.sec, 1);
+  // We used to check against 1 sec. However, the time can occasionally jump
+  // depending on the system and its usage.
+  EXPECT_LE(pubDiff.sec, 2);
 
   // The total receive duration will be longer.
   EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);

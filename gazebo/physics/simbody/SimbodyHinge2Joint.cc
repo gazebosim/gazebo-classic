@@ -62,10 +62,10 @@ void SimbodyHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
     gzthrow("Requires simbody bodies");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axis1Elem->GetValueVector3("xyz");
+  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
 
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
-  math::Vector3 axis2 = axis2Elem->GetValueVector3("xyz");
+  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
 
   SimTK::Vec3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
   SimTK::Vec3 baxis1(axis1.x, axis1.y, axis1.z);

@@ -33,7 +33,7 @@
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -46,15 +46,17 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(0)
+    : Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
   this->link = _link;
 
   this->contactsEnabled = false;
+  this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
+  sdf::initFile("collision.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -83,13 +85,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->GetElement("max_contacts")->GetValueInt();
+  this->maxContacts = _sdf->Get<int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
-    this->SetLaserRetro(this->sdf->GetElement("laser_retro")->GetValueDouble());
+    this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -118,7 +120,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->GetValuePose("pose"));
+    this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////

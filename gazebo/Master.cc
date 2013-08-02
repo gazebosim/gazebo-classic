@@ -19,7 +19,7 @@
 
 #include "Master.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 

@@ -27,10 +27,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -158,11 +159,11 @@ void World::Load(sdf::ElementPtr _sdf)
   this->loaded = false;
   this->sdf = _sdf;
 
-  if (this->sdf->GetValueString("name").empty())
+  if (this->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -173,8 +174,16 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  // pose pub for server side, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory for efficiency.
+  this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/local/info", 10);
+
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60.0);
+    "~/pose/info", 10, 60);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
@@ -198,7 +207,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -432,7 +441,7 @@ void World::LogStep()
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->GetValueString());
+                                    nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
@@ -737,7 +746,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   else
   {
     gzerr << "SDF is missing the <model> tag:\n";
-    _sdf->PrintValues("  ");
   }
 
   this->PublishModelPose(model);
@@ -1235,8 +1243,8 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
 
@@ -1265,7 +1273,7 @@ void World::ProcessEntityMsgs()
     if (this->sdf->HasElement("model"))
     {
       sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->GetValueString("name") != (*iter))
+      while (childElem && childElem->Get<std::string>("name") != (*iter))
         childElem = childElem->GetNextElement("model");
       if (childElem)
         this->sdf->RemoveChild(childElem);
@@ -1780,34 +1788,46 @@ void World::ProcessMessages()
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
     msgs::Pose *poseMsg;
 
-    if (this->posePub && this->posePub->HasConnections() &&
-        this->publishModelPoses.size() > 0)
+    if ((this->posePub && this->posePub->HasConnections()) ||
+        (this->poseLocalPub && this->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-          iter != this->publishModelPoses.end(); ++iter)
+      if (this->publishModelPoses.size() > 0)
       {
-        poseMsg = msg.add_pose();
-
-        // Publish the model's relative pose
-        poseMsg->set_name((*iter)->GetScopedName());
-        msgs::Set(poseMsg, (*iter)->GetRelativePose());
-
-        // Publish each of the model's children relative poses
-        Link_V links = (*iter)->GetLinks();
-        for (Link_V::iterator linkIter = links.begin();
-            linkIter != links.end(); ++linkIter)
+        for (std::set<ModelPtr>::iterator iter =
+            this->publishModelPoses.begin();
+            iter != this->publishModelPoses.end(); ++iter)
         {
           poseMsg = msg.add_pose();
-          poseMsg->set_name((*linkIter)->GetScopedName());
-          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+
+          // Publish the model's relative pose
+          poseMsg->set_name((*iter)->GetScopedName());
+          msgs::Set(poseMsg, (*iter)->GetRelativePose());
+
+          // Publish each of the model's children relative poses
+          Link_V links = (*iter)->GetLinks();
+          for (Link_V::iterator linkIter = links.begin();
+              linkIter != links.end(); ++linkIter)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name((*linkIter)->GetScopedName());
+            msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          }
         }
+        if (this->posePub && this->posePub->HasConnections())
+          this->posePub->Publish(msg);
       }
-      this->posePub->Publish(msg);
+
+      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->poseLocalPub->Publish(msg);
+      }
     }
     this->publishModelPoses.clear();
   }

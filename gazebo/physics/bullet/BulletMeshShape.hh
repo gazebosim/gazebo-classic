@@ -14,32 +14,32 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh collisionetry
+/* Desc: Trimesh collision
  * Author: Nate Koenig
  * Date: 21 May 2009
  */
 
-#ifndef _SIMBODYTRIMESHSHAPE_HH_
-#define _SIMBODYTRIMESHSHAPE_HH_
+#ifndef _BULLETMESHSHAPE_HH_
+#define _BULLETMESHSHAPE_HH_
 
-#include "gazebo/physics/TrimeshShape.hh"
+#include "gazebo/physics/MeshShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_simbody Simbody Physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Triangle mesh collision
-    class SimbodyTrimeshShape : public TrimeshShape
+    class BulletMeshShape : public MeshShape
     {
       /// \brief Constructor
-      public: SimbodyTrimeshShape(CollisionPtr _parent);
+      public: BulletMeshShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~SimbodyTrimeshShape();
+      public: virtual ~BulletMeshShape();
 
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr _sdf);

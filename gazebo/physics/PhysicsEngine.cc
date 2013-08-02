@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
@@ -74,11 +74,11 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
   this->sdf->Copy(_sdf);
 
   this->realTimeUpdateRate =
-      this->sdf->GetElement("real_time_update_rate")->GetValueDouble();
+      this->sdf->GetElement("real_time_update_rate")->Get<double>();
   this->targetRealTimeFactor =
-      this->sdf->GetElement("real_time_factor")->GetValueDouble();
+      this->sdf->GetElement("real_time_factor")->Get<double>();
   this->maxStepSize =
-      this->sdf->GetElement("max_step_size")->GetValueDouble();
+      this->sdf->GetElement("max_step_size")->Get<double>();
 }
 
 //////////////////////////////////////////////////
@@ -105,7 +105,7 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->GetValueVector3("gravity");
+  return this->sdf->Get<math::Vector3>("gravity");
 }
 
 //////////////////////////////////////////////////
