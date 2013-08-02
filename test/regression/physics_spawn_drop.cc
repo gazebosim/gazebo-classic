@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 
 #define HAVE_SIMBODY 1
