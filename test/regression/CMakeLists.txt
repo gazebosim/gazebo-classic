@@ -37,6 +37,7 @@ set(tests
   speed.cc
   #state_log.cc
   surface_properties.cc
+  transceiver.cc
   )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS

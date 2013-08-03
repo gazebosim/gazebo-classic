@@ -65,6 +65,10 @@ namespace gazebo
       /// \return Service Set Identifier (network name).
       public: std::string GetESSID();
 
+      /// \brief Returns reception frequency (MHz).
+      /// \return Reception frequency (MHz).
+      public: double GetFreq();
+
       /// \brief Returns the pose of the transmitter in world coordinate.
       /// \return Pose of object.
       public: math::Pose GetPose() const;
@@ -87,6 +91,9 @@ namespace gazebo
 
       /// \brief Service Set Identifier (network name).
       private: std::string essid;
+
+      /// \brief Reception frequency (MHz).
+      protected: double freq;
     };
     /// \}
   }

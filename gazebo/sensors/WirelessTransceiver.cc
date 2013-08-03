@@ -68,34 +68,14 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   {
     sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
 
-    if (transElem->HasElement("frequency"))
-    {
-      this->freq = transElem->Get<double>("frequency");
-    }
-
-    if (transElem->HasElement("frequency_from"))
-    {
-      this->freq_from = transElem->Get<double>("frequency_from");
-    }
-
-    if (transElem->HasElement("frequency_to"))
-    {
-      this->freq_to = transElem->Get<double>("frequency_to");
-    }
-
-    if (transElem->HasElement("power"))
-    {
-      this->power = transElem->Get<double>("power");
-    }
-
     if (transElem->HasElement("gain"))
     {
       this->gain = transElem->Get<double>("gain");
     }
 
-    if (transElem->HasElement("sensitivity"))
+    if (transElem->HasElement("power"))
     {
-      this->sensitivity = transElem->Get<double>("sensitivity");
+      this->power = transElem->Get<double>("power");
     }
   }
 }
@@ -113,24 +93,6 @@ void WirelessTransceiver::Init()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetFreq()
-{
-  return this->freq;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransceiver::GetLowerFreqFiltered()
-{
-  return this->freq_from;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransceiver::GetHigherFreqFiltered()
-{
-  return this->freq_to;
-}
-
-/////////////////////////////////////////////////
 double WirelessTransceiver::GetPower()
 {
   return this->power;
@@ -140,10 +102,4 @@ double WirelessTransceiver::GetPower()
 double WirelessTransceiver::GetGain()
 {
   return this->gain;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransceiver::GetSensitivity()
-{
-  return this->sensitivity;
 }

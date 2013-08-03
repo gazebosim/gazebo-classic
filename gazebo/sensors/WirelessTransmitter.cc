@@ -52,6 +52,24 @@ WirelessTransmitter::WirelessTransmitter()
 void WirelessTransmitter::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
+
+  this->entity = this->world->GetEntity(this->parentName);
+
+  if (this->sdf->HasElement("transceiver"))
+  {
+    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+
+    if (transElem->HasElement("essid"))
+    {
+      this->essid = transElem->Get<std::string>("essid");
+    }
+
+    if (transElem->HasElement("frequency"))
+    {
+      this->freq = transElem->Get<double>("frequency");
+    }
+  }
+
   this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(), 30);
 }
 
@@ -99,6 +117,12 @@ std::string WirelessTransmitter::GetESSID()
 }
 
 /////////////////////////////////////////////////
+double WirelessTransmitter::GetFreq()
+{
+  return this->freq;
+}
+
+/////////////////////////////////////////////////
 math::Pose WirelessTransmitter::GetPose() const
 {
   return entity->GetWorldPose();
@@ -135,7 +159,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
   if (dist > 0 && entityName != "ground_plane::link::collision" &&
       entityName != "" && entityName != "wirelessReceiver::link::collision-box")
   {
-    std::cout << "Found obstacle\nDist: " << dist << " EntityName: " << entityName << std::endl;
+    //std::cout << "Found obstacle\nDist: " << dist << " EntityName: " << entityName << std::endl;
     n = N_OBSTACLE;
   }
 

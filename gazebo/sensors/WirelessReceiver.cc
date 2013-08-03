@@ -44,6 +44,28 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
+
+  this->entity = this->world->GetEntity(this->parentName);
+
+  if (this->sdf->HasElement("transceiver"))
+  {
+    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+
+    if (transElem->HasElement("frequency_from"))
+    {
+      this->freq_from = transElem->Get<double>("frequency_from");
+    }
+
+    if (transElem->HasElement("frequency_to"))
+    {
+      this->freq_to = transElem->Get<double>("frequency_to");
+    }
+
+    if (transElem->HasElement("sensitivity"))
+    {
+      this->sensitivity = transElem->Get<double>("sensitivity");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -91,4 +113,22 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
       this->pub->Publish(msg);                                               
     }
   }
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::GetLowerFreqFiltered()
+{
+  return this->freq_from;
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::GetHigherFreqFiltered()
+{
+  return this->freq_to;
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::GetSensitivity()
+{
+  return this->sensitivity;
 }

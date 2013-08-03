@@ -46,7 +46,28 @@ namespace gazebo
       public: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      private: virtual void UpdateImpl(bool _force);
+
+      /// \brief Returns the lower frequency filtered (MHz).
+      /// \return Reception frequency (MHz).
+      public: double GetLowerFreqFiltered();
+
+      /// \brief Returns the higher frequency filtered (MHz).
+      /// \return Reception frequency (MHz).
+      public: double GetHigherFreqFiltered();
+
+      /// \brief Returns the receiver sensitivity (dBm).
+      /// \return Receiver sensitivity (dBm).
+      public: double GetSensitivity();
+
+      /// \brief Reception low filter frequency (MHz).
+      private: double freq_from;
+
+      /// \brief Reception high filter frequency (MHz).
+      private: double freq_to;
+
+      /// \brief Antenna's sensitivity of the receiver (dBm).
+      private: double sensitivity;
     };
     /// \}
   }

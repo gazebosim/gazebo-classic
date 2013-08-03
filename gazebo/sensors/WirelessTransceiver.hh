@@ -59,18 +59,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Returns reception frequency (MHz).
-      /// \return Reception frequency (MHz).
-      public: double GetFreq();
-
-      /// \brief Returns the lower frequency filtered (MHz).
-      /// \return Reception frequency (MHz).
-      public: double GetLowerFreqFiltered();
-
-      /// \brief Returns the higher frequency filtered (MHz).
-      /// \return Reception frequency (MHz).
-      public: double GetHigherFreqFiltered();
-
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
       public: double GetGain();
@@ -79,33 +67,17 @@ namespace gazebo
       /// \return Receiver power (dBm).
       public: double GetPower();
 
-      /// \brief Returns the receiver sensitivity (dBm).
-      /// \return Receiver sensitivity (dBm).
-      public: double GetSensitivity();
-
       /// \brief Parent entity
       protected: physics::EntityPtr entity;
 
       /// \brief Publisher to publish propagation model data
       protected: transport::PublisherPtr pub;
 
-      /// \brief Reception frequency (MHz).
-      protected: double freq;
-
-      /// \brief Reception low filter frequency (MHz).
-      protected: double freq_from;
-
-      /// \brief Reception high filter frequency (MHz).
-      protected: double freq_to;
-
       /// \brief Receiver's power (dBm).
       protected: double power;
 
       /// \brief Antenna's gain of the receiver (dBi).
       protected: double gain;
-
-      /// \brief Antenna's sensitivity of the receiver (dBm).
-      protected: double sensitivity;
     };
     /// \}
   }
