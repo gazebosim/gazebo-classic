@@ -34,6 +34,7 @@ class TransceiverTest : public ServerFixture
   private: static const double GAIN;
   private: static const double POWER;
   private: static const double SENSITIVITY;
+  private: static const double MAX_POS;
 
   private: boost::mutex mutex;
   private: std::vector<int> num_msgs;
@@ -47,6 +48,8 @@ const double TransceiverTest::FREQ_TO = 2484.0;
 const double TransceiverTest::GAIN = 2.6;
 const double TransceiverTest::POWER = 14.5;
 const double TransceiverTest::SENSITIVITY = -90.0;
+const double TransceiverTest::MAX_POS = 10.0;
+
 
 /////////////////////////////////////////////////
 void TransceiverTest::RxMsg(const ConstWirelessNodesPtr &_msg)
@@ -71,14 +74,17 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(2412.0, 2472.0);
+    double txFreq = math::Rand::GetDblUniform(TransceiverTest::FREQ_FROM,
+          TransceiverTest::FREQ_TO);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-10.0, 10.0);
-    double y = math::Rand::GetDblUniform(-10.0, 10.0);
+    double x = math::Rand::GetDblUniform(-TransceiverTest::MAX_POS,
+          TransceiverTest::MAX_POS);
+    double y = math::Rand::GetDblUniform(-TransceiverTest::MAX_POS,
+          TransceiverTest::MAX_POS);
     math::Pose txPose(math::Vector3(x, y, 0.055),
         math::Quaternion(0, 0, 0));
 
@@ -319,4 +325,3 @@ TEST_F(TransceiverTest, ObstacleBullet)
   TxRxObstacle("bullet");
 }
 #endif
-
