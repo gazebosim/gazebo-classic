@@ -170,6 +170,11 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
     dMultiply0_331( ax1, node[0].body->posr.R, axis1 );
     dPlaneSpace( ax1, p, q );
 
+    printf("axis1 [%f %f %f] ax1 [%f %f %f]\n",
+            axis1[0], axis1[1], axis1[2],
+            ax1[0], ax1[1], ax1[2]);
+
+
     int s3 = 3 * info->rowskip;
     int s4 = 4 * info->rowskip;
 

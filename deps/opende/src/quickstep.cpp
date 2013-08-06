@@ -1669,6 +1669,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         Jinfo.fps = stepsize1;
 
         dReal *Jcopyrow = Jcopy;
+        int *jb_ptr = jb;
         unsigned ofsi = 0;
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
@@ -1710,31 +1711,48 @@ void dxQuickStepper (dxWorldProcessContext *context,
               findex_ofsi[j] = fival + ofsi;
           }
 
+          {
+            // create an array of body numbers for each joint row
+            int b1 = (joint->node[0].body) ? (joint->node[0].body->tag) : -1;
+            int b2 = (joint->node[1].body) ? (joint->node[1].body->tag) : -1;
+            for (int j=0; j<infom; j++) {
+              jb_ptr[0] = b1;
+              jb_ptr[1] = b2;
+              jb_ptr += 2;
+            }
+          }
+
           /// do something here for inertia tweaking:
           ///   For now, try this only for the two non-free axial rotation constraints for hinge joints.
-          ///     a. both parent and child MOI/invMOI have been rotated into inertial frame already.
-          ///     b. determine constrained axis(s) direction for Jrow
+          ///     *. both parent and child MOI/invMOI have been rotated into inertial frame already.
+          ///     *. determine constrained axis(s) direction for Jrow
           ///        maybe we can assume that Jrow.J1l and Jrow.J2l are zeros,
           ///        and J1a and J2a fully constrains w1 and w2...
           ///        are J1a always equal to J2a?
-          printf("J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n",
-                 Jinfo.J1l[0],Jinfo.J1l[1],Jinfo.J1l[2],
-                 Jinfo.J2l[0],Jinfo.J2l[1],Jinfo.J2l[2],
-                 Jinfo.J1a[0],Jinfo.J1a[1],Jinfo.J1a[2],
-                 Jinfo.J2a[0],Jinfo.J2a[1],Jinfo.J2a[2]);
-          ///     c. get scalar axis MOI in the constrained axis direction.
-          ///     d. get full axis MOI tensor representing the scalar axis MOI.
-          ///     e. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
+          printf("ofsi [%d]:\n", ofsi);
+          for (int j=0; j<infom; j++) {
+            printf("j [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n", j,
+                   Jinfo.J1l[0+j*Jinfo.rowskip],Jinfo.J1l[1+j*Jinfo.rowskip],Jinfo.J1l[2+j*Jinfo.rowskip],
+                   Jinfo.J2l[0+j*Jinfo.rowskip],Jinfo.J2l[1+j*Jinfo.rowskip],Jinfo.J2l[2+j*Jinfo.rowskip],
+                   Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip],
+                   Jinfo.J2a[0+j*Jinfo.rowskip],Jinfo.J2a[1+j*Jinfo.rowskip],Jinfo.J2a[2+j*Jinfo.rowskip]);
+          }
+          ///     *. J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
+          ///        of each other.  J1a and J2a denotes the axis direction.
+          ///     *. get the MOI for parent and child bodies constrained by J1a and J2a.
+          ///     *. get scalar axis MOI in the constrained axis direction.
+          ///     *. get full axis MOI tensor representing the scalar axis MOI.
+          ///     *. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
           ///        constrained direction.
-          ///     f. keep parent/child MOI/invMOI in inertial frame.
+          ///     *. keep parent/child MOI/invMOI in inertial frame.
 
-          ///     b. 
-          ///     c. 
-          ///     d. 
 
 
           // update index for next joint
           ofsi += infom;
+
+          // double check jb_ptr length
+          dIASSERT (jb_ptr == jb+2*m);
         }
       }
 
@@ -1763,31 +1781,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
           }
         }
       }
-
-      {
-        // create an array of body numbers for each joint row
-        int *jb_ptr = jb;
-        const dJointWithInfo1 *jicurr = jointiinfos;
-        const dJointWithInfo1 *const jiend = jicurr + nj;
-        for (; jicurr != jiend; jicurr++) {
-          dxJoint *joint = jicurr->joint;
-          const int infom = jicurr->info.m;
-
-          int b1 = (joint->node[0].body) ? (joint->node[0].body->tag) : -1;
-          int b2 = (joint->node[1].body) ? (joint->node[1].body->tag) : -1;
-          for (int j=0; j<infom; j++) {
-            jb_ptr[0] = b1;
-            jb_ptr[1] = b2;
-            jb_ptr += 2;
-          }
-        }
-        dIASSERT (jb_ptr == jb+2*m);
-        //printf("jjjjjjjjj %d %d\n",jb[0],jb[1]);
-      }
-
-
-
-
 
       BEGIN_STATE_SAVE(context, tmp1state) {
         IFTIMING (dTimerNow ("compute rhs"));
