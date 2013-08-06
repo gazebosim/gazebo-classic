@@ -1471,8 +1471,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
   dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
-  // TODO: move this to inside joint getInfo2, for inertia tweaking
+  // TODO: possible optimization: move this to inside joint getInfo2, for inertia tweaking
   // update tacc from external force and inertia tensor in inerial frame
+  // for now, modify MOI and invMOI after getInfo2 is called
   {
     dReal *invMOIrow = invMOI;
     dReal *MOIrow = MOI;
@@ -1711,14 +1712,55 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
           /// do something here for inertia tweaking:
           ///   For now, try this only for the two non-free axial rotation constraints for hinge joints.
-          ///     a. rotate both parent and child MOI into a common joint frame, store in local variable MOI and invMOI
-          ///     b. get scalar axis MOI in the constrained axis direction.
-          ///     c. get full axis MOI tensor representing the scalar axis MOI.
-          ///     d. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for constrained direction.
-          ///     e. rotate modified parent/child MOI back to their original reference frames.
+          ///     a. both parent and child MOI/invMOI have been rotated into inertial frame already.
+          ///     b. determine constrained axis(s) direction for Jrow
+          ///        maybe we can assume that Jrow.J1l and Jrow.J2l are zeros,
+          ///        and J1a and J2a fully constrains w1 and w2...
+          ///        are J1a always equal to J2a?
+          printf("J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n",
+                 Jinfo.J1l[0],Jinfo.J1l[1],Jinfo.J1l[2],
+                 Jinfo.J2l[0],Jinfo.J2l[1],Jinfo.J2l[2],
+                 Jinfo.J1a[0],Jinfo.J1a[1],Jinfo.J1a[2],
+                 Jinfo.J2a[0],Jinfo.J2a[1],Jinfo.J2a[2]);
+          ///     c. get scalar axis MOI in the constrained axis direction.
+          ///     d. get full axis MOI tensor representing the scalar axis MOI.
+          ///     e. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
+          ///        constrained direction.
+          ///     f. keep parent/child MOI/invMOI in inertial frame.
+
+          ///     b. 
+          ///     c. 
+          ///     d. 
+
 
           // update index for next joint
           ofsi += infom;
+        }
+      }
+
+      // Inertia tweaking for better convergence
+      // modify MOI and invMOI per constraint
+      {
+        dReal *invMOIrow = invMOI;
+        dReal *MOIrow = MOI;
+        dxBody *const *const bodyend = body + nb;
+        for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
+          dMatrix3 tmp;
+          dxBody *b_ptr = *bodycurr;
+
+          // compute inverse inertia tensor in global frame
+          dMultiply2_333 (tmp,b_ptr->invI,b_ptr->posr.R);
+          dMultiply0_333 (invMOIrow,b_ptr->posr.R,tmp);
+
+          // also store MOI for later use by preconditioner
+          dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
+          dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
+
+          if (b_ptr->flags & dxBodyGyroscopic) {
+            // compute rotational force
+            dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
+            dSubtractVectorCross3(b_ptr->tacc,b_ptr->avel,tmp);
+          }
         }
       }
 
