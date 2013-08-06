@@ -230,6 +230,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
+
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -259,6 +260,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     {
       scale.x = scale.y;
     }
+  }
+  else if (_vis->GetName().find("unit_box") != std::string::npos)
+  {
+  }
+  else
+  {
+    // TODO scaling for complex models are not yet functional.
+    // Limit scaling to simple shapes for now.
+    gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+    return;
   }
 
   math::Vector3 newScale = this->mouseVisualScale * scale;
@@ -555,7 +566,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
         this->selectionObj->UpdateSize();
         this->PublishVisualScale(this->mouseMoveVis);
       }
-      this->PublishVisualPose(this->mouseMoveVis);
+      else
+        this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }

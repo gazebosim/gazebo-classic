@@ -1391,7 +1391,6 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
           _msg.visual(j)));
     if (_msg.has_scale())
     {
-//      msgs::Set(vm->mutable_scale(), _msg.scale());
       vm->mutable_scale()->set_x(_msg.scale().x());
       vm->mutable_scale()->set_y(_msg.scale().y());
       vm->mutable_scale()->set_z(_msg.scale().z());

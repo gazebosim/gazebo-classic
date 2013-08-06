@@ -1004,7 +1004,7 @@ void Link::PublishData()
 }
 
 /////////////////////////////////////////////////
-void Link::SetScale(const math::Vector3 _scale)
+void Link::SetScale(const math::Vector3 &_scale)
 {
   Base_V::const_iterator biter;
   for (biter = this->children.begin(); biter != this->children.end(); ++biter)
