@@ -1471,6 +1471,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
   dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
+  // TODO: move this to inside joint getInfo2, for inertia tweaking
+  // update tacc from external force and inertia tensor in inerial frame
   {
     dReal *invMOIrow = invMOI;
     dReal *MOIrow = MOI;
@@ -1590,31 +1592,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_orig = NULL;
   int *jb = NULL;
 
-  dReal *vnew = NULL;
-#ifdef PENETRATION_JVERROR_CORRECTION
-  // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
-  vnew = context->AllocateArray<dReal> (nb*6);
-  {
-    dRealMutablePtr vnewcurr = vnew;
-    dxBody* const* bodyend = body + nb;
-    const dReal *invMOIrow = invMOI;
-    dReal tmp_tacc[3];
-    for (dxBody* const* bodycurr = body; bodycurr != bodyend;
-         invMOIrow += 12, vnewcurr += 6, bodycurr++) {
-      dxBody *b_ptr = *bodycurr;
-
-      // add stepsize * invM * fe to the body velocity
-      dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
-      for (int j=0; j<3; j++) {
-        vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
-        vnewcurr[j+3] = b_ptr->avel[j];
-        tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
-      }
-      dMultiplyAdd0_331 (vnewcurr+3, invMOIrow, tmp_tacc);
-
-    }
-  }
-#endif
+  dReal *vnew = NULL; // used by PENETRATION_JVERROR_CORRECTION
 
   dReal *cforce = context->AllocateArray<dReal> (nb*6);
   dReal *caccel = context->AllocateArray<dReal> (nb*6);
@@ -1733,12 +1711,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
           /// do something here for inertia tweaking:
           ///   For now, try this only for the two non-free axial rotation constraints for hinge joints.
-          ///     a. rotate both parent and child MOI into a common joint frame.
+          ///     a. rotate both parent and child MOI into a common joint frame, store in local variable MOI and invMOI
           ///     b. get scalar axis MOI in the constrained axis direction.
           ///     c. get full axis MOI tensor representing the scalar axis MOI.
           ///     d. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for constrained direction.
           ///     e. rotate modified parent/child MOI back to their original reference frames.
-
 
           // update index for next joint
           ofsi += infom;
@@ -1830,6 +1807,31 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int j=0; j<m; j++) cfm[j] *= stepsize1;
 
     } END_STATE_SAVE(context, cstate);
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+    // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
+    vnew = context->AllocateArray<dReal> (nb*6);
+    {
+      dRealMutablePtr vnewcurr = vnew;
+      dxBody* const* bodyend = body + nb;
+      const dReal *invMOIrow = invMOI;
+      dReal tmp_tacc[3];
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend;
+           invMOIrow += 12, vnewcurr += 6, bodycurr++) {
+        dxBody *b_ptr = *bodycurr;
+
+        // add stepsize * invM * fe to the body velocity
+        dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
+        for (int j=0; j<3; j++) {
+          vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
+          vnewcurr[j+3] = b_ptr->avel[j];
+          tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
+        }
+        dMultiplyAdd0_331 (vnewcurr+3, invMOIrow, tmp_tacc);
+
+      }
+    }
+#endif
 
     // load lambda from the value saved on the previous iteration
     dReal *lambda = context->AllocateArray<dReal> (m);
