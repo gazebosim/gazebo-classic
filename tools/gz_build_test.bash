@@ -27,8 +27,9 @@ hg clone /home/scpeters/osrf/gazebo_readonly /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
-PATH=/tmp/gazebo_build/install/bin:$PATH
-LD_LIBRARY_PATH=/tmp/gazebo_build/install/lib:$LD_LIBRARY_PATH
+export PATH=/tmp/gazebo_build/install/bin:$PATH
+export LD_LIBRARY_PATH=/tmp/gazebo_build/install/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/tmp/gazebo_build/install/lib/pkgconfig:$PKG_CONFIG_PATH
 ulimit -c unlimited
 
 # Process each branch from the command line
