@@ -1669,7 +1669,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
         Jinfo.fps = stepsize1;
 
         int *jb_ptr = jb;
-        dxBody *const *const bodyend = body + nb;
 
         dReal *Jcopyrow = Jcopy;
         unsigned ofsi = 0;
@@ -1736,16 +1735,73 @@ void dxQuickStepper (dxWorldProcessContext *context,
                    Jinfo.J2l[0+j*Jinfo.rowskip],Jinfo.J2l[1+j*Jinfo.rowskip],Jinfo.J2l[2+j*Jinfo.rowskip],
                    Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip],
                    Jinfo.J2a[0+j*Jinfo.rowskip],Jinfo.J2a[1+j*Jinfo.rowskip],Jinfo.J2a[2+j*Jinfo.rowskip]);
-          }
-          ///     *. J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
-          ///        of each other.  J1a and J2a denotes the axis direction.
-          ///     *. get the MOI for parent and child bodies constrained by J1a and J2a.
-          dReal *invMOIrow1 = invMOI + b1 * 12;
-          dReal *MOIrow1 = MOI + b1 * 12;
-          if (b2 >= 0)
-          {
-            dReal *invMOIrow2 = invMOI + b2 * 12;
-            dReal *MOIrow2 = MOI + b2 * 12;
+            ///   *. J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
+            ///      of each other.  J1a and J2a denotes the axis direction.
+            ///   *. get the MOI for parent and child bodies constrained by J1a and J2a.
+            if (j >= 3) // \FIXME:  hack for hinges for now: if this is a pure rotational constraint!!!  J1a and J2a
+            {
+              // get pointers to our invMOI/MOI matrices
+              dReal *invMOI_ptr1 = invMOI + b1 * 12;
+              dReal *MOI_ptr1 = MOI + b1 * 12;
+
+              printf("--------------------------\n");
+              printf("MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+                MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+                MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+
+              // compute scalar MOI in line with S:
+              //   moi_S = S' * I * S
+              dVector3 S = // line about which we want to compute MOI along
+                   { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
+
+              dVector3 tmp31;
+              dMultiply0_133(tmp31, S, MOI_ptr1);
+              dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+              printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S1);
+
+              // full MOI tensor for S formed from matrix outer product fo S:
+              //   MOI_S = moi_S * [ S * S' ]
+
+              dMatrix3 RJ1a = {
+                   S[0], 0   , 0   , 0,
+                   S[1], 0   , 0   , 0,
+                   S[2], 0   , 0   , 0};
+
+              dMatrix3 tmp33;
+
+              dMultiply2_333 (tmp33,invMOI_ptr1,RJ1a);
+              // dMultiply0_333 (new_invMOI_ptr1,RJ1a,tmp33);
+
+              dMultiply2_333 (tmp33,MOI_ptr1,RJ1a);
+              // dMultiply0_333 (new_MOI_ptr1,RJ1a,tmp33);
+
+              if (b2 >= 0)
+              {
+                dReal *invMOI_ptr2 = invMOI + b2 * 12;
+                dReal *MOI_ptr2 = MOI + b2 * 12;
+
+                printf("==========================\n");
+                printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                  MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+                  MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+                  MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+
+                // compute scalar MOI in line with S:
+                dMultiply0_133(tmp31, S, MOI_ptr2);
+                dReal moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+                printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S2);
+
+
+                dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
+                // dMultiply0_333 (new_invMOI_ptr2,RJ1a,tmp33);
+
+                dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
+                // dMultiply0_333 (new_MOI_ptr2,RJ1a,tmp33);
+              }
+
+              printf("--------------------------\n");
+            }
           }
           ///     *. get scalar axis MOI in the constrained axis direction.
           ///     *. get full axis MOI tensor representing the scalar axis MOI.
