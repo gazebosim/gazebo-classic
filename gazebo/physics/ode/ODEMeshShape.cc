@@ -25,14 +25,14 @@
 
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODEMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
+ODEMeshShape::ODEMeshShape(CollisionPtr _parent) : MeshShape(_parent)
 {
   this->odeData = NULL;
   this->vertices = NULL;
@@ -40,7 +40,7 @@ ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
 }
 
 //////////////////////////////////////////////////
-ODETrimeshShape::~ODETrimeshShape()
+ODEMeshShape::~ODEMeshShape()
 {
   delete [] this->vertices;
   delete [] this->indices;
@@ -48,7 +48,7 @@ ODETrimeshShape::~ODETrimeshShape()
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Update()
+void ODEMeshShape::Update()
 {
   ODECollisionPtr ocollision =
     boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
@@ -89,15 +89,15 @@ void ODETrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
+void ODEMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  TrimeshShape::Load(_sdf);
+  MeshShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Init()
+void ODEMeshShape::Init()
 {
-  TrimeshShape::Init();
+  MeshShape::Init();
   if (!this->mesh)
     return;
 
@@ -127,11 +127,11 @@ void ODETrimeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->GetValueVector3("scale").x;
+      this->sdf->Get<math::Vector3>("scale").x;
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->GetValueVector3("scale").y;
+      this->sdf->Get<math::Vector3>("scale").y;
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->GetValueVector3("scale").z;
+      this->sdf->Get<math::Vector3>("scale").z;
   }
 
   // Build the ODE triangle mesh

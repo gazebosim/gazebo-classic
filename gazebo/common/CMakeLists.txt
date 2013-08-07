@@ -6,7 +6,7 @@ if (HAVE_GTS)
   add_definitions(${gts_CFLAGS})
 endif()
 
-set (sources 
+set (sources
   Animation.cc
   Assert.cc
   Base64.cc
@@ -35,7 +35,7 @@ set (sources
   Video.cc
 )
 
-set (headers 
+set (headers
   Animation.hh
   Assert.hh
   Base64.hh
@@ -49,6 +49,7 @@ set (headers
   Events.hh
   Exception.hh
   Image.hh
+  KeyEvent.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh
@@ -102,18 +103,35 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 
 gz_add_library(gazebo_common ${sources})
 
-target_link_libraries(gazebo_common gazebo_math
-                                    ${libdl_library}
-                                    ${Boost_LIBRARIES}
-                                    ${freeimage_library}
-                                    ${tinyxml_libraries}
-                                    ${libavcodec_LIBRARIES}
-                                    ${libavformat_LIBRARIES}
-                                    ${CURL_LIBRARIES}
-                                    ${libswscale_LIBRARIES}
-                                    ${libtar_libraries}
-                                    rt
-                                    )
+set_property(
+  SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
+  GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
+  OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+target_link_libraries(gazebo_common
+  gazebo_math
+  ${libdl_library}
+  ${libtool_library}
+  ${Boost_LIBRARIES}
+  ${freeimage_library}
+  ${tinyxml_libraries}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  ${libtar_libraries}
+  ${TBB_LIBRARIES}
+  rt
+  pthread
+)
+
+if (HAVE_SDF)
+  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
+endif()
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})

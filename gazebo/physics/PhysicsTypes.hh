@@ -50,6 +50,7 @@ namespace gazebo
     class SurfaceParams;
     class BoxShape;
     class CylinderShape;
+    class MeshShape;
     class SphereShape;
     class MeshShape;
     class HeightmapShape;

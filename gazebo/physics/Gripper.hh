@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo

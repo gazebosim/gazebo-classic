@@ -34,6 +34,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/Gui.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -239,6 +240,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
+  this->keyEvent.key = _event->key();
+
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
@@ -262,6 +265,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::AltModifier ? true : false;
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandlePress(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -302,6 +308,9 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   }
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -1095,7 +1104,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
                                    const std::string &_mode)
 
 {
-  std::map<std::string, unsigned int>::iterator iter;
   if (!_name.empty())
   {
     std::string name = _name;
@@ -1116,7 +1124,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
 {
-  if (this->moveHistory.size() == 0 ||
+  if (this->moveHistory.empty() ||
       this->moveHistory.back().first != _visName ||
       this->moveHistory.back().second != _pose)
   {
@@ -1127,7 +1135,7 @@ void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
 /////////////////////////////////////////////////
 void GLWidget::PopHistory()
 {
-  if (this->moveHistory.size() > 0)
+  if (!this->moveHistory.empty())
   {
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));

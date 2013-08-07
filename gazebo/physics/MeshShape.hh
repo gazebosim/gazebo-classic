@@ -19,8 +19,8 @@
  * Date: 8 May 2003
  */
 
-#ifndef _TRIMESHSHAPE_HH_
-#define _TRIMESHSHAPE_HH_
+#ifndef _MESHSHAPE_HH_
+#define _MESHSHAPE_HH_
 
 #include <string>
 
@@ -35,16 +35,16 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class TrimeshShape TrimeshShape.hh physics/physics.hh
+    /// \class MeshShape MeshShape.hh physics/physics.hh
     /// \brief Triangle mesh collision shape
-    class TrimeshShape : public Shape
+    class MeshShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision.
-      public: explicit TrimeshShape(CollisionPtr _parent);
+      public: explicit MeshShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~TrimeshShape();
+      public: virtual ~MeshShape();
 
       /// \brief Update the tri mesh.
       public: virtual void Update() {}

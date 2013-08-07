@@ -27,6 +27,7 @@ for geometry objects
 
 */
 
+#include <iostream>
 #include <ode/common.h>
 #include <ode/matrix.h>
 #include <ode/rotation.h>
@@ -350,14 +351,18 @@ dxGeom::dxGeom (dSpaceID _space, int is_placeable)
   data = 0;
   body = 0;
   body_next = 0;
-  if (is_placeable) {
-	final_posr = dAllocPosr();
-    dSetZero (final_posr->pos,4);
+
+  if (is_placeable)
+  {
+    final_posr = dAllocPosr();
+    dSetZero (final_posr->pos, 4);
     dRSetIdentity (final_posr->R);
   }
-  else {
+  else
+  {
     final_posr = 0;
   }
+
   offset_posr = 0;
 
   // setup space vars
@@ -375,9 +380,12 @@ dxGeom::dxGeom (dSpaceID _space, int is_placeable)
 
 dxGeom::~dxGeom()
 {
-   if (parent_space) dSpaceRemove (parent_space,this);
+   if (parent_space)
+     dSpaceRemove (parent_space,this);
+
    if ((gflags & GEOM_PLACEABLE) && (!body || (body && offset_posr)))
      dFreePosr(final_posr);
+
    if (offset_posr) dFreePosr(offset_posr);
    bodyRemove();
 }
@@ -456,7 +464,8 @@ void dxGeom::computePosr()
   // should only be recalced if we need to - ie offset from a body
   dIASSERT(offset_posr);  
   dIASSERT(body);
-  
+  dIASSERT(final_posr);
+
   dMultiply0_331 (final_posr->pos,body->posr.R,offset_posr->pos);
   final_posr->pos[0] += body->posr.pos[0];
   final_posr->pos[1] += body->posr.pos[1];
@@ -510,13 +519,19 @@ void dGeomSetBody (dxGeom *g, dxBody *b)
   dUASSERT (b == NULL || (g->gflags & GEOM_PLACEABLE),"geom must be placeable");
   CHECK_NOT_LOCKED (g->parent_space);
 
-  if (b) {
-    if (!g->body) dFreePosr(g->final_posr);
-    if (g->body != b) {
-      if (g->offset_posr) {
+  if (b)
+  {
+    if (!g->body)
+      dFreePosr(g->final_posr);
+
+    if (g->body != b)
+    {
+      if (g->offset_posr)
+      {
         dFreePosr(g->offset_posr);
         g->offset_posr = 0;
       }
+
       g->final_posr = &b->posr;
       g->bodyRemove();
       g->bodyAdd (b);
@@ -1043,7 +1058,7 @@ void dGeomSetOffsetPosition (dxGeom *g, dReal x, dReal y, dReal z)
   CHECK_NOT_LOCKED (g->parent_space);
   if (!g->offset_posr) 
   {
-	dGeomCreateOffset(g);
+    dGeomCreateOffset(g);
   }
   g->offset_posr->pos[0] = x;
   g->offset_posr->pos[1] = y;

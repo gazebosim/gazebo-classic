@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
