@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: double Apply(double _in);
+      public: double Apply(double _in) const;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType

@@ -86,7 +86,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-double Noise::Apply(double _in)
+double Noise::Apply(double _in) const
 {
   double output = 0.0;
   if (this->noiseType == NONE)
