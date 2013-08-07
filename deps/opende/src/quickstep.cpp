@@ -1668,8 +1668,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
         Jinfo.rowskip = 12;
         Jinfo.fps = stepsize1;
 
-        dReal *Jcopyrow = Jcopy;
         int *jb_ptr = jb;
+        dxBody *const *const bodyend = body + nb;
+
+        dReal *Jcopyrow = Jcopy;
         unsigned ofsi = 0;
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
@@ -1711,15 +1713,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
               findex_ofsi[j] = fival + ofsi;
           }
 
-          {
-            // create an array of body numbers for each joint row
-            int b1 = (joint->node[0].body) ? (joint->node[0].body->tag) : -1;
-            int b2 = (joint->node[1].body) ? (joint->node[1].body->tag) : -1;
-            for (int j=0; j<infom; j++) {
-              jb_ptr[0] = b1;
-              jb_ptr[1] = b2;
-              jb_ptr += 2;
-            }
+          // create an array of body numbers for each joint row
+          int b1 = (joint->node[0].body) ? (joint->node[0].body->tag) : -1;
+          int b2 = (joint->node[1].body) ? (joint->node[1].body->tag) : -1;
+          for (int j=0; j<infom; j++) {
+            jb_ptr[0] = b1;
+            jb_ptr[1] = b2;
+            jb_ptr += 2;
           }
 
           /// do something here for inertia tweaking:
@@ -1740,6 +1740,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
           ///     *. J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
           ///        of each other.  J1a and J2a denotes the axis direction.
           ///     *. get the MOI for parent and child bodies constrained by J1a and J2a.
+          dReal *invMOIrow1 = invMOI + b1 * 12;
+          dReal *MOIrow1 = MOI + b1 * 12;
+          if (b2 >= 0)
+          {
+            dReal *invMOIrow2 = invMOI + b2 * 12;
+            dReal *MOIrow2 = MOI + b2 * 12;
+          }
           ///     *. get scalar axis MOI in the constrained axis direction.
           ///     *. get full axis MOI tensor representing the scalar axis MOI.
           ///     *. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
