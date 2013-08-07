@@ -141,6 +141,17 @@ namespace gazebo
       /// \return True on success.
       public: bool SetLoop(bool _state);
 
+      /// \brief Set whether the audio source should play on contact.
+      /// \param[in] _onContact True to play when the parent link collides
+      /// with another object.
+      /// \return True if SetOnContact was successful.
+      public: bool SetOnContact(bool _onContact);
+
+      /// \brief Return true if the audio source is played on contact with
+      /// another object.
+      /// \return True if audio is played on contact.
+      public: bool GetOnContact() const;
+
       /// \brief Play a sound
       public: void Play();
 
@@ -167,11 +178,14 @@ namespace gazebo
       /// \brief Fill the OpenAL audio buffer with data from a sound file
       public: void FillBufferFromFile(const std::string &_audioFile);
 
-      // OpenAL source index
+      /// \brief OpenAL source index.
       private: unsigned int alSource;
 
-      // OpenAL buffer index
+      /// \brief OpenAL buffer index.
       private: unsigned int alBuffer;
+
+      /// \brief True if the audio source is played on contact.
+      private: bool playOnContact;
     };
   }
 }

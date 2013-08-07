@@ -246,6 +246,8 @@ OpenALSource::OpenALSource()
 
   // Create 1 buffer
   alGenBuffers(1, &this->alBuffer);
+
+  this->playOnContact = false;
 }
 
 /////////////////////////////////////////////////
@@ -276,6 +278,9 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("loop"))
     result = result && this->SetLoop(_sdf->Get<bool>("loop"));
+
+  if (_sdf->HasElement("contact"))
+    result = result && this->SetOnContact(_sdf->Get<bool>("loop"));
 
   return result;
 }
@@ -378,6 +383,19 @@ bool OpenALSource::SetLoop(bool _state)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+bool OpenALSource::SetOnContact(bool _onContact)
+{
+  this->playOnContact = _onContact;
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool OpenALSource::GetOnContact() const
+{
+  return this->playOnContact;
 }
 
 /////////////////////////////////////////////////

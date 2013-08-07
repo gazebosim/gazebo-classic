@@ -27,6 +27,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/Console.hh"
@@ -38,6 +39,7 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
@@ -180,6 +182,60 @@ void Link::Load(sdf::ElementPtr _sdf)
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
   }
+
+  if (_sdf->HasElement("audio_source"))
+  {
+    bool onContact = false;
+    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
+    while (audioElem)
+    {
+      util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
+          audioElem);
+
+      if (source->GetOnContact())
+        onContact = true;
+      else
+        source->Play();
+
+      audioElem = audioElem->GetNextElement("audio_source");
+      this->audioSources.push_back(source);
+    }
+
+    if (onContact)
+    {
+      std::vector<std::string> collisionNames;
+      Collision_V collisions = this->GetCollisions();
+      for (Collision_V::iterator iter = collisions.begin();
+          iter != collisions.end(); ++iter)
+      {
+        collisionNames.push_back((*iter)->GetScopedName());
+      }
+      std::string topic =
+        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+            this->GetScopedName()+"/audio_collision", collisionNames);
+      this->audioContactsSub = this->node->Subscribe(topic,
+          &Link::OnCollision, this);
+    }
+  }
+  if (_sdf->HasElement("audio_sink"))
+  {
+    this->audioSink = util::OpenAL::Instance()->CreateSink(
+        _sdf->GetElement("audio_sink"));
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::OnCollision(ConstContactsPtr &_msg)
+{
+  if (_msg->contact_size() > 0)
+  {
+    for (std::vector<util::OpenALSourcePtr>::iterator iter =
+        this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+    {
+      if ((*iter)->GetOnContact())
+        (*iter)->Play();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -281,6 +337,8 @@ void Link::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
+
+  this->audioSink.reset();
 
   Entity::Fini();
 }
@@ -442,6 +500,20 @@ void Link::SetLaserRetro(float _retro)
 //////////////////////////////////////////////////
 void Link::Update()
 {
+  // Update all the audio sources
+  for (std::vector<util::OpenALSourcePtr>::iterator iter =
+      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+  {
+    (*iter)->SetPose(this->GetWorldPose());
+    (*iter)->SetVelocity(this->GetWorldLinearVel());
+  }
+
+  if (this->audioSink)
+  {
+    this->audioSink->SetPose(this->GetWorldPose());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel());
+  }
+
   // Apply our linear accel
   // this->SetForce(this->linearAccel);
 
