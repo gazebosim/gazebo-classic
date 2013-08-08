@@ -20,7 +20,7 @@
 
 #include "gazebo/common/Console.hh"
 
-#include "SphericalCoordinates.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
 using namespace gazebo;
 using namespace common;
