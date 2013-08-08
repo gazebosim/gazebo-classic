@@ -30,7 +30,7 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 Noise::Noise()
- : noiseType(NONE),
+ : type(NONE),
    mean(0.0),
    stdDev(0.0),
    bias(0.0),
@@ -50,20 +50,20 @@ void Noise::Load(sdf::ElementPtr _sdf)
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
   std::string type = this->sdf->Get<std::string>("type");
   if (type == "none")
-    this->noiseType = NONE;
+    this->type = NONE;
   else if (type == "gaussian")
-    this->noiseType = GAUSSIAN;
+    this->type = GAUSSIAN;
   else if (type == "gaussian_quantized")
-    this->noiseType = GAUSSIAN_QUANTIZED;
+    this->type = GAUSSIAN_QUANTIZED;
   else
   {
     gzerr << "Unrecognized noise type: [" << type << "]"
           << ", using default [none]" << std::endl;
-    this->noiseType = NONE;
+    this->type = NONE;
   }
 
-  if (this->noiseType == GAUSSIAN ||
-      this->noiseType == GAUSSIAN_QUANTIZED)
+  if (this->type == GAUSSIAN ||
+      this->type == GAUSSIAN_QUANTIZED)
   {
     this->mean = this->sdf->Get<double>("mean");
     this->stdDev = this->sdf->Get<double>("stddev");
@@ -81,7 +81,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
       << ", bias " << this->bias << std::endl;
   }
 
-  if (this->noiseType == GAUSSIAN_QUANTIZED)
+  if (this->type == GAUSSIAN_QUANTIZED)
     this->precision = this->sdf->Get<double>("precision");
 }
 
@@ -89,14 +89,14 @@ void Noise::Load(sdf::ElementPtr _sdf)
 double Noise::Apply(double _in) const
 {
   double output = 0.0;
-  if (this->noiseType == NONE)
+  if (this->type == NONE)
     output = _in;
-  else if (this->noiseType == GAUSSIAN ||
-           this->noiseType == GAUSSIAN_QUANTIZED)
+  else if (this->type == GAUSSIAN ||
+           this->type == GAUSSIAN_QUANTIZED)
   {
     double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
     output = _in + this->bias + whiteNoise;
-    if (this->noiseType == GAUSSIAN_QUANTIZED)
+    if (this->type == GAUSSIAN_QUANTIZED)
     {
       // Apply this->precision
       if (!math::equal(this->precision, 0.0, 1e-6))
@@ -106,4 +106,28 @@ double Noise::Apply(double _in) const
     }
   }
   return output;
+}
+
+//////////////////////////////////////////////////
+Noise::NoiseType Noise::GetNoiseType() const
+{
+  return this->type;
+}
+
+//////////////////////////////////////////////////
+double Noise::GetMean() const
+{
+  return this->mean;
+}
+
+//////////////////////////////////////////////////
+double Noise::GetStdDev() const
+{
+  return this->stdDev;
+}
+
+//////////////////////////////////////////////////
+double Noise::GetBias() const
+{
+  return this->bias;
 }

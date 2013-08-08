@@ -27,6 +27,11 @@
 
 using namespace gazebo;
 
+const unsigned int g_applyCount = 100;
+
+// We will use 5 sigma (4e-5 chance of failure)
+const double g_sigma = 5.0;
+
 ////////////////////////////////////////////////////////////////
 // Helper function that constructs sdf strings for noise element
 sdf::ElementPtr NoiseSdf(const std::string &_type, double _mean,
@@ -74,18 +79,21 @@ TEST(NoiseTest, Types)
   {
     sensors::Noise noise;
     noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::NONE);
   }
 
   // GAUSSIAN type
   {
     sensors::Noise noise;
     noise.Load(NoiseSdf("gaussian", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN);
   }
 
   // GAUSSIAN_QUANTIZED type
   {
     sensors::Noise noise;
     noise.Load(NoiseSdf("gaussian_quantized", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN_QUANTIZED);
   }
 }
 
@@ -105,90 +113,222 @@ void NoNoise(const sensors::Noise &_noise, unsigned int _count)
 // Helper function for testing Gaussian noise
 void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
 {
-  // Expect no change in input value
+  // Use constant input and repeatedly add noise to it.
+  double x = 42.0;
+
+  // boost code from http://stackoverflow.com/questions/3534335
+  boost::accumulators::accumulator_set<double,
+    boost::accumulators::stats<boost::accumulators::tag::mean,
+                               boost::accumulators::tag::variance > > acc;
+
   for (unsigned int i = 0; i < _count; ++i)
   {
-    double x = math::Rand::GetDblUniform(-1e6, 1e6);
-    EXPECT_NEAR(x, _noise.Apply(x), 1e-6);
+    double y = _noise.Apply(x);
+    acc(y);
   }
+
+  // The sample mean should be near x+mean, with standard deviation of
+  // stddev / sqrt(_count)
+  // https://onlinecourses.science.psu.edu/stat414/node/167
+  // We will use 5 sigma (4e-5 chance of failure)
+  double mean = _noise.GetMean() + _noise.GetBias();
+  double stddev = _noise.GetStdDev();
+  double sampleStdDev = g_sigma*stddev / sqrt(_count);
+  EXPECT_NEAR(boost::accumulators::mean(acc), x+mean, sampleStdDev);
+
+  // The sample variance has the following variance:
+  // 2 stddev^4 / (_count - 1)
+  // en.wikipedia.org/wiki/Variance#Distribution_of_the_sample_variance
+  // Again use 5 sigma
+  double variance = stddev*stddev;
+  double sampleVariance2 = 2 * variance*variance / (_count - 1);
+  EXPECT_NEAR(boost::accumulators::variance(acc),
+              variance, g_sigma*sqrt(sampleVariance2));
 }
 
 //////////////////////////////////////////////////
 // Test noise application
-TEST(NoiseTest, Apply)
+TEST(NoiseTest, ApplyNone)
 {
-  unsigned int applyCount = 100;
+  sensors::Noise noise;
+  noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
 
-  // NONE type
+  NoNoise(noise, g_applyCount);
+}
+
+TEST(NoiseTest, ApplyGaussian)
+{
+  double mean, stddev, biasMean, biasStddev;
+
+  // GAUSSIAN with zero means and standard deviations
+  // should be the same as NONE
+  mean = 0.0;
+  stddev = 0.0;
+  biasMean = 0.0;
+  biasStddev = 0.0;
   {
     sensors::Noise noise;
-    noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
+    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
 
-    NoNoise(noise, applyCount);
+    NoNoise(noise, g_applyCount);
   }
 
-  // GAUSSIAN type
+  // GAUSSIAN with non-zero means and standard deviations, but no bias
+  mean = 10.0;
+  stddev = 5.0;
+  biasMean = 0.0;
+  biasStddev = 0.0;
   {
-    double mean, stddev, biasMean, biasStddev;
+    sensors::Noise noise;
+    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
 
-    // GAUSSIAN with zero means and standard deviations
-    // should be the same as NONE
-    mean = 0.0;
-    stddev = 0.0;
-    biasMean = 0.0;
-    biasStddev = 0.0;
+    GaussianNoise(noise, g_applyCount);
+  }
+
+  // GAUSSIAN with non-zero mean, exact bias, and standard deviations
+  mean = 10.0;
+  stddev = 5.0;
+  biasMean = 100.0;
+  biasStddev = 0.0;
+  {
+    sensors::Noise noise;
+    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+
+    GaussianNoise(noise, g_applyCount);
+  }
+
+  // Test bias generation
+  mean = 0.0;
+  stddev = 0.0;
+  biasMean = 0.0;
+  biasStddev = 5.0;
+  {
+    boost::accumulators::accumulator_set<double,
+      boost::accumulators::stats<boost::accumulators::tag::mean,
+                                 boost::accumulators::tag::variance > > acc;
+
+    for (unsigned int i = 0; i < g_applyCount; ++i)
     {
       sensors::Noise noise;
       noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
 
-      NoNoise(noise, applyCount);
+      acc(noise.GetBias());
     }
- 
-    // GAUSSIAN with non-zero means and standard deviations, but no bias
-    mean = 10.0;
-    stddev = 5.0;
-    biasMean = 0.0;
-    biasStddev = 0.0;
-    {
-      sensors::Noise noise;
-      noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
 
-      // Use constant input and repeatedly add noise to it.
-      double x = 42.0;
-      // boost code from http://stackoverflow.com/questions/3534335
-      boost::accumulators::accumulator_set<double,
-        boost::accumulators::stats<boost::accumulators::tag::mean,
-                                   boost::accumulators::tag::variance > > acc;
-      for (unsigned int i = 0; i < applyCount; ++i)
-      {
-        double y = noise.Apply(x);
-        acc(y);
-      }
+    // See comments in GaussianNoise function to explain these calculations.
+    double sampleStdDev = g_sigma*biasStddev / sqrt(g_applyCount);
+    EXPECT_NEAR(boost::accumulators::mean(acc), 0.0, sampleStdDev);
 
-      // The sample mean should be near x+mean, with standard deviation of
-      // stddev / sqrt(applyCount)
-      // https://onlinecourses.science.psu.edu/stat414/node/167
-      // We will use 5 sigma (4e-5 chance of failure)
-      double sampleStdDev = 5*stddev / sqrt(applyCount);
-      EXPECT_NEAR(boost::accumulators::mean(acc), x+mean, sampleStdDev);
-
-      // The sample variance has the following variance:
-      // 2 stddev^4 / (applyCount - 1)
-      // en.wikipedia.org/wiki/Variance#Distribution_of_the_sample_variance
-      // Again use 5 sigma
-      double variance = stddev*stddev;
-      double sampleVariance2 = 2 * variance*variance / (applyCount - 1);
-      EXPECT_NEAR(boost::accumulators::variance(acc),
-                  variance, 5*sqrt(sampleVariance2));
-    }
+    double variance = biasStddev*biasStddev;
+    double sampleVariance2 = 2 * variance*variance / (g_applyCount - 1);
+    EXPECT_NEAR(boost::accumulators::variance(acc),
+                variance, g_sigma*sqrt(sampleVariance2));
   }
+}
 
-  // GAUSSIAN_QUANTIZED type
+TEST(NoiseTest, ApplyGaussianQuantized)
+{
+  double mean, stddev, biasMean, biasStddev, precision;
+
+  // GAUSSIAN_QUANTIZED with zero means and standard deviations
+  // should be the same as NONE
+  mean = 0.0;
+  stddev = 0.0;
+  biasMean = 0.0;
+  biasStddev = 0.0;
+  precision = 0.0;
   {
     sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", 0, 0, 0, 0, 0));
+    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+                        biasStddev, precision));
 
-    NoNoise(noise, applyCount);
+    NoNoise(noise, g_applyCount);
+  }
+
+  // GAUSSIAN_QUANTIZED with non-zero means and standard deviations,
+  // but no bias or precision
+  mean = 10.0;
+  stddev = 5.0;
+  biasMean = 0.0;
+  biasStddev = 0.0;
+  precision = 0.0;
+  {
+    sensors::Noise noise;
+    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+                        biasStddev, precision));
+    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
+
+    GaussianNoise(noise, g_applyCount);
+  }
+
+  // GAUSSIAN with non-zero mean, exact bias, and standard deviations
+  // no precision specified
+  mean = 10.0;
+  stddev = 5.0;
+  biasMean = 100.0;
+  biasStddev = 0.0;
+  precision = 0.0;
+  {
+    sensors::Noise noise;
+    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+                        biasStddev, precision));
+
+    GaussianNoise(noise, g_applyCount);
+  }
+
+  // Test bias generation
+  mean = 0.0;
+  stddev = 0.0;
+  biasMean = 0.0;
+  biasStddev = 5.0;
+  precision = 0.0;
+  {
+    boost::accumulators::accumulator_set<double,
+      boost::accumulators::stats<boost::accumulators::tag::mean,
+                                 boost::accumulators::tag::variance > > acc;
+
+    for (unsigned int i = 0; i < g_applyCount; ++i)
+    {
+      sensors::Noise noise;
+      noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+                          biasStddev, precision));
+
+      acc(noise.GetBias());
+    }
+
+    // See comments in GaussianNoise function to explain these calculations.
+    double sampleStdDev = g_sigma*biasStddev / sqrt(g_applyCount);
+    EXPECT_NEAR(boost::accumulators::mean(acc), 0.0, sampleStdDev);
+
+    double variance = biasStddev*biasStddev;
+    double sampleVariance2 = 2 * variance*variance / (g_applyCount - 1);
+    EXPECT_NEAR(boost::accumulators::variance(acc),
+                variance, g_sigma*sqrt(sampleVariance2));
+  }
+
+  // Test precision
+  mean = 0.0;
+  stddev = 0.0;
+  biasMean = 0.0;
+  biasStddev = 0.0;
+  precision = 0.3;
+  {
+    sensors::Noise noise;
+    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+                        biasStddev, precision));
+
+    EXPECT_NEAR(noise.Apply(0.32), 0.3, 1e-6);
+    EXPECT_NEAR(noise.Apply(0.31), 0.3, 1e-6);
+    EXPECT_NEAR(noise.Apply(0.30), 0.3, 1e-6);
+    EXPECT_NEAR(noise.Apply(0.29), 0.3, 1e-6);
+    EXPECT_NEAR(noise.Apply(0.28), 0.3, 1e-6);
+
+    EXPECT_NEAR(noise.Apply(-12.92), -12.9, 1e-6);
+    EXPECT_NEAR(noise.Apply(-12.91), -12.9, 1e-6);
+    EXPECT_NEAR(noise.Apply(-12.90), -12.9, 1e-6);
+    EXPECT_NEAR(noise.Apply(-12.89), -12.9, 1e-6);
+    EXPECT_NEAR(noise.Apply(-12.88), -12.9, 1e-6);
   }
 }
 

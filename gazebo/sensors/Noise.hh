@@ -34,6 +34,14 @@ namespace gazebo
     /// \brief Noise models for sensor output signals.
     class Noise
     {
+      /// \brief Which noise types we support
+      public: enum NoiseType
+      {
+        NONE,
+        GAUSSIAN,
+        GAUSSIAN_QUANTIZED
+      };
+
       /// \brief Constructor.
       public: Noise();
 
@@ -48,32 +56,40 @@ namespace gazebo
       /// \return Data with noise applied.
       public: double Apply(double _in) const;
 
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN,
-        GAUSSIAN_QUANTIZED
-      };
+      /// \brief Accessor for NoiseType.
+      /// \return Type of noise currently in use.
+      public: NoiseType GetNoiseType() const;
 
-      /// \brief 
+      /// \brief Accessor for mean.
+      /// \return Mean of Gaussian noise.
+      public: double GetMean() const;
+
+      /// \brief Accessor for stddev.
+      /// \return Standard deviation of Gaussian noise.
+      public: double GetStdDev() const;
+
+      /// \brief Accessor for bias.
+      /// \return Bias on output.
+      public: double GetBias() const;
+
+      /// \brief sdf data.
       private: sdf::ElementPtr sdf;
 
       /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
+      private: NoiseType type;
 
-      /// \brief If noiseType starts with GAUSSIAN, the mean of the distibution
+      /// \brief If type starts with GAUSSIAN, the mean of the distibution
       /// from which we sample when adding noise.
       private: double mean;
 
-      /// \brief If noiseType starts with GAUSSIAN, the standard devation of the
+      /// \brief If type starts with GAUSSIAN, the standard devation of the
       /// distibution from which we sample when adding noise.
       private: double stdDev;
 
-      /// \brief If noiseType starts with GAUSSIAN, the bias we'll add.
+      /// \brief If type starts with GAUSSIAN, the bias we'll add.
       private: double bias;
 
-      /// \brief If noiseType==GAUSSIAN_QUANTIZED, the precision to which
+      /// \brief If type==GAUSSIAN_QUANTIZED, the precision to which
       /// the output signal is rounded.
       private: double precision;
     };
