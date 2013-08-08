@@ -59,14 +59,14 @@ namespace gazebo
       /// \brief Add a point to the point list
       /// \param[in] pt math::Vector3 point
       public: void AddPoint(const math::Vector3 &_pt,
-                            const Ogre::ColourValue _color = DynamicLines::WHITE);
+            const Ogre::ColourValue _color = DynamicLines::WHITE);
 
       /// \brief Add a point to the point list.
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \param[in] _z Z position.
       public: void AddPoint(double _x, double _y, double _z,
-                            const Ogre::ColourValue _color = DynamicLines::WHITE);
+            const Ogre::ColourValue _color = DynamicLines::WHITE);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -76,7 +76,8 @@ namespace gazebo
       /// \brief Change the color of an existing point in the point list
       /// \param[in] _index Index of the point to set
       /// \param[in] _color pixelcolor color to set the point to
-      public: void SetColor(unsigned int _index, const Ogre::ColourValue _color);
+      public: void SetColor(unsigned int _index,
+            const Ogre::ColourValue _color);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return

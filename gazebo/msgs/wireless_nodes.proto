@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Contacts
-/// \brief Contacts from collision detection
+/// \interface WirelessNodes
+/// \brief Msgs for sending information about a list of wireless transmitters
 
 
 import "wireless_node.proto";

@@ -22,6 +22,7 @@
 #ifndef _WIRELESS_TRANSMITTER_HH_
 #define _WIRELESS_TRANSMITTER_HH_
 
+#include <string>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -34,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \class WirelessTransmitter WirelessTransmitter.hh sensors/sensors.hh
-    /// \brief Transmitter to send wireless signals 
+    /// \brief Transmitter to send wireless signals
     class WirelessTransmitter: public WirelessTransceiver
     {
       /// \brief Constant used in the propagation model when there are no
@@ -75,7 +76,7 @@ namespace gazebo
 
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \return Signal strength in a world's point (dBm).
-      public: double GetSignalStrength(const math::Pose _receiver,
+      public: double GetSignalStrength(const math::Pose &_receiver,
           const double rxGain);
 
       /// \brief Size of the grid used for visualization.

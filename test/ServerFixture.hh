@@ -853,7 +853,7 @@ class ServerFixture : public testing::Test
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
                  const math::Vector3 &_rpy,
-                 const std::string _essid,
+                 const std::string &_essid,
                  double _freq,
                  double _power,
                  double _gain)
@@ -866,7 +866,7 @@ class ServerFixture : public testing::Test
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wirelessTransmitter'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>true</visualize>"
@@ -891,8 +891,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _sensorName Sensor name
   /// \param[in] _pos World position
   /// \param[in] _rpy World rotation in Euler angles
-  /// \param[in] _freq_from Service set identifier (network name)
-  /// \param[in] _freq_to Frequency of transmission (Hz)
+  /// \param[in] _minFreq Minimum frequency to be filtered (Hz)
+  /// \param[in] _maxFreq Maximum frequency to be filtered (Hz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
   /// \param[in] _sensitivity Receiver sensitibity (dBm)             
@@ -900,8 +900,8 @@ class ServerFixture : public testing::Test
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
                  const math::Vector3 &_rpy,
-                 double _freq_from,
-                 double _freq_to,
+                 double _minFreq,
+                 double _maxFreq,
                  double _power,
                  double _gain,
                  double _sensitivity)
@@ -914,12 +914,12 @@ class ServerFixture : public testing::Test
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wirelessReceiver'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>true</visualize>"
                  << "    <transceiver>"
-                 << "      <frequency_from>" << _freq_from << "</frequency_from>"
-                 << "      <frequency_to>" << _freq_to << "</frequency_to>"
+                 << "      <min_frequency>" << _minFreq << "</min_frequency>"
+                 << "      <maxFrequency>" << _maxFreq << "</max_frequency>"
                  << "      <power>" << _power << "</power>"
                  << "      <gain>" << _gain << "</gain>"
                  << "      <sensitivity>" << _sensitivity << "</sensitivity>"

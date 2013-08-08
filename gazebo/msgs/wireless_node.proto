@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Contact
-/// \brief Contact message for passing info between two entities
+/// \interface WirelessNode
+/// \brief Message for sending info about a detected wireless transmitter
 
 
 message WirelessNode

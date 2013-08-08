@@ -31,7 +31,7 @@ using namespace gazebo;
 using namespace sensors;
 using namespace physics;
 
-GZ_REGISTER_STATIC_SENSOR("wirelessTransmitter", WirelessTransmitter)
+GZ_REGISTER_STATIC_SENSOR("wireless_transmitter", WirelessTransmitter)
 
 const double WirelessTransmitter::N_EMPTY = 6;
 const double WirelessTransmitter::N_OBSTACLE = 12.0;
@@ -70,14 +70,15 @@ void WirelessTransmitter::Load(const std::string &_worldName)
     }
   }
 
-  this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(), 30);
+  this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(),
+        30);
 }
 
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
-  if (this->pub)                                                           
-  {                                                                             
+  if (this->pub)
+  {
     msgs::PropagationGrid msg;
     math::Pose pos;
     double strength;
@@ -96,9 +97,9 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
         p = msg.add_particle();
         p->set_x(x);
         p->set_y(y);
-        p->set_signal_level(strength); 
+        p->set_signal_level(strength);
       }
-    }                                                
+    }
     this->pub->Publish(msg);
   }
 }
@@ -129,7 +130,7 @@ math::Pose WirelessTransmitter::GetPose() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
+double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
     const double rxGain)
 {
   math::Pose txPos = this->GetPose();
@@ -141,13 +142,13 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->
       GetPhysicsUpdateMutex()));
-  
+
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = N_EMPTY;
 
-  /// \brief Ray used to test for collisions when placing entities.
+  // Ray used to test for collisions when placing entities
   physics::RayShapePtr testRay;
-  
+
   testRay = boost::dynamic_pointer_cast<RayShape>(
       world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
@@ -155,33 +156,20 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose _receiver,
   testRay->GetIntersection(dist, entityName);
   testRay.reset();
 
-  //ToDo: The ray intersects with my own collision model. Fix it.
+  // ToDo: The ray intersects with my own collision model. Fix it.
   if (dist > 0 && entityName != "ground_plane::link::collision" &&
       entityName != "" && entityName != "wirelessReceiver::link::collision-box")
   {
-    //std::cout << "Found obstacle\nDist: " << dist << " EntityName: " << entityName << std::endl;
     n = N_OBSTACLE;
   }
 
-  double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));  
+  double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));
   double x = abs(math::Rand::GetDblNormal(0.0, MODEL_STD_DESV));
   double wavelength = C / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
   double rxPower = this->GetPower() + this->GetGain() + rxGain - x +
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
-
-  if (rxPower > 0)
-  {
-    std::cout << "Tx Power: " << this->GetPower() << std::endl;
-    std::cout << "Tx Gain: " << this->GetGain() << std::endl;
-    std::cout << "Rx Gain: " << rxGain << std::endl;
-    std::cout << "-x: " << -x << std::endl;
-    std::cout << "20 * log10(wavelength): " << 20 * log10(wavelength) << std::endl;
-    std::cout << "-20 * log10(4 * M_PI): " << -20 * log10(4 * M_PI) << std::endl;
-    std::cout << "Distance: " << distance << std::endl;
-    std::cout << "-10 * n * log10(distance): " << -10 * n * log10(distance) << std::endl;
-  }
 
   return rxPower;
 }

@@ -22,6 +22,7 @@
 #ifndef _WIRELESS_RECEIVER_HH_
 #define _WIRELESS_RECEIVER_HH_
 
+#include <string>
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -61,10 +62,10 @@ namespace gazebo
       public: double GetSensitivity();
 
       /// \brief Reception low filter frequency (MHz).
-      private: double freq_from;
+      private: double minFreq;
 
       /// \brief Reception high filter frequency (MHz).
-      private: double freq_to;
+      private: double maxFreq;
 
       /// \brief Antenna's sensitivity of the receiver (dBm).
       private: double sensitivity;

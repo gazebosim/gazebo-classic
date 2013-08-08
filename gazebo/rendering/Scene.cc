@@ -1854,7 +1854,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     this->visuals[rfidVis->GetName()] = rfidVis;
   }
-  else if (_msg->type() == "wirelessTransmitter" && _msg->visualize() &&
+  else if (_msg->type() == "wireless_transmitter" && _msg->visualize() &&
            !_msg->topic().empty())
   {
     VisualPtr parentVis = this->GetVisual(_msg->parent());

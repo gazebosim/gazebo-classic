@@ -31,9 +31,9 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("WirelessTransceiver", WirelessTransceiver)
+GZ_REGISTER_STATIC_SENSOR("Wireless_transceiver", WirelessTransceiver)
 
-const double WirelessTransceiver::C = 300000000;
+const double WirelessTransceiver::C = 299792458;
 
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
@@ -47,14 +47,14 @@ WirelessTransceiver::~WirelessTransceiver()
 {
 }
 
-//////////////////////////////////////////////////                              
-std::string WirelessTransceiver::GetTopic() const                               
-{                                                                               
-  std::string topicName = "~/";                                                 
-  topicName += this->parentName + "/" + this->GetName() + "/transceiver";          
-  boost::replace_all(topicName, "::", "/");                                     
-                                                                                
-  return topicName;                                                             
+//////////////////////////////////////////////////
+std::string WirelessTransceiver::GetTopic() const
+{
+  std::string topicName = "~/";
+  topicName += this->parentName + "/" + this->GetName() + "/transceiver";
+  boost::replace_all(topicName, "::", "/");
+
+  return topicName;
 }
 
 /////////////////////////////////////////////////

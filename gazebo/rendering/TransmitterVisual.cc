@@ -101,12 +101,13 @@ void TransmitterVisual::Update()
     p = gridMsg->particle(i);
     this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
 
-    // Assuming that the Rx gain is the same as Tx gain
-    double strength = 1.0 - (std::min(std::max(0.0, -p.signal_level()), 255.0) / 255.0);
-    //if (p.signal_level() > 0)
-    //std::cout << p.signal_level() << std::endl;
-    Ogre::ColourValue color(strength, strength, strength);
+    // Crop the signal strength between 0 and 255
+    double strength = std::min(std::max(0.0, -p.signal_level()), 255.0);
+    // Normalize
+    strength = 1.0 - (strength / 255.0);
 
+    // Set the color in gray scale
+    Ogre::ColourValue color(strength, strength, strength);
     this->points->SetColor(i, color);
   }
 }

@@ -486,7 +486,6 @@ void Visual::Update()
     return;
 
   std::list<DynamicLines*>::iterator iter;
-  //std::list<DynamicLines*>::iterator iterP;
 
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); ++iter)

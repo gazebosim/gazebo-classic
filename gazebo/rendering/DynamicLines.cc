@@ -174,8 +174,10 @@ void DynamicLines::FillHardwareBuffers()
   Ogre::HardwareVertexBufferSharedPtr cbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(1);
 
-  Ogre::RGBA *colorArrayBuffer = static_cast<Ogre::RGBA*>(cbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-  Ogre::RenderSystem* renderSystemForVertex = Ogre::Root::getSingleton().getRenderSystem();
+  Ogre::RGBA *colorArrayBuffer =
+        static_cast<Ogre::RGBA*>(cbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  Ogre::RenderSystem* renderSystemForVertex =
+        Ogre::Root::getSingleton().getRenderSystem();
   for (int i = 0; i < size; i++)
   {
     Ogre::ColourValue color = this->colors[i];

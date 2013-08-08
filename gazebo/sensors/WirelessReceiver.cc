@@ -31,7 +31,7 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("wirelessReceiver", WirelessReceiver)
+GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
@@ -51,14 +51,14 @@ void WirelessReceiver::Load(const std::string &_worldName)
   {
     sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
 
-    if (transElem->HasElement("frequency_from"))
+    if (transElem->HasElement("min_frequency"))
     {
-      this->freq_from = transElem->Get<double>("frequency_from");
+      this->minFreq = transElem->Get<double>("min_frequency");
     }
 
-    if (transElem->HasElement("frequency_to"))
+    if (transElem->HasElement("max_frequency"))
     {
-      this->freq_to = transElem->Get<double>("frequency_to");
+      this->maxFreq = transElem->Get<double>("max_frequency");
     }
 
     if (transElem->HasElement("sensitivity"))
@@ -71,9 +71,9 @@ void WirelessReceiver::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
-  if (this->pub)                                                           
+  if (this->pub)
   {
-    std::string txEssid;                                                                           
+    std::string txEssid;
     msgs::WirelessNodes msg;
     double rxPower;
     double txFreq;
@@ -82,7 +82,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
     for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
     {
-      if ((*it)->GetType() == "wirelessTransmitter")
+      if ((*it)->GetType() == "wireless_transmitter")
       {
         txFreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetFreq();
@@ -90,7 +90,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
         rxPower = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
             GetSignalStrength(myPos, this->GetGain());
 
-        // Disgard if the frequency received is out of our frequency range, 
+        // Disgard if the frequency received is out of our frequency range,
         // or if the received signal strengh is lower than the sensivity
         if ((txFreq < this->GetLowerFreqFiltered()) ||
             (txFreq > this->GetHigherFreqFiltered()) ||
@@ -110,7 +110,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     }
     if (msg.node_size() > 0)
     {
-      this->pub->Publish(msg);                                               
+      this->pub->Publish(msg);
     }
   }
 }
@@ -118,13 +118,13 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
 /////////////////////////////////////////////////
 double WirelessReceiver::GetLowerFreqFiltered()
 {
-  return this->freq_from;
+  return this->minFreq;
 }
 
 /////////////////////////////////////////////////
 double WirelessReceiver::GetHigherFreqFiltered()
 {
-  return this->freq_to;
+  return this->maxFreq;
 }
 
 /////////////////////////////////////////////////

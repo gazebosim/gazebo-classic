@@ -17,6 +17,7 @@
 #ifndef _DYNAMICRENDERABLE_HH_
 #define _DYNAMICRENDERABLE_HH_
 
+#include <string>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 

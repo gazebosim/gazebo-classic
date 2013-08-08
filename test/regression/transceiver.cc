@@ -15,22 +15,23 @@
  *
 */
 
+#include <boost/foreach.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include <boost/foreach.hpp>
 
 using namespace gazebo;
 
 class TransceiverTest : public ServerFixture
 {
+  public: TransceiverTest();
   public: void TxRxEmptySpace(const std::string &_physicsEngine);
   public: void TxRxObstacle(const std::string &_physicsEngine);
   private: void RxMsg(const ConstWirelessNodesPtr &_msg);
 
-  private: static const double FREQ_FROM;
-  private: static const double FREQ_TO;
+  private: static const double MIN_FREQ;
+  private: static const double MAX_FREQ;
   private: static const double GAIN;
   private: static const double POWER;
   private: static const double SENSITIVITY;
@@ -43,13 +44,18 @@ class TransceiverTest : public ServerFixture
   private: bool receivedMsg;
 };
 
-const double TransceiverTest::FREQ_FROM = 2412.0;
-const double TransceiverTest::FREQ_TO = 2484.0;
+const double TransceiverTest::MIN_FREQ = 2412.0;
+const double TransceiverTest::MAX_FREQ = 2484.0;
 const double TransceiverTest::GAIN = 2.6;
 const double TransceiverTest::POWER = 14.5;
 const double TransceiverTest::SENSITIVITY = -90.0;
 const double TransceiverTest::MAX_POS = 10.0;
 
+/////////////////////////////////////////////////
+TransceiverTest::TransceiverTest()
+{
+  this->receivedMsg = false;
+}
 
 /////////////////////////////////////////////////
 void TransceiverTest::RxMsg(const ConstWirelessNodesPtr &_msg)
@@ -66,16 +72,18 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   typedef std::map<std::string, sensors::WirelessTransmitterPtr> trans_map_type;
   trans_map_type transmitters;
 
-  srand (time(NULL));
+  srand(time(NULL));
+  unsigned int seed = time(NULL);
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = (rand() % 10) + 1; 
+  int nTransmitters = (rand_r(&seed) % 10) + 1;
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(TransceiverTest::FREQ_FROM,
-          TransceiverTest::FREQ_TO);
+    double txFreq = math::Rand::GetDblUniform(TransceiverTest::MIN_FREQ,
+        TransceiverTest::MAX_FREQ);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
@@ -89,43 +97,42 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
         math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), txEssid, txFreq, this->POWER, this->GAIN);
+        txPose.rot.GetAsEuler(), txEssid, txFreq, this->POWER, this->GAIN);
 
     sensors::WirelessTransmitterPtr tx =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
-        sensors::SensorManager::Instance()->GetSensor(txSensorName));
-    
+        boost::static_pointer_cast<sensors::WirelessTransmitter>(
+          sensors::SensorManager::Instance()->GetSensor(txSensorName));
+
     // Store the new transmitter sensor in the map
     transmitters[txEssid] = tx;
 
     ASSERT_TRUE(tx);
   }
 
-  // Wireless Receiver - rx1
-  std::string rx1ModelName = "rx1";
-  std::string rx1SensorName = "wirelessReceiver";
-  math::Pose rx1Pose(math::Vector3(0, 2, 0.055),
+  // Wireless Receiver - rx
+  std::string rxModelName = "rx";
+  std::string rxSensorName = "wirelessReceiver";
+  math::Pose rxPose(math::Vector3(0, 2, 0.055),
       math::Quaternion(0, 0, 0));
 
-  // Spawn rx1
-  SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.pos,
-      rx1Pose.rot.GetAsEuler(), this->FREQ_FROM, this->FREQ_TO, this->POWER,
+  // Spawn rx
+  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
+      rxPose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
       this->GAIN, this->SENSITIVITY);
 
-  sensors::WirelessReceiverPtr rx1 =
+  sensors::WirelessReceiverPtr rx =
     boost::static_pointer_cast<sensors::WirelessReceiver>(
-        sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
+        sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx1);
+  ASSERT_TRUE(rx);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
   node->Init("default");
 
-  std::string rx1Topic = "/gazebo/default/rx1/link/wirelessReceiver/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(rx1Topic, 
-                                                 &TransceiverTest::RxMsg,
-                                                 this);
+  std::string rxTopic = "/gazebo/default/rx/link/wirelessReceiver/transceiver";
+  transport::SubscriberPtr sub = node->Subscribe(rxTopic,
+      &TransceiverTest::RxMsg, this);
   this->receivedMsg = false;
 
   while (true)
@@ -135,9 +142,9 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     {
       myPair.second->Update(true);
     }
-    
+
     // Update the receiver sensor
-    rx1->Update(true);
+    rx->Update(true);
 
     common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
@@ -155,7 +162,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
         EXPECT_EQ(transmitters[essid]->GetESSID(), essid);
         EXPECT_EQ(transmitters[essid]->GetFreq(), txNode.frequency());
         EXPECT_LE(txNode.signal_level(), 0);
-        EXPECT_GE(txNode.signal_level(), rx1->GetSensitivity());
+        EXPECT_GE(txNode.signal_level(), rx->GetSensitivity());
       }
       break;
     }
@@ -183,7 +190,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       this->GAIN);
 
   sensors::WirelessTransmitterPtr tx =
-    boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
   ASSERT_TRUE(tx);
@@ -196,44 +203,43 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   // Spawn rx1
   SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.pos,
-      rx1Pose.rot.GetAsEuler(), this->FREQ_FROM, this->FREQ_TO, this->POWER,
+      rx1Pose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
       this->GAIN, this->SENSITIVITY);
 
   sensors::WirelessReceiverPtr rx1 =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+      boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
   ASSERT_TRUE(rx1);
 
-   // Wireless Receiver - rx2
+  // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-3, 0, 0.055),
-      math::Quaternion(0, 0, 0));
+  math::Pose rx2Pose(math::Vector3(-3, 0, 0.055), math::Quaternion(0, 0, 0));
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
-      rx2Pose.rot.GetAsEuler(), this->FREQ_FROM, this->FREQ_TO, this->POWER,
+      rx2Pose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
       this->GAIN, this->SENSITIVITY);
 
   sensors::WirelessReceiverPtr rx2 =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+      boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
   SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.055),
-                 math::Vector3(0, 0, 0), true);
+      math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
   node->Init("default");
-  
+
   std::string rx1Topic = "/gazebo/default/rx1/link/wirelessRx1/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(rx1Topic, 
-                                                 &TransceiverTest::RxMsg,
-                                                 this);
+  transport::SubscriberPtr sub = node->Subscribe(rx1Topic,
+      &TransceiverTest::RxMsg, this);
+
   this->receivedMsg = false;
 
   while (samples < 10)
@@ -254,9 +260,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       for (int i = 0; i < numTxNodes; ++i)
       {
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
-        std::string essid = txNode.essid();
         double signalLevel = txNode.signal_level();
-        
+
         samples++;
         avgSignalLevelEmpty += signalLevel;
       }
@@ -288,7 +293,6 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       for (int i = 0; i < numTxNodes; ++i)
       {
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
-        std::string essid = txNode.essid();
         double signalLevel = txNode.signal_level();
 
         samples++;

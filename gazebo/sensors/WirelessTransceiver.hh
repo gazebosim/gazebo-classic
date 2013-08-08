@@ -22,6 +22,7 @@
 #ifndef _WIRELESS_TRANSCEIVER_HH_
 #define _WIRELESS_TRANSCEIVER_HH_
 
+#include <string>
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -39,6 +40,7 @@ namespace gazebo
     /// \brief Sensor class for receiving wireless signals.
     class WirelessTransceiver: public Sensor
     {
+      /// \brief Speed of light.
       public: static const double C;
 
       /// \brief Constructor
@@ -47,7 +49,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~WirelessTransceiver();
 
-      // Documentation inherited                                                
+      // Documentation inherited
       public: virtual std::string GetTopic() const;
 
       // Documentation inherited
