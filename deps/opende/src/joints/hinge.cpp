@@ -172,14 +172,14 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
 
     // strange the rotation matrix is not really a rotation matrix (non-orthogonal vectors)
     // normals of columns and rows are not exactly 1 when velocity is large.
-    printf("posr.R\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
-      node[0].body->posr.R[0*4+0],node[0].body->posr.R[0*4+1],node[0].body->posr.R[0*4+2],node[0].body->posr.R[0*4+3],
-      node[0].body->posr.R[1*4+0],node[0].body->posr.R[1*4+1],node[0].body->posr.R[1*4+2],node[0].body->posr.R[1*4+3],
-      node[0].body->posr.R[2*4+0],node[0].body->posr.R[2*4+1],node[0].body->posr.R[2*4+2],node[0].body->posr.R[2*4+3]);
+    // printf("posr.R\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+    //   node[0].body->posr.R[0*4+0],node[0].body->posr.R[0*4+1],node[0].body->posr.R[0*4+2],node[0].body->posr.R[0*4+3],
+    //   node[0].body->posr.R[1*4+0],node[0].body->posr.R[1*4+1],node[0].body->posr.R[1*4+2],node[0].body->posr.R[1*4+3],
+    //   node[0].body->posr.R[2*4+0],node[0].body->posr.R[2*4+1],node[0].body->posr.R[2*4+2],node[0].body->posr.R[2*4+3]);
 
-    printf("axis1 [%f %f %f] ax1 [%f %f %f]\n",
-            axis1[0], axis1[1], axis1[2],
-            ax1[0], ax1[1], ax1[2]);
+    // printf("axis1 [%f %f %f] ax1 [%f %f %f]\n",
+    //         axis1[0], axis1[1], axis1[2],
+    //         ax1[0], ax1[1], ax1[2]);
 
 
     int s3 = 3 * info->rowskip;
