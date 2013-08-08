@@ -57,6 +57,7 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
+  this->dampingCoefficient = 0;
 }
 
 //////////////////////////////////////////////////
