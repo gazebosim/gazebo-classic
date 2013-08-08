@@ -35,7 +35,8 @@ const double g_earth_wgs84_axis_polar = 6356752.314245;
 const double g_earth_wgs84_flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(const std::string &_str)
+SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
+  const std::string &_str)
 {
   if ("EARTH_WGS84" == _str)
     return EARTH_WGS84;
@@ -46,15 +47,15 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(const std::strin
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates() :
-      surfaceType(EARTH_WGS84),
-      elevationReference(0.0)
+SphericalCoordinates::SphericalCoordinates()
+  : surfaceType(EARTH_WGS84),
+    elevationReference(0.0)
 {
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(const SurfaceType _type) :
-      surfaceType(_type)
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
+  : surfaceType(_type)
 {
 }
 

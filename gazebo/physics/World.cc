@@ -229,7 +229,7 @@ void World::Load(sdf::ElementPtr _sdf)
     latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
     longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
     heading.SetFromDegree(spherical->Get<double>("heading_deg"));
-      
+
     this->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
   }

@@ -30,11 +30,11 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 Noise::Noise()
- : type(NONE),
-   mean(0.0),
-   stdDev(0.0),
-   bias(0.0),
-   precision(0.0)
+  : type(NONE),
+    mean(0.0),
+    stdDev(0.0),
+    bias(0.0),
+    precision(0.0)
 {
 }
 

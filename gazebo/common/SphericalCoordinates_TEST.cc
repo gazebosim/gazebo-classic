@@ -175,7 +175,6 @@ TEST(SphericalCoordinatesTest, CoordinateTransforms)
       EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
       // no change in elevation
       EXPECT_NEAR(sph.z, elev, 1e-6);
-
     }
   }
 }

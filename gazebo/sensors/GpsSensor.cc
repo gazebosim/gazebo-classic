@@ -125,7 +125,7 @@ void GpsSensor::Fini()
 void GpsSensor::Init()
 {
   Sensor::Init();
-  
+
   this->sphericalCoordinates = this->world->GetSphericalCoordinates();
 }
 
