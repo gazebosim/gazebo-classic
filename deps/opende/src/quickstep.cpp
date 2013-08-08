@@ -1749,9 +1749,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal *invMOI_ptr1 = invMOI + b1 * 12;
               dReal *MOI_ptr1 = MOI + b1 * 12;
 
-              MOI_ptr1[0*4+3] = 0.0;
-              MOI_ptr1[1*4+3] = 0.0;
-              MOI_ptr1[2*4+3] = 0.0;
+              // ode seems to leave these values uninitialized, unused too
+              // MOI_ptr1[0*4+3] = 0.0;
+              // MOI_ptr1[1*4+3] = 0.0;
+              // MOI_ptr1[2*4+3] = 0.0;
 
               printf("--------------------------\n");
               printf("MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
@@ -1785,9 +1786,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal *invMOI_ptr2 = invMOI + b2 * 12;
               dReal *MOI_ptr2 = MOI + b2 * 12;
 
-              MOI_ptr2[0*4+3] = 0.0;
-              MOI_ptr2[1*4+3] = 0.0;
-              MOI_ptr2[2*4+3] = 0.0;
+              // ode seems to leave these values uninitialized, unused too
+              // MOI_ptr2[0*4+3] = 0.0;
+              // MOI_ptr2[1*4+3] = 0.0;
+              // MOI_ptr2[2*4+3] = 0.0;
 
               printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
                 MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
