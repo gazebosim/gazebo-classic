@@ -14,8 +14,12 @@
     <description>Gain for the audio media</description>
   </element>
 
-  <element name="loop" type="bool" default="true" required="0">
-    <description>True to make the audio source loop playback</description>
+  <element name="contact" type="bool" default="true" required="0">
+    <description>True to play the audio clip when on contact with another object.</description>
+  </element>
+
+  <element name="loop" type="bool" default="false" required="0">
+    <description>True to make the audio source loop playback.</description>
   </element>
 
   <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">

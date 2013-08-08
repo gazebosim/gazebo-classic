@@ -5,6 +5,15 @@
     <description>Unique name of the world</description>
   </attribute>
 
+  <element name="audio" required="0">
+    <description>Global audio properties.</description>
+
+    <element name="device" type="string" default="default" required="1">
+      <description>Device to use for audio playback.</description>
+    </element>
+  </element>
+
+
   <include filename="gui.sdf" required="0"/>
   <include filename="physics.sdf" required="1"/>
   <include filename="scene.sdf" required="1"/>
