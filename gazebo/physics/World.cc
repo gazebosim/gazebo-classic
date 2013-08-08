@@ -1279,7 +1279,7 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->deleteEntity.empty())
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
@@ -1793,7 +1793,7 @@ void World::ProcessMessages()
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      if (this->publishModelPoses.size() > 0)
+      if (!this->publishModelPoses.empty())
       {
         for (std::set<ModelPtr>::iterator iter =
             this->publishModelPoses.begin();

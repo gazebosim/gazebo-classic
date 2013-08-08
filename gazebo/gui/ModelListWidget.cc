@@ -225,7 +225,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillTypes.size() > 0)
+  if (!this->fillTypes.empty())
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;
