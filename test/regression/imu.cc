@@ -128,6 +128,13 @@ TEST_F(ImuTest, EmptyWorldBullet)
 }
 #endif
 
+#ifdef HAVE_DART
+TEST_F(ImuTest, EmptyWorldDART)
+{
+  Stationary_EmptyWorld("dart");
+}
+#endif
+
 void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
@@ -213,6 +220,13 @@ TEST_F(ImuTest, EmptyWorldNoiseBullet)
 }
 #endif
 
+#ifdef HAVE_DART
+TEST_F(ImuTest, EmptyWorldNoiseDart)
+{
+  Stationary_EmptyWorld_Noise("dart");
+}
+#endif
+
 void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
@@ -295,6 +309,13 @@ TEST_F(ImuTest, EmptyWorldBiasODE)
 TEST_F(ImuTest, EmptyWorldBiasBullet)
 {
   Stationary_EmptyWorld_Bias("bullet");
+}
+#endif
+
+#ifdef HAVE_DART
+TEST_F(ImuTest, EmptyWorldBiasDART)
+{
+  Stationary_EmptyWorld_Bias("dart");
 }
 #endif
 
