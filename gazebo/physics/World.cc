@@ -1798,7 +1798,7 @@ void World::ProcessMessages()
             this->publishModelPoses.begin();
             iter != this->publishModelPoses.end(); ++iter)
         {
-          msgs::Pose * poseMsg = msg.add_pose();
+          msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the model's relative pose
           poseMsg->set_name((*iter)->GetScopedName());

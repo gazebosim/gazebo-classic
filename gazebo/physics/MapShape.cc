@@ -337,7 +337,7 @@ void MapShape::BuildTree(QuadNode *_node)
 
       for (int j = 0; j < 2; j++)
       {
-        QuadNode * newNode = new QuadNode(_node);
+        QuadNode *newNode = new QuadNode(_node);
         newNode->x = (unsigned int)newX;
         newNode->y = (unsigned int)newY;
 
@@ -419,4 +419,3 @@ void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
-
