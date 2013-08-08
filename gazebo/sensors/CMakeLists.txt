@@ -43,6 +43,7 @@ set (headers
 
 set (gtest_sources
   ForceTorqueSensor_TEST.cc
+  GpsSensor_TEST.cc
   ImuSensor_TEST.cc
   Noise_TEST.cc
   RaySensor_TEST.cc

@@ -61,6 +61,18 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
+      /// \brief Accessor for current longitude angle
+      /// \return Current longitude angle.
+      public: math::Angle GetLongitude() const;
+
+      /// \brief Accessor for current latitude angle
+      /// \return Current latitude angle.
+      public: math::Angle GetLatitude() const;
+
+      /// \brief Accessor for current altitude
+      /// \return Current altitude above sea level.
+      public: double GetAltitude() const;
+
       /// \brief Noise attributes for horizontal position measurement.
       private: NoisePtr horizontalPositionNoise;
 

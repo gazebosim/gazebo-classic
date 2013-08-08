@@ -177,3 +177,25 @@ void GpsSensor::UpdateImpl(bool /*_force*/)
   if (this->gpsPub)
     this->gpsPub->Publish(this->lastGpsMsg);
 }
+
+//////////////////////////////////////////////////
+math::Angle GpsSensor::GetLongitude() const
+{
+  math::Angle angle;
+  angle.SetFromDegree(this->lastGpsMsg.longitude_deg());
+  return angle;
+}
+
+//////////////////////////////////////////////////
+math::Angle GpsSensor::GetLatitude() const
+{
+  math::Angle angle;
+  angle.SetFromDegree(this->lastGpsMsg.latitude_deg());
+  return angle;
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::GetAltitude() const
+{
+  return this->lastGpsMsg.altitude();
+}
