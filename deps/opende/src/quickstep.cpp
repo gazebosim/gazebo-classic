@@ -1729,21 +1729,29 @@ void dxQuickStepper (dxWorldProcessContext *context,
           ///        and J1a and J2a fully constrains w1 and w2...
           ///        are J1a always equal to J2a?
           printf("ofsi [%d]:\n", ofsi);
+
           for (int j=0; j<infom; j++) {
+
             printf("j [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n", j,
                    Jinfo.J1l[0+j*Jinfo.rowskip],Jinfo.J1l[1+j*Jinfo.rowskip],Jinfo.J1l[2+j*Jinfo.rowskip],
                    Jinfo.J2l[0+j*Jinfo.rowskip],Jinfo.J2l[1+j*Jinfo.rowskip],Jinfo.J2l[2+j*Jinfo.rowskip],
                    Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip],
                    Jinfo.J2a[0+j*Jinfo.rowskip],Jinfo.J2a[1+j*Jinfo.rowskip],Jinfo.J2a[2+j*Jinfo.rowskip]);
+
             ///   *. J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
             ///      of each other.  J1a and J2a denotes the axis direction.
             ///   *. get the MOI for parent and child bodies constrained by J1a and J2a.
-            if (j >= 3) // \FIXME:  hack for hinges for now: if this is a pure rotational constraint!!!  J1a and J2a
-            if (b2 >= 0) /// this is usefule only if connecting two dynamic bodies
+            /// \FIXME:  hack for hinges for now: if this is a pure rotational constraint!!!  J1a and J2a
+            /// this is usefule only if connecting two dynamic bodies (b2 >= 0)
+            if (b2 >= 0 && jicurr->joint->type() == dJointTypeHinge && (j == 3 || j == 4))
             {
               // get pointers to our invMOI/MOI matrices
               dReal *invMOI_ptr1 = invMOI + b1 * 12;
               dReal *MOI_ptr1 = MOI + b1 * 12;
+
+              MOI_ptr1[0*4+3] = 0.0;
+              MOI_ptr1[1*4+3] = 0.0;
+              MOI_ptr1[2*4+3] = 0.0;
 
               printf("--------------------------\n");
               printf("MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
@@ -1755,19 +1763,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
               //   moi_S = S' * I * S
               dVector3 S = // line about which we want to compute MOI along
                    { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
-
               dVector3 tmp31;
               dMultiply0_133(tmp31, S, MOI_ptr1);
               dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
               printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S1);
-
-              // full MOI tensor for S needs matrix outer product of S:
-              //   SS = [ S * S' ]
-              dMatrix3 SS = {
-                   S[0]*S[0], S[0]*S[1], S[0]*S[2], 0,
-                   S[1]*S[0], S[1]*S[1], S[1]*S[2], 0,
-                   S[2]*S[0], S[2]*S[1], S[2]*S[2], 0};
-              // memcpy (MOI_ptr1, MOI_S1, 12 * sizeof(dReal));
 
               // printf("R1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
               //   RJ1a[0*4+0],RJ1a[0*4+1],RJ1a[0*4+2],RJ1a[0*4+3],
@@ -1786,7 +1785,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal *invMOI_ptr2 = invMOI + b2 * 12;
               dReal *MOI_ptr2 = MOI + b2 * 12;
 
-              printf("==========================\n");
+              MOI_ptr2[0*4+3] = 0.0;
+              MOI_ptr2[1*4+3] = 0.0;
+              MOI_ptr2[2*4+3] = 0.0;
+
               printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
                 MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
                 MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
@@ -1806,12 +1808,28 @@ void dxQuickStepper (dxWorldProcessContext *context,
               // dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
               // dMultiply0_333 (MOI_ptr2,RJ1a,tmp33);
 
+              // full MOI tensor for S needs matrix outer product of S:
+              //   SS = [ S * S' ]
+              dMatrix3 SS = {
+                   S[0]*S[0], S[0]*S[1], S[0]*S[2], 0,
+                   S[1]*S[0], S[1]*S[1], S[1]*S[2], 0,
+                   S[2]*S[0], S[2]*S[1], S[2]*S[2], 0};
+              // memcpy (MOI_ptr1, MOI_S1, 12 * sizeof(dReal));
+
+              printf("==========================\n");
+
+              printf("SS [%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                SS[0*4+0],SS[0*4+1],SS[0*4+2],SS[0*4+3],
+                SS[1*4+0],SS[1*4+1],SS[1*4+2],SS[1*4+3],
+                SS[2*4+0],SS[2*4+1],SS[2*4+2],SS[2*4+3]);
+
               // average scalar MOI about S
               dReal moi_S = 0.5*(moi_S1 + moi_S2);
 
               // delta scalar MOI's needed to equalize MOI about S
               moi_S1 = moi_S - moi_S1;
               moi_S2 = moi_S - moi_S2;
+              printf(" distributed S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
 
               // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
               for (int si = 0; si < 12; ++si)
@@ -1856,6 +1874,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
               invMOI_ptr2[2*4+3] = 0.0;
 
+              printf("==========================\n");
 
               printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
                 MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
@@ -1867,6 +1886,17 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
                 MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
                 MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+              printf("--------------------------\n");
+              printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
+                invMOI_ptr1[1*4+0],invMOI_ptr1[1*4+1],invMOI_ptr1[1*4+2],invMOI_ptr1[1*4+3],
+                invMOI_ptr1[2*4+0],invMOI_ptr1[2*4+1],invMOI_ptr1[2*4+2],invMOI_ptr1[2*4+3]);
+
+              // Modify invMOI_ptr2
+              printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+                invMOI_ptr2[0*4+0],invMOI_ptr2[0*4+1],invMOI_ptr2[0*4+2],invMOI_ptr2[0*4+3],
+                invMOI_ptr2[1*4+0],invMOI_ptr2[1*4+1],invMOI_ptr2[1*4+2],invMOI_ptr2[1*4+3],
+                invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
               printf("--------------------------\n");
             }
           }
