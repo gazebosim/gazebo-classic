@@ -36,7 +36,8 @@ namespace gazebo
     {
       /// \enum SurfaceType
       /// \brief Unique identifiers for planetary surface models.
-      public: enum SurfaceType {
+      public: enum SurfaceType
+              {
                 /// \brief Model of reference ellipsoid for earth, based on
                 /// WGS 84 standard. see wikipedia: World_Geodetic_System
                 EARTH_WGS84 = 1
