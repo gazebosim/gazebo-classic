@@ -380,7 +380,7 @@ void Camera::Update()
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
-      if (this->moveToPositionQueue.size() > 0)
+      if (!this->moveToPositionQueue.empty())
       {
         this->MoveToPosition(this->moveToPositionQueue[0].first,
                              this->moveToPositionQueue[0].second);

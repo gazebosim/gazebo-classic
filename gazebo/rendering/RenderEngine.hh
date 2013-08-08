@@ -89,7 +89,8 @@ namespace gazebo
       /// \param[in] _enableVisualizations True enables visualization
       /// elements such as laser lines.
       public: ScenePtr CreateScene(const std::string &_name,
-                                   bool _enableVisualizations);
+                                   bool _enableVisualizations,
+                                   bool _isServer = false);
 
       /// \brief Remove a scene
       /// \param[in] _name The name of the scene to remove.

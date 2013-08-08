@@ -174,8 +174,16 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
+  // pose pub for server side, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory for efficiency.
+  this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/local/info", 10);
+
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60.0);
+    "~/pose/info", 10, 60);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
@@ -1271,7 +1279,7 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->deleteEntity.empty())
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
@@ -1777,34 +1785,46 @@ void World::ProcessMessages()
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
     msgs::Pose *poseMsg;
 
-    if (this->posePub && this->posePub->HasConnections() &&
-        this->publishModelPoses.size() > 0)
+    if ((this->posePub && this->posePub->HasConnections()) ||
+        (this->poseLocalPub && this->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-          iter != this->publishModelPoses.end(); ++iter)
+      if (!this->publishModelPoses.empty())
       {
-        poseMsg = msg.add_pose();
-
-        // Publish the model's relative pose
-        poseMsg->set_name((*iter)->GetScopedName());
-        msgs::Set(poseMsg, (*iter)->GetRelativePose());
-
-        // Publish each of the model's children relative poses
-        Link_V links = (*iter)->GetLinks();
-        for (Link_V::iterator linkIter = links.begin();
-            linkIter != links.end(); ++linkIter)
+        for (std::set<ModelPtr>::iterator iter =
+            this->publishModelPoses.begin();
+            iter != this->publishModelPoses.end(); ++iter)
         {
           poseMsg = msg.add_pose();
-          poseMsg->set_name((*linkIter)->GetScopedName());
-          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+
+          // Publish the model's relative pose
+          poseMsg->set_name((*iter)->GetScopedName());
+          msgs::Set(poseMsg, (*iter)->GetRelativePose());
+
+          // Publish each of the model's children relative poses
+          Link_V links = (*iter)->GetLinks();
+          for (Link_V::iterator linkIter = links.begin();
+              linkIter != links.end(); ++linkIter)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name((*linkIter)->GetScopedName());
+            msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          }
         }
+        if (this->posePub && this->posePub->HasConnections())
+          this->posePub->Publish(msg);
       }
-      this->posePub->Publish(msg);
+
+      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->poseLocalPub->Publish(msg);
+      }
     }
     this->publishModelPoses.clear();
   }

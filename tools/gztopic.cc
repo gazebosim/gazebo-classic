@@ -156,7 +156,17 @@ void list()
     request.set_id(0);
     request.set_request("get_publishers");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(data);
+
+    try
+    {
+      connection->Read(data);
+    }
+    catch(...)
+    {
+      gzerr << "An active gzserver is probably not present.\n";
+      connection.reset();
+      return;
+    }
 
     packet.ParseFromString(data);
     pubs.ParseFromString(packet.serialized_data());

@@ -70,14 +70,14 @@ void JointController::Update()
   // TODO: fix this when World::ResetTime is improved
   if (stepTime > 0)
   {
-    if (this->forces.size() > 0)
+    if (!this->forces.empty())
     {
       std::map<std::string, double>::iterator iter;
       for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
         this->joints[iter->first]->SetForce(0, iter->second);
     }
 
-    if (this->positions.size() > 0)
+    if (!this->positions.empty())
     {
       double cmd;
       std::map<std::string, double>::iterator iter;
@@ -92,7 +92,7 @@ void JointController::Update()
       }
     }
 
-    if (this->velocities.size() > 0)
+    if (!this->velocities.empty())
     {
       double cmd;
       std::map<std::string, double>::iterator iter;
@@ -201,9 +201,18 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetScopedName());
-    if (jiter != _jointPositions.end())
-      this->SetJointPosition(iter->second, jiter->second);
+    // First try name without scope, i.e. joint_name
+    jiter = _jointPositions.find(iter->second->GetName());
+
+    if (jiter == _jointPositions.end())
+    {
+      // Second try name with scope, i.e. model_name::joint_name
+      jiter = _jointPositions.find(iter->second->GetScopedName());
+      if (jiter == _jointPositions.end())
+        continue;
+    }
+
+    this->SetJointPosition(iter->second, jiter->second);
   }
 }
 
