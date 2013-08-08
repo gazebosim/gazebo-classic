@@ -62,7 +62,7 @@ const Ogre::String &DynamicLines::getMovableType() const
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(const math::Vector3 &pt,
-                            const Ogre::ColourValue _color)
+                            const Ogre::ColourValue &_color)
 {
   this->points.push_back(pt);
   this->colors.push_back(_color);
@@ -71,7 +71,7 @@ void DynamicLines::AddPoint(const math::Vector3 &pt,
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(double _x, double _y, double _z,
-                            const Ogre::ColourValue _color)
+                            const Ogre::ColourValue &_color)
 {
   this->AddPoint(math::Vector3(_x, _y, _z), _color);
 }
@@ -93,7 +93,7 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetColor(unsigned int _index, const Ogre::ColourValue _color)
+void DynamicLines::SetColor(unsigned int _index, const Ogre::ColourValue &_color)
 {
   this->colors[_index] = _color;
   this->dirty = true;
