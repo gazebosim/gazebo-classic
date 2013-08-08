@@ -1739,6 +1739,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
             ///      of each other.  J1a and J2a denotes the axis direction.
             ///   *. get the MOI for parent and child bodies constrained by J1a and J2a.
             if (j >= 3) // \FIXME:  hack for hinges for now: if this is a pure rotational constraint!!!  J1a and J2a
+            if (b2 >= 0) /// this is usefule only if connecting two dynamic bodies
             {
               // get pointers to our invMOI/MOI matrices
               dReal *invMOI_ptr1 = invMOI + b1 * 12;
@@ -1760,46 +1761,112 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
               printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S1);
 
-              // full MOI tensor for S formed from matrix outer product fo S:
-              //   MOI_S = moi_S * [ S * S' ]
+              // full MOI tensor for S needs matrix outer product of S:
+              //   SS = [ S * S' ]
+              dMatrix3 SS = {
+                   S[0]*S[0], S[0]*S[1], S[0]*S[2], 0,
+                   S[1]*S[0], S[1]*S[1], S[1]*S[2], 0,
+                   S[2]*S[0], S[2]*S[1], S[2]*S[2], 0};
+              // memcpy (MOI_ptr1, MOI_S1, 12 * sizeof(dReal));
 
-              dMatrix3 RJ1a = {
-                   S[0], 0   , 0   , 0,
-                   S[1], 0   , 0   , 0,
-                   S[2], 0   , 0   , 0};
+              // printf("R1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+              //   RJ1a[0*4+0],RJ1a[0*4+1],RJ1a[0*4+2],RJ1a[0*4+3],
+              //   RJ1a[1*4+0],RJ1a[1*4+1],RJ1a[1*4+2],RJ1a[1*4+3],
+              //   RJ1a[2*4+0],RJ1a[2*4+1],RJ1a[2*4+2],RJ1a[2*4+3]);
 
-              dMatrix3 tmp33;
+              // dMatrix3 tmp33;
 
-              dMultiply2_333 (tmp33,invMOI_ptr1,RJ1a);
-              // dMultiply0_333 (new_invMOI_ptr1,RJ1a,tmp33);
+              // dMultiply2_333 (tmp33,invMOI_ptr1,RJ1a);
+              // dMultiply0_333 (invMOI_ptr1,RJ1a,tmp33);
 
-              dMultiply2_333 (tmp33,MOI_ptr1,RJ1a);
-              // dMultiply0_333 (new_MOI_ptr1,RJ1a,tmp33);
+              // dMultiply2_333 (tmp33,MOI_ptr1,RJ1a);
+              // dMultiply0_333 (MOI_ptr1,RJ1a,tmp33);
 
-              if (b2 >= 0)
+              // get MOI from body 2
+              dReal *invMOI_ptr2 = invMOI + b2 * 12;
+              dReal *MOI_ptr2 = MOI + b2 * 12;
+
+              printf("==========================\n");
+              printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+                MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+                MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+
+              // FIXME:  check that directions of J1a == J2a
+              // compute scalar MOI in line with S:
+              dMultiply0_133(tmp31, S, MOI_ptr2);
+              dReal moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+              printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S2);
+
+              // memcpy (MOI_ptr2, MOI_S2, 12 * sizeof(dReal));
+
+              // dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
+              // dMultiply0_333 (invMOI_ptr2,RJ1a,tmp33);
+
+              // dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
+              // dMultiply0_333 (MOI_ptr2,RJ1a,tmp33);
+
+              // average scalar MOI about S
+              dReal moi_S = 0.5*(moi_S1 + moi_S2);
+
+              // delta scalar MOI's needed to equalize MOI about S
+              moi_S1 = moi_S - moi_S1;
+              moi_S2 = moi_S - moi_S2;
+
+              // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
+              for (int si = 0; si < 12; ++si)
               {
-                dReal *invMOI_ptr2 = invMOI + b2 * 12;
-                dReal *MOI_ptr2 = MOI + b2 * 12;
-
-                printf("==========================\n");
-                printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
-                  MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
-                  MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
-                  MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
-
-                // compute scalar MOI in line with S:
-                dMultiply0_133(tmp31, S, MOI_ptr2);
-                dReal moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
-                printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S2);
-
-
-                dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
-                // dMultiply0_333 (new_invMOI_ptr2,RJ1a,tmp33);
-
-                dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
-                // dMultiply0_333 (new_MOI_ptr2,RJ1a,tmp33);
+                MOI_ptr1[si] += moi_S1 * SS[si];
+                MOI_ptr2[si] += moi_S2 * SS[si];
               }
 
+              // Update invMOI by inverting analytically (may not be efficient).
+              // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
+              //   (http://math.stackexchange.com/questions/17776/inverse-of-the-sum-of-matrices)
+              // try taking advantage of symmetry of MOI
+              dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
+                          -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
+                          +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
+              invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
+              invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
+              invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
+              invMOI_ptr1[0*4+3] = 0.0;
+              invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
+              invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
+              invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
+              invMOI_ptr1[1*4+3] = 0.0;
+              invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
+              invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
+              invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
+              invMOI_ptr1[2*4+3] = 0.0;
+
+              dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
+                          -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
+                          +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
+              invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
+              invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
+              invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
+              invMOI_ptr2[0*4+3] = 0.0;
+              invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
+              invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
+              invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
+              invMOI_ptr2[1*4+3] = 0.0;
+              invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
+              invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
+              invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
+              invMOI_ptr2[2*4+3] = 0.0;
+
+
+              printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+                MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+                MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+
+              // Modify MOI_ptr2
+              printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+                MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+                MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+                MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
               printf("--------------------------\n");
             }
           }
@@ -1821,6 +1888,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // Inertia tweaking for better convergence
       // modify MOI and invMOI per constraint
+      if (0)
       {
         dReal *invMOIrow = invMOI;
         dReal *MOIrow = MOI;
