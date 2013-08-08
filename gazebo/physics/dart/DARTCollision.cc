@@ -56,6 +56,7 @@ void DARTCollision::Init()
   this->dartBodyNode
       = boost::shared_static_cast<DARTLink>(this->link)->GetBodyNode();
 
+  // Geometry
   sdf::ElementPtr geometryElem = this->sdf->GetElement("geometry");
   std::string geomType = geometryElem->GetFirstElement()->GetName();
 
@@ -105,7 +106,7 @@ void DARTCollision::Init()
   else
     gzerr << "Unknown visual type[" << geomType << "]\n";
 
-  //
+  // Offset
   math::Pose relativePose = this->GetRelativePose();
   this->dartCollShape->setOffset(DARTUtils::ConvertVector3(relativePose.pos));
 }

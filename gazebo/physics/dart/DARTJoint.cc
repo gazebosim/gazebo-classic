@@ -381,7 +381,8 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dartChildBody->getBodyForce();
+    F2 = -dart::math::dAdInvR(dartChildBody->getWorldTransform(),
+                              dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
