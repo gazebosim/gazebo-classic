@@ -39,12 +39,6 @@
 
 namespace gazebo
 {
-  namespace util
-  {
-    class OpenALSource;
-    class OpenALSink;
-  }
-
   namespace physics
   {
     class Model;
@@ -449,8 +443,6 @@ namespace gazebo
       /// entities.
       private: void SetInertialFromCollisions();
 
-      private: void OnCollision(ConstContactsPtr &_msg);//const std::string &_name, const Contact *_contact);
-
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
@@ -501,14 +493,6 @@ namespace gazebo
 
       /// \brief Mutex to protect the publishData variable
       private: boost::recursive_mutex *publishDataMutex;
-
-      /// \brief All the audio sources
-      private: std::vector<util::OpenALSourcePtr> audioSources;
-
-      /// \brief An audio sink
-      private: util::OpenALSinkPtr audioSink;
-
-      private: transport::SubscriberPtr audioContactsSub;
     };
     /// \}
   }

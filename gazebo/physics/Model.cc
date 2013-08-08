@@ -211,10 +211,6 @@ void Model::Update()
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
 
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-    (*liter)->Update();
-
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
     (*jiter)->Update();
@@ -724,8 +720,8 @@ unsigned int Model::GetSensorCount() const
   unsigned int result = 0;
 
   // Count all the sensors on all the links
-  Link_V links = this->GetLinks();
-  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->links.begin();
+      iter != this->links.end(); ++iter)
   {
     result += (*iter)->GetSensorCount();
   }

@@ -54,7 +54,7 @@ namespace gazebo
 
       /// \brief Load the OpenAL server.
       /// \return True on success.
-      public: bool Load();
+      public: bool Load(sdf::ElementPtr _sdf = sdf::ElementPtr());
 
       /// \brief Finalize.
       public: void Fini();

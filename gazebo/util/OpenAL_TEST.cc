@@ -34,6 +34,48 @@ TEST(OpenAL, SourceInvalid)
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
 }
+/////////////////////////////////////////////////
+TEST(OpenAL, DefaultDevice)
+{
+  common::load();
+
+  sdf::SDFPtr sdf(new sdf::SDF);
+  sdf::initFile("world.sdf", sdf->root);
+
+  std::string sdfString = "<sdf version='1.4'>"
+    "<world name='default'>"
+    "<audio>"
+    "<device>default</device>"
+    "</device>"
+    "</world>"
+    "</sdf>";
+
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+
+  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->root));
+  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->root->GetElement("audio")));
+}
+
+/////////////////////////////////////////////////
+TEST(OpenAL, NonDefaultDevice)
+{
+  common::load();
+
+  sdf::SDFPtr sdf(new sdf::SDF);
+  sdf::initFile("world.sdf", sdf->root);
+
+  std::string sdfString = "<sdf version='1.4'>"
+    "<world name='default'>"
+    "<audio>"
+    "<device>garbage</device>"
+    "</device>"
+    "</world>"
+    "</sdf>";
+
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+
+  EXPECT_FALSE(util::OpenAL::Instance()->Load(sdf->root->GetElement("audio")));
+}
 
 /////////////////////////////////////////////////
 TEST(OpenAL, BadSDF)
@@ -70,6 +112,7 @@ TEST(OpenAL, BadValues)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
+    "<contact>true</contact>"
     "</audio_source>"
     "</sdf>";
 
@@ -83,6 +126,8 @@ TEST(OpenAL, BadValues)
   EXPECT_FALSE(source->SetPitch(0));
   EXPECT_FALSE(source->SetGain(-1));
   EXPECT_FALSE(source->SetLoop(false));
+  EXPECT_TRUE(source->SetOnContact(false));
+  EXPECT_TRUE(source->SetOnContact(true));
 }
 
 /////////////////////////////////////////////////
@@ -102,13 +147,17 @@ TEST(OpenAL, SourcePlay)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
+    "<contact>true</contact>"
     "</audio_source>"
     "</sdf>";
+
 
   EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
 
   source = util::OpenAL::Instance()->CreateSource(sdf->root);
   EXPECT_TRUE(source != NULL);
+
+  EXPECT_TRUE(source->GetOnContact());
 
   EXPECT_NO_THROW(source->Play());
   EXPECT_TRUE(source->IsPlaying());
@@ -155,6 +204,7 @@ TEST(OpenAL, SourceVelPose)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
+    "<contact>false</contact>"
     "</audio_source>"
     "</sdf>";
 
@@ -164,6 +214,7 @@ TEST(OpenAL, SourceVelPose)
   source = util::OpenAL::Instance()->CreateSource(sdf->root);
   EXPECT_TRUE(source != NULL);
 
+  EXPECT_FALSE(source->GetOnContact());
   EXPECT_TRUE(source->SetVelocity(math::Vector3(1, 1, 1)));
   EXPECT_TRUE(source->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
 }
@@ -175,7 +226,7 @@ TEST(OpenAL, Sourcevalid)
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
-  // Has pitch, gain, loop
+  // Has pitch, gain, loop, contact
   {
     sdf::SDFPtr sdf(new sdf::SDF);
     sdf::initFile("audio_source.sdf", sdf->root);
@@ -186,6 +237,7 @@ TEST(OpenAL, Sourcevalid)
       "<pitch>2.0</pitch>"
       "<gain>1.0</gain>"
       "<loop>true</loop>"
+      "<contact>true</contact>"
       "</audio_source>"
       "</sdf>";
 
@@ -194,7 +246,7 @@ TEST(OpenAL, Sourcevalid)
     EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
   }
 
-  // No Pitch, gain, loop
+  // No Pitch, gain, loop, contact
   {
     sdf::SDFPtr sdf(new sdf::SDF);
     sdf::initFile("audio_source.sdf", sdf->root);

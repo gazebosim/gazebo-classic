@@ -46,6 +46,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -165,6 +166,8 @@ void World::Load(sdf::ElementPtr _sdf)
            << this->name << "]) overwrites sdf world name\n!";
   else
     this->name = this->sdf->Get<std::string>("name");
+
+  util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -668,6 +671,8 @@ void World::Fini()
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+
+  util::OpenAL::Instance()->Fini();
 }
 
 //////////////////////////////////////////////////

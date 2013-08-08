@@ -52,22 +52,18 @@ OpenAL::~OpenAL()
 }
 
 /////////////////////////////////////////////////
-bool OpenAL::Load()
+bool OpenAL::Load(sdf::ElementPtr _sdf)
 {
   std::string deviceName = "default";
 
-  // \todo Add back in the ability to set the hardware device
-  // Get the audio device name
-  // if (node)
-  // {
-  //   deviceName = node->GetString("device", "default", 0);
-  // }
+  if (_sdf && _sdf->HasElement("device"))
+    deviceName = _sdf->Get<std::string>("device");
 
   // Open the default audio device
-  // if (deviceName == "default")
-  this->audioDevice = alcOpenDevice(NULL);
-  // else
-  //  this->audioDevice = alcOpenDevice(deviceName.c_str());
+  if (deviceName == "default")
+    this->audioDevice = alcOpenDevice(NULL);
+  else
+    this->audioDevice = alcOpenDevice(deviceName.c_str());
 
   // Make sure that we could open the audio device
   if (this->audioDevice == NULL)
@@ -280,7 +276,7 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
     result = result && this->SetLoop(_sdf->Get<bool>("loop"));
 
   if (_sdf->HasElement("contact"))
-    result = result && this->SetOnContact(_sdf->Get<bool>("loop"));
+    result = result && this->SetOnContact(_sdf->Get<bool>("contact"));
 
   return result;
 }

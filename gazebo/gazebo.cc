@@ -61,8 +61,6 @@ bool gazebo::load(int _argc, char **_argv)
 {
   gazebo::common::load();
 
-  util::OpenAL::Instance()->Load();
-
   // Initialize the informational logger. This will log warnings, and
   // errors.
   if (!gazebo::common::Console::Instance()->IsInitialized())
@@ -108,7 +106,6 @@ void gazebo::stop()
 /////////////////////////////////////////////////
 void gazebo::fini()
 {
-  util::OpenAL::Instance()->Fini();
   boost::mutex::scoped_lock lock(fini_mutex);
   util::LogRecord::Instance()->Fini();
   g_plugins.clear();

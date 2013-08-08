@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -34,6 +35,12 @@
 
 namespace gazebo
 {
+  namespace util
+  {
+    class OpenALSource;
+    class OpenALSink;
+  }
+
   namespace physics
   {
     /// \addtogroup gazebo_physics
@@ -62,6 +69,10 @@ namespace gazebo
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+
+      /// \brief Update the collision.
+      /// \param[in] _info Update information.
+      public: void Update(const common::UpdateInfo &_info);
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _placeable True to make the object movable.
@@ -205,6 +216,10 @@ namespace gazebo
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
 
+      /// \brief On collision callback.
+      /// \param[in] _msg Message that contains contact information.
+      private: void OnCollision(ConstContactsPtr &_msg);
+
       /// \brief The link this collision belongs to
       protected: LinkPtr link;
 
@@ -232,6 +247,19 @@ namespace gazebo
 
       /// \brief Number of contact points allowed for this collision.
       private: int maxContacts;
+
+      /// \brief All the audio sources
+      private: std::vector<util::OpenALSourcePtr> audioSources;
+
+      /// \brief An audio sink
+      private: util::OpenALSinkPtr audioSink;
+
+      /// \brief Subscriber to contacts with this collision. Used for audio
+      /// playback.
+      private: transport::SubscriberPtr audioContactsSub;
+
+      /// \brief Event connections
+      private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}
   }
