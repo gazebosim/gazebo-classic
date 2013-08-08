@@ -30,9 +30,9 @@ using namespace common;
 // b: Semi-minor polar axis (meters)
 // if: inverse flattening (no units)
 // wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
-const double g_earth_wgs84_axis_equatorial = 6378137.0;
-const double g_earth_wgs84_axis_polar = 6356752.314245;
-const double g_earth_wgs84_flattening = 1/298.257223563;
+const double g_EarthWGS84AxisEquatorial = 6378137.0;
+const double g_EarthWGS84AxisPolar = 6356752.314245;
+// const double g_EarthWGS84Flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
@@ -150,8 +150,8 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
       // Currently uses radius of curvature equations from wikipedia
       // http://en.wikipedia.org/wiki/Earth_radius#Radius_of_curvature
       {
-        double a = g_earth_wgs84_axis_equatorial;
-        double b = g_earth_wgs84_axis_polar;
+        double a = g_EarthWGS84AxisEquatorial;
+        double b = g_EarthWGS84AxisPolar;
         double ab = a*b;
         double cosLat = cos(this->latitudeReference.Radian());
         double sinLat = sin(this->latitudeReference.Radian());
