@@ -35,6 +35,7 @@ gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
 gazebo_player
 gazebo_common
+gazebo_util
 gazebo_transport
 gazebo_msgs
 gazebo_math
