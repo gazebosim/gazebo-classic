@@ -104,8 +104,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    ODECollision * collision1 = NULL;
-    ODECollision * collision2 = NULL;
+    ODECollision *collision1 = NULL;
+    ODECollision *collision2 = NULL;
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
@@ -128,8 +128,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     assert(collision1 && collision2);
 
-    ODECollision * rayCollision = NULL;
-    ODECollision * hitCollision = NULL;
+    ODECollision *rayCollision = NULL;
+    ODECollision *hitCollision = NULL;
 
     // Figure out which one is a ray; note that this assumes
     // that the ODE dRayClass is used *soley* by the RayCollision.
