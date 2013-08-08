@@ -98,9 +98,11 @@ namespace gazebo
     private: gazebo::common::StrStr_M params;
     private: po::variables_map vm;
 
-    // save argc and argv for access by system plugins
+    /// \brief Save argc for access by system plugins.
     public: int systemPluginsArgc;
-    public: char** systemPluginsArgv;
+
+    /// \brief Save argv for access by system plugins.
+    public: char **systemPluginsArgv;
   };
 }
 

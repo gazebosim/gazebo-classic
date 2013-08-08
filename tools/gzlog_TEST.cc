@@ -49,10 +49,10 @@ std::string custom_exec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog info' returns correct information
+/// Check to make sure that 'gz log -i' returns correct information
 TEST(gz_log, Info)
 {
-  std::string info = custom_exec(std::string("gzlog info ") +
+  std::string info = custom_exec(std::string("gz log -i -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(info);
 
@@ -72,10 +72,10 @@ TEST(gz_log, Info)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog echo' returns correct information
+/// Check to make sure that 'gz log -e' returns correct information
 TEST(gz_log, Echo)
 {
-  std::string echo = custom_exec(std::string("gzlog echo ") +
+  std::string echo = custom_exec(std::string("gz log -e -f ") +
       PROJECT_SOURCE_PATH + "/test/data/empty_state.log");
   boost::trim_right(echo);
 
@@ -127,46 +127,46 @@ TEST(gz_log, Echo)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog echo --filter' returns correct information
+/// Check to make sure that 'gz log -e --filter' returns correct information
 TEST(gz_log, EchoFilter)
 {
   std::string echo;
 
   // Test model filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2 ") +
+      std::string("gz log -e --filter pr2 -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   EXPECT_EQ(pr2StateLog, echo);
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose ") +
+      std::string("gz log -e --filter pr2.pose -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   EXPECT_EQ(pr2PoseStateLog, echo);
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose.x ") +
+      std::string("gz log -e --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log 2>/dev/null");
   boost::trim_right(echo);
   EXPECT_EQ(pr2PoseXStateLog, echo);
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose.[x,y] ") +
+      std::string("gz log -e --filter pr2.pose.[x,y] -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   EXPECT_EQ(pr2PoseXYStateLog, echo);
 
   // Test link filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2/r_upper*.pose ") +
+      std::string("gz log -e --filter pr2/r_upper*.pose -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   EXPECT_EQ(pr2LinkStateLog, echo);
 
   // Test joint filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2//r_upper_arm_roll_joint ") +
+      std::string("gz log -e --filter pr2//r_upper_arm_roll_joint -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   EXPECT_EQ(pr2JointStateLog, echo);
@@ -180,7 +180,7 @@ TEST(gz_log, HzFilter)
 
   // Test Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z 1.0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z 1.0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008";
@@ -188,7 +188,7 @@ TEST(gz_log, HzFilter)
 
   // Test zero Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z 0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z 0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -196,7 +196,7 @@ TEST(gz_log, HzFilter)
 
   // Test negative Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z -1.0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z -1.0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -204,19 +204,19 @@ TEST(gz_log, HzFilter)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog step' returns correct information
+/// Check to make sure that 'gz log -s' returns correct information
 /// Just check number of characters returned for now
 TEST(gz_log, Step)
 {
   std::string stepCmd;
-  stepCmd = std::string("gzlog step ") + PROJECT_SOURCE_PATH +
+  stepCmd = std::string("gz log -s -f ") + PROJECT_SOURCE_PATH +
     std::string("/test/data/pr2_state.log");
 
-  // Call gzlog step and press q immediately
+  // Call gz log step and press q immediately
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
   EXPECT_EQ(stepq0.length(), 115569u);
 
-  // Call gzlog step and press space once, then q
+  // Call gz log step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
 #ifdef HAVE_SDF
   EXPECT_EQ(stepq1.length(), 124131u);
@@ -224,7 +224,7 @@ TEST(gz_log, Step)
   EXPECT_EQ(stepq1.length(), 124082u);
 #endif
 
-  // Call gzlog step and press space twice, then q
+  // Call gz log step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
 #ifdef HAVE_SDF
   EXPECT_EQ(stepq2.length(), 132516u);
@@ -237,7 +237,7 @@ TEST(gz_log, Step)
 TEST(gz_log, HangCheck)
 {
   gazebo::common::Time start = gazebo::common::Time::GetWallTime();
-  custom_exec("gzlog stop");
+  custom_exec("gz log -r 0");
   gazebo::common::Time end = gazebo::common::Time::GetWallTime();
 
   EXPECT_LT(end - start, gazebo::common::Time(60, 0));

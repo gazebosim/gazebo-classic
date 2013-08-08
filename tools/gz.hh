@@ -18,7 +18,12 @@
 #define _GZMODIFY_HH_
 
 #include <string>
+#include <boost/thread.hpp>
 #include <boost/program_options.hpp>
+
+#include "gazebo/transport/transport.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -47,6 +52,17 @@ namespace gazebo
     /// \param[in] _argv The line arguments.
     public: bool Run(int _argc, char **_argv);
 
+    /// \brief Process signal interrupt.
+    public: static void Signal();
+
+    /// \brief Return true if transport is need for the command.
+    /// \return True if transport should be initialized.
+    protected: virtual bool TransportRequired();
+
+    /// \brief Create a connection to master.
+    /// \return Connection to the master.
+    protected: transport::ConnectionPtr ConnectToMaster();
+
     /// \brief Implementation of Run
     protected: virtual bool RunImpl() = 0;
 
@@ -67,6 +83,18 @@ namespace gazebo
 
     /// \brief Variable map
     protected: po::variables_map vm;
+
+    /// \brief Signal mutex.
+    protected: static boost::mutex sigMutex;
+
+    /// \breif Signal condition.
+    protected: static boost::condition_variable sigCondition;
+
+    /// \brief Save argc for use by child commands.
+    protected: int argc;
+
+    /// \brief Save argv for use by child commands.
+    protected: char **argv;
   };
 
   /// \brief World command
@@ -132,6 +160,45 @@ namespace gazebo
 
     // Documentation inherited
     protected: virtual bool RunImpl();
+  };
+
+  /// \brief Stats command
+  class StatsCommand : public Command
+  {
+    /// \brief Constructor
+    public: StatsCommand();
+
+    // Documentation inherited
+    public: virtual void HelpDetailed();
+
+    // Documentation inherited
+    protected: virtual bool RunImpl();
+
+    /// \brief World statistics callback.
+    /// \param[in] _msg World statistics message.
+    private: void CB(ConstWorldStatisticsPtr &_msg);
+
+    /// \brief Sim time buffer
+    private: std::list<common::Time> simTimes;
+
+    /// \brief Real time buffer
+    private: std::list<common::Time> realTimes;
+  };
+
+  /// \brief SDF command
+  class SDFCommand : public Command
+  {
+    /// \brief Constructor
+    public: SDFCommand();
+
+    // Documentation inherited
+    public: virtual void HelpDetailed();
+
+    // Documentation inherited
+    protected: virtual bool RunImpl();
+
+    // Documentation inherited
+    protected: virtual bool TransportRequired();
   };
 }
 #endif

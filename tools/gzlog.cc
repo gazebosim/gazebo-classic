@@ -24,12 +24,10 @@
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-
 #include <sdf/sdf.hh>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/physics/WorldState.hh>
 #include <gazebo/common/Time.hh>
 #include <gazebo/util/util.hh>
 #include <gazebo/gazebo_config.h>

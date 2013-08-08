@@ -174,7 +174,7 @@ void CameraCB(ConstCameraCmdPtr &_msg)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gz' exists
-/*TEST(gz, Alive)
+TEST(gz, Alive)
 {
   std::string rawOutput = custom_exec_str("gz");
   std::string helpOutput = custom_exec_str("gz help");
@@ -217,8 +217,8 @@ TEST(gz, Joint)
   // Test joint position PID
   {
     waitForMsg("gz joint -w default -m simple_arm "
-        "-j arm_shoulder_pan_joint --position-t 1.5707 --position-p 1.2 "
-        "--position-i 0.01 --position-d 0.2");
+        "-j arm_shoulder_pan_joint --pos-t 1.5707 --pos-p 1.2 "
+        "--pos-i 0.01 --pos-d 0.2");
 
     gazebo::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -233,8 +233,8 @@ TEST(gz, Joint)
   // Test joint velocity PID
   {
     waitForMsg("gz joint -w default -m simple_arm "
-        "-j arm_shoulder_pan_joint --velocity-t 1.5707 --velocity-p 1.2 "
-        "--velocity-i 0.01 --velocity-d 0.2");
+        "-j arm_shoulder_pan_joint --vel-t 1.5707 --vel-p 1.2 "
+        "--vel-i 0.01 --vel-d 0.2");
 
     gazebo::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -418,12 +418,12 @@ TEST(gz, Physics)
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
-  // Test dt
+  // Test step size
   {
-    waitForMsg("gz physics -w default -d 0.0123 ");
+    waitForMsg("gz physics -w default -s 0.0123 ");
 
     gazebo::msgs::Physics msg;
-    msg.set_dt(0.0123);
+    msg.set_max_step_size(0.0123);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -440,10 +440,10 @@ TEST(gz, Physics)
 
   // Test update-rate
   {
-    waitForMsg("gz physics -w default -u 1234");
+    waitForMsg("gz physics -w default -u 1234 ");
 
     gazebo::msgs::Physics msg;
-    msg.set_update_rate(1234);
+    msg.set_real_time_update_rate(1234);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -462,56 +462,89 @@ TEST(gz, Camera)
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
   gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/physics", &PhysicsCB);
+    node->Subscribe("~/user/cmd", &CameraCB);
 
   // Run the transport loop: starts a new thread
   gazebo::transport::run();
 
-  // Test gravity
+  // Test follow
   {
-    waitForMsg("gz physics -w default -g 1,2,3 ");
+    waitForMsg("gz camera -w default -c user -f box");
 
-    gazebo::msgs::Physics msg;
-    msg.mutable_gravity()->set_x(1);
-    msg.mutable_gravity()->set_y(2);
-    msg.mutable_gravity()->set_z(3);
-
-    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
-  }
-
-  // Test dt
-  {
-    waitForMsg("gz physics -w default -d 0.0123 ");
-
-    gazebo::msgs::Physics msg;
-    msg.set_dt(0.0123);
-
-    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
-  }
-
-  // Test iters
-  {
-    waitForMsg("gz physics -w default -i 561 ");
-
-    gazebo::msgs::Physics msg;
-    msg.set_iters(561);
-
-    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
-  }
-
-  // Test update-rate
-  {
-    waitForMsg("gz physics -w default -u 1234");
-
-    gazebo::msgs::Physics msg;
-    msg.set_update_rate(1234);
+    gazebo::msgs::CameraCmd msg;
+    msg.set_name("user");
+    msg.set_follow_model("box");
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
   fini();
 }
-*/
+
+/////////////////////////////////////////////////
+TEST(gz, Stats)
+{
+  init();
+
+  std::string helpOutput = custom_exec_str("gz help stats");
+  EXPECT_NE(helpOutput.find("gz stats"), std::string::npos);
+
+  // Basic output
+  std::string output = custom_exec_str("gz stats -d 1");
+  EXPECT_NE(output.find("Factor["), std::string::npos);
+
+  // Plot option
+  output = custom_exec_str("gz stats -d 1 -p");
+  EXPECT_NE(output.find("# real-time factor (percent),"), std::string::npos);
+
+  fini();
+}
+
+/////////////////////////////////////////////////
+TEST(gz, Topic)
+{
+  init();
+
+  std::string helpOutput = custom_exec_str("gz help topic");
+  EXPECT_NE(helpOutput.find("gz topic"), std::string::npos);
+
+  // List 
+  std::string output = custom_exec_str("gz topic -l");
+  EXPECT_NE(output.find("/gazebo/default/world_stats"), std::string::npos);
+
+  // Info
+  output = custom_exec_str("gz topic -i /gazebo/default/world_stats");
+  EXPECT_NE(output.find("gazebo.msgs.WorldStatistics"), std::string::npos);
+
+  // Echo 
+  output = custom_exec_str("gz topic -e /gazebo/default/world_stats -d 1");
+  EXPECT_NE(output.find("real_time {"), std::string::npos);
+
+  // Hz 
+  output = custom_exec_str("gz topic -z /gazebo/default/world_stats -d 1");
+  EXPECT_NE(output.find("Hz:"), std::string::npos);
+
+  // Bw 
+  output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
+  EXPECT_NE(output.find("Total["), std::string::npos);
+
+ fini();
+}
+
+/////////////////////////////////////////////////
+TEST(gz, SDF)
+{
+  init();
+  std::string helpOutput = custom_exec_str("gz help sdf");
+  EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
+
+  // List 
+  // std::string output = custom_exec_str("gz topic -l");
+  // EXPECT_NE(output.find("/gazebo/default/world_stats"), std::string::npos);
+
+  fini();
+}
+
 
 /////////////////////////////////////////////////
 TEST(gz, Stress)
@@ -527,7 +560,7 @@ TEST(gz, Stress)
   gazebo::transport::run();
 
   // Test world reset time
-  for (unsigned int i = 0; i < 1000; ++i)
+  for (unsigned int i = 0; i < 100; ++i)
   {
     waitForMsg("gz world -w default -t");
 

@@ -14,12 +14,19 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <gazebo/transport/transport.hh>
+#include <sdf/sdf.hh>
+#include "gz_topic.hh"
+#include "gz_log.hh"
 #include "gz.hh"
 
 using namespace gazebo;
+
+boost::mutex Command::sigMutex;
+boost::condition_variable Command::sigCondition;
 
 std::map<std::string, Command *> g_commandMap;
 
@@ -31,7 +38,7 @@ void Help(const std::string &_command)
 
   if (_command.empty() || g_commandMap.find(_command) == g_commandMap.end())
   {
-    std::cout << "  Usage:  gzmodify <command>\n\n"
+    std::cout << "  Usage:  gz <command>\n\n"
       << "List of commands:\n\n";
 
     std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
@@ -47,7 +54,7 @@ void Help(const std::string &_command)
     }
 
     std::cout << "\n\n";
-    std::cout << "Use \"gzmodify help <command>\" to print help for a "
+    std::cout << "Use \"gz help <command>\" to print help for a "
       "command.\n";
   }
   else if (g_commandMap.find(_command) != g_commandMap.end())
@@ -61,9 +68,16 @@ Command::Command(const std::string &_name, const std::string &_brief)
 }
 
 /////////////////////////////////////////////////
+void Command::Signal()
+{
+  boost::mutex::scoped_lock lock(sigMutex);
+  sigCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
 void Command::Help()
 {
-  std::cout << " gzmodify " << this->name << " [options]\n\n";
+  std::cout << " gz " << this->name << " [options]\n\n";
   this->HelpDetailed();
   std::cout << this->visibleOptions << "\n";
 }
@@ -77,11 +91,20 @@ std::string Command::GetBrief() const
 /////////////////////////////////////////////////
 bool Command::TransportInit()
 {
+  if (!this->TransportRequired())
+    return true;
+
   if (!transport::init())
     return false;
 
   transport::run();
 
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Command::TransportRequired()
+{
   return true;
 }
 
@@ -95,6 +118,16 @@ bool Command::TransportFini()
 /////////////////////////////////////////////////
 bool Command::Run(int _argc, char **_argv)
 {
+  // save a copy of argc and argv for consumption by child commands
+  this->argc = _argc;
+  this->argv = new char*[_argc];
+  for (int i = 0; i < _argc; ++i)
+  {
+    int argvLen = strlen(_argv[i]) + 1;
+    this->argv[i] = new char[argvLen];
+    snprintf(this->argv[i], argvLen, "%s", _argv[i]);
+  }
+
   // Hidden options
   po::options_description hiddenOptions("hidden options");
   hiddenOptions.add_options()
@@ -128,6 +161,47 @@ bool Command::Run(int _argc, char **_argv)
   this->TransportFini();
 
   return result;
+}
+
+/////////////////////////////////////////////////
+transport::ConnectionPtr Command::ConnectToMaster()
+{
+  std::string data, namespacesData, publishersData;
+  msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
+
+  // Connect to the master
+  transport::ConnectionPtr connection(new transport::Connection());
+
+  if (connection->Connect(host, port))
+  {
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
+  }
+
+  return connection;
 }
 
 /////////////////////////////////////////////////
@@ -198,10 +272,10 @@ PhysicsCommand::PhysicsCommand()
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("gravity,g", po::value<std::string>(),
-     "Gravity vector. Comma separated 3-tuple")
-    ("dt,d", po::value<double>(), "Step size")
-    ("iters,i", po::value<double>(), "Iterations")
-    ("update-rate,u", po::value<double>(), "Update rate");
+     "Gravity vector. Comma separated 3-tuple.")
+    ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
+    ("iters,i", po::value<double>(), "Number of iterations.")
+    ("update-rate,u", po::value<double>(), "Target real-time update rate.");
 }
 
 /////////////////////////////////////////////////
@@ -231,14 +305,14 @@ bool PhysicsCommand::RunImpl()
 
   msgs::Physics msg;
 
-  if (this->vm.count("dt"))
-    msg.set_dt(this->vm["dt"].as<double>());
+  if (this->vm.count("step-size"))
+    msg.set_max_step_size(this->vm["step-size"].as<double>());
 
   if (this->vm.count("iters"))
     msg.set_iters(this->vm["iters"].as<double>());
 
   if (this->vm.count("update-rate"))
-    msg.set_update_rate(this->vm["update-rate"].as<double>());
+    msg.set_real_time_update_rate(this->vm["update-rate"].as<double>());
 
   if (this->vm.count("gravity"))
   {
@@ -364,7 +438,7 @@ bool ModelCommand::RunImpl()
 
     // Get/Set the model name
     if (modelName.empty())
-      modelName = modelElem->GetValueString("name");
+      modelName = modelElem->Get<std::string>("name");
     else
       modelElem->GetAttribute("name")->SetFromString(modelName);
 
@@ -403,14 +477,14 @@ JointCommand::JointCommand()
     ("joint-name,j", po::value<std::string>(), "Model name.")
     ("delete,d", "Delete a model.")
     ("force,f", po::value<double>(), "Force to apply to a joint.")
-    ("position-t", po::value<double>(), "Target angle.")
-    ("position-p", po::value<double>(), "Position proportional gain.")
-    ("position-i", po::value<double>(), "Position integral gain.")
-    ("position-d", po::value<double>(), "Position differential gain.")
-    ("velocity-t", po::value<double>(), "Target speed.")
-    ("velocity-p", po::value<double>(), "Velocity proportional gain.")
-    ("velocity-i", po::value<double>(), "Velocity integral gain.")
-    ("velocity-d", po::value<double>(), "Velocity differential gain.");
+    ("pos-t", po::value<double>(), "Target angle.")
+    ("pos-p", po::value<double>(), "Position proportional gain.")
+    ("pos-i", po::value<double>(), "Position integral gain.")
+    ("pos-d", po::value<double>(), "Position differential gain.")
+    ("vel-t", po::value<double>(), "Target speed.")
+    ("vel-p", po::value<double>(), "Velocity proportional gain.")
+    ("vel-i", po::value<double>(), "Velocity integral gain.")
+    ("vel-d", po::value<double>(), "Velocity differential gain.");
 }
 
 /////////////////////////////////////////////////
@@ -456,40 +530,32 @@ bool JointCommand::RunImpl()
   if (this->vm.count("force"))
     msg.set_force(this->vm["force"].as<double>());
 
-  if (this->vm.count("position-t"))
+  if (this->vm.count("pos-t"))
   {
-    msg.mutable_position()->set_target(
-        this->vm["position-t"].as<double>());
+    msg.mutable_position()->set_target(this->vm["pos-t"].as<double>());
 
-    if (this->vm.count("position-p"))
-      msg.mutable_position()->set_p_gain(
-          this->vm["position-p"].as<double>());
+    if (this->vm.count("pos-p"))
+      msg.mutable_position()->set_p_gain(this->vm["pos-p"].as<double>());
 
-    if (this->vm.count("position-i"))
-      msg.mutable_position()->set_i_gain(
-          this->vm["position-i"].as<double>());
+    if (this->vm.count("pos-i"))
+      msg.mutable_position()->set_i_gain(this->vm["pos-i"].as<double>());
 
-    if (this->vm.count("position-d"))
-      msg.mutable_position()->set_d_gain(
-          this->vm["position-d"].as<double>());
+    if (this->vm.count("pos-d"))
+      msg.mutable_position()->set_d_gain(this->vm["pos-d"].as<double>());
   }
 
-  if (this->vm.count("velocity-t"))
+  if (this->vm.count("vel-t"))
   {
-    msg.mutable_velocity()->set_target(
-        this->vm["velocity-t"].as<double>());
+    msg.mutable_velocity()->set_target(this->vm["vel-t"].as<double>());
 
-    if (this->vm.count("velocity-p"))
-      msg.mutable_velocity()->set_p_gain(
-          this->vm["velocity-p"].as<double>());
+    if (this->vm.count("vel-p"))
+      msg.mutable_velocity()->set_p_gain(this->vm["vel-p"].as<double>());
 
-    if (this->vm.count("velocity-i"))
-      msg.mutable_velocity()->set_i_gain(
-          this->vm["velocity-i"].as<double>());
+    if (this->vm.count("vel-i"))
+      msg.mutable_velocity()->set_i_gain(this->vm["vel-i"].as<double>());
 
-    if (this->vm.count("velocity-d"))
-      msg.mutable_velocity()->set_d_gain(
-          this->vm["velocity-d"].as<double>());
+    if (this->vm.count("vel-d"))
+      msg.mutable_velocity()->set_d_gain(this->vm["vel-d"].as<double>());
   }
 
   transport::NodePtr node(new transport::Node());
@@ -565,6 +631,269 @@ bool CameraCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
+StatsCommand::StatsCommand()
+  : Command("stats", "Print statistics about a running gzserver instance.")
+{
+  // Options that are visible to the user through help.
+  this->visibleOptions.add_options()
+    ("world-name,w", po::value<std::string>(), "World name.")
+    ("duration,d", po::value<double>(), "Duration (seconds) to run.")
+    ("plot,p", "Output comma-separated values, useful for processing and "
+     "plotting.");
+}
+
+/////////////////////////////////////////////////
+void StatsCommand::HelpDetailed()
+{
+  std::cout <<
+    "\tPrint gzserver statics to standard out. If a name for the world, \n"
+    "\toption -w, is not specified, the first world found on \n"
+    "\tthe Gazebo master will be used.\n"
+    << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool StatsCommand::RunImpl()
+{
+  std::string worldName;
+
+  if (this->vm.count("world-name"))
+    worldName = this->vm["world-name"].as<std::string>();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init(worldName);
+
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/world_stats", &StatsCommand::CB, this);
+
+  boost::mutex::scoped_lock lock(this->sigMutex);
+  if (this->vm.count("duration"))
+    this->sigCondition.timed_wait(lock,
+        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+  else
+    this->sigCondition.wait(lock);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void StatsCommand::CB(ConstWorldStatisticsPtr &_msg)
+{
+  double percent = 0;
+  char paused;
+  common::Time simTime  = msgs::Convert(_msg->sim_time());
+  common::Time realTime = msgs::Convert(_msg->real_time());
+
+  this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (this->simTimes.size() > 20)
+    this->simTimes.pop_front();
+
+  this->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (this->realTimes.size() > 20)
+    this->realTimes.pop_front();
+
+  common::Time simAvg, realAvg;
+  std::list<common::Time>::iterator simIter, realIter;
+  simIter = ++(this->simTimes.begin());
+  realIter = ++(this->realTimes.begin());
+  while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
+  {
+    simAvg += ((*simIter) - this->simTimes.front());
+    realAvg += ((*realIter) - this->realTimes.front());
+    ++simIter;
+    ++realIter;
+  }
+
+  // Prevent divide by zero
+  if (realAvg <= 0)
+    return;
+
+  simAvg = simAvg / realAvg;
+
+  if (simAvg > 0)
+    percent = simAvg.Double();
+  else
+    percent = 0;
+
+
+  if (_msg->paused())
+    paused = 'T';
+  else
+    paused = 'F';
+
+  if (this->vm.count("plot"))
+  {
+    static bool first = true;
+    if (first)
+    {
+      printf("# real-time factor (percent), simtime (sec), realtime (sec), "
+             "paused (T or F)\n");
+      first = false;
+    }
+    printf("%4.2f, %16.6f, %16.6f, %c\n",
+        percent, simTime.Double(), realTime.Double(), paused);
+    fflush(stdout);
+  }
+  else
+    printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
+        percent, simTime.Double(), realTime.Double(), paused);
+}
+
+/////////////////////////////////////////////////
+SDFCommand::SDFCommand()
+  : Command("sdf",
+      "Converts between SDF versions, and provides info about SDF files")
+{
+  // Options that are visible to the user through help.
+  this->visibleOptions.add_options()
+    ("describe,d", "Print SDF format for given version(-v).")
+    ("convert,c", po::value<std::string>(),
+     "In place conversion of [arg] to the latest SDF version.")
+    ("doc,o", "Print HTML SDF. Use -v to specify version.")
+    ("check,k", po::value<std::string>(), "Validate [arg].")
+    ("version,v", po::value<double>(),
+     "Version of SDF to use with other options.") 
+    ("print,p", po::value<std::string>(),
+     "Print [arg], useful for debugging and as a conversion tool.");
+}
+
+/////////////////////////////////////////////////
+void SDFCommand::HelpDetailed()
+{
+  std::cout <<
+    "\tIntrospect, convert, and output SDF files.\n"
+    "\tUse the -v option to specify the version of\n"
+    "\tSDF for use with other options.\n"
+    << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool SDFCommand::TransportRequired()
+{
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool SDFCommand::RunImpl()
+{
+  sdf::SDF::version = SDF_VERSION;
+
+  try
+  {
+    // Initialize the informational logger. This will log warnings and errors.
+    gazebo::common::Console::Instance()->Init("gzsdf.log");
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+    std::cerr << "Error initializing log file" << std::endl;
+  }
+
+  if (this->vm.count("version"))
+  {
+    try
+    {
+      sdf::SDF::version = boost::lexical_cast<std::string>(
+          this->vm["version"].as<double>());
+    }
+    catch(...)
+    {
+      gzerr << "Invalid version number[" << this->vm["version"].as<double>()
+      << "]\n";
+      return false;
+    }
+  }
+
+  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+  if (!sdf::init(sdf))
+  {
+    std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
+    return -1;
+  }
+
+  if (this->vm.count("check"))
+  {
+    boost::filesystem::path path = this->vm["check"].as<std::string>();
+
+    if (!boost::filesystem::exists(path))
+      std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
+
+    if (!readFile(path.string(), sdf))
+    {
+      std::cerr << "Error: SDF parsing the xml failed\n";
+      return -1;
+    }
+
+    std::cout << "Check complete\n";
+  }
+  else if (this->vm.count("describe"))
+  {
+    sdf->PrintDescription();
+  }
+  else if (this->vm.count("doc"))
+  {
+    sdf->PrintDoc();
+  }
+  else if (this->vm.count("convert"))
+  {
+    boost::filesystem::path path = this->vm["convert"].as<std::string>();
+
+    if (!boost::filesystem::exists(path))
+      std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
+
+    TiXmlDocument xmlDoc;
+    if (xmlDoc.LoadFile(path.string()))
+    {
+      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
+      {
+        // Create an XML printer to control formatting
+        TiXmlPrinter printer;
+        printer.SetIndent("  ");
+        xmlDoc.Accept(&printer);
+
+        // Output the XML
+        std::ofstream stream(path.string().c_str(), std::ios_base::out);
+        stream << printer.Str();
+        stream.close();
+        std::cout << "Success\n";
+      }
+    }
+    else
+    {
+      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      return false;
+    }
+  }
+  else if (this->vm.count("print"))
+  {
+    boost::filesystem::path path = this->vm["print"].as<std::string>();
+
+    if (!boost::filesystem::exists(path))
+      std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
+
+    if (!readFile(path.string(), sdf))
+    {
+      std::cerr << "Error: SDF parsing the xml failed\n";
+      return false;
+    }
+    sdf->PrintValues();
+  }
+  else
+  {
+    this->Help();
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+void SignalHandler(int /*dummy*/)
+{
+  Command::Signal();
+  return;
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   gazebo::common::Console::Instance()->SetQuiet(true);
@@ -599,16 +928,30 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  std::string command;
-
   // Get the command name
-  command = vm.count("command") ? vm["command"].as<std::string>() : "";
+  std::string command =
+    vm.count("command") ? vm["command"].as<std::string>() : "";
+
+  if (signal(SIGINT, SignalHandler) == SIG_ERR)
+  {
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    return -1;
+  }
 
   g_commandMap["camera"] = new CameraCommand();
   g_commandMap["joint"] = new JointCommand();
   g_commandMap["model"] = new ModelCommand();
   g_commandMap["world"] = new WorldCommand();
   g_commandMap["physics"] = new PhysicsCommand();
+  g_commandMap["stats"] = new StatsCommand();
+  g_commandMap["topic"] = new TopicCommand();
+  g_commandMap["log"] = new LogCommand();
+  g_commandMap["sdf"] = new SDFCommand();
+
+  std::map<std::string, Command *>::iterator iter =
+    g_commandMap.find(command);
+
+  int result = 0;
 
   // Output help when appropriate
   if (command.empty() || command == "help" || vm.count("help"))
@@ -619,10 +962,15 @@ int main(int argc, char **argv)
 
     Help(option);
   }
-  else
+  else if (iter != g_commandMap.end())
   {
     g_commandMap[command]->Run(argc, argv);
   }
+  else
+  {
+    gzerr << "Invalid command [" << command << "]\n";
+    result = -1;
+  }
 
-  return 0;
+  return result;
 }
