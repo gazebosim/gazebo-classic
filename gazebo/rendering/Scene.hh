@@ -23,8 +23,10 @@
 #include <list>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -91,7 +93,8 @@ namespace gazebo
       /// this should be set to true for user interfaces, and false for
       /// sensor generation.
       public: Scene(const std::string &_name,
-                    bool _enableVisualizations = false);
+                    bool _enableVisualizations = false,
+                    bool _isServer = false);
 
       /// \brief Destructor
       public: virtual ~Scene();
@@ -792,6 +795,14 @@ namespace gazebo
 
       /// \brief Keeps track of the visual ID for contact visualization.
       private: uint32_t contactVisId;
+
+      /// \def JointMsgs_M
+      /// \brief Map of joint names to joint messages.
+      typedef boost::unordered_map<std::string,
+          boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
+
+      /// \brief Keep track of data of joints.
+      private: JointMsgs_M joints;
     };
     /// \}
   }

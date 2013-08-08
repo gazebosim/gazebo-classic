@@ -31,6 +31,8 @@
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/LaserVisual.hh"
+#include "gazebo/rendering/SonarVisual.hh"
+#include "gazebo/rendering/WrenchVisual.hh"
 #include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
@@ -79,7 +81,8 @@ struct VisualMessageLess {
 
 
 //////////////////////////////////////////////////
-Scene::Scene(const std::string &_name, bool _enableVisualizations)
+Scene::Scene(const std::string &_name, bool _enableVisualizations,
+    bool _isServer)
 {
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
@@ -118,7 +121,15 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
-  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  if (_isServer)
+    this->poseSub = this->node->Subscribe("~/pose/local/info",
+    &Scene::OnPoseMsg, this);
+  else
+  {
+    this->poseSub = this->node->Subscribe("~/pose/info",
+        &Scene::OnPoseMsg, this);
+  }
+
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
           &Scene::OnSkeletonPoseMsg, this);
@@ -159,6 +170,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->joints.clear();
   this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
@@ -170,7 +182,7 @@ void Scene::Clear()
   // Erase the world visual
   this->visuals.erase(this->visuals.begin());
 
-  while (this->visuals.size() > 0)
+  while (!this->visuals.empty())
     if (this->visuals.begin()->second)
       this->RemoveVisual(this->visuals.begin()->second);
   this->visuals.clear();
@@ -181,6 +193,8 @@ void Scene::Clear()
 
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
+
+  this->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -202,6 +216,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
+  this->joints.clear();
   this->linkMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
@@ -282,11 +297,11 @@ void Scene::Init()
   if (this->sdf->HasElement("fog"))
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
-    this->SetFog(fogElem->GetValueString("type"),
-                 fogElem->GetValueColor("color"),
-                 fogElem->GetValueDouble("density"),
-                 fogElem->GetValueDouble("start"),
-                 fogElem->GetValueDouble("end"));
+    this->SetFog(fogElem->Get<std::string>("type"),
+                 fogElem->Get<common::Color>("color"),
+                 fogElem->Get<double>("density"),
+                 fogElem->Get<double>("start"),
+                 fogElem->Get<double>("end"));
   }
 
   // Create ray scene query
@@ -402,7 +417,7 @@ void Scene::SetAmbientColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  return this->sdf->GetValueColor("ambient");
+  return this->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
@@ -434,7 +449,7 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  return this->sdf->GetValueColor("background");
+  return this->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -1385,11 +1400,11 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       elem->GetElement("type")->Set(type);
     }
 
-    this->SetFog(elem->GetValueString("type"),
-                 elem->GetValueColor("color"),
-                 elem->GetValueDouble("density"),
-                 elem->GetValueDouble("start"),
-                 elem->GetValueDouble("end"));
+    this->SetFog(elem->Get<std::string>("type"),
+                 elem->Get<common::Color>("color"),
+                 elem->Get<double>("density"),
+                 elem->Get<double>("start"),
+                 elem->Get<double>("end"));
   }
 
   return true;
@@ -1413,6 +1428,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
           _msg.joint(j)));
     this->jointMsgs.push_back(jm);
+
+    for (int k = 0; k < _msg.joint(j).sensor_size(); k++)
+    {
+      boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
+            _msg.joint(j).sensor(k)));
+      this->sensorMsgs.push_back(sm);
+    }
   }
 
   for (int j = 0; j < _msg.link_size(); j++)
@@ -1768,6 +1790,48 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       this->visuals[_msg->id()] = laserVis;
     }
   }
+  else if ((_msg->type() == "sonar") && _msg->visualize()
+      && !_msg->topic().empty())
+  {
+    std::string sonarVisualName = _msg->parent() + "::" + _msg->name();
+    if (this->visuals.find(sonarVisualName+"_sonar_vis") == this->visuals.end())
+    {
+      VisualPtr parentVis = this->GetVisual(_msg->parent());
+      if (!parentVis)
+        return false;
+
+      SonarVisualPtr sonarVis(new SonarVisual(
+            sonarVisualName+"_GUIONLY_sonar_vis", parentVis, _msg->topic()));
+      sonarVis->Load();
+      sonarVis->SetId(_msg->id());
+      this->visuals[_msg->id()] = sonarVis;
+    }
+  }
+  else if ((_msg->type() == "force_torque") && _msg->visualize()
+      && !_msg->topic().empty())
+  {
+    std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
+    if (this->visuals.find(wrenchVisualName + "_wrench_vis") ==
+        this->visuals.end())
+    {
+      ConstJointPtr jointMsg = this->joints[_msg->parent()];
+
+      if (!jointMsg)
+        return false;
+
+      VisualPtr parentVis = this->GetVisual(jointMsg->child());
+
+      if (!parentVis)
+        return false;
+
+      WrenchVisualPtr wrenchVis(new WrenchVisual(
+            wrenchVisualName+"_GUIONLY_wrench_vis", parentVis,
+            _msg->topic()));
+      wrenchVis->Load(jointMsg);
+      wrenchVis->SetId(_msg->id());
+      this->visuals[_msg->id()] = wrenchVis;
+    }
+  }
   else if (_msg->type() == "camera" && _msg->visualize())
   {
     VisualPtr parentVis = this->GetVisual(_msg->parent_id());
@@ -1790,6 +1854,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->camera().image_size().x(),
                       _msg->camera().image_size().y());
+
+      this->visuals[cameraVis->GetId()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -1801,6 +1867,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     contactVis->SetId(_msg->id());
 
     this->contactVisId = _msg->id();
+    this->visuals[contactVis->GetId()] = contactVis;
   }
   else if (_msg->type() == "rfidtag" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1812,6 +1879,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
           _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
+
+    this->visuals[rfidVis->GetId()] = rfidVis;
   }
   else if (_msg->type() == "rfid" && _msg->visualize() &&
            !_msg->topic().empty())
@@ -1823,6 +1892,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDVisualPtr rfidVis(new RFIDVisual(
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     rfidVis->SetId(_msg->id());
+    this->visuals[rfidVis->GetId()] = rfidVis;
   }
 
   return true;
@@ -1892,11 +1962,14 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
             _msg->name() + "_JOINT_VISUAL__", childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
+    jointVis->GetSceneNode()->_setDerivedOrientation(
+        Ogre::Quaternion(1, 0, 0, 0));
     if (_msg->has_id())
       jointVis->SetId(_msg->id());
 
     this->visuals[jointVis->GetId()] = jointVis;
   }
+
   return true;
 }
 
@@ -2504,7 +2577,7 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  return this->sdf->GetValueBool("shadows");
+  return this->sdf->Get<bool>("shadows");
 }
 
 /////////////////////////////////////////////////
@@ -2554,7 +2627,7 @@ void Scene::RemoveVisual(VisualPtr _vis)
 /////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
-  if (_enabled && this->grids.size() == 0)
+  if (_enabled && this->grids.empty())
   {
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();

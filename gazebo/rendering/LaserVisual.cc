@@ -100,7 +100,7 @@ void LaserVisual::Update()
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
-    pt += offset.pos;
+    pt = offset.rot * pt + offset.pos;
 
     if (i+1 >= this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);

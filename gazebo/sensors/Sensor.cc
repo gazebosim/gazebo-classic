@@ -19,7 +19,8 @@
  * Date: 25 May 2007
  */
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Physics.hh"
@@ -30,8 +31,10 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -88,13 +91,16 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->GetValuePose("pose");
+    this->pose = this->sdf->Get<math::Pose>("pose");
   }
 
-  if (this->sdf->GetValueBool("always_on"))
+  if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
+
+  if (this->category == IMAGE)
+    this->scene = rendering::get_scene(_worldName);
 
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
@@ -106,7 +112,7 @@ void Sensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+  this->SetUpdateRate(this->sdf->Get<double>("update_rate"));
 
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
@@ -160,10 +166,19 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
+    common::Time simTime;
+    if (this->category == IMAGE && this->scene)
+      simTime = this->scene->GetSimTime();
+    else
+      simTime = this->world->GetSimTime();
+
+    if (simTime == this->lastUpdateTime && !_force)
+      return;
+
     // Adjust time-to-update period to compensate for delays caused by another
     // sensor's update in the same thread.
-    common::Time adjustedElapsed = this->world->GetSimTime() -
-        this->lastUpdateTime + this->updateDelay;
+    common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+        this->updateDelay;
 
     if (adjustedElapsed >= this->updatePeriod || _force)
     {
@@ -177,7 +192,7 @@ void Sensor::Update(bool _force)
       if (this->updateDelay >= this->updatePeriod)
         this->updateDelay = common::Time::Zero;
 
-      this->lastUpdateTime = this->world->GetSimTime();
+      this->lastUpdateTime = simTime;
       this->UpdateImpl(_force);
       this->updated();
     }
@@ -194,7 +209,7 @@ void Sensor::Fini()
 //////////////////////////////////////////////////
 std::string Sensor::GetName() const
 {
-  return this->sdf->GetValueString("name");
+  return this->sdf->Get<std::string>("name");
 }
 
 //////////////////////////////////////////////////
@@ -207,8 +222,8 @@ std::string Sensor::GetScopedName() const
 //////////////////////////////////////////////////
 void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string name = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)
@@ -223,6 +238,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }
@@ -278,13 +294,13 @@ common::Time Sensor::GetLastMeasurementTime()
 //////////////////////////////////////////////////
 std::string Sensor::GetType() const
 {
-  return this->sdf->GetValueString("type");
+  return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 bool Sensor::GetVisualize() const
 {
-  return this->sdf->GetValueBool("visualize");
+  return this->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////
@@ -292,8 +308,8 @@ std::string Sensor::GetTopic() const
 {
   std::string result;
   if (this->sdf->HasElement("topic") &&
-      this->sdf->GetValueString("topic") != "__default__")
-    result = this->sdf->GetValueString("topic");
+      this->sdf->Get<std::string>("topic") != "__default__")
+    result = this->sdf->Get<std::string>("topic");
   return result;
 }
 

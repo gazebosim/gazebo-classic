@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -31,8 +33,6 @@
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/sensors/Sensors.hh"
 
@@ -95,9 +95,9 @@ bool Server::ParseArgs(int argc, char **argv)
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
-     "Compression encoding format for log data.")
+     "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
-     "Aboslute path in which to store state data")
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
@@ -206,6 +206,12 @@ bool Server::ParseArgs(int argc, char **argv)
   else
     this->params["pause"] = "false";
 
+  if (!this->PreLoad())
+  {
+    gzerr << "Unable to load gazebo\n";
+    return false;
+  }
+
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
   //
@@ -285,7 +291,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
@@ -315,8 +321,7 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics)
+bool Server::PreLoad()
 {
   std::string host = "";
   unsigned int port = 0;
@@ -327,10 +332,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->master->Init(port);
   this->master->RunThread();
 
-
   // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+}
 
+/////////////////////////////////////////////////
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
+{
   /// Load the sensors library
   sensors::load();
 

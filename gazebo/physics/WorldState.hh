@@ -24,7 +24,8 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
 

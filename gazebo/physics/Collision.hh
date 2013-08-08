@@ -227,7 +227,7 @@ namespace gazebo
       /// \brief The laser retro value.
       private: float laserRetro;
 
-      /// \brief Collision state.
+      /// \brief Stores collision state information.
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.

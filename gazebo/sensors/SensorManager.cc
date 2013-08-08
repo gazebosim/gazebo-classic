@@ -234,7 +234,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_parentName,
                                         uint32_t _parentId)
 {
-  std::string type = _elem->GetValueString("type");
+  std::string type = _elem->Get<std::string>("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
 
   if (!sensor)

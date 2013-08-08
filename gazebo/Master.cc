@@ -19,7 +19,7 @@
 
 #include "Master.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
@@ -314,7 +314,7 @@ void Master::RunOnce()
   // Process the incoming message queue
   {
     boost::recursive_mutex::scoped_lock lock(this->msgsMutex);
-    while (this->msgs.size() > 0)
+    while (!this->msgs.empty())
     {
       this->ProcessMessage(this->msgs.front().first,
                            this->msgs.front().second);

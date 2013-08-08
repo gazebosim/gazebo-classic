@@ -8,6 +8,7 @@ package gazebo.msgs;
 import "vector3d.proto";
 import "axis.proto";
 import "pose.proto";
+import "sensor.proto";
 
 message Joint
 {
@@ -41,4 +42,6 @@ message Joint
   optional double limit_erp      = 17;
   optional double suspension_cfm = 18;
   optional double suspension_erp = 19;
+
+  repeated Sensor sensor         = 20;
 }
