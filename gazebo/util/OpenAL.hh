@@ -1,23 +1,19 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ * Copyright 2013 Open Source Robotics Foundation
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- */
+*/
 #ifndef _GAZEBO_OPENAL_HH_
 #define _GAZEBO_OPENAL_HH_
 
@@ -44,6 +40,11 @@ namespace gazebo
     class OpenALSource;
     class OpenALSink;
 
+    /// \addtogroup gazebo_util Utility
+    /// \{
+
+    /// \class OpenAL OpenAL.hh util/util.hh
+    /// \brief 3D audio setup and playback.
     class OpenAL :public SingletonT<OpenAL>
     {
       /// \brief Constructor
@@ -83,6 +84,7 @@ namespace gazebo
       private: friend class SingletonT<OpenAL>;
     };
 
+    /// \class OpenALSink OpenALSink.hh util/util.hh
     /// \brief OpenAL Listener. This can be thought of as a microphone.
     class OpenALSink
     {
@@ -103,17 +105,19 @@ namespace gazebo
       public: bool SetVelocity(const math::Vector3 &_vel);
     };
 
+    /// \class OpenALSource OpenALSource.hh util/util.hh
     /// \brief OpenAL Source. This can be thought of as a speaker.
     class OpenALSource
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: OpenALSource();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~OpenALSource();
 
       /// \brief Load the source from sdf.
       /// \param[in] _sdf SDF element parameters for an audio_source.
+      /// \return True on success.
       public: bool Load(sdf::ElementPtr _sdf);
 
       /// \brief Set the position of the source.
@@ -121,22 +125,22 @@ namespace gazebo
       /// \return True on success.
       public: bool SetPose(const math::Pose &_pose);
 
-      /// \brief Set the velocity of the source
-      /// \param[in] _vel New velocity of the source
+      /// \brief Set the velocity of the source.
+      /// \param[in] _vel New velocity of the source.
       /// \return True on success.
       public: bool SetVelocity(const math::Vector3 &_vel);
 
-      /// \brief Set the pitch of the source
+      /// \brief Set the pitch of the source.
       /// \param[in] _p Pitch value.
       /// \return True on success.
       public: bool SetPitch(float _p);
 
-      /// \brief Set the pitch of the source
+      /// \brief Set the pitch of the source.
       /// \param[in] _g Gain value.
       /// \return True on success.
       public: bool SetGain(float _g);
 
-      /// \brief Set whether the source loops the audio
+      /// \brief Set whether the source loops the audio.
       /// \param[in] _state True to cause playback to loop.
       /// \return True on success.
       public: bool SetLoop(bool _state);
@@ -175,7 +179,8 @@ namespace gazebo
       public: bool FillBufferFromPCM(uint8_t *_pcmData, unsigned int _dataCount,
                                      int _sampleRate);
 
-      /// \brief Fill the OpenAL audio buffer with data from a sound file
+      /// \brief Fill the OpenAL audio buffer with data from a sound file.
+      /// \param[in] _audioFile Name and an audio file.
       public: void FillBufferFromFile(const std::string &_audioFile);
 
       /// \brief OpenAL source index.
@@ -187,8 +192,8 @@ namespace gazebo
       /// \brief True if the audio source is played on contact.
       private: bool playOnContact;
     };
+    /// \}
   }
 }
-
 #endif
 #endif
