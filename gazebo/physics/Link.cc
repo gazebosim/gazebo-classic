@@ -62,8 +62,6 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  std::vector<Entity*>::iterator iter;
-
   this->attachedModels.clear();
 
   for (unsigned int i = 0; i < this->visuals.size(); i++)

@@ -218,7 +218,7 @@ void Model::Update()
   if (this->jointController)
     this->jointController->Update();
 
-  if (this->jointAnimations.size() > 0)
+  if (!this->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
@@ -970,7 +970,7 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 /////////////////////////////////////////////////
 void Model::SetAutoDisable(bool _auto)
 {
-  if (this->joints.size() > 0)
+  if (!this->joints.empty())
     return;
 
   Link_V::iterator iter;

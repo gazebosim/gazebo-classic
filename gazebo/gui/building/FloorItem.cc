@@ -125,7 +125,7 @@ void FloorItem:: NotifyChange()
 /////////////////////////////////////////////////
 void FloorItem::RecalculateBoundingBox()
 {
-  if ((this->walls.size() == 0) || !this->dirty)
+  if ((this->walls.empty()) || !this->dirty)
     return;
 
   WallItem *wallItem = this->walls[0];
