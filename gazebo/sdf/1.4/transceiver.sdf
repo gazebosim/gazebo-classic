@@ -13,15 +13,15 @@
     <description>Specifies the transmission power in dBm</description>
   </element> <!-- End Power -->
 
-  <element name="frequency_from" type="double" default="2412" required="0">
+  <element name="min_frequency" type="double" default="2412" required="0">
     <description>Only a frequency range is filtered. Here we set the lower bound.
     </description>
-  </element> <!-- End Power -->
+  </element> <!-- End Min_frequency -->
 
-  <element name="frequency_to" type="double" default="2484" required="0">
+  <element name="max_frequency" type="double" default="2484" required="0">
     <description>Only a frequency range is filtered. Here we set the upper bound.
     </description>
-  </element> <!-- End Power -->
+  </element> <!-- End Max_frequency -->
 
   <element name="gain" type="double" default="2.5" required="1">
     <description>Specifies the antenna gain in dBi</description>
