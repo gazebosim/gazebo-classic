@@ -20,5 +20,7 @@
 
   <include filename="geometry.sdf" required="1"/>
   <include filename="surface.sdf" required="0"/>
+  <include filename="audio_source.sdf" required="*"/>
+  <include filename="audio_sink.sdf" required="*"/>
 
 </element> <!-- End Collision -->
