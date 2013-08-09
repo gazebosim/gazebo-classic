@@ -26,7 +26,7 @@ endif()
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)
-target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread gazebo_gui ${QT_LIBRARIES} QtTest)
+target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport pthread gazebo_gui ${QT_LIBRARIES})
 gz_install_executable(gztopic)
 
 add_executable(gzlog gzlog.cc)
