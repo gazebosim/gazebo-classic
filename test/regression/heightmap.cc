@@ -292,7 +292,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   //   }
   // }
   // printf(" %f};\nstatic float *heights = __heights;\n",
-  // shape->GetHeight(x,y));  
+  // shape->GetHeight(x,y));
 }
 */
 
