@@ -189,6 +189,17 @@ void BulletLink::Update()
 }
 
 //////////////////////////////////////////////////
+void BulletLink::UpdateBounds()
+{
+  if (this->compoundShape)
+  {
+    dynamic_cast<btCompoundShape *>(this->compoundShape)
+      ->recalculateLocalAabb();
+  }
+}
+
+
+//////////////////////////////////////////////////
 void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)

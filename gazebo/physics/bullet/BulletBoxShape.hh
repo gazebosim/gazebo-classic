@@ -23,6 +23,7 @@
 #define _BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
@@ -45,6 +46,7 @@ namespace gazebo
       /// \brief Set the size of the box
       public: void SetSize(const math::Vector3 &_size)
               {
+                gzerr << " bullet box set size " << _size << std::endl;
                 if (_size.x < 0 || _size.y < 0 || _size.z < 0)
                 {
                     gzerr << "Box shape does not support negative"
@@ -71,6 +73,10 @@ namespace gazebo
                   size.z = 1e-4;
                 }
 
+//                math::Vector3 boxSize = this->GetSize();
+//                gzerr << "oldSize " << oldSize << std::endl;
+                gzerr << "size " << size << std::endl;
+
                 BoxShape::SetSize(size);
                 BulletCollisionPtr bParent;
                 bParent = boost::dynamic_pointer_cast<BulletCollision>(
@@ -80,19 +86,36 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
+                  this->initialSize = size;
                   bParent->SetCollisionShape(new btBoxShape(
                       btVector3(size.x*0.5, size.y*0.5, size.z*0.5)));
                 }
                 else
                 {
                   btVector3 boxScale = shape->getLocalScaling();
-                  math::Vector3 boxSize = this->GetSize();
-                  boxScale.setX(size.x / boxSize.x);
-                  boxScale.setY(size.y / boxSize.y);
-                  boxScale.setZ(size.z / boxSize.z);
+                  boxScale.setX(size.x / this->initialSize.x);
+                  boxScale.setY(size.y / this->initialSize.y);
+                  boxScale.setZ(size.z / this->initialSize.z);
+
+                  BulletLinkPtr bLink =
+                      boost::dynamic_pointer_cast<BulletLink>(
+                      bParent->GetLink());
+                  BulletPhysicsPtr bulletPhysics =
+                      boost::dynamic_pointer_cast<BulletPhysics>(
+                      bLink->GetWorld()->GetPhysicsEngine());
+                  btDynamicsWorld *bulletWorld =
+                      bulletPhysics->GetDynamicsWorld();
                   shape->setLocalScaling(boxScale);
+                  bulletWorld->updateSingleAabb(bLink->GetBulletLink());
+                  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+                      cleanProxyFromPairs(
+                      bLink->GetBulletLink()->getBroadphaseHandle(),
+                      bulletWorld->getDispatcher());
                 }
               }
+
+      /// \brief Initial size of box.
+      private: math::Vector3 initialSize;
     };
     /// \}
   }

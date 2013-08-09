@@ -23,6 +23,7 @@
 #define _BULLETSPHERESHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
@@ -69,16 +70,36 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
+                  this->initialSize = math::Vector3(_radius, _radius, _radius);
                   bParent->SetCollisionShape(new btSphereShape(_radius));
                 }
                 else
                 {
-                  double sphereRadius = this->GetRadius();
-                  double sphereScale = _radius / sphereRadius;
-                  shape->setLocalScaling(btVector3(sphereScale, sphereScale,
-                      sphereScale));
+                  btVector3 sphereScale;
+                  sphereScale.setX(_radius / this->initialSize.x);
+                  sphereScale.setY(_radius / this->initialSize.y);
+                  sphereScale.setZ(_radius / this->initialSize.z);
+
+                  BulletLinkPtr bLink =
+                      boost::dynamic_pointer_cast<BulletLink>(
+                      bParent->GetLink());
+                  BulletPhysicsPtr bulletPhysics =
+                      boost::dynamic_pointer_cast<BulletPhysics>(
+                      bLink->GetWorld()->GetPhysicsEngine());
+                  btDynamicsWorld *bulletWorld =
+                      bulletPhysics->GetDynamicsWorld();
+
+                  shape->setLocalScaling(sphereScale);
+                  bulletWorld->updateSingleAabb(bLink->GetBulletLink());
+                  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+                      cleanProxyFromPairs(
+                      bLink->GetBulletLink()->getBroadphaseHandle(),
+                      bulletWorld->getDispatcher());
                 }
               }
+
+      /// \brief Initial size of sphere.
+      private: math::Vector3 initialSize;
     };
     /// \}
   }

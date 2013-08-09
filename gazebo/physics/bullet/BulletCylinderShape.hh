@@ -82,20 +82,37 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
+                  this->initialSize = math::Vector3(_radius, _radius, _length);
                   bParent->SetCollisionShape(new btCylinderShapeZ(
                       btVector3(_radius, _radius, _length * 0.5)));
                 }
                 else
                 {
-                  btVector3 cylinderScale = shape->getLocalScaling();
-                  double cylinderRadius = this->GetRadius();
-                  double cylinderLength = this->GetLength();
-                  cylinderScale.setX(_radius / cylinderRadius);
-                  cylinderScale.setY(cylinderScale.x());
-                  cylinderScale.setZ(_length / cylinderLength);
+                  btVector3 cylinderScale;
+                  cylinderScale.setX(_radius / this->initialSize.x);
+                  cylinderScale.setY(_radius / this->initialSize.y);
+                  cylinderScale.setZ(_length / this->initialSize.z);
+
+                  BulletLinkPtr bLink =
+                      boost::dynamic_pointer_cast<BulletLink>(
+                      bParent->GetLink());
+                  BulletPhysicsPtr bulletPhysics =
+                      boost::dynamic_pointer_cast<BulletPhysics>(
+                      bLink->GetWorld()->GetPhysicsEngine());
+                  btDynamicsWorld *bulletWorld =
+                      bulletPhysics->GetDynamicsWorld();
+
                   shape->setLocalScaling(cylinderScale);
+                  bulletWorld->updateSingleAabb(bLink->GetBulletLink());
+                  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+                      cleanProxyFromPairs(
+                      bLink->GetBulletLink()->getBroadphaseHandle(),
+                      bulletWorld->getDispatcher());
                 }
               }
+
+      /// \brief Initial size of cylinder.
+      private: math::Vector3 initialSize;
     };
     /// \}
   }
