@@ -117,8 +117,8 @@ namespace gazebo
       /// \param[in] _enable True to enable collision contacts.
       public: void SetContactsEnabled(bool _enable);
 
-      /// \brief Return true if contact recording is on
-      /// \return True of contact are on.
+      /// \brief Return true if contacts are requested.
+      /// \return True if contact are on.
       public: bool GetContactsEnabled() const;
 
       /// \brief Add an occurance of a contact to this collision.
