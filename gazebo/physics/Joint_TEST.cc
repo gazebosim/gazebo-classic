@@ -17,15 +17,11 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Joint_TEST.hh"
 
 #define TOL 1e-6
 using namespace gazebo;
-
-class Joint_TEST : public ServerFixture
-{
-};
 
 ////////////////////////////////////////////////////////////////////////
 // Create a joint between link and world
