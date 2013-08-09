@@ -34,8 +34,15 @@ class Joint_TEST : public ServerFixture
              {
              }
 
-  /// \brief Spawn a model with a joint.
+  /// \brief Spawn model with each type of joint.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SpawnJointTypes(const std::string &_physicsEngine);
+
+  /// \brief Spawn a model with a joint connecting to the world.
+  /// \param[in] _type Type of joint to create.
+  /// \param[in] _wait Flag to wait and return Joint pointer.
   public: physics::JointPtr SpawnJoint(const std::string &_type,
+                                       bool _connectWorld = true,
                                        bool _wait = true)
           {
             msgs::Factory msg;
@@ -43,19 +50,30 @@ class Joint_TEST : public ServerFixture
             std::ostringstream modelName;
             modelName << "joint_model" << this->spawnCount++;
 
-            modelStr << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>"
-              << "  <link name='parent'>"
-              << "  </link>"
+            modelStr
+              << "<sdf version='" << SDF_VERSION << "'>"
+              << "<model name ='" << modelName.str() << "'>";
+            if (!_connectWorld)
+            {
+              modelStr
+                << "  <link name='parent'>"
+                << "  </link>";
+            }
+            modelStr
               << "  <link name='child'>"
               << "  </link>"
               << "  <joint name='joint' type='" << _type << "'>"
-              << "    <pose>0 0 0  0 0 0</pose>"
-              << "    <parent>parent</parent>"
+              << "    <pose>0 0 0  0 0 0</pose>";
+            if (!_connectWorld)
+              modelStr << "    <parent>parent</parent>";
+            else
+              modelStr << "    <parent>world</parent>";
+            modelStr
               << "    <child>child</child>"
               << "    <axis>"
               << "      <xyz>0 0 1</xyz>"
-              << "    </axis>"
+              << "    </axis>";
+            modelStr
               << "  </joint>"
               << "</model>";
 
