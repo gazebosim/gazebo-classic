@@ -42,7 +42,8 @@ class Joint_TEST : public ServerFixture
   /// \param[in] _type Type of joint to create.
   /// \param[in] _wait Flag to wait and return Joint pointer.
   public: physics::JointPtr SpawnJoint(const std::string &_type,
-                                       bool _connectWorld = true,
+                                       bool _worldChild = false,
+                                       bool _worldParent = false,
                                        bool _wait = true)
           {
             msgs::Factory msg;
@@ -53,23 +54,30 @@ class Joint_TEST : public ServerFixture
             modelStr
               << "<sdf version='" << SDF_VERSION << "'>"
               << "<model name ='" << modelName.str() << "'>";
-            if (!_connectWorld)
+            if (!_worldParent)
             {
               modelStr
                 << "  <link name='parent'>"
                 << "  </link>";
             }
+            if (!_worldChild)
+            {
+              modelStr
+                << "  <link name='child'>"
+                << "  </link>";
+            }
             modelStr
-              << "  <link name='child'>"
-              << "  </link>"
               << "  <joint name='joint' type='" << _type << "'>"
               << "    <pose>0 0 0  0 0 0</pose>";
-            if (!_connectWorld)
-              modelStr << "    <parent>parent</parent>";
-            else
+            if (_worldParent)
               modelStr << "    <parent>world</parent>";
+            else
+              modelStr << "    <parent>parent</parent>";
+            if (_worldChild)
+              modelStr << "    <child>world</child>";
+            else
+              modelStr << "    <child>child</child>";
             modelStr
-              << "    <child>child</child>"
               << "    <axis>"
               << "      <xyz>0 0 1</xyz>"
               << "    </axis>";

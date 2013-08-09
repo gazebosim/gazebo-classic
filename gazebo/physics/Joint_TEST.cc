@@ -37,12 +37,24 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  SpawnJoint("revolute");
-  SpawnJoint("prismatic");
-  SpawnJoint("screw");
-  //SpawnJoint("universal");
-  SpawnJoint("ball");
-  //SpawnJoint("revolute2");
+  std::vector<std::string> types;
+  types.push_back("revolute");
+  types.push_back("prismatic");
+  types.push_back("screw");
+  types.push_back("universal");
+  types.push_back("ball");
+  types.push_back("revolute2");
+
+  std::vector<std::string>::iterator iter;
+  for (iter = types.begin(); iter != types.end(); ++iter)
+  {
+    gzdbg << "SpawnJoint " << *iter << " child parent" << std::endl;
+    SpawnJoint(*iter, false, false);
+    gzdbg << "SpawnJoint " << *iter << " child world" << std::endl;
+    SpawnJoint(*iter, false, true);
+    gzdbg << "SpawnJoint " << *iter << " world parent" << std::endl;
+    SpawnJoint(*iter, true, false);
+  }
 }
 
 TEST_F(Joint_TEST, SpawnJointTypesODE)
