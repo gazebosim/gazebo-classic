@@ -1,10 +1,10 @@
-<!-- Model -->
-<element name="spherical_coordinates" required="*">
+<element name="spherical_coordinates" required="0">
   <element name="surface_model" type="string" default="EARTH_WGS84" required="1">
     <description>
       Name of planetary surface model, used to determine the surface altitude
       at a given latitude and longitude. The default is an ellipsoid model of
-      the earth based on the WGS-84 standard.
+      the earth based on the WGS-84 standard. It is used in Gazebo's GPS sensor
+      implementation.
     </description>
   </element>
 

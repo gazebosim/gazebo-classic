@@ -78,7 +78,7 @@ void GpsSensor::Load(const std::string &_worldName)
   {
     // Load Position noise parameters
     {
-      sdf::ElementPtr posElem = gpsElem->GetElement("position");
+      sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
       if (posElem)
       {
         {
@@ -95,7 +95,7 @@ void GpsSensor::Load(const std::string &_worldName)
     }
     // Load Velocity noise parameters
     {
-      sdf::ElementPtr posElem = gpsElem->GetElement("velocity");
+      sdf::ElementPtr posElem = gpsElem->GetElement("velocity_sensing");
       if (posElem)
       {
         {

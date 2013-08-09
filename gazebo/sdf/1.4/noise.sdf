@@ -1,4 +1,4 @@
-<element name="noise" required="+">
+<element name="noise" required="1">
   <description>The properties of a sensor noise model.</description>
 
   <attribute name="type" type="string" default="none" required="1">
