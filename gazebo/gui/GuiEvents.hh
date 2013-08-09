@@ -18,8 +18,8 @@
 #define _GUI_EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -98,6 +98,15 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
               { inputStepSize.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the follow signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectFollow(T _subscriber)
+              { return follow.Connect(_subscriber); }
+      public: static void DisconnectFollow(
+              event::ConnectionPtr _subscriber)
+              { follow.Disconnect(_subscriber); }
+
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 
@@ -111,6 +120,10 @@ namespace gazebo
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;
+
+      /// \brief Event triggered when the user follows a model. The model
+      /// name is given as the function parameter.
+      public: static event::EventT<void (const std::string &)> follow;
 
       public: static event::EventT<void (std::string)> keyPress;
 

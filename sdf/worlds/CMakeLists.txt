@@ -22,6 +22,7 @@ set (files
   pr2.world
   presentation.world
   projector.world
+  ray_cpu.world
   rubble.world
   shapes.world
   weshare2012.world

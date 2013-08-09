@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PointCloud
+/// \brief A point cloud
+
+import "vector3d.proto";
+
+message PointCloud
+{
+  repeated Vector3d points = 1;
+}

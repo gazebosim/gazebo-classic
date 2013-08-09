@@ -25,8 +25,8 @@
 #include <boost/any.hpp>
 #include <string>
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/Joint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {

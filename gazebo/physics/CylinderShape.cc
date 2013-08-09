@@ -15,7 +15,7 @@
  *
 */
 
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -25,6 +25,7 @@ using namespace physics;
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
+  sdf::initFile("cylinder_shape.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -35,25 +36,28 @@ CylinderShape::~CylinderShape()
 //////////////////////////////////////////////////
 void CylinderShape::Init()
 {
-  this->SetSize(this->sdf->GetValueDouble("radius"),
-                 this->sdf->GetValueDouble("length"));
+  this->SetSize(this->sdf->Get<double>("radius"),
+                 this->sdf->Get<double>("length"));
 }
-
 
 //////////////////////////////////////////////////
 void CylinderShape::SetRadius(double _radius)
 {
   this->sdf->GetElement("radius")->Set(_radius);
-  this->SetSize(this->sdf->GetValueDouble("radius"),
-                this->sdf->GetValueDouble("length"));
+  if (this->sdf->HasElement("length"))
+  {
+    this->SetSize(_radius, this->sdf->Get<double>("length"));
+  }
 }
 
 //////////////////////////////////////////////////
 void CylinderShape::SetLength(double _length)
 {
   this->sdf->GetElement("length")->Set(_length);
-  this->SetSize(this->sdf->GetValueDouble("radius"),
-                 this->sdf->GetValueDouble("length"));
+  if (this->sdf->HasElement("radius"))
+  {
+    this->SetSize(this->sdf->Get<double>("radius"), _length);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -66,13 +70,13 @@ void CylinderShape::SetSize(double _radius, double _length)
 /////////////////////////////////////////////////
 double CylinderShape::GetRadius() const
 {
-  return this->sdf->GetValueDouble("radius");
+  return this->sdf->Get<double>("radius");
 }
 
 /////////////////////////////////////////////////
 double CylinderShape::GetLength() const
 {
-  return this->sdf->GetValueDouble("length");
+  return this->sdf->Get<double>("length");
 }
 
 /////////////////////////////////////////////////

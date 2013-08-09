@@ -25,9 +25,9 @@
 #include <string>
 #include <vector>
 
-#include "transport/CallbackHelper.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/PublicationTransport.hh"
 
 namespace gazebo
 {
@@ -110,10 +110,11 @@ namespace gazebo
 
       /// \brief Publish data to remote subscribers
       /// \param[in] _msg Message to be published
-      /// \param[in] _cb If non-null, callback to be invoked after publishing
+      /// \param[in] _cb Callback to be invoked after publishing
       /// is completed
       public: void Publish(MessagePtr _msg,
-                           const boost::function<void()> &_cb = NULL);
+                  boost::function<void(uint32_t)> _cb,
+                  uint32_t _id);
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
@@ -145,7 +146,7 @@ namespace gazebo
       /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages.
+      /// \brief Remote nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
       /// \brief Local nodes that recieve messages.

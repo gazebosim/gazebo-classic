@@ -35,7 +35,7 @@ class ODEJoint_TEST : public ServerFixture
 TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo2.world", true);
+  Load("worlds/force_torque_test2.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -90,7 +90,7 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
     if (i == 3387)
     {
       EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.y,     2.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
@@ -229,7 +229,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 TEST_F(ODEJoint_TEST, GetForceTorque)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo.world", true);
+  Load("worlds/force_torque_test.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");

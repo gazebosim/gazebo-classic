@@ -1107,7 +1107,6 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
   startings.insert(start);
 
   std::multiset<QPointF>::iterator startIt;
-  std::multiset<QRectF>::iterator filledIt;
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here

@@ -25,11 +25,11 @@
 #include <vector>
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
-#include "common/Event.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -89,7 +89,8 @@ namespace gazebo
       /// \param[in] _enableVisualizations True enables visualization
       /// elements such as laser lines.
       public: ScenePtr CreateScene(const std::string &_name,
-                                   bool _enableVisualizations);
+                                   bool _enableVisualizations,
+                                   bool _isServer = false);
 
       /// \brief Remove a scene
       /// \param[in] _name The name of the scene to remove.

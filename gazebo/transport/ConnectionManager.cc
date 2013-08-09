@@ -21,7 +21,7 @@
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/ConnectionManager.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace transport;
@@ -100,12 +100,16 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   while (!this->masterConn->Connect(_masterHost, master_port) &&
       this->IsRunning() && timeoutCount < timeoutCountMax)
   {
-    printf(".");
-    fflush(stdout);
+    if (!common::Console::Instance()->GetQuiet())
+    {
+      printf(".");
+      fflush(stdout);
+    }
     common::Time::MSleep(waitDurationMS);
     ++timeoutCount;
   }
-  printf("\n");
+  if (!common::Console::Instance()->GetQuiet())
+    printf("\n");
 
   if (timeoutCount >= timeoutCountMax)
   {
@@ -443,7 +447,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::OnAccept(const ConnectionPtr &_newConnection)
+void ConnectionManager::OnAccept(ConnectionPtr _newConnection)
 {
   _newConnection->AsyncRead(
       boost::bind(&ConnectionManager::OnRead, this, _newConnection, _1));
@@ -454,7 +458,7 @@ void ConnectionManager::OnAccept(const ConnectionPtr &_newConnection)
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::OnRead(const ConnectionPtr &_connection,
+void ConnectionManager::OnRead(ConnectionPtr _connection,
                                const std::string &_data)
 {
   if (_data.empty())
@@ -627,8 +631,8 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 }
 
 //////////////////////////////////////////////////
-ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
-                                                     unsigned int port)
+ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &_host,
+                                                     unsigned int _port)
 {
   ConnectionPtr conn;
 
@@ -636,12 +640,12 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
     return conn;
 
   // Sharing connections is broken
-  // conn = this->FindConnection(host, port);
+  // conn = this->FindConnection(_host, _port);
   // if (!conn)
   {
     // Connect to the remote host
     conn.reset(new Connection());
-    if (conn->Connect(host, port))
+    if (conn->Connect(_host, _port))
     {
       boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
       this->connections.push_back(conn);

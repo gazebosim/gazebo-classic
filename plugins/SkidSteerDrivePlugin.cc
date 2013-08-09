@@ -17,8 +17,8 @@
 
 #include <string>
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/SkidSteerDrivePlugin.hh"
 
 using namespace gazebo;
@@ -77,12 +77,12 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
 
   if (_sdf->HasElement("max_force"))
-    this->maxForce = _sdf->GetElement("max_force")->GetValueDouble();
+    this->maxForce = _sdf->GetElement("max_force")->Get<double>();
   else if (_sdf->HasElement("MaxForce"))
   {
     gzerr << "The <MaxForce> element in the skid steer plugin is deprecated."
           << "Use <max_force>\n";
-    this->maxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
+    this->maxForce = _sdf->GetElement("MaxForce")->Get<double>();
   }
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";

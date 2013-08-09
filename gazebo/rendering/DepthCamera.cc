@@ -23,19 +23,18 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Pose.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DepthCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DepthCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -65,7 +64,7 @@ void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =
-    (_sdf->GetElement("depth_camera")->GetValueString("output")
+    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
 

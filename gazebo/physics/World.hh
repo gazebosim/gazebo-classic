@@ -31,6 +31,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
@@ -43,7 +45,6 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -404,7 +405,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.
@@ -462,9 +463,6 @@ namespace gazebo
       /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
 
-      /// \brief Incoming message buffer.
-      private: std::vector<google::protobuf::Message> messages;
-
       /// \brief Name of the world.
       private: std::string name;
 
@@ -512,6 +510,9 @@ namespace gazebo
 
       /// \brief Publisher for pose messages.
       private: transport::PublisherPtr posePub;
+
+      /// \brief Publisher for local pose messages.
+      private: transport::PublisherPtr poseLocalPub;
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;

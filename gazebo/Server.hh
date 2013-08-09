@@ -25,10 +25,10 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
-#include "transport/TransportTypes.hh"
-#include "common/CommonTypes.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/World.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/World.hh"
 
 namespace po = boost::program_options;
 
@@ -51,6 +51,10 @@ namespace gazebo
 
     public: void PrintUsage();
     public: bool ParseArgs(int argc, char **argv);
+
+    /// \brief Preload the server.
+    /// \return True if load was successful.
+    public: bool PreLoad();
 
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.

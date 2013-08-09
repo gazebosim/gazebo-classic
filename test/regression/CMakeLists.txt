@@ -1,6 +1,4 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo
-  ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
@@ -59,6 +57,7 @@ set(dri_tests
   heightmap.cc
   pr2.cc
   projector.cc
+  rendering_sensor.cc
   speed_pr2.cc
 )
 
@@ -67,8 +66,10 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_dri_tests(${dri_tests})
 
 
-# Increase timeout, to account for model download time.
-set_tests_properties(pr2 PROPERTIES TIMEOUT 500)
+if (VALID_DRI_DISPLAY)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
 
-# Increase timeout, to account for model download time.
-set_tests_properties(pioneer2dx PROPERTIES TIMEOUT 500)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
+endif()

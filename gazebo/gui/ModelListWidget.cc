@@ -22,7 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -225,7 +225,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillTypes.size() > 0)
+  if (!this->fillTypes.empty())
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;

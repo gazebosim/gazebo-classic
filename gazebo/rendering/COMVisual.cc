@@ -18,15 +18,15 @@
  * Author: Nate Koenig
  */
 
-#include "common/MeshManager.hh"
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
-#include "math/Pose.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "rendering/DynamicLines.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/Scene.hh"
-#include "rendering/COMVisual.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/COMVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -46,7 +46,7 @@ COMVisual::~COMVisual()
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->GetValuePose("origin");
+  math::Pose pose = _elem->Get<math::Pose>("origin");
   this->Load(pose);
 }
 

@@ -23,16 +23,18 @@
 #include <list>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
+#include <sdf/sdf.hh>
 
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/TransportTypes.hh"
-#include "common/Events.hh"
-#include "common/Color.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace SkyX
 {
@@ -91,7 +93,8 @@ namespace gazebo
       /// this should be set to true for user interfaces, and false for
       /// sensor generation.
       public: Scene(const std::string &_name,
-                    bool _enableVisualizations = false);
+                    bool _enableVisualizations = false,
+                    bool _isServer = false);
 
       /// \brief Destructor
       public: virtual ~Scene();
@@ -419,6 +422,13 @@ namespace gazebo
 
       /// \brief Return true if the Scene has been initialized.
       public: bool GetInitialized() const;
+
+      /// \brief Get the scene simulation time.
+      /// Note this is different from World::GetSimTime() because
+      /// there is a lag between the time new poses are sent out by World
+      /// and when they are received and applied by the Scene.
+      /// \return The current simulation time in Scene
+      public: common::Time GetSimTime() const;
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -779,12 +789,13 @@ namespace gazebo
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
 
-      /// \brief Get the scene simulation time.
-      /// Note this is different from World::GetSimTime() because
-      /// there is a lag between the time new poses are sent out by World
-      /// and when they are received and applied by the Scene.
-      /// \return The current simulation time in Scene
-      public: common::Time GetSimTime() const;
+      /// \def JointMsgs_M
+      /// \brief Map of joint names to joint messages.
+      typedef boost::unordered_map<std::string,
+          boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
+
+      /// \brief Keep track of data of joints.
+      private: JointMsgs_M joints;
     };
     /// \}
   }

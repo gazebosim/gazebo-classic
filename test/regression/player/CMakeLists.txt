@@ -1,6 +1,4 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${PROJECT_BINARY_DIR}/gazebo 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
@@ -27,15 +25,14 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
 
   target_link_libraries(${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
-    gazebo_sdf_interface
     gazebo_transport
     gazebo_physics
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs
-    pthread
     ${tinyxml_libraries}
     ${PLAYER_LINK_LIBS}
     )
+
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 endforeach()

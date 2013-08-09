@@ -78,7 +78,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -98,7 +99,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -109,7 +110,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -132,7 +133,7 @@ void CameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }
@@ -184,7 +185,9 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msg.mutable_image()->set_data(this->camera->GetImageData(),
           msg.image().width() * this->camera->GetImageDepth() *
           msg.image().height());
-      this->imagePub->Publish(msg);
+
+      if (this->imagePub && this->imagePub->HasConnections())
+        this->imagePub->Publish(msg);
     }
   }
 }
