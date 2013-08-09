@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/transport/Transport.hh"
@@ -83,14 +78,11 @@ void Collision::Fini()
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
-
-  this->audioSink.reset();
 }
 
 //////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr _sdf)
 {
-  bool needUpdate = false;
   Entity::Load(_sdf);
 
   this->maxContacts = _sdf->Get<int>("max_contacts");
@@ -121,46 +113,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->surface->maxVel = 0.0;
   }
 
-  if (_sdf->HasElement("audio_source"))
-  {
-    bool onContact = false;
-    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
-    while (audioElem)
-    {
-      util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
-          audioElem);
-
-      if (source->GetOnContact())
-        onContact = true;
-      else
-        source->Play();
-
-      audioElem = audioElem->GetNextElement("audio_source");
-      this->audioSources.push_back(source);
-    }
-
-    if (onContact)
-    {
-      std::string topic =
-        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
-            this->GetScopedName()+"/audio_collision", this->GetScopedName());
-      this->audioContactsSub = this->node->Subscribe(topic,
-          &Collision::OnCollision, this);
-    }
-
-    needUpdate = true;
-  }
-
-  if (_sdf->HasElement("audio_sink"))
-  {
-    needUpdate = true;
-    this->audioSink = util::OpenAL::Instance()->CreateSink(
-        _sdf->GetElement("audio_sink"));
-  }
-
-  if (needUpdate)
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&Collision::Update, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -342,24 +294,6 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Collision::Update(const common::UpdateInfo & /*_info*/)
-{
-  if (this->audioSink)
-  {
-    this->audioSink->SetPose(this->GetWorldPose());
-    this->audioSink->SetVelocity(this->GetWorldLinearVel());
-  }
-
-  // Update all the audio sources
-  for (std::vector<util::OpenALSourcePtr>::iterator iter =
-      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
-  {
-    (*iter)->SetPose(this->GetWorldPose());
-    (*iter)->SetVelocity(this->GetWorldLinearVel());
-  }
-}
-
-//////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
@@ -449,18 +383,4 @@ void Collision::SetMaxContacts(double _maxContacts)
 int Collision::GetMaxContacts()
 {
   return this->maxContacts;
-}
-
-//////////////////////////////////////////////////
-void Collision::OnCollision(ConstContactsPtr &_msg)
-{
-  if (_msg->contact_size() > 0)
-  {
-    for (std::vector<util::OpenALSourcePtr>::iterator iter =
-        this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
-    {
-      if ((*iter)->GetOnContact())
-        (*iter)->Play();
-    }
-  }
 }

@@ -51,21 +51,6 @@
 using namespace gazebo;
 using namespace physics;
 
-class LinkUpdate_TBB
-{
-  public: LinkUpdate_TBB(Link_V *_bodies) : bodies(_bodies) {}
-  public: void operator() (const tbb::blocked_range<size_t> &_r) const
-  {
-    for (size_t i = _r.begin(); i != _r.end(); i++)
-    {
-      (*this->bodies)[i]->Update();
-    }
-  }
-
-  private: Link_V *bodies;
-};
-
-
 //////////////////////////////////////////////////
 Model::Model(BasePtr _parent)
   : Entity(_parent)

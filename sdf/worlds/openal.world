@@ -37,8 +37,8 @@
           <uri>file://media/audio/cheer.mp3</uri>
           <pitch>2.0</pitch>
           <gain>1.0</gain>
-          <loop>true</loop>
-          <contact>true</contact>
+          <loop>false</loop>
+          <contact><collision>collision</collision></contact>
         </audio_source>
 
       </link>

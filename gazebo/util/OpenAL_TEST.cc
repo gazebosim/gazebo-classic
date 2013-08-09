@@ -126,8 +126,6 @@ TEST(OpenAL, BadValues)
   EXPECT_FALSE(source->SetPitch(0));
   EXPECT_FALSE(source->SetGain(-1));
   EXPECT_FALSE(source->SetLoop(false));
-  EXPECT_TRUE(source->SetOnContact(false));
-  EXPECT_TRUE(source->SetOnContact(true));
 }
 
 /////////////////////////////////////////////////
@@ -147,7 +145,7 @@ TEST(OpenAL, SourcePlay)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
-    "<contact>true</contact>"
+    "<contact><collision>name</collision></contact>"
     "</audio_source>"
     "</sdf>";
 
@@ -204,7 +202,6 @@ TEST(OpenAL, SourceVelPose)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
-    "<contact>false</contact>"
     "</audio_source>"
     "</sdf>";
 

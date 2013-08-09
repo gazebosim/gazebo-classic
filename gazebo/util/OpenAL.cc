@@ -236,8 +236,6 @@ OpenALSource::OpenALSource()
 
   // Create 1 buffer
   alGenBuffers(1, &this->alBuffer);
-
-  this->playOnContact = false;
 }
 
 /////////////////////////////////////////////////
@@ -270,7 +268,20 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
     result = result && this->SetLoop(_sdf->Get<bool>("loop"));
 
   if (_sdf->HasElement("contact"))
-    result = result && this->SetOnContact(_sdf->Get<bool>("contact"));
+  {
+    sdf::ElementPtr collisionElem =
+      _sdf->GetElement("contact")->GetElement("collision");
+
+    while (collisionElem)
+    {
+      this->collisionNames.push_back(collisionElem->Get<std::string>());
+      collisionElem = collisionElem->GetNextElement("collision");
+    }
+
+    result = result && !this->collisionNames.empty();
+  }
+  else
+    this->Play();
 
   return result;
 }
@@ -376,16 +387,15 @@ bool OpenALSource::SetLoop(bool _state)
 }
 
 /////////////////////////////////////////////////
-bool OpenALSource::SetOnContact(bool _onContact)
+std::vector<std::string> OpenALSource::GetCollisionNames() const
 {
-  this->playOnContact = _onContact;
-  return true;
+  return this->collisionNames;
 }
 
 /////////////////////////////////////////////////
 bool OpenALSource::GetOnContact() const
 {
-  return this->playOnContact;
+  return !this->collisionNames.empty();
 }
 
 /////////////////////////////////////////////////
@@ -500,5 +510,18 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
     delete [] dataBuffer;
 
   fclose(testFile);
+}
+
+/////////////////////////////////////////////////
+bool OpenALSource::HasCollisionName(const std::string &_name) const
+{
+  for (std::vector<std::string>::const_iterator iter =
+      this->collisionNames.begin(); iter != this->collisionNames.end(); ++iter)
+  {
+    if (*iter  == _name)
+      return true;
+  }
+
+  return false;
 }
 #endif

@@ -145,16 +145,22 @@ namespace gazebo
       /// \return True on success.
       public: bool SetLoop(bool _state);
 
-      /// \brief Set whether the audio source should play on contact.
-      /// \param[in] _onContact True to play when the parent link collides
-      /// with another object.
-      /// \return True if SetOnContact was successful.
-      public: bool SetOnContact(bool _onContact);
-
       /// \brief Return true if the audio source is played on contact with
-      /// another object.
+      /// another object. Contact is determine based on a set of
+      /// collision objects.
       /// \return True if audio is played on contact.
+      /// \sa AddCollision()
       public: bool GetOnContact() const;
+
+      /// \brief Get a vector of all the collision names.
+      /// \return All the collision names used to trigger audio playback on
+      /// contact.
+      public: std::vector<std::string> GetCollisionNames() const;
+
+      /// \brief Get whether the source has a collision name set.
+      /// \param[in] _name Name of a collision to check for.
+      /// \return True if the collision name was found.
+      public: bool HasCollisionName(const std::string &_name) const;
 
       /// \brief Play a sound
       public: void Play();
@@ -189,8 +195,9 @@ namespace gazebo
       /// \brief OpenAL buffer index.
       private: unsigned int alBuffer;
 
-      /// \brief True if the audio source is played on contact.
-      private: bool playOnContact;
+      /// \brief Names of collision objects that should trigger audio
+      /// playback.
+      private: std::vector<std::string> collisionNames;
     };
     /// \}
   }
