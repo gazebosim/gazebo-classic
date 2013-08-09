@@ -1829,9 +1829,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal moi_S = 0.5*(moi_S1 + moi_S2);
 
               // delta scalar MOI's needed to equalize MOI about S
-              moi_S1 = moi_S - moi_S1;
-              moi_S2 = moi_S - moi_S2;
-              printf(" distributed S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
+              moi_S1 = 0.5* (moi_S - moi_S1);
+              moi_S2 = 0.5* (moi_S - moi_S2);
+              printf(" distributed S1 [%f] S2 [%f] = S [%f]\n", moi_S1, moi_S2, moi_S);
 
               // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
               for (int si = 0; si < 12; ++si)
