@@ -1783,30 +1783,32 @@ void World::ProcessMessages()
         {
           poseMsg = msg.add_pose();
 
-        // Publish the model's relative pose
-        poseMsg->set_name((*iter)->GetScopedName());
-        poseMsg->set_id((*iter)->GetId());
-        msgs::Set(poseMsg, (*iter)->GetRelativePose());
+          // Publish the model's relative pose
+          poseMsg->set_name((*iter)->GetScopedName());
+          poseMsg->set_id((*iter)->GetId());
+          msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
-        // Publish each of the model's children relative poses
-        Link_V links = (*iter)->GetLinks();
-        for (Link_V::iterator linkIter = links.begin();
-            linkIter != links.end(); ++linkIter)
-        {
-          poseMsg = msg.add_pose();
-          poseMsg->set_name((*linkIter)->GetScopedName());
-          poseMsg->set_id((*linkIter)->GetId());
-          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          // Publish each of the model's children relative poses
+          Link_V links = (*iter)->GetLinks();
+          for (Link_V::iterator linkIter = links.begin();
+              linkIter != links.end(); ++linkIter)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name((*linkIter)->GetScopedName());
+            poseMsg->set_id((*linkIter)->GetId());
+            msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          }
         }
+
         if (this->posePub && this->posePub->HasConnections())
           this->posePub->Publish(msg);
-      }
 
-      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
-      {
-        // rendering::Scene depends on this timestamp, which is used by
-        // rendering sensors to time stamp their data
-        this->poseLocalPub->Publish(msg);
+        if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+        {
+          // rendering::Scene depends on this timestamp, which is used by
+          // rendering sensors to time stamp their data
+          this->poseLocalPub->Publish(msg);
+        }
       }
     }
     this->publishModelPoses.clear();

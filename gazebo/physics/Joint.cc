@@ -184,7 +184,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName());
+              this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       else

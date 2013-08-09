@@ -20,7 +20,6 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
@@ -1794,7 +1793,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       && !_msg->topic().empty())
   {
     std::string sonarVisualName = _msg->parent() + "::" + _msg->name();
-    if (this->visuals.find(sonarVisualName+"_sonar_vis") == this->visuals.end())
+    if (this->visuals.find(_msg->id()) == this->visuals.end())
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
@@ -1811,8 +1810,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       && !_msg->topic().empty())
   {
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
-    if (this->visuals.find(wrenchVisualName + "_wrench_vis") ==
-        this->visuals.end())
+    if (this->visuals.find(_msg->id()) == this->visuals.end())
     {
       ConstJointPtr jointMsg = this->joints[_msg->parent()];
 
@@ -1903,7 +1901,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
   VisualPtr linkVis;
 
- if (_msg->has_id()) 
+ if (_msg->has_id())
    linkVis = this->GetVisual(_msg->id());
  else
    linkVis = this->GetVisual(_msg->name());

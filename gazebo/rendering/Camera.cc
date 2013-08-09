@@ -24,8 +24,6 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/sdf/sdf.hh"
-
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/common/Assert.hh"
@@ -466,6 +464,26 @@ void Camera::PostRender()
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
+    size_t size;
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
+
+    // Get access to the buffer and make an image and write it to file
+    size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat));
+
+    // Allocate buffer
+    if (!this->saveFrameBuffer)
+      this->saveFrameBuffer = new unsigned char[size];
+
+    memset(this->saveFrameBuffer, 128, size);
+
+    Ogre::PixelBox box(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
+
+    this->viewport->getTarget()->copyContentsToMemory(box);
+
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->GetFrameFilename());
