@@ -13,14 +13,14 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>10000</iters>
+          <iters>1000</iters>
           <sor>1.2</sor>
         </solver>
         <constraints>
           <cfm>0</cfm>
           <erp>0.2</erp>
           <contact_max_correcting_vel>0.0</contact_max_correcting_vel>
-          <contact_surface_layer>0.001</contact_surface_layer>
+          <contact_surface_layer>0.00</contact_surface_layer>
         </constraints>
       </ode>
       <max_step_size>0.001</max_step_size>
@@ -184,7 +184,7 @@
           <pose>0 0 0  0 0 0</pose>
           <mass>1000.0</mass>
           <inertia>
-            <ixx> 50.0</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <ixx>100.0</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
             <iyy>100.0</iyy> <iyz>000.0</iyz>
             <izz>100.0</izz>
           </inertia>
@@ -229,7 +229,7 @@
           <pose>0 -1.5 0 0 0 0</pose>
           <mass>1.0</mass>
           <inertia>
-            <ixx>50.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <ixx> 0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
             <iyy> 0.1</iyy> <iyz>000.0</iyz>
             <izz> 0.1</izz>
           </inertia>
@@ -332,8 +332,8 @@
     </model>
 
     <model name="model_2">
-      <pose>2 0 5.0 0 0 0</pose>
-      <link name="box_link_2">
+      <pose>-4 0 5.0 0 0 0</pose>
+      <link name="box_link_21">
         <inertial>
           <pose>0 0 0  0 0 0</pose>
           <mass>1000.0</mass>
@@ -377,7 +377,7 @@
           </material>
         </visual>
       </link>
-      <link name="sphere_link_2">
+      <link name="sphere_link_21">
         <pose>0 1.5 0 0 0 0</pose>
         <inertial>
           <pose>0 -1.5 0 0 0 0</pose>
@@ -422,7 +422,7 @@
           </material>
         </visual>
       </link>
-      <link name="cylinder_link_2">
+      <link name="cylinder_link_21">
         <pose>0 -1.5 0 0 0 0</pose>
         <inertial>
           <pose>0 1.5 0 0 0 0</pose>
@@ -470,19 +470,479 @@
         </visual>
       </link>
       <joint name="joint_1" type="revolute">
-        <parent>sphere_link_2</parent>
-        <child>box_link_2</child>
+        <parent>sphere_link_21</parent>
+        <child>box_link_21</child>
         <axis>
           <xyz>0 1 0</xyz>
         </axis>
       </joint>
       <joint name="joint_2" type="revolute">
-        <parent>cylinder_link_2</parent>
-        <child>box_link_2</child>
+        <parent>cylinder_link_21</parent>
+        <child>box_link_21</child>
         <axis>
           <xyz>0 0 1</xyz>
         </axis>
       </joint>
     </model>
+
+    <model name="model_3">
+      <pose>-6 0 5.0 0 0 0</pose>
+      <link name="box_link_31">
+        <inertial>
+          <pose>0 0 0  0 0 0</pose>
+          <mass>1000.0</mass>
+          <inertia>
+            <ixx>100.0</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>100.0</iyy> <iyz>000.0</iyz>
+            <izz>100.0</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="sphere_link_31">
+        <pose>0 1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 -1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>0.1</iyy> <iyz>000.0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="cylinder_link_31">
+        <pose>0 -1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>0.1</iyy> <iyz>000.0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_1" type="revolute">
+        <parent>sphere_link_31</parent>
+        <child>box_link_31</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <joint name="joint_2" type="revolute">
+        <parent>cylinder_link_31</parent>
+        <child>box_link_31</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+
+    <model name="model_51">
+      <pose>-8 0 5.0 0 0 0</pose>
+      <link name="box_link_51">
+        <inertial>
+          <pose>0 0 0  0 0 0</pose>
+          <mass>1000.0</mass>
+          <inertia>
+            <ixx>100.0</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>100.0</iyy> <iyz>000.0</iyz>
+            <izz>100.0</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="sphere_link_51">
+        <pose>0 1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 -1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>0.1</iyy> <iyz>000.0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="cylinder_link_51">
+        <pose>0 -1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>0.1</iyy> <iyz>000.0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_5_1_1" type="revolute">
+        <parent>sphere_link_51</parent>
+        <child>box_link_51</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <joint name="joint_5_1_2" type="revolute">
+        <parent>cylinder_link_51</parent>
+        <child>box_link_51</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <link name="box_link_52">
+        <inertial>
+          <pose>0 0 0  0 0 0</pose>
+          <mass>1000.0</mass>
+          <inertia>
+            <ixx>100.0</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>100.0</iyy> <iyz>000.0</iyz>
+            <izz>100.0</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="sphere_link_52">
+        <pose>0 1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 -1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx> 0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy> 0.1</iyy> <iyz>000.0</iyz>
+            <izz> 0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="cylinder_link_52">
+        <pose>0 -1.5 0 0 0 0</pose>
+        <inertial>
+          <pose>0 1.5 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx> <ixy>000.0</ixy> <ixz>000.0</ixz>
+            <iyy>0.1</iyy> <iyz>000.0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>100000000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0.7 0.3 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_5_2_1" type="revolute">
+        <parent>sphere_link_52</parent>
+        <child>box_link_52</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <joint name="joint_5_2_2" type="revolute">
+        <parent>cylinder_link_52</parent>
+        <child>box_link_52</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+
   </world>
 </sdf>
