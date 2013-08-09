@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _NOISE_HH_
-#define _NOISE_HH_
+#ifndef _GAZEBO_NOISE_HH_
+#define _GAZEBO_NOISE_HH_
 
 #include <vector>
 #include <string>
@@ -49,6 +49,7 @@ namespace gazebo
       public: ~Noise();
 
       /// \brief Load parameters from sdf.
+      /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Apply noise to input data value.

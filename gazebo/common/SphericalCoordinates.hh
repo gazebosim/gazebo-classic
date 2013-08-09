@@ -66,6 +66,7 @@ namespace gazebo
       public: ~SphericalCoordinates();
 
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
+      /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
       public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz)
@@ -73,6 +74,7 @@ namespace gazebo
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
+      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
       public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
               const;

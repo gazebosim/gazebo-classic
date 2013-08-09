@@ -48,16 +48,16 @@ void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
-  std::string type = this->sdf->Get<std::string>("type");
-  if (type == "none")
+  std::string typeString = this->sdf->Get<std::string>("type");
+  if (typeString == "none")
     this->type = NONE;
-  else if (type == "gaussian")
+  else if (typeString == "gaussian")
     this->type = GAUSSIAN;
-  else if (type == "gaussian_quantized")
+  else if (typeString == "gaussian_quantized")
     this->type = GAUSSIAN_QUANTIZED;
   else
   {
-    gzerr << "Unrecognized noise type: [" << type << "]"
+    gzerr << "Unrecognized noise type: [" << typeString << "]"
           << ", using default [none]" << std::endl;
     this->type = NONE;
   }

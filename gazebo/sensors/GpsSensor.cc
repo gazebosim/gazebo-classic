@@ -72,44 +72,25 @@ void GpsSensor::Load(const std::string &_worldName)
 
   this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
 
-  // Todo: parse sdf noise parameters
+  // Parse sdf noise parameters
   sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
-  if (gpsElem)
+
+  // Load position noise parameters
   {
-    // Load Position noise parameters
-    {
-      sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
-      if (posElem)
-      {
-        {
-          sdf::ElementPtr horElem = posElem->GetElement("horizontal");
-          if (horElem)
-            this->horizontalPositionNoise->Load(horElem->GetElement("noise"));
-        }
-        {
-          sdf::ElementPtr vertElem = posElem->GetElement("vertical");
-          if (vertElem)
-            this->verticalPositionNoise->Load(vertElem->GetElement("noise"));
-        }
-      }
-    }
-    // Load Velocity noise parameters
-    {
-      sdf::ElementPtr posElem = gpsElem->GetElement("velocity_sensing");
-      if (posElem)
-      {
-        {
-          sdf::ElementPtr horElem = posElem->GetElement("horizontal");
-          if (horElem)
-            this->horizontalVelocityNoise->Load(horElem->GetElement("noise"));
-        }
-        {
-          sdf::ElementPtr vertElem = posElem->GetElement("vertical");
-          if (vertElem)
-            this->verticalVelocityNoise->Load(vertElem->GetElement("noise"));
-        }
-      }
-    }
+    sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
+    this->horizontalPositionNoise->Load(
+      posElem->GetElement("horizontal")->GetElement("noise"));
+    this->verticalPositionNoise->Load(
+      posElem->GetElement("vertical")->GetElement("noise"));
+  }
+
+  // Load velocity noise parameters
+  {
+    sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
+    this->horizontalPositionNoise->Load(
+      velElem->GetElement("horizontal")->GetElement("noise"));
+    this->verticalPositionNoise->Load(
+      velElem->GetElement("vertical")->GetElement("noise"));
   }
 }
 
