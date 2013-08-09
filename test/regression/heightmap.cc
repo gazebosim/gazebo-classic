@@ -296,8 +296,6 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 }
 */
 
-// Common tests
-
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
@@ -316,7 +314,41 @@ TEST_F(HeightmapTest, PhysicsLoadODE)
   PhysicsLoad("ode");
 }
 
-// ODE Tests
+/////////////////////////////////////////////////
+#ifdef HAVE_BULLET
+TEST_F(HeightmapTest, PhysicsLoadBullet)
+{
+  PhysicsLoad("bullet");
+}
+#endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, WhiteAlphaODE)
+{
+  WhiteAlpha("ode");
+}
+
+/////////////////////////////////////////////////
+#ifdef HAVE_BULLET
+TEST_F(HeightmapTest, WhiteAlphaBullet)
+{
+  WhiteAlpha("bullet");
+}
+#endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, WhiteNoAlphaODE)
+{
+  WhiteNoAlpha("ode");
+}
+
+/////////////////////////////////////////////////
+#ifdef HAVE_BULLET
+TEST_F(HeightmapTest, WhiteNoAlphaBullet)
+{
+  WhiteNoAlpha("bullet");
+}
+#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 //
@@ -331,50 +363,19 @@ TEST_F(HeightmapTest, Heights)
 */
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteAlphaODE)
-{
-  WhiteAlpha("ode");
-}
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteNoAlphaODE)
-{
-  WhiteNoAlpha("ode");
-}
-
-// Bullet tests
-#ifdef HAVE_BULLET
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, PhysicsLoadBullet)
-{
-  PhysicsLoad("bullet");
-}
-
-/////////////////////////////////////////////////
 //
 // Disabled: segfaults ocassionally
 // See https://bitbucket.org/osrf/gazebo/issue/521 for details
 
 /*
 /////////////////////////////////////////////////
+#ifdef HAVE_BULLET
 TEST_F(HeightmapTest, HeightsBullet)
 {
-  Heights("ode");
-}
-*/
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteAlphaBullet)
-{
-  WhiteAlpha("bullet");
-}
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteNoAlphaBullet)
-{
-  WhiteNoAlpha("bullet");
+  Heights("bullet");
 }
 #endif  // HAVE_BULLET
+*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
