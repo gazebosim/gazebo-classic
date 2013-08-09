@@ -30,17 +30,9 @@ class Joint_TEST : public ServerFixture
   public: void ForceTorque(const std::string &_physicsEngine);
   public: void GetForceTorqueWithAppliedForce(
     const std::string &_physicsEngine);
+  public: void JointTorqueTest(const std::string &_physicsEngine);
+  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
 };
-
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODEDELETEME)
-{
-  GetForceTorqueWithAppliedForce("ode");
-}
-
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbodyDELETEME)
-{
-  GetForceTorqueWithAppliedForce("simbody");
-}
 
 ////////////////////////////////////////////////////////////////////////
 // Load example world with a few joints
@@ -376,10 +368,10 @@ TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
 // Create a joint between link and world
 // Apply force and check acceleration for correctness
 ////////////////////////////////////////////////////////////////////////
-TEST_F(Joint_TEST, JointTorqueTest)
+void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
-  Load("worlds/joint_test.world", true);
+  Load("worlds/joint_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -520,10 +512,30 @@ TEST_F(Joint_TEST, JointTorqueTest)
   }
 }
 
-TEST_F(Joint_TEST, JointCreationDestructionTest)
+TEST_F(Joint_TEST, JointTorqueTestODE)
+{
+  JointTorqueTest("ode");
+}
+
+#ifdef HAVE_SIMBODY
+TEST_F(Joint_TEST, JointTorqueTestSimbody)
+{
+  JointTorqueTest("simbody");
+}
+#endif  // HAVE_SIMBODY
+
+#ifdef HAVE_BULLET
+/// bullet collision parameters needs tweaking
+TEST_F(Joint_TEST, JointTorqueTestBullet)
+{
+  JointTorqueTest("bullet");
+}
+#endif  // HAVE_BULLET
+
+void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
-  Load("worlds/joint_test.world", true);
+  Load("worlds/joint_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -612,6 +624,26 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     shareLast = shareCur;
   }
 }
+
+TEST_F(Joint_TEST, JointCreationDestructionTestODE)
+{
+  JointCreationDestructionTest("ode");
+}
+
+#ifdef HAVE_SIMBODY
+TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
+{
+  JointCreationDestructionTest("simbody");
+}
+#endif  // HAVE_SIMBODY
+
+#ifdef HAVE_BULLET
+/// bullet collision parameters needs tweaking
+TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
+{
+  JointCreationDestructionTest("bullet");
+}
+#endif  // HAVE_BULLET
 
 TEST_F(Joint_TEST, joint_SDF14)
 {
