@@ -43,7 +43,7 @@ class Joint_TEST : public ServerFixture
 void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo.world", true, _physicsEngine);
+  Load("worlds/force_torque_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -155,15 +155,12 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
     EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
     EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
 
-    gzdbg << "*************** joint_01 force torque : "
+    gzdbg << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
           << "] torque1 [" << wrench_01.body1Torque
           << "] force2 [" << wrench_01.body2Force
           << "] torque2 [" << wrench_01.body2Torque
           << "]\n";
-
-    gzdbg << "joint angle1[" << std::setprecision(17) << joint_01->GetAngle(0)
-          << "] angle2[" << joint_12->GetAngle(0) << "]\n";
 
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
@@ -228,7 +225,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo2.world", true, _physicsEngine);
+  Load("worlds/force_torque_test2.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -264,7 +261,6 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-  gzerr << "press enter to start\n"; getchar();
   for (unsigned int i = 0; i < 3388; ++i)
   {
     // pd control
@@ -284,7 +280,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
     if (i == 3387)
     {
       EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.y,     2.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
@@ -297,15 +293,15 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
       EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
 
-      gzdbg << "joint_01 force torque : "
-            << "step [" << i
-            << "] GetForce [" << joint_01->GetForce(0u)
-            << "] command [" << effort1
-            << "] force1 [" << wrench_01.body1Force
-            << "] torque1 [" << wrench_01.body1Torque
-            << "] force2 [" << wrench_01.body2Force
-            << "] torque2 [" << wrench_01.body2Torque
-            << "]\n";
+      // gzdbg << "joint_01 force torque : "
+      //       << "step [" << i
+      //       << "] GetForce [" << joint_01->GetForce(0u)
+      //       << "] command [" << effort1
+      //       << "] force1 [" << wrench_01.body1Force
+      //       << "] torque1 [" << wrench_01.body1Torque
+      //       << "] force2 [" << wrench_01.body2Force
+      //       << "] torque2 [" << wrench_01.body2Torque
+      //       << "]\n";
     }
 
     // test joint_12 wrench
@@ -326,20 +322,16 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_12.body2Torque.y,    0.000, TOL_CONT);
       EXPECT_NEAR(wrench_12.body2Torque.z,   17.678, TOL_CONT);
 
-      gzdbg << "joint_12 force torque : "
-            << "step [" << i
-            << "] GetForce [" << joint_12->GetForce(0u)
-            << "] command [" << effort2
-            << "] force1 [" << wrench_12.body1Force
-            << "] torque1 [" << wrench_12.body1Torque
-            << "] force2 [" << wrench_12.body2Force
-            << "] torque2 [" << wrench_12.body2Torque
-            << "]\n";
-      gzerr << " press enter to continue:"; getchar();
+      // gzdbg << "joint_12 force torque : "
+      //       << "step [" << i
+      //       << "] GetForce [" << joint_12->GetForce(0u)
+      //       << "] command [" << effort2
+      //       << "] force1 [" << wrench_12.body1Force
+      //       << "] torque1 [" << wrench_12.body1Torque
+      //       << "] force2 [" << wrench_12.body2Force
+      //       << "] torque2 [" << wrench_12.body2Torque
+      //       << "]\n";
     }
-    gzerr << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
-          << "] 2[" << joint_12->GetAngle(0)
-          << "]\n";
   }
 }
 
