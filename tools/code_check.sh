@@ -14,31 +14,27 @@ else
   builddir=./build
 fi
 
-echo "*:gazebo/common/Plugin.hh:144" > /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/sdf/interface/parser.cc:544" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:94" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:105" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:126" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:149" >> /tmp/gazebo_cpp_check.suppress
+echo "*:gazebo/common/Plugin.hh:145" >> /tmp/gazebo_cpp_check.suppress
+echo "*:gazebo/common/Plugin.hh:118" >> /tmp/gazebo_cpp_check.suppress
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> /tmp/gazebo_cpp_check.suppress
-
+# Not defined FREEIMAGE_COLORORDER
+echo "*:gazebo/common/Image.cc:1" >> /tmp/gazebo_cpp_check.suppress
 
 #cppcheck
 if [ $xmlout -eq 1 ]; then
   # Run most of the checks in parallel
   (cppcheck --xml --enable=style,performance,portability,information --rule-file=./tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"`) 2> $xmldir/cppcheck.xml 
 
-  # Unused function checking must happen in one job
-  (cppcheck --xml --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"`) 2> $xmldir/cppcheck-unused-functions.xml 
-
   # Finally, check the configuration
   (cppcheck --xml --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config) 2> $xmldir/cppcheck-configuration.xml
 else
   # Run most of the checks in parallel
   cppcheck --enable=style,performance,portability,information --rule-file=./tools/cppcheck_rules/issue_581.rule -j 4 -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` 2>&1
-
-  # Unused function checking must happen in one job
-  cppcheck --enable=unusedFunction -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` 2>&1
 
   # Finally, check the configuration
   cppcheck --enable=missingInclude -q -j 4 --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test --check-config 2>&1
