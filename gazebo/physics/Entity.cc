@@ -71,8 +71,6 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
   // TODO: put this back in
   // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
