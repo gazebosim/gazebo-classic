@@ -168,6 +168,12 @@
         </element>
       </element>
     </element>
+    <element name="bullet" required="0">
+      <description>Bullet specific parameters</description>
+      <element name="provide_feedback" type="bool" default="false" required="0">
+        <description>If provide feedback is set to true, Bullet will compute the constraint forces at this joint.</description>
+      </element>
+    </element>
   </element> <!-- End Physics -->
 
   <include filename="sensor.sdf" required="*"/>
