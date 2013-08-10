@@ -292,7 +292,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   //   }
   // }
   // printf(" %f};\nstatic float *heights = __heights;\n",
-  // shape->GetHeight(x,y));  
+  // shape->GetHeight(x,y));
 }
 */
 
@@ -309,46 +309,22 @@ TEST_F(HeightmapTest, InvalidSizeImage)
 }
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, PhysicsLoadODE)
+TEST_P(HeightmapTest, PhysicsLoad)
 {
-  PhysicsLoad("ode");
+  PhysicsLoad(GetParam());
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(HeightmapTest, PhysicsLoadBullet)
+TEST_P(HeightmapTest, WhiteAlpha)
 {
-  PhysicsLoad("bullet");
-}
-#endif  // HAVE_BULLET
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteAlphaODE)
-{
-  WhiteAlpha("ode");
+  WhiteAlpha(GetParam());
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(HeightmapTest, WhiteAlphaBullet)
+TEST_P(HeightmapTest, WhiteNoAlpha)
 {
-  WhiteAlpha("bullet");
+  WhiteNoAlpha(GetParam());
 }
-#endif  // HAVE_BULLET
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteNoAlphaODE)
-{
-  WhiteNoAlpha("ode");
-}
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(HeightmapTest, WhiteNoAlphaBullet)
-{
-  WhiteNoAlpha("bullet");
-}
-#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 //
@@ -356,26 +332,19 @@ TEST_F(HeightmapTest, WhiteNoAlphaBullet)
 // See https://bitbucket.org/osrf/gazebo/issue/521 for details
 
 /*
-TEST_F(HeightmapTest, Heights)
+TEST_P(HeightmapTest, Heights)
 {
-  Heights("ode");
+  Heights(GetParam());
 }
 */
 
-/////////////////////////////////////////////////
-//
-// Disabled: segfaults ocassionally
-// See https://bitbucket.org/osrf/gazebo/issue/521 for details
+INSTANTIATE_TEST_CASE_P(TestODE, HeightmapTest,
+    ::testing::Values("ode"));
 
-/*
-/////////////////////////////////////////////////
 #ifdef HAVE_BULLET
-TEST_F(HeightmapTest, HeightsBullet)
-{
-  Heights("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestBullet, HeightmapTest,
+    ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
-*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
