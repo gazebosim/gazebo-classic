@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wireless receiver
- * Author: Carlos Agüero
- * Date: 24 June 2013
- */
 
 #ifndef _WIRELESS_RECEIVER_HH_
 #define _WIRELESS_RECEIVER_HH_
