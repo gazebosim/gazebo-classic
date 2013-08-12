@@ -235,8 +235,8 @@ math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
   // The following call should work, but doesn't:
-  //this->bulletHinge->enableAngularMotor(true, _angle, 
-    //this->GetMaxForce(_index));
+  // this->bulletHinge->enableAngularMotor(true, _angle,
+  // this->GetMaxForce(_index));
 
   // TODO: Should prescribe the linear velocity of the child link if there is an
   // offset between the child's CG and the joint anchor.
