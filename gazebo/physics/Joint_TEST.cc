@@ -45,15 +45,21 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
   types.push_back("ball");
   types.push_back("revolute2");
 
+  physics::JointPtr joint;
   std::vector<std::string>::iterator iter;
   for (iter = types.begin(); iter != types.end(); ++iter)
   {
     gzdbg << "SpawnJoint " << *iter << " child parent" << std::endl;
-    SpawnJoint(*iter, false, false);
+    joint = SpawnJoint(*iter, false, false);
+    EXPECT_TRUE(joint != NULL);
+
     gzdbg << "SpawnJoint " << *iter << " child world" << std::endl;
-    SpawnJoint(*iter, false, true);
+    joint = SpawnJoint(*iter, false, true);
+    EXPECT_TRUE(joint != NULL);
+
     gzdbg << "SpawnJoint " << *iter << " world parent" << std::endl;
-    SpawnJoint(*iter, true, false);
+    joint = SpawnJoint(*iter, true, false);
+    EXPECT_TRUE(joint != NULL);
   }
 }
 

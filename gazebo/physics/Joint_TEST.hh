@@ -38,13 +38,20 @@ class Joint_TEST : public ServerFixture
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpawnJointTypes(const std::string &_physicsEngine);
 
-  /// \brief Spawn a model with a joint connecting to the world.
+  /// \brief Spawn a model with a joint connecting to the world. The function
+  ///        will wait for duration _wait for the model to spawn and attempt
+  ///        to return a pointer to the spawned joint. This function is not
+  ///        guaranteed to return a valid JointPtr, so the output should be
+  ///        checked.
   /// \param[in] _type Type of joint to create.
-  /// \param[in] _wait Flag to wait and return Joint pointer.
+  /// \param[in] _worldChild Flag to set child link to the world.
+  /// \param[in] _worldParent Flag to set parent link to the world.
+  /// \param[in] _wait Length of time to wait for model to spawn in order
+  ///                  to return Joint pointer.
   public: physics::JointPtr SpawnJoint(const std::string &_type,
                                        bool _worldChild = false,
                                        bool _worldParent = false,
-                                       bool _wait = true)
+                                       common::Time _wait = common::Time(99, 0))
           {
             msgs::Factory msg;
             std::ostringstream modelStr;
@@ -88,17 +95,31 @@ class Joint_TEST : public ServerFixture
             msg.set_sdf(modelStr.str());
             this->factoryPub->Publish(msg);
 
-            while (_wait && !this->HasEntity(modelName.str()))
-              common::Time::MSleep(100);
-
             physics::JointPtr joint;
-            if (_wait)
+            if (_wait != common::Time::Zero)
             {
+              common::Time wallStart = common::Time::GetWallTime();
+              unsigned int waitCount = 0;
+              while (_wait > (common::Time::GetWallTime() - wallStart) &&
+                     !this->HasEntity(modelName.str()))
+              {
+                common::Time::MSleep(100);
+                if (++waitCount % 10 == 0)
+                {
+                  gzwarn << "Waiting " << waitCount / 10 << " seconds for "
+                         << _type << " joint to spawn." << std::endl;
+                }
+              }
+              if (this->HasEntity(modelName.str()) && waitCount >= 10)
+                gzwarn << _type << " joint has spawned." << std::endl;
+
               physics::WorldPtr world = physics::get_world("default");
-              EXPECT_TRUE(world != NULL);
-              physics::ModelPtr model = world->GetModel(modelName.str());
-              EXPECT_TRUE(model!= NULL);
-              joint = model->GetJoint("joint");
+              if (world != NULL)
+              {
+                physics::ModelPtr model = world->GetModel(modelName.str());
+                if (model != NULL)
+                  joint = model->GetJoint("joint");
+              }
             }
             return joint;
           }
