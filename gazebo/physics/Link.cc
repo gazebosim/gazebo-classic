@@ -193,12 +193,6 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::vector<std::string> names = source->GetCollisionNames();
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
-      /*if (source->GetOnContact())
-        onContact = true;
-      else
-        source->Play();
-        */
-
       audioElem = audioElem->GetNextElement("audio_source");
       this->audioSources.push_back(source);
     }
