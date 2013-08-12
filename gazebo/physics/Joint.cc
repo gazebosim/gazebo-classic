@@ -194,7 +194,7 @@ void Joint::Init()
   {
     this->Attach(this->parentLink, this->childLink);
   }
-  catch (...)
+  catch(...)
   {
     gzerr << "Attach joint failed" << std::endl;
     return;
