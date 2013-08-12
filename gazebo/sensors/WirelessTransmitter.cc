@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wireless transmitter 
- * Author: Carlos Agüero 
- * Date: 24 June 2013
- */
 
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
