@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wireless transceiver
- * Author: Carlos Agüero
- * Date: 03 July 2013
- */
 
 #ifndef _WIRELESS_TRANSCEIVER_HH_
 #define _WIRELESS_TRANSCEIVER_HH_
