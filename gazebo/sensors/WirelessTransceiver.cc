@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wireless transceiver
- * Author: Carlos Agüero 
- * Date: 03 July 2013
- */
 
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
