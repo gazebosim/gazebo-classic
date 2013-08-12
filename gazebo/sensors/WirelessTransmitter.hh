@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wireless transmitter
- * Author: Carlos Agüero
- * Date: 24 June 2013
- */
 
 #ifndef _WIRELESS_TRANSMITTER_HH_
 #define _WIRELESS_TRANSMITTER_HH_
