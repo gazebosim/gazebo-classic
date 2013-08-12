@@ -112,7 +112,6 @@ TEST(OpenAL, BadValues)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
-    "<contact>true</contact>"
     "</audio_source>"
     "</sdf>";
 
@@ -126,6 +125,8 @@ TEST(OpenAL, BadValues)
   EXPECT_FALSE(source->SetPitch(0));
   EXPECT_FALSE(source->SetGain(-1));
   EXPECT_FALSE(source->SetLoop(false));
+
+  EXPECT_FALSE(source->HasCollisionName("name2"));
 }
 
 /////////////////////////////////////////////////
@@ -145,7 +146,7 @@ TEST(OpenAL, SourcePlay)
     "<pitch>2.0</pitch>"
     "<gain>1.0</gain>"
     "<loop>true</loop>"
-    "<contact><collision>name</collision></contact>"
+    "<contact><collision>name</collision><collision>name2</collision></contact>"
     "</audio_source>"
     "</sdf>";
 
@@ -156,6 +157,12 @@ TEST(OpenAL, SourcePlay)
   EXPECT_TRUE(source != NULL);
 
   EXPECT_TRUE(source->GetOnContact());
+
+  EXPECT_EQ(source->GetCollisionNames().size(), 2u);
+  EXPECT_EQ(source->GetCollisionNames()[0], "name");
+  EXPECT_EQ(source->GetCollisionNames()[1], "name2");
+  EXPECT_TRUE(source->HasCollisionName("name2"));
+  EXPECT_TRUE(source->HasCollisionName("name"));
 
   EXPECT_NO_THROW(source->Play());
   EXPECT_TRUE(source->IsPlaying());
