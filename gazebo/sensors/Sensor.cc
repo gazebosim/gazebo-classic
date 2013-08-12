@@ -31,7 +31,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
