@@ -28,10 +28,18 @@ endforeach()
 
 foreach(dep @PKG_DEPENDS@)
   if(NOT ${dep}_FOUND)
-    find_package(${dep})
+    find_package(${dep} REQUIRED)
   endif()
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
-  list(APPEND @PKG_NAME@_LIBRARIES ${${dep}_LIBRARIES})
+
+  # Protobuf needs to be capitalized to match PROTOBUF_LIBRARIES
+  if (${dep} STREQUAL "Protobuf")
+    string (TOLOWER ${dep} dep_lib)
+  else()
+    set (dep_lib ${dep})
+  endif()
+    
+  list(APPEND @PKG_NAME@_LIBRARIES ${${dep_lib}_LIBRARIES})
 endforeach()
 
 list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/lib,-rpath,@CMAKE_INSTALL_PREFIX@/lib/gazebo-@GAZEBO_VERSION@/plugins)
