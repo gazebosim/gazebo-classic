@@ -16,7 +16,7 @@
 */
 #include <string.h>
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
