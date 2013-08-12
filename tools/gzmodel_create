@@ -19,7 +19,7 @@ manifest="<?xml version='1.0'?>
 if [ $1 ]
 then
   mkdir $1
-  echo "$manifest" > $1/manifest.xml;
+  echo "$manifest" > $1/model.config;
 else
   echo "Enter a directory to create for the model."
   echo "Usage:"
