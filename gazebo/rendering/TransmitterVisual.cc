@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Transmitter radiation diagram visualization Class
- * Author: Carlos Agüero
- * Date: 27 Jun 2013
- */
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Scene.hh"
