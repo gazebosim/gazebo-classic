@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Transmitter radiation diagram visualization Class
- * Author: Carlos Agüero
- * Date: 27 Jun 2013
- */
 
 #ifndef _TRANSMITTERVISUAL_HH_
 #define _TRANSMITTERVISUAL_HH_
