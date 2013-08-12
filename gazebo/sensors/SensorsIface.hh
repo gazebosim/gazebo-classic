@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_HH_
-#define _GAZEBO_SENSORS_HH_
+#ifndef _GAZEBO_SENSORSIFACE_HH_
+#define _GAZEBO_SENSORSIFACE_HH_
 
 #include <string>
 #include <sdf/sdf.hh>
