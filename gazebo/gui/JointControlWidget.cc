@@ -15,8 +15,8 @@
  *
  */
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/JointControlWidget.hh"
 
 using namespace gazebo;

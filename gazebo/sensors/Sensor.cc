@@ -23,7 +23,7 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Timer.hh"
