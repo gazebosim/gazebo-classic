@@ -112,7 +112,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
   {
     this->surface->maxVel = 0.0;
   }
-
 }
 
 //////////////////////////////////////////////////

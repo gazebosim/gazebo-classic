@@ -18,6 +18,7 @@
 #define _GAZEBO_OPENAL_HH_
 
 #include <string>
+#include <vector>
 #include <sdf/sdf.hh>
 
 #include "gazebo/math/Vector3.hh"

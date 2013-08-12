@@ -289,7 +289,7 @@ void Model::RemoveChild(EntityPtr _child)
     }
 
     Link_V::iterator liter = std::find(this->links.begin(),
-        this->links.end(),_child);
+        this->links.end(), _child);
     if (liter != this->links.end())
       this->links.erase(liter);
   }
