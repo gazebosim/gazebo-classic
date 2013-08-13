@@ -30,7 +30,7 @@ set (sources
   Model.cc
   ModelState.cc
   MultiRayShape.cc
-  Physics.cc
+  PhysicsIface.cc
   PhysicsEngine.cc
   PhysicsFactory.cc
   PlaneShape.cc
@@ -71,7 +71,7 @@ set (headers
   Model.hh
   ModelState.hh
   MultiRayShape.hh
-  Physics.hh
+  PhysicsIface.hh
   PhysicsEngine.hh
   PhysicsFactory.hh
   PhysicsTypes.hh
@@ -126,6 +126,9 @@ target_link_libraries(gzphysics
 gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
+
+# Deprecated Physics.hh
+gz_issue_775("Physics")
 
 # unit tests
 set (gtest_sources
