@@ -34,7 +34,7 @@ foreach(dep @PKG_DEPENDS@)
 
   # Protobuf needs to be capitalized to match PROTOBUF_LIBRARIES
   if (${dep} STREQUAL "Protobuf")
-    string (TOLOWER ${dep} dep_lib)
+    string (TOUPPER ${dep} dep_lib)
   else()
     set (dep_lib ${dep})
   endif()
