@@ -633,7 +633,9 @@ TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
 /// bullet collision parameters needs tweaking
 TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
 {
-  JointCreationDestructionTest("bullet");
+  /// \TODO: Disable for now until functionality is implemented
+  // JointCreationDestructionTest("bullet");
+  gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
 }
 #endif  // HAVE_BULLET
 
