@@ -31,7 +31,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelMaker.hh"
 
