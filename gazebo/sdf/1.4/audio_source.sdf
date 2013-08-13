@@ -7,15 +7,18 @@
   </element>
 
   <element name="pitch" type="double" default="1.0" required="0">
-    <description>Pitch for the audio media</description>
+    <description>Pitch for the audio media, in Hz</description>
   </element>
 
   <element name="gain" type="double" default="1.0" required="0">
-    <description>Gain for the audio media</description>
+    <description>Gain for the audio media, in dB.</description>
   </element>
 
-  <element name="contact" type="bool" default="true" required="0">
-    <description>True to play the audio clip when on contact with another object.</description>
+  <element name="contact" required="0">
+    <description>List of collision objects that will trigger audio playback.</description>
+    <element name="collision" type="string" default="__default__" required="+">
+      <description>Name of child collision element that will trigger audio playback.</description>
+    </element>
   </element>
 
   <element name="loop" type="bool" default="false" required="0">

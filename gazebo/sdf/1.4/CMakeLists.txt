@@ -1,8 +1,8 @@
 set (sdfs
   1_3.convert
   actor.sdf
-  audio_source.sdf
   audio_sink.sdf
+  audio_source.sdf
   box_shape.sdf
   camera.sdf
   collision.sdf
@@ -40,5 +40,4 @@ set (sdfs
   world.sdf
 )
 
-install(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/sdf/1.4)
-
+install(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/sdformat/1.4)
