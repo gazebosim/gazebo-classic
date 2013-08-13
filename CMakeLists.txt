@@ -73,27 +73,6 @@ endif()
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-if (APPLE)
-	# NOTE MacOSX provides different system versions than CMake is parsing.
-	#      The following table lists the most recent OSX versions
-	#     9.x.x = Mac OSX Leopard (10.5)
-	#    10.x.x = Mac OSX Snow Leopard (10.6)
-	#    11.x.x = Mac OSX Lion (10.7)
-	#    12.x.x = Mac OSX Mountain Lion (10.8)
-	if (${CMAKE_SYSTEM_VERSION} LESS 10)
-		add_definitions(-DMAC_OS_X_VERSION=1050)
-	elseif (${CMAKE_SYSTEM_VERSION} GREATER 10 AND ${CMAKE_SYSTEM_VERSION} LESS 11)
-		add_definitions(-DMAC_OS_X_VERSION=1060)
-	elseif (${CMAKE_SYSTEM_VERSION} GREATER 11 AND ${CMAKE_SYSTEM_VERSION} LESS 12)
-		add_definitions(-DMAC_OS_X_VERSION=1070)
-	elseif (${CMAKE_SYSTEM_VERSION} GREATER 12 OR ${CMAKE_SYSTEM_VERSION} EQUAL 12)
-		add_definitions(-DMAC_OS_X_VERSION=1080)
-	else ()
-		add_definitions(-DMAC_OS_X_VERSION=0)
-	endif ()
-endif ()
-
-
 # developer's option to cache PKG_CONFIG_PATH and
 # LD_LIBRARY_PATH for local installs
 if(PKG_CONFIG_PATH)
@@ -279,10 +258,6 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE_UPPERCASE}")
     build_warning("CMAKE_BUILD_TYPE was specified in uppercase. This will stop to be supported soon. Valid types: Debug Release RelWithDebInfo Profile Check")
 endif ()
 
-message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
-add_subdirectory(deps)
-message (STATUS "----------------------------------------\n")
-
 #################################################
 # OS Specific initialization
 if (UNIX)
@@ -294,6 +269,12 @@ endif()
 if(APPLE)
   gz_setup_apple()
 endif()
+
+#################################################
+# Configure 3rd Party Packages after OS Specific initialization
+message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
+add_subdirectory(deps)
+message (STATUS "----------------------------------------\n")
 
 #################################################
 # Print warnings and errors
