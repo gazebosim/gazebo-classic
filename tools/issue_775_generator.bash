@@ -1,5 +1,9 @@
+#!/bin/bash
+lower=`echo $1 | tr '[:upper:]' '[:lower:]'`
+guard=_GAZEBO_`echo $1 | tr '[:lower:]' '[:upper:]'`_HH_
+cat <<END
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +18,16 @@
  * limitations under the License.
  *
 */
-#include "gazebo/gui/GuiIface.hh"
+#ifndef $guard
+#define $guard
 
-//////////////////////////////////////////////////
-int main(int _argc, char **_argv)
-{
-  int result = 0;
-  if (!gazebo::gui::run(_argc, _argv))
-    result = -1;
-  return result;
-}
+// Deprecated header file for case-sensitive filesystems
+#warning The gazebo/$lower/$1.hh header file is deprecated \\
+  as of gazebo 1.9 and will be removed in the next release. \\
+  Please include gazebo/$lower/$1Iface.hh instead.
+#include "gazebo/$lower/$1Iface.hh"
+
+#endif
+
+END
+
