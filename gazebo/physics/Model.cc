@@ -162,7 +162,7 @@ void Model::Init()
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
-       iter!= this->children.end(); ++iter)
+       iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
       boost::static_pointer_cast<Link>(*iter)->Init();
@@ -364,13 +364,13 @@ void Model::Reset()
 
   // reset link velocities when resetting model
   for (Link_V::iterator liter = this->links.begin();
-       liter!= this->links.end(); ++liter)
+       liter != this->links.end(); ++liter)
   {
     (*liter)->ResetPhysicsStates();
   }
 
   for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); ++jiter)
+       jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
@@ -380,7 +380,7 @@ void Model::Reset()
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
-       iter!= this->links.end(); ++iter)
+       iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -394,7 +394,7 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
-       iter!= this->links.end(); ++iter)
+       iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -408,7 +408,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
   for (Link_V::iterator iter = this->links.begin();
-       iter!= this->links.end(); ++iter)
+       iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -422,7 +422,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
   for (Link_V::iterator iter = this->links.begin();
-       iter!= this->links.end(); ++iter)
+       iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -514,7 +514,7 @@ math::Box Model::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -744,7 +744,7 @@ void Model::SetGravityMode(const bool &_v)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -758,7 +758,7 @@ void Model::SetCollideMode(const std::string &_m)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -772,7 +772,7 @@ void Model::SetLaserRetro(const float _retro)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {

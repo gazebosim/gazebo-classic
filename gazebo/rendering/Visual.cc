@@ -133,7 +133,7 @@ Visual::~Visual()
 
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
     delete *iter;
     */
   this->lines.clear();
@@ -1506,7 +1506,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
   {
     if (*iter == _line)
     {
