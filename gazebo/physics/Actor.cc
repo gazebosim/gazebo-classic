@@ -40,7 +40,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Actor.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/transport/Node.hh"
 

@@ -327,7 +327,6 @@ void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
 //////////////////////////////////////////////////
 void MapShape::BuildTree(QuadNode *_node)
 {
-  QuadNode *newNode = NULL;
   unsigned int freePixels, occPixels;
 
   this->GetPixelCount(_node->x, _node->y, _node->width, _node->height,
@@ -352,7 +351,7 @@ void MapShape::BuildTree(QuadNode *_node)
 
       for (int j = 0; j < 2; j++)
       {
-        newNode = new QuadNode(_node);
+        QuadNode *newNode = new QuadNode(_node);
         newNode->x = (unsigned int)newX;
         newNode->y = (unsigned int)newY;
 
