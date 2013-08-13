@@ -46,7 +46,7 @@ namespace gazebo
 
     /// \class OpenAL OpenAL.hh util/util.hh
     /// \brief 3D audio setup and playback.
-    class OpenAL :public SingletonT<OpenAL>
+    class OpenAL : public SingletonT<OpenAL>
     {
       /// \brief Constructor
       private: OpenAL();
