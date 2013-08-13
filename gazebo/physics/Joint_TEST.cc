@@ -204,6 +204,8 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
           << "]\n";
   }
 
+  gzerr << "end test:"; getchar();
+
   // simulate a few steps
   int steps = 20;
   world->StepWorld(steps);
@@ -273,6 +275,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   physics::JointPtr joint_12 = model_1->GetJoint("joint2");
 
   gzdbg << "------------------- PD CONTROL -------------------\n";
+  gzerr << "begin test:"; getchar();
   static const double kp1 = 50000.0;
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
@@ -349,6 +352,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       //       << "]\n";
     }
   }
+  gzerr << "end test:"; getchar();
 }
 
 TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)

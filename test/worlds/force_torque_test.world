@@ -28,7 +28,7 @@
           <erp>0.200000</erp>
           <split_impulse>true</split_impulse>
           <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-          <contact_surface_layer>0.01000</contact_surface_layer>
+          <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </bullet>
       <real_time_update_rate>0.000000</real_time_update_rate>

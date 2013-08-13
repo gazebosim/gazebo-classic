@@ -129,21 +129,159 @@ void BulletJoint::CacheForceTorque()
 
   // caching force torque for the joint
   // if cached, GetForceTorque should use this value
-  // this->forceTorque
-  this->forceTorque.body2Force = -BulletTypes::ConvertVector3(
+  // this->wrench
+  this->wrench.body2Force = BulletTypes::ConvertVector3(
                       this->feedback->m_appliedForceBodyA);
-  this->forceTorque.body2Torque = -BulletTypes::ConvertVector3(
+  this->wrench.body2Torque = BulletTypes::ConvertVector3(
                       this->feedback->m_appliedTorqueBodyA);
-  this->forceTorque.body1Force = -BulletTypes::ConvertVector3(
+  this->wrench.body1Force = BulletTypes::ConvertVector3(
                       this->feedback->m_appliedForceBodyB);
-  this->forceTorque.body1Torque = -BulletTypes::ConvertVector3(
+  this->wrench.body1Torque = BulletTypes::ConvertVector3(
                       this->feedback->m_appliedTorqueBodyB);
   // gzerr << "   " << this->GetName()
-  //       << " : " << this->forceTorque.body1Force
-  //       << " : " << this->forceTorque.body1Torque
-  //       << " : " << this->forceTorque.body2Force
-  //       << " : " << this->forceTorque.body2Torque
+  //       << " : " << this->wrench.body1Force
+  //       << " : " << this->wrench.body1Torque
+  //       << " : " << this->wrench.body2Force
+  //       << " : " << this->wrench.body2Torque
   //       << "\n";
+
+  // get force applied through SetForce
+  physics::JointWrench wrenchAppliedWorld;
+  if (this->HasType(physics::Base::HINGE_JOINT))
+  {
+    // rotate force into child link frame
+    // GetLocalAxis is the axis specified in parent link frame!!!
+    wrenchAppliedWorld.body2Torque =
+      this->GetForce(0u) * this->GetLocalAxis(0u);
+
+    // gzerr << "body2Torque [" << wrenchAppliedWorld.body2Torque
+    //       << "] axis [" << this->GetLocalAxis(0u)
+    //       << "]\n";
+
+    wrenchAppliedWorld.body1Torque = -wrenchAppliedWorld.body2Torque;
+  }
+  else if (this->HasType(physics::Base::SLIDER_JOINT))
+  {
+    // rotate force into child link frame
+    wrenchAppliedWorld.body2Force =
+      this->GetForce(0u) * this->GetLocalAxis(0u);
+    wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
+  }
+  else
+  {
+    /// \TODO: fix for multi-axis joints
+    gzerr << "force torque for joint type [" << this->GetType()
+          << "] not implemented, returns false results!!\n";
+  }
+
+  // convert wrench from child cg location to child link frame
+  if (this->childLink)
+  {
+    math::Pose childPose = this->childLink->GetWorldPose();
+
+    // convert torque from about child CG to joint anchor location
+    // cg position specified in child link frame
+    math::Pose cgPose = this->childLink->GetInertial()->GetPose();
+
+    // anchorPose location of joint in child frame
+    // childMomentArm: from child CG to joint location in child link frame
+    // moment arm rotated into world frame (given feedback is in world frame)
+    math::Vector3 childMomentArm = childPose.rot.RotateVector(
+      (this->anchorPose - math::Pose(cgPose.pos, math::Quaternion())).pos);
+
+    // gzerr << "anchor [" << anchorPose
+    //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+    //       << "] childMomentArm[" << childMomentArm
+    //       << "] f1[" << this->wrench.body2Force
+    //       << "] t1[" << this->wrench.body2Torque
+    //       << "] fxp[" << this->wrench.body2Force.Cross(childMomentArm)
+    //       << "]\n";
+
+    this->wrench.body2Torque += this->wrench.body2Force.Cross(childMomentArm);
+
+    // rotate resulting body2Force in world frame into link frame
+    this->wrench.body2Force = childPose.rot.RotateVectorReverse(
+      -this->wrench.body2Force);
+
+    // rotate resulting body2Torque in world frame into link frame
+    this->wrench.body2Torque = childPose.rot.RotateVectorReverse(
+      -this->wrench.body2Torque);
+  }
+
+  // convert torque from about parent CG to joint anchor location
+  if (this->parentLink)
+  {
+    // get child pose, or it's the inertial world if childLink is NULL
+    math::Pose childPose;
+    if (this->childLink)
+      childPose = this->childLink->GetWorldPose();
+
+    math::Pose parentPose = this->parentLink->GetWorldPose();
+
+    // if parent link exists, convert torque from about parent
+    // CG to joint anchor location
+
+    // parent cg specified in parent link frame
+    math::Pose cgPose = this->parentLink->GetInertial()->GetPose();
+
+    // get parent CG pose in child link frame
+    math::Pose parentCGInChildLink =
+      math::Pose(cgPose.pos, math::Quaternion()) - (childPose - parentPose);
+
+    // anchor location in parent CG frame
+    // this is the moment arm, but it's in parent CG frame, we need
+    // to convert it into world frame
+    math::Pose anchorInParendCGFrame = this->anchorPose - parentCGInChildLink;
+
+    // paretnCGFrame in world frame
+    math::Pose parentCGInWorld = cgPose + parentPose;
+
+    // rotate momeent arms into world frame
+    math::Vector3 parentMomentArm = parentCGInWorld.rot.RotateVector(
+      (this->anchorPose - parentCGInChildLink).pos);
+
+    // gzerr << "anchor [" << this->anchorPose
+    //       << "] pcginc[" << parentCGInChildLink
+    //       << "] iarm[" << cgPose
+    //       << "] anc2pcg[" << this->anchorPose - parentCGInChildLink
+    //       << "] parentMomentArm[" << parentMomentArm
+    //       << "] f1[" << this->wrench.body1Force
+    //       << "] t1[" << this->wrench.body1Torque
+    //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
+    //       << "]\n";
+
+    this->wrench.body1Torque += this->wrench.body1Force.Cross(parentMomentArm);
+
+    // rotate resulting body1Force in world frame into link frame
+    this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
+      -this->wrench.body1Force);
+
+    // rotate resulting body1Torque in world frame into link frame
+    this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
+      -this->wrench.body1Torque);
+
+    if (!this->childLink)
+    {
+      // if child link does not exist, use equal and opposite
+      this->wrench.body2Force = -this->wrench.body1Force;
+      this->wrench.body2Torque = -this->wrench.body1Torque;
+    }
+  }
+  else
+  {
+    if (!this->childLink)
+    {
+      gzerr << "Both parent and child links are invalid, abort.\n";
+      return;
+    }
+    else
+    {
+      // if parentLink does not exist, use equal opposite body1 wrench
+      this->wrench.body1Force = -this->wrench.body2Force;
+      this->wrench.body1Torque = -this->wrench.body2Torque;
+    }
+  }
+  this->wrench = this->wrench - wrenchAppliedWorld;
 }
 
 //////////////////////////////////////////////////
@@ -155,7 +293,7 @@ JointWrench BulletJoint::GetForceTorque(int _index)
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  return this->forceTorque;
+  return this->wrench;
 }
 
 //////////////////////////////////////////////////

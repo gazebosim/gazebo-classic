@@ -20,8 +20,8 @@
       <bullet>
         <solver>
           <type>sequential_impulse</type>
-          <iters>1000</iters>
-          <sor>1.000000</sor>
+          <iters>250</iters>
+          <sor>1.400000</sor>
         </solver>
         <constraints>
           <cfm>0.000000</cfm>

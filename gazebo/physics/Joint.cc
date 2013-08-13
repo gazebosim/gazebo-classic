@@ -57,10 +57,10 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
-  this->forceTorque.body1Force = math::Vector3(0, 0, 0);
-  this->forceTorque.body1Torque = math::Vector3(0, 0, 0);
-  this->forceTorque.body2Force = math::Vector3(0, 0, 0);
-  this->forceTorque.body2Torque = math::Vector3(0, 0, 0);
+  this->wrench.body1Force = math::Vector3(0, 0, 0);
+  this->wrench.body1Torque = math::Vector3(0, 0, 0);
+  this->wrench.body2Force = math::Vector3(0, 0, 0);
+  this->wrench.body2Torque = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////

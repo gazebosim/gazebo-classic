@@ -499,9 +499,9 @@ namespace gazebo
       /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
 
-      /// \brief Store Joint force torque values before physics engine
-      ///        clears them
-      protected: JointWrench forceTorque;
+      /// \brief Cache Joint force torque values in case physics engine
+      /// clears them at the end of update step.
+      protected: JointWrench wrench;
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
