@@ -40,7 +40,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Actor.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/transport/Node.hh"
 
@@ -283,9 +283,9 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     }
   }
   double scriptTime = 0.0;
-  if (this->skelAnimation.size() > 0)
+  if (!this->skelAnimation.empty())
   {
-    if (this->trajInfo.size() == 0)
+    if (this->trajInfo.empty())
     {
       TrajectoryInfo tinfo;
       tinfo.id = 0;
