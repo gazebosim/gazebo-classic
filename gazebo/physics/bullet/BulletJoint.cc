@@ -121,6 +121,44 @@ void BulletJoint::Detach()
 }
 
 //////////////////////////////////////////////////
+void BulletJoint::CacheForceTorque()
+{
+  if (!this->provideFeedback)
+    return;
+
+  // caching force torque for the joint
+  // if cached, GetForceTorque should use this value
+  // this->forceTorque
+  if (this->parentLink)
+  {
+    btRigidBody parentRB = this->constraint->getRigidBodyB();
+    gzerr << "   " << this->GetName()
+          << " : " << BulletTypes::ConvertVector3(parentRB.getTotalForce())
+          << " : " << BulletTypes::ConvertVector3(parentRB.getTotalTorque())
+          << " : " << BulletTypes::ConvertVector3(
+                        this->feedback->m_appliedForceBodyB)
+          << " : " << BulletTypes::ConvertVector3(
+                        this->feedback->m_appliedTorqueBodyB)
+          << "\n";
+
+    // btVector3 tmp = this->constraint->getDeltaLinearVelocity();
+  }
+  if (this->childLink)
+  {
+    btRigidBody childRB = this->constraint->getRigidBodyA();
+    // gzerr << BulletTypes::ConvertVector3(childRB.getDeltaLinearVelocity())
+    gzerr << "   " << this->GetName()
+          << " : " << BulletTypes::ConvertVector3(childRB.getTotalForce())
+          << " : " << BulletTypes::ConvertVector3(childRB.getTotalTorque())
+          << " : " << BulletTypes::ConvertVector3(
+                        this->feedback->m_appliedForceBodyA)
+          << " : " << BulletTypes::ConvertVector3(
+                        this->feedback->m_appliedTorqueBodyA)
+          << "\n";
+  }
+}
+
+//////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(int _index)
 {
   return this->GetForceTorque(static_cast<unsigned int>(_index));
@@ -131,20 +169,6 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;
 
-  if (this->parentLink)
-  btRigidBody parentRB = this->constraint->getRigidBodyB();
-  btRigidBody childRB = this->constraint->getRigidBodyA();
-  // gzerr << BulletTypes::ConvertVector3(childRB.getDeltaLinearVelocity())
-  gzerr << " : " << BulletTypes::ConvertVector3(childRB.getTotalForce())
-        << " : " << BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyA)
-        << " : " << BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyB)
-        << " : " << BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyA)
-        << " : " << BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyB)
-        << "\n";
 
   return wrench;
 }
