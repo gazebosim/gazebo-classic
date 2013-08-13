@@ -17,12 +17,15 @@ if (HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
-set(tests
-#  RAMLibrary_TEST.cc
-#  factory_stress.cc
-#  transport_stress.cc
-)
-
-set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
-  "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
-gz_build_tests(${tests})
+# Per issue #802, these tests are not yet portable
+if (NOT APPLE)
+  set(tests
+    RAMLibrary_TEST.cc
+    factory_stress.cc
+    transport_stress.cc
+  )
+  
+  set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
+  gz_build_tests(${tests})
+endif()
