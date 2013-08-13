@@ -138,7 +138,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     CollisionPtr collisionPtr2 = link2->GetCollision(colIndex);
 
     if (!collisionPtr1 || !collisionPtr2)
-      return;
+      continue;
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
@@ -151,7 +151,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         collisionPtr1->GetWorld()->GetSimTime());
 
     if (!contactFeedback)
-      return;
+      continue;
 
     math::Pose body1Pose = link1->GetWorldPose();
     math::Pose body2Pose = link2->GetWorldPose();
@@ -454,7 +454,7 @@ void BulletPhysics::UpdatePhysics()
   // common::Time currTime =  this->world->GetRealTime();
 
   this->dynamicsWorld->stepSimulation(
-      this->maxStepSize, 1, this->maxStepSize);
+      this->maxStepSize, 0);  // , this->maxStepSize);
   // this->lastUpdateTime = currTime;
 }
 

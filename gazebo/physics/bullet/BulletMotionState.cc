@@ -60,6 +60,7 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
 
   // below is inefficient as we end up double caching for some joints
   // should consider adding a "dirty" flag.
+  // or trying doing this during BulletPhysics::InternalTickCallback(...)
   Joint_V parentJoints = this->link->GetParentJoints();
   for (unsigned int j = 0; j < parentJoints.size(); ++j)
   {

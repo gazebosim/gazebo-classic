@@ -64,9 +64,9 @@ void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletBallJoint::Init()
 {
-  BallJoint<BulletJoint>::Attach(_one, _two);
+  BallJoint<BulletJoint>::Init();
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -97,6 +97,9 @@ void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 /////////////////////////////////////////////////

@@ -52,11 +52,11 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletScrewJoint::Init()
 {
-  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
+  ScrewJoint<BulletJoint>::Init();
 
-  ScrewJoint<BulletJoint>::Attach(_one, _two);
+  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -136,6 +136,9 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
