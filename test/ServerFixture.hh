@@ -500,6 +500,14 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  ++i;
                }
                EXPECT_LT(i, 50);
+
+               i = 0;
+               while (sensors::get_sensor(_cameraName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
@@ -568,6 +576,14 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  ++i;
                }
                EXPECT_LT(i, 100);
+
+               i = 0;
+               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -636,7 +652,15 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+               ASSERT_LT(i, 100);
+
+               i = 0;
+               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -668,31 +692,37 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "    </cylinder>" << std::endl
                  << "  </geometry>" << std::endl
                  << "</collision>" << std::endl
-                 << "  <sensor name ='" << _imuSensorName << "' type ='imu'>" << std::endl
+                 << "  <sensor name ='" << _imuSensorName
+                 << "' type ='imu'>" << std::endl
                  << "    <imu>" << std::endl;
 
                if (_noiseType.size() > 0)
+               {
                  newModelStr << "      <noise>" << std::endl
-                 << "        <type>" << _noiseType << "</type>" << std::endl
+                 << "        <type>" << _noiseType << "</type>\n"
                  << "        <rate>" << std::endl
-                 << "          <mean>" << _rateNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _rateNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _rateBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _rateBiasStdDev << "</bias_stddev>" << std::endl
-                 << "        </rate>" << std::endl
-                 << "        <accel>" << std::endl
-                 << "          <mean>" << _accelNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _accelBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _accelBiasStdDev << "</bias_stddev>" << std::endl
-                 << "        </accel>" << std::endl
-                 << "      </noise>" << std::endl;
+                 << "          <mean>" << _rateNoiseMean << "</mean>\n"
+                 << "          <stddev>" << _rateNoiseStdDev << "</stddev>\n"
+                 << "          <bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+                 << "          <bias_stddev>" << _rateBiasStdDev
+                 << "</bias_stddev>\n"
+                 << "        </rate>\n"
+                 << "        <accel>\n"
+                 << "          <mean>" << _accelNoiseMean << "</mean>\n"
+                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>\n"
+                 << "          <bias_mean>" << _accelBiasMean
+                 << "</bias_mean>\n"
+                 << "          <bias_stddev>" << _accelBiasStdDev
+                 << "</bias_stddev>\n"
+                 << "        </accel>\n"
+                 << "      </noise>\n";
+               }
 
-               newModelStr << "    </imu>" << std::endl
-                 << "  </sensor>" << std::endl
-                 << "</link>" << std::endl
-                 << "</model>" << std::endl
-                 << "</sdf>" << std::endl;
+               newModelStr << "    </imu>\n"
+                 << "  </sensor>\n"
+                 << "</link>\n"
+                 << "</model>\n"
+                 << "</sdf>\n";
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
@@ -705,6 +735,14 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  ++i;
                }
                EXPECT_LT(i, 100);
+
+               i = 0;
+               while (sensors::get_sensor(_imuSensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -769,6 +807,14 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  ++i;
                }
                EXPECT_LT(i, 100);
+
+               i = 0;
+               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   /// \brief Spawn an IMU sensor on a link
@@ -838,6 +884,14 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  ++i;
                }
                EXPECT_LT(i, 50);
+
+               i = 0;
+               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnCylinder(const std::string &_name,

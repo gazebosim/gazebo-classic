@@ -121,8 +121,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
   if (_isServer)
+  {
     this->poseSub = this->node->Subscribe("~/pose/local/info",
-    &Scene::OnPoseMsg, this);
+        &Scene::OnPoseMsg, this);
+  }
   else
   {
     this->poseSub = this->node->Subscribe("~/pose/info",
@@ -156,7 +158,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->terrain = NULL;
   this->selectedVis.reset();
 
-  this->sceneSimTimePosesApplied  = common::Time();
+  this->sceneSimTimePosesApplied = common::Time();
   this->sceneSimTimePosesReceived = common::Time();
 }
 
@@ -1901,15 +1903,15 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
   VisualPtr linkVis;
 
- if (_msg->has_id())
-   linkVis = this->GetVisual(_msg->id());
- else
-   linkVis = this->GetVisual(_msg->name());
+  if (_msg->has_id())
+    linkVis = this->GetVisual(_msg->id());
+  else
+    linkVis = this->GetVisual(_msg->name());
 
   if (!linkVis)
   {
     gzerr << "No link visual with id[" << _msg->id() << "] and name["
-          << _msg->name() << "]\n";
+      << _msg->name() << "]\n";
     return false;
   }
 

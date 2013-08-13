@@ -29,7 +29,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"

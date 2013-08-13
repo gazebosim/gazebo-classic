@@ -1801,13 +1801,13 @@ void World::ProcessMessages()
 
         if (this->posePub && this->posePub->HasConnections())
           this->posePub->Publish(msg);
+      }
 
-        if (this->poseLocalPub && this->poseLocalPub->HasConnections())
-        {
-          // rendering::Scene depends on this timestamp, which is used by
-          // rendering sensors to time stamp their data
-          this->poseLocalPub->Publish(msg);
-        }
+      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->poseLocalPub->Publish(msg);
       }
     }
     this->publishModelPoses.clear();
