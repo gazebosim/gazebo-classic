@@ -142,6 +142,9 @@
             <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>
           </ode>
+          <bullet>
+            <provide_feedback>true</provide_feedback>
+          </bullet>
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
@@ -165,6 +168,9 @@
             <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>
           </ode>
+          <bullet>
+            <provide_feedback>true</provide_feedback>
+          </bullet>
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
