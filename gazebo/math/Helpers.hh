@@ -26,13 +26,22 @@
 #include <iostream>
 #include <vector>
 
+/// \brief Double maximum value
 #define GZ_DBL_MAX std::numeric_limits<double>::max()
+
+/// \brief Double min value
 #define GZ_DBL_MIN std::numeric_limits<double>::min()
 
+/// \brief Float maximum value
 #define GZ_FLT_MAX std::numeric_limits<float>::max()
+
+/// \brief Float minimum value
 #define GZ_FLT_MIN std::numeric_limits<float>::min()
 
+/// \brief 32bit unsigned integer maximum value
 #define GZ_UINT32_MAX std::numeric_limits<uint32_t>::max()
+
+/// \brief 32bit unsigned integer minimum value
 #define GZ_UINT32_MIN std::numeric_limits<uint32_t>::min()
 
 
