@@ -25,13 +25,6 @@
     </element>
   </element>
 
-  <element name="simbody" required="0">
-    <description>Simbody Physics Engine</description>
-    <element name="dt" type="double" default="0.001" required="1">
-      <description>Time step</description>
-    </element>
-  </element>
-
   <element name="ode" required="0">
     <description>ODE specific physics properties</description>
     <element name="solver" required="1">

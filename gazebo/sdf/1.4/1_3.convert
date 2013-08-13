@@ -13,10 +13,6 @@
         <from element="bullet::dt"/>
         <to element="max_step_size"/>
       </move>
-      <move>
-        <from element="simbody::dt"/>
-        <to element="max_step_size"/>
-      </move>
     </convert>
 
     <!-- See comments joint.sdf about poses in joints -->
