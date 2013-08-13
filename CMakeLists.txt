@@ -347,18 +347,28 @@ else (build_errors)
     gazebo_msgs
     gazebo_ode
     gazebo_opcode
-    gazebo_opcode_ou
+    gazebo_opende_ou
     gazebo_physics
-    gazebo_physics_bullet
     gazebo_physics_ode
-    gazebo_player
     gazebo_rendering
-    gazebo_rendering_deferred
     gazebo_selection_buffer
     gazebo_sensors
     gazebo_skyx
     gazebo_transport
     gazebo_util)
+    
+  if (INCLUDE_PLAYER)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
+  endif()
+
+  if (HAVE_BULLET)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
+  endif()
+  
+  if (${OGRE_VERSION} GREATER 1.7.4)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  endif()
+    
   if (HAVE_SDF)
     set(PKG_DEPENDS Boost Protobuf SDFormat)
   else()
