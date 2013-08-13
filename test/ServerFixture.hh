@@ -39,12 +39,12 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -58,7 +58,7 @@ using namespace gazebo;
 
 std::string custom_exec(std::string _cmd);
 
-class ServerFixture : public testing::Test
+class ServerFixture : public testing::TestWithParam<const char*>
 {
   protected: ServerFixture()
              {
