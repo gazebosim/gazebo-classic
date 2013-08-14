@@ -1,6 +1,9 @@
 #ifndef _DART_INC_H_
 #define _DART_INC_H_
 
+// This disables warning messages for ODE
+#pragma GCC system_header
+
 #include <dart/math/UtilsRotation.h>
 
 #include <dart/integration/Integrator.h>
