@@ -49,10 +49,8 @@ namespace gazebo
       /// Documentation inherited from parent.
       public: void Load();
 
-      /// \brief Creates an SDF box on the fly for visualization.
-      private: std::string GetTemplateSDFString();
-
-      /// \brief Callback when a new propagation grid is received.
+      /// \brief Callback when a new propagation grid is received
+      /// \brief[in] _msg New transmitter propagation grid received
       private: void OnNewPropagationGrid(ConstPropagationGridPtr &_msg);
 
       /// \brief Function that runs on the OGRE thread to refresh the UI.
@@ -66,9 +64,6 @@ namespace gazebo
 
       /// \brief Renders the points representing the signal strength.
       private: DynamicLines *points;
-
-      /// \brief Required for accessing to the visual elements.
-      private: sdf::SDFPtr modelTemplateSDF;
 
       /// \brief Use for allocate the visuals for the grid only the first time
       /// you receive the grid. The next times there are just updates.

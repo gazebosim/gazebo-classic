@@ -25,8 +25,6 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_sensors
-  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
@@ -36,9 +34,6 @@ namespace gazebo
     /// \brief Sensor class for receiving wireless signals.
     class WirelessTransceiver: public Sensor
     {
-      /// \brief Speed of light.
-      public: static const double C;
-
       /// \brief Constructor
       public: WirelessTransceiver();
 
@@ -54,16 +49,13 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      // Documentation inherited
-      public: virtual void Fini();
-
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
-      public: double GetGain();
+      public: double GetGain() const;
 
       /// \brief Returns the receiver power (dBm).
       /// \return Receiver power (dBm).
-      public: double GetPower();
+      public: double GetPower() const;
 
       /// \brief Parent entity
       protected: physics::EntityPtr entity;

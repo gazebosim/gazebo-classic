@@ -83,7 +83,7 @@ void TransmitterVisual::Update()
 
   if (this->isFirst)
   {
-    for (int i = 0; i < gridMsg->particle_size(); i++)
+    for (int i = 0; i < gridMsg->particle_size(); ++i)
     {
       p = gridMsg->particle(i);
       this->points->AddPoint(p.x(), p.y(), 0.0);
@@ -92,7 +92,7 @@ void TransmitterVisual::Update()
   }
 
   // Update the list of visual elements
-  for (int i = 0; i < gridMsg->particle_size(); i++)
+  for (int i = 0; i < gridMsg->particle_size(); ++i)
   {
     p = gridMsg->particle(i);
     this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
@@ -103,7 +103,7 @@ void TransmitterVisual::Update()
     strength = 1.0 - (strength / 255.0);
 
     // Set the color in gray scale
-    Ogre::ColourValue color(strength, strength, strength);
+    common::Color color(strength, strength, strength);
     this->points->SetColor(i, color);
   }
 }

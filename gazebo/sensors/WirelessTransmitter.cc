@@ -29,12 +29,12 @@ using namespace physics;
 
 GZ_REGISTER_STATIC_SENSOR("wireless_transmitter", WirelessTransmitter)
 
-const double WirelessTransmitter::N_EMPTY = 6;
-const double WirelessTransmitter::N_OBSTACLE = 12.0;
-const double WirelessTransmitter::MODEL_STD_DESV = 6.0;
-const double WirelessTransmitter::XLIMIT = 10.0;
-const double WirelessTransmitter::YLIMIT = 10.0;
-const double WirelessTransmitter::STEP = 0.25;
+const double WirelessTransmitter::NEmpty = 6;
+const double WirelessTransmitter::NObstacle = 12.0;
+const double WirelessTransmitter::ModelStdDesv = 6.0;
+const double WirelessTransmitter::XLimit = 10.0;
+const double WirelessTransmitter::YLimit = 10.0;
+const double WirelessTransmitter::Step = 0.25;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
@@ -42,6 +42,9 @@ WirelessTransmitter::WirelessTransmitter()
 {
   this->active = false;
   srand((unsigned)time(NULL));
+
+  this->essid = "MyESSID";
+  this->freq = 2442.0;
 }
 
 /////////////////////////////////////////////////
@@ -50,6 +53,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   WirelessTransceiver::Load(_worldName);
 
   this->entity = this->world->GetEntity(this->parentName);
+  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
 
   if (this->sdf->HasElement("transceiver"))
   {
@@ -80,11 +84,11 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     double strength;
     msgs::PropagationParticle *p;
 
-    for (double x = -XLIMIT; x <= XLIMIT; x += STEP)
+    for (double x = -this->XLimit; x <= this->XLimit; x += this->Step)
     {
-      for (double y = -YLIMIT; y <= YLIMIT; y += STEP)
+      for (double y = -YLimit; y <= YLimit; y += Step)
       {
-        pos = math::Pose(x, y, 0, 0, 0, 0);
+        pos.Set(x, y, 0.0, 0.0, 0.0, 0.0);
         // For the propagation model assume the receiver antenna has the same
         // gain as the transmitter
         strength = this->GetSignalStrength(pos, this->GetGain());
@@ -108,13 +112,13 @@ void WirelessTransmitter::Fini()
 }
 
 /////////////////////////////////////////////////
-std::string WirelessTransmitter::GetESSID()
+std::string WirelessTransmitter::GetESSID() const
 {
   return this->essid;
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetFreq()
+double WirelessTransmitter::GetFreq() const
 {
   return this->freq;
 }
@@ -140,28 +144,25 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
       GetPhysicsUpdateMutex()));
 
   // Compute the value of n depending on the obstacles between Tx and Rx
-  double n = N_EMPTY;
+  double n = NEmpty;
 
-  // Ray used to test for collisions when placing entities
-  physics::RayShapePtr testRay;
-
-  testRay = boost::dynamic_pointer_cast<RayShape>(
+  // Check for collisions between transmitter and receiver
+  this->testRay = boost::static_pointer_cast<RayShape>(
       world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
-
-  testRay->SetPoints(start, end);
-  testRay->GetIntersection(dist, entityName);
-  testRay.reset();
+  this->testRay->SetPoints(start, end);
+  this->testRay->GetIntersection(dist, entityName);
+  this->testRay.reset();
 
   // ToDo: The ray intersects with my own collision model. Fix it.
   if (dist > 0 && entityName != "ground_plane::link::collision" &&
       entityName != "" && entityName != "wirelessReceiver::link::collision-box")
   {
-    n = N_OBSTACLE;
+    n = NObstacle;
   }
 
   double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));
-  double x = abs(math::Rand::GetDblNormal(0.0, MODEL_STD_DESV));
-  double wavelength = C / (this->GetFreq() * 1000000);
+  double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
+  double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
   double rxPower = this->GetPower() + this->GetGain() + rxGain - x +

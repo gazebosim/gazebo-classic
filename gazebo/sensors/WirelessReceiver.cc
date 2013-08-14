@@ -33,6 +33,10 @@ GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 WirelessReceiver::WirelessReceiver()
 : WirelessTransceiver()
 {
+  // Initialization
+  this->minFreq = 2412.0;
+  this->maxFreq = 2484.0;
+  this->sensitivity = -90.0;
 }
 
 /////////////////////////////////////////////////
@@ -42,6 +46,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
 
   this->entity = this->world->GetEntity(this->parentName);
+  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
 
   if (this->sdf->HasElement("transceiver"))
   {
@@ -61,7 +66,9 @@ void WirelessReceiver::Load(const std::string &_worldName)
     {
       this->sensitivity = transElem->Get<double>("sensitivity");
     }
-  }
+
+    this->sensitivity = transElem->Get<double>("sensitivity");
+  } 
 }
 
 //////////////////////////////////////////////////
@@ -74,17 +81,17 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     double rxPower;
     double txFreq;
 
-    math::Pose myPos = entity->GetWorldPose();
+    math::Pose myPos = this->entity->GetWorldPose();
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
     for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
     {
       if ((*it)->GetType() == "wireless_transmitter")
       {
-        txFreq = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetFreq();
+        boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter = 
+            boost::static_pointer_cast<WirelessTransmitter>(*it);
 
-        rxPower = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetSignalStrength(myPos, this->GetGain());
+        txFreq = transmitter->GetFreq();
+        rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
 
         // Disgard if the frequency received is out of our frequency range,
         // or if the received signal strengh is lower than the sensivity
@@ -95,8 +102,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
           continue;
         }
 
-        txEssid = boost::dynamic_pointer_cast<WirelessTransmitter>(*it)->
-            GetESSID();
+        txEssid = transmitter->GetESSID();
 
         msgs::WirelessNode *wirelessNode = msg.add_node();
         wirelessNode->set_essid(txEssid);
@@ -112,19 +118,19 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetLowerFreqFiltered()
+double WirelessReceiver::GetLowerFreqFiltered() const
 {
   return this->minFreq;
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetHigherFreqFiltered()
+double WirelessReceiver::GetHigherFreqFiltered() const
 {
   return this->maxFreq;
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetSensitivity()
+double WirelessReceiver::GetSensitivity() const
 {
   return this->sensitivity;
 }

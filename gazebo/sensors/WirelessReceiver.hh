@@ -25,8 +25,6 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_sensors
-  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
@@ -47,15 +45,15 @@ namespace gazebo
 
       /// \brief Returns the lower frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetLowerFreqFiltered();
+      public: double GetLowerFreqFiltered() const;
 
       /// \brief Returns the higher frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetHigherFreqFiltered();
+      public: double GetHigherFreqFiltered() const;
 
       /// \brief Returns the receiver sensitivity (dBm).
       /// \return Receiver sensitivity (dBm).
-      public: double GetSensitivity();
+      public: double GetSensitivity() const;
 
       /// \brief Reception low filter frequency (MHz).
       private: double minFreq;

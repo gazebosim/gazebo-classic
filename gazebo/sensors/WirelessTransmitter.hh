@@ -36,15 +36,15 @@ namespace gazebo
     {
       /// \brief Constant used in the propagation model when there are no
       /// obstacles between transmitter and receiver
-      public: static const double N_EMPTY;
+      public: static const double NEmpty;
 
       /// \brief Constant used in the propagation model when there are
       /// obstacles between transmitter and receiver
-      public: static const double N_OBSTACLE;
+      public: static const double NObstacle;
 
       /// \brief Std desv of the Gaussian random variable used in the
       /// propagation model
-      public: static const double MODEL_STD_DESV;
+      public: static const double ModelStdDesv;
 
       /// \brief Constructor.
       public: WirelessTransmitter();
@@ -60,11 +60,11 @@ namespace gazebo
 
       /// \brief Returns the Service Set Identifier (network name).
       /// \return Service Set Identifier (network name).
-      public: std::string GetESSID();
+      public: std::string GetESSID() const;
 
       /// \brief Returns reception frequency (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetFreq();
+      public: double GetFreq() const;
 
       /// \brief Returns the pose of the transmitter in world coordinate.
       /// \return Pose of object.
@@ -76,21 +76,24 @@ namespace gazebo
           const double rxGain);
 
       /// \brief Size of the grid used for visualization.
-      private: static const double STEP;
+      private: static const double Step;
 
       /// \brief The visualization shows the propagation model from a grid
       /// in which the x coordinates go from -XLIMIT to XLIMIT.
-      private: static const double XLIMIT;
+      private: static const double XLimit;
 
       /// \brief The visualization shows the propagation model from a grid
       /// in which the y coordinates go from -YLIMIT to YLIMIT.
-      private: static const double YLIMIT;
+      private: static const double YLimit;
 
       /// \brief Service Set Identifier (network name).
       private: std::string essid;
 
       /// \brief Reception frequency (MHz).
       protected: double freq;
+
+      // \brief Ray used to test for collisions when placing entities
+      private: physics::RayShapePtr testRay;
     };
     /// \}
   }

@@ -30,12 +30,12 @@ class TransceiverTest : public ServerFixture
   public: void TxRxObstacle(const std::string &_physicsEngine);
   private: void RxMsg(const ConstWirelessNodesPtr &_msg);
 
-  private: static const double MIN_FREQ;
-  private: static const double MAX_FREQ;
-  private: static const double GAIN;
-  private: static const double POWER;
-  private: static const double SENSITIVITY;
-  private: static const double MAX_POS;
+  private: static const double MinFreq;
+  private: static const double MaxFreq;
+  private: static const double Gain;
+  private: static const double Power;
+  private: static const double Sensitivity;
+  private: static const double MaxPos;
 
   private: boost::mutex mutex;
   private: std::vector<int> num_msgs;
@@ -44,12 +44,12 @@ class TransceiverTest : public ServerFixture
   private: bool receivedMsg;
 };
 
-const double TransceiverTest::MIN_FREQ = 2412.0;
-const double TransceiverTest::MAX_FREQ = 2484.0;
-const double TransceiverTest::GAIN = 2.6;
-const double TransceiverTest::POWER = 14.5;
-const double TransceiverTest::SENSITIVITY = -90.0;
-const double TransceiverTest::MAX_POS = 10.0;
+const double TransceiverTest::MinFreq = 2412.0;
+const double TransceiverTest::MaxFreq = 2484.0;
+const double TransceiverTest::Gain = 2.6;
+const double TransceiverTest::Power = 14.5;
+const double TransceiverTest::Sensitivity = -90.0;
+const double TransceiverTest::MaxPos = 10.0;
 
 /////////////////////////////////////////////////
 TransceiverTest::TransceiverTest()
@@ -82,22 +82,18 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(TransceiverTest::MIN_FREQ,
-        TransceiverTest::MAX_FREQ);
+    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-TransceiverTest::MAX_POS,
-          TransceiverTest::MAX_POS);
-    double y = math::Rand::GetDblUniform(-TransceiverTest::MAX_POS,
-          TransceiverTest::MAX_POS);
-    math::Pose txPose(math::Vector3(x, y, 0.055),
-        math::Quaternion(0, 0, 0));
+    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-        txPose.rot.GetAsEuler(), txEssid, txFreq, this->POWER, this->GAIN);
+        txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
     sensors::WirelessTransmitterPtr tx =
         boost::static_pointer_cast<sensors::WirelessTransmitter>(
@@ -117,8 +113,8 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
 
   // Spawn rx
   SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
-      rxPose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
-      this->GAIN, this->SENSITIVITY);
+      rxPose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+      this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
     boost::static_pointer_cast<sensors::WirelessReceiver>(
@@ -186,8 +182,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   // Spawn tx
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), "osrf", 2450.0, this->POWER,
-      this->GAIN);
+      txPose.rot.GetAsEuler(), "osrf", 2450.0, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx =
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
@@ -203,8 +198,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   // Spawn rx1
   SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.pos,
-      rx1Pose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
-      this->GAIN, this->SENSITIVITY);
+      rx1Pose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+      this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx1 =
       boost::static_pointer_cast<sensors::WirelessReceiver>(
@@ -219,8 +214,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
-      rx2Pose.rot.GetAsEuler(), this->MIN_FREQ, this->MAX_FREQ, this->POWER,
-      this->GAIN, this->SENSITIVITY);
+      rx2Pose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+      this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx2 =
       boost::static_pointer_cast<sensors::WirelessReceiver>(
@@ -304,28 +299,27 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_F(TransceiverTest, EmptyWorldODE)
+TEST_P(TransceiverTest, EmptyWorld)
 {
-  TxRxEmptySpace("ode");
+  TxRxEmptySpace(GetParam());
 }
 
 /////////////////////////////////////////////////
-TEST_F(TransceiverTest, ObstacleODE)
+TEST_P(TransceiverTest, Obstacle)
 {
-  TxRxObstacle("ode");
+  TxRxObstacle(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
+    ::testing::Values("ode"));
 
 #ifdef HAVE_BULLET
-/////////////////////////////////////////////////
-TEST_F(TransceiverTest, EmptyWorldBullet)
-{
-  TxRxEmptySpace("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
+    ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
-/////////////////////////////////////////////////
-TEST_F(TransceiverTest, ObstacleBullet)
+int main(int argc, char **argv)
 {
-  TxRxObstacle("bullet");
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
-#endif

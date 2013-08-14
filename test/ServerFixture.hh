@@ -883,7 +883,7 @@ class ServerFixture : public testing::Test
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
-               waitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilEntitySpawn(_name, 20, 50);
              }
 
   /// \brief Spawn an Wireless receiver sensor on a link
@@ -931,10 +931,14 @@ class ServerFixture : public testing::Test
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
-               waitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilEntitySpawn(_name, 20, 50);
              }
 
-  private: void waitUntilEntitySpawn(const std::string &_name,
+  /// \brief Wait for a number of ms. and attempts until the entity is spawned
+  /// \param[in] _name Model name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilEntitySpawn(const std::string &_name,
                                      unsigned int sleep_each,
                                      int retries)
              {

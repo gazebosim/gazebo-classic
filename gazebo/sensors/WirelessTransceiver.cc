@@ -29,13 +29,13 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("Wireless_transceiver", WirelessTransceiver)
 
-const double WirelessTransceiver::C = 299792458;
-
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
   : Sensor(sensors::OTHER)
 {
   this->active = false;
+  this->gain = 2.5;
+  this->power = 14.5;
 }
 
 /////////////////////////////////////////////////
@@ -59,6 +59,7 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->entity = this->world->GetEntity(this->parentName);
+  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
 
   if (this->sdf->HasElement("transceiver"))
   {
@@ -76,12 +77,6 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   }
 }
 
-/////////////////////////////////////////////////
-void WirelessTransceiver::Fini()
-{
-  Sensor::Fini();
-}
-
 //////////////////////////////////////////////////
 void WirelessTransceiver::Init()
 {
@@ -89,13 +84,13 @@ void WirelessTransceiver::Init()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetPower()
+double WirelessTransceiver::GetPower() const
 {
   return this->power;
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetGain()
+double WirelessTransceiver::GetGain() const
 {
   return this->gain;
 }

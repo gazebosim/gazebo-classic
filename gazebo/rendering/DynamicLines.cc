@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ using namespace gazebo;
 using namespace rendering;
 
 enum {POSITION_BINDING, TEXCOORD_BINDING};
-const Ogre::ColourValue DynamicLines::WHITE(1.0, 1.0, 1.0);
 
 /////////////////////////////////////////////////
 DynamicLines::DynamicLines(RenderOpType opType)
@@ -61,17 +60,17 @@ const Ogre::String &DynamicLines::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(const math::Vector3 &pt,
-                            const Ogre::ColourValue &_color)
+void DynamicLines::AddPoint(const math::Vector3 &_pt,
+                            const common::Color &_color)
 {
-  this->points.push_back(pt);
+  this->points.push_back(_pt);
   this->colors.push_back(_color);
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(double _x, double _y, double _z,
-                            const Ogre::ColourValue &_color)
+                            const common::Color &_color)
 {
   this->AddPoint(math::Vector3(_x, _y, _z), _color);
 }
@@ -93,7 +92,7 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetColor(unsigned int _index, const Ogre::ColourValue &_color)
+void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 {
   this->colors[_index] = _color;
   this->dirty = true;
@@ -176,11 +175,11 @@ void DynamicLines::FillHardwareBuffers()
 
   Ogre::RGBA *colorArrayBuffer =
         static_cast<Ogre::RGBA*>(cbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-  Ogre::RenderSystem* renderSystemForVertex =
+  Ogre::RenderSystem *renderSystemForVertex =
         Ogre::Root::getSingleton().getRenderSystem();
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < size; ++i)
   {
-    Ogre::ColourValue color = this->colors[i];
+    Ogre::ColourValue color = Conversions::Convert(this->colors[i]);
     renderSystemForVertex->convertColourValue(color, &colorArrayBuffer[i]);
   }
   cbuf->unlock();

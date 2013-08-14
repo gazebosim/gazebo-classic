@@ -101,6 +101,9 @@ namespace gazebo
     template <typename T>
     class ParamT;
 
+    /// \brief Speed of light.
+    static const double SpeedOfLight = 299792458;
+
     /// \def Param_V
     /// \brief std::vector of Param*
     typedef std::vector<common::Param*> Param_V;
