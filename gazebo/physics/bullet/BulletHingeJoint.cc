@@ -240,9 +240,12 @@ void BulletHingeJoint::SetVelocity(int _index, double _angle)
 
   // TODO: Should prescribe the linear velocity of the child link if there is an
   // offset between the child's CG and the joint anchor.
-  math::Vector3 desiredVel = this->parentLink->GetWorldAngularVel();
+  math::Vector3 desiredVel;
+  if (this->parentLink)
+    desiredVel = this->parentLink->GetWorldAngularVel();
   desiredVel += _angle * this->GetGlobalAxis(_index);
-  this->childLink->SetAngularVel(desiredVel);
+  if (this->childLink)
+    this->childLink->SetAngularVel(desiredVel);
 }
 
 //////////////////////////////////////////////////
