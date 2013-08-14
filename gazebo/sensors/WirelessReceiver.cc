@@ -68,7 +68,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
     }
 
     this->sensitivity = transElem->Get<double>("sensitivity");
-  } 
+  }
 }
 
 //////////////////////////////////////////////////
@@ -87,7 +87,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     {
       if ((*it)->GetType() == "wireless_transmitter")
       {
-        boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter = 
+        boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
             boost::static_pointer_cast<WirelessTransmitter>(*it);
 
         txFreq = transmitter->GetFreq();

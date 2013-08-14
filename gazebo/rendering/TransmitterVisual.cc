@@ -48,8 +48,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 TransmitterVisual::~TransmitterVisual()
 {
-  delete this->points;
-  this->points = NULL;
+  DeleteDynamicLine(this->points);
 }
 
 /////////////////////////////////////////////////
@@ -71,6 +70,8 @@ void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 ////////////////////////////////////////////////
 void TransmitterVisual::Update()
 {
+  gazebo::msgs::PropagationParticle p;
+
   boost::mutex::scoped_lock lock(this->mutex);
 
   if (!this->gridMsg || !this->receivedMsg)
@@ -78,8 +79,6 @@ void TransmitterVisual::Update()
 
   // Update the visualization of the last propagation grid received
   this->receivedMsg = false;
-
-  gazebo::msgs::PropagationParticle p;
 
   if (this->isFirst)
   {

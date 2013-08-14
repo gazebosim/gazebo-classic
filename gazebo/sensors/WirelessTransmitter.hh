@@ -49,6 +49,9 @@ namespace gazebo
       /// \brief Constructor.
       public: WirelessTransmitter();
 
+      /// \brief Destructor
+      public: virtual ~WirelessTransmitter();
+
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
@@ -59,7 +62,7 @@ namespace gazebo
       public: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited
-      public: void Init();
+      public: virtual void Init();
 
       /// \brief Returns the Service Set Identifier (network name).
       /// \return Service Set Identifier (network name).

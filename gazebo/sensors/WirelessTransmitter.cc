@@ -41,10 +41,14 @@ WirelessTransmitter::WirelessTransmitter()
 : WirelessTransceiver()
 {
   this->active = false;
-  srand((unsigned)time(NULL));
-
   this->essid = "MyESSID";
   this->freq = 2442.0;
+}
+
+/////////////////////////////////////////////////
+WirelessTransmitter::~WirelessTransmitter()
+{
+  this->testRay.reset();
 }
 
 /////////////////////////////////////////////////
@@ -79,9 +83,10 @@ void WirelessTransmitter::Init()
 {
   Sensor::Init();
 
-  // If uncomment don't forget to comment out the line in GetSignalStrength()
-  //this->testRay = boost::dynamic_pointer_cast<RayShape>(
-  //    world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+  // This ray will be used in GetSignalStrength() for checking obstacles
+  // between the transmitter and a given point.
+  this->testRay = boost::dynamic_pointer_cast<RayShape>(
+      world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 }
 
 //////////////////////////////////////////////////
@@ -99,6 +104,7 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
       for (double y = -YLimit; y <= YLimit; y += Step)
       {
         pos.Set(x, y, 0.0, 0.0, 0.0, 0.0);
+
         // For the propagation model assume the receiver antenna has the same
         // gain as the transmitter
         strength = this->GetSignalStrength(pos, this->GetGain());
@@ -156,12 +162,9 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = NEmpty;
 
-  // Check for collisions between transmitter and receiver
-  this->testRay = boost::dynamic_pointer_cast<RayShape>(
-      world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+  // Looking for obstacles between start and end points
   this->testRay->SetPoints(start, end);
   this->testRay->GetIntersection(dist, entityName);
-  this->testRay.reset();
 
   // ToDo: The ray intersects with my own collision model. Fix it.
   if (dist > 0 && entityName != "ground_plane::link::collision" &&
