@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "test/ServerFixture.hh"

@@ -25,7 +25,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid

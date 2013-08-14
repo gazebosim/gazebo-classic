@@ -19,7 +19,7 @@
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
