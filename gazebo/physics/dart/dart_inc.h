@@ -1,30 +1,30 @@
 #ifndef _DART_INC_H_
 #define _DART_INC_H_
 
-#include <dart/math/UtilsRotation.h>
+#include <math/UtilsRotation.h>
 
-#include <dart/integration/Integrator.h>
-#include <dart/integration/EulerIntegrator.h>
-#include <dart/integration/RK4Integrator.h>
+#include <integration/Integrator.h>
+#include <integration/EulerIntegrator.h>
+#include <integration/RK4Integrator.h>
 
-#include <dart/dynamics/Dof.h>
-#include <dart/dynamics/Joint.h>
-#include <dart/dynamics/Shape.h>
-#include <dart/dynamics/ShapeBox.h>
-#include <dart/dynamics/ShapeCylinder.h>
-#include <dart/dynamics/ShapeEllipsoid.h>
-#include <dart/dynamics/ShapeMesh.h>
-#include <dart/dynamics/BodyNode.h>
-#include <dart/dynamics/Skeleton.h>
-#include <dart/dynamics/BallJoint.h>
-#include <dart/dynamics/RevoluteJoint.h>
-#include <dart/dynamics/PrismaticJoint.h>
-#include <dart/dynamics/FreeJoint.h>
-#include <dart/dynamics/WeldJoint.h>
+#include <dynamics/Dof.h>
+#include <dynamics/Joint.h>
+#include <dynamics/Shape.h>
+#include <dynamics/ShapeBox.h>
+#include <dynamics/ShapeCylinder.h>
+#include <dynamics/ShapeEllipsoid.h>
+#include <dynamics/ShapeMesh.h>
+#include <dynamics/BodyNode.h>
+#include <dynamics/Skeleton.h>
+#include <dynamics/BallJoint.h>
+#include <dynamics/RevoluteJoint.h>
+#include <dynamics/PrismaticJoint.h>
+#include <dynamics/FreeJoint.h>
+#include <dynamics/WeldJoint.h>
 
-#include <dart/constraint/Constraint.h>
-#include <dart/constraint/ConstraintDynamics.h>
+#include <constraint/Constraint.h>
+#include <constraint/ConstraintDynamics.h>
 
-#include <dart/simulation/World.h>
+#include <simulation/World.h>
 
 #endif
