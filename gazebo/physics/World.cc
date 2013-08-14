@@ -33,13 +33,13 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -1783,7 +1783,6 @@ void World::ProcessMessages()
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-    msgs::Pose *poseMsg;
 
     if ((this->posePub && this->posePub->HasConnections()) ||
         (this->poseLocalPub && this->poseLocalPub->HasConnections()))
@@ -1799,7 +1798,7 @@ void World::ProcessMessages()
             this->publishModelPoses.begin();
             iter != this->publishModelPoses.end(); ++iter)
         {
-          poseMsg = msg.add_pose();
+          msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the model's relative pose
           poseMsg->set_name((*iter)->GetScopedName());
