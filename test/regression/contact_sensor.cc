@@ -20,6 +20,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
+#include "helper_physics_generator.hh"
 
 #define TOL 1e-4
 
@@ -402,11 +403,7 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, ContactSensor, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, ContactSensor, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(ContactSensor);
 
 int main(int argc, char **argv)
 {
