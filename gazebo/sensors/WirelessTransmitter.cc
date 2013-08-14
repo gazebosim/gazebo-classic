@@ -75,6 +75,16 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
+void WirelessTransmitter::Init()
+{
+  Sensor::Init();
+
+  // If uncomment don't forget to comment out the line in GetSignalStrength()
+  //this->testRay = boost::dynamic_pointer_cast<RayShape>(
+  //    world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+}
+
+//////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   if (this->pub)
@@ -147,7 +157,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   double n = NEmpty;
 
   // Check for collisions between transmitter and receiver
-  this->testRay = boost::static_pointer_cast<RayShape>(
+  this->testRay = boost::dynamic_pointer_cast<RayShape>(
       world->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
   this->testRay->SetPoints(start, end);
   this->testRay->GetIntersection(dist, entityName);

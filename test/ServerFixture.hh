@@ -919,7 +919,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "    <visualize>true</visualize>"
                  << "    <transceiver>"
                  << "      <min_frequency>" << _minFreq << "</min_frequency>"
-                 << "      <maxFrequency>" << _maxFreq << "</max_frequency>"
+                 << "      <max_frequency>" << _maxFreq << "</max_frequency>"
                  << "      <power>" << _power << "</power>"
                  << "      <gain>" << _gain << "</gain>"
                  << "      <sensitivity>" << _sensitivity << "</sensitivity>"

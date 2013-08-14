@@ -58,6 +58,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
+      // Documentation inherited
+      public: void Init();
+
       /// \brief Returns the Service Set Identifier (network name).
       /// \return Service Set Identifier (network name).
       public: std::string GetESSID() const;

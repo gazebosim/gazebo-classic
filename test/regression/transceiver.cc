@@ -72,13 +72,10 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   typedef std::map<std::string, sensors::WirelessTransmitterPtr> trans_map_type;
   trans_map_type transmitters;
 
-  srand(time(NULL));
-  unsigned int seed = time(NULL);
-
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = (rand_r(&seed) % 10) + 1;
+  int nTransmitters = math::Rand::GetIntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
@@ -131,7 +128,8 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       &TransceiverTest::RxMsg, this);
   this->receivedMsg = false;
 
-  while (true)
+  // Loop a max. of ~5 seconds
+  for (int i = 0; i < 50; ++i)
   {
     // Update all the transmitter sensors
     BOOST_FOREACH(const trans_map_type::value_type& myPair, transmitters)
@@ -160,9 +158,10 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
         EXPECT_LE(txNode.signal_level(), 0);
         EXPECT_GE(txNode.signal_level(), rx->GetSensitivity());
       }
-      break;
+      return;
     }
   }
+  FAIL();
 }
 
 /////////////////////////////////////////////////
@@ -237,7 +236,9 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   this->receivedMsg = false;
 
-  while (samples < 10)
+  // Loop until you have 10 samples or timeout after ~5segs
+  int iters = 0;
+  while (samples < 10 && iters < 50)
   {
     // Update all the sensors
     tx->Update(true);
@@ -261,16 +262,19 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
         avgSignalLevelEmpty += signalLevel;
       }
     }
+    ++iters;
   }
 
   samples = 0;
+  iters = 0;
 
   std::string rx2Topic = "/gazebo/default/rx2/link/wirelessRx2/transceiver";
   sub = node->Subscribe(rx2Topic, &TransceiverTest::RxMsg, this);
 
   this->receivedMsg = false;
 
-  while (samples < 10)
+  // Loop until you have 10 samples or timeout after ~5segs
+  while (samples < 10 && iters < 50)
   {
     // Update all the sensors
     tx->Update(true);
@@ -294,8 +298,12 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
         avgSignalLevelObstacle += signalLevel;
       }
     }
+    ++iters;
   }
-  EXPECT_GE(avgSignalLevelEmpty / samples, avgSignalLevelObstacle / samples);
+
+  // Check that the signal level in the not-occluded receiver is higher than
+  // the signal received by the occluded receiver
+  EXPECT_GT(avgSignalLevelEmpty / samples, avgSignalLevelObstacle / samples);
 }
 
 /////////////////////////////////////////////////
@@ -310,14 +318,17 @@ TEST_P(TransceiverTest, Obstacle)
   TxRxObstacle(GetParam());
 }
 
+/////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
     ::testing::Values("ode"));
 
+/////////////////////////////////////////////////
 #ifdef HAVE_BULLET
 INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
     ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
