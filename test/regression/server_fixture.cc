@@ -110,10 +110,10 @@ TEST_F(ServerFixtureTest, SpawnSDF)
 }
 
 INSTANTIATE_TEST_CASE_P(TestODE, ServerFixtureTest,
-   ::testing::Values("ode"));
+  ::testing::Values("ode"));
 
 #ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, ServerFixtureTest, 
+INSTANTIATE_TEST_CASE_P(TestBullet, ServerFixtureTest,
   ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
