@@ -26,13 +26,19 @@
 using namespace gazebo;
 class ContactSensor : public ServerFixture
 {
+  public: void EmptyWorld(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
 };
 
-TEST_F(ContactSensor, EmptyWorld)
+void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", false, _physicsEngine);
+}
+
+TEST_P(ContactSensor, EmptyWorld)
+{
+  EmptyWorld(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

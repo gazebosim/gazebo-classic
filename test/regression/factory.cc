@@ -29,6 +29,10 @@
 using namespace gazebo;
 class FactoryTest : public ServerFixture
 {
+  public: void BoxSdf(const std::string &_physicsEngine);
+  public: void Box(const std::string &_physicsEngine);
+  public: void Sphere(const std::string &_physicsEngine);
+  public: void Cylinder(const std::string &_physicsEngine);
 };
 
 ///////////////////////////////////////////////////
@@ -36,10 +40,10 @@ class FactoryTest : public ServerFixture
 // via factory messages. A change between 1.6, 1.7
 // caused entities to lose their sdf data
 // (see issue #651)
-TEST_F(FactoryTest, BoxSdf)
+void FactoryTest::BoxSdf(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world", true);
+  Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -70,11 +74,15 @@ TEST_F(FactoryTest, BoxSdf)
   }
 }
 
-TEST_F(FactoryTest, Box)
+TEST_P(FactoryTest, BoxSdf)
+{
+  BoxSdf(GetParam());
+}
+
+void FactoryTest::Box(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  SetPause(true);
+  Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -90,11 +98,15 @@ TEST_F(FactoryTest, Box)
   }
 }
 
-TEST_F(FactoryTest, Sphere)
+TEST_P(FactoryTest, Box)
+{
+  Box(GetParam());
+}
+
+void FactoryTest::Sphere(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  SetPause(true);
+  Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -109,11 +121,15 @@ TEST_F(FactoryTest, Sphere)
   }
 }
 
-TEST_F(FactoryTest, Cylinder)
+TEST_P(FactoryTest, Sphere)
+{
+  Sphere(GetParam());
+}
+
+void FactoryTest::Cylinder(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  SetPause(true);
+  Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -128,10 +144,15 @@ TEST_F(FactoryTest, Cylinder)
   }
 }
 
-TEST_F(FactoryTest, Camera)
+TEST_P(FactoryTest, Cylinder)
 {
-  // Disabling this test for now. Different machines return different
-  // camera images. Need a better way to evaluate rendered content.
+  Cylinder(GetParam());
+}
+
+// Disabling this test for now. Different machines return different
+// camera images. Need a better way to evaluate rendered content.
+//TEST_F(FactoryTest, Camera)
+//{
 /*
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
@@ -160,7 +181,13 @@ TEST_F(FactoryTest, Camera)
   ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
   ASSERT_EQ(0.0, diffAvg);
   */
-}
+//}
+
+INSTANTIATE_TEST_CASE_P(TestODE, FactoryTest, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, FactoryTest, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

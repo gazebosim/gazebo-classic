@@ -20,18 +20,32 @@
 using namespace gazebo;
 class NonDefaultWorld : public ServerFixture
 {
+  public: void Load(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-TEST_F(NonDefaultWorld, Load)
+void NonDefaultWorld::Load(const std::string &_physicsEngine)
 {
-  Load("worlds/empty_different_name.world");
+  ServerFixture::Load("worlds/empty_different_name.world", false, 
+    _physicsEngine);
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
 }
+
+TEST_P(NonDefaultWorld, Load)
+{
+  Load(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(TestODE, NonDefaultWorld, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, NonDefaultWorld,
+  ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

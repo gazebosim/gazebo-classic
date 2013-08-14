@@ -21,15 +21,16 @@ using namespace gazebo;
 class PR2Test : public ServerFixture
 {
   public: void StaticPR2(std::string _physicsEngine);
+  public: void Load(std::string _physicsEngine);
 };
 
-TEST_F(PR2Test, Load)
+void PR2Test::Load(std::string _physicsEngine)
 {
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
   boost::filesystem::create_directories("/tmp/gazebo_test");
 
-  Load("worlds/empty.world");
+  ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
 
   int i;
@@ -67,6 +68,11 @@ TEST_F(PR2Test, Load)
   boost::filesystem::remove_all("/tmp/gazebo_test");
 }
 
+TEST_P(PR2Test, Load)
+{
+  Load(GetParam());
+}
+
 ////////////////////////////////////////////////////////////////////////
 // StaticPR2:
 // Issue #586 noted a segfault when loading a pr2 as static and stepping
@@ -75,7 +81,7 @@ TEST_F(PR2Test, Load)
 ////////////////////////////////////////////////////////////////////////
 void PR2Test::StaticPR2(std::string _physicsEngine)
 {
-  Load("worlds/static_pr2.world", true, _physicsEngine);
+  ServerFixture::Load("worlds/static_pr2.world", true, _physicsEngine);
 
   // The body of this is copied from PhysicsTest::EmptyWorld
   physics::WorldPtr world = physics::get_world("default");

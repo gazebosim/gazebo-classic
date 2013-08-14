@@ -31,6 +31,9 @@ class PhysicsTest : public ServerFixture
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
+  public: void JointDampingTest(const std::string &_physicsEngine);
+  public: void DropStuff(const std::string &_physicsEngine);
+  public: void CollisionTest(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -957,9 +960,9 @@ TEST_P(PhysicsTest, RevoluteJoint)
   RevoluteJoint(GetParam());
 }
 
-TEST_F(PhysicsTest, State)
-{
-  /// \TODO: Redo state test
+/// \TODO: Redo state test
+//TEST_F(PhysicsTest, State)
+//{
   /*
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
@@ -1017,13 +1020,13 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
-}
+//}
 
-TEST_F(PhysicsTest, JointDampingTest)
+void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
-  Load("worlds/damp_test.world", true);
+  Load("worlds/damp_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -1075,9 +1078,15 @@ TEST_F(PhysicsTest, JointDampingTest)
   }
 }
 
-TEST_F(PhysicsTest, DropStuff)
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, JointDampingTest)
 {
-  Load("worlds/drop_test.world", true);
+  JointDampingTest("ode");
+}
+
+void PhysicsTest::DropStuff(const std::string &_physicsEngine)
+{
+  Load("worlds/drop_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
@@ -1184,11 +1193,16 @@ TEST_F(PhysicsTest, DropStuff)
   }
 }
 
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, DropStuff)
+{
+  DropStuff("ode");
+}
 
-TEST_F(PhysicsTest, CollisionTest)
+void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear inelastic collision
-  Load("worlds/collision_test.world", true);
+  Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
@@ -1270,10 +1284,10 @@ TEST_F(PhysicsTest, CollisionTest)
   }
 }
 
-
-TEST_P(PhysicsTest, SimplePendulum)
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, CollisionTest)
 {
-  SimplePendulum(GetParam());
+  CollisionTest("ode");
 }
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
@@ -1421,6 +1435,11 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
       }
     }
   }
+}
+
+TEST_P(PhysicsTest, SimplePendulum)
+{
+  SimplePendulum(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

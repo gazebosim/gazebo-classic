@@ -17,14 +17,14 @@
 #include "ServerFixture.hh"
 
 using namespace gazebo;
-class SpeedTest : public ServerFixture
+class SpeedPR2Test : public ServerFixture
 {
+  public: void PR2World(const std::string &_physicsEngine);
 };
 
-
-TEST_F(SpeedTest, PR2World)
+void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
@@ -47,6 +47,17 @@ TEST_F(SpeedTest, PR2World)
   EXPECT_GT(speedRatio, 0.3);
 #endif
 }
+
+TEST_P(SpeedPR2Test, PR2World)
+{
+  PR2World(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(TestODE, SpeedPR2Test, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, SpeedPR2Test, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {
