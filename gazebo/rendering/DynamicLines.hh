@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
