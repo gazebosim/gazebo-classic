@@ -81,7 +81,6 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
   if (iter == this->callbacks.end())
   {
-
     this->callbacks.push_back(_callback);
 
     if (_callback->GetLatching())

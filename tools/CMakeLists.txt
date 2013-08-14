@@ -12,7 +12,7 @@ link_directories(
 )
 
 set (test_sources 
-  gzlog_TEST.cc 
+  gz_log_TEST.cc 
   gz_TEST.cc
 )
 

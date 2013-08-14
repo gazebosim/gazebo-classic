@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/filesystem.hpp>
 
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -27,6 +28,8 @@
 #include <stdlib.h>
 #include <string>
 
+#include "test/data/pr2_state_log_expected.h"
+#include "test/data/sdf_descriptions_expected.h"
 #include "test_config.h"
 
 std::string g_msgDebugOut;
@@ -115,7 +118,7 @@ void fini()
 
   g_pid = -1;
 }
-
+/*
 /////////////////////////////////////////////////
 void JointCmdCB(ConstJointCmdPtr &_msg)
 {
@@ -532,21 +535,6 @@ TEST(gz, Topic)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, SDF)
-{
-  init();
-  std::string helpOutput = custom_exec_str("gz help sdf");
-  EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
-
-  // List 
-  // std::string output = custom_exec_str("gz topic -l");
-  // EXPECT_NE(output.find("/gazebo/default/world_stats"), std::string::npos);
-
-  fini();
-}
-
-
-/////////////////////////////////////////////////
 TEST(gz, Stress)
 {
   init();
@@ -568,6 +556,70 @@ TEST(gz, Stress)
     msg.mutable_reset()->set_time_only(true);
     ASSERT_EQ(g_msgDebugOut, msg.DebugString());
   }
+
+  fini();
+}
+*/
+
+/////////////////////////////////////////////////
+TEST(gz, SDF)
+{
+  std::string output;
+  boost::filesystem::path path;
+
+  init();
+  std::string helpOutput = custom_exec_str("gz help sdf");
+  EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
+
+  // 1.0 description
+  output = custom_exec_str("gz sdf -d -v 1.0");
+  EXPECT_EQ(output, sdf_description_1_0);
+
+  // 1.2 description
+  output = custom_exec_str("gz sdf -d -v 1.2");
+  EXPECT_EQ(output, sdf_description_1_2);
+
+  // 1.3 description
+  output = custom_exec_str("gz sdf -d -v 1.3");
+  EXPECT_EQ(output, sdf_description_1_3);
+
+  // 1.0 doc
+  output = custom_exec_str("gz sdf -o -v 1.0");
+  EXPECT_EQ(output, sdf_doc_1_0);
+
+  // 1.2 doc
+  output = custom_exec_str("gz sdf -o -v 1.2");
+  EXPECT_EQ(output, sdf_doc_1_2);
+
+  // 1.3 doc
+  output = custom_exec_str("gz sdf -o -v 1.3");
+  EXPECT_EQ(output, sdf_doc_1_3);
+
+  path = TEST_PATH;
+  path /= "worlds/empty_different_name.world";
+
+  // Check empty.world
+  output = custom_exec_str(std::string("gz sdf -k ") + path.string());
+  EXPECT_EQ(output, "Check complete\n");
+
+  // Print empty.world
+  output = custom_exec_str(std::string("gz sdf -p ") + path.string());
+  EXPECT_EQ(output, sdf_print_empty_world_different_name);
+
+  path = PROJECT_BINARY_PATH;
+  path = path / "test" / "sdf_convert_test.world";
+  std::ofstream file(path.string().c_str(), std::ios::out);
+  file << "<?xml version='1.0' ?>"
+    "<sdf version='1.3'>"
+    "<world name='default'>"
+    "<include><uri>model://camera</uri></include>"
+    "</world>"
+    "</sdf>";
+  file.close();
+
+  // Convert 1.3 SDF
+  output = custom_exec_str(std::string("gz sdf -c ") + path.string());
+  EXPECT_EQ(output, "Success\n");
 
   fini();
 }

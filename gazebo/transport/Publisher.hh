@@ -25,6 +25,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <list>
+#include <map>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -168,6 +169,8 @@ namespace gazebo
 
       /// \brief Current id of the sent message.
       private: uint32_t pubId;
+
+      /// \brief Current publication ids
       private: std::map<uint32_t, int> pubIds;
 
       /// \brief Unique ID for this publisher.

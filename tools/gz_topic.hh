@@ -17,6 +17,9 @@
 #ifndef _GZSTATS_HH_
 #define _GZSTATS_HH_
 
+#include <string>
+#include <vector>
+
 #include "gz.hh"
 
 namespace gazebo

@@ -18,6 +18,7 @@
 #define _GZMODIFY_HH_
 
 #include <string>
+#include <list>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 
@@ -36,6 +37,9 @@ namespace gazebo
     /// \param[in] _name Name of the command.
     /// \param[in] _brief One line command description.
     public: Command(const std::string &_name, const std::string &_brief);
+
+    /// \brief Destructor
+    public: virtual ~Command();
 
     /// \brief Print help information.
     public: virtual void Help();
@@ -66,10 +70,10 @@ namespace gazebo
     /// \brief Implementation of Run
     protected: virtual bool RunImpl() = 0;
 
-    /// \brief Initialize transport. 
+    /// \brief Initialize transport.
     protected: bool TransportInit();
 
-    /// \brief Finalized transport. 
+    /// \brief Finalized transport.
     protected: bool TransportFini();
 
     /// \brief Name of the command.
@@ -190,6 +194,22 @@ namespace gazebo
   {
     /// \brief Constructor
     public: SDFCommand();
+
+    // Documentation inherited
+    public: virtual void HelpDetailed();
+
+    // Documentation inherited
+    protected: virtual bool RunImpl();
+
+    // Documentation inherited
+    protected: virtual bool TransportRequired();
+  };
+
+  /// \brief Debug command
+  class DebugCommand : public Command
+  {
+    /// \brief Constructor
+    public: DebugCommand();
 
     // Documentation inherited
     public: virtual void HelpDetailed();

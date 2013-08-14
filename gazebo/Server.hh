@@ -25,12 +25,10 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
+#include <sdf/sdf.hh>
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/World.hh"
-
-namespace po = boost::program_options;
 
 namespace boost
 {
@@ -100,7 +98,7 @@ namespace gazebo
     private: std::list<msgs::ServerControl> controlMsgs;
 
     private: gazebo::common::StrStr_M params;
-    private: po::variables_map vm;
+    private: boost::program_options::variables_map vm;
 
     /// \brief Save argc for access by system plugins.
     public: int systemPluginsArgc;

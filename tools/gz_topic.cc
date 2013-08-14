@@ -242,7 +242,7 @@ void TopicCommand::BwCB(const std::string &_data)
   this->bwBytes.push_back(_data.size());
   this->bwTime.push_back(common::Time::GetWallTime());
 
-  if (curTime - this->prevMsgTime > common::Time(1,0))
+  if (curTime - this->prevMsgTime > common::Time(1, 0))
   {
     if (this->bwBytes.size() >= 10)
     {

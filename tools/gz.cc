@@ -17,6 +17,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
 #include <sdf/sdf.hh>
 #include "gz_topic.hh"
@@ -61,9 +62,25 @@ void Help(const std::string &_command)
     g_commandMap[_command]->Help();
 }
 
+/*
+/////////////////////////////////////////////////
+void Debug()
+{
+  for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
+      iter != g_commandMap.end(); ++iter)
+  {
+    std::cout << iter->first << "\n";
+  }
+}*/
+
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options")
+{
+}
+
+/////////////////////////////////////////////////
+Command::~Command()
 {
 }
 
@@ -127,6 +144,9 @@ bool Command::Run(int _argc, char **_argv)
     this->argv[i] = new char[argvLen];
     snprintf(this->argv[i], argvLen, "%s", _argv[i]);
   }
+
+  // The SDF find file callback.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   // Hidden options
   po::options_description hiddenOptions("hidden options");
@@ -752,7 +772,7 @@ SDFCommand::SDFCommand()
     ("doc,o", "Print HTML SDF. Use -v to specify version.")
     ("check,k", po::value<std::string>(), "Validate [arg].")
     ("version,v", po::value<double>(),
-     "Version of SDF to use with other options.") 
+     "Version of SDF to use with other options.")
     ("print,p", po::value<std::string>(),
      "Print [arg], useful for debugging and as a conversion tool.");
 }
@@ -886,6 +906,42 @@ bool SDFCommand::RunImpl()
   return true;
 }
 
+/////////////////////////////////////////////////
+DebugCommand::DebugCommand()
+  : Command("debug",
+      "Returns completion list associated with command")
+{
+  // Options that are visible to the user through help.
+  this->visibleOptions.add_options()
+    ("option,o", "Show the command options.");
+}
+
+/////////////////////////////////////////////////
+void DebugCommand::HelpDetailed()
+{
+  std::cout <<
+    "\tUsed primarily for bash completion, this tool\n"
+    "\treturn the completion list for a given command.\n"
+    << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool DebugCommand::TransportRequired()
+{
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool DebugCommand::RunImpl()
+{
+  if (this->vm.count("option") <= 0)
+    printf("help\ntopic\njoint\nworld\n");
+  else
+    printf("more options...\n");
+
+  return true;
+}
+
 //////////////////////////////////////////////////
 void SignalHandler(int /*dummy*/)
 {
@@ -928,10 +984,6 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  // Get the command name
-  std::string command =
-    vm.count("command") ? vm["command"].as<std::string>() : "";
-
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -947,6 +999,11 @@ int main(int argc, char **argv)
   g_commandMap["topic"] = new TopicCommand();
   g_commandMap["log"] = new LogCommand();
   g_commandMap["sdf"] = new SDFCommand();
+  g_commandMap["debug"] = new DebugCommand();
+
+  // Get the command name
+  std::string command =
+    vm.count("command") ? vm["command"].as<std::string>() : "";
 
   std::map<std::string, Command *>::iterator iter =
     g_commandMap.find(command);

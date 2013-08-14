@@ -24,6 +24,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "gazebo/transport/CallbackHelper.hh"
 #include "gazebo/transport/TransportTypes.hh"

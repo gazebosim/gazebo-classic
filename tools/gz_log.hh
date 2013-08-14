@@ -17,6 +17,9 @@
 #ifndef _GZ_LOG_HH_
 #define _GZ_LOG_HH_
 
+#include <string>
+#include <list>
+
 #include <gazebo/physics/WorldState.hh>
 #include "gz.hh"
 
@@ -29,13 +32,13 @@ namespace gazebo
     /// \param[in] _xmlOutput True if the output should be in XML format.
     /// \param[in[ _stamp Type of stamp to apply.
     public: FilterBase(bool _xmlOutput, const std::string &_stamp);
-  
+
     /// \brief Output a line of data.
     /// \param[in] _stream The output stream.
     /// \param[in] _state Current state.
     public: std::ostringstream &Out(std::ostringstream &_stream,
                 const gazebo::physics::State &_state);
-  
+
     /// \brief Filter a pose.
     /// \param[in] _pose The pose to filter.
     /// \param[in] _xmlName Name of the xml tag.
@@ -45,104 +48,104 @@ namespace gazebo
                 const std::string &_xmlName,
                 std::string _filter,
                 const gazebo::physics::State &_state);
-  
+
     /// \brief True if XML output is requested.
     protected: bool xmlOutput;
-  
+
     /// \brief Time stamp type
     protected: std::string stamp;
   };
-  
+
   /// \brief Filter for joint state.
   class JointFilter : public FilterBase
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     public: JointFilter(bool _xmlOutput, const std::string &_stamp);
-  
+
     /// \brief Initialize the filter.
     /// \param[in] _filter The command line filter string.
     public: void Init(const std::string &_filter);
-  
+
     /// \brief Filter joint parts (angle)
     /// \param[in] _state Link state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
     public: std::string FilterParts(gazebo::physics::JointState &_state,
                 std::list<std::string>::iterator _partIter);
-  
+
     /// \brief Filter the joints in a Model state, and output the result
     /// as a string.
     /// \param[in] _state The model state to filter.
     /// \return Filtered string.
     public: std::string Filter(gazebo::physics::ModelState &_state);
-  
+
     /// \brief The list of filter strings.
     public: std::list<std::string> parts;
   };
-  
+
   /// \brief Filter for link state.
   class LinkFilter : public FilterBase
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     public: LinkFilter(bool _xmlOutput, const std::string &_stamp);
-  
+
     /// \brief Initialize the filter.
     /// \param[in] _filter The command line filter string.
     public: void Init(const std::string &_filter);
-  
+
     /// \brief Filter link parts (pose, velocity, acceleration, wrench)
     /// \param[in] _state Link state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
     public: std::string FilterParts(gazebo::physics::LinkState &_state,
                 std::list<std::string>::iterator _partIter);
-  
+
     /// \brief Filter the links in a Model state, and output the result
     /// as a string.
     /// \param[in] _state The model state to filter.
     /// \return Filtered string.
     public: std::string Filter(gazebo::physics::ModelState &_state);
-  
+
     /// \brief The list of filter strings.
     public: std::list<std::string> parts;
   };
-  
+
   /// \brief Filter for model state.
   class ModelFilter : public FilterBase
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     public: ModelFilter(bool _xmlOutput, const std::string &_stamp);
-  
+
     /// \brief Destructor.
     public: virtual ~ModelFilter();
-  
+
     /// \brief Initialize the filter.
     /// \param[in] _filter The command line filter string.
     public: void Init(const std::string &_filter);
-  
+
     /// \brief Filter model parts (pose)
     /// \param[in] _state Model state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
     public: std::string FilterParts(gazebo::physics::ModelState &_state,
                 std::list<std::string>::iterator _partIter);
-  
+
     /// \brief Filter the models in a World state, and output the result
     /// as a string.
     /// \param[in] _state The World state to filter.
     /// \return Filtered string.
     public: std::string Filter(gazebo::physics::WorldState &_state);
-  
+
     /// \brief The list of model parts to filter.
     public: std::list<std::string> parts;
-  
+
     /// \brief Pointer to the link filter.
     public: LinkFilter *linkFilter;
-  
+
     /// \brief Pointer to the joint filter.
     public: JointFilter *jointFilter;
   };
-  
+
   /// \brief Filter interface for an entire state.
   class StateFilter : public FilterBase
   {
@@ -150,21 +153,21 @@ namespace gazebo
     /// \param[in] _xmlOutput True to format output as XML
     public: StateFilter(bool _xmlOutput, const std::string &_stamp,
                 double _hz = 0);
-  
+
     /// \brief Initialize the filter with a set of parameters.
     /// \param[_in] _filter The filter parameters
     public: void Init(const std::string &_filter);
-  
+
     /// \brief Perform filtering
     /// \param[in] _stateString The string to filter.
     public: std::string Filter(const std::string &_stateString);
-  
+
     /// \brief Filter for a model.
     private: ModelFilter filter;
-  
+
     /// \brief Rate at which to output states.
     private: double hz;
-  
+
     /// \brief Previous time a state was output.
     private: gazebo::common::Time prevTime;
   };

@@ -44,6 +44,7 @@
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
