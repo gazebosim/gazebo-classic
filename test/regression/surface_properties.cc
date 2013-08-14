@@ -161,18 +161,17 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, CollideWithoutContactODE)
+TEST_P(PhysicsTest, CollideWithoutContact)
 {
-  CollideWithoutContact("ode");
+  CollideWithoutContact(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
 // This doesn't yet work in bullet
-// #ifdef HAVE_BULLET
-// TEST_F(PhysicsTest, CollideWithoutContactBullet)
-// {
-//   CollideWithoutContact("bullet");
-// }
-// #endif  // HAVE_BULLET
+//INSTANTIATE_TEST_CASE_P(TestBullet, PhysicsTest, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

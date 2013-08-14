@@ -264,17 +264,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(ContactSensor, StackTestODE)
+TEST_P(ContactSensor, StackTest)
 {
-  StackTest("ode");
+  StackTest(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ContactSensor, StackTestBullet)
-{
-  StackTest("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // Test contact sensor torque feedback. Rest one x-rotated cylinder over
@@ -404,16 +397,15 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(ContactSensor, TorqueTestODE)
+TEST_P(ContactSensor, TorqueTest)
 {
-  TorqueTest("ode");
+  TorqueTest(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestODE, ContactSensor, ::testing::Values("ode"));
+
 #ifdef HAVE_BULLET
-TEST_F(ContactSensor, TorqueTestBullet)
-{
-  TorqueTest("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestBullet, ContactSensor, ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
 int main(int argc, char **argv)

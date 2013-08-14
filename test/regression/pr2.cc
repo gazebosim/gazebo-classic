@@ -101,16 +101,15 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PR2Test, StaticPR2ODE)
+TEST_P(PR2Test, StaticPR2)
 {
-  StaticPR2("ode");
+  StaticPR2(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestODE, PR2Test, ::testing::Values("ode"));
+
 #ifdef HAVE_BULLET
-TEST_F(PR2Test, StaticPR2Bullet)
-{
-  StaticPR2("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestBullet, PR2Test, ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
 int main(int argc, char **argv)

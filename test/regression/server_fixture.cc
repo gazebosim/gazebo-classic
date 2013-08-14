@@ -63,17 +63,10 @@ void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
   EXPECT_EQ(physics->GetType(), _physicsType);
 }
 
-TEST_F(ServerFixtureTest, LoadODE)
+TEST_P(ServerFixtureTest, Load)
 {
-  LoadEmptyOfType("ode");
+  LoadEmptyOfType(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ServerFixtureTest, LoadBullet)
-{
-  LoadEmptyOfType("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnSDF:
@@ -115,6 +108,14 @@ TEST_F(ServerFixtureTest, SpawnSDF)
 
   EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
 }
+
+INSTANTIATE_TEST_CASE_P(TestODE, ServerFixtureTest,
+   ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, ServerFixtureTest, 
+  ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

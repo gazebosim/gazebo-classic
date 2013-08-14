@@ -72,15 +72,16 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 }
 
 
-TEST_F(Pioneer2dx, StraightLineODE)
+TEST_P(Pioneer2dx, StraightLine)
 {
-  StraightLine("ode");
+  StraightLine(GetParam());
 }
 
-TEST_F(Pioneer2dx, StraightLineBullet)
-{
-  StraightLine("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestODE, Pioneer2dx, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, Pioneer2dx, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

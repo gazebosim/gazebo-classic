@@ -116,17 +116,10 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldODE)
+TEST_P(ImuTest, EmptyWorld)
 {
-  Stationary_EmptyWorld("ode");
+  Stationary_EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldBullet)
-{
-  Stationary_EmptyWorld("bullet");
-}
-#endif
 
 void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 {
@@ -201,17 +194,10 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldNoiseODE)
+TEST_P(ImuTest, EmptyWorldNoise)
 {
-  Stationary_EmptyWorld_Noise("ode");
+  Stationary_EmptyWorld_Noise(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldNoiseBullet)
-{
-  Stationary_EmptyWorld_Noise("bullet");
-}
-#endif
 
 void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
@@ -286,17 +272,16 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldBiasODE)
+TEST_P(ImuTest, EmptyWorldBias)
 {
-  Stationary_EmptyWorld_Bias("ode");
+  Stationary_EmptyWorld_Bias(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestODE, ImuTest, ::testing::Values("ode"));
+
 #ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldBiasBullet)
-{
-  Stationary_EmptyWorld_Bias("bullet");
-}
-#endif
+INSTANTIATE_TEST_CASE_P(TestBullet, ImuTest, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {

@@ -144,17 +144,10 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(LaserTest, EmptyWorldODE)
+TEST_P(LaserTest, EmptyWorld)
 {
-  Stationary_EmptyWorld("ode");
+  Stationary_EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(LaserTest, EmptyWorldBullet)
-{
-  Stationary_EmptyWorld("bullet");
-}
-#endif
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
@@ -240,17 +233,10 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(LaserTest, LaserBoxODE)
+TEST_P(LaserTest, LaserBox)
 {
-  LaserUnitBox("ode");
+  LaserUnitBox(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(LaserTest, LaserBoxBullet)
-{
-  LaserUnitBox("bullet");
-}
-#endif  // HAVE_BULLET
 
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
@@ -307,16 +293,15 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   EXPECT_NEAR(mean, maxRange + noiseMean, 3*noiseStdDev);
 }
 
-TEST_F(LaserTest, LaserNoiseODE)
+TEST_P(LaserTest, LaserNoise)
 {
-  LaserUnitNoise("ode");
+  LaserUnitNoise(GetParam());
 }
 
+INSTANTIATE_TEST_CASE_P(TestODE, LaserTest, ::testing::Values("ode"));
+
 #ifdef HAVE_BULLET
-TEST_F(LaserTest, LaserNoiseBullet)
-{
-  LaserUnitNoise("bullet");
-}
+INSTANTIATE_TEST_CASE_P(TestBullet, LaserTest, ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
