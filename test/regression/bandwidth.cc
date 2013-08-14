@@ -23,6 +23,7 @@ using namespace gazebo;
 
 class BandwidthTest : public ServerFixture
 {
+  public: void Bandwidth(const std::string &_physicsEngine);
 };
 
 boost::mutex g_mutex;
@@ -37,9 +38,9 @@ void BandwidthMsg(const std::string &_msg)
   g_bwTime.push_back(common::Time::GetWallTime());
 }
 
-TEST_F(BandwidthTest, Bandwidth)
+void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
-  Load("worlds/pr2.world");
+  Load("worlds/pr2.world", false, _physicsEngine);
 
   transport::NodePtr node(new transport::Node());
   node->Init("default");
@@ -80,6 +81,17 @@ TEST_F(BandwidthTest, Bandwidth)
     }
   }
 }
+
+TEST_P(BandwidthTest, Bandwidth)
+{
+  Bandwidth(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(TestODE, BandwidthTest, ::testing::Values("ode"));
+
+#ifdef HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(TestBullet, BandwidthTest, ::testing::Values("bullet"));
+#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {
