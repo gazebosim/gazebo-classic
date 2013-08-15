@@ -151,8 +151,8 @@ TEST_P(FactoryTest, Cylinder)
 
 // Disabling this test for now. Different machines return different
 // camera images. Need a better way to evaluate rendered content.
-//TEST_F(FactoryTest, Camera)
-//{
+// TEST_F(FactoryTest, Camera)
+// {
 /*
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
@@ -181,7 +181,7 @@ TEST_P(FactoryTest, Cylinder)
   ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
   ASSERT_EQ(0.0, diffAvg);
   */
-//}
+// }
 
 INSTANTIATE_TEST_CASE_P(TestODE, FactoryTest, ::testing::Values("ode"));
 

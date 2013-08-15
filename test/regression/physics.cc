@@ -961,8 +961,8 @@ TEST_P(PhysicsTest, RevoluteJoint)
 }
 
 /// \TODO: Redo state test
-//TEST_F(PhysicsTest, State)
-//{
+// TEST_F(PhysicsTest, State)
+// {
   /*
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
@@ -1020,7 +1020,7 @@ TEST_P(PhysicsTest, RevoluteJoint)
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
-//}
+// }
 
 void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {

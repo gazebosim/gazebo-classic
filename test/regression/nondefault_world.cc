@@ -26,7 +26,7 @@ class NonDefaultWorld : public ServerFixture
 /////////////////////////////////////////////////
 void NonDefaultWorld::Load(const std::string &_physicsEngine)
 {
-  ServerFixture::Load("worlds/empty_different_name.world", false, 
+  ServerFixture::Load("worlds/empty_different_name.world", false,
     _physicsEngine);
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
   ASSERT_TRUE(world != NULL);
