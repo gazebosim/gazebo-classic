@@ -115,11 +115,14 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
   poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->GetModel(name);
-  if (model != NULL)
+  ASSERT_TRUE(model != NULL);
+
   {
     math::Pose initialPose = model->GetWorldPose();
     EXPECT_EQ(pos, initialPose.pos);
+  }
 
+  {
     msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
@@ -136,11 +139,6 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
 
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
-  }
-  else
-  {
-    EXPECT_TRUE(model);
-    gzerr << "Could not get pointer to " << name << std::endl;
   }
 }
 
