@@ -168,7 +168,7 @@ TEST_P(PhysicsTest, CollideWithoutContact)
 }
 
 // This test doesn't yet work in bullet, so we'll declare it only for ode.
-//INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
+// INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
 INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
 
 int main(int argc, char **argv)
