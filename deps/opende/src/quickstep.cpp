@@ -1845,7 +1845,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               if (moi_S1 > moi_ratio * moi_S2)
               {
                 moi_S1 = moi_ratio/(moi_ratio + 1.0)*(moi_sum);
-                moi_S2 = (moi_sum)/11.0;
+                moi_S2 = (moi_sum)/(moi_ratio + 1.0);
               }
               else if (moi_S2 > moi_ratio * moi_S1)
               {
