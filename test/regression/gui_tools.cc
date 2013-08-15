@@ -65,8 +65,8 @@ void GuiToolsTest::SetGravity(const std::string &_physicsEngine)
   gravity.push_back(math::Vector3(-2, 3, 0));
   gravity.push_back(math::Vector3(-2, -3, -9.81));
 
-  std::vector<math::Vector3>::iterator iter;
-  for (iter = gravity.begin(); iter != gravity.end(); ++iter)
+  for (std::vector<math::Vector3>::iterator iter = gravity.begin();
+       iter != gravity.end(); ++iter)
   {
     msgs::Set(msg.mutable_gravity(), *iter);
     physicsPub->Publish(msg);
@@ -124,8 +124,8 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    std::vector<math::Pose>::iterator iter;
-    for (iter = poses.begin(); iter != poses.end(); ++iter)
+    for (std::vector<math::Pose>::iterator iter = poses.begin();
+         iter != poses.end(); ++iter)
     {
       msgs::Set(msg.mutable_pose(), *iter);
       modelPub->Publish(msg);
