@@ -48,19 +48,6 @@ BulletJoint::~BulletJoint()
 void BulletJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
-
-  // Joint force and torque feedback
-  if (_sdf->HasElement("physics") &&
-      _sdf->GetElement("physics")->HasElement("bullet"))
-  {
-    sdf::ElementPtr elem =
-      _sdf->GetElement("physics")->GetElement("bullet");
-
-    if (elem->HasElement("provide_feedback"))
-    {
-      this->SetProvideFeedback(elem->Get<bool>("provide_feedback"));
-    }
-  }
 }
 
 //////////////////////////////////////////////////

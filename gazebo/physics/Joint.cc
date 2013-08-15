@@ -111,6 +111,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
+  // Joint force and torque feedback
+  if (_sdf->HasElement("physics"))
+  {
+    sdf::ElementPtr physics_elem = _sdf->GetElement("physics");
+    if (physics_elem->HasElement("provide_feedback"))
+    {
+      this->SetProvideFeedback(physics_elem->Get<bool>("provide_feedback"));
+    }
+  }
+
   sdf::ElementPtr parentElem = _sdf->GetElement("parent");
   sdf::ElementPtr childElem = _sdf->GetElement("child");
 
