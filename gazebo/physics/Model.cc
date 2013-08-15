@@ -104,7 +104,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 void Model::LoadLinks()
 {
   /// \TODO: check for duplicate model, and raise an error
-  /// BasePtr dup = Base::GetByName(this->GetScopedName());
+  // BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
   if (this->sdf->HasElement("link"))

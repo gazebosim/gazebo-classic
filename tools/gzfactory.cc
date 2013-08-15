@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("pose-x,x", po::value<double>(), "set model x position.")
     ("pose-y,y", po::value<double>(), "set model y position.")
-    ("pose-z,z", po::value<double>(), "set model z positione.")
+    ("pose-z,z", po::value<double>(), "set model z position.")
     ("pose-R,R", po::value<double>(), "set model roll orientation in radians.")
     ("pose-P,P", po::value<double>(), "set model pitch orientation in radians.")
     ("pose-Y,Y", po::value<double>(), "set model yaw orientation in radians.");

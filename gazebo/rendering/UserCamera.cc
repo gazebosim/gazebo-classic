@@ -446,7 +446,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   // dist = start.Distance(end);
   // double vel = 5.0;
-  double time = 0.5;  // dist / vel;
+  // time = dist / vel;
+  double time = 0.5;
 
   Ogre::Animation *anim =
     this->scene->GetManager()->createAnimation("cameratrack", time);
