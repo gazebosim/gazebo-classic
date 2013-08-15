@@ -17,6 +17,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/Time.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
@@ -77,11 +78,7 @@ TEST_P(Pioneer2dx, StraightLine)
   StraightLine(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, Pioneer2dx, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, Pioneer2dx, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

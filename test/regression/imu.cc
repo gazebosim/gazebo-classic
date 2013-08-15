@@ -18,6 +18,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
 #define IMU_TOL 1e-5
@@ -277,11 +278,7 @@ TEST_P(ImuTest, EmptyWorldBias)
   Stationary_EmptyWorld_Bias(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, ImuTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, ImuTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(ImuTest);
 
 int main(int argc, char **argv)
 {

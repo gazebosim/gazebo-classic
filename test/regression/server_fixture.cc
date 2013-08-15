@@ -16,6 +16,7 @@
 */
 
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
@@ -109,13 +110,7 @@ TEST_F(ServerFixtureTest, SpawnSDF)
   EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, ServerFixtureTest,
-  ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, ServerFixtureTest,
-  ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest);
 
 int main(int argc, char **argv)
 {
