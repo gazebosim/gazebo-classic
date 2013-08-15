@@ -1858,7 +1858,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               if (modify_inertia)
               {
 #ifdef DEBUG_INERTIA_PROPAGATION
-                printf(" distributed S1 [%f] S2 [%f] = S [%f]\n", moi_S1, moi_S2, moi_S);
+                printf(" distributed S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
 #endif
                 // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
                 for (int si = 0; si < 12; ++si)
