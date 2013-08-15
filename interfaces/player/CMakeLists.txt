@@ -38,6 +38,7 @@ gazebo_common
 gazebo_transport
 gazebo_msgs
 gazebo_math
+gazebo_util
 )
 
 gz_install_library(gazebo_player)
