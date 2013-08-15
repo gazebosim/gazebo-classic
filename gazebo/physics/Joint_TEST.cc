@@ -46,8 +46,8 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
   types.push_back("revolute2");
 
   physics::JointPtr joint;
-  std::vector<std::string>::iterator iter;
-  for (iter = types.begin(); iter != types.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = types.begin();
+       iter != types.end(); ++iter)
   {
     gzdbg << "SpawnJoint " << *iter << " child parent" << std::endl;
     joint = SpawnJoint(*iter, false, false);
