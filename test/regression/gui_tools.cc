@@ -59,6 +59,11 @@ void GuiToolsTest::SetGravity(const std::string &_physicsEngine)
   gravity.push_back(math::Vector3(0, 0, 20));
   gravity.push_back(math::Vector3(0, 0, 0));
   gravity.push_back(math::Vector3(0, 0, -9.81));
+  gravity.push_back(math::Vector3(1, 1, 9.81));
+  gravity.push_back(math::Vector3(2, 3, -20));
+  gravity.push_back(math::Vector3(2, -3, 20));
+  gravity.push_back(math::Vector3(-2, 3, 0));
+  gravity.push_back(math::Vector3(-2, -3, -9.81));
 
   std::vector<math::Vector3>::iterator iter;
   for (iter = gravity.begin(); iter != gravity.end(); ++iter)
@@ -67,7 +72,8 @@ void GuiToolsTest::SetGravity(const std::string &_physicsEngine)
     physicsPub->Publish(msg);
 
     world->StepWorld(10);
-    common::Time::MSleep(50);
+    common::Time::MSleep(10);
+    world->StepWorld(10);
 
     EXPECT_EQ(*iter, physics->GetGravity());
   }
@@ -97,16 +103,16 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
   transport::PublisherPtr modelPub =
     this->node->Advertise<msgs::Model>("~/model/modify");
 
-  // list of positions to move to
-  std::vector<math::Vector3> positions;
-  positions.push_back(math::Vector3(5, 0, z0));
-  positions.push_back(math::Vector3(0, 8, z0));
-  positions.push_back(math::Vector3(-99, 0, z0));
-  positions.push_back(math::Vector3(0, 999, z0));
-  positions.push_back(math::Vector3(123.456, 456.123, z0*10));
-  positions.push_back(math::Vector3(-123.456, 456.123, z0*10));
-  positions.push_back(math::Vector3(123.456, -456.123, z0*10));
-  positions.push_back(math::Vector3(-123.456, -456.123, z0*10));
+  // list of poses to move to
+  std::vector<math::Pose> poses;
+  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
+  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
+  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
+  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
+  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->GetModel(name);
   if (model != NULL)
@@ -118,16 +124,17 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    std::vector<math::Vector3>::iterator iter;
-    for (iter = positions.begin(); iter != positions.end(); ++iter)
+    std::vector<math::Pose>::iterator iter;
+    for (iter = poses.begin(); iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), math::Pose(*iter, math::Quaternion()));
+      msgs::Set(msg.mutable_pose(), *iter);
       modelPub->Publish(msg);
 
-      world->StepWorld(100);
+      world->StepWorld(50);
       common::Time::MSleep(100);
+      world->StepWorld(50);
 
-      EXPECT_EQ(*iter, model->GetWorldPose().pos);
+      EXPECT_EQ(*iter, model->GetWorldPose());
     }
   }
   else
