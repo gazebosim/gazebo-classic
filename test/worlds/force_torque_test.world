@@ -135,9 +135,7 @@
           <update_rate>30</update_rate>
         </sensor>
         <physics>
-          <bullet>
-            <provide_feedback>true</provide_feedback>
-          </bullet>
+          <provide_feedback>true</provide_feedback>
           <ode>
             <provide_feedback>true</provide_feedback>
           </ode>
@@ -170,9 +168,7 @@
           <update_rate>30</update_rate>
         </sensor>
         <physics>
-          <bullet>
-            <provide_feedback>true</provide_feedback>
-          </bullet>
+          <provide_feedback>true</provide_feedback>
           <ode>
             <provide_feedback>true</provide_feedback>
           </ode>
