@@ -1844,13 +1844,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
               bool modify_inertia = true;
               if (moi_S1 > moi_ratio * moi_S2)
               {
-                moi_S1 = moi_ratio/(moi_ratio + 1.0)*(moi_sum);
                 moi_S2 = (moi_sum)/(moi_ratio + 1.0);
+                moi_S1 = moi_ratio*moi_S2;
               }
               else if (moi_S2 > moi_ratio * moi_S1)
               {
-                moi_S2 = moi_ratio/(moi_ratio + 1.0)*(moi_sum);
                 moi_S1 = (moi_sum)/(moi_ratio + 1.0);
+                moi_S2 = moi_ratio*moi_S1;
               }
               else
                 modify_inertia = false;
