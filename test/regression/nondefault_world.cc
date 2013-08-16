@@ -16,6 +16,7 @@
 */
 #include <string.h>
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class NonDefaultWorld : public ServerFixture
@@ -40,12 +41,7 @@ TEST_P(NonDefaultWorld, Load)
   Load(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, NonDefaultWorld, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, NonDefaultWorld,
-  ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(NonDefaultWorld);
 
 int main(int argc, char **argv)
 {

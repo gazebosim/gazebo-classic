@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -87,11 +88,7 @@ TEST_P(BandwidthTest, Bandwidth)
   Bandwidth(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, BandwidthTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, BandwidthTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(BandwidthTest);
 
 int main(int argc, char **argv)
 {

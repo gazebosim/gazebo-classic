@@ -15,6 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class SpeedTest : public ServerFixture
@@ -101,11 +102,7 @@ TEST_P(SpeedTest, ShapesWorld)
   ShapesWorld(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, SpeedTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, SpeedTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(SpeedTest);
 
 int main(int argc, char **argv)
 {

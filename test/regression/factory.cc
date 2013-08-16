@@ -25,6 +25,7 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class FactoryTest : public ServerFixture
@@ -183,11 +184,7 @@ TEST_P(FactoryTest, Cylinder)
   */
 // }
 
-INSTANTIATE_TEST_CASE_P(TestODE, FactoryTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, FactoryTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(FactoryTest);
 
 int main(int argc, char **argv)
 {
