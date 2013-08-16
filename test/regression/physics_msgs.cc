@@ -98,7 +98,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   double z0 = 5;
   math::Vector3 pos = math::Vector3(0, 0, z0);
   math::Vector3 size = math::Vector3(1, 1, 1);
-  SpawnBox("test_box", size, pos, math::Vector3::Zero);
+  SpawnBox(name, size, pos, math::Vector3::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
