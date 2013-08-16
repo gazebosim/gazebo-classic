@@ -47,14 +47,14 @@ namespace gazebo
       public: virtual ~TransmitterVisual();
 
       /// Documentation inherited from parent.
-      public: void Load();
+      public: virtual void Load();
+
+      /// \brief Function that runs on the OGRE thread to refresh the UI.
+      public: virtual void Update();
 
       /// \brief Callback when a new propagation grid is received
       /// \brief[in] _msg New transmitter propagation grid received
       private: void OnNewPropagationGrid(ConstPropagationGridPtr &_msg);
-
-      /// \brief Function that runs on the OGRE thread to refresh the UI.
-      public: void Update();
 
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;

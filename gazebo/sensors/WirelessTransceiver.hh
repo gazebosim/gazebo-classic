@@ -37,9 +37,6 @@ namespace gazebo
       /// \brief Constructor
       public: WirelessTransceiver();
 
-      /// \brief Destructor
-      public: virtual ~WirelessTransceiver();
-
       // Documentation inherited
       public: virtual std::string GetTopic() const;
 
@@ -49,6 +46,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
+      // Documentation inherited
+      public: virtual void Fini();
+
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
       public: double GetGain() const;
@@ -56,9 +56,6 @@ namespace gazebo
       /// \brief Returns the receiver power (dBm).
       /// \return Receiver power (dBm).
       public: double GetPower() const;
-
-      /// \brief Parent entity
-      protected: physics::EntityPtr entity;
 
       /// \brief Publisher to publish propagation model data
       protected: transport::PublisherPtr pub;
@@ -68,6 +65,9 @@ namespace gazebo
 
       /// \brief Antenna's gain of the receiver (dBi).
       protected: double gain;
+
+      /// \brief SDF <transceiver> element.
+      protected: sdf::ElementPtr transceiverElem;
     };
     /// \}
   }

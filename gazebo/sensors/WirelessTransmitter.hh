@@ -56,9 +56,6 @@ namespace gazebo
       protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
-      public: virtual void Fini();
-
-      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited
@@ -72,10 +69,6 @@ namespace gazebo
       /// \return Reception frequency (MHz).
       public: double GetFreq() const;
 
-      /// \brief Returns the pose of the transmitter in world coordinate.
-      /// \return Pose of object.
-      public: math::Pose GetPose() const;
-
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \return Signal strength in a world's point (dBm).
       public: double GetSignalStrength(const math::Pose &_receiver,
@@ -84,13 +77,9 @@ namespace gazebo
       /// \brief Size of the grid used for visualization.
       private: static const double Step;
 
-      /// \brief The visualization shows the propagation model from a grid
-      /// in which the x coordinates go from -XLIMIT to XLIMIT.
-      private: static const double XLimit;
-
-      /// \brief The visualization shows the propagation model from a grid
-      /// in which the y coordinates go from -YLIMIT to YLIMIT.
-      private: static const double YLimit;
+      /// \brief The visualization shows the propagation model using a circular
+      /// grid, where the maximum radius covered is MaxRadius
+      private: static const double MaxRadius;
 
       /// \brief Service Set Identifier (network name).
       private: std::string essid;
@@ -100,6 +89,16 @@ namespace gazebo
 
       // \brief Ray used to test for collisions when placing entities
       private: physics::RayShapePtr testRay;
+
+      // \brief When true it will publish the propagation grid to be used
+      // by the transmitter visual layer
+      private: bool visualize;
+
+      /// \brief Sensor reference pose
+      private: math::Pose referencePose;
+
+      /// \brief Parent entity which the IMU is attached to
+      private: physics::LinkPtr parentEntity;
     };
     /// \}
   }

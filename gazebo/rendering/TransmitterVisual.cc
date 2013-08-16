@@ -26,16 +26,13 @@ using namespace rendering;
 /////////////////////////////////////////////////
 TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
     const std::string &_topicName)
-: Visual(_name, _vis)
+: Visual(_name, _vis), isFirst(true), receivedMsg(false)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
   this->signalPropagationSub = this->node->Subscribe(_topicName,
       &TransmitterVisual::OnNewPropagationGrid, this);
-
-  this->isFirst = true;
-  this->receivedMsg = false;
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -49,6 +46,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
 TransmitterVisual::~TransmitterVisual()
 {
   DeleteDynamicLine(this->points);
+  this->signalPropagationSub.reset();
 }
 
 /////////////////////////////////////////////////

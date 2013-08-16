@@ -43,31 +43,43 @@ WirelessReceiver::WirelessReceiver()
 void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
+
+  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
+      this->world->GetEntity(this->parentName));
+
+  if (!parentEntity)
+  {
+    gzthrow("WirelessReceiver has invalid parent [" + this->parentName +
+            "]. Must be a link\n");
+  }
+
+  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
 
-  this->entity = this->world->GetEntity(this->parentName);
-  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
+  this->minFreq = transceiverElem->Get<double>("min_frequency");
+  this->maxFreq = transceiverElem->Get<double>("max_frequency");
+  this->sensitivity = transceiverElem->Get<double>("sensitivity");
 
-  if (this->sdf->HasElement("transceiver"))
+  if (this->minFreq < 0)
   {
-    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+    gzerr << "Wireless receiver min. frequency must be > 0. Current value is ["
+      << this->minFreq << "]\n";
+    return;
+  }
 
-    if (transElem->HasElement("min_frequency"))
-    {
-      this->minFreq = transElem->Get<double>("min_frequency");
-    }
+  if (this->maxFreq < 0)
+  {
+    gzerr << "Wireless receiver max. frequency must be > 0. Current value is ["
+      << this->maxFreq << "]\n";
+    return;
+  }
 
-    if (transElem->HasElement("max_frequency"))
-    {
-      this->maxFreq = transElem->Get<double>("max_frequency");
-    }
-
-    if (transElem->HasElement("sensitivity"))
-    {
-      this->sensitivity = transElem->Get<double>("sensitivity");
-    }
-
-    this->sensitivity = transElem->Get<double>("sensitivity");
+  if (this->sensitivity > 0)
+  {
+    gzerr << "Wireless receiver sensitivity must be < 0. Current value is ["
+      << this->sensitivity << "]\n";
+    return;
   }
 }
 
@@ -81,7 +93,9 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     double rxPower;
     double txFreq;
 
-    math::Pose myPos = this->entity->GetWorldPose();
+    this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+
+    math::Pose myPos = this->referencePose;
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
     for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
     {

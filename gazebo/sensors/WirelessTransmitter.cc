@@ -32,15 +32,15 @@ GZ_REGISTER_STATIC_SENSOR("wireless_transmitter", WirelessTransmitter)
 const double WirelessTransmitter::NEmpty = 6;
 const double WirelessTransmitter::NObstacle = 12.0;
 const double WirelessTransmitter::ModelStdDesv = 6.0;
-const double WirelessTransmitter::XLimit = 10.0;
-const double WirelessTransmitter::YLimit = 10.0;
 const double WirelessTransmitter::Step = 0.25;
+const double WirelessTransmitter::MaxRadius = 10.0;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
 : WirelessTransceiver()
 {
   this->active = false;
+  this->visualize = false;
   this->essid = "MyESSID";
   this->freq = 2442.0;
 }
@@ -56,22 +56,32 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->entity = this->world->GetEntity(this->parentName);
-  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
+  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
+      this->world->GetEntity(this->parentName));
 
-  if (this->sdf->HasElement("transceiver"))
+  if (!parentEntity)
   {
-    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+    gzthrow("WirelessTransmitter has invalid parent [" + this->parentName +
+            "]. Must be a link\n");
+  }
 
-    if (transElem->HasElement("essid"))
-    {
-      this->essid = transElem->Get<std::string>("essid");
-    }
+  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
 
-    if (transElem->HasElement("frequency"))
-    {
-      this->freq = transElem->Get<double>("frequency");
-    }
+  this->visualize = this->sdf->Get<bool>("visualize");
+  this->essid = transceiverElem->Get<std::string>("essid");
+  this->freq = transceiverElem->Get<double>("frequency");
+
+  if (this->essid.empty())
+  {
+    gzerr << "Wireless transmitter ESSID must be a non-empty string.\n";
+    return;
+  }
+
+  if (this->freq < 0)
+  {
+    gzerr << "Wireless transmitter frequency must be > 0. Current value is ["
+      << this->freq << "]\n";
+    return;
   }
 
   this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(),
@@ -92,39 +102,42 @@ void WirelessTransmitter::Init()
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
-  if (this->pub)
+  if (this->pub && this->visualize)
   {
     msgs::PropagationGrid msg;
     math::Pose pos;
+    math::Pose worldPose;
     double strength;
     msgs::PropagationParticle *p;
 
-    for (double x = -this->XLimit; x <= this->XLimit; x += this->Step)
+    this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+
+    // Iterate using a rectangular grid, but only choose the points within
+    // a circunference of radius MaxRadius
+    for (double x = -this->MaxRadius; x <= this->MaxRadius; x += this->Step)
     {
-      for (double y = -YLimit; y <= YLimit; y += Step)
+      for (double y = -this->MaxRadius; y <= this->MaxRadius; y += this->Step)
       {
-        pos.Set(x, y, 0.0, 0.0, 0.0, 0.0);
+        pos.Set(x, y, 0.0, 0, 0, 0);
 
-        // For the propagation model assume the receiver antenna has the same
-        // gain as the transmitter
-        strength = this->GetSignalStrength(pos, this->GetGain());
+        worldPose = pos + this->referencePose;
 
-        // Add a new particle to the grid
-        p = msg.add_particle();
-        p->set_x(x);
-        p->set_y(y);
-        p->set_signal_level(strength);
+        if (this->referencePose.pos.Distance(worldPose.pos) <= this->MaxRadius)
+        {
+          // For the propagation model assume the receiver antenna has the same
+          // gain as the transmitter
+          strength = this->GetSignalStrength(worldPose, this->GetGain());
+
+          // Add a new particle to the grid
+          p = msg.add_particle();
+          p->set_x(x);
+          p->set_y(y);
+          p->set_signal_level(strength);
+        }
       }
     }
     this->pub->Publish(msg);
   }
-}
-
-/////////////////////////////////////////////////
-void WirelessTransmitter::Fini()
-{
-  WirelessTransceiver::Fini();
-  this->entity.reset();
 }
 
 /////////////////////////////////////////////////
@@ -140,20 +153,13 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-math::Pose WirelessTransmitter::GetPose() const
-{
-  return entity->GetWorldPose();
-}
-
-/////////////////////////////////////////////////
 double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
     const double rxGain)
 {
-  math::Pose txPos = this->GetPose();
   std::string entityName;
   double dist;
-  math::Vector3 start = txPos.pos;
   math::Vector3 end = _receiver.pos;
+  math::Vector3 start = this->referencePose.pos;
 
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->
@@ -168,12 +174,13 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
 
   // ToDo: The ray intersects with my own collision model. Fix it.
   if (dist > 0 && entityName != "ground_plane::link::collision" &&
-      entityName != "" && entityName != "wirelessReceiver::link::collision-box")
+      entityName != "")
   {
     n = NObstacle;
   }
 
-  double distance = std::max(1.0, txPos.pos.Distance(_receiver.pos));
+  double distance = std::max(1.0,
+      this->referencePose.pos.Distance(_receiver.pos));
   double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
   double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 

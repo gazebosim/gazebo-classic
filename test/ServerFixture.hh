@@ -846,7 +846,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _pos World position
   /// \param[in] _rpy World rotation in Euler angles
   /// \param[in] _essid Service set identifier (network name)
-  /// \param[in] _freq Frequency of transmission (Hz)
+  /// \param[in] _freq Frequency of transmission (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
@@ -869,7 +869,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
-                 << "    <visualize>true</visualize>"
+                 << "    <visualize>false</visualize>"
                  << "    <transceiver>"
                  << "      <essid>" << _essid << "</essid>"
                  << "      <frequency>" << _freq << "</frequency>"
@@ -891,8 +891,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _sensorName Sensor name
   /// \param[in] _pos World position
   /// \param[in] _rpy World rotation in Euler angles
-  /// \param[in] _minFreq Minimum frequency to be filtered (Hz)
-  /// \param[in] _maxFreq Maximum frequency to be filtered (Hz)
+  /// \param[in] _minFreq Minimum frequency to be filtered (MHz)
+  /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
   /// \param[in] _sensitivity Receiver sensitibity (dBm)             

@@ -33,6 +33,7 @@ set(tests
   physics.cc
   pioneer2dx.cc
   transport.cc
+  rayshape.cc
   server_fixture.cc
   speed.cc
   #state_log.cc

@@ -38,11 +38,6 @@ WirelessTransceiver::WirelessTransceiver()
   this->power = 14.5;
 }
 
-/////////////////////////////////////////////////
-WirelessTransceiver::~WirelessTransceiver()
-{
-}
-
 //////////////////////////////////////////////////
 std::string WirelessTransceiver::GetTopic() const
 {
@@ -58,22 +53,28 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->entity = this->world->GetEntity(this->parentName);
-  GZ_ASSERT(this->entity != NULL, "Unable to get the parent entity.");
-
-  if (this->sdf->HasElement("transceiver"))
+  this->transceiverElem = this->sdf->GetElement("transceiver");
+  if (!this->transceiverElem)
   {
-    sdf::ElementPtr transElem = this->sdf->GetElement("transceiver");
+    gzerr << "Transceiver sensor is missing <transceiver> SDF element";
+    return;
+  }
 
-    if (transElem->HasElement("gain"))
-    {
-      this->gain = transElem->Get<double>("gain");
-    }
+  this->gain = transceiverElem->Get<double>("gain");
+  this->power = transceiverElem->Get<double>("power");
 
-    if (transElem->HasElement("power"))
-    {
-      this->power = transElem->Get<double>("power");
-    }
+  if (this->gain < 0)
+  {
+    gzerr << "Wireless transceiver gain must be > 0. Current value is ["
+      << this->gain << "]\n";
+    return;
+  }
+
+  if (this->power < 0)
+  {
+    gzerr << "Wireless transceiver power must be > 0. Current value is ["
+      << this->power << "]\n";
+    return;
   }
 }
 
@@ -81,6 +82,13 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 void WirelessTransceiver::Init()
 {
   Sensor::Init();
+}
+
+/////////////////////////////////////////////////
+void WirelessTransceiver::Fini()
+{
+  this->pub.reset();
+  Sensor::Fini();
 }
 
 /////////////////////////////////////////////////
