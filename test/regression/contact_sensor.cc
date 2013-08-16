@@ -20,6 +20,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
+#include "helper_physics_generator.hh"
 
 #define TOL 1e-4
 
@@ -264,17 +265,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(ContactSensor, StackTestODE)
+TEST_P(ContactSensor, StackTest)
 {
-  StackTest("ode");
+  StackTest(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ContactSensor, StackTestBullet)
-{
-  StackTest("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // Test contact sensor torque feedback. Rest one x-rotated cylinder over
@@ -404,17 +398,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(ContactSensor, TorqueTestODE)
+TEST_P(ContactSensor, TorqueTest)
 {
-  TorqueTest("ode");
+  TorqueTest(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(ContactSensor, TorqueTestBullet)
-{
-  TorqueTest("bullet");
-}
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(ContactSensor);
 
 int main(int argc, char **argv)
 {
