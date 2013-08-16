@@ -16,6 +16,7 @@
 */
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture
@@ -101,17 +102,12 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PR2Test, StaticPR2ODE)
+TEST_P(PR2Test, StaticPR2)
 {
-  StaticPR2("ode");
+  StaticPR2(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PR2Test, StaticPR2Bullet)
-{
-  StaticPR2("bullet");
-}
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(PR2Test);
 
 int main(int argc, char **argv)
 {
