@@ -19,6 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -154,13 +155,7 @@ TEST_P(PhysicsMsgsTest, MoveTool)
   MoveTool(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, PhysicsMsgsTest,
-    ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, PhysicsMsgsTest,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsMsgsTest);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
