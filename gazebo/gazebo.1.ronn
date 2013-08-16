@@ -1,13 +1,13 @@
-Gazebo multi-robot simulator, version 1.9.0
+gzserver -- Run the Gazebo server.
 =============================================
 
 ## SYNPOSIS
 
-Released under the Apache 2 License.
+`gzserver` [options] <world_file>
 
 ## DESCRIPTION
 
-
+Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops.
 
 ## OPTIONS
 

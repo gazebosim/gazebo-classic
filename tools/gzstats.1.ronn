@@ -1,14 +1,25 @@
-This tool displays statistics about a running Gazebo world.
+gzstats -- This tool displays statistics about a running Gazebo world
 =============================================
 
 ## SYNPOSIS
 
-Allowed options:
+`gzstats` [options]
 
 ## DESCRIPTION
 
-  -p [ --plot ]           output comma-separated values, useful for processing 
+This tool displays statistics about a running Gazebo world.
 
+## OPTIONS
+
+* -h, --help :
+ Print help message.
+* -p, --plot :
+ Output comma-separated values, useful for processing and plotting.
+* -w, --world-name arg :
+ The Gazebo world to monitor.
+
+## SEE ALSO
+Examples and more information can be found at: http://gazebosim.org/wiki/Tools#World_Statistics
 
 ## AUTHOR
   Open Source Robotics Foundation

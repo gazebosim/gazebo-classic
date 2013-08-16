@@ -12,7 +12,10 @@ help_txt = stderr
 
 lines = help_txt.splitlines()
 
-f = open(sys.argv[2], 'w')
+if len(sys.argv) > 2:
+  f = open(sys.argv[2], 'w')
+else:
+  f = sys.stdout
 
 i = 0
 for i in range(len(lines)):

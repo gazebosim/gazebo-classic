@@ -1,3 +1,33 @@
+gztopic -- Tool to interact with gztopics on a Gazebo master
+=============================================
+
+## SYNPOSIS
+
+`gztopic` <command>
+
+## DESCRIPTION
+
+List information about published topics on a Gazebo master.
+
+## COMMAND ELEMENTS
+
+* **list**:
+List all topics.
+* **info <topic>**:
+Get information about a topic.
+* **echo <topic>**:
+Output topic data to screen.
+* **view <topic>**:
+View topic data using a QT widget.
+* **hz <topic>**:
+Get publish frequency.
+* **bw <topic>**:
+Get topic bandwidth.
+* **help**:
+This help text.
+
+## SEE ALSO
+Examples and more information can be found at:http://gazebosim.org/wiki/Tools#Topic_Info
 
 ## AUTHOR
   Open Source Robotics Foundation

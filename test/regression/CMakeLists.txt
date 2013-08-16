@@ -29,6 +29,7 @@ set(tests
   file_handling.cc
   imu.cc
   laser.cc
+  manpages.cc
   nondefault_world.cc
   physics.cc
   pioneer2dx.cc

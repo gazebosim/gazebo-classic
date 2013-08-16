@@ -1,13 +1,13 @@
-Gazebo multi-robot simulator, version 1.9.0
+gzclient -- Gazebo GUI Client
 =============================================
 
 ## SYNPOSIS
 
-Released under the Apache 2 License.
+`gzclient` [options]
 
 ## DESCRIPTION
 
-
+Gazebo GUI client which allows visualization and user interaction.
 
 ## OPTIONS
 

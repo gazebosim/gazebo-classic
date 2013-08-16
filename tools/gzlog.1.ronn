@@ -1,26 +1,24 @@
-Help:
+gzlog -- Tool to instrospect Gazebo log files
 =============================================
 
 ## SYNPOSIS
 
-
+`gzlog` [command] <options> [log file]
 
 ## DESCRIPTION
 
-
+Introspect Gazebo log files through different commands.
 
 ## COMMAND ELEMENTS
 
 * **help**:
 Output this help message.
+* **info**:
+Display statistical information about a log file.
 * **echo**:
 Output the contents of a log file to screen.
 * **step**:
 Step through the contents of a log file.
-* **start**:
-Start recording a log file on an active Gazebo server.
-* **stop**:
-Stop recording a log file on an active Gazebo server.
 
 ## OPTIONS
 
@@ -31,11 +29,14 @@ Stop recording a log file on an active Gazebo server.
 * -s, --stamp arg :
  Add a timestamp to each line of output. Valid values are (sim,real,wall)
 * -z, --hz arg :
- Filter output to the specified Hz rate. Only valid for echo and step commands.
+ Filter output to the specified Hz rate.Only valid for echo and step commands.
 * -f, --file arg :
  Path to a log file.
 * --filter arg :
  Filter output. Valid only for the echo and step commands
+
+## SEE ALSO
+Example and more information can be found at: http://gazebosim.org/wiki/Tools#Data_Log_Tool
 
 
 ## AUTHOR
