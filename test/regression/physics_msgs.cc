@@ -72,9 +72,11 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
     msgs::Set(msg.mutable_gravity(), *iter);
     physicsPub->Publish(msg);
 
-    world->StepWorld(10);
-    common::Time::MSleep(10);
-    world->StepWorld(10);
+    while (*iter != physics->GetGravity())
+    {
+      world->StepWorld(1);
+      common::Time::MSleep(1);
+    }
 
     EXPECT_EQ(*iter, physics->GetGravity());
   }
@@ -99,6 +101,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   math::Vector3 pos = math::Vector3(0, 0, z0);
   math::Vector3 size = math::Vector3(1, 1, 1);
   SpawnBox(name, size, pos, math::Vector3::Zero);
+  gzdbg << "SpawnBox called" << std::endl;
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
@@ -134,9 +137,11 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       msgs::Set(msg.mutable_pose(), *iter);
       modelPub->Publish(msg);
 
-      world->StepWorld(50);
-      common::Time::MSleep(100);
-      world->StepWorld(50);
+      while (*iter != model->GetWorldPose())
+      {
+        world->StepWorld(1);
+        common::Time::MSleep(1);
+      }
 
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
