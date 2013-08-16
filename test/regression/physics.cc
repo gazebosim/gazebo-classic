@@ -19,6 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -1564,11 +1565,7 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   ASSERT_TRUE(model);
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, PhysicsTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
 
 int main(int argc, char **argv)
 {

@@ -20,6 +20,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
+#include "helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -298,11 +299,7 @@ TEST_P(LaserTest, LaserNoise)
   LaserUnitNoise(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, LaserTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, LaserTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(LaserTest);
 
 int main(int argc, char **argv)
 {

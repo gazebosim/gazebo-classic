@@ -18,6 +18,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "helper_physics_generator.hh"
 
 const double g_physics_tol = 1e-2;
 
@@ -161,17 +162,14 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   }
 }
 
-// This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, CollideWithoutContact)
+TEST_P(PhysicsTest, CollideWithoutContact)
 {
-  CollideWithoutContact("ode");
+  CollideWithoutContact(GetParam());
 }
 
+// This test doesn't yet work in bullet, so we'll declare it only for ode.
+// INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
 INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
-
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, PhysicsTest, ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
 
 int main(int argc, char **argv)
 {
