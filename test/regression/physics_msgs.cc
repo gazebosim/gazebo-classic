@@ -22,14 +22,14 @@
 
 using namespace gazebo;
 
-class GuiToolsTest : public ServerFixture
+class PhysicsMsgsTest : public ServerFixture
 {
   public: void MoveTool(const std::string &_physicsEngine);
   public: void SetGravity(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-void GuiToolsTest::SetGravity(const std::string &_physicsEngine)
+void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -80,7 +80,7 @@ void GuiToolsTest::SetGravity(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
+void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -143,22 +143,22 @@ void GuiToolsTest::MoveTool(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(GuiToolsTest, SetGravity)
+TEST_P(PhysicsMsgsTest, SetGravity)
 {
   SetGravity(GetParam());
 }
 
 /////////////////////////////////////////////////
-TEST_P(GuiToolsTest, MoveTool)
+TEST_P(PhysicsMsgsTest, MoveTool)
 {
   MoveTool(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, GuiToolsTest,
+INSTANTIATE_TEST_CASE_P(TestODE, PhysicsMsgsTest,
     ::testing::Values("ode"));
 
 #ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestBullet, GuiToolsTest,
+INSTANTIATE_TEST_CASE_P(TestBullet, PhysicsMsgsTest,
     ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
