@@ -27,11 +27,11 @@ set(tests
   contact_sensor.cc
   factory.cc
   file_handling.cc
-  gui_tools.cc
   imu.cc
   laser.cc
   nondefault_world.cc
   physics.cc
+  physics_msgs.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
