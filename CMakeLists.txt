@@ -336,12 +336,44 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
+  set(PKG_LIBRARIES
+    gazebo_ccd
+    gazebo_common
+    gazebo_gimpact
+    gazebo_gui
+    gazebo_gui_building
+    gazebo_gui_viewers
+    gazebo_math
+    gazebo_msgs
+    gazebo_ode
+    gazebo_opcode
+    gazebo_opende_ou
+    gazebo_physics
+    gazebo_physics_ode
+    gazebo_rendering
+    gazebo_selection_buffer
+    gazebo_sensors
+    gazebo_skyx
+    gazebo_transport
+    gazebo_util)
+    
+  if (INCLUDE_PLAYER)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
+  endif()
+
+  if (HAVE_BULLET)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
+  endif()
+  
+  if (${OGRE_VERSION} GREATER 1.7.4)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  endif()
+    
   if (HAVE_SDF)
-    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport)
     set(PKG_DEPENDS Boost Protobuf SDFormat)
   else()
-    set(PKG_LIBRARIES gazebo_physics gazebo_common gazebo_math gazebo_rendering gazebo_gui gazebo_ode gazebo_msgs gazebo_transport gazebo_sdf_interface)
     set(PKG_DEPENDS Boost Protobuf)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_sdf_interface)
   endif()
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
