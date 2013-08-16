@@ -40,9 +40,6 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   double maxMass = _sdf->Get<double>("max_mass");
   unsigned int count = _sdf->Get<unsigned int>("count");
 
-  std::vector<CompoundObj> objects;
-  std::vector<CompoundObj>::iterator iter;
-
   for (unsigned int i = 0; i < count; ++i)
   {
     int rubbleType = math::Rand::GetIntUniform(0, 1);
@@ -108,7 +105,9 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     // Disable compound objects for now.
     // bool merged = false;
-    /*for (iter = objects.begin(); iter != objects.end(); ++iter)
+    /* std::vector<CompoundObj> objects;
+       std::vector<CompoundObj>::iterator iter;
+       for (iter = objects.begin(); iter != objects.end(); ++iter)
     {
       bool x = fabs(obj.pos.x - (*iter).pos.x) <=
         (*iter).size.x * 0.5 + obj.size.x * 0.5;

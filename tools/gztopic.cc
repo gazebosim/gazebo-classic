@@ -24,7 +24,7 @@
 #include <gazebo/gazebo.hh>
 
 #include <gazebo/common/Time.hh>
-#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportIface.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
 
@@ -168,7 +168,17 @@ void list()
     request.set_id(0);
     request.set_request("get_publishers");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(data);
+
+    try
+    {
+      connection->Read(data);
+    }
+    catch(...)
+    {
+      gzerr << "An active gzserver is probably not present.\n";
+      connection.reset();
+      return;
+    }
 
     packet.ParseFromString(data);
     pubs.ParseFromString(packet.serialized_data());

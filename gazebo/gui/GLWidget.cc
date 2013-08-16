@@ -24,7 +24,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -36,7 +36,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -1104,7 +1104,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
                                    const std::string &_mode)
 
 {
-  std::map<std::string, unsigned int>::iterator iter;
   if (!_name.empty())
   {
     std::string name = _name;
@@ -1125,7 +1124,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
 {
-  if (this->moveHistory.size() == 0 ||
+  if (this->moveHistory.empty() ||
       this->moveHistory.back().first != _visName ||
       this->moveHistory.back().second != _pose)
   {
@@ -1136,7 +1135,7 @@ void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
 /////////////////////////////////////////////////
 void GLWidget::PopHistory()
 {
-  if (this->moveHistory.size() > 0)
+  if (!this->moveHistory.empty())
   {
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));

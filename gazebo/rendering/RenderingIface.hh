@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERING_HH_
-#define _RENDERING_HH_
+#ifndef _RENDERINGIFACE_HH_
+#define _RENDERINGIFACE_HH_
 
 #include <string>
-#include "RenderTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -45,7 +45,8 @@ namespace gazebo
     /// \param[in] _enableVisualizations True enables visualization
     /// elements such as laser lines.
     rendering::ScenePtr create_scene(const std::string &_name,
-                                     bool _enableVisualizations);
+                                     bool _enableVisualizations,
+                                     bool _isServer = false);
 
     /// \brief remove a rendering::Scene by name
     /// \param[in] _name The name of the scene to remove.

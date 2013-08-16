@@ -25,7 +25,7 @@
 
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
@@ -135,7 +135,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
   std::string collision1;
 
   // Don't do anything if there is no new data to process.
-  if (this->incomingContacts.size() == 0)
+  if (this->incomingContacts.empty())
     return;
 
   // Clear the outgoing contact message.

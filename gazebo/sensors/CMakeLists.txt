@@ -11,7 +11,7 @@ set (sources
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
-  Sensors.cc
+  SensorsIface.cc
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
@@ -29,7 +29,7 @@ set (headers
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
-  Sensors.hh
+  SensorsIface.hh
   Sensor.hh
   SensorTypes.hh
   SensorFactory.hh
@@ -75,3 +75,6 @@ target_link_libraries(gazebo_sensors
 
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
+
+# Deprecated Sensors.hh
+gz_issue_775("Sensors")

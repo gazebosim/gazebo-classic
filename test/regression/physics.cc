@@ -19,6 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -65,17 +66,10 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
+TEST_P(PhysicsTest, EmptyWorld)
 {
-  EmptyWorld("ode");
+  EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, EmptyWorldBullet)
-{
-  EmptyWorld("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -277,17 +271,10 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropODE)
+TEST_P(PhysicsTest, SpawnDrop)
 {
-  SpawnDrop("ode");
+  SpawnDrop(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropBullet)
-{
-  SpawnDrop("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -562,17 +549,10 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
+TEST_P(PhysicsTest, SpawnDropCoGOffset)
 {
-  SpawnDropCoGOffset("ode");
+  SpawnDropCoGOffset(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
-{
-  SpawnDropCoGOffset("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
@@ -973,17 +953,10 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, RevoluteJointODE)
+TEST_P(PhysicsTest, RevoluteJoint)
 {
-  RevoluteJoint("ode");
+  RevoluteJoint(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, RevoluteJointBullet)
-{
-  RevoluteJoint("bullet");
-}
-#endif  // HAVE_BULLET
 
 TEST_F(PhysicsTest, State)
 {
@@ -1299,17 +1272,10 @@ TEST_F(PhysicsTest, CollisionTest)
 }
 
 
-TEST_F(PhysicsTest, SimplePendulumODE)
+TEST_P(PhysicsTest, SimplePendulum)
 {
-  SimplePendulum("ode");
+  SimplePendulum(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SimplePendulumBullet)
-{
-  SimplePendulum("bullet");
-}
-#endif  // HAVE_BULLET
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
@@ -1560,18 +1526,10 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PhysicsTest, CollisionFilteringODE)
+TEST_P(PhysicsTest, CollisionFiltering)
 {
-  CollisionFiltering("ode");
+  CollisionFiltering(GetParam());
 }
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, CollisionFilteringBullet)
-{
-  CollisionFiltering("bullet");
-}
-#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
@@ -1587,6 +1545,8 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
 }
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
 
 int main(int argc, char **argv)
 {

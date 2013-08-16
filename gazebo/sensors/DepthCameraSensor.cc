@@ -30,7 +30,7 @@
 
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
@@ -88,7 +88,7 @@ void DepthCameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
 
     if (!this->scene)
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
     this->camera = this->scene->CreateDepthCamera(
         this->sdf->Get<std::string>("name"), false);

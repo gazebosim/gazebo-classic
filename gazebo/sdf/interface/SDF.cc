@@ -400,7 +400,7 @@ void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 
   stream << "</div>";
 
-  if (this->attributes.size() > 0)
+  if (!this->attributes.empty())
   {
     stream << "<div style='background-color: #dedede; padding-left:10px; "
            << "display:inline-block;'>\n";
@@ -480,7 +480,7 @@ void Element::PrintValues(std::string _prefix)
       << (*aiter)->GetAsString() << "'";
   }
 
-  if (this->elements.size() > 0)
+  if (!this->elements.empty())
   {
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
@@ -529,7 +529,7 @@ void Element::ToString(const std::string &_prefix,
            << (*aiter)->GetAsString() << "'";
     }
 
-    if (this->elements.size() > 0)
+    if (!this->elements.empty())
     {
       _out << ">\n";
       ElementPtr_V::const_iterator eiter;

@@ -39,12 +39,12 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -58,7 +58,7 @@ using namespace gazebo;
 
 std::string custom_exec(std::string _cmd);
 
-class ServerFixture : public testing::Test
+class ServerFixture : public testing::TestWithParam<const char*>
 {
   protected: ServerFixture()
              {
@@ -136,11 +136,6 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
-               // We must set the findFile callback here,
-               // before the server loads the file (server->LoadFile).
-               sdf::setFindCallback(
-                   boost::bind(&gazebo::common::find_file, _1));
-
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -215,6 +210,7 @@ class ServerFixture : public testing::Test
                             const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
+               this->server->PreLoad();
                if (_physics.length())
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
                                                         _physics));
@@ -226,7 +222,7 @@ class ServerFixture : public testing::Test
                      gazebo::physics::get_world()->GetName()))
                {
                  rendering::create_scene(
-                     gazebo::physics::get_world()->GetName(), false);
+                     gazebo::physics::get_world()->GetName(), false, true);
                }
 
                this->SetPause(_paused);

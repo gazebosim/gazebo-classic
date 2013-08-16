@@ -23,11 +23,11 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -101,7 +101,7 @@ void InsertModelWidget::Update()
 
   // If the model database has call the OnModels callback function, then
   // add all the models from the database.
-  if (this->modelBuffer.size() > 0)
+  if (!this->modelBuffer.empty())
   {
     std::string uri = common::ModelDatabase::Instance()->GetURI();
     this->modelDatabaseItem->setText(0,
@@ -178,7 +178,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   boost::filesystem::path dir(_path);
 
   // Create a top-level tree item for the path
-  if (matchList.size() == 0)
+  if (matchList.empty())
   {
     topItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0), QStringList(qpath));
@@ -193,8 +193,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   // Remove current items.
   topItem->takeChildren();
-
-  std::list<boost::filesystem::path> resultSet;
 
   if (boost::filesystem::exists(dir) &&
       boost::filesystem::is_directory(dir))

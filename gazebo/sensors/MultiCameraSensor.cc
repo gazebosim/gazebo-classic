@@ -26,7 +26,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
@@ -95,7 +95,7 @@ void MultiCameraSensor::Init()
 
   if (!this->scene)
   {
-    this->scene = rendering::create_scene(worldName, false);
+    this->scene = rendering::create_scene(worldName, false, true);
 
     // This usually means rendering is not available
     if (!this->scene)
@@ -186,7 +186,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
-  if (this->cameras.size() == 0)
+  if (this->cameras.empty())
     return;
 
   bool publish = this->imagePub->HasConnections();

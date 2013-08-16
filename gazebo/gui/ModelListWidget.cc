@@ -30,11 +30,11 @@
 
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -225,7 +225,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillTypes.size() > 0)
+  if (!this->fillTypes.empty())
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;

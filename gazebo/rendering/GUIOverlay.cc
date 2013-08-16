@@ -20,7 +20,7 @@
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/math/Vector2d.hh"
 
@@ -210,7 +210,6 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 
   press = false;
   release = false;
-  pos = false;
   scroll = false;
 
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
