@@ -1,0 +1,29 @@
+Gazebo multi-robot simulator, version 1.9.0
+=============================================
+
+## SYNPOSIS
+
+Released under the Apache 2 License.
+
+## DESCRIPTION
+
+
+
+## OPTIONS
+
+* -q, --quiet :
+ Reduce output to stdout.
+* -h, --help :
+ Produce this help message.
+* -g, --gui-plugin arg :
+ Load a plugin.
+
+
+## AUTHOR
+  Open Source Robotics Foundation
+
+## COPYRIGHT 
+  Copyright 2013 Open Source Robotics Foundation
+       
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.

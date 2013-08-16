@@ -1,0 +1,20 @@
+This tool for spawning or deleting models into or from a running Gazebo simulation.
+=============================================
+
+## SYNPOSIS
+
+  gzfactory <spawn|delete> [options]
+
+## DESCRIPTION
+
+    delete  : Delete existing model. Must specify model name.
+
+
+## AUTHOR
+  Open Source Robotics Foundation
+
+## COPYRIGHT 
+  Copyright 2013 Open Source Robotics Foundation
+       
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
