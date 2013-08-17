@@ -31,6 +31,7 @@ set(tests
   laser.cc
   nondefault_world.cc
   physics.cc
+  physics_msgs.cc
   pioneer2dx.cc
   transport.cc
   rayshape.cc
