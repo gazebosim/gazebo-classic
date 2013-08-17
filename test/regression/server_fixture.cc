@@ -21,7 +21,9 @@
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture
 {
+  public: void LoadPaused(const std::string &_physicsType);
   public: void LoadEmptyOfType(const std::string &_physicsType);
+  public: void SpawnSDF(const std::string &_physicsType);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,10 +31,10 @@ class ServerFixtureTest : public ServerFixture
 // Verify that ServerFixture can load world in paused state
 // Gazebo issue #334
 ////////////////////////////////////////////////////////////////////////
-TEST_F(ServerFixtureTest, LoadPaused)
+void ServerFixtureTest::LoadPaused(const std::string &_physicsType)
 {
   // Note the second argument of Load sets the pause state
-  Load("worlds/empty.world", true);
+  Load("worlds/empty.world", true, _physicsType);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   gzdbg << "Check IsPaused with no delay\n";
@@ -45,6 +47,11 @@ TEST_F(ServerFixtureTest, LoadPaused)
   common::Time::MSleep(900);
   gzdbg << "Check IsPaused with 1000 ms delay\n";
   EXPECT_TRUE(world->IsPaused());
+}
+
+TEST_P(ServerFixtureTest, LoadPaused)
+{
+  LoadPaused(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +71,7 @@ void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
   EXPECT_EQ(physics->GetType(), _physicsType);
 }
 
-TEST_P(ServerFixtureTest, Load)
+TEST_P(ServerFixtureTest, LoadEmptyOfType)
 {
   LoadEmptyOfType(GetParam());
 }
@@ -74,10 +81,10 @@ TEST_P(ServerFixtureTest, Load)
 // Verify that the SpawnSDF function does not get stuck in a loop
 // Gazebo issue #530
 ////////////////////////////////////////////////////////////////////////
-TEST_F(ServerFixtureTest, SpawnSDF)
+void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
 {
   // Note the second argument of Load sets the pause state
-  Load("worlds/blank.world", true);
+  Load("worlds/blank.world", true, _physicsType);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   EXPECT_TRUE(world->IsPaused());
@@ -101,13 +108,18 @@ TEST_F(ServerFixtureTest, SpawnSDF)
          << "  </link>"
          << "</model>"
          << "</sdf>";
-  SpawnSDF(sdfStr.str());
+  ServerFixture::SpawnSDF(sdfStr.str());
 
   physics::ModelPtr model;
   model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
 
   EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
+}
+
+TEST_P(ServerFixtureTest, SpawnSDF)
+{
+  SpawnSDF(GetParam());
 }
 
 INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest);

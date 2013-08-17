@@ -16,22 +16,32 @@
 */
 #include <string.h>
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class NonDefaultWorld : public ServerFixture
 {
+  public: void Load(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-TEST_F(NonDefaultWorld, Load)
+void NonDefaultWorld::Load(const std::string &_physicsEngine)
 {
-  Load("worlds/empty_different_name.world");
+  ServerFixture::Load("worlds/empty_different_name.world", false,
+    _physicsEngine);
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
 }
+
+TEST_P(NonDefaultWorld, Load)
+{
+  Load(GetParam());
+}
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(NonDefaultWorld);
 
 int main(int argc, char **argv)
 {

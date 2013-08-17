@@ -33,8 +33,10 @@ set(tests
   file_handling.cc
   imu.cc
   laser.cc
+  manpages.cc
   nondefault_world.cc
   physics.cc
+  physics_msgs.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
