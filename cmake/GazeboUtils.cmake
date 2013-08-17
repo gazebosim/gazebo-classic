@@ -122,6 +122,7 @@ endmacro ()
 macro (gz_install_executable _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION_FULL})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+  manpage(${_name} 1)
 endmacro ()
 
 #################################################
