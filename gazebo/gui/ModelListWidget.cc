@@ -52,6 +52,11 @@
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
 
+// avoid collision from Mac OS X's ConditionalMacros.h
+#ifdef __MACH__
+#undef TYPE_BOOL
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
