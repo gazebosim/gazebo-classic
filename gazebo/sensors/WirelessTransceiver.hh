@@ -37,6 +37,9 @@ namespace gazebo
       /// \brief Constructor
       public: WirelessTransceiver();
 
+      /// \brief Constructor
+      public: ~WirelessTransceiver();
+
       // Documentation inherited
       public: virtual std::string GetTopic() const;
 
@@ -66,8 +69,11 @@ namespace gazebo
       /// \brief Antenna's gain of the receiver (dBi).
       protected: double gain;
 
-      /// \brief SDF <transceiver> element.
-      protected: sdf::ElementPtr transceiverElem;
+      /// \brief Parent entity which the sensor is attached to
+      protected: boost::weak_ptr<physics::Link> parentEntity;
+
+      /// \brief Sensor reference pose
+      protected: math::Pose referencePose;
     };
     /// \}
   }

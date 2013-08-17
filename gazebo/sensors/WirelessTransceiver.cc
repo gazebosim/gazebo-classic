@@ -27,8 +27,6 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("Wireless_transceiver", WirelessTransceiver)
-
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
   : Sensor(sensors::OTHER)
@@ -36,6 +34,11 @@ WirelessTransceiver::WirelessTransceiver()
   this->active = false;
   this->gain = 2.5;
   this->power = 14.5;
+}
+
+/////////////////////////////////////////////////
+WirelessTransceiver::~WirelessTransceiver()
+{
 }
 
 //////////////////////////////////////////////////
@@ -48,13 +51,20 @@ std::string WirelessTransceiver::GetTopic() const
   return topicName;
 }
 
-/////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void WirelessTransceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->transceiverElem = this->sdf->GetElement("transceiver");
-  if (!this->transceiverElem)
+  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
+    this->world->GetEntity(this->parentName));
+
+  GZ_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
+
+  this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
+
+  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
+  if (!transceiverElem)
   {
     gzerr << "Transceiver sensor is missing <transceiver> SDF element";
     return;
@@ -88,6 +98,7 @@ void WirelessTransceiver::Init()
 void WirelessTransceiver::Fini()
 {
   this->pub.reset();
+  this->parentEntity.lock().reset();
   Sensor::Fini();
 }
 

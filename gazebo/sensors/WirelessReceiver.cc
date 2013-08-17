@@ -33,10 +33,20 @@ GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 WirelessReceiver::WirelessReceiver()
 : WirelessTransceiver()
 {
-  // Initialization
   this->minFreq = 2412.0;
   this->maxFreq = 2484.0;
   this->sensitivity = -90.0;
+}
+
+//////////////////////////////////////////////////
+WirelessReceiver::~WirelessReceiver()
+{
+}
+
+//////////////////////////////////////////////////
+void WirelessReceiver::Init()
+{
+  WirelessTransceiver::Init();
 }
 
 /////////////////////////////////////////////////
@@ -44,18 +54,9 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-      this->world->GetEntity(this->parentName));
-
-  if (!parentEntity)
-  {
-    gzthrow("WirelessReceiver has invalid parent [" + this->parentName +
-            "]. Must be a link\n");
-  }
-
-  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
-
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
+
+  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
 
   this->minFreq = transceiverElem->Get<double>("min_frequency");
   this->maxFreq = transceiverElem->Get<double>("max_frequency");
@@ -93,7 +94,8 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     double rxPower;
     double txFreq;
 
-    this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+    this->referencePose = 
+        this->pose + this->parentEntity.lock()->GetWorldPose();
 
     math::Pose myPos = this->referencePose;
     Sensor_V sensors = SensorManager::Instance()->GetSensors();
@@ -107,7 +109,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
         txFreq = transmitter->GetFreq();
         rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
 
-        // Disgard if the frequency received is out of our frequency range,
+        // Discard if the frequency received is out of our frequency range,
         // or if the received signal strengh is lower than the sensivity
         if ((txFreq < this->GetLowerFreqFiltered()) ||
             (txFreq > this->GetHigherFreqFiltered()) ||
@@ -147,4 +149,10 @@ double WirelessReceiver::GetHigherFreqFiltered() const
 double WirelessReceiver::GetSensitivity() const
 {
   return this->sensitivity;
+}
+
+//////////////////////////////////////////////////
+void WirelessReceiver::Fini()
+{
+  WirelessTransceiver::Fini();
 }

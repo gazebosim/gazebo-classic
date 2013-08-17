@@ -37,8 +37,17 @@ namespace gazebo
       /// \brief Constructor
       public: WirelessReceiver();
 
+      /// \brief Constructor
+      public: virtual ~WirelessReceiver();
+
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
+
+      // Documentation inherited
+      public: virtual void Init();
+
+      // Documentation inherited
+      public: virtual void Fini();
 
       // Documentation inherited
       private: virtual void UpdateImpl(bool _force);
@@ -63,12 +72,6 @@ namespace gazebo
 
       /// \brief Antenna's sensitivity of the receiver (dBm).
       private: double sensitivity;
-
-      /// \brief Sensor reference pose
-      private: math::Pose referencePose;
-
-      /// \brief Parent entity which the IMU is attached to
-      private: physics::LinkPtr parentEntity;
     };
     /// \}
   }

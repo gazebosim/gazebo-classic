@@ -93,12 +93,6 @@ namespace gazebo
       // \brief When true it will publish the propagation grid to be used
       // by the transmitter visual layer
       private: bool visualize;
-
-      /// \brief Sensor reference pose
-      private: math::Pose referencePose;
-
-      /// \brief Parent entity which the IMU is attached to
-      private: physics::LinkPtr parentEntity;
     };
     /// \}
   }

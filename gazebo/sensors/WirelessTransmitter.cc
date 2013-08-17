@@ -56,16 +56,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-      this->world->GetEntity(this->parentName));
-
-  if (!parentEntity)
-  {
-    gzthrow("WirelessTransmitter has invalid parent [" + this->parentName +
-            "]. Must be a link\n");
-  }
-
-  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
 
   this->visualize = this->sdf->Get<bool>("visualize");
   this->essid = transceiverElem->Get<std::string>("essid");
@@ -91,7 +82,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void WirelessTransmitter::Init()
 {
-  Sensor::Init();
+  WirelessTransceiver::Init();
 
   // This ray will be used in GetSignalStrength() for checking obstacles
   // between the transmitter and a given point.
@@ -110,7 +101,8 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     double strength;
     msgs::PropagationParticle *p;
 
-    this->referencePose = this->pose + this->parentEntity->GetWorldPose();
+    this->referencePose =
+        this->pose + this->parentEntity.lock()->GetWorldPose();
 
     // Iterate using a rectangular grid, but only choose the points within
     // a circunference of radius MaxRadius
