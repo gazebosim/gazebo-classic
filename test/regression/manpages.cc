@@ -28,6 +28,7 @@ boost::filesystem::path g_serverBinPath;
 boost::filesystem::path g_serverSrcPath;
 boost::filesystem::path g_guiBinPath;
 boost::filesystem::path g_guiSrcPath;
+std::string g_gazeboPATH;
 
 /////////////////////////////////////////////////
 std::string customExec(std::string _cmd)
@@ -84,7 +85,7 @@ void toolTest(const std::string &_command)
 /////////////////////////////////////////////////
 void serverTest(const std::string &_command)
 {
-  std::string ronnOut = customExec(g_mkRonn.string()
+  std::string ronnOut = customExec(g_gazeboPATH + " " + g_mkRonn.string()
       + " " + (g_serverBinPath / _command).string());
 
   boost::filesystem::path origRonnFilename = PROJECT_SOURCE_PATH;
@@ -177,6 +178,9 @@ int main(int argc, char **argv)
 
   g_guiBinPath = g_serverBinPath / "gui";
   g_guiSrcPath = g_serverSrcPath / "gui";
+
+  g_gazeboPATH = std::string("PATH=") + g_serverBinPath.string() + ":"
+      + g_guiBinPath.string() + ":$PATH";
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
