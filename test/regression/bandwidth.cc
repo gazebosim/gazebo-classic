@@ -70,7 +70,7 @@ void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
         float totalBw = sumSize / dt.Double();
 
         printf("Bandwidth:\n");
-        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
+        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%u] Time[%4.2fs]\n",
                totalBw, meanSize, count, dt.Double());
 
         EXPECT_GT(totalBw, 1000.0);
