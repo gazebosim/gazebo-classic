@@ -8,6 +8,7 @@ set (sdfs
   cylinder_shape.sdf
   forcetorque.sdf
   geometry.sdf
+  gps.sdf
   gripper.sdf
   gui.sdf
   heightmap_shape.sdf
@@ -19,6 +20,7 @@ set (sdfs
   link.sdf
   mesh_shape.sdf
   model.sdf
+  noise.sdf
   physics.sdf
   plane_shape.sdf
   plugin.sdf
@@ -30,6 +32,7 @@ set (sdfs
   root.sdf
   scene.sdf
   sensor.sdf
+  spherical_coordinates.sdf
   sphere_shape.sdf
   sonar.sdf
   state.sdf
@@ -40,4 +43,3 @@ set (sdfs
 )
 
 install(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/sdf/1.4)
-
