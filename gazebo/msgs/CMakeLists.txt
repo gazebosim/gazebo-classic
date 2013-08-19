@@ -16,6 +16,7 @@ set (msgs
   fog.proto
   friction.proto
   geometry.proto
+  gps.proto
   gui_overlay_config.proto
   gui_camera.proto
   gui.proto

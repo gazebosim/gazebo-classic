@@ -15,6 +15,7 @@
   <include filename="plugin.sdf" required="*"/>
   <include filename="joint.sdf" required="*"/>
   <include filename="road.sdf" required="*"/>
+  <include filename="spherical_coordinates.sdf" required="0"/>
 
   <include filename="state.sdf" required="*"/>
 </element> <!-- End World -->
