@@ -5,6 +5,7 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+    
     <!-- Wireless transmitter sensor model -->
     <model name="wirelessTransmitter">
       <static>true</static>
