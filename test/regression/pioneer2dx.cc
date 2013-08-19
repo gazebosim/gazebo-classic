@@ -17,16 +17,18 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/Time.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
 {
+  public: void StraightLine(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-TEST_F(Pioneer2dx, StraightLine)
+void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
-  Load("worlds/pioneer2dx.world");
+  Load("worlds/pioneer2dx.world", false, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
@@ -69,6 +71,14 @@ TEST_F(Pioneer2dx, StraightLine)
   EXPECT_LT(fabs(endPose.pos.y), 0.5);
   EXPECT_LT(fabs(endPose.pos.z), 0.01);
 }
+
+
+TEST_P(Pioneer2dx, StraightLine)
+{
+  StraightLine(GetParam());
+}
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

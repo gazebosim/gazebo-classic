@@ -30,14 +30,14 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -69,8 +69,11 @@ Server::~Server()
 /////////////////////////////////////////////////
 void Server::PrintUsage()
 {
-  std::cerr << "Run the Gazebo server.\n\n"
-    << "Usage: gzserver [options] <world_file>\n\n";
+  std::cerr << "gzserver -- Run the Gazebo server.\n\n";
+  std::cerr << "`gzserver` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops.\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -86,7 +89,7 @@ bool Server::ParseArgs(int argc, char **argv)
     snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
   }
 
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
@@ -112,7 +115,7 @@ bool Server::ParseArgs(int argc, char **argv)
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc).add(h_desc);
 
   po::positional_options_description p_desc;
@@ -133,11 +136,17 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << v_desc << "\n";
+    return false;
+  }
+
   if (this->vm.count("quiet"))
     gazebo::common::Console::Instance()->SetQuiet(true);
   else
     gazebo::print_version();
-
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
@@ -150,13 +159,6 @@ bool Server::ParseArgs(int argc, char **argv)
     {
       gzerr << "Unable to set random number seed. Must supply a number.\n";
     }
-  }
-
-  if (this->vm.count("help"))
-  {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
-    return false;
   }
 
   /// Load all the plugins specified on the command line

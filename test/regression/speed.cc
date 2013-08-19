@@ -15,15 +15,18 @@
  *
 */
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class SpeedTest : public ServerFixture
 {
+  public: void BallTest(const std::string &_physicsEngine);
+  public: void ShapesWorld(const std::string &_physicsEngine);
 };
 
-TEST_F(SpeedTest, BallTest)
+void SpeedTest::BallTest(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
@@ -56,9 +59,14 @@ TEST_F(SpeedTest, BallTest)
 #endif
 }
 
-TEST_F(SpeedTest, ShapesWorld)
+TEST_P(SpeedTest, BallTest)
 {
-  Load("worlds/shapes.world");
+  BallTest(GetParam());
+}
+
+void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
+{
+  Load("worlds/shapes.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
@@ -88,6 +96,13 @@ TEST_F(SpeedTest, ShapesWorld)
   EXPECT_GT(speedRatio, 0.01);
 #endif
 }
+
+TEST_P(SpeedTest, ShapesWorld)
+{
+  ShapesWorld(GetParam());
+}
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(SpeedTest);
 
 int main(int argc, char **argv)
 {

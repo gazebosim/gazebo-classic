@@ -11,7 +11,7 @@ set (sources
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
-  Sensors.cc
+  SensorsIface.cc
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
@@ -29,7 +29,7 @@ set (headers
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
-  Sensors.hh
+  SensorsIface.hh
   Sensor.hh
   SensorTypes.hh
   SensorFactory.hh
@@ -64,22 +64,17 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY
 
 add_library(gazebo_sensors SHARED ${sources})
 
-target_link_libraries(gazebo_sensors gazebo_common 
-                                     gazebo_rendering
-                                     gazebo_physics
-                                     ${libtool_library} 
-                                     ${Boost_LIBRARIES}
-                                     ${ogre_ldflags}
-                                     )
+target_link_libraries(gazebo_sensors
+  gazebo_common 
+  gazebo_rendering
+  gazebo_physics
+  ${libtool_library} 
+  ${Boost_LIBRARIES}
+  ${ogre_ldflags}
+  )
 
-add_executable(gzsensor server.cc ../gazebo.cc)
-target_link_libraries( gzsensor gazebo_common
-                                gazebo_transport
-                                gazebo_sensors
-                                gazebo_rendering
-                                gazebo_msgs
-                                pthread)
-
-gz_install_executable( gzsensor )
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
+
+# Deprecated Sensors.hh
+gz_issue_775("Sensors")

@@ -21,7 +21,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 bool sig_killed = false;
 int status1, status2;

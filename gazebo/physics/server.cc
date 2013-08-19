@@ -23,9 +23,9 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/gazebo_config.h"
 
