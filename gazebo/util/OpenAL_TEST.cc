@@ -22,9 +22,11 @@
 #include "test_config.h"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/util/OpenAL.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
+#ifdef HAVE_OPENAL
 /////////////////////////////////////////////////
 TEST(OpenAL, SourceInvalid)
 {
@@ -312,3 +314,4 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+#endif
