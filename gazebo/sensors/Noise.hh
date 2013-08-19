@@ -79,7 +79,7 @@ namespace gazebo
       /// \brief Which type of noise we're applying
       private: NoiseType type;
 
-      /// \brief If type starts with GAUSSIAN, the mean of the distibution
+      /// \brief If type starts with GAUSSIAN, the mean of the distribution
       /// from which we sample when adding noise.
       private: double mean;
 
