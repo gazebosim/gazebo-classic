@@ -94,7 +94,7 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
     double rxPower;
     double txFreq;
 
-    this->referencePose = 
+    this->referencePose =
         this->pose + this->parentEntity.lock()->GetWorldPose();
 
     math::Pose myPos = this->referencePose;
