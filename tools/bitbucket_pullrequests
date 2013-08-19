@@ -12,24 +12,25 @@ class BitbucketPullRequests
 
   # constructor
   def initialize
-    @url_prefix = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests'
+    @url_domain = 'https://bitbucket.org'
+    @url_prefix = @url_domain + '/api/2.0/repositories/osrf/gazebo/pullrequests'
   end
-
-    #output += jsonHash["size"].to_s + " open pull requests: "+"\n"
-    #fields = ["id", "branch\t", "commit"]
-    #fields.each { |field|
-    #  output += field + "\t"
-    #}
-    #output += "\n"
-
-      #pr.keys.each { |key|
-      #  output += " "+key+"\n"
-      #}
 
   # summary of open pull requests
   def getPullRequestsSummary()
     response = RestClient.get(@url_prefix)
     jsonHash = JSON.parse(response.body)
+    output = ""
+    output += prettyPrintSummary(jsonHash)
+    while jsonHash.has_key? "next"
+      response = RestClient.get(@url_domain + jsonHash["next"])
+      jsonHash = JSON.parse(response.body)
+      output += prettyPrintSummary(jsonHash)
+    end
+    return output
+  end
+
+  def prettyPrintSummary(jsonHash)
     output = ""
     jsonHash["values"].each { |pr|
       output += pr["id"].to_s
