@@ -83,8 +83,8 @@ namespace gazebo
       /// from which we sample when adding noise.
       private: double mean;
 
-      /// \brief If type starts with GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise.
+      /// \brief If type starts with GAUSSIAN, the standard deviation of the
+      /// distribution from which we sample when adding noise.
       private: double stdDev;
 
       /// \brief If type starts with GAUSSIAN, the bias we'll add.
