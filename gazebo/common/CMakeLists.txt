@@ -34,6 +34,7 @@ set (sources
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
+  SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
   Time.cc
@@ -68,6 +69,7 @@ set (headers
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
+  SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -97,6 +99,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )

@@ -28,6 +28,7 @@ void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
 void RegisterMultiCameraSensor();
+void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
 void RegisterRaySensor();
@@ -48,6 +49,7 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
   RegisterDepthCameraSensor();
   RegisterMultiCameraSensor();
+  RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
   RegisterRaySensor();
