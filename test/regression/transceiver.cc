@@ -223,7 +223,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0),
+  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.5),
       math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
@@ -258,7 +258,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
         double signalLevel = txNode.signal_level();
 
-        samples++;
+        ++samples;
         avgSignalLevelEmpty += signalLevel;
       }
     }
@@ -294,7 +294,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
         double signalLevel = txNode.signal_level();
 
-        samples++;
+        ++samples;
         avgSignalLevelObstacle += signalLevel;
       }
     }
@@ -313,9 +313,9 @@ TEST_P(TransceiverTest, EmptyWorld)
 }
 
 /////////////////////////////////////////////////
-TEST_F(TransceiverTest, Obstacle)
+TEST_P(TransceiverTest, Obstacle)
 {
-  TxRxObstacle("ode");
+  TxRxObstacle(GetParam());
 }
 
 /////////////////////////////////////////////////
