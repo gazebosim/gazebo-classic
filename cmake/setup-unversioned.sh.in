@@ -16,3 +16,5 @@ else
   # Otherwise, looks good.  Source it.
   . $setup
 fi
+
+. "@CMAKE_INSTALL_PREFIX@/share/gazebo/gz_completion"

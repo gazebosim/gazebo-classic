@@ -66,17 +66,14 @@ void Help(const std::string &_command)
 /////////////////////////////////////////////////
 void Debug()
 {
-  for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
-      iter != g_commandMap.end(); ++iter)
-  {
-    std::cout << iter->first << "\n";
-  }
 }*/
 
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options")
 {
+  this->visibleOptions.add_options()
+    ("help,h", "Print this help message");
 }
 
 /////////////////////////////////////////////////
@@ -89,6 +86,28 @@ void Command::Signal()
 {
   boost::mutex::scoped_lock lock(sigMutex);
   sigCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+void Command::ListOptions()
+{
+  std::vector<std::string> pieces;
+
+  std::vector<boost::shared_ptr<po::option_description> >::const_iterator iter; 
+  for (iter = this->visibleOptions.options().begin(); 
+      iter != this->visibleOptions.options().end(); ++iter)
+  {
+    pieces.clear();
+    std::string formatName = (*iter)->format_name();
+    boost::split(pieces, formatName, boost::is_any_of(" "));
+
+    // Output the short name option, or long name if there is no shortname
+    std::cout << pieces[0] << std::endl;
+
+    // Output the long name option if it exists.
+    if (pieces.size() > 3)
+      std::cout << pieces[2] << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -111,7 +130,7 @@ bool Command::TransportInit()
   if (!this->TransportRequired())
     return true;
 
-  if (!transport::init())
+  if (!transport::init("", 0, 1))
     return false;
 
   transport::run();
@@ -151,14 +170,15 @@ bool Command::Run(int _argc, char **_argv)
   // Hidden options
   po::options_description hiddenOptions("hidden options");
   hiddenOptions.add_options()
-    ("command", po::value<std::string>(), "Command");
+    ("command", po::value<std::string>(), "Command")
+    ("pass", po::value<std::vector<std::string> >(), "pass through");
 
   po::options_description allOptions("all options");
   allOptions.add(hiddenOptions).add(this->visibleOptions);
 
   // The command and file options are positional
   po::positional_options_description positional;
-  positional.add("command", 1);
+  positional.add("command", 1).add("pass", -1);
 
   try
   {
@@ -171,6 +191,12 @@ bool Command::Run(int _argc, char **_argv)
   {
     std::cout << "Invalid arguments\n";
     return false;
+  }
+
+  if (this->vm.count("help"))
+  {
+    this->Help();
+    return true;
   }
 
   if (!this->TransportInit())
@@ -907,13 +933,81 @@ bool SDFCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
+HelpCommand::HelpCommand()
+  : Command("help",
+      "Outputs information about a command")
+{
+  // Options that are visible to the user through help.
+  // this->visibleOptions.add_options()
+  //  ("option,o", po::value<std::string>(), "Show the command options.");
+}
+
+/////////////////////////////////////////////////
+void HelpCommand::HelpDetailed()
+{
+  std::cout <<
+    "\tOutput information about a gz command.\n"
+    << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool HelpCommand::TransportRequired()
+{
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool HelpCommand::RunImpl()
+{
+  std::string option;
+  if (vm.count("pass") && !vm["pass"].as<std::vector<std::string> >().empty())
+    option = vm["pass"].as<std::vector<std::string> >()[0];
+
+  this->Help(option);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void HelpCommand::Help(const std::string &_command)
+{
+  std::cout << "This tool modifies various aspects of a "
+    << "running Gazebo simulation.\n\n";
+
+  if (_command.empty() || g_commandMap.find(_command) == g_commandMap.end())
+  {
+    std::cout << "  Usage:  gz <command>\n\n"
+      << "List of commands:\n\n";
+
+    std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+      << "help";
+    std::cout << "Print this help text.\n";
+
+    for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
+        iter != g_commandMap.end(); ++iter)
+    {
+      std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+        << iter->first;
+      std::cout << iter->second->GetBrief() << "\n";
+    }
+
+    std::cout << "\n\n";
+    std::cout << "Use \"gz help <command>\" to print help for a "
+      "command.\n";
+  }
+  else if (g_commandMap.find(_command) != g_commandMap.end())
+    g_commandMap[_command]->Help();
+
+}
+
+/////////////////////////////////////////////////
 DebugCommand::DebugCommand()
   : Command("debug",
       "Returns completion list associated with command")
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("option,o", "Show the command options.");
+    ("option,o", po::value<std::string>(), "Show the command options.");
 }
 
 /////////////////////////////////////////////////
@@ -935,9 +1029,20 @@ bool DebugCommand::TransportRequired()
 bool DebugCommand::RunImpl()
 {
   if (this->vm.count("option") <= 0)
-    printf("help\ntopic\njoint\nworld\n");
+  {
+    for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
+        iter != g_commandMap.end(); ++iter)
+    {
+      std::cout << iter->first << "\n";
+    }
+  }
   else
-    printf("more options...\n");
+  {
+    std::map<std::string, Command *>::iterator iter =
+      g_commandMap.find(this->vm["option"].as<std::string>());
+    if (iter != g_commandMap.end())
+      iter->second->ListOptions();
+  }
 
   return true;
 }
@@ -991,6 +1096,7 @@ int main(int argc, char **argv)
   }
 
   g_commandMap["camera"] = new CameraCommand();
+  g_commandMap["help"] = new HelpCommand();
   g_commandMap["joint"] = new JointCommand();
   g_commandMap["model"] = new ModelCommand();
   g_commandMap["world"] = new WorldCommand();
@@ -1011,7 +1117,7 @@ int main(int argc, char **argv)
   int result = 0;
 
   // Output help when appropriate
-  if (command.empty() || command == "help" || vm.count("help"))
+  /*if (command.empty() || command == "help" || vm.count("help"))
   {
     std::string option;
     if (vm.count("pass") && !vm["pass"].as<std::vector<std::string> >().empty())
@@ -1019,7 +1125,7 @@ int main(int argc, char **argv)
 
     Help(option);
   }
-  else if (iter != g_commandMap.end())
+  else*/ if (iter != g_commandMap.end())
   {
     g_commandMap[command]->Run(argc, argv);
   }

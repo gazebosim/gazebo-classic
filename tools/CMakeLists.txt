@@ -49,3 +49,5 @@ target_link_libraries(gz
 gz_install_executable(gz)
 
 install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+
+install(FILES gz_completion DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo)

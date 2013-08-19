@@ -59,6 +59,8 @@ namespace gazebo
     /// \brief Process signal interrupt.
     public: static void Signal();
 
+    public: void ListOptions();
+
     /// \brief Return true if transport is need for the command.
     /// \return True if transport should be initialized.
     protected: virtual bool TransportRequired();
@@ -203,6 +205,24 @@ namespace gazebo
 
     // Documentation inherited
     protected: virtual bool TransportRequired();
+  };
+
+  /// \brief Help command
+  class HelpCommand : public Command
+  {
+    /// \brief Constructor
+    public: HelpCommand();
+
+    // Documentation inherited
+    public: virtual void HelpDetailed();
+
+    // Documentation inherited
+    protected: virtual bool RunImpl();
+
+    // Documentation inherited
+    protected: virtual bool TransportRequired();
+
+    private: void Help(const std::string &_command);
   };
 
   /// \brief Debug command
