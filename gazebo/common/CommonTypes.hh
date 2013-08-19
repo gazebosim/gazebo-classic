@@ -96,6 +96,7 @@ namespace gazebo
     class Param;
     class PoseAnimation;
     class SkeletonAnimation;
+    class SphericalCoordinates;
     class Time;
 
     template <typename T>
@@ -127,6 +128,10 @@ namespace gazebo
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class
     typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+
+    /// \def  SphericalCoordinatesPtr
+    /// \brief Boost shared pointer to a SphericalCoordinates object
+    typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
   }
 
   namespace event
