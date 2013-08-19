@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#ifdef HAVE_OPENAL
 #ifdef __APPLE__
 # include <OpenAL/al.h>
 # include <OpenAL/alc.h>
@@ -27,6 +28,7 @@
 # include <AL/alc.h>
 # include <AL/alext.h>
 #endif
+#endif
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
@@ -34,10 +36,10 @@
 #include "gazebo/common/AudioDecoder.hh"
 #include "gazebo/util/OpenAL.hh"
 
-#ifdef HAVE_OPENAL
 using namespace gazebo;
 using namespace util;
 
+#ifdef HAVE_OPENAL
 /////////////////////////////////////////////////
 OpenAL::OpenAL()
 {
