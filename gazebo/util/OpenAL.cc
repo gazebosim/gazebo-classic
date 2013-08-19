@@ -22,7 +22,7 @@
 #include <AL/alc.h>
 #include <AL/alext.h>
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/AudioDecoder.hh"

@@ -20,7 +20,7 @@
 #include <sdf/sdf.hh>
 
 #include "test_config.h"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;

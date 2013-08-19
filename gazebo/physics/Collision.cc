@@ -22,7 +22,7 @@
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/transport/Publisher.hh"
 

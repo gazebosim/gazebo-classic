@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #include "test_config.h"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/AudioDecoder.hh"
 
 using namespace gazebo;
