@@ -19,7 +19,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -30,7 +30,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/Sensor.hh"
 
 #include "gazebo/physics/Model.hh"

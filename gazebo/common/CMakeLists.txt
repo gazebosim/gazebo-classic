@@ -19,7 +19,7 @@ set (sources
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
-  Common.cc
+  CommonIface.cc
   Console.cc
   Event.cc
   Events.cc
@@ -48,7 +48,7 @@ set (headers
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
-  Common.hh
+  CommonIface.hh
   CommonTypes.hh
   Color.hh
   Console.hh
@@ -133,9 +133,13 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
-  rt
   pthread
 )
+
+if (NOT APPLE)
+  # rt is used for clock_gettime, which is not available on apple
+  target_link_libraries(gazebo_common rt)
+endif()
 
 if (HAVE_SDF)
   target_link_libraries(gazebo_common ${SDF_LIBRARIES})
@@ -151,3 +155,6 @@ endif()
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
+
+# Deprecated Common.hh
+gz_issue_775("Common")

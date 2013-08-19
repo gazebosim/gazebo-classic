@@ -25,7 +25,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
@@ -50,8 +50,10 @@ bool g_fullscreen = false;
 //////////////////////////////////////////////////
 void print_usage()
 {
-  fprintf(stderr, "Usage: gzclient [-h]\n");
-  fprintf(stderr, "  -h            : Print this message.\n");
+  std::cerr << "gzclient -- Gazebo GUI Client\n\n";
+  std::cerr << "`gzclient` [options]\n\n";
+  std::cerr << "Gazebo GUI client which allows visualization and user "
+    << "interaction.\n\n";
 }
 
 //////////////////////////////////////////////////
@@ -70,13 +72,13 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc);
 
   try
@@ -90,17 +92,18 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  if (!vm.count("quiet"))
-    gazebo::print_version();
-  else
-    gazebo::common::Console::Instance()->SetQuiet(true);
-
   if (vm.count("help"))
   {
     print_usage();
     std::cerr << v_desc << "\n";
     return false;
   }
+
+  if (!vm.count("quiet"))
+    gazebo::print_version();
+  else
+    gazebo::common::Console::Instance()->SetQuiet(true);
+
 
   /// Load all the plugins specified on the command line
   if (vm.count("gui-plugin"))

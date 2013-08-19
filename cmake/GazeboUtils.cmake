@@ -122,6 +122,7 @@ endmacro ()
 macro (gz_install_executable _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION_FULL})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+  manpage(${_name} 1)
 endmacro ()
 
 #################################################
@@ -134,7 +135,43 @@ endmacro()
 
 #################################################
 macro (gz_setup_apple)
+  # NOTE MacOSX provides different system versions than CMake is parsing.
+  #      The following table lists the most recent OSX versions
+  #     9.x.x = Mac OSX Leopard (10.5)
+  #    10.x.x = Mac OSX Snow Leopard (10.6)
+  #    11.x.x = Mac OSX Lion (10.7)
+  #    12.x.x = Mac OSX Mountain Lion (10.8)
+  if (${CMAKE_SYSTEM_VERSION} LESS 10)
+    add_definitions(-DMAC_OS_X_VERSION=1050)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 10 AND ${CMAKE_SYSTEM_VERSION} LESS 11)
+    add_definitions(-DMAC_OS_X_VERSION=1060)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 11 AND ${CMAKE_SYSTEM_VERSION} LESS 12)
+    add_definitions(-DMAC_OS_X_VERSION=1070)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 12 OR ${CMAKE_SYSTEM_VERSION} EQUAL 12)
+    add_definitions(-DMAC_OS_X_VERSION=1080)
+  else ()
+    add_definitions(-DMAC_OS_X_VERSION=0)
+  endif ()
+
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
+endmacro()
+
+#################################################
+macro (gz_issue_775 _name)
+  # Deprecated header files
+  # Install until next gazebo version on case-sensitive filesystems
+  if (FILESYSTEM_CASE_SENSITIVE)
+    if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
+      message(WARNING "Installing deprecated ${_name}.hh. This should be removed after Gazebo 1.9")
+    endif()
+    set(generated_file "${CMAKE_CURRENT_BINARY_DIR}/${_name}.hh")
+    execute_process(
+      COMMAND bash ${PROJECT_SOURCE_DIR}/tools/issue_775_generator.bash ${_name}
+      OUTPUT_FILE ${generated_file}
+    )
+    string(TOLOWER ${_name} nameLower)
+    gz_install_includes(${nameLower} ${generated_file})
+  endif()
 endmacro()
 
 # This should be migrated to more fine control solution based on set_property APPEND

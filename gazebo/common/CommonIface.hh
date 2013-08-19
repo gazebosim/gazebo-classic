@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COMMON_HH_
-#define _COMMON_HH_
+#ifndef _COMMONIFACE_HH_
+#define _COMMONIFACE_HH_
 
 #include <string>
 

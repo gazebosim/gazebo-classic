@@ -198,6 +198,10 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   if (!this->jointId)
     gzerr << "ODE Joint ID is invalid\n";
 
+  if (this->HasType(Base::HINGE2_JOINT) &&
+      (odechild == NULL || odeparent == NULL))
+    gzthrow("ODEHinge2Joint cannot be connected to the world");
+
   if (!odechild && odeparent)
   {
     dJointAttach(this->jointId, 0, odeparent->GetODEId());
