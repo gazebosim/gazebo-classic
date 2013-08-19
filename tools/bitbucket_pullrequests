@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+# based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
+
+require 'rubygems'
+require 'rest_client'
+require 'json'
+
+class BitbucketPullRequests
+  # URL for bitbucket 2.0 api
+  @url_prefix
+  @url_suffix
+
+  # constructor
+  def initialize
+    @url_prefix = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests'
+  end
+
+    #output += jsonHash["size"].to_s + " open pull requests: "+"\n"
+    #fields = ["id", "branch\t", "commit"]
+    #fields.each { |field|
+    #  output += field + "\t"
+    #}
+    #output += "\n"
+
+      #pr.keys.each { |key|
+      #  output += " "+key+"\n"
+      #}
+
+  # summary of open pull requests
+  def getPullRequestsSummary()
+    response = RestClient.get(@url_prefix)
+    jsonHash = JSON.parse(response.body)
+    output = ""
+    jsonHash["values"].each { |pr|
+      output += pr["id"].to_s
+      output += "\t"+pr["source"]["commit"]["sha"]
+      output += "\t"+pr["source"]["branch"]["name"]
+      output += "\n"
+    }
+    return output
+  end
+
+  # list of files changed by pull request
+  def getPullRequestDetail(id)
+    url = @url_prefix + "/" + id.to_s + "/patch"
+    response = RestClient.get(url)
+    output = ""
+    response.lines.map(&:chomp).each do |line|
+      if line.include? '+++'
+        line["+++ b/"] = ""
+        output += line + "\n"
+      end
+    end
+    return output
+  end
+end
+
+client = BitbucketPullRequests.new
+if ARGV.length == 1
+  puts client.getPullRequestDetail(ARGV[0].to_i)
+else
+  puts client.getPullRequestsSummary()
+end
+
