@@ -32,7 +32,7 @@ GZ_REGISTER_STATIC_SENSOR("wireless_transmitter", WirelessTransmitter)
 const double WirelessTransmitter::NEmpty = 6;
 const double WirelessTransmitter::NObstacle = 12.0;
 const double WirelessTransmitter::ModelStdDesv = 6.0;
-const double WirelessTransmitter::Step = 0.25;
+const double WirelessTransmitter::Step = 1.0;
 const double WirelessTransmitter::MaxRadius = 10.0;
 
 /////////////////////////////////////////////////
