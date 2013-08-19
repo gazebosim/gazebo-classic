@@ -505,6 +505,7 @@ namespace gazebo
       /// \brief Mutex to protect the publishData variable
       private: boost::recursive_mutex *publishDataMutex;
 
+#ifdef HAVE_OPENAL
       /// \brief All the audio sources
       private: std::vector<util::OpenALSourcePtr> audioSources;
 
@@ -514,6 +515,7 @@ namespace gazebo
       /// \brief Subscriber to contacts with this collision. Used for audio
       /// playback.
       private: transport::SubscriberPtr audioContactsSub;
+#endif
     };
     /// \}
   }

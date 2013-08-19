@@ -167,7 +167,9 @@ void World::Load(sdf::ElementPtr _sdf)
   else
     this->name = this->sdf->Get<std::string>("name");
 
+#ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
+#endif
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -680,7 +682,9 @@ void World::Fini()
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
 
+#ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
+#endif
 }
 
 //////////////////////////////////////////////////

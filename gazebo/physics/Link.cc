@@ -179,6 +179,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->inertial->Load(this->sdf->GetElement("inertial"));
   }
 
+#ifdef HAVE_OPENAL
   if (_sdf->HasElement("audio_source"))
   {
     // bool onContact = false;
@@ -221,6 +222,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
+#endif
 
   if (needUpdate)
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
@@ -327,7 +329,9 @@ void Link::Fini()
     this->requestPub->Publish(*msg, true);
   }
 
+#ifdef HAVE_OPENAL
   this->audioSink.reset();
+#endif
 
   Entity::Fini();
 }
@@ -489,6 +493,7 @@ void Link::SetLaserRetro(float _retro)
 //////////////////////////////////////////////////
 void Link::Update(const common::UpdateInfo & /*_info*/)
 {
+#ifdef HAVE_OPENAL
   if (this->audioSink)
   {
     this->audioSink->SetPose(this->GetWorldPose());
@@ -502,6 +507,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
     (*iter)->SetPose(this->GetWorldPose());
     (*iter)->SetVelocity(this->GetWorldLinearVel());
   }
+#endif
 
   // Apply our linear accel
   // this->SetForce(this->linearAccel);
@@ -1085,6 +1091,7 @@ void Link::OnCollision(ConstContactsPtr &_msg)
     collisionName1 = collisionName1.substr(pos1+2);
     collisionName2 = collisionName2.substr(pos2+2);
 
+#ifdef HAVE_OPENAL
     for (std::vector<util::OpenALSourcePtr>::iterator iter =
         this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
     {
@@ -1092,5 +1099,6 @@ void Link::OnCollision(ConstContactsPtr &_msg)
           (*iter)->HasCollisionName(collisionName2))
         (*iter)->Play();
     }
+#endif
   }
 }
