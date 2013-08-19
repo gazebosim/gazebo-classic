@@ -15,31 +15,22 @@
  *
 */
 
-#include <stdio.h>
-#include <string>
+#ifndef _TEST_GENERATOR_HH
+#define _TEST_GENERATOR_HH_
 
-#include "ServerFixture.hh"
+#define ODE_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestODE, \
+    testclass, ::testing::Values("ode"))
+#define BULLET_SUPPORT(testclass)
 
-using namespace gazebo;
+#ifdef HAVE_BULLET
+#undef BULLET_SUPPORT
+#define BULLET_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
+    testclass, ::testing::Values("bullet"))
+#endif
 
-/////////////////////////////////////////////////
-std::string custom_exec(std::string _cmd)
-{
-  _cmd += " 2>/dev/null";
-  FILE* pipe = popen(_cmd.c_str(), "r");
+/// \brief Helper macro to instantiate gtest for using different physics engines
+#define INSTANTIATE_PHYSICS_ENGINES_TEST(testclass) \
+    ODE_SUPPORT(testclass); \
+    BULLET_SUPPORT(testclass)
 
-  if (!pipe)
-    return "ERROR";
-
-  char buffer[128];
-  std::string result = "";
-
-  while (!feof(pipe))
-  {
-    if (fgets(buffer, 128, pipe) != NULL)
-      result += buffer;
-  }
-
-  pclose(pipe);
-  return result;
-}
+#endif

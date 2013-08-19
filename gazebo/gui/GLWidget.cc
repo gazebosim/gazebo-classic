@@ -642,7 +642,7 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::string ogreHandle;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__)
   ogreHandle = boost::lexical_cast<std::string>(this->winId());
 #else
   QX11Info info = x11Info();

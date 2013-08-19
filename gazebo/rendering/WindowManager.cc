@@ -16,6 +16,10 @@
 */
 #include <math.h>
 
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Events.hh"
@@ -76,9 +80,21 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
+#ifdef Q_OS_MAC
+  params["externalWindowHandle"] = _ogreHandle;
+#else
   params["parentWindowHandle"] = _ogreHandle;
+#endif
   params["externalGLControl"] = true;
   params["FSAA"] = "4";
+
+  // Set the macAPI for Ogre based on the Qt implementation
+#ifdef QT_MAC_USE_COCOA
+  params["macAPI"] = "cocoa";
+  params["macAPICocoaUseNSView"] = "true";
+#else
+  params["macAPI"] = "carbon";
+#endif
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
