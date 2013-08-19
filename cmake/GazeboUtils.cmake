@@ -135,6 +135,24 @@ endmacro()
 
 #################################################
 macro (gz_setup_apple)
+  # NOTE MacOSX provides different system versions than CMake is parsing.
+  #      The following table lists the most recent OSX versions
+  #     9.x.x = Mac OSX Leopard (10.5)
+  #    10.x.x = Mac OSX Snow Leopard (10.6)
+  #    11.x.x = Mac OSX Lion (10.7)
+  #    12.x.x = Mac OSX Mountain Lion (10.8)
+  if (${CMAKE_SYSTEM_VERSION} LESS 10)
+    add_definitions(-DMAC_OS_X_VERSION=1050)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 10 AND ${CMAKE_SYSTEM_VERSION} LESS 11)
+    add_definitions(-DMAC_OS_X_VERSION=1060)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 11 AND ${CMAKE_SYSTEM_VERSION} LESS 12)
+    add_definitions(-DMAC_OS_X_VERSION=1070)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 12 OR ${CMAKE_SYSTEM_VERSION} EQUAL 12)
+    add_definitions(-DMAC_OS_X_VERSION=1080)
+  else ()
+    add_definitions(-DMAC_OS_X_VERSION=0)
+  endif ()
+
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
