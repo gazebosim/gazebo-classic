@@ -176,7 +176,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Transmitter - tx
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTx";
-  math::Pose txPose(math::Vector3(0, 0, 0.025),
+  math::Pose txPose(math::Vector3(0, 0, 0.5),
       math::Quaternion(0, 0, 0));
 
   // Spawn tx
@@ -192,7 +192,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx1
   std::string rx1ModelName = "rx1";
   std::string rx1SensorName = "wirelessRx1";
-  math::Pose rx1Pose(math::Vector3(3, 0, 0.025),
+  math::Pose rx1Pose(math::Vector3(3, 0, 0.5),
       math::Quaternion(0, 0, 0));
 
   // Spawn rx1
@@ -209,7 +209,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-3, 0, 0.025), math::Quaternion(0, 0, 0));
+  math::Pose rx2Pose(math::Vector3(-3, 0, 0.5), math::Quaternion(0, 0, 0));
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
@@ -223,7 +223,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.5),
+  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0),
       math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
@@ -265,8 +265,6 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     ++iters;
   }
 
-  std::cout << "Num of samples: " << samples << std::endl;
-
   samples = 0;
   iters = 0;
 
@@ -303,33 +301,31 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     ++iters;
   }
 
-  std::cout << "Num of samples: " << samples << std::endl;
-
   // Check that the signal level in the not-occluded receiver is higher than
   // the signal received by the occluded receiver
   EXPECT_GT(avgSignalLevelEmpty / samples, avgSignalLevelObstacle / samples);
 }
 
 /////////////////////////////////////////////////
-/*TEST_P(TransceiverTest, EmptyWorld)
+TEST_P(TransceiverTest, EmptyWorld)
 {
   TxRxEmptySpace(GetParam());
 }
-*/
+
 /////////////////////////////////////////////////
-TEST_P(TransceiverTest, Obstacle)
+TEST_F(TransceiverTest, Obstacle)
 {
-  TxRxObstacle(GetParam());
+  TxRxObstacle("ode");
 }
 
 /////////////////////////////////////////////////
-//INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
-//    ::testing::Values("ode"));
+INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
+    ::testing::Values("ode"));
 
 /////////////////////////////////////////////////
 #ifdef HAVE_BULLET
 INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
-    ::testing::Values("ode"));
+    ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////

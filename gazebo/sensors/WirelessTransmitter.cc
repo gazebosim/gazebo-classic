@@ -93,6 +93,9 @@ void WirelessTransmitter::Init()
 //////////////////////////////////////////////////
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
+  this->referencePose =
+        this->pose + this->parentEntity.lock()->GetWorldPose();
+
   if (this->pub && this->visualize)
   {
     msgs::PropagationGrid msg;
@@ -100,9 +103,6 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     math::Pose worldPose;
     double strength;
     msgs::PropagationParticle *p;
-
-    this->referencePose =
-        this->pose + this->parentEntity.lock()->GetWorldPose();
 
     // Iterate using a rectangular grid, but only choose the points within
     // a circunference of radius MaxRadius
