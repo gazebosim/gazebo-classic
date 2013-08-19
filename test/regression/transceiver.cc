@@ -236,7 +236,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   this->receivedMsg = false;
 
-  // Loop until you have 10 samples or timeout after ~5segs
+  // Loop until you have 10 samples or timeout after ~5secs
   int iters = 0;
   while (samples < 10 && iters < 50)
   {
@@ -273,7 +273,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 
   this->receivedMsg = false;
 
-  // Loop until you have 10 samples or timeout after ~5segs
+  // Loop until you have 10 samples or timeout after ~5secs
   while (samples < 10 && iters < 50)
   {
     // Update all the sensors
