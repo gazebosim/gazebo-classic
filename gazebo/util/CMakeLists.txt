@@ -1,5 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_OPENAL)
+  include_directories(${OPENAL_INCLUDE_DIR})
+endif()
+
 set (sources 
   Diagnostics.cc
   LogPlay.cc
