@@ -33,13 +33,13 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -56,6 +56,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -216,6 +217,25 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  // This should also come before loading of entities
+  {
+    sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
+    common::SphericalCoordinates::SurfaceType surfaceType =
+      common::SphericalCoordinates::Convert(
+        spherical->Get<std::string>("surface_model"));
+    math::Angle latitude, longitude, heading;
+    double elevation = spherical->Get<double>("elevation");
+    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
+    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
+    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+
+    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceType, latitude, longitude, elevation, heading));
+  }
+
+  if (this->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
@@ -693,6 +713,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+{
+  return this->sphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
@@ -1279,7 +1305,7 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->deleteEntity.empty())
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
@@ -1788,7 +1814,6 @@ void World::ProcessMessages()
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-    msgs::Pose *poseMsg;
 
     if ((this->posePub && this->posePub->HasConnections()) ||
         (this->poseLocalPub && this->poseLocalPub->HasConnections()))
@@ -1798,13 +1823,13 @@ void World::ProcessMessages()
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      if (this->publishModelPoses.size() > 0)
+      if (!this->publishModelPoses.empty())
       {
         for (std::set<ModelPtr>::iterator iter =
             this->publishModelPoses.begin();
             iter != this->publishModelPoses.end(); ++iter)
         {
-          poseMsg = msg.add_pose();
+          msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the model's relative pose
           poseMsg->set_name((*iter)->GetScopedName());

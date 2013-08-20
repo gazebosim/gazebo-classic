@@ -407,6 +407,11 @@ else (libdl_library AND libdl_include_dir)
 endif ()
 
 ########################################
+# Include man pages stuff
+include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+add_manpage_target()
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include

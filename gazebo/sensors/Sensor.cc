@@ -23,7 +23,7 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Timer.hh"
@@ -31,7 +31,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"

@@ -122,7 +122,7 @@ void MouseEventHandler::Add(const std::string &_name,
 void MouseEventHandler::Remove(const std::string &_name,
     std::list<Filter> &_list)
 {
-  std::remove(_list.begin(), _list.end(), _name);
+  _list.remove(Filter(_name, NULL));
 }
 
 /////////////////////////////////////////////////

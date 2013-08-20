@@ -24,7 +24,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"

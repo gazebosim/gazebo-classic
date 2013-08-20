@@ -19,11 +19,11 @@
  * Date: 21 May 2003
  */
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -190,7 +190,15 @@ void Joint::LoadImpl(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
-  this->Attach(this->parentLink, this->childLink);
+  try
+  {
+    this->Attach(this->parentLink, this->childLink);
+  }
+  catch(...)
+  {
+    gzerr << "Attach joint failed" << std::endl;
+    return;
+  }
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
