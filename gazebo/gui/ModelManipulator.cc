@@ -390,8 +390,11 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr mouseVis
       = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-  if (this->selectionObj->GetMode() == rendering::SelectionObj::SELECTION_NONE
-      || (mouseVis && mouseVis != this->selectionObj->GetParent()))
+  // set the new mouse vis only if there are no modifier keys pressed and the
+  // entity was different from the previously selected one.
+  if (!this->keyEvent.key && (this->selectionObj->GetMode() ==
+       rendering::SelectionObj::SELECTION_NONE
+      || (mouseVis && mouseVis != this->selectionObj->GetParent())))
   {
     vis = mouseVis;
   }
