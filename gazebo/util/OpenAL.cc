@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <gazebo/gazebo_config.h>
+
 #ifdef HAVE_OPENAL
 #ifdef __APPLE__
 # include <OpenAL/al.h>
