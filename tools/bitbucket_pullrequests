@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
 
+# to install dependencies on Ubuntu (tested with Quantal):
+#sudo apt-get install ruby1.9.1-dev
+#sudo gem install rest-client json
 require 'rubygems'
 require 'rest_client'
 require 'json'
