@@ -42,13 +42,37 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
+if (${GAZEBO_VERSION} VERSION_GREATER 1.10)
+  message (WARNING
+    "Installing deprecated manpages. This should be removed after Gazebo 1.10")
+  manpage(gzfactory 1)
+  manpage(gzlog 1)
+  manpage(gzsdf 1)
+  manpage(gzstats 1)
+  manpage(gztopic 1)
+endif()
+
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
 target_link_libraries(gz
  gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
  gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
 gz_install_executable(gz)
 
-install (PROGRAMS gzmodel_create gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+# Create man page for gz
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gz.1.roff
+  COMMAND ${GZIP} -c ${CMAKE_CURRENT_SOURCE_DIR}/gz.1.roff
+  > ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz
+)
+set(MANPAGE_TARGET "man-gz")
+add_custom_target(${MANPAGE_TARGET} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz DESTINATION share/man/man1)
+
+
+install (PROGRAMS gzmodel_create gzmodel_create.sh
+  DESTINATION ${BIN_INSTALL_DIR})
+
 if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
   message (WARNING "Installing deprecated gzmodel_create.sh. This should be removed after Gazebo 1.9")
 endif()
