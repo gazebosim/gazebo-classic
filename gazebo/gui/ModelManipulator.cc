@@ -18,7 +18,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -27,7 +27,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/MouseEventHandler.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
 
