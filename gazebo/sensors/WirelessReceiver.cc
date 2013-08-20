@@ -111,8 +111,8 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
 
         // Discard if the frequency received is out of our frequency range,
         // or if the received signal strengh is lower than the sensivity
-        if ((txFreq < this->GetLowerFreqFiltered()) ||
-            (txFreq > this->GetHigherFreqFiltered()) ||
+        if ((txFreq < this->GetMinFreqFiltered()) ||
+            (txFreq > this->GetMaxFreqFiltered()) ||
             (rxPower < this->GetSensitivity()))
         {
           continue;
@@ -134,13 +134,13 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetLowerFreqFiltered() const
+double WirelessReceiver::GetMinFreqFiltered() const
 {
   return this->minFreq;
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetHigherFreqFiltered() const
+double WirelessReceiver::GetMaxFreqFiltered() const
 {
   return this->maxFreq;
 }

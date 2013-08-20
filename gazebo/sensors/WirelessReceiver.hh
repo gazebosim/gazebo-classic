@@ -52,13 +52,13 @@ namespace gazebo
       // Documentation inherited
       private: virtual void UpdateImpl(bool _force);
 
-      /// \brief Returns the lower frequency filtered (MHz).
+      /// \brief Returns the minimum frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetLowerFreqFiltered() const;
+      public: double GetMinFreqFiltered() const;
 
-      /// \brief Returns the higher frequency filtered (MHz).
+      /// \brief Returns the maximum frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetHigherFreqFiltered() const;
+      public: double GetMaxFreqFiltered() const;
 
       /// \brief Returns the receiver sensitivity (dBm).
       /// \return Receiver sensitivity (dBm).
