@@ -57,13 +57,13 @@ AudioDecoder::~AudioDecoder()
 void AudioDecoder::Cleanup()
 {
 #ifdef HAVE_FFMPEG
-  // Close the audio file
-  if (this->formatCtx)
-    avformat_close_input(&this->formatCtx);
-
   // Close the codec
   if (this->codecCtx)
     avcodec_close(this->codecCtx);
+
+  // Close the audio file
+  if (this->formatCtx)
+    avformat_close_input(&this->formatCtx);
 #endif
 }
 
