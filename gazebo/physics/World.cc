@@ -56,6 +56,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -216,6 +217,25 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  // This should also come before loading of entities
+  {
+    sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
+    common::SphericalCoordinates::SurfaceType surfaceType =
+      common::SphericalCoordinates::Convert(
+        spherical->Get<std::string>("surface_model"));
+    math::Angle latitude, longitude, heading;
+    double elevation = spherical->Get<double>("elevation");
+    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
+    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
+    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+
+    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceType, latitude, longitude, elevation, heading));
+  }
+
+  if (this->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
@@ -693,6 +713,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+{
+  return this->sphericalCoordinates;
 }
 
 //////////////////////////////////////////////////

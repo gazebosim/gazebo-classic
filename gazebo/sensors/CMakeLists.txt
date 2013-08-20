@@ -5,9 +5,11 @@ set (sources
   ContactSensor.cc
   DepthCameraSensor.cc
   ForceTorqueSensor.cc
+  GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
+  Noise.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -23,9 +25,11 @@ set (headers
   ContactSensor.hh
   DepthCameraSensor.hh
   ForceTorqueSensor.hh
+  GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
+  Noise.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
@@ -38,18 +42,20 @@ set (headers
 )
 
 set (gtest_sources
-  RaySensor_TEST.cc
+  ForceTorqueSensor_TEST.cc
+  GpsSensor_TEST.cc
   ImuSensor_TEST.cc
+  Noise_TEST.cc
+  RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc
-  ForceTorqueSensor_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
-  SensorManager_TEST.cc
   GpuRaySensor_TEST.cc
+  SensorManager_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})
