@@ -36,8 +36,8 @@ CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
 CPPCHECK_CMD1="-j 4 --enable=style,performance,portability,information"\
 " $CPPCHECK_RULES $CPPCHECK_FILES"
-# This command used to be part of the script but was removed since it
-# generated many errors in raring.
+# This command used to be part of the script but was removed since our API
+# provides many functions that Gazebo does not use internally
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
 CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
 " $CPPCHECK_INCLUDES --check-config"
