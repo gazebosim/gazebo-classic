@@ -46,12 +46,10 @@ namespace gazebo
       /// \brief Set the size of the box
       public: void SetSize(const math::Vector3 &_size)
               {
-                gzerr << " bullet box set size " << _size << std::endl;
                 if (_size.x < 0 || _size.y < 0 || _size.z < 0)
                 {
-                    gzerr << "Box shape does not support negative"
-                          << " size\n";
-                    return;
+                  gzerr << "Box shape does not support negative size\n";
+                  return;
                 }
                 math::Vector3 size = _size;
                 if (math::equal(size.x, 0.0))
@@ -72,10 +70,6 @@ namespace gazebo
                   gzwarn << "Setting box shape's z to zero \n";
                   size.z = 1e-4;
                 }
-
-//                math::Vector3 boxSize = this->GetSize();
-//                gzerr << "oldSize " << oldSize << std::endl;
-                gzerr << "size " << size << std::endl;
 
                 BoxShape::SetSize(size);
                 BulletCollisionPtr bParent;
@@ -105,12 +99,31 @@ namespace gazebo
                       bLink->GetWorld()->GetPhysicsEngine());
                   btDynamicsWorld *bulletWorld =
                       bulletPhysics->GetDynamicsWorld();
+
                   shape->setLocalScaling(boxScale);
+
+                  // clear bullet cache and re-add the collision shape
+                  // otherwise collisions won't work properly after scaling
                   bulletWorld->updateSingleAabb(bLink->GetBulletLink());
                   bulletWorld->getBroadphase()->getOverlappingPairCache()->
                       cleanProxyFromPairs(
                       bLink->GetBulletLink()->getBroadphaseHandle(),
                       bulletWorld->getDispatcher());
+
+                  // remove and add the shape again
+                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
+                  {
+                    btCompoundShape *compoundShape =
+                        dynamic_cast<btCompoundShape *>(
+                        bLink->GetBulletLink()->getCollisionShape());
+
+                    compoundShape->removeChildShape(shape);
+                    math::Pose relativePose =
+                        this->collisionParent->GetRelativePose();
+                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    compoundShape->addChildShape(
+                        BulletTypes::ConvertPose(relativePose), shape);
+                  }
                 }
               }
 

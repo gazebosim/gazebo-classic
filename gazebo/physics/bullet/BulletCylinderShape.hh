@@ -50,15 +50,13 @@ namespace gazebo
               {
                 if (_radius < 0)
                 {
-                    gzerr << "Cylinder shape does not support negative"
-                          << " radius\n";
-                    return;
+                  gzerr << "Cylinder shape does not support negative radius\n";
+                  return;
                 }
                 if (_length < 0)
                 {
-                    gzerr << "Cylinder shape does not support negative"
-                          << " length\n";
-                    return;
+                  gzerr << "Cylinder shape does not support negative length\n";
+                  return;
                 }
                 if (math::equal(_radius, 0.0))
                 {
@@ -103,11 +101,29 @@ namespace gazebo
                       bulletPhysics->GetDynamicsWorld();
 
                   shape->setLocalScaling(cylinderScale);
+
+                  // clear bullet cache and re-add the collision shape
+                  // otherwise collisions won't work properly after scaling
                   bulletWorld->updateSingleAabb(bLink->GetBulletLink());
                   bulletWorld->getBroadphase()->getOverlappingPairCache()->
                       cleanProxyFromPairs(
                       bLink->GetBulletLink()->getBroadphaseHandle(),
                       bulletWorld->getDispatcher());
+
+                  // remove and add the shape again
+                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
+                  {
+                    btCompoundShape *compoundShape =
+                        dynamic_cast<btCompoundShape *>(
+                        bLink->GetBulletLink()->getCollisionShape());
+
+                    compoundShape->removeChildShape(shape);
+                    math::Pose relativePose =
+                        this->collisionParent->GetRelativePose();
+                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    compoundShape->addChildShape(
+                        BulletTypes::ConvertPose(relativePose), shape);
+                  }
                 }
               }
 

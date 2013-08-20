@@ -193,6 +193,25 @@ void BulletLink::UpdateBounds()
 {
   if (this->compoundShape)
   {
+  math::Vector3 cogVec = this->inertial->GetCoG();
+    for (Base_V::iterator iter = this->children.begin();
+         iter != this->children.end(); ++iter)
+    {
+      if ((*iter)->HasType(Base::COLLISION))
+      {
+        BulletCollisionPtr collision;
+        collision = boost::static_pointer_cast<BulletCollision>(*iter);
+        btCollisionShape *shape = collision->GetCollisionShape();
+
+        math::Pose relativePose = collision->GetRelativePose();
+        relativePose.pos -= cogVec;
+        dynamic_cast<btCompoundShape *>(this->compoundShape)->removeChildShape(
+            shape);
+        dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(
+            BulletTypes::ConvertPose(relativePose), shape);
+      }
+    }
+
     dynamic_cast<btCompoundShape *>(this->compoundShape)
       ->recalculateLocalAabb();
   }
