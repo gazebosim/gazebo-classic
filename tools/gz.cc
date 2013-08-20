@@ -34,39 +34,33 @@ std::map<std::string, Command *> g_commandMap;
 /////////////////////////////////////////////////
 void Help(const std::string &_command)
 {
-  std::cout << "This tool modifies various aspects of a "
+  std::cerr << "This tool modifies various aspects of a "
             << "running Gazebo simulation.\n\n";
 
   if (_command.empty() || g_commandMap.find(_command) == g_commandMap.end())
   {
-    std::cout << "  Usage:  gz <command>\n\n"
+    std::cerr << "  Usage:  gz <command>\n\n"
       << "List of commands:\n\n";
 
-    std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+    std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
       << "help";
-    std::cout << "Print this help text.\n";
+    std::cerr << "Print this help text.\n";
 
     for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
         iter != g_commandMap.end(); ++iter)
     {
-      std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+      std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
         << iter->first;
-      std::cout << iter->second->GetBrief() << "\n";
+      std::cerr << iter->second->GetBrief() << "\n";
     }
 
-    std::cout << "\n\n";
-    std::cout << "Use \"gz help <command>\" to print help for a "
+    std::cerr << "\n\n";
+    std::cerr << "Use \"gz help <command>\" to print help for a "
       "command.\n";
   }
   else if (g_commandMap.find(_command) != g_commandMap.end())
     g_commandMap[_command]->Help();
 }
-
-/*
-/////////////////////////////////////////////////
-void Debug()
-{
-}*/
 
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
@@ -113,9 +107,9 @@ void Command::ListOptions()
 /////////////////////////////////////////////////
 void Command::Help()
 {
-  std::cout << " gz " << this->name << " [options]\n\n";
+  std::cerr << " gz " << this->name << " [options]\n\n";
   this->HelpDetailed();
-  std::cout << this->visibleOptions << "\n";
+  std::cerr << this->visibleOptions << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -189,7 +183,7 @@ bool Command::Run(int _argc, char **_argv)
   }
   catch(boost::exception &_e)
   {
-    std::cout << "Invalid arguments\n";
+    std::cerr << "Invalid arguments\n";
     return false;
   }
 
@@ -269,7 +263,7 @@ WorldCommand::WorldCommand()
 /////////////////////////////////////////////////
 void WorldCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tChange properties of a Gazebo world on a running\n "
     "\tserver. If a name for the world, option -w, is not specified\n"
     "\tthe first world found on the Gazebo master will be used.\n"
@@ -327,7 +321,7 @@ PhysicsCommand::PhysicsCommand()
 /////////////////////////////////////////////////
 void PhysicsCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tChange properties of the physics engine on a specific\n"
     "\tworld. If a name for the world, option -w, is not specified,\n"
     "\tthe first world found on the Gazebo master will be used.\n"
@@ -397,7 +391,7 @@ ModelCommand::ModelCommand()
 /////////////////////////////////////////////////
 void ModelCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tChange properties of a model, delete a model, or\n"
     "\tspawn a new model. If a name for the world, option -w, is\n"
     "\tnot pecified, the first world found on the Gazebo master\n"
@@ -417,7 +411,7 @@ bool ModelCommand::RunImpl()
     modelName = this->vm["model-name"].as<std::string>();
   else
   {
-    std::cout << "A model name is required using the "
+    std::cerr << "A model name is required using the "
       << "(-m <model_name> command line argument)\n";
     return false;
   }
@@ -457,20 +451,20 @@ bool ModelCommand::RunImpl()
     std::ifstream ifs(filename.c_str());
     if (!ifs)
     {
-      std::cout << "Error: Unable to open file[" << filename << "]\n";
+      std::cerr << "Error: Unable to open file[" << filename << "]\n";
       return false;
     }
 
     boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
-      std::cout << "ERROR: SDF parsing the xml failed" << std::endl;
+      std::cerr << "Error: SDF parsing the xml failed" << std::endl;
       return false;
     }
 
     if (!sdf::readFile(filename, sdf))
     {
-      std::cout << "Error: SDF parsing the xml failed\n";
+      std::cerr << "Error: SDF parsing the xml failed\n";
       return false;
     }
 
@@ -536,7 +530,7 @@ JointCommand::JointCommand()
 /////////////////////////////////////////////////
 void JointCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tChange properties of a joint. If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
@@ -556,7 +550,7 @@ bool JointCommand::RunImpl()
     modelName = this->vm["model-name"].as<std::string>();
   else
   {
-    std::cout << "A model name is required using the "
+    std::cerr << "A model name is required using the "
       << "(-m <model_name> command line argument)\n";
     return false;
   }
@@ -565,7 +559,7 @@ bool JointCommand::RunImpl()
     jointName = this->vm["joint-name"].as<std::string>();
   else
   {
-    std::cout << "A joint name is required using the "
+    std::cerr << "A joint name is required using the "
       << "(-j <joint_name> command line argument)\n";
     return false;
   }
@@ -632,7 +626,7 @@ CameraCommand::CameraCommand()
 /////////////////////////////////////////////////
 void CameraCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tChange properties of a camera. If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
@@ -652,7 +646,7 @@ bool CameraCommand::RunImpl()
     cameraName = this->vm["camera-name"].as<std::string>();
   else
   {
-    std::cout << "A camera name is required using the "
+    std::cerr << "A camera name is required using the "
       << "(-c <camera_name> command line argument)\n";
     return false;
   }
@@ -691,7 +685,7 @@ StatsCommand::StatsCommand()
 /////////////////////////////////////////////////
 void StatsCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tPrint gzserver statics to standard out. If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
@@ -806,7 +800,7 @@ SDFCommand::SDFCommand()
 /////////////////////////////////////////////////
 void SDFCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tIntrospect, convert, and output SDF files.\n"
     "\tUse the -v option to specify the version of\n"
     "\tSDF for use with other options.\n"
@@ -945,7 +939,7 @@ HelpCommand::HelpCommand()
 /////////////////////////////////////////////////
 void HelpCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tOutput information about a gz command.\n"
     << std::endl;
 }
@@ -971,28 +965,28 @@ bool HelpCommand::RunImpl()
 /////////////////////////////////////////////////
 void HelpCommand::Help(const std::string &_command)
 {
-  std::cout << "This tool modifies various aspects of a "
+  std::cerr << "This tool modifies various aspects of a "
     << "running Gazebo simulation.\n\n";
 
   if (_command.empty() || g_commandMap.find(_command) == g_commandMap.end())
   {
-    std::cout << "  Usage:  gz <command>\n\n"
+    std::cerr << "  Usage:  gz <command>\n\n"
       << "List of commands:\n\n";
 
-    std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+    std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
       << "help";
-    std::cout << "Print this help text.\n";
+    std::cerr << "Print this help text.\n";
 
     for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
         iter != g_commandMap.end(); ++iter)
     {
-      std::cout << "  " << std::left << std::setw(10) << std::setfill(' ')
+      std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
         << iter->first;
-      std::cout << iter->second->GetBrief() << "\n";
+      std::cerr << iter->second->GetBrief() << "\n";
     }
 
-    std::cout << "\n\n";
-    std::cout << "Use \"gz help <command>\" to print help for a "
+    std::cerr << "\n\n";
+    std::cerr << "Use \"gz help <command>\" to print help for a "
       "command.\n";
   }
   else if (g_commandMap.find(_command) != g_commandMap.end())
@@ -1013,7 +1007,7 @@ DebugCommand::DebugCommand()
 /////////////////////////////////////////////////
 void DebugCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tUsed primarily for bash completion, this tool\n"
     "\treturn the completion list for a given command.\n"
     << std::endl;
@@ -1085,7 +1079,7 @@ int main(int argc, char **argv)
   }
   catch(boost::exception &_e)
   {
-    std::cout << "Invalid arguments\n";
+    std::cerr << "Invalid arguments\n";
     return -1;
   }
 
@@ -1116,22 +1110,13 @@ int main(int argc, char **argv)
 
   int result = 0;
 
-  // Output help when appropriate
-  /*if (command.empty() || command == "help" || vm.count("help"))
-  {
-    std::string option;
-    if (vm.count("pass") && !vm["pass"].as<std::vector<std::string> >().empty())
-      option = vm["pass"].as<std::vector<std::string> >()[0];
-
-    Help(option);
-  }
-  else*/ if (iter != g_commandMap.end())
+  if (iter != g_commandMap.end())
   {
     g_commandMap[command]->Run(argc, argv);
   }
   else
   {
-    gzerr << "Invalid command [" << command << "]\n";
+    g_commandMap["help"]->Run(argc, argv);
     result = -1;
   }
 

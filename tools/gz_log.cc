@@ -581,7 +581,7 @@ LogCommand::LogCommand()
 /////////////////////////////////////////////////
 void LogCommand::HelpDetailed()
 {
-  std::cout <<
+  std::cerr <<
     "\tIntrospect and manipulate Gazebo log files. The log   \n"
     "\tcommand can also start and stop data log recording from \n"
     "\tan active Gazebo server.\n"

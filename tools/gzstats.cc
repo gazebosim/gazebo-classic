@@ -112,7 +112,8 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gzerr << "gzstats is deprecated. Use the gz command line: gz help stats.\n";
+  std::cout << "gzstats is deprecated. Use the gz "
+    << "command line: gz help stats.\n";
 
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
@@ -143,8 +144,7 @@ int main(int argc, char **argv)
 
   if (vm.count("help"))
   {
-    std::cerr << "gzstats -- This tool displays statistics about a "
-      "running Gazebo world\n\n";
+    std::cerr << "gzstats -- DEPRECATED(see 'gz help sdf')\n\n";
 
     std::cerr << "`gzstats` [options]\n\n";
 

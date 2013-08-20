@@ -652,7 +652,7 @@ class StateFilter : public FilterBase
 /// \brief Print general help
 void help(po::options_description &_options)
 {
-  std::cerr << "gzlog -- Tool to instrospect Gazebo log files\n\n";
+  std::cerr << "gzlog -- DEPRECATED(see 'gz help log')\n\n";
 
   std::cerr << "`gzlog` [command] <options> [log file]\n\n";
 
@@ -979,6 +979,9 @@ void record(bool _start)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  std::cout << "gzlog is deprecated. Use the gz "
+    << "command line: gz help log.\n";
+
   // Hidden options
   po::options_description hiddenOptions("hidden options");
   hiddenOptions.add_options()

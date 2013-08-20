@@ -52,8 +52,7 @@ boost::shared_ptr<google::protobuf::Message> g_echoMsg;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cerr << "gztopic -- Tool to interact with gztopics on a "
-    "Gazebo master\n\n";
+  std::cerr << "gztopic -- DEPRECATED(see 'gz help topic')\n\n";
 
   std::cerr << "`gztopic` <command>\n\n";
 
@@ -509,7 +508,8 @@ void view(int _argc, char **_argv)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gzerr << "gztopic is deprecated. Use the gz command line: gz help topic.\n";
+  std::cout << "gztopic is deprecated. Use the gz command "
+    << "line: gz help topic.\n";
 
   if (!parse(argc, argv))
     return 0;
