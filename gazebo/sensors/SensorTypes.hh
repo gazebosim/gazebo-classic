@@ -40,6 +40,8 @@ namespace gazebo
     class RFIDTag;
     class SonarSensor;
     class ForceTorqueSensor;
+    class GpsSensor;
+    class Noise;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -84,6 +86,14 @@ namespace gazebo
     /// \def ForceTorqueSensorPtr
     /// \brief Shared pointer to ForceTorqueSensor
     typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
+
+    /// \def GpsSensorPtr
+    /// \brief Shared pointer to GpsSensor
+    typedef boost::shared_ptr<GpsSensor> GpsSensorPtr;
+
+    /// \def NoisePtr
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<Noise> NoisePtr;
 
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers

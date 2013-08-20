@@ -191,7 +191,15 @@ void Joint::LoadImpl(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
-  this->Attach(this->parentLink, this->childLink);
+  try
+  {
+    this->Attach(this->parentLink, this->childLink);
+  }
+  catch(...)
+  {
+    gzerr << "Attach joint failed" << std::endl;
+    return;
+  }
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);

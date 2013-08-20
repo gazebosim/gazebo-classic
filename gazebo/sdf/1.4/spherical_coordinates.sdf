@@ -1,0 +1,39 @@
+<element name="spherical_coordinates" required="0">
+  <element name="surface_model" type="string" default="EARTH_WGS84" required="1">
+    <description>
+      Name of planetary surface model, used to determine the surface altitude
+      at a given latitude and longitude. The default is an ellipsoid model of
+      the earth based on the WGS-84 standard. It is used in Gazebo's GPS sensor
+      implementation.
+    </description>
+  </element>
+
+  <element name="latitude_deg" type="double" default="0.0" required="1">
+    <description>
+      Geodetic latitude at origin of gazebo reference frame, specified
+      in units of degrees.
+    </description>
+  </element>
+
+  <element name="longitude_deg" type="double" default="0.0" required="1">
+    <description>
+      Longitude at origin of gazebo reference frame, specified in units
+      of degrees.
+    </description>
+  </element>
+
+  <element name="elevation" type="double" default="0.0" required="1">
+    <description>
+      Elevation of origin of gazebo reference frame, specified in meters.
+    </description>
+  </element>
+
+  <element name="heading_deg" type="double" default="0.0" required="1">
+    <description>
+      Heading offset of gazebo reference frame, measured as angle between
+      East and gazebo x axis, or equivalently, the angle between North and
+      gazebo y axis. The angle is specified in degrees.
+    </description>
+  </element>
+
+</element>
