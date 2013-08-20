@@ -122,6 +122,10 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the spherical coordinates converter.
+      /// \return Pointer to the spherical coordinates converter.
+      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
+
       /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
@@ -454,6 +458,9 @@ namespace gazebo
 
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Pointer the spherical coordinates data.
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
