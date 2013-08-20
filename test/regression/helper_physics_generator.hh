@@ -31,6 +31,6 @@
 /// \brief Helper macro to instantiate gtest for using different physics engines
 #define INSTANTIATE_PHYSICS_ENGINES_TEST(testclass) \
     ODE_SUPPORT(testclass); \
-    BULLET_SUPPORT(testclass)
+    BULLET_SUPPORT(testclass);
 
 #endif
