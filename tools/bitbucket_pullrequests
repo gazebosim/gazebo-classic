@@ -38,6 +38,7 @@ class BitbucketPullRequests
     jsonHash["values"].each { |pr|
       output += pr["id"].to_s
       output += "\t"+pr["source"]["commit"]["sha"]
+      output += "\t"+pr["destination"]["commit"]["sha"]
       output += "\t"+pr["source"]["branch"]["name"]
       output += "\n"
     }
