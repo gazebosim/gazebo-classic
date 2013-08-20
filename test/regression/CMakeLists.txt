@@ -22,7 +22,7 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDEDIR} )
+  include_directories ( ${DART_INCLUDE_DIRS} )
   link_directories ( ${DART_LIBRARY_DIRS} )
 endif()
 

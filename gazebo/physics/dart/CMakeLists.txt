@@ -1,6 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${DART_INCLUDEDIR}
+include_directories(${DART_INCLUDE_DIRS}
                     ${FCL_INCLUDEDIR}
                     ${ASSIMP_INCLUDEDIR})
 
