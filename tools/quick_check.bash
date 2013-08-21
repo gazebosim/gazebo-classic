@@ -31,14 +31,16 @@ do
   echo $msg
 
   files=`$hg_root/tools/bitbucket_pullrequests -f $id | grep '\.[ch]*$'`
-  tmp=`mktemp -t asdf`
+  tmp=`mktemp -t asdfXXXXXXXXXX`
   for f in $files
   do
+    prefix=`basename $f | sed -e 's@\..*$@@'`
     ext=`echo $f | sed -e 's@^.*\.@@'`
     tmp2="$tmp.$ext"
+    tmp2base=`basename "$tmp"`
     hg cat -r $src $hg_root/$f > $tmp2
     python $hg_root/tools/cpplint.py $tmp2 2>&1 \
-      | sed -e "s@$tmp2@$f@g" \
+      | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \
       | grep -v 'Total errors found: 0'
     cppcheck -q --enable=style,performance,portability,information $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" \
