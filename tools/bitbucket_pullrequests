@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+#/ Usage: <progname> [options]...
+#/ Get info on pull requests from gazebo's bitbucket repository
 # based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
 
 # to install dependencies on Ubuntu (tested with Quantal):
@@ -7,6 +9,9 @@
 require 'rubygems'
 require 'rest_client'
 require 'json'
+require 'optparse'
+
+$stderr.sync = true
 
 class BitbucketPullRequests
   # URL for bitbucket 2.0 api
@@ -20,33 +25,38 @@ class BitbucketPullRequests
   end
 
   # summary of open pull requests
-  def getPullRequestsSummary()
+  def listPullRequests()
     response = RestClient.get(@url_prefix)
     jsonHash = JSON.parse(response.body)
     output = ""
-    output += prettyPrintSummary(jsonHash)
+    jsonHash["values"].each { |pr| output += prettyPrintSummary(pr) }
     while jsonHash.has_key? "next"
       response = RestClient.get(@url_domain + jsonHash["next"])
       jsonHash = JSON.parse(response.body)
-      output += prettyPrintSummary(jsonHash)
+      jsonHash["values"].each { |pr| output += prettyPrintSummary(pr) }
     end
     return output
   end
 
-  def prettyPrintSummary(jsonHash)
+  # summary of one pull request
+  def getPullRequestSummary(id)
+    response = RestClient.get(@url_prefix + "/" + id.to_s)
+    jsonHash = JSON.parse(response.body)
+    return prettyPrintSummary(jsonHash)
+  end
+
+  def prettyPrintSummary(pr)
     output = ""
-    jsonHash["values"].each { |pr|
-      output += pr["id"].to_s
-      output += "\t"+pr["source"]["commit"]["sha"]
-      output += "\t"+pr["destination"]["commit"]["sha"]
-      output += "\t"+pr["source"]["branch"]["name"]
-      output += "\n"
-    }
+    output += pr["id"].to_s
+    output += "\t"+pr["source"]["commit"]["sha"]
+    output += "\t"+pr["destination"]["commit"]["sha"]
+    output += "\t"+pr["source"]["branch"]["name"]
+    output += "\n"
     return output
   end
 
   # list of files changed by pull request
-  def getPullRequestDetail(id)
+  def getPullRequestFiles(id)
     url = @url_prefix + "/" + id.to_s + "/patch"
     response = RestClient.get(url)
     output = ""
@@ -60,10 +70,32 @@ class BitbucketPullRequests
   end
 end
 
-client = BitbucketPullRequests.new
-if ARGV.length == 1
-  puts client.getPullRequestDetail(ARGV[0].to_i)
-else
-  puts client.getPullRequestsSummary()
+# default options
+list    = false
+summary = nil
+files   = nil
+help    = false
+opt_parser = OptionParser.new do |o|
+  o.on("-l", "--list",
+       "List open pull requests")         { |list| }
+  o.on("-s", "--summary [ID]", Integer,
+       "Summarize a pull request by id")  { |s| summary = s }
+  o.on("-f", "--files [ID]", Integer,
+       "Show changed files in a pull request by id") { |f| files = f }
+  o.on("-h", "--help", "Display this help message") do
+    puts opt_parser
+    exit
+  end
 end
+opt_parser.parse!
 
+client = BitbucketPullRequests.new
+if list
+  puts client.listPullRequests()
+elsif !summary.nil?
+  puts client.getPullRequestSummary(summary)
+elsif !files.nil?
+  puts client.getPullRequestFiles(files)
+else
+  puts opt_parser
+end
