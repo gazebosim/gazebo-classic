@@ -77,11 +77,13 @@ files   = nil
 help    = false
 opt_parser = OptionParser.new do |o|
   o.on("-l", "--list",
-       "List open pull requests")         { |l| list = l }
+       "List open pull requests with fields:\n"+" "*37+
+       "[id] [source] [dest] [branch]") { |l| list = l }
   o.on("-s", "--summary [ID]", Integer,
-       "Summarize a pull request by id")  { |s| summary = s }
+       "Summarize a pull request with fields:\n"+" "*37+
+       "[id] [source] [dest] [branch]")  { |s| summary = s }
   o.on("-f", "--files [ID]", Integer,
-       "Show changed files in a pull request by id") { |f| files = f }
+       "Show changed files in a pull request") { |f| files = f }
   o.on("-h", "--help", "Display this help message") do
     puts opt_parser
     exit
