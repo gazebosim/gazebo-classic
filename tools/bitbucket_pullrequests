@@ -77,7 +77,7 @@ files   = nil
 help    = false
 opt_parser = OptionParser.new do |o|
   o.on("-l", "--list",
-       "List open pull requests")         { |list| }
+       "List open pull requests")         { |l| list = l }
   o.on("-s", "--summary [ID]", Integer,
        "Summarize a pull request by id")  { |s| summary = s }
   o.on("-f", "--files [ID]", Integer,
