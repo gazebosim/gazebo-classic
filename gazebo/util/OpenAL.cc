@@ -196,8 +196,12 @@ bool OpenALSink::SetPose(const math::Pose &_pose)
 
   // The first three values are the direction vector values.
   // The second three value are the up vector values.
-  ALfloat orient[] = {rot[0][0], rot[0][1], rot[0][2],
-                      rot[2][0], rot[2][1], rot[2][2]};
+  ALfloat orient[] = {static_cast<ALfloat>(rot[0][0]),
+                      static_cast<ALfloat>(rot[0][1]),
+                      static_cast<ALfloat>(rot[0][2]),
+                      static_cast<ALfloat>(rot[2][0]),
+                      static_cast<ALfloat>(rot[2][1]),
+                      static_cast<ALfloat>(rot[2][2])};
 
   // Clear error state
   alGetError();
