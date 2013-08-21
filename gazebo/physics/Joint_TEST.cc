@@ -19,6 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Joint_TEST.hh"
+#include "test/regression/helper_physics_generator.hh"
 
 #define TOL 1e-6
 using namespace gazebo;
@@ -61,19 +62,75 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
     joint = SpawnJoint(*iter, true, false);
     EXPECT_TRUE(joint != NULL);
   }
+
+  world->StepWorld(100);
 }
 
-TEST_F(Joint_TEST, SpawnJointTypesODE)
+TEST_P(Joint_TEST, SpawnJointTypes)
 {
-  SpawnJointTypes("ode");
+  SpawnJointTypes(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(Joint_TEST, SpawnJointTypesBullet)
+////////////////////////////////////////////////////////////////////////
+// Test for non-translational joints.
+// Attach to world and make sure they don't fall.
+void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
 {
-  SpawnJointTypes("bullet");
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::vector<std::string> types;
+  types.push_back("revolute");
+  // Skip these because they allow translation
+  // types.push_back("prismatic");
+  // types.push_back("screw");
+  types.push_back("universal");
+  types.push_back("ball");
+  // Skip revolute2 since it can't be attached to world
+  // types.push_back("revolute2");
+
+  physics::JointPtr joint;
+  for (std::vector<std::string>::iterator iter = types.begin();
+       iter != types.end(); ++iter)
+  {
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      bool worldChild = (i == 0);
+      bool worldParent = (i == 1);
+      std::string child = worldChild ? "world" : "child";
+      std::string parent = worldParent ? "world" : "parent";
+      gzdbg << "SpawnJoint " << *iter << " "
+            << child << " "
+            << parent << std::endl;
+      joint = SpawnJoint(*iter, worldChild, worldParent);
+      EXPECT_TRUE(joint != NULL);
+
+      physics::LinkPtr link;
+      if (!worldChild)
+        link = joint->GetChild();
+      else if (!worldParent)
+        link = joint->GetParent();
+      EXPECT_TRUE(link != NULL);
+
+      math::Pose initialPose = link->GetWorldPose();
+      world->StepWorld(100);
+      math::Pose afterPose = link->GetWorldPose();
+      EXPECT_TRUE(initialPose.pos == afterPose.pos);
+    }
+  }
 }
-#endif  // HAVE_BULLET
+
+TEST_P(Joint_TEST, SpawnJointRotational)
+{
+  SpawnJointRotational(GetParam());
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Create a joint between link and world
@@ -356,6 +413,8 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(Joint_TEST);
 
 int main(int argc, char **argv)
 {
