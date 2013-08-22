@@ -65,7 +65,8 @@ void BulletUniversalJoint::Init()
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
-  math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
+  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
+  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
 
   this->bulletUniversal = new btUniversalConstraint(
       *bulletParentLink->GetBulletLink(),

@@ -49,7 +49,7 @@ class Joint_TEST : public ServerFixture
   {
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              axis(math::Vector3(0, 0, 1))
+              axis(math::Vector3(1, 0, 0))
             {
             }
 
