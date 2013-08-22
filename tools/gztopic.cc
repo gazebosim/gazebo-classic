@@ -119,14 +119,31 @@ bool parse(int argc, char **argv)
     return -1;
   }
 
-  if (argc == 1 || std::string(argv[1]) == "help" ||
-      std::string(argv[1]) == "-h")
   {
-    help(visibleOptions);
-    return false;
+    std::string command;
+    command = vm.count("command") ? vm["command"].as<std::string>() : "";
+
+    if (command.empty() || command == "help" || vm.count("help"))
+    {
+      help(visibleOptions);
+      return false;
+    }
+
+    // Get parameters from command line
+    if (!command.empty())
+      params.push_back(command);
+
+    if (vm.count("unformatted"))
+      g_useShortDebugString = true;
   }
 
-  // Get parameters from command line
+  {
+    std::string topic;
+    topic = vm.count("topic") ? vm["topic"].as<std::string>() : "";
+    if (!topic.empty())
+      params.push_back(topic);
+  }
+
   for (int i = 1; i < argc; i++)
   {
     std::string p = argv[i];
@@ -563,11 +580,6 @@ int main(int argc, char **argv)
     print_topic_info(params[1]);
   else if (params[0] == "echo")
     echo();
-  else if (params[0] == "echo2")
-  {
-    g_useShortDebugString = true;
-    echo();
-  }
   else if (params[0] == "hz")
     hz();
   else if (params[0] == "bw")
