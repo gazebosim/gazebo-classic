@@ -164,13 +164,6 @@ void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetDamping(int /*index*/, double _damping)
-{
-  if (this->bulletScrew)
-    this->bulletScrew->setDampingDirLin(_damping);
-}
-
-//////////////////////////////////////////////////
 void BulletScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";

@@ -35,6 +35,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
 {
   this->constraint = NULL;
   this->bulletWorld = NULL;
+  this->dampingInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -48,6 +49,44 @@ BulletJoint::~BulletJoint()
 void BulletJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
+
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
+      }
+    }
+  }
+
+  if (this->sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -303,3 +342,24 @@ void BulletJoint::SetupJointFeedback()
     }
   }
 }
+
+//////////////////////////////////////////////////
+void BulletJoint::SetDamping(int /*_index*/, double _damping)
+{
+  this->dampingCoefficient = _damping;
+
+  // \TODO: implement on a per axis basis (requires additional sdf parameters)
+
+  /// \TODO:  this check might not be needed?  attaching an object to a static
+  /// body should not affect damping application.
+  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
+  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+  if (!this->dampingInitialized && !parentStatic && !childStatic)
+  {
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&Joint::ApplyDamping, this));
+    this->dampingInitialized = true;
+  }
+}
+

@@ -547,6 +547,7 @@ void Joint::ApplyDamping()
   // dampingCoefficient are used for adaptive damping to enforce stability.
   double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
   this->SetForce(0, dampingForce);
+  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
 }
 
 //////////////////////////////////////////////////

@@ -58,12 +58,6 @@ void BulletBallJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
 void BulletBallJoint::Init()
 {
   BallJoint<BulletJoint>::Init();

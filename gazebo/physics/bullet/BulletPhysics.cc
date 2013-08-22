@@ -330,6 +330,15 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
       boost::any_cast<int>(this->GetParam(PGS_ITERS));
   info.m_sor =
       boost::any_cast<double>(this->GetParam(SOR));
+
+  gzdbg << " debug physics: "
+        << " iters[" << info.m_numIterations
+        << "] sor[" << info.m_sor
+        << "] erp[" << info.m_erp
+        << "] cfm[" << info.m_globalCfm
+        << "] split[" << info.m_splitImpulse
+        << "] split tol[" << info.m_splitImpulsePenetrationThreshold
+        << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -451,11 +460,7 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  // common::Time currTime =  this->world->GetRealTime();
-
-  this->dynamicsWorld->stepSimulation(
-      this->maxStepSize, 0);  // , this->maxStepSize);
-  // this->lastUpdateTime = currTime;
+  this->dynamicsWorld->stepSimulation(this->maxStepSize, 0);
 }
 
 //////////////////////////////////////////////////

@@ -102,12 +102,6 @@ math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
 void BulletUniversalJoint::SetAxis(int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {

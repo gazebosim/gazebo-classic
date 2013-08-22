@@ -68,12 +68,8 @@ namespace gazebo
                 gzerr << "Not implement in Bullet\n";
               }
 
-      /// \brief Set the joint damping
-      public: virtual void SetDamping(int /*index*/,
-                                      const double /*damping*/)
-              {
-                gzerr << "Not implement in Bullet\n";
-              }
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
@@ -142,6 +138,10 @@ namespace gazebo
 
       /// \brief Feedback data for this joint
       private: btJointFeedback *feedback;
+
+      /// \brief internal variable to keep track if ConnectJointUpdate
+      /// has been called on a damping method
+      private: bool dampingInitialized;
     };
     /// \}
   }
