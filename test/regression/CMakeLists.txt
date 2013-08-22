@@ -30,6 +30,7 @@ set(tests
   imu.cc
   laser.cc
   manpages.cc
+  model_resize.cc
   nondefault_world.cc
   physics.cc
   physics_msgs.cc
