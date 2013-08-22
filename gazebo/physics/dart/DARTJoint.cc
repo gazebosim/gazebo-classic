@@ -381,13 +381,13 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dartChildBody->getBodyForce();
+    F2 = -dart::math::dAdT(dartJoint->getLocalTransformationFromChildBody(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvT(T12 ,F2);
+  F1 = -dart::math::dAdInvR(T12 ,F2);
 
   // kind of backwards here, body1 (parent) corresponds go f2, t2
   // and body2 (child) corresponds go f1, t1
