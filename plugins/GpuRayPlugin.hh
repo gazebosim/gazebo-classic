@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_GPU_LASER_PLUGIN_HH__
-#define __GAZEBO_GPU_LASER_PLUGIN_HH__
+#ifndef _GAZEBO_GPU_LASER_PLUGIN_HH_
+#define _GAZEBO_GPU_LASER_PLUGIN_HH_
 
 #include <string>
 

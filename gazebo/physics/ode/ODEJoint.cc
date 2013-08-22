@@ -72,53 +72,53 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("provide_feedback"))
     {
-      this->SetProvideFeedback(elem->GetValueBool("provide_feedback"));
+      this->SetProvideFeedback(elem->Get<bool>("provide_feedback"));
     }
 
     if (elem->HasElement("cfm_damping"))
     {
-      this->useCFMDamping = elem->GetValueBool("cfm_damping");
+      this->useCFMDamping = elem->Get<bool>("cfm_damping");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->stopERP = elem->GetElement("limit")->GetValueDouble("erp");
+    this->stopERP = elem->GetElement("limit")->Get<double>("erp");
     for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
       this->SetAttribute("stop_erp", i, this->stopERP);
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->stopCFM = elem->GetElement("limit")->GetValueDouble("cfm");
+    this->stopCFM = elem->GetElement("limit")->Get<double>("cfm");
     for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
       this->SetAttribute("stop_cfm", i, this->stopCFM);
 
     if (elem->HasElement("suspension"))
     {
       this->SetParam(dParamSuspensionERP,
-          elem->GetElement("suspension")->GetValueDouble("erp"));
+          elem->GetElement("suspension")->Get<double>("erp"));
       this->SetParam(dParamSuspensionCFM,
-          elem->GetElement("suspension")->GetValueDouble("cfm"));
+          elem->GetElement("suspension")->Get<double>("cfm"));
     }
 
     if (elem->HasElement("fudge_factor"))
       this->SetParam(dParamFudgeFactor,
-          elem->GetElement("fudge_factor")->GetValueDouble());
+          elem->GetElement("fudge_factor")->Get<double>());
 
     if (elem->HasElement("cfm"))
-        this->SetAttribute("cfm", 0, elem->GetElement("cfm")->GetValueDouble());
+        this->SetAttribute("cfm", 0, elem->Get<double>("cfm"));
 
     if (elem->HasElement("erp"))
-        this->SetAttribute("erp", 0, elem->GetElement("erp")->GetValueDouble());
+        this->SetAttribute("erp", 0, elem->Get<double>("erp"));
 
     if (elem->HasElement("bounce"))
         this->SetParam(dParamBounce,
-          elem->GetElement("bounce")->GetValueDouble());
+          elem->GetElement("bounce")->Get<double>());
 
     if (elem->HasElement("max_force"))
       this->SetParam(dParamFMax,
-          elem->GetElement("max_force")->GetValueDouble());
+          elem->GetElement("max_force")->Get<double>());
 
     if (elem->HasElement("velocity"))
       this->SetParam(dParamVel,
-          elem->GetElement("velocity")->GetValueDouble());
+          elem->GetElement("velocity")->Get<double>());
   }
 
   if (this->sdf->HasElement("axis"))
@@ -130,7 +130,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
       if (dynamicsElem->HasElement("damping"))
       {
-        this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
+        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
       }
       if (dynamicsElem->HasElement("friction"))
       {
@@ -197,6 +197,10 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 
   if (!this->jointId)
     gzerr << "ODE Joint ID is invalid\n";
+
+  if (this->HasType(Base::HINGE2_JOINT) &&
+      (odechild == NULL || odeparent == NULL))
+    gzthrow("ODEHinge2Joint cannot be connected to the world");
 
   if (!odechild && odeparent)
   {

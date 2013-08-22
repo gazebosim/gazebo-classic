@@ -31,7 +31,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
@@ -99,7 +99,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -110,7 +110,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -133,7 +133,7 @@ void CameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }

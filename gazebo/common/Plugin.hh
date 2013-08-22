@@ -31,6 +31,8 @@
 #include <list>
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -38,7 +40,6 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo

@@ -6,14 +6,14 @@ if (HAVE_GTS)
   add_definitions(${gts_CFLAGS})
 endif()
 
-set (sources 
+set (sources
   Animation.cc
   Assert.cc
   Base64.cc
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
-  Common.cc
+  CommonIface.cc
   Console.cc
   Event.cc
   Events.cc
@@ -28,6 +28,7 @@ set (sources
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
+  SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
   Time.cc
@@ -35,13 +36,13 @@ set (sources
   Video.cc
 )
 
-set (headers 
+set (headers
   Animation.hh
   Assert.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
-  Common.hh
+  CommonIface.hh
   CommonTypes.hh
   Color.hh
   Console.hh
@@ -61,6 +62,7 @@ set (headers
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
+  SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -89,6 +91,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
@@ -112,18 +115,30 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-target_link_libraries(gazebo_common gazebo_math
-                                    ${libdl_library}
-                                    ${Boost_LIBRARIES}
-                                    ${freeimage_library}
-                                    ${tinyxml_libraries}
-                                    ${libavcodec_LIBRARIES}
-                                    ${libavformat_LIBRARIES}
-                                    ${CURL_LIBRARIES}
-                                    ${libswscale_LIBRARIES}
-                                    ${libtar_libraries}
-                                    rt
-                                    )
+target_link_libraries(gazebo_common
+  gazebo_math
+  ${libdl_library}
+  ${libtool_library}
+  ${Boost_LIBRARIES}
+  ${freeimage_library}
+  ${tinyxml_libraries}
+  ${libavcodec_LIBRARIES}
+  ${libavformat_LIBRARIES}
+  ${CURL_LIBRARIES}
+  ${libswscale_LIBRARIES}
+  ${libtar_libraries}
+  ${TBB_LIBRARIES}
+  pthread
+)
+
+if (NOT APPLE)
+  # rt is used for clock_gettime, which is not available on apple
+  target_link_libraries(gazebo_common rt)
+endif()
+
+if (HAVE_SDF)
+  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
+endif()
 
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
@@ -131,3 +146,6 @@ endif()
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
+
+# Deprecated Common.hh
+gz_issue_775("Common")

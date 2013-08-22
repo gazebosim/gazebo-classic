@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
@@ -24,6 +23,15 @@
 #include "gazebo/sdf/interface/SDF.hh"
 
 using namespace sdf;
+
+void sdf::addURIPath(const std::string &/*_uri*/, const std::string &/*_path*/)
+{
+}
+
+void sdf::setFindCallback(
+    boost::function<std::string (const std::string &)> /*_cb*/)
+{
+}
 
 std::string SDF::version = SDF_VERSION;
 
@@ -392,7 +400,7 @@ void Element::PrintDocRightPane(std::string &_html, int _spacing, int &_index)
 
   stream << "</div>";
 
-  if (this->attributes.size() > 0)
+  if (!this->attributes.empty())
   {
     stream << "<div style='background-color: #dedede; padding-left:10px; "
            << "display:inline-block;'>\n";
@@ -472,7 +480,7 @@ void Element::PrintValues(std::string _prefix)
       << (*aiter)->GetAsString() << "'";
   }
 
-  if (this->elements.size() > 0)
+  if (!this->elements.empty())
   {
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
@@ -521,7 +529,7 @@ void Element::ToString(const std::string &_prefix,
            << (*aiter)->GetAsString() << "'";
     }
 
-    if (this->elements.size() > 0)
+    if (!this->elements.empty())
     {
       _out << ">\n";
       ElementPtr_V::const_iterator eiter;

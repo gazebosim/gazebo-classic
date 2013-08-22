@@ -20,6 +20,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
+#include "helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -144,17 +145,10 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(LaserTest, EmptyWorldODE)
+TEST_P(LaserTest, EmptyWorld)
 {
-  Stationary_EmptyWorld("ode");
+  Stationary_EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(LaserTest, EmptyWorldBullet)
-{
-  Stationary_EmptyWorld("bullet");
-}
-#endif
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
@@ -240,17 +234,10 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(LaserTest, LaserBoxODE)
+TEST_P(LaserTest, LaserBox)
 {
-  LaserUnitBox("ode");
+  LaserUnitBox(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(LaserTest, LaserBoxBullet)
-{
-  LaserUnitBox("bullet");
-}
-#endif  // HAVE_BULLET
 
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
@@ -283,6 +270,8 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   sensors::RaySensorPtr raySensor =
     boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
+  EXPECT_TRUE(raySensor != NULL);
+
   raySensor->Init();
   raySensor->Update(true);
 
@@ -305,17 +294,12 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   EXPECT_NEAR(mean, maxRange + noiseMean, 3*noiseStdDev);
 }
 
-TEST_F(LaserTest, LaserNoiseODE)
+TEST_P(LaserTest, LaserNoise)
 {
-  LaserUnitNoise("ode");
+  LaserUnitNoise(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(LaserTest, LaserNoiseBullet)
-{
-  LaserUnitNoise("bullet");
-}
-#endif  // HAVE_BULLET
+INSTANTIATE_PHYSICS_ENGINES_TEST(LaserTest);
 
 int main(int argc, char **argv)
 {

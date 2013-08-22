@@ -27,7 +27,7 @@ set (sources
   Model.cc
   ModelState.cc
   MultiRayShape.cc
-  Physics.cc
+  PhysicsIface.cc
   PhysicsEngine.cc
   PhysicsFactory.cc
   PlaneShape.cc
@@ -68,7 +68,7 @@ set (headers
   Model.hh
   ModelState.hh
   MultiRayShape.hh
-  Physics.hh
+  PhysicsIface.hh
   PhysicsEngine.hh
   PhysicsFactory.hh
   PhysicsTypes.hh
@@ -99,32 +99,18 @@ gz_add_library(gazebo_physics ${sources})
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
-  gazebo_sdf_interface
   gazebo_physics_ode
-  ${TBB_LIBRARIES}
-  ${libtool_library}
-  ${Boost_LIBRARIES}
 )
 
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
 
-gz_add_executable(gzphysics server.cc)
-target_link_libraries(gzphysics
-  gazebo_common
-  gazebo_util
-  gazebo_transport
-  gazebo_physics
-  gazebo_sensors
-  gazebo_sdf_interface
-  gazebo_msgs
-  pthread
-  )
-
-gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
+
+# Deprecated Physics.hh
+gz_issue_775("Physics")
 
 # unit tests
 set (gtest_sources

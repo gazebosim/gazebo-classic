@@ -234,7 +234,7 @@ bool Param::Get(bool &_value)
 {
   if (this->IsBool())
   {
-    _value = static_cast<ParamT<bool>*>(this)->GetValue();
+    _value = static_cast<ParamT<bool> *>(this)->GetValue();
     return true;
   }
   else

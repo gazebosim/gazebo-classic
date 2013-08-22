@@ -25,7 +25,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -92,7 +93,8 @@ namespace gazebo
       /// this should be set to true for user interfaces, and false for
       /// sensor generation.
       public: Scene(const std::string &_name,
-                    bool _enableVisualizations = false);
+                    bool _enableVisualizations = false,
+                    bool _isServer = false);
 
       /// \brief Destructor
       public: virtual ~Scene();

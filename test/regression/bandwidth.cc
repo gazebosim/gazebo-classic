@@ -18,11 +18,13 @@
 #include <unistd.h>
 
 #include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
 class BandwidthTest : public ServerFixture
 {
+  public: void Bandwidth(const std::string &_physicsEngine);
 };
 
 boost::mutex g_mutex;
@@ -37,9 +39,9 @@ void BandwidthMsg(const std::string &_msg)
   g_bwTime.push_back(common::Time::GetWallTime());
 }
 
-TEST_F(BandwidthTest, Bandwidth)
+void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
-  Load("worlds/pr2.world");
+  Load("worlds/pr2.world", false, _physicsEngine);
 
   transport::NodePtr node(new transport::Node());
   node->Init("default");
@@ -68,7 +70,7 @@ TEST_F(BandwidthTest, Bandwidth)
         float totalBw = sumSize / dt.Double();
 
         printf("Bandwidth:\n");
-        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%d] Time[%4.2fs]\n",
+        printf("  Total[%6.2f B/s] Mean[%6.2f B] Messages[%u] Time[%4.2fs]\n",
                totalBw, meanSize, count, dt.Double());
 
         EXPECT_GT(totalBw, 1000.0);
@@ -80,6 +82,13 @@ TEST_F(BandwidthTest, Bandwidth)
     }
   }
 }
+
+TEST_P(BandwidthTest, Bandwidth)
+{
+  Bandwidth(GetParam());
+}
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(BandwidthTest);
 
 int main(int argc, char **argv)
 {

@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/sdf/sdf.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

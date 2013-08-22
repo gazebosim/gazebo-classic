@@ -53,11 +53,11 @@ CollisionState::~CollisionState()
 void CollisionState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetValuePose("pose");
+    this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 }
