@@ -62,7 +62,7 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+    gzthrow("BulletHinge2Joint cannot be connected to the world");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");

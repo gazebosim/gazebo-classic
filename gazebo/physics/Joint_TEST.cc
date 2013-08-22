@@ -73,7 +73,8 @@ TEST_P(Joint_TEST, SpawnJointTypes)
 
 ////////////////////////////////////////////////////////////////////////
 // Test for non-translational joints.
-// Attach to world and make sure they don't fall.
+// Set velocity to parent and make sure child follows.
+// Also attach to world and see if it doesn't fall.
 void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
 {
   // Load an empty world
@@ -86,19 +87,51 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // Skip prismatic and screw because they allow translation
   std::vector<std::string> types;
   types.push_back("revolute");
-  // Skip these because they allow translation
-  // types.push_back("prismatic");
-  // types.push_back("screw");
   types.push_back("universal");
   types.push_back("ball");
-  // Skip revolute2 since it can't be attached to world
-  // types.push_back("revolute2");
+  types.push_back("revolute2");
 
   physics::JointPtr joint;
   for (std::vector<std::string>::iterator iter = types.begin();
        iter != types.end(); ++iter)
+  {
+    gzdbg << "SpawnJoint " << *iter << std::endl;
+    joint = SpawnJoint(*iter);
+    EXPECT_TRUE(joint != NULL);
+
+    physics::LinkPtr parent, child;
+    child = joint->GetChild();
+    parent = joint->GetParent();
+    EXPECT_TRUE(child != NULL);
+    EXPECT_TRUE(parent != NULL);
+
+    math::Vector3 pos(10, 10, 10);
+    math::Vector3 vel(10, 10, 10);
+    parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      parent->SetLinearVel(vel);
+      world->StepWorld(10);
+    }
+    world->StepWorld(50);
+    math::Pose childPose = child->GetWorldPose();
+    math::Pose parentPose = parent->GetWorldPose();
+    EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
+    EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
+    EXPECT_TRUE(childPose.pos == parentPose.pos);
+  }
+
+  // Skip prismatic and screw because they allow translation
+  // Skip universal and revolute2 because they can't be connected to world
+  // in bullet.
+  std::vector<std::string> typesWorld;
+  typesWorld.push_back("revolute");
+  typesWorld.push_back("ball");
+  for (std::vector<std::string>::iterator iter = typesWorld.begin();
+       iter != typesWorld.end(); ++iter)
   {
     for (unsigned int i = 0; i < 2; ++i)
     {

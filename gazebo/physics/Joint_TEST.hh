@@ -38,8 +38,9 @@ class Joint_TEST : public ServerFixture
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpawnJointTypes(const std::string &_physicsEngine);
 
-  /// \brief Spawn model with rotational joints attached to world.
-  ///        Verify that position of attached link does not change.
+  /// \brief Spawn model with rotational joints. Set velocity on parent
+  ///        and make sure child follows. Also attach to world and make
+  ///        sure it doesn't fall.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpawnJointRotational(const std::string &_physicsEngine);
 

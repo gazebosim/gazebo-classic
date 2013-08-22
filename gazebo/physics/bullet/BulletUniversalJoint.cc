@@ -45,9 +45,15 @@ BulletUniversalJoint::~BulletUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletUniversalJoint::Load(sdf::ElementPtr _sdf)
 {
-  UniversalJoint<BulletJoint>::Attach(_one, _two);
+  UniversalJoint<BulletJoint>::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
+void BulletUniversalJoint::Init()
+{
+  UniversalJoint<BulletJoint>::Init();
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -55,7 +61,7 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+    gzthrow("BulletUniversalJoint cannot be connected to the world");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
@@ -88,7 +94,7 @@ math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 void BulletUniversalJoint::SetAnchor(int /*_index*/,
                                      const math::Vector3 &/*_anchor*/)
 {
-  gzerr << "Not implemented\n";
+  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -108,7 +114,7 @@ void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
 void BulletUniversalJoint::SetAxis(int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented\n";
+  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -164,8 +170,6 @@ void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
       this->bulletUniversal->setUpperLimit(
         this->GetHighStop(0).Radian(), _angle.Radian());
   }
-  else
-    gzthrow("Joint must be created first");
 }
 
 //////////////////////////////////////////////////
@@ -180,8 +184,6 @@ void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
       this->bulletUniversal->setUpperLimit(
         this->GetLowStop(0).Radian(), _angle.Radian());
   }
-  else
-    gzthrow("Joint must be created first");
 }
 
 //////////////////////////////////////////////////
