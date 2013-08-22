@@ -116,7 +116,7 @@ class Joint_TEST : public ServerFixture
   ///        guaranteed to return a valid JointPtr, so the output should be
   ///        checked.
   /// \param[in] _opt Options for spawned model and joint.
-  public: physics::JointPtr SpawnJoint(const SpawnJointOptions _opt)
+  public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
           {
             msgs::Factory msg;
             std::ostringstream modelStr;

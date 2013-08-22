@@ -54,7 +54,7 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::Init()
 {
-  Hinge2Joint<BulletJoint>::Init(); 
+  Hinge2Joint<BulletJoint>::Init();
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
