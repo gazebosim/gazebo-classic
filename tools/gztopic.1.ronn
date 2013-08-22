@@ -26,6 +26,13 @@ Get topic bandwidth.
 * **help**:
 This help text.
 
+## OPTIONS
+
+* -h, --help :
+ Output this help message.
+* -u, --unformatted :
+ Output the data from echo and list without formatting.
+
 ## SEE ALSO
 Examples and more information can be found at:http://gazebosim.org/wiki/Tools#Topic_Info
 

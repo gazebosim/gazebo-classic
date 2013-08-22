@@ -32,7 +32,10 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 #include <boost/thread/mutex.hpp>
+
+namespace po = boost::program_options;
 
 using namespace gazebo;
 
@@ -51,7 +54,7 @@ boost::shared_ptr<google::protobuf::Message> g_echoMsg;
 bool g_useShortDebugString = false;
 
 /////////////////////////////////////////////////
-void help()
+void help(po::options_description &_options)
 {
   std::cerr << "gztopic -- Tool to interact with gztopics on a "
     "Gazebo master\n\n";
@@ -65,11 +68,12 @@ void help()
             << "    list          List all topics.\n"
             << "    info <topic>  Get information about a topic.\n"
             << "    echo <topic>  Output topic data to screen.\n"
-            << "    echo2 <topic> : Output unformatted topic data to screen \n"
             << "    view <topic>  View topic data using a QT widget.\n"
             << "    hz <topic>    Get publish frequency.\n"
             << "    bw <topic>    Get topic bandwidth.\n"
             << "    help          This help text.\n\n";
+
+  std::cerr << _options << "\n";
 
   std::cerr << "See also:\n"
     << "Examples and more information can be found at:"
@@ -79,10 +83,46 @@ void help()
 /////////////////////////////////////////////////
 bool parse(int argc, char **argv)
 {
+  // Hidden options
+  po::options_description hiddenOptions("hidden options");
+  hiddenOptions.add_options()
+    ("command", po::value<std::string>(), "Command"),
+    ("topic", po::value<std::string>(), "Topic");
+
+  // Options that are visible to the user through help.
+  po::options_description visibleOptions("Options");
+  visibleOptions.add_options()
+    ("help,h", "Output this help message.")
+    ("unformatted,u", "Output the data from echo and list without formatting.");
+
+  // Both the hidden and visible options
+  po::options_description allOptions("all options");
+  allOptions.add(hiddenOptions).add(visibleOptions);
+
+  // The command and file options are positional
+  po::positional_options_description positional;
+  positional.add("command", 1).add("topic", -1);
+
+  po::variables_map vm;
+
+  try
+  {
+    po::store(
+        po::command_line_parser(argc, argv).options(allOptions).positional(
+          positional).run(), vm);
+
+    po::notify(vm);
+  }
+  catch(boost::exception &_e)
+  {
+    std::cerr << "Invalid arguments\n\n";
+    return -1;
+  }
+
   if (argc == 1 || std::string(argv[1]) == "help" ||
       std::string(argv[1]) == "-h")
   {
-    help();
+    help(visibleOptions);
     return false;
   }
 
