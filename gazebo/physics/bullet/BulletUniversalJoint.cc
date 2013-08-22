@@ -63,10 +63,13 @@ void BulletUniversalJoint::Init()
   if (!bulletChildLink || !bulletParentLink)
     gzthrow("BulletUniversalJoint cannot be connected to the world");
 
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
+  sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
+  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
+
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
   math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
+
+  // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   this->bulletUniversal = new btUniversalConstraint(
       *bulletParentLink->GetBulletLink(),

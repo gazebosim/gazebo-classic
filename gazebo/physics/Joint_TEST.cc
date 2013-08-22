@@ -87,12 +87,11 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Skip prismatic and screw because they allow translation
+  // Skip prismatic, screw, and revolute2 because they allow translation
   std::vector<std::string> types;
   types.push_back("revolute");
   types.push_back("universal");
   types.push_back("ball");
-  types.push_back("revolute2");
 
   physics::JointPtr joint;
   for (std::vector<std::string>::iterator iter = types.begin();
@@ -124,9 +123,8 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
     EXPECT_TRUE(childPose.pos == parentPose.pos);
   }
 
-  // Skip prismatic and screw because they allow translation
-  // Skip universal and revolute2 because they can't be connected to world
-  // in bullet.
+  // Skip prismatic, screw, and revolute2 because they allow translation
+  // Skip universal because it can't be connected to world in bullet.
   std::vector<std::string> typesWorld;
   typesWorld.push_back("revolute");
   typesWorld.push_back("ball");
