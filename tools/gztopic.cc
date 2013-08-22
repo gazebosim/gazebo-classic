@@ -249,9 +249,9 @@ void echoCB(const std::string &_data)
 {
   g_echoMsg->ParseFromString(_data);
   if (g_useShortDebugString)
-    std::cout << g_echoMsg->ShortDebugString() << "\n";
+    std::cout << g_echoMsg->ShortDebugString() << std::endl;
   else
-    std::cout << g_echoMsg->DebugString() << "\n";
+    std::cout << g_echoMsg->DebugString() << std::endl;
 }
 
 /////////////////////////////////////////////////
