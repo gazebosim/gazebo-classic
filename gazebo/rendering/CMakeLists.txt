@@ -45,6 +45,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -87,6 +88,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh
