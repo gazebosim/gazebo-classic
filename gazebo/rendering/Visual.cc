@@ -21,6 +21,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -1320,6 +1321,8 @@ void Visual::SetRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
+  if (dynamic_cast<CameraVisual*>(this))
+    std::cout << "SetPose[" << _pose << "]\n";
   this->SetPosition(_pose.pos);
   this->SetRotation(_pose.rot);
 }

@@ -573,14 +573,16 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 
   math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
+  std::cout << "Camera[" << this->GetName() << "]::SetWorldRotation RPY[" << rpy << "]\n";
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
   s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
-  this->sceneNode->setOrientation(
+  this->sceneNode->_setDerivedOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
   this->pitchNode->setOrientation(
       Ogre::Quaternion(p.w, p.x, p.y, p.z));
+  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
