@@ -46,6 +46,12 @@
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreRenderObjectListener.h>
 
+#include <OGRE/Paging/OgrePageManager.h>
+#include <OGRE/Paging/OgrePagedWorld.h>
+#include <OGRE/Paging/OgrePagedWorldSection.h>
+#include <OGRE/Terrain/OgreTerrainPaging.h>
+
+
 #include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
 #include <OGRE/Terrain/OgreTerrain.h>
 #include <OGRE/Terrain/OgreTerrainGroup.h>

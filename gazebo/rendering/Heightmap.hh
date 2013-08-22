@@ -32,6 +32,8 @@
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
 
+using namespace Ogre;
+
 namespace Ogre
 {
   class TerrainGlobalOptions;
@@ -44,6 +46,30 @@ namespace gazebo
   namespace rendering
   {
     class GzTerrainMatGen;
+
+    class DummyPageProvider : public PageProvider
+    {
+      public:
+      bool prepareProceduralPage(Page* page, PagedWorldSection* section) {
+        std::cout << "Loading page\n";
+        return true;
+      }
+      bool loadProceduralPage(Page* page, PagedWorldSection* section)
+      {
+        std::cout << "Preparing page\n";
+        return true;
+      }
+      bool unloadProceduralPage(Page* page, PagedWorldSection* section)
+      {
+        std::cout << "Unloading page\n";
+        return true;
+      }
+      bool unprepareProceduralPage(Page* page, PagedWorldSection* section)
+      {
+        std::cout << "Unpreparing page\n";
+        return true;
+      }
+    };
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -221,6 +247,15 @@ namespace gazebo
 
       /// \brief Pointer to the terrain material generator.
       private: GzTerrainMatGen *gzMatGen;
+
+      private: DummyPageProvider mDummyPageProvider;
+
+      private: Ogre::PageManager *mPageManager;
+
+      private: Ogre::TerrainPaging *mTerrainPaging;
+
+      private: Ogre::PagedWorld* world;
+
     };
     /// \}
 

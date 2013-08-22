@@ -19,6 +19,8 @@
  * Date: 12 May 2009
  */
 
+#define PAGING
+
 #include <string.h>
 #include <math.h>
 
@@ -35,8 +37,18 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
+
+// max range for a int16
+#define TERRAIN_PAGE_MIN_X (-0x7FFF)
+#define TERRAIN_PAGE_MIN_Y (-0x7FFF)
+#define TERRAIN_PAGE_MAX_X 0x7FFF
+#define TERRAIN_PAGE_MAX_Y 0x7FFF 
+
 using namespace gazebo;
 using namespace rendering;
+using namespace Ogre;
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -183,6 +195,32 @@ void Heightmap::Load()
   this->ConfigureTerrainDefaults();
 
   this->SetupShadows(true);
+
+  // caguero - Testing Paging
+
+  this->mPageManager = OGRE_NEW Ogre::PageManager();
+  this->mPageManager->setPageProvider(&this->mDummyPageProvider);
+
+  // Add cameras
+  //std::cout << "Cameras: " << this->scene->GetCameraCount() << std::endl;
+  for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
+  {
+    this->mPageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
+  }
+  //std::cout << "User Cameras: " << this->scene->GetUserCameraCount() << std::endl;
+  for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
+  {
+    this->mPageManager->addCamera(this->scene->GetUserCamera(i)->GetOgreCamera());
+  }
+
+  this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
+  this->world = mPageManager->createWorld();
+  mTerrainPaging->createWorldSection(world, this->terrainGroup, 2000, 3000, 
+    //TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
+    //TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
+    0, 0, 0, 0);
+
+  // caguero - Testing Paging
 
   for (int x = 0; x <= 0; ++x)
     for (int y = 0; y <= 0; ++y)
@@ -333,7 +371,7 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 {
   if (!_terrain)
   {
-    std::cerr << "Invalid  terrain\n";
+    std::cerr << "Invalid terrain\n";
     return false;
   }
 
