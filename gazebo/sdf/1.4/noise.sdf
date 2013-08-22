@@ -1,0 +1,31 @@
+<element name="noise" required="1">
+  <description>The properties of a sensor noise model.</description>
+
+  <attribute name="type" type="string" default="none" required="1">
+    <description>
+      The type of noise. Currently supported types are:
+      "none" (no noise).
+      "gaussian" (draw noise values independently for each measurement from a Gaussian distribution).
+      "gaussian_quantized" ("gaussian" plus quantization of outputs (ie. rounding))
+    </description>
+  </attribute>
+  <element name="mean" type="double" default="0.0" required="0">
+    <description>For type "gaussian*", the mean of the Gaussian distribution from which noise values are drawn.</description>
+  </element>
+  <element name="stddev" type="double" default="0.0" required="0">
+    <description>For type "gaussian*", the standard deviation of the Gaussian distribution from which noise values are drawn.</description>
+  </element>
+  <element name="bias_mean" type="double" default="0.0" required="0">
+    <description>For type "gaussian*", the mean of the Gaussian distribution from which bias values are drawn.</description>
+  </element>
+  <element name="bias_stddev" type="double" default="0.0" required="0">
+    <description>For type "gaussian*", the standard deviation of the Gaussian distribution from which bias values are drawn.</description>
+  </element>
+  <element name="precision" type="double" default="0.0" required="0">
+    <description>
+      For type "gaussian_quantized", the precision of output signals. A value
+      of zero implies infinite precision / no quantization.
+    </description>
+  </element>
+
+</element>

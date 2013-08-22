@@ -17,29 +17,14 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Joint_TEST.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0
 
 using namespace gazebo;
 
-class Joint_TEST : public ServerFixture
-{
-  public: void ForceTorque(const std::string &_physicsEngine);
-  public: void GetForceTorqueWithAppliedForce(
-    const std::string &_physicsEngine);
-  public: void JointTorqueTest(const std::string &_physicsEngine);
-  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
-};
-
-////////////////////////////////////////////////////////////////////////
-// Load example world with a few joints
-// Measure force torques
-// Tip over the joints until joint stops are hit, then check force
-// torques again
-////////////////////////////////////////////////////////////////////////
 void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
 {
   // Load our force torque test world
@@ -243,18 +228,14 @@ TEST_F(Joint_TEST, ForceTorqueSimbody)
 #endif  // HAVE_SIMBODY
 
 #ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
+
+/// bullet collision parameters needs tweaking?
 TEST_F(Joint_TEST, ForceTorqueBullet)
 {
   ForceTorque("bullet");
 }
 #endif  // HAVE_BULLET
 
-////////////////////////////////////////////////////////////////////////
-// Load example world with a few joints
-// Measure force torques
-// with active torque control at joints
-////////////////////////////////////////////////////////////////////////
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
 {
@@ -392,11 +373,56 @@ TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
 }
 #endif  // HAVE_BULLET
 
+void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
 
-////////////////////////////////////////////////////////////////////////
-// Create a joint between link and world
-// Apply force and check acceleration for correctness
-////////////////////////////////////////////////////////////////////////
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::vector<std::string> types;
+  types.push_back("revolute");
+  types.push_back("prismatic");
+  types.push_back("screw");
+  types.push_back("universal");
+  types.push_back("ball");
+  types.push_back("revolute2");
+
+  physics::JointPtr joint;
+  for (std::vector<std::string>::iterator iter = types.begin();
+       iter != types.end(); ++iter)
+  {
+    gzdbg << "SpawnJoint " << *iter << " child parent" << std::endl;
+    joint = SpawnJoint(*iter, false, false);
+    EXPECT_TRUE(joint != NULL);
+
+    gzdbg << "SpawnJoint " << *iter << " child world" << std::endl;
+    joint = SpawnJoint(*iter, false, true);
+    EXPECT_TRUE(joint != NULL);
+
+    gzdbg << "SpawnJoint " << *iter << " world parent" << std::endl;
+    joint = SpawnJoint(*iter, true, false);
+    EXPECT_TRUE(joint != NULL);
+  }
+}
+
+TEST_F(Joint_TEST, SpawnJointTypesODE)
+{
+  SpawnJointTypes("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(Joint_TEST, SpawnJointTypesBullet)
+{
+  SpawnJointTypes("bullet");
+}
+#endif  // HAVE_BULLET
+
 void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
@@ -718,7 +744,6 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
-
 
 int main(int argc, char **argv)
 {

@@ -158,7 +158,7 @@ Quaternion Quaternion::GetExp() const
 void Quaternion::Invert()
 {
   this->Normalize();
-  this->w = this->w;
+  // this->w = this->w;
   this->x = -this->x;
   this->y = -this->y;
   this->z = -this->z;

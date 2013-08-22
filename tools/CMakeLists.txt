@@ -41,4 +41,7 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-install (FILES gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS gzmodel_create gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
+if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
+  message (WARNING "Installing deprecated gzmodel_create.sh. This should be removed after Gazebo 1.9")
+endif()

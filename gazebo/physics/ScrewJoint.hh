@@ -63,8 +63,11 @@ namespace gazebo
                    }
                    else
                    {
-                     gzerr << "should not see this\n";
                      this->threadPitch = 1.0;
+                     gzwarn << "<thread_pitch> element not specified. "
+                            << "Using default value of "
+                            << this->threadPitch
+                            << ". \n";
                    }
 
                    if (_sdf->HasElement("axis"))
