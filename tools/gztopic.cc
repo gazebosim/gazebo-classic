@@ -86,7 +86,7 @@ bool parse(int argc, char **argv)
   // Hidden options
   po::options_description hiddenOptions("hidden options");
   hiddenOptions.add_options()
-    ("command", po::value<std::string>(), "Command"),
+    ("command", po::value<std::string>(), "Command")
     ("topic", po::value<std::string>(), "Topic");
 
   // Options that are visible to the user through help.
@@ -116,7 +116,7 @@ bool parse(int argc, char **argv)
   catch(boost::exception &_e)
   {
     std::cerr << "Invalid arguments\n\n";
-    return -1;
+    return false;
   }
 
   {
@@ -149,23 +149,6 @@ bool parse(int argc, char **argv)
     std::string p = argv[i];
     boost::trim(p);
     params.push_back(p);
-  }
-
-  // Get parameters from stdin
-  if (!isatty(fileno(stdin)))
-  {
-    char str[1024];
-    while (!feof(stdin))
-    {
-      if (fgets(str, 1024, stdin)== NULL)
-        break;
-
-      if (feof(stdin))
-        break;
-      std::string p = str;
-      boost::trim(p);
-      params.push_back(p);
-    }
   }
 
   return true;
