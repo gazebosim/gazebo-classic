@@ -869,7 +869,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
-                 << "    <visualize>false</visualize>"
+                 << "    <visualize>true</visualize>"
                  << "    <transceiver>"
                  << "      <essid>" << _essid << "</essid>"
                  << "      <frequency>" << _freq << "</frequency>"
