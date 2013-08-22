@@ -39,6 +39,7 @@
   <include filename="rfid.sdf" required="0"/>
   <include filename="rfidtag.sdf" required="0"/>
   <include filename="sonar.sdf" required="0"/>
+  <include filename="transceiver.sdf" required="0"/>
   <include filename="forcetorque.sdf" required="0"/>
 
 </element> <!-- End Sensor -->
