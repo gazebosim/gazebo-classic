@@ -31,6 +31,17 @@
           <contact_surface_layer>0.01000</contact_surface_layer>
         </constraints>
       </bullet>
+      <simbody>
+        <accuracy>0.001</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>10</dissipation>
+          <static_friction>0.15</static_friction>
+          <dynamic_friction>0.1</dynamic_friction>
+          <viscous_friction>0.0</viscous_friction>
+        </contact>
+      </simbody>
       <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
@@ -79,12 +90,12 @@
           <mass>100.0</mass>
           <pose>0.5 0 0.5 0 0 0</pose>
           <inertia>
-            <ixx>0.1</ixx>
-            <iyy>0.1</iyy>
-            <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixx>1.0</ixx>
+            <iyy>1.0</iyy>
+            <izz>1.0</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -110,12 +121,12 @@
           <mass>5.0</mass>
           <pose>0.5 0 0.5 0 0 0</pose>
           <inertia>
-            <ixx>0.1</ixx>
-            <iyy>0.1</iyy>
-            <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixx>1.0</ixx>
+            <iyy>1.0</iyy>
+            <izz>1.0</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -141,12 +152,12 @@
           <mass>1.0</mass>
           <pose>0.5 0.5 0.5 0 0 0</pose>
           <inertia>
-            <ixx>0.1</ixx>
-            <iyy>0.1</iyy>
-            <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixx>1.0</ixx>
+            <iyy>1.0</iyy>
+            <izz>1.0</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
