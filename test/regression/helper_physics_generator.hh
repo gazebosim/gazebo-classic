@@ -28,9 +28,16 @@
     testclass, ::testing::Values("bullet"));
 #endif
 
+#ifdef HAVE_DART
+#undef DART_SUPPORT
+#define DART_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
+    testclass, ::testing::Values("dart"));
+#endif
+
 /// \brief Helper macro to instantiate gtest for using different physics engines
 #define INSTANTIATE_PHYSICS_ENGINES_TEST(testclass) \
     ODE_SUPPORT(testclass) \
-    BULLET_SUPPORT(testclass)
+    BULLET_SUPPORT(testclass) \
+    DART_SUPPORT(testclass)
 
 #endif
