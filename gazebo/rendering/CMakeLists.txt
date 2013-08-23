@@ -45,6 +45,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -87,6 +88,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh
@@ -119,8 +121,11 @@ target_link_libraries( gazebo_rendering
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
-  X11 
 )
+
+if (NOT APPLE)
+  target_link_libraries(gazebo_rendering X11)
+endif()
 
 if (${OGRE_VERSION} GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)

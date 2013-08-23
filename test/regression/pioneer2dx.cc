@@ -17,6 +17,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/Time.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
@@ -72,15 +73,12 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 }
 
 
-TEST_F(Pioneer2dx, StraightLineODE)
+TEST_P(Pioneer2dx, StraightLine)
 {
-  StraightLine("ode");
+  StraightLine(GetParam());
 }
 
-TEST_F(Pioneer2dx, StraightLineBullet)
-{
-  StraightLine("bullet");
-}
+INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx)
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
