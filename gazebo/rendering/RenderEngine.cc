@@ -19,9 +19,15 @@
  * Date: 13 Feb 2006
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
+#ifndef Q_OS_MAC  // Not Apple
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <GL/glx.h>
+#endif
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -34,11 +40,11 @@
 
 #include "gazebo/gazebo_config.h"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -313,6 +319,7 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -322,6 +329,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
+#endif
 
   this->initialized = false;
 }
@@ -334,7 +342,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -348,24 +356,32 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL");
-    plugins.push_back(path+"/Plugin_ParticleFX");
-    plugins.push_back(path+"/Plugin_BSPSceneManager");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager");
+#ifdef __APPLE__
+    std::string prefix = "lib";
+    std::string extension = ".dylib";
+#else
+    std::string prefix = "";
+    std::string extension = ".so";
+#endif
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
+    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter+".so");
+        this->root->loadPlugin(*piter+extension);
       }
       catch(Ogre::Exception &e)
       {
         try
         {
           // Load the debug plugin into OGRE
-          this->root->loadPlugin(*piter+"_d.so");
+          this->root->loadPlugin(*piter+"_d"+extension);
         }
         catch(Ogre::Exception &ed)
         {
@@ -528,7 +544,7 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {
@@ -599,6 +615,9 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
+#ifdef Q_OS_MAC
+  this->dummyDisplay = 0;
+#else
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -645,6 +664,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
+#endif
 
   return result;
 }

@@ -1,5 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_OPENAL)
+  include_directories(${OPENAL_INCLUDE_DIR})
+endif()
+
+
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
@@ -9,11 +14,12 @@ endif()
 set (sources
   Animation.cc
   Assert.cc
+  AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
-  Common.cc
+  CommonIface.cc
   Console.cc
   Event.cc
   Events.cc
@@ -28,6 +34,7 @@ set (sources
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
+  SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
   Time.cc
@@ -38,10 +45,11 @@ set (sources
 set (headers
   Animation.hh
   Assert.hh
+  AudioDecoder.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
-  Common.hh
+  CommonIface.hh
   CommonTypes.hh
   Color.hh
   Console.hh
@@ -61,6 +69,7 @@ set (headers
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
+  SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -82,6 +91,7 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  AudioDecoder_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
@@ -89,6 +99,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
@@ -125,9 +136,13 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
-  rt
   pthread
 )
+
+if (NOT APPLE)
+  # rt is used for clock_gettime, which is not available on apple
+  target_link_libraries(gazebo_common rt)
+endif()
 
 if (HAVE_SDF)
   target_link_libraries(gazebo_common ${SDF_LIBRARIES})
@@ -137,5 +152,12 @@ if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
 endif()
 
+if (HAVE_OPENAL)
+  target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+endif()
+
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
+
+# Deprecated Common.hh
+gz_issue_775("Common")

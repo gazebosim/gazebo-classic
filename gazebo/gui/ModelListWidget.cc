@@ -30,11 +30,11 @@
 
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -51,6 +51,11 @@
 #include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
+
+// avoid collision from Mac OS X's ConditionalMacros.h
+#ifdef __MACH__
+#undef TYPE_BOOL
+#endif
 
 using namespace gazebo;
 using namespace gui;

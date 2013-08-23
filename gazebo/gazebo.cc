@@ -58,6 +58,8 @@ void gazebo::add_plugin(const std::string &_filename)
 /////////////////////////////////////////////////
 bool gazebo::load(int _argc, char **_argv)
 {
+  gazebo::common::load();
+
   // The SDF find file callback.
   sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 

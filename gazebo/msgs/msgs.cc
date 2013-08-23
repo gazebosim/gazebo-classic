@@ -24,7 +24,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"

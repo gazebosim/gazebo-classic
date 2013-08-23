@@ -378,13 +378,13 @@ namespace gazebo
     public: friend std::istream &operator>>(std::istream &_in,
                                              gazebo::math::Quaternion &_q)
     {
-      Angle r, p, y;
+      Angle roll, pitch, yaw;
 
       // Skip white spaces
       _in.setf(std::ios_base::skipws);
-      _in >> r >> p >> y;
+      _in >> roll >> pitch >> yaw;
 
-      _q.SetFromEuler(Vector3(*r, *p, *y));
+      _q.SetFromEuler(Vector3(*roll, *pitch, *yaw));
 
       return _in;
     }

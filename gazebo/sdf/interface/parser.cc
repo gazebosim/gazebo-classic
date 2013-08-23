@@ -29,7 +29,7 @@
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 
 namespace sdf
 {
