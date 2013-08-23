@@ -60,6 +60,8 @@ set (msgs
   pose_v.proto
   poses_stamped.proto
   projector.proto
+  propagation_particle.proto
+  propagation_grid.proto
   publishers.proto
   publish.proto
   quaternion.proto
@@ -86,6 +88,8 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wireless_node.proto
+  wireless_nodes.proto
   world_control.proto
   world_reset.proto
   world_stats.proto

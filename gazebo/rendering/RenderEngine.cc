@@ -342,7 +342,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -369,7 +369,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
     plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
@@ -544,7 +544,7 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {

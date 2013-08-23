@@ -299,7 +299,7 @@ TEST_P(LaserTest, LaserNoise)
   LaserUnitNoise(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(LaserTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(LaserTest)
 
 int main(int argc, char **argv)
 {

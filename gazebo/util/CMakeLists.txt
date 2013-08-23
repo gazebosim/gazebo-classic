@@ -1,22 +1,30 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_OPENAL)
+  include_directories(${OPENAL_INCLUDE_DIR})
+endif()
+
 set (sources 
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
+  OpenAL.cc
 )
 
 set (headers 
   Diagnostics.hh
   LogPlay.hh
   LogRecord.hh
+  OpenAL.hh
   UtilTypes.hh
 )
 
 set (gtest_sources
   Diagnostics_TEST.cc
   LogRecord_TEST.cc
+  OpenAL_TEST.cc
 )
+
 gz_build_tests(${gtest_sources})
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
