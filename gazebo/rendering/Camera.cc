@@ -1228,12 +1228,14 @@ void Camera::CreateCamera()
   this->camera = this->scene->GetManager()->createCamera(this->name);
 
   // Use X/Y as horizon, Z up
-  this->camera->pitch(Ogre::Degree(90));
-
+  // this->camera->pitch(Ogre::Degree(90));
   // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  // this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  // this->camera->setDirection(1, 0, 0);
 
-  this->camera->setDirection(1, 0, 0);
+  this->camera->setFixedYawAxis(false);
+  this->camera->yaw(Ogre::Degree(-90.0));
+  this->camera->roll(Ogre::Degree(-90.0));
 }
 
 //////////////////////////////////////////////////
