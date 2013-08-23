@@ -26,13 +26,13 @@
 #ifdef HAVE_SIMBODY
 #undef SIMBODY_SUPPORT
 #define SIMBODY_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestSimbody, \
-    testclass, ::testing::Values("simbody"))
+    testclass, ::testing::Values("simbody"));
 #endif
 
 #ifdef HAVE_BULLET
 #undef BULLET_SUPPORT
 #define BULLET_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
-    testclass, ::testing::Values("bullet"))
+    testclass, ::testing::Values("bullet"));
 #endif
 
 /// \brief Helper macro to instantiate gtest for using different physics engines

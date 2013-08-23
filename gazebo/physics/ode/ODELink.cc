@@ -204,12 +204,6 @@ void ODELink::Fini()
 }
 
 //////////////////////////////////////////////////
-void ODELink::Update()
-{
-  Link::Update();
-}
-
-//////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
   this->sdf->GetElement("gravity")->Set(_mode);
