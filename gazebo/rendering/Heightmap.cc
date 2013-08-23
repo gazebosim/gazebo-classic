@@ -166,12 +166,17 @@ void Heightmap::Load()
   {
     geomMsg.ParseFromString(response->serialized_data());
 
+    std::cout << geomMsg.heightmap().width() << " , " <<
+        geomMsg.heightmap().height() << std::endl;
+
     // Copy the height data.
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
+
+    std::cout << this->heights.size() << std::endl;
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -215,16 +220,21 @@ void Heightmap::Load()
 
   this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
   this->world = mPageManager->createWorld();
-  mTerrainPaging->createWorldSection(world, this->terrainGroup, 2000, 3000, 
+  mTerrainPaging->createWorldSection(world, this->terrainGroup, 2, 3, 
     //TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
     //TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
-    0, 0, 0, 0);
+    0, 0, 1, 0);
 
   // caguero - Testing Paging
 
-  for (int x = 0; x <= 0; ++x)
+  /*for (int x = 0; x <= 1; ++x)
     for (int y = 0; y <= 0; ++y)
-      this->DefineTerrain(x, y);
+      this->DefineTerrain(x, y);*/
+
+  DefineTerrainCaguero(0, 0);
+  DefineTerrainCaguero(0, 1);
+  DefineTerrainCaguero(1, 0);
+  DefineTerrainCaguero(1, 1);
 
   // sync load since we want everything in place when we start
   this->terrainGroup->loadAllTerrains(true);
@@ -239,6 +249,7 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
+    this->terrainGroup->saveAllTerrains(true);
   }
 
   this->terrainGroup->freeTemporaryResources();
@@ -362,6 +373,38 @@ void Heightmap::DefineTerrain(int _x, int _y)
   else
   {
     this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+    this->terrainsImported = true;
+  }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::DefineTerrainCaguero(int _x, int _y)
+{
+  Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
+
+  if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
+        this->terrainGroup->getResourceGroup(), filename))
+  {
+    this->terrainGroup->defineTerrain(_x, _y);
+  }
+  else
+  {
+    std::vector<float>::const_iterator first = this->heights.begin();
+    int half;
+    if (this->heights.size() % 2 == 0)
+    {
+      half = (this->heights.size() / 2) - 1;
+    }
+    else
+    {
+      half = (this->heights.size() / 2);
+    }
+
+    std::vector<float>::const_iterator last = this->heights.begin() + half + 1;
+    std::vector<float> newVec(first, last);
+    std::cout << "half vector1: " << half << std::endl;
+    std::cout << "Size new vector1: " << newVec.size() << std::endl;
+    this->terrainGroup->defineTerrain(_x, _y, &newVec[0]);
     this->terrainsImported = true;
   }
 }
