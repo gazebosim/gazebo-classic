@@ -80,6 +80,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           {
             newPass->setDepthCheckEnabled(originalPass->getDepthCheckEnabled());
             newPass->setDepthWriteEnabled(originalPass->getDepthWriteEnabled());
+            newPass->setLightingEnabled(originalPass->getLightingEnabled());
           }
         }
 
