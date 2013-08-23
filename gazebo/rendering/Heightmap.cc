@@ -489,7 +489,7 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
   int startx = (pos.x - _radius) * size;
   int starty = (pos.y - _radius) * size;
   int endx = (pos.x + _radius) * size;
-  int endy= (pos.y + _radius) * size;
+  int endy = (pos.y + _radius) * size;
 
   startx = std::max(startx, 0);
   starty = std::max(starty, 0);
@@ -532,7 +532,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
   int startx = (pos.x - _outsideRadius) * size;
   int starty = (pos.y - _outsideRadius) * size;
   int endx = (pos.x + _outsideRadius) * size;
-  int endy= (pos.y + _outsideRadius) * size;
+  int endy = (pos.y + _outsideRadius) * size;
 
   startx = std::max(startx, 0);
   starty = std::max(starty, 0);

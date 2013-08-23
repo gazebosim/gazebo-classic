@@ -183,12 +183,6 @@ void BulletLink::Fini()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::Update()
-{
-  Link::Update();
-}
-
-//////////////////////////////////////////////////
 void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)
