@@ -96,12 +96,6 @@ void SimbodyLink::Fini()
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::Update()
-{
-  Link::Update();
-}
-
-//////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
   this->gravityMode = _mode;

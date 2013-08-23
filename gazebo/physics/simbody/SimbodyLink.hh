@@ -55,9 +55,6 @@ namespace gazebo
       /// \brief Finalize the body
       public: virtual void Fini();
 
-      /// \brief Update the body
-      public: virtual void Update();
-
       /// \brief Called when the pose of the entity (or one of its parents) has
       /// changed
       public: virtual void OnPoseChange();
