@@ -22,9 +22,9 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
 
 class btRigidBody;
 
@@ -56,9 +56,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Fini();
-
-      // Documentation inherited.
-      public: virtual void Update();
 
       // Documentation inherited.
       public: virtual void OnPoseChange();
@@ -156,7 +153,7 @@ namespace gazebo
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.
-      private: BulletMotionStatePtr motionState;
+      public: BulletMotionStatePtr motionState;
 
       /// \brief Pointer to the bullet rigid body object.
       private: btRigidBody *rigidLink;

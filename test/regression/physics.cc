@@ -16,9 +16,10 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -31,6 +32,9 @@ class PhysicsTest : public ServerFixture
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
+  public: void JointDampingTest(const std::string &_physicsEngine);
+  public: void DropStuff(const std::string &_physicsEngine);
+  public: void CollisionTest(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,17 +69,10 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
+TEST_P(PhysicsTest, EmptyWorld)
 {
-  EmptyWorld("ode");
+  EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, EmptyWorldBullet)
-{
-  EmptyWorld("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -111,6 +108,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
   modelPos["test_empty"] = math::Vector3(12, 0, z0);
+  modelPos["link_offset_box"] = math::Vector3(0, 0, z0);
 
   // FIXME Trimesh drop test passes in bullet but fails in ode because
   // the mesh bounces to the side when it hits the ground.
@@ -123,6 +121,40 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
   SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+
+  std::ostringstream linkOffsetStream;
+  math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
+  math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
+  math::Vector3 linkOffsetSize(1, 1, 1);
+  linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='link_offset_box'>"
+    << "<pose>" << linkOffsetPose1 << "</pose>"
+    << "<allow_auto_disable>false</allow_auto_disable>"
+    << "<link name ='body'>"
+    << "  <pose>" << linkOffsetPose2 << "</pose>"
+    << "  <inertial>"
+    << "    <mass>4.0</mass>"
+    << "    <inertia>"
+    << "      <ixx>0.1667</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>"
+    << "      <iyy>0.1667</iyy> <iyz>0.0</iyz>"
+    << "      <izz>0.1667</izz>"
+    << "    </inertia>"
+    << "  </inertial>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(linkOffsetStream.str());
+
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
@@ -223,19 +255,29 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
+
+  // Compute and check link pose of link_offset_box
+  gzdbg << "Check link pose of link_offset_box\n";
+  model = world->GetModel("link_offset_box");
+  ASSERT_TRUE(model);
+  physics::LinkPtr link = model->GetLink();
+  ASSERT_TRUE(link);
+  // relative pose of link in linkOffsetPose2
+  for (int i = 0; i < 20; ++i)
+  {
+    pose1 = model->GetWorldPose();
+    pose2 = linkOffsetPose2 + pose1;
+    EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.pos.z, 0.5, PHYSICS_TOL);
+    world->StepWorld(1);
+  }
 }
 
-TEST_F(PhysicsTest, SpawnDropODE)
+TEST_P(PhysicsTest, SpawnDrop)
 {
-  SpawnDrop("ode");
+  SpawnDrop(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropBullet)
-{
-  SpawnDrop("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -510,17 +552,10 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
+TEST_P(PhysicsTest, SpawnDropCoGOffset)
 {
-  SpawnDropCoGOffset("ode");
+  SpawnDropCoGOffset(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
-{
-  SpawnDropCoGOffset("bullet");
-}
-#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
@@ -921,21 +956,14 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, RevoluteJointODE)
+TEST_P(PhysicsTest, RevoluteJoint)
 {
-  RevoluteJoint("ode");
+  RevoluteJoint(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, RevoluteJointBullet)
-{
-  RevoluteJoint("bullet");
-}
-#endif  // HAVE_BULLET
-
-TEST_F(PhysicsTest, State)
-{
-  /// \TODO: Redo state test
+/// \TODO: Redo state test
+// TEST_F(PhysicsTest, State)
+// {
   /*
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
@@ -993,13 +1021,13 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
-}
+// }
 
-TEST_F(PhysicsTest, JointDampingTest)
+void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
-  Load("worlds/damp_test.world", true);
+  Load("worlds/damp_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -1039,26 +1067,27 @@ TEST_F(PhysicsTest, JointDampingTest)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    EXPECT_LT(vel.y, -10.2006);
-    EXPECT_GT(vel.y, -10.2008);
-    EXPECT_LT(vel.z, -6.51766);
-    EXPECT_GT(vel.z, -6.51768);
+    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
     EXPECT_EQ(pose.pos.x, 3.0);
-    EXPECT_LT(pose.pos.y, 5.0e-6);
-    EXPECT_GT(pose.pos.y, 0.0);
-    EXPECT_GT(pose.pos.z, 10.099);
-    EXPECT_LT(pose.pos.z, 10.101);
-    EXPECT_GT(pose.rot.GetAsEuler().x, 0.567336);
-    EXPECT_LT(pose.rot.GetAsEuler().x, 0.567338);
+    EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
     EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
     EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
 }
 
-TEST_F(PhysicsTest, DropStuff)
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, JointDampingTest)
 {
-  Load("worlds/drop_test.world", true);
+  JointDampingTest("ode");
+}
+
+void PhysicsTest::DropStuff(const std::string &_physicsEngine)
+{
+  Load("worlds/drop_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
@@ -1165,11 +1194,16 @@ TEST_F(PhysicsTest, DropStuff)
   }
 }
 
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, DropStuff)
+{
+  DropStuff("ode");
+}
 
-TEST_F(PhysicsTest, CollisionTest)
+void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear inelastic collision
-  Load("worlds/collision_test.world", true);
+  Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
@@ -1251,18 +1285,11 @@ TEST_F(PhysicsTest, CollisionTest)
   }
 }
 
-
-TEST_F(PhysicsTest, SimplePendulumODE)
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, CollisionTest)
 {
-  SimplePendulum("ode");
+  CollisionTest("ode");
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SimplePendulumBullet)
-{
-  SimplePendulum("bullet");
-}
-#endif  // HAVE_BULLET
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
@@ -1411,6 +1438,11 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
   }
 }
 
+TEST_P(PhysicsTest, SimplePendulum)
+{
+  SimplePendulum(GetParam());
+}
+
 ////////////////////////////////////////////////////////////////////////
 // CollisionFiltering:
 // Load a world, spawn a model with two overlapping links. By default,
@@ -1513,18 +1545,10 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PhysicsTest, CollisionFilteringODE)
+TEST_P(PhysicsTest, CollisionFiltering)
 {
-  CollisionFiltering("ode");
+  CollisionFiltering(GetParam());
 }
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, CollisionFilteringBullet)
-{
-  CollisionFiltering("bullet");
-}
-#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
@@ -1540,6 +1564,8 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
 }
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest)
 
 int main(int argc, char **argv)
 {

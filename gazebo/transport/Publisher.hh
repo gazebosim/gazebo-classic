@@ -26,7 +26,7 @@
 #include <string>
 #include <list>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -62,6 +62,13 @@ namespace gazebo
       /// \brief Block until a connection has been established with this
       ///        publisher
       public: void WaitForConnection() const;
+
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      /// \param[in] _timeout Maxiumum time to wait. Use a negative time
+      /// value to wait forever.
+      /// \return True if a connection was established.
+      public: bool WaitForConnection(const common::Time &_timeout) const;
 
       /// \brief DEPRECATED in version 1.6
       /// \sa SetPublication
@@ -106,6 +113,11 @@ namespace gazebo
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
 
+      /// \brief Set our containing node.
+      /// \param[in] _node Pointer to a node. Should be the node that create
+      /// this publisher.
+      public: void SetNode(NodePtr _node);
+
       /// Deprecated
       public: bool GetLatching() const GAZEBO_DEPRECATED(1.5);
 
@@ -118,7 +130,8 @@ namespace gazebo
       public: MessagePtr GetPrevMsgPtr() const;
 
       /// \brief Callback when a publish is completed
-      private: void OnPublishComplete();
+      /// \param[in] _id ID associated with the publication.
+      private: void OnPublishComplete(uint32_t _id);
 
       /// \brief Topic on which messages are published.
       private: std::string topic;
@@ -151,8 +164,18 @@ namespace gazebo
       /// \brief The previous message published. Used for latching topics.
       private: MessagePtr prevMsg;
 
+      /// \brief Pointer to our containing node.
+      private: NodePtr node;
+
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
+
+      /// \brief True if waiting to here back about a sent message.
+      private: bool waiting;
+
+      /// \brief Current id of the sent message.
+      private: uint32_t pubId;
+      private: std::list<uint32_t> pubIds;
     };
     /// \}
   }

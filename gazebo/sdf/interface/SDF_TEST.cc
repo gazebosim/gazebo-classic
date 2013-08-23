@@ -333,6 +333,7 @@ TEST(SdfUpdate, EmptyValues)
   elem->AddValue("double", "12.34", "0", "description");
   EXPECT_NEAR(elem->GetValueDouble(emptyString), 12.34, 1e-6);
 }
+
 /////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)

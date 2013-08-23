@@ -26,11 +26,11 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
-#include "math/Vector3.hh"
-#include "common/Common.hh"
-#include "common/Console.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -374,7 +374,7 @@ Color Image::GetMaxColor()
 void Image::Rescale(int _width, int _height)
 {
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
-      FILTER_BICUBIC);
+      FILTER_LANCZOS3);
 }
 
 //////////////////////////////////////////////////

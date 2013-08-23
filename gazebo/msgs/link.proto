@@ -15,7 +15,7 @@ import "pose.proto";
 
 message Link
 {
-  required uint32 id            = 1;
+  optional uint32 id            = 1;
   required string name          = 2;
   optional bool self_collide    = 3;
   optional bool gravity         = 4;
@@ -28,4 +28,3 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
 }
-

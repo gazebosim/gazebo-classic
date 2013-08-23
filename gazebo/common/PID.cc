@@ -16,9 +16,10 @@
 */
 
 #include <math.h>
+#include <cmath>
 #include <stdio.h>
 
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 #include "PID.hh"
 
 using namespace gazebo;
@@ -111,7 +112,7 @@ double PID::Update(double _error, common::Time _dt)
   double pTerm, dTerm, iTerm;
   this->pErr = _error;
 
-  if (_dt == common::Time(0, 0) || math::isnan(_error) || isinf(_error))
+  if (_dt == common::Time(0, 0) || math::isnan(_error) || std::isinf(_error))
     return 0.0;
 
   // Calculate proportional contribution to command

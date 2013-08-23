@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "transport/TransportTypes.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 namespace gazebo
 {
@@ -53,6 +53,7 @@ namespace gazebo
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
+                this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
                 return NULL;
@@ -156,6 +157,7 @@ namespace gazebo
               decodedTopic, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);
 
         return publisher;
@@ -338,6 +340,10 @@ namespace gazebo
       private: boost::mutex publisherMutex;
       private: boost::mutex publisherDeleteMutex;
       private: boost::recursive_mutex incomingMutex;
+
+      /// \brief make sure we don't call ProcessingIncoming simultaneously
+      /// from separate threads.
+      private: boost::recursive_mutex processIncomingMutex;
 
       private: bool initialized;
     };

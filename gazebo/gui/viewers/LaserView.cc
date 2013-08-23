@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -334,7 +334,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 QRectF LaserView::LaserItem::GetBoundingRect() const
 {
-  if (this->ranges.size() == 0)
+  if (this->ranges.empty())
     return QRectF(0, 0, 0, 0);
 
   // Compute the maximum size of bound box by scaling up the maximum

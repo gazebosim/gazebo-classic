@@ -20,15 +20,16 @@
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <iostream>
+
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -60,24 +61,50 @@ size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
 
 /////////////////////////////////////////////////
 ModelDatabase::ModelDatabase()
+  : updateCacheThread(NULL)
 {
-  this->stop = false;
-
-  // Create the thread that is used to update the model cache. This
-  // retreives online data in the background to improve startup times.
-  this->updateCacheThread = new boost::thread(
-      boost::bind(&ModelDatabase::UpdateModelCache, this));
+  this->Start();
 }
 
 /////////////////////////////////////////////////
 ModelDatabase::~ModelDatabase()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void ModelDatabase::Start(bool _fetchImmediately)
+{
+  boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
+
+  if (!this->updateCacheThread)
+  {
+    this->stop = false;
+
+    // Create the thread that is used to update the model cache. This
+    // retreives online data in the background to improve startup times.
+    this->updateCacheThread = new boost::thread(
+        boost::bind(&ModelDatabase::UpdateModelCache, this, _fetchImmediately));
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelDatabase::Fini()
+{
+  this->callbacks.clear();
+
   // Stop the update thread.
   this->stop = true;
-  this->updateCacheCondition.notify_one();
-  this->updateCacheThread->join();
+  this->updateCacheCompleteCondition.notify_all();
+  this->updateCacheCondition.notify_all();
 
-  delete this->updateCacheThread;
+  {
+    boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
+    if (this->updateCacheThread)
+      this->updateCacheThread->join();
+    delete this->updateCacheThread;
+    this->updateCacheThread = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -88,7 +115,10 @@ std::string ModelDatabase::GetURI()
   if (uriStr)
     result = uriStr;
   else
-    gzwarn << "GAZEBO_MODEL_DATABASE_URI not set\n";
+  {
+    // No env var.  Take compile-time default.
+    result = GAZEBO_MODEL_DATABASE_URI;
+  }
 
   if (result[result.size()-1] != '/')
     result += '/';
@@ -105,10 +135,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 
   // Make sure there is a URI separator
   if (uriSeparator == std::string::npos)
-  {
-    gzerr << "URI[" << _modelURI << "] missing ://\n";
     return false;
-  }
 
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
@@ -239,14 +266,18 @@ bool ModelDatabase::UpdateModelCacheImpl()
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::UpdateModelCache()
+void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
+
   // Continually update the model cache when requested.
   while (!this->stop)
   {
     // Wait for an update request.
-    boost::mutex::scoped_lock lock(this->updateMutex);
-    this->updateCacheCondition.wait(lock);
+    if (!_fetchImmediately)
+      this->updateCacheCondition.wait(lock);
+    else
+      _fetchImmediately = false;
 
     // Exit if notified and stopped.
     if (this->stop)
@@ -264,7 +295,11 @@ void ModelDatabase::UpdateModelCache()
       }
       this->callbacks.clear();
     }
+    this->updateCacheCompleteCondition.notify_all();
   }
+
+  // Make sure no one is waiting on us.
+  this->updateCacheCompleteCondition.notify_all();
 }
 
 /////////////////////////////////////////////////
@@ -273,12 +308,22 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
   size_t size = 0;
 
   {
+    boost::recursive_mutex::scoped_lock startLock(this->startCacheMutex);
+    if (!this->updateCacheThread)
     {
-      boost::mutex::scoped_try_lock tryLock(this->updateMutex);
-      if (!tryLock)
-        gzmsg << "Waiting for model database update to complete...\n";
+      boost::mutex::scoped_lock lock(this->updateMutex);
+      this->Start(true);
+      this->updateCacheCompleteCondition.wait(lock);
     }
-    boost::mutex::scoped_lock lock(this->updateMutex);
+    else
+    {
+      boost::mutex::scoped_try_lock lock(this->updateMutex);
+      if (!lock)
+      {
+        gzmsg << "Waiting for model database update to complete...\n";
+        boost::mutex::scoped_lock lock2(this->updateMutex);
+      }
+    }
 
     size = this->modelCache.size();
   }
@@ -290,14 +335,13 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     gzwarn << "Getting models from[" << GetURI()
            << "]. This may take a few seconds.\n";
 
-    // Tell the background thread to grab the models from online.
-    this->updateCacheCondition.notify_one();
+    boost::mutex::scoped_lock lock(this->updateMutex);
 
-    // Let the other thread start downloading.
-    common::Time::MSleep(100);
+    // Tell the background thread to grab the models from online.
+    this->updateCacheCondition.notify_all();
 
     // Wait for the thread to finish.
-    boost::mutex::scoped_lock lock(this->updateMutex);
+    this->updateCacheCompleteCondition.wait(lock);
   }
 
   return this->modelCache;

@@ -15,30 +15,27 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "common/Time.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Time.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
 {
+  public: void StraightLine(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-TEST_F(Pioneer2dx, StraightLine)
+void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
-  Load("worlds/pioneer2dx.world");
+  Load("worlds/pioneer2dx.world", false, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
   int i = 0;
-  while (!this->HasEntity("pioneer2dx") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-
-  if (i > 20)
-    gzthrow("Unable to get pioneer2dx");
+  for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
+    common::Time::MSleep(500);
+  ASSERT_LT(i, 1000);
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
@@ -58,22 +55,30 @@ TEST_F(Pioneer2dx, StraightLine)
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
   */
-
-  while (currTime - startTime < common::Time(100, 0))
+  while (currTime - startTime < common::Time(20, 0))
   {
     // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }
+
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;
-  std::cout << "DIst[" << dist << "]\n";
-  std::cout << "EnPose.x[" << endPose.pos.x << "]\n";
+  std::cout << "Dist[" << dist << "]\n";
+  std::cout << "EndPose.x[" << endPose.pos.x << "]\n";
   EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
   EXPECT_LT(fabs(endPose.pos.y), 0.5);
   EXPECT_LT(fabs(endPose.pos.z), 0.01);
 }
+
+
+TEST_P(Pioneer2dx, StraightLine)
+{
+  StraightLine(GetParam());
+}
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx)
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

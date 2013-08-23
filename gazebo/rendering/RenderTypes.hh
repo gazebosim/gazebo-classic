@@ -48,6 +48,8 @@ namespace gazebo
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class SonarVisual;
+    class WrenchVisual;
     class CameraVisual;
     class JointVisual;
     class AxisVisual;
@@ -56,6 +58,7 @@ namespace gazebo
     class COMVisual;
     class RFIDVisual;
     class RFIDTagVisual;
+    class WindowManager;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -93,6 +96,14 @@ namespace gazebo
     /// \brief Shared pointer to LaserVisual
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
 
+    /// \def SonarVisualPtr
+    /// \brief Shared pointer to SonarVisual
+    typedef boost::shared_ptr<SonarVisual> SonarVisualPtr;
+
+    /// \def WrenchVisualPtr
+    /// \brief Shared pointer to WrenchVisual
+    typedef boost::shared_ptr<WrenchVisual> WrenchVisualPtr;
+
     /// \def CameraVisualPtr
     /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
@@ -124,6 +135,10 @@ namespace gazebo
     /// \def RFIDTagVisual
     /// \brief Shared pointer to RFIDTagVisual
     typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+
+    /// \def WindowManager
+    /// \brief Shared pointer to WindowManager
+    typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

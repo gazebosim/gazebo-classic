@@ -19,22 +19,25 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/LogRecord.hh"
-#include "gazebo/common/LogPlay.hh"
+#include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/LogPlay.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "gazebo/sdf/sdf.hh"
-
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -49,7 +52,6 @@ bool Server::stop = true;
 Server::Server()
 {
   this->receiveMutex = new boost::mutex();
-  gazebo::print_version();
 
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -66,8 +68,11 @@ Server::~Server()
 /////////////////////////////////////////////////
 void Server::PrintUsage()
 {
-  std::cerr << "Run the Gazebo server.\n\n"
-    << "Usage: gzserver [options] <world_file>\n\n";
+  std::cerr << "gzserver -- Run the Gazebo server.\n\n";
+  std::cerr << "`gzserver` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops.\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -78,23 +83,28 @@ bool Server::ParseArgs(int argc, char **argv)
   this->systemPluginsArgv = new char*[argc];
   for (int i = 0; i < argc; ++i)
   {
-    int argv_len = strlen(argv[i]);
-    this->systemPluginsArgv[i] = new char[argv_len];
-    for (int j = 0; j < argv_len; ++j)
-      this->systemPluginsArgv[i][j] = argv[i][j];
+    int argvLen = strlen(argv[i]) + 1;
+    this->systemPluginsArgv[i] = new char[argvLen];
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
   }
 
-
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
+    ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
      "Specify a physics engine (ode|bullet).")
     ("play,p", po::value<std::string>(), "Play a log file.")
-    ("record,r", "Record state data to disk.")
+    ("record,r", "Record state data.")
+    ("record_encoding", po::value<std::string>()->default_value("zlib"),
+     "Compression encoding format for log data (zlib|bz2|txt).")
+    ("record_path", po::value<std::string>()->default_value(""),
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
+    ("iters",  po::value<unsigned int>(),
+     "Number of iterations to simulate.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -106,7 +116,7 @@ bool Server::ParseArgs(int argc, char **argv)
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc).add(h_desc);
 
   po::positional_options_description p_desc;
@@ -127,6 +137,18 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << v_desc << "\n";
+    return false;
+  }
+
+  if (this->vm.count("quiet"))
+    gazebo::common::Console::Instance()->SetQuiet(true);
+  else
+    gazebo::print_version();
+
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
   {
@@ -138,13 +160,6 @@ bool Server::ParseArgs(int argc, char **argv)
     {
       gzerr << "Unable to set random number seed. Must supply a number.\n";
     }
-  }
-
-  if (this->vm.count("help"))
-  {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
-    return false;
   }
 
   /// Load all the plugins specified on the command line
@@ -162,12 +177,37 @@ bool Server::ParseArgs(int argc, char **argv)
 
   // Set the parameter to record a log file
   if (this->vm.count("record"))
-    this->params["record"] = "bz2";
+  {
+    this->params["record"] = this->vm["record_path"].as<std::string>();
+    this->params["record_encoding"] =
+        this->vm["record_encoding"].as<std::string>();
+  }
+
+  if (this->vm.count("iters"))
+  {
+    try
+    {
+      this->params["iterations"] = boost::lexical_cast<std::string>(
+          this->vm["iters"].as<unsigned int>());
+    }
+    catch(...)
+    {
+      this->params["iterations"] = "0";
+      gzerr << "Unable to set iterations of [" <<
+        this->vm["iters"].as<unsigned int>() << "]\n";
+    }
+  }
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
   else
     this->params["pause"] = "false";
+
+  if (!this->PreLoad())
+  {
+    gzerr << "Unable to load gazebo\n";
+    return false;
+  }
 
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
@@ -178,19 +218,19 @@ bool Server::ParseArgs(int argc, char **argv)
   if (this->vm.count("play"))
   {
     // Load the log file
-    common::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
+    util::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
-      << common::LogPlay::Instance()->GetLogVersion() << "\n"
+      << util::LogPlay::Instance()->GetLogVersion() << "\n"
       << "  Gazebo Version: "
-      << common::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
       << "  Random Seed: "
-      << common::LogPlay::Instance()->GetRandSeed() << "\n";
+      << util::LogPlay::Instance()->GetRandSeed() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
-    common::LogPlay::Instance()->Step(sdfString);
+    util::LogPlay::Instance()->Step(sdfString);
 
     // Load the server
     if (!this->LoadString(sdfString))
@@ -248,7 +288,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
@@ -278,8 +318,7 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics)
+bool Server::PreLoad()
 {
   std::string host = "";
   unsigned int port = 0;
@@ -290,10 +329,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->master->Init(port);
   this->master->RunThread();
 
-
   // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+}
 
+/////////////////////////////////////////////////
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
+{
   /// Load the sensors library
   sensors::load();
 
@@ -356,6 +399,9 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  // Make sure the model database has started.
+  common::ModelDatabase::Instance()->Start();
+
   gazebo::init();
 
   sensors::init();
@@ -368,6 +414,9 @@ void Server::Init()
 void Server::SigInt(int)
 {
   stop = true;
+
+  // Signal to plugins/etc that a shutdown event has occured
+  event::Events::sigInt();
 }
 
 /////////////////////////////////////////////////
@@ -391,6 +440,9 @@ void Server::Fini()
     this->master->Fini();
   delete this->master;
   this->master = NULL;
+
+  // Cleanup model database.
+  common::ModelDatabase::Instance()->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -406,11 +458,27 @@ void Server::Run()
   // Run the sensor threads
   sensors::run_threads();
 
+  unsigned int iterations = 0;
+  common::StrStr_M::iterator piter = this->params.find("iterations");
+  if (piter != this->params.end())
+  {
+    try
+    {
+      iterations = boost::lexical_cast<unsigned int>(piter->second);
+    }
+    catch(...)
+    {
+      iterations = 0;
+      gzerr << "Unable to cast iterations[" << piter->second << "] "
+        << "to unsigned integer\n";
+    }
+  }
+
   // Run each world. Each world starts a new thread
-  physics::run_worlds();
+  physics::run_worlds(iterations);
 
   // Update the sensors.
-  while (!this->stop)
+  while (!this->stop && physics::worlds_running())
   {
     this->ProcessControlMsgs();
     sensors::run_once();
@@ -461,7 +529,8 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      common::LogRecord::Instance()->Start(iter->second);
+      util::LogRecord::Instance()->Start(this->params["record_encoding"],
+                                         iter->second);
     }
   }
 }

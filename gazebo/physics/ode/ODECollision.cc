@@ -40,6 +40,9 @@ ODECollision::ODECollision(LinkPtr _link)
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+
+  this->SetSpaceId(
+      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
 }
 
 //////////////////////////////////////////////////
@@ -54,9 +57,6 @@ ODECollision::~ODECollision()
 void ODECollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
-
-  this->SetSpaceId(
-      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
 
   if (this->IsStatic())
   {
@@ -166,9 +166,6 @@ math::Box ODECollision::GetBoundingBox() const
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
-
-  if (this->collisionId == NULL)
-    printf("HOW IS THIS NULL\n");
 
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);

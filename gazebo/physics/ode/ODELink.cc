@@ -87,8 +87,8 @@ void ODELink::Init()
   }
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -201,12 +201,6 @@ void ODELink::Fini()
   this->linkId = NULL;
 
   this->odePhysics.reset();
-}
-
-//////////////////////////////////////////////////
-void ODELink::Update()
-{
-  Link::Update();
 }
 
 //////////////////////////////////////////////////
@@ -411,7 +405,6 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
           << " does not exist, GetWorldLinearVel returns default of "
           << vel << std::endl;
   }
-
   return vel;
 }
 
@@ -701,9 +694,9 @@ void ODELink::SetKinematic(const bool &_state)
   this->sdf->GetElement("kinematic")->Set(_state);
   if (this->linkId)
   {
-    if (_state)
+    if (_state && !dBodyIsKinematic(this->linkId))
       dBodySetKinematic(this->linkId);
-    else
+    else if (dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
   else

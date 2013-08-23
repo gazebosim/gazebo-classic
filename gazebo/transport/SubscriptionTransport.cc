@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
-#include "transport/ConnectionManager.hh"
-#include "transport/SubscriptionTransport.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/SubscriptionTransport.hh"
 
 using namespace gazebo;
 using namespace transport;
+
+extern void dummy_callback_fn(uint32_t);
 
 //////////////////////////////////////////////////
 SubscriptionTransport::SubscriptionTransport()
@@ -29,10 +31,11 @@ SubscriptionTransport::SubscriptionTransport()
 SubscriptionTransport::~SubscriptionTransport()
 {
   ConnectionManager::Instance()->RemoveConnection(this->connection);
+  this->connection.reset();
 }
 
 //////////////////////////////////////////////////
-void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
+void SubscriptionTransport::Init(ConnectionPtr _conn, bool _latching)
 {
   this->connection = _conn;
   this->latching = _latching;
@@ -43,16 +46,17 @@ bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 {
   std::string data;
   _newMsg->SerializeToString(&data);
-  return this->HandleData(data);
+  return this->HandleData(data, boost::bind(&dummy_callback_fn, _1), 0);
 }
 
 //////////////////////////////////////////////////
-bool SubscriptionTransport::HandleData(const std::string &newdata)
+bool SubscriptionTransport::HandleData(const std::string &_newdata,
+    boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
   bool result = false;
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg(newdata);
+    this->connection->EnqueueMsg(_newdata, _cb, _id);
     result = true;
   }
   else
@@ -73,4 +77,3 @@ bool SubscriptionTransport::IsLocal() const
 {
   return false;
 }
-

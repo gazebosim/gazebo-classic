@@ -16,10 +16,11 @@
  */
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogRecord.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo.hh"
@@ -57,6 +58,11 @@ void gazebo::add_plugin(const std::string &_filename)
 /////////////////////////////////////////////////
 bool gazebo::load(int _argc, char **_argv)
 {
+  gazebo::common::load();
+
+  // The SDF find file callback.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   if (!gazebo::common::Console::Instance()->IsInitialized())
@@ -95,7 +101,7 @@ void gazebo::run()
 /////////////////////////////////////////////////
 void gazebo::stop()
 {
-  common::LogRecord::Instance()->Stop();
+  util::LogRecord::Instance()->Stop();
   gazebo::transport::stop();
 }
 
@@ -103,7 +109,7 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
-  common::LogRecord::Instance()->Stop();
+  util::LogRecord::Instance()->Fini();
   g_plugins.clear();
   gazebo::transport::fini();
 }

@@ -17,8 +17,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "math/Helpers.hh"
-#include "math/Matrix3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Matrix3.hh"
 
 using namespace gazebo;
 using namespace math;

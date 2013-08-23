@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,47 +14,49 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/transport/TransportIface.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "physics/Contact.hh"
-#include "physics/Shape.hh"
-#include "physics/BoxShape.hh"
-#include "physics/CylinderShape.hh"
-#include "physics/TrimeshShape.hh"
-#include "physics/SphereShape.hh"
-#include "physics/HeightmapShape.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/MeshShape.hh"
+#include "gazebo/physics/SphereShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link)
+    : Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
   this->link = _link;
 
   this->contactsEnabled = false;
+  this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
+  sdf::initFile("collision.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -83,7 +85,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->SetMaxContacts(this->maxContacts);
+
+  if (this->sdf->HasElement("laser_retro"))
+    this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
+
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -112,7 +120,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->GetValuePose("pose"));
+    this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -361,4 +369,17 @@ CollisionState Collision::GetState()
 void Collision::SetState(const CollisionState &_state)
 {
   this->SetRelativePose(_state.GetPose());
+}
+
+/////////////////////////////////////////////////
+void Collision::SetMaxContacts(double _maxContacts)
+{
+  this->maxContacts = static_cast<int>(_maxContacts);
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+int Collision::GetMaxContacts()
+{
+  return this->maxContacts;
 }

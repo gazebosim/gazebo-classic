@@ -22,6 +22,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletHingeJoint.hh"
@@ -155,8 +156,8 @@ void BulletHingeJoint::Init()
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
-    this->angleOffset + limitElem->GetValueDouble("lower"),
-    this->angleOffset + limitElem->GetValueDouble("upper"));
+    this->angleOffset + limitElem->Get<double>("lower"),
+    this->angleOffset + limitElem->Get<double>("upper"));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
@@ -191,7 +192,15 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   if (this->bulletHinge == NULL)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    this->initialWorldAxis = _axis;
+
+    /// \TODO: currently we assume joint axis is specified in model frame,
+    /// this is incorrect, and should be corrected to be
+    /// joint frame which is specified in child link frame.
+    if (this->parentLink)
+      this->initialWorldAxis =
+        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+    else
+      this->initialWorldAxis = _axis;
   }
   else
   {
@@ -223,10 +232,20 @@ math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
-  // this->bulletHinge->enableAngularMotor(true, -_angle,
+  // The following call should work, but doesn't:
+  // this->bulletHinge->enableAngularMotor(true, _angle,
   // this->GetMaxForce(_index));
+
+  // TODO: Should prescribe the linear velocity of the child link if there is an
+  // offset between the child's CG and the joint anchor.
+  math::Vector3 desiredVel;
+  if (this->parentLink)
+    desiredVel = this->parentLink->GetWorldAngularVel();
+  desiredVel += _angle * this->GetGlobalAxis(_index);
+  if (this->childLink)
+    this->childLink->SetAngularVel(desiredVel);
 }
 
 //////////////////////////////////////////////////

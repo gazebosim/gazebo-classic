@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -61,6 +61,13 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 {
   this->pos = _pos;
   this->rot = _rot;
+}
+
+//////////////////////////////////////////////////
+void Pose::Set(const Vector3 &_pos, const Vector3 &_rpy)
+{
+  this->pos = _pos;
+  this->rot.SetFromEuler(_rpy);
 }
 
 //////////////////////////////////////////////////
@@ -129,6 +136,14 @@ bool Pose::operator!=(const Pose &_pose) const
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
 }
 
 //////////////////////////////////////////////////

@@ -15,14 +15,15 @@
  *
 */
 
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/common/Timer.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/CameraSensor.hh"
+
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
-#include "common/Timer.hh"
 #include "scans_cmp.h"
-#include "rendering/Camera.hh"
-#include "sensors/CameraSensor.hh"
 
 using namespace gazebo;
 class CameraSensor : public ServerFixture
@@ -144,8 +145,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
-  /*
-
+/*
   Load("worlds/empty_test.world");
 
   // Make sure the render engine is available.

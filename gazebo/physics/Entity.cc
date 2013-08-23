@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -30,7 +30,7 @@
 #include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/RayShape.hh"
@@ -53,11 +53,13 @@ Entity::Entity(BasePtr _parent)
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
+  this->visualMsg->set_parent_name(this->world->GetName());
   this->poseMsg = new msgs::Pose;
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
+    this->visualMsg->set_parent_name(this->parentEntity->GetScopedName());
     this->SetStatic(this->parentEntity->IsStatic());
   }
 
@@ -67,8 +69,6 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
   // TODO: put this back in
   // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
@@ -100,16 +100,19 @@ void Entity::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->GetValuePose("pose") +
+      this->worldPose = this->sdf->Get<math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->GetValuePose("pose");
+      this->worldPose = this->sdf->Get<math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->GetValuePose("pose");
+    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
   }
 
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+  else
+    this->visualMsg->set_parent_name(this->world->GetName());
+
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
@@ -339,11 +342,9 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   // also update parent model's pose
   if (this->parentEntity->HasType(MODEL))
   {
-    this->parentEntity->worldPose.pos = _pose.pos -
-      this->parentEntity->worldPose.rot.RotateVector(
-          this->initialRelativePose.pos);
-    this->parentEntity->worldPose.rot = _pose.rot *
-      this->initialRelativePose.rot.GetInverse();
+    // setting parent Model world pose from canonical link world pose
+    // where _pose is the canonical link's world pose
+    this->parentEntity->worldPose = (-this->initialRelativePose) + _pose;
 
     this->parentEntity->worldPose.Correct();
 
@@ -537,7 +538,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->GetValuePose("pose");
+  math::Pose newPose = _sdf->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);
@@ -621,6 +622,7 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
+  this->GetWorld()->GetPhysicsEngine()->InitForThread();
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 

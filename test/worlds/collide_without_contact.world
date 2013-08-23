@@ -9,7 +9,6 @@
       <link name="link">
         <pose>0 0 0.251  0 0 0</pose>
         <collision name="collision">
-          <max_contacts>1</max_contacts>
           <geometry>
             <box>
               <size>4 4 0.5</size>

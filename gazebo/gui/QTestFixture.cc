@@ -20,16 +20,24 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-#include "gazebo/physics/Physics.hh"
+#include <unistd.h>
+
+#include "gazebo/physics/PhysicsIface.hh"
+
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/util/LogRecord.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
-  : server(NULL), serverThread(NULL), residentStart(0), shareStart(0)
+  : server(NULL), serverThread(NULL),
+    resMaxPercentChange(0), shareMaxPercentChange(0),
+    residentStart(0), shareStart(0)
 {
 }
 
@@ -41,7 +49,7 @@ void QTestFixture::initTestCase()
   gazebo::common::Console::Instance()->Init("test.log");
 
   // Initialize the data logger. This will log state information.
-  gazebo::common::LogRecord::Instance()->Init("test");
+  gazebo::util::LogRecord::Instance()->Init("test");
 
   // Add local search paths
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
@@ -57,16 +65,22 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
+  this->resMaxPercentChange = 3.0;
+  this->shareMaxPercentChange = 1.0;
+
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
+  gazebo::rendering::load();
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
+void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
+    bool _serverScene, bool _clientScene)
 {
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-      boost::bind(&QTestFixture::RunServer, this, _worldFilename, _paused));
+      boost::bind(&QTestFixture::RunServer, this,
+        _worldFilename, _paused, _serverScene));
 
   // Wait for the server to come up
   // Use a 30 second timeout.
@@ -74,25 +88,34 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused)
   while ((!this->server || !this->server->GetInitialized()) &&
       ++waitCount < maxWaitCount)
     gazebo::common::Time::MSleep(10);
+
+  if (_clientScene)
+    gazebo::rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false);
 }
 
 /////////////////////////////////////////////////
-void QTestFixture::RunServer(const std::string &_worldFilename, bool _paused)
+void QTestFixture::RunServer(const std::string &_worldFilename,
+    bool _paused, bool _createScene)
 {
   this->server = new gazebo::Server();
+  this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
   this->server->Init();
 
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   this->SetPause(_paused);
+
+  if (_createScene)
+    gazebo::rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false);
 
   this->server->Run();
 
-  gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
+  if (_createScene)
+    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   this->server->Fini();
+
   delete this->server;
   this->server = NULL;
 }
@@ -106,6 +129,8 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  // gazebo::rendering::fini();
+
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
 
@@ -114,11 +139,14 @@ void QTestFixture::cleanup()
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 
-  std::cout << "REs[" << resPercentChange << "]\n";
-  std::cout << "Shared[" << sharePercentChange << "]\n";
+  std::cout << "SharePercentChange[" << sharePercentChange << "] "
+    << "ShareMaxPercentChange[" << this->shareMaxPercentChange << "]\n";
+  std::cout << "ResPercentChange[" << resPercentChange << "]"
+    << "ResMaxPercentChange[" << this->resMaxPercentChange << "]\n";
+
   // Make sure the percent change values are reasonable.
-  QVERIFY(resPercentChange < 2.5);
-  QVERIFY(sharePercentChange < 1.0);
+  QVERIFY(resPercentChange < this->resMaxPercentChange);
+  QVERIFY(sharePercentChange < this->shareMaxPercentChange);
 
   if (this->server)
   {

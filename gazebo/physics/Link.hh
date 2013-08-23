@@ -25,6 +25,10 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -35,6 +39,12 @@
 
 namespace gazebo
 {
+  namespace util
+  {
+    class OpenALSource;
+    class OpenALSink;
+  }
+
   namespace physics
   {
     class Model;
@@ -76,8 +86,9 @@ namespace gazebo
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Update the body.
-      public: virtual void Update();
+      /// \brief Update the collision.
+      /// \param[in] _info Update information.
+      public: void Update(const common::UpdateInfo &_info);
 
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
@@ -424,6 +435,13 @@ namespace gazebo
       /// \return Vector of parent Links connected by joints.
       public: Link_V GetParentJointsLinks() const;
 
+      /// \brief Enable/Disable link data publishing
+      /// \param[in] _enable True to enable publishing, false to stop publishing
+      public: void SetPublishData(bool _enable);
+
+      /// \brief Publish timestamped link data such as velocity.
+      private: void PublishData();
+
       /// \brief Load a new collision helper function.
       /// \param[in] _sdf SDF element used to load the collision.
       private: void LoadCollision(sdf::ElementPtr _sdf);
@@ -431,6 +449,10 @@ namespace gazebo
       /// \brief Set the inertial properties based on the collision
       /// entities.
       private: void SetInertialFromCollisions();
+
+      /// \brief On collision callback.
+      /// \param[in] _msg Message that contains contact information.
+      private: void OnCollision(ConstContactsPtr &_msg);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -467,6 +489,33 @@ namespace gazebo
 
       /// \brief All the attached models.
       private: std::vector<ModelPtr> attachedModels;
+
+      /// \brief Link data publisher
+      private: transport::PublisherPtr dataPub;
+
+      /// \brief Link data message
+      private: msgs::LinkData linkDataMsg;
+
+      /// \brief Event connections
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief True to publish data, false otherwise
+      private: bool publishData;
+
+      /// \brief Mutex to protect the publishData variable
+      private: boost::recursive_mutex *publishDataMutex;
+
+#ifdef HAVE_OPENAL
+      /// \brief All the audio sources
+      private: std::vector<util::OpenALSourcePtr> audioSources;
+
+      /// \brief An audio sink
+      private: util::OpenALSinkPtr audioSink;
+
+      /// \brief Subscriber to contacts with this collision. Used for audio
+      /// playback.
+      private: transport::SubscriberPtr audioContactsSub;
+#endif
     };
     /// \}
   }

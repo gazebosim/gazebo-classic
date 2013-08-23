@@ -61,7 +61,7 @@ void RFIDTag::Load(const std::string &_worldName)
   if (this->sdf->GetElement("topic"))
   {
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->GetValueString());
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 
   this->entity = this->world->GetEntity(this->parentName);
@@ -111,7 +111,7 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     // msg.set_range_min( this->GetRangeMin() );
     // msg.set_range_max( this->GetRangeMax() );
 
-    // for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    // for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
     // {
     //   msg.add_ranges(this->laserShape->GetRange(i));
     //   msg.add_intensities(0);

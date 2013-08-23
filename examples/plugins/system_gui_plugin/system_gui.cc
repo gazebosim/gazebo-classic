@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "gui/Gui.hh"
-#include "rendering/rendering.hh"
-#include "gazebo.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

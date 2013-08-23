@@ -24,7 +24,7 @@
 #include <gazebo/gazebo.hh>
 
 #include <gazebo/common/Time.hh>
-#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportIface.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
 
@@ -52,21 +52,33 @@ boost::shared_ptr<google::protobuf::Message> g_echoMsg;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cerr << "This tool lists information about published topics on a "
-            << "Gazebo master.\n"
-            << "    list         : List all topics\n"
-            << "    info <topic> : Get information about a topic\n"
-            << "    echo <topic> : Output topic data to screen\n"
-            << "    view <topic> : View topic data using a QT widget\n"
-            << "    hz <topic>   : Get publish frequency\n"
-            << "    bw <topic>   : Get topic bandwidth\n"
-            << "    help         : This help text\n";
+  std::cerr << "gztopic -- Tool to interact with gztopics on a "
+    "Gazebo master\n\n";
+
+  std::cerr << "`gztopic` <command>\n\n";
+
+  std::cerr << "List information about published topics on a "
+    "Gazebo master.\n\n";
+
+  std::cerr << "Commands:\n"
+            << "    list          List all topics.\n"
+            << "    info <topic>  Get information about a topic.\n"
+            << "    echo <topic>  Output topic data to screen.\n"
+            << "    view <topic>  View topic data using a QT widget.\n"
+            << "    hz <topic>    Get publish frequency.\n"
+            << "    bw <topic>    Get topic bandwidth.\n"
+            << "    help          This help text.\n\n";
+
+  std::cerr << "See also:\n"
+    << "Examples and more information can be found at:"
+    << "http://gazebosim.org/wiki/Tools#Topic_Info\n";
 }
 
 /////////////////////////////////////////////////
 bool parse(int argc, char **argv)
 {
-  if (argc == 1 || std::string(argv[1]) == "help")
+  if (argc == 1 || std::string(argv[1]) == "help" ||
+      std::string(argv[1]) == "-h")
   {
     help();
     return false;
@@ -112,20 +124,30 @@ transport::ConnectionPtr connect_to_master()
 
   // Connect to the master
   transport::ConnectionPtr connection(new transport::Connection());
-  connection->Connect(host, port);
 
-  // Read the verification message
-  connection->Read(data);
-  connection->Read(namespacesData);
-  connection->Read(publishersData);
-
-  packet.ParseFromString(data);
-  if (packet.type() == "init")
+  if (connection->Connect(host, port))
   {
-    msgs::GzString msg;
-    msg.ParseFromString(packet.serialized_data());
-    if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
-      std::cerr << "Conflicting gazebo versions\n";
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
   }
 
   return connection;
@@ -141,26 +163,39 @@ void list()
 
   transport::ConnectionPtr connection = connect_to_master();
 
-  request.set_id(0);
-  request.set_request("get_publishers");
-  connection->EnqueueMsg(msgs::Package("request", request), true);
-  connection->Read(data);
-
-  packet.ParseFromString(data);
-  pubs.ParseFromString(packet.serialized_data());
-
-  // This list is used to filter topic output.
-  std::list<std::string> listed;
-
-  for (int i = 0; i < pubs.publisher_size(); i++)
+  if (connection)
   {
-    const msgs::Publish &p = pubs.publisher(i);
-    if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
-    {
-      std::cout << p.topic() << std::endl;
+    request.set_id(0);
+    request.set_request("get_publishers");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
 
-      // Record the topics that have been listed to prevent duplicates.
-      listed.push_back(p.topic());
+    try
+    {
+      connection->Read(data);
+    }
+    catch(...)
+    {
+      gzerr << "An active gzserver is probably not present.\n";
+      connection.reset();
+      return;
+    }
+
+    packet.ParseFromString(data);
+    pubs.ParseFromString(packet.serialized_data());
+
+    // This list is used to filter topic output.
+    std::list<std::string> listed;
+
+    for (int i = 0; i < pubs.publisher_size(); i++)
+    {
+      const msgs::Publish &p = pubs.publisher(i);
+      if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
+      {
+        std::cout << p.topic() << std::endl;
+
+        // Record the topics that have been listed to prevent duplicates.
+        listed.push_back(p.topic());
+      }
     }
   }
 
@@ -255,7 +290,8 @@ void echo()
 
   std::string topic = params[1];
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -300,7 +336,8 @@ void bw()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -392,7 +429,8 @@ void hz()
     return;
   }
 
-  transport::init();
+  if (!transport::init())
+    return;
 
   transport::NodePtr node(new transport::Node());
   node->Init();

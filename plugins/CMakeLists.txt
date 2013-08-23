@@ -1,34 +1,30 @@
 include_directories(
-  ${PROJECT_BINARY_DIR}/gazebo
-  ${PROJECT_SOURCE_DIR}/gazebo
+  ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDF_INCLUDE_DIRS}
 )
 
-if(HAVE_URDFDOM_HEADERS)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS})
-endif(HAVE_URDFDOM_HEADERS)
-
-if(HAVE_CONSOLE_BRIDGE)
-  link_directories(
-    ${console_bridge_LIBRARY_DIRS})
-endif(HAVE_CONSOLE_BRIDGE)
+link_directories(
+  ${SDF_LIBRARY_DIRS}
+)
 
 set (plugins
   CameraPlugin
-  DepthCameraPlugin
-  GpuRayPlugin
-  ContactPlugin
   CartTestPlugin
+  ContactPlugin
+  DepthCameraPlugin
+  DiffDrivePlugin
   ForceTorquePlugin
+  GpuRayPlugin
+  JointTrajectoryPlugin
   ModelTrajectoryTestPlugin
+  MudPlugin
+  PressurePlugin
   RayPlugin
   RubblePlugin
-  SpringTestPlugin
-  DiffDrivePlugin
   SkidSteerDrivePlugin
-  JointTrajectoryPlugin
+  SonarPlugin
+  SpringTestPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})

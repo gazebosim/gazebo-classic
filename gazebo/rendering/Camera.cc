@@ -24,7 +24,8 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+// Moved to top to avoid osx compilation errors
+#include "gazebo/math/Rand.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
@@ -33,7 +34,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -166,8 +166,10 @@ Camera::~Camera()
   this->pitchNode = NULL;
   this->sceneNode = NULL;
 
-  if (this->renderTexture)
+  if (this->renderTexture && this->scene->GetInitialized())
     Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  this->renderTexture = NULL;
+  this->renderTarget = NULL;
 
   if (this->camera)
   {
@@ -177,7 +179,6 @@ Camera::~Camera()
 
   this->connections.clear();
 
-  this->sdf->Reset();
   this->imageElem.reset();
   this->sdf.reset();
 }
@@ -195,22 +196,22 @@ void Camera::Load()
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   if (imgElem)
   {
-    this->imageWidth = imgElem->GetValueInt("width");
-    this->imageHeight = imgElem->GetValueInt("height");
+    this->imageWidth = imgElem->Get<int>("width");
+    this->imageHeight = imgElem->Get<int>("height");
     this->imageFormat = this->GetOgrePixelFormat(
-        imgElem->GetValueString("format"));
+        imgElem->Get<std::string>("format"));
   }
   else
     gzthrow("Camera has no <image> tag.");
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") &&
-      this->sdf->GetElement("save")->GetValueBool("enabled"))
+      this->sdf->GetElement("save")->Get<bool>("enabled"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("save");
     std::string command;
 
-    command = "mkdir " + elem->GetValueString("path")+ " 2>>/dev/null";
+    command = "mkdir " + elem->Get<std::string>("path")+ " 2>>/dev/null";
     if (system(command.c_str()) < 0)
       gzerr << "Error making directory\n";
   }
@@ -218,10 +219,10 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->GetValueDouble();
+    double angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI)
     {
-      gzthrow("Camera horizontal field of veiw invalid.");
+      gzthrow("Camera horizontal field of view invalid.");
     }
     this->SetHFOV(angle);
   }
@@ -231,12 +232,12 @@ void Camera::Load()
   if (this->sdf->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->GetValueDouble("mean");
-      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseMean = noiseElem->Get<double>("mean");
+      this->noiseStdDev = noiseElem->Get<double>("stddev");
       this->noiseActive = true;
       this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->noiseMean, this->noiseStdDev));
@@ -278,10 +279,16 @@ void Camera::Init()
 void Camera::Fini()
 {
   if (this->gaussianNoiseCompositorListener)
+  {
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
+  }
+
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
-  this->renderTarget->removeAllViewports();
+
+  if (this->renderTarget && this->scene->GetInitialized())
+    this->renderTarget->removeAllViewports();
+
   this->connections.clear();
 }
 
@@ -312,8 +319,8 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (this->TrackVisualImpl((*iter).data()))
-        erase = true;
+      this->TrackVisualImpl((*iter).data());
+      erase = true;
     }
     else if ((*iter).request() == "attach_visual")
     {
@@ -321,7 +328,9 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       if (this->AttachToVisualImpl(msg.name(), msg.inherit_orientation(),
                                     msg.min_dist(), msg.max_dist()))
+      {
         erase = true;
+      }
     }
 
     if (erase)
@@ -354,7 +363,7 @@ void Camera::Update()
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
-      if (this->moveToPositionQueue.size() > 0)
+      if (!this->moveToPositionQueue.empty())
       {
         this->MoveToPosition(this->moveToPositionQueue[0].first,
                              this->moveToPositionQueue[0].second);
@@ -362,14 +371,48 @@ void Camera::Update()
       }
     }
   }
-
-  // TODO: this doesn't work properly
-  /*if (this->trackedVisual)
+  else if (this->trackedVisual)
   {
-    math::Pose displacement = this->trackedVisual->GetWorldPose() -
-      this->GetWorldPose();
-    this->sceneNode->translate(Conversions::Convert(displacement.pos));
-  }*/
+    math::Vector3 direction = this->trackedVisual->GetWorldPose().pos -
+                              this->GetWorldPose().pos;
+
+    double yaw = atan2(direction.y, direction.x);
+    double pitch = atan2(-direction.z,
+                         sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
+    pitch = math::clamp(pitch, 0.0, 0.25*M_PI);
+
+    double currPitch = this->GetWorldRotation().GetAsEuler().y;
+    double currYaw = this->GetWorldRotation().GetAsEuler().z;
+
+    double pitchError = currPitch - pitch;
+
+    double yawError = currYaw - yaw;
+    if (yawError > M_PI)
+      yawError -= M_PI*2;
+    if (yawError < -M_PI)
+      yawError += M_PI*2;
+
+    double pitchAdj = this->trackVisualPitchPID.Update(pitchError, 0.01);
+    double yawAdj = this->trackVisualYawPID.Update(yawError, 0.01);
+
+    this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
+          currYaw + yawAdj));
+
+    double origDistance = 8.0;
+    double distance = direction.GetLength();
+    double error = origDistance - distance;
+
+    double scaling = this->trackVisualPID.Update(error, 0.3);
+
+    math::Vector3 displacement = direction;
+    displacement.Normalize();
+    displacement *= scaling;
+
+    math::Vector3 pos = this->GetWorldPosition() + displacement;
+    pos.z = math::clamp(pos.z, 3.0, pos.z);
+
+    this->SetWorldPosition(pos);
+  }
 }
 
 
@@ -436,7 +479,7 @@ void Camera::PostRender()
     }
 
     if (this->sdf->HasElement("save") &&
-        this->sdf->GetElement("save")->GetValueBool("enabled"))
+        this->sdf->GetElement("save")->Get<bool>("enabled"))
     {
       this->SaveFrame(this->GetFrameFilename());
     }
@@ -478,6 +521,7 @@ math::Vector3 Camera::GetWorldPosition() const
   return Conversions::Convert(this->sceneNode->_getDerivedPosition());
 }
 
+//////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
   math::Vector3 sRot, pRot;
@@ -502,6 +546,9 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
     return;
 
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+
+  // The pitch nodes needs to be told to update its transform
+  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -553,9 +600,9 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    this->camera->setNearClipDistance(clipElem->GetValueDouble("near"));
-    this->camera->setFarClipDistance(clipElem->GetValueDouble("far"));
-    this->camera->setRenderingDistance(clipElem->GetValueDouble("far"));
+    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
+    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
     gzerr << "Setting clip distances failed -- no camera yet\n";
@@ -581,7 +628,7 @@ void Camera::SetHFOV(math::Angle _angle)
 //////////////////////////////////////////////////
 math::Angle Camera::GetHFOV() const
 {
-  return math::Angle(this->sdf->GetValueDouble("horizontal_fov"));
+  return math::Angle(this->sdf->Get<double>("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////
@@ -622,7 +669,7 @@ unsigned int Camera::GetImageWidth() const
   else
   {
     sdf::ElementPtr elem = this->sdf->GetElement("image");
-    width = elem->GetValueInt("width");
+    width = elem->Get<int>("width");
   }
   return width;
 }
@@ -638,7 +685,7 @@ unsigned int Camera::GetImageHeight() const
   else
   {
     sdf::ElementPtr elem = this->sdf->GetElement("image");
-    height = elem->GetValueInt("height");
+    height = elem->Get<int>("height");
   }
   return height;
 }
@@ -647,7 +694,7 @@ unsigned int Camera::GetImageHeight() const
 unsigned int Camera::GetImageDepth() const
 {
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
-  std::string imgFmt = imgElem->GetValueString("format");
+  std::string imgFmt = imgElem->Get<std::string>("format");
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
@@ -670,7 +717,7 @@ unsigned int Camera::GetImageDepth() const
 std::string Camera::GetImageFormat() const
 {
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
-  return imgElem->GetValueString("format");
+  return imgElem->Get<std::string>("format");
 }
 
 //////////////////////////////////////////////////
@@ -690,8 +737,8 @@ unsigned int Camera::GetTextureHeight() const
 size_t Camera::GetImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return this->GetImageByteSize(elem->GetValueInt("width"),
-                                elem->GetValueInt("height"),
+  return this->GetImageByteSize(elem->Get<int>("width"),
+                                elem->Get<int>("height"),
                                 this->GetImageFormat());
 }
 
@@ -753,7 +800,7 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
   elem->GetElement("path")->Set(_pathname);
 
   // Create the directory to store frames
-  if (elem->GetValueBool("enabled"))
+  if (elem->Get<bool>("enabled"))
   {
     std::string command;
     command = "mkdir -p " + _pathname + " 2>>/dev/null";
@@ -895,7 +942,7 @@ std::string Camera::GetFrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
-  std::string path = saveElem->GetValueString("path");
+  std::string path = saveElem->Get<std::string>("path");
   boost::filesystem::path pathToFile;
 
   std::string friendlyName = this->GetName();
@@ -1349,10 +1396,7 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-  {
     this->trackedVisual.reset();
-    this->camera->setAutoTracking(false, NULL);
-  }
 
   return false;
 }
@@ -1360,33 +1404,36 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 //////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(VisualPtr _visual)
 {
-  this->sceneNode->getParent()->removeChild(this->sceneNode);
+  // if (this->sceneNode->getParent())
+  //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
   if (_visual)
   {
-    this->camera->setAutoTracking(true, _visual->GetSceneNode());
+    this->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+    this->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
+
     this->trackedVisual = _visual;
   }
   else
-  {
     this->trackedVisual.reset();
-    this->camera->setAutoTracking(false, NULL);
-    // this->camera->setPosition(Ogre::Vector3(0, 0, 0));
-    // this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));
-  }
+
   return true;
 }
 
+//////////////////////////////////////////////////
 Ogre::Texture *Camera::GetRenderTexture() const
 {
   return this->renderTexture;
 }
 
+/////////////////////////////////////////////////
 math::Vector3 Camera::GetDirection() const
 {
   return Conversions::Convert(this->camera->getDerivedDirection());
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)

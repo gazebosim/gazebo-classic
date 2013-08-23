@@ -16,8 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "sensors/sensors.hh"
-#include "common/common.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/common/common.hh"
+#include "helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
 #define IMU_TOL 1e-5
@@ -58,7 +59,18 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   for (unsigned int i = 0; i < _cnt; ++i)
   {
     world->StepWorld(1);
-    _imu->Update(true);
+
+    int j = 0;
+    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+        j < 100)
+    {
+      _imu->Update(true);
+      gazebo::common::Time::MSleep(100);
+      ++j;
+    }
+
+    EXPECT_LT(j, 100);
+
     rateSum += _imu->GetAngularVelocity();
     accelSum += _imu->GetLinearAcceleration();
   }
@@ -105,17 +117,10 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldODE)
+TEST_P(ImuTest, EmptyWorld)
 {
-  Stationary_EmptyWorld("ode");
+  Stationary_EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldBullet)
-{
-  Stationary_EmptyWorld("bullet");
-}
-#endif
 
 void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 {
@@ -190,17 +195,10 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldNoiseODE)
+TEST_P(ImuTest, EmptyWorldNoise)
 {
-  Stationary_EmptyWorld_Noise("ode");
+  Stationary_EmptyWorld_Noise(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldNoiseBullet)
-{
-  Stationary_EmptyWorld_Noise("bullet");
-}
-#endif
 
 void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
@@ -275,17 +273,12 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
 }
 
-TEST_F(ImuTest, EmptyWorldBiasODE)
+TEST_P(ImuTest, EmptyWorldBias)
 {
-  Stationary_EmptyWorld_Bias("ode");
+  Stationary_EmptyWorld_Bias(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(ImuTest, EmptyWorldBiasBullet)
-{
-  Stationary_EmptyWorld_Bias("bullet");
-}
-#endif
+INSTANTIATE_PHYSICS_ENGINES_TEST(ImuTest)
 
 int main(int argc, char **argv)
 {

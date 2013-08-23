@@ -10,7 +10,16 @@
     <description>The type of joint, which must be one of the following: (revolute) a hinge joint that rotates on a single axis with either a fixed or continuous range of motion, (revolute2) same as two revolute joints connected in series, (prismatic) a sliding joint that slides along an axis with a limited range specified by upper and lower limits, (ball) a ball and socket joint, (universal), like a ball joint, but constrains one degree of freedom, (piston) similar to a Slider joint except that rotation around the translation axis is possible.</description>
   </attribute>
 
-  <element name="parent" required="1">
+  <element name="parent" type="string" default="__default__" required="1">
+    <description>Name of the parent link</description>
+  </element> <!-- End Parent -->
+
+  <element name="child" type="string" default="__default__" required="1">
+    <description>Name of the child link</description>
+  </element> <!-- End Child -->
+
+  <!-- This is new stuff for SimBody support. We need to refactor SDF a bit more to remove link poses when this change is made-->
+  <!--<element name="parent" required="1">
     <description>Parent link of the joint</description>
     <element name="link_name" type="string" default="__default__" required="1">
       <description>Name of the parent link</description>
@@ -18,7 +27,7 @@
     <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
       <description>Experimental:  alternative joint pose specification.</description>
     </element>
-  </element> <!-- End Parent -->
+  </element>
 
   <element name="child" required="1">
     <description>Child link of the joint</description>
@@ -28,7 +37,8 @@
     <element name="pose" type="Pose" default="0 0 0 0 0 0" required="0">
       <description>Experimental:  alternative joint pose specification.</description>
     </element>
-  </element> <!-- End Child -->
+  </element>
+  -->
 
   <element name="pose"  type="pose" default="0 0 0 0 0 0" required="0">
     <description>offset from child link origin in child link frame.</description>
@@ -39,7 +49,7 @@
   </element>
 
   <element name="axis" required="1">
-    <description>The joint axis specified in the model frame. This is the axis of rotation for revolute joints, the axis of translation for prismatic joints. The axis is currently specified in the model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
+    <description>The joint axis specified in the parent model frame. This is the axis of rotation for revolute joints, the axis of translation for prismatic joints. The axis is currently specified in the parent model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
     <element name="xyz" type="vector3" default="0 0 1" required="1">
       <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
     </element>
@@ -70,14 +80,14 @@
   </element> <!-- End Axis -->
 
   <element name="axis2" required="0">
-    <description>The second joint axis specified in the model frame. This is the second axis of rotation for revolute2 joints and universal joints. The axis is currently specified in the model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
+    <description>The second joint axis specified in the parent model frame. This is the second axis of rotation for revolute2 joints and universal joints. The axis is currently specified in the parent model frame of reference, but this will be changed to the joint frame in future version of sdf (see gazebo issue #494).</description>
     <element name="xyz" type="vector3" default="0 0 1" required="1">
       <description>Represents the x,y,z components of a vector. The vector should be normalized.</description>
     </element>
     <element name="dynamics" required="0">
       <description>An element specifying physical properties of the joint. These values are used to specify modeling properties of the joint, particularly useful for simulation.</description>
       <element name="damping" type="double" default="0" required="0">
-        <description>The physical velocity dependent viscous damping coefficient of the joint.</description>
+        <description>The physical velocity dependent viscous damping coefficient of the joint.  EXPERIMENTAL: if damping coefficient is negative and cfm_damping is true, adaptive damping is used.</description>
       </element>
       <element name="friction" type="double" default="0" required="0">
         <description>The physical static friction value of the joint.</description>
@@ -123,7 +133,10 @@
         <description>Scale the excess for in a joint motor at joint limits. Should be between zero and one.</description>
       </element>
       <element name="cfm" type="double" default="0" required="0">
-        <description>Constraint force mixing used when not at a stop</description>
+        <description>Constraint force mixing for constrained directions</description>
+      </element>
+      <element name="erp" type="double" default="0.2" required="0">
+        <description>Error reduction parameter for constrained directions</description>
       </element>
       <element name="bounce" type="double" default="0" required="0">
         <description>Bounciness of the limits</description>
@@ -156,4 +169,6 @@
       </element>
     </element>
   </element> <!-- End Physics -->
+
+  <include filename="sensor.sdf" required="*"/>
 </element> <!-- End Joint -->

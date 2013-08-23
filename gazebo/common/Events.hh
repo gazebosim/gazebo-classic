@@ -137,7 +137,7 @@ namespace gazebo
               static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
               {
                 // Putting in this comment so the deprecation message
-                // will be found easier: GAZEBO_DEPRECATED.
+                // will be found easier: GAZEBO_DEPRECATED(1.5).
                 gzerr << "Events::ConnectWorldUpdateStart is deprecated "
                       << "in v 1.5.0. Please use "
                       << "Events::ConnectWorldUpdateBegin\n";
@@ -230,6 +230,18 @@ namespace gazebo
       public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
               { diagTimerStop.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectSigInt(T _subscriber)
+              { return sigInt.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectSigInt(ConnectionPtr _subscriber)
+              { sigInt.Disconnect(_subscriber); }
+
       /// \brief Pause signal
       public: static EventT<void (bool)> pause;
 
@@ -238,6 +250,9 @@ namespace gazebo
 
       /// \brief Simulation stop signal
       public: static EventT<void ()> stop;
+
+      /// \brief Simulation stop signal
+      public: static EventT<void ()> sigInt;
 
       /// \brief A world has been created
       public: static EventT<void (std::string)> worldCreated;

@@ -24,6 +24,12 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+// Remove the gazebo_config and ifdefs in Gazebo 2.0
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -33,23 +39,26 @@
 
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 
 #include "test_config.h"
 
 using namespace gazebo;
 
-class ServerFixture : public testing::Test
+std::string custom_exec(std::string _cmd);
+
+class ServerFixture : public testing::TestWithParam<const char*>
 {
   protected: ServerFixture()
              {
@@ -154,11 +163,9 @@ class ServerFixture : public testing::Test
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
-               this->factoryPub->WaitForConnection();
 
                this->requestPub =
                  this->node->Advertise<msgs::Request>("~/request");
-               this->requestPub->WaitForConnection();
 
                // Wait for the world to reach the correct pause state.
                // This might not work properly with multiple worlds.
@@ -171,6 +178,8 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(100);
                ASSERT_LT(waitCount, maxWaitCount);
 
+               this->factoryPub->WaitForConnection();
+               this->requestPub->WaitForConnection();
              }
 
   protected: void RunServer(const std::string &_worldFilename)
@@ -201,6 +210,7 @@ class ServerFixture : public testing::Test
                             const std::string &_physics)
              {
                ASSERT_NO_THROW(this->server = new Server());
+               this->server->PreLoad();
                if (_physics.length())
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
                                                         _physics));
@@ -212,7 +222,7 @@ class ServerFixture : public testing::Test
                      gazebo::physics::get_world()->GetName()))
                {
                  rendering::create_scene(
-                     gazebo::physics::get_world()->GetName(), false);
+                     gazebo::physics::get_world()->GetName(), false, true);
                }
 
                this->SetPause(_paused);
@@ -222,6 +232,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }
@@ -255,7 +266,7 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(ConstPose_VPtr &_msg)
+  protected: void OnPose(ConstPosesStampedPtr &_msg)
              {
                boost::mutex::scoped_lock lock(this->receiveMutex);
                for (int i = 0; i < _msg->pose_size(); ++i)
@@ -559,6 +570,75 @@ class ServerFixture : public testing::Test
                EXPECT_LT(i, 100);
              }
 
+  protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "<collision name='parent_collision'>"
+                 << "  <pose>0 0 0.0205 0 0 0</pose>"
+                 << "  <geometry>"
+                 << "    <cylinder>"
+                 << "      <radius>0.021</radius>"
+                 << "      <length>0.029</length>"
+                 << "    </cylinder>"
+                 << "  </geometry>"
+                 << "</collision>"
+                 << "  <sensor name ='" << _raySensorName
+                 << "' type ='gpu_ray'>"
+                 << "    <ray>"
+                 << "      <scan>"
+                 << "        <horizontal>"
+                 << "          <samples>" << _samples << "</samples>"
+                 << "          <resolution> 1 </resolution>"
+                 << "          <min_angle>" << _hMinAngle << "</min_angle>"
+                 << "          <max_angle>" << _hMaxAngle << "</max_angle>"
+                 << "        </horizontal>"
+                 << "      </scan>"
+                 << "      <range>"
+                 << "        <min>" << _minRange << "</min>"
+                 << "        <max>" << _maxRange << "</max>"
+                 << "        <resolution>" << _rangeResolution <<"</resolution>"
+                 << "      </range>";
+
+               if (_noiseType.size() > 0)
+                 newModelStr << "      <noise>"
+                 << "        <type>" << _noiseType << "</type>"
+                 << "        <mean>" << _noiseMean << "</mean>"
+                 << "        <stddev>" << _noiseStdDev << "</stddev>"
+                 << "      </noise>";
+
+               newModelStr << "    </ray>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName) && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               EXPECT_LT(i, 100);
+             }
+
   protected: void SpawnImuSensor(const std::string &_modelName,
                  const std::string &_imuSensorName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -588,23 +668,32 @@ class ServerFixture : public testing::Test
                  << "    </cylinder>" << std::endl
                  << "  </geometry>" << std::endl
                  << "</collision>" << std::endl
-                 << "  <sensor name ='" << _imuSensorName << "' type ='imu'>" << std::endl
+                 << "  <sensor name ='" << _imuSensorName
+                 << "' type ='imu'>" << std::endl
                  << "    <imu>" << std::endl;
 
                if (_noiseType.size() > 0)
                  newModelStr << "      <noise>" << std::endl
                  << "        <type>" << _noiseType << "</type>" << std::endl
                  << "        <rate>" << std::endl
-                 << "          <mean>" << _rateNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _rateNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _rateBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _rateBiasStdDev << "</bias_stddev>" << std::endl
+                 << "          <mean>" << _rateNoiseMean
+                 << "</mean>" << std::endl
+                 << "          <stddev>" << _rateNoiseStdDev
+                 << "</stddev>" << std::endl
+                 << "          <bias_mean>" << _rateBiasMean
+                 << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _rateBiasStdDev
+                 << "</bias_stddev>" << std::endl
                  << "        </rate>" << std::endl
                  << "        <accel>" << std::endl
-                 << "          <mean>" << _accelNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _accelBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _accelBiasStdDev << "</bias_stddev>" << std::endl
+                 << "          <mean>" << _accelNoiseMean << "</mean>"
+                 << std::endl
+                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>"
+                 << std::endl
+                 << "          <bias_mean>" << _accelBiasMean
+                 << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _accelBiasStdDev
+                 << "</bias_stddev>" << std::endl
                  << "        </accel>" << std::endl
                  << "      </noise>" << std::endl;
 
@@ -619,12 +708,12 @@ class ServerFixture : public testing::Test
 
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < 100)
                {
-                 common::Time::MSleep(50);
+                 common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -689,6 +778,187 @@ class ServerFixture : public testing::Test
                  ++i;
                }
                EXPECT_LT(i, 100);
+             }
+
+  /// \brief Spawn an IMU sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _topic Topic to publish IMU data to
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitImuSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType,
+                 const std::string &_topic, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+               std::ostringstream shapeStr;
+               if (_collisionType == "box")
+                 shapeStr << " <box><size>1 1 1</size></box>";
+               else if (_collisionType == "cylinder")
+               {
+                 shapeStr << "<cylinder>"
+                          << "  <radius>.5</radius><length>1.0</length>"
+                          << "</cylinder>";
+               }
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>" << _static << "</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='body'>"
+                 << "  <collision name ='contact_collision'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.01</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << shapeStr.str()
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "  <sensor name='" << _sensorName << "' type='imu'>"
+                 << "    <imu>"
+                 << "      <topic>" << _topic << "</topic>"
+                 << "    </imu>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < 50)
+               {
+                 common::Time::MSleep(20);
+                 ++i;
+               }
+               EXPECT_LT(i, 50);
+             }
+
+  /// \brief Spawn an Wireless transmitter sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _essid Service set identifier (network name)
+  /// \param[in] _freq Frequency of transmission (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 const std::string &_essid,
+                 double _freq,
+                 double _power,
+                 double _gain)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>false</visualize>"
+                 << "    <transceiver>"
+                 << "      <essid>" << _essid << "</essid>"
+                 << "      <frequency>" << _freq << "</frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  /// \brief Spawn an Wireless receiver sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _minFreq Minimum frequency to be filtered (MHz)
+  /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)             
+  protected: void SpawnWirelessReceiverSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 double _minFreq,
+                 double _maxFreq,
+                 double _power,
+                 double _gain,
+                 double _sensitivity)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>true</visualize>"
+                 << "    <transceiver>"
+                 << "      <min_frequency>" << _minFreq << "</min_frequency>"
+                 << "      <max_frequency>" << _maxFreq << "</max_frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "      <sensitivity>" << _sensitivity << "</sensitivity>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  /// \brief Wait for a number of ms. and attempts until the entity is spawned
+  /// \param[in] _name Model name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilEntitySpawn(const std::string &_name,
+                                     unsigned int sleep_each,
+                                     int retries)
+             {
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < retries)
+               {
+                 common::Time::MSleep(sleep_each);
+                 ++i;
+               }
+               EXPECT_LT(i, retries);   
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -926,7 +1196,7 @@ class ServerFixture : public testing::Test
                  // Timeout of 30 seconds (3000 * 10 ms)
                  int waitCount = 0, maxWaitCount = 3000;
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
-                 std::string name = model->GetValueString("name");
+                 std::string name = model->Get<std::string>("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
                    common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);

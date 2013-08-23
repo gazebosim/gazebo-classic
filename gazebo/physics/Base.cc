@@ -43,6 +43,7 @@ Base::Base(BasePtr _parent)
 
   this->sdf.reset(new sdf::Element);
   this->sdf->AddAttribute("name", "string", "__default__", true);
+  this->name = "__default__";
 
   if (this->parent)
   {
@@ -67,21 +68,31 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  if (_sdf)
+    this->sdf = _sdf;
 
-  this->sdf = _sdf;
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+
+  if (this->sdf->HasAttribute("name"))
+    this->name = this->sdf->Get<std::string>("name");
+  else
+    this->name.clear();
+
   if (this->parent)
   {
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
+
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -132,17 +143,14 @@ void Base::SetName(const std::string &_name)
   GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
+  this->name = _name;
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
 std::string Base::GetName() const
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-
-  if (this->sdf->HasAttribute("name"))
-    return this->sdf->GetValueString("name");
-  else
-    return std::string();
+  return this->name;
 }
 
 //////////////////////////////////////////////////
@@ -301,19 +309,22 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName() const
 {
+  return this->scopedName;
+}
+
+//////////////////////////////////////////////////
+void Base::ComputeScopedName()
+{
   BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
+  this->scopedName = this->GetName();
 
   while (p)
   {
     if (p->GetParent())
-      scopedName.insert(0, p->GetName()+"::");
+      this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
-
-  return scopedName;
 }
-
 
 //////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const

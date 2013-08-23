@@ -41,7 +41,7 @@ vertex_program Gazebo/XYZPointsVS glsl
 fragment_program Gazebo/XYZPointsFS glsl
 {
   source depth_points_map.frag
-  
+
   default_params
   {
     param_named_auto width viewport_width
@@ -71,7 +71,7 @@ vertex_program Gazebo/LaserScan1stVS glsl
 fragment_program Gazebo/LaserScan1stFS glsl
 {
   source laser_1st_pass.frag
-  
+
   default_params
   {
     param_named retro float 0.0
@@ -102,7 +102,7 @@ vertex_program Gazebo/LaserScan2ndVS glsl
 fragment_program Gazebo/LaserScan2ndFS glsl
 {
   source laser_2nd_pass.frag
-  
+
   default_params
   {
     param_named tex1 int 0
@@ -150,8 +150,8 @@ material Gazebo/White
 
 		pass light
 		{
-      diffuse 1 1 1 1
-      specular .1 .1 .1 128
+			diffuse 1 1 1 1
+      			specular .1 .1 .1 128
 		}
 	}
 }
@@ -163,9 +163,9 @@ material Gazebo/FlatBlack
 		pass
 		{
 			ambient 0.1 0.1 0.1
-      diffuse 0.1 0.1 0.1
-      specular 0.01 0.01 0.01 1.0 1.0
-    }
+      			diffuse 0.1 0.1 0.1
+      			specular 0.01 0.01 0.01 1.0 1.0
+    		}
 	}
 }
 
@@ -176,8 +176,8 @@ material Gazebo/Black
 		pass
 		{
 			ambient 0 0 0 1
-			diffuse 0 0 0 1 
-      specular 0.1 0.1 0.1 1 5.0
+			diffuse 0 0 0 1
+      			specular 0.1 0.1 0.1 1 5.0
 		}
 	}
 }
@@ -189,9 +189,9 @@ material Gazebo/Red
 	{
 		pass ambient
 		{
-			ambient 1 0 0 
-      diffuse 1 0 0
-      specular 0.1 0.1 0.1 1 1
+			ambient 1 0 0
+      			diffuse 1 0 0
+			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -203,8 +203,8 @@ material Gazebo/Green
 		pass ambient
 		{
 			ambient 0 1 0
-      diffuse 0 1 0
-      specular 0.1 0.1 0.1 1 1
+			diffuse 0 1 0
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -213,12 +213,12 @@ material Gazebo/Blue
 {
 	technique
 	{
-    pass ambient
-    {
+	    pass ambient
+	    {
 			ambient 0 0 1
-      diffuse 0 0 1
-      specular 0.1 0.1 0.1 1 1
-    }
+      			diffuse 0 0 1
+      			specular 0.1 0.1 0.1 1 1
+    	    }
 	}
 }
 
@@ -229,9 +229,9 @@ material Gazebo/Yellow
 		pass ambient
 		{
 			ambient 1 1 0 1
-      diffuse 1 1 0 1
-      specular 0 0 0 0 0
-    }
+      			diffuse 1 1 0 1
+			specular 0 0 0 0 0	
+		}			
 	}
 }
 
@@ -242,8 +242,8 @@ material Gazebo/Purple
 		pass ambient
 		{
 			ambient 1 0 1
-      diffuse 1 0 1
-      specular 0.1 0.1 0.1 1 1
+      			diffuse 1 0 1
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -255,12 +255,26 @@ material Gazebo/Turquoise
 		pass ambient
 		{
 			ambient 0 1 1
-      diffuse 0 1 1
-      specular 0.1 0.1 0.1 1 1
+			diffuse 0 1 1
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
 
+material Gazebo/Orange
+{
+	technique
+	{
+		pass ambient
+		{
+			lighting on
+
+                        ambient 1 0.5088 0.0468 1
+                        diffuse 1 0.5088 0.0468 1
+                        specular 0.5 0.5 0.5 128
+		}
+	}
+}
 
 material Gazebo/WhiteGlow : Gazebo/White
 {
@@ -282,7 +296,7 @@ material Gazebo/RedGlow
       ambient 1 0 0
       diffuse 1 0 0
       emissive 1 0 0
-			specular 0 0 0 128 
+			specular 0 0 0 128
     }
 
     pass light
@@ -290,7 +304,7 @@ material Gazebo/RedGlow
       ambient 1 0 0
       diffuse 1 0 0
 			emissive 1 0 0
-			specular 1 0 0 128 
+			specular 1 0 0 128
     }
 	}
 }
@@ -319,7 +333,7 @@ material Gazebo/BlueGlow : Gazebo/Blue
   {
     pass light
     {
-      emissive 0 0 1 
+      emissive 0 0 1
     }
   }
 }
@@ -367,15 +381,15 @@ material Gazebo/TurquoiseGlowOutline
       //lighting off
 
 			diffuse 0 1 1 1
-			specular .1 .1 .1 128 
+			specular .1 .1 .1 128
     }
 
     pass ambient2
     {
       scene_blend alpha_blend
 
-			diffuse 0 1 1 
-			specular .1 .1 .1 128 
+			diffuse 0 1 1
+			specular .1 .1 .1 128
 			emissive 0 1 1
 
       polygon_mode wireframe
@@ -444,6 +458,27 @@ material Gazebo/BlueTransparent
 	}
 }
 
+material Gazebo/GreyTransparent
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 0.5 0.5 0.5 1
+      diffuse 0.5 0.5 0.5 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
 material Gazebo/YellowTransparent
 {
   technique
@@ -505,8 +540,6 @@ material Gazebo/LightOff
     }
   }
 }
-
-
 
 material Gazebo/BlueLaser
 {
@@ -637,7 +670,7 @@ material Gazebo/PioneerBody
 	{
     pass Ambient
     {
-      ambient 0.5 0 0 
+      ambient 0.5 0 0
 
 			texture_unit
 			{
@@ -647,7 +680,7 @@ material Gazebo/PioneerBody
     }
     pass DirectionalLight
     {
-      ambient 0 0 0 
+      ambient 0 0 0
       diffuse 1 0 0 1
       specular 0.5 0 0 1 10
 
@@ -659,7 +692,7 @@ material Gazebo/PioneerBody
     }
     pass PointLight
     {
-      ambient 0 0 0 
+      ambient 0 0 0
       diffuse 1 0 0 1
       specular 0.5 0 0 1 10
 
@@ -867,4 +900,20 @@ material Gazebo/GaussianCameraNoise
       }
     }
   }
+}
+
+material Gazebo/PointCloud
+{
+   technique
+   {
+      pass
+      {
+         diffuse vertexcolour
+         specular vertexcolour
+         ambient vertexcolour
+         point_size 3
+         point_sprites off
+         point_size_attenuation off
+      }
+   }
 }

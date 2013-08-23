@@ -25,7 +25,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -41,6 +41,7 @@
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
 RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   : Shape(CollisionPtr())
 {

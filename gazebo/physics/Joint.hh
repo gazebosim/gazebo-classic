@@ -23,6 +23,7 @@
 #define _JOINT_HH_
 
 #include <string>
+#include <vector>
 
 #include <boost/any.hpp>
 
@@ -160,16 +161,24 @@ namespace gazebo
       /// \brief Detach this joint from all links.
       public: virtual void Detach();
 
-      /// \brief Set the axis of rotation.
+      /// \brief Set the axis of rotation where axis is specified in local
+      /// joint frame.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Vector in world frame of axis direction
+      /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
-      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Returns the current joint damping coefficient.
+      /// \param[in] _index Index of the axis to get, currently ignored, to be
+      ///                   implemented.
+      /// \return Joint viscous damping coefficient for this joint.
+      public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();
@@ -405,27 +414,17 @@ namespace gazebo
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetLowerLimit(unsigned int _index) const
-        {
-          if (_index < this->GetAngleCount())
-            return this->lowerLimit[_index];
-
-          gzwarn << "requesting lower limit of joint index out of bound\n";
-          return math::Angle();
-        }
+      public: math::Angle GetLowerLimit(unsigned int _index) const;
 
       /// \brief:  get the joint lower limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetUpperLimit(unsigned int _index) const
-        {
-          if (_index < this->GetAngleCount())
-            return this->upperLimit[_index];
+      public: math::Angle GetUpperLimit(unsigned int _index) const;
 
-          gzwarn << "requesting upper limit of joint index out of bound\n";
-          return math::Angle();
-        }
+      /// \brief Set whether the joint should generate feedback.
+      /// \param[in] _enable True to enable joint feedback.
+      public: virtual void SetProvideFeedback(bool _enable);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -469,14 +468,8 @@ namespace gazebo
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 
-      /// \brief Joint update event.
-      private: event::EventT<void ()> jointUpdate;
-
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
-
-      /// \brief Angle used when the joint is paret of a static model.
-      private: math::Angle staticAngle;
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
@@ -505,6 +498,18 @@ namespace gazebo
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief Provide Feedback data for contact forces
+      protected: bool provideFeedback;
+
+      /// \brief Names of all the sensors attached to the link.
+      private: std::vector<std::string> sensors;
+
+      /// \brief Joint update event.
+      private: event::EventT<void ()> jointUpdate;
+
+      /// \brief Angle used when the joint is parent of a static model.
+      private: math::Angle staticAngle;
     };
     /// \}
   }

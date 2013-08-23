@@ -130,6 +130,9 @@ namespace gazebo
       /// \brief internal variable to keep track of cfm damping internals
       private: int cfmDampingState[3];
 
+      /// \brief current cfm damping for stability reasons
+      private: double dStable[3];
+
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
       private: bool dampingInitialized;
@@ -157,6 +160,9 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
 
@@ -164,14 +170,14 @@ namespace gazebo
       public: virtual double GetAttribute(const std::string &_key,
                                                 unsigned int _index);
 
+      // Documentation inherited.
+      public: virtual void SetProvideFeedback(bool _enable);
+
       /// \brief This is our ODE ID
       protected: dJointID jointId;
 
       /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
-
-      /// \brief Provide Feedback data for contact forces
-      private: bool provideFeedback;
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);

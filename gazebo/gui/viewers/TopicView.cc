@@ -15,10 +15,10 @@
  *
  */
 #include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -58,12 +58,12 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   // Create the Hz and bandwidth labels
   // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
-  QLabel *hzLabel = new QLabel("Hz: ");
+  QLabel *hzLabel = new QLabel(tr("Hz: "));
   this->hzEdit = new QLineEdit;
   this->hzEdit->setReadOnly(true);
   this->hzEdit->setFixedWidth(80);
 
-  QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+  QLabel *bandwidthLabel = new QLabel(tr("Bandwidth: "));
   this->bandwidthEdit = new QLineEdit;
   this->bandwidthEdit->setReadOnly(true);
   this->bandwidthEdit->setFixedWidth(110);
@@ -124,7 +124,7 @@ void TopicView::Update()
       }
 
       double avgDbl = 0;
-      if (this->dataTimes.size() != 0)
+      if (!this->dataTimes.empty())
         avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
 
       std::ostringstream stream;

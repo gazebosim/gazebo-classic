@@ -25,10 +25,10 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
 
@@ -199,7 +199,7 @@ namespace gazebo
       /// \param[in] _jointName Name of the joint to set.
       /// \param[in] _position Position to set the joint to.
       public: void SetJointPosition(const std::string &_jointName,
-                                    double _position);
+                                    double _position, int _index = 0);
 
       /// \brief Set the positions of a set of joints.
       /// \sa JointController::SetJointPositions.
@@ -323,6 +323,9 @@ namespace gazebo
       /// \brief All the joints in the model.
       private: Joint_V joints;
 
+      /// \brief All the links in the model.
+      private: Link_V links;
+
       /// \brief All the grippers in the model.
       private: std::vector<Gripper*> grippers;
 
@@ -343,7 +346,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
-      private: boost::recursive_mutex *updateMutex;
+      private: mutable boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;

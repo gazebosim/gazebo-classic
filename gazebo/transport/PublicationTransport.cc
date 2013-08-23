@@ -15,9 +15,9 @@
  *
 */
 
-#include "transport/TopicManager.hh"
-#include "transport/ConnectionManager.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/transport/PublicationTransport.hh"
 
 using namespace gazebo;
 using namespace transport;

@@ -22,7 +22,9 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"
@@ -47,6 +49,14 @@ namespace gazebo
 
       /// \brief Destructor
       private: virtual ~ModelDatabase();
+
+      /// \brief Start the model database.
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      public: void Start(bool _fetchImmediately = false);
+
+      /// \brief Finalize the model database.
+      public: void Fini();
 
       /// \brief Returns the the global model database URI.
       /// \return the URI.
@@ -129,11 +139,16 @@ namespace gazebo
       private: std::string GetManifestImpl(const std::string &_uri);
 
       /// \brief Used by a thread to update the model cache.
-      private: void UpdateModelCache();
+      /// \param[in] _fetchImmediately True to fetch the models without
+      /// waiting.
+      private: void UpdateModelCache(bool _fetchImmediately);
 
       /// \brief Used by ModelDatabase::UpdateModelCache,
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
+
+      /// \brief Thread to update the model cache.
+      private: boost::thread *updateCacheThread;
 
       /// \brief A dictionary of all model names indexed by their uri.
       private: std::map<std::string, std::string> modelCache;
@@ -144,11 +159,14 @@ namespace gazebo
       /// \brief Cache update mutex
       private: boost::mutex updateMutex;
 
-      /// \brief Thread to update the model cache.
-      private: boost::thread *updateCacheThread;
+      /// \brief Mutex to protect cache thread status checks.
+      private: boost::recursive_mutex startCacheMutex;
 
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;
+
+      /// \brief Condition variable for completion of one cache update.
+      private: boost::condition_variable updateCacheCompleteCondition;
 
       /// \def CallbackFunc
       /// \brief Boost function that is used to passback the model cache.
