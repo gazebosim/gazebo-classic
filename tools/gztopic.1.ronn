@@ -1,7 +1,7 @@
 gztopic -- Tool to interact with gztopics on a Gazebo master
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gztopic` <command>
 
