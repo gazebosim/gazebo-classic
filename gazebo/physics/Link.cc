@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
@@ -27,6 +23,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/Console.hh"
@@ -38,6 +35,7 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
@@ -106,6 +104,8 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
+  bool needUpdate = false;
+
   Entity::Load(_sdf);
 
   // before loading child collsion, we have to figure out of selfCollide is true
@@ -178,6 +178,55 @@ void Link::Load(sdf::ElementPtr _sdf)
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
   }
+
+#ifdef HAVE_OPENAL
+  if (_sdf->HasElement("audio_source"))
+  {
+    // bool onContact = false;
+    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
+    std::vector<std::string> collisionNames;
+
+    while (audioElem)
+    {
+      util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
+          audioElem);
+
+      std::vector<std::string> names = source->GetCollisionNames();
+      std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
+
+      audioElem = audioElem->GetNextElement("audio_source");
+      this->audioSources.push_back(source);
+    }
+
+    if (!collisionNames.empty())
+    {
+      for (std::vector<std::string>::iterator iter = collisionNames.begin();
+          iter != collisionNames.end(); ++iter)
+      {
+        (*iter) = this->GetScopedName() + "::" + (*iter);
+      }
+
+      std::string topic =
+        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+            this->GetScopedName() + "/audio_collision", collisionNames);
+      this->audioContactsSub = this->node->Subscribe(topic,
+          &Link::OnCollision, this);
+    }
+
+    needUpdate = true;
+  }
+
+  if (_sdf->HasElement("audio_sink"))
+  {
+    needUpdate = true;
+    this->audioSink = util::OpenAL::Instance()->CreateSink(
+        _sdf->GetElement("audio_sink"));
+  }
+#endif
+
+  if (needUpdate)
+    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&Link::Update, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -279,6 +328,10 @@ void Link::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
+
+#ifdef HAVE_OPENAL
+  this->audioSink.reset();
+#endif
 
   Entity::Fini();
 }
@@ -438,8 +491,24 @@ void Link::SetLaserRetro(float _retro)
 }
 
 //////////////////////////////////////////////////
-void Link::Update()
+void Link::Update(const common::UpdateInfo & /*_info*/)
 {
+#ifdef HAVE_OPENAL
+  if (this->audioSink)
+  {
+    this->audioSink->SetPose(this->GetWorldPose());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel());
+  }
+
+  // Update all the audio sources
+  for (std::vector<util::OpenALSourcePtr>::iterator iter =
+      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+  {
+    (*iter)->SetPose(this->GetWorldPose());
+    (*iter)->SetVelocity(this->GetWorldLinearVel());
+  }
+#endif
+
   // Apply our linear accel
   // this->SetForce(this->linearAccel);
 
@@ -815,10 +884,11 @@ void Link::FillMsg(msgs::Link &_msg)
 //////////////////////////////////////////////////
 void Link::ProcessMsg(const msgs::Link &_msg)
 {
-  if (_msg.id() != this->GetId())
+ /* if (_msg.id() != this->GetId())
   {
     return;
   }
+  */
 
   this->SetName(_msg.name());
 
@@ -998,5 +1068,37 @@ void Link::PublishData()
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
         this->GetWorldAngularVel());
     this->dataPub->Publish(this->linkDataMsg);
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::OnCollision(ConstContactsPtr &_msg)
+{
+  std::string collisionName1;
+  std::string collisionName2;
+  std::string::size_type pos1, pos2;
+
+  for (int i = 0; i < _msg->contact_size(); ++i)
+  {
+    collisionName1 = _msg->contact(i).collision1();
+    collisionName2 = _msg->contact(i).collision2();
+    pos1 = collisionName1.rfind("::");
+    pos2 = collisionName2.rfind("::");
+
+    GZ_ASSERT(pos1 != std::string::npos, "Invalid collision name");
+    GZ_ASSERT(pos2 != std::string::npos, "Invalid collision name");
+
+    collisionName1 = collisionName1.substr(pos1+2);
+    collisionName2 = collisionName2.substr(pos2+2);
+
+#ifdef HAVE_OPENAL
+    for (std::vector<util::OpenALSourcePtr>::iterator iter =
+        this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+    {
+      if ((*iter)->HasCollisionName(collisionName1) ||
+          (*iter)->HasCollisionName(collisionName2))
+        (*iter)->Play();
+    }
+#endif
   }
 }
