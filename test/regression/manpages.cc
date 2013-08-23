@@ -74,7 +74,7 @@ void toolTest(const std::string &_command)
   std::string ronnOut = customExec(g_mkRonn.string()
       + " " + (g_toolBinPath / _command).string());
 
-  boost::filesystem::path origRonnFilename = 
+  boost::filesystem::path origRonnFilename =
     g_toolSrcPath / (_command + ".1.ronn");
 
   std::string origRonn = readFile(origRonnFilename.string());
@@ -88,7 +88,7 @@ void serverTest(const std::string &_command)
   std::string ronnOut = customExec(g_gazeboPATH + " " + g_mkRonn.string()
       + " " + (g_serverBinPath / _command).string());
 
-  boost::filesystem::path origRonnFilename = 
+  boost::filesystem::path origRonnFilename =
     g_serverSrcPath / (_command + ".1.ronn");
 
   std::string origRonn = readFile(origRonnFilename.string());
