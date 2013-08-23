@@ -90,7 +90,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
               updateRate*now * 0.5);
 
   // Wait another 1.5 seconds
-  for (i=0; i < 15; ++i)
+  for (i = 0; i < 15; ++i)
     common::Time::MSleep(100);
 
   hokuyoMsgCount = g_hokuyoMsgCount;
