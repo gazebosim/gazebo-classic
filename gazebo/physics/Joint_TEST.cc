@@ -146,29 +146,38 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < 5; ++i)
   {
     world->StepWorld(1);
+    // Dbg joint_01 force torque :
+    //   force1 [600 -200 999.99999600000001 / 600 -1000 -200]
+    //   torque1 [749.999819 82.840868 -450.00009699999998 / 750 450 0]
+    //   force2 [-600 999.99976200000003 200.00117299999999 / -600 1000 200]
+    //   torque2 [-749.999819 -450 -82.841396000000003 / -750 -450 0]
+    // Dbg joint_12 force torque :
+    //   force1 [300 -499.99987900000002 -100.000587 / 300 -500 -100]
+    //   torque1 [249.99994000000001 150 82.841396000000003 / 250 150 0]
+    //   force2 [-300.000407 499.99963500000001 100.000587 / -300 500 100]
+    //   torque2 [-249.999818 -150.000203 -82.841396000000003 / -250 -150 0]
 
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_NEAR(wrench_01.body1Force.x,   600.0,  6.0);
-    EXPECT_NEAR(wrench_01.body1Force.y, -1000.0, 10.0);
-    EXPECT_NEAR(wrench_01.body1Force.z,  -200.0,  2.0);
+    EXPECT_NEAR(wrench_01.body1Force.y,  -200.0, 10.0);
+    EXPECT_NEAR(wrench_01.body1Force.z,  1000.0,  2.0);
     EXPECT_NEAR(wrench_01.body1Torque.x,  750.0,  7.5);
-    EXPECT_NEAR(wrench_01.body1Torque.y,  450.0,  4.5);
-    EXPECT_NEAR(wrench_01.body1Torque.z,    0.0,  0.1);
+    EXPECT_NEAR(wrench_01.body1Torque.y,    0.0,  4.5);
+    EXPECT_NEAR(wrench_01.body1Torque.z, -450.0,  0.1);
 
-    // since first link is world, these should be exact
-    EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL);
-    EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL);
-    EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL);
-    EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL);
-    EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL);
-    EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL);
+    EXPECT_NEAR(wrench_01.body2Force.x,  -600.0,  6.0);
+    EXPECT_NEAR(wrench_01.body2Force.y,  1000.0, 10.0);
+    EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  2.0);
+    EXPECT_NEAR(wrench_01.body2Torque.x, -750.0,  7.5);
+    EXPECT_NEAR(wrench_01.body2Torque.y, -450.0,  4.5);
+    EXPECT_NEAR(wrench_01.body2Torque.z,    0.0,  0.1);
 
     gzdbg << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
-          << " / 600 -1000 -200"
+          << " / 600 -200 1000"
           << "] torque1 [" << wrench_01.body1Torque
-          << " / 750 450 0"
+          << " / 750 0 450"
           << "] force2 [" << wrench_01.body2Force
           << " / -600 1000 200"
           << "] torque2 [" << wrench_01.body2Torque

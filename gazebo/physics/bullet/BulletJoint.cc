@@ -291,6 +291,16 @@ void BulletJoint::CacheForceTorque()
       // if child link does not exist, use equal and opposite
       this->wrench.body2Force = -this->wrench.body1Force;
       this->wrench.body2Torque = -this->wrench.body1Torque;
+
+      // force/torque are in parent link frame, transform them into
+      // child link(world) frame.
+      math::Pose parentToWorldTransform = this->parentLink->GetWorldPose();
+      this->wrench.body1Force =
+        parentToWorldTransform.rot.RotateVector(
+        this->wrench.body1Force);
+      this->wrench.body1Torque =
+        parentToWorldTransform.rot.RotateVector(
+        this->wrench.body1Torque);
     }
   }
   else
@@ -305,6 +315,16 @@ void BulletJoint::CacheForceTorque()
       // if parentLink does not exist, use equal opposite body1 wrench
       this->wrench.body1Force = -this->wrench.body2Force;
       this->wrench.body1Torque = -this->wrench.body2Torque;
+
+      // force/torque are in child link frame, transform them into
+      // parent link frame.  Here, parent link is world, so zero transform.
+      math::Pose childToWorldTransform = this->childLink->GetWorldPose();
+      this->wrench.body1Force =
+        childToWorldTransform.rot.RotateVector(
+        this->wrench.body1Force);
+      this->wrench.body1Torque =
+        childToWorldTransform.rot.RotateVector(
+        this->wrench.body1Torque);
     }
   }
   this->wrench = this->wrench - wrenchAppliedWorld;
