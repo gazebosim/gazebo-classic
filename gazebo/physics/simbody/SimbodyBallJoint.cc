@@ -60,31 +60,6 @@ void SimbodyBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////
-void SimbodyBallJoint::Attach(LinkPtr _one, LinkPtr _two)
-{
-  BallJoint<SimbodyJoint>::Attach(_one, _two);
-
-  SimbodyLinkPtr simbodyChildLink =
-    boost::shared_static_cast<SimbodyLink>(this->childLink);
-  SimbodyLinkPtr simbodyParentLink =
-    boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-  if (!simbodyChildLink || !simbodyParentLink)
-    gzthrow("Requires simbody bodies");
-
-  math::Vector3 pivotA, pivotB;
-
-  // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos + this->childLink->GetWorldPose().pos
-                           - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos;
-
-  // Add the joint to the world
-
-  // Allows access to impulse
-}
-
 /////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {

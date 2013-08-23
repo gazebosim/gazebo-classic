@@ -17,6 +17,20 @@
           <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </ode>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>250</iters>
+          <sor>1.400000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </bullet>
       <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
@@ -138,6 +152,7 @@
       </link>
       <joint name="joint1" type="revolute">
         <physics>
+          <provide_feedback>true</provide_feedback>
           <ode>
             <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>
@@ -161,6 +176,7 @@
       </joint>
       <joint name="joint2" type="revolute">
         <physics>
+          <provide_feedback>true</provide_feedback>
           <ode>
             <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>

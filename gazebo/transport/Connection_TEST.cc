@@ -44,7 +44,8 @@ TEST(Connection, IPWhiteList)
   connection = NULL;
 
   // Restore value
-  setenv("GAZEBO_IP_WHITE_LIST", ipEnv, 1);
+  if (ipEnv)
+    setenv("GAZEBO_IP_WHITE_LIST", ipEnv, 1);
 }
 
 int main(int argc, char **argv)

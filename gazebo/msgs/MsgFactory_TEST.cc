@@ -83,7 +83,7 @@ TEST(MsgFactory, AllTypes)
   gazebo::msgs::MsgFactory::GetMsgTypes(types);
   std::string protoCount = custom_exec(std::string("ls ") +
       PROJECT_SOURCE_PATH + "/gazebo/msgs/*.proto | wc -l");
-  boost::trim_right(protoCount);
+  boost::trim(protoCount);
 
   EXPECT_EQ(boost::lexical_cast<size_t>(protoCount), types.size());
 }

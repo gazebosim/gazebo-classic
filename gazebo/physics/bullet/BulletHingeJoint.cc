@@ -165,6 +165,9 @@ void BulletHingeJoint::Init()
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -212,12 +215,6 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////

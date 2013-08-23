@@ -19,153 +19,23 @@
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
-#define NUMERICAL_TOL 1e-8
 using namespace gazebo;
 
 class PhysicsTest : public ServerFixture
 {
   public: void InelasticCollision(const std::string &_physicsEngine);
   public: void EmptyWorld(const std::string &_physicsEngine);
-  public: void JointDamping(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
+  public: void JointDampingTest(const std::string &_physicsEngine);
+  public: void DropStuff(const std::string &_physicsEngine);
 };
-
-void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
-{
-  // check conservation of mementum for linear inelastic collision
-  Load("worlds/collision_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
-
-  int i = 0;
-  while (!this->HasEntity("sphere") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-
-  if (i > 20)
-    gzthrow("Unable to get sphere");
-
-  {
-    // todo: get parameters from drop_test.world
-    double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
-
-    physics::ModelPtr box_model = world->GetModel("box");
-    physics::LinkPtr box_link = box_model->GetLink("link");
-    double f = 1000.0;
-    double v = 0;
-    double x = 0;
-    double m = box_link->GetInertial()->GetMass();
-
-    int steps = test_duration/dt;
-
-    for (int i = 0; i < steps; ++i)
-    {
-      double t = world->GetSimTime().Double();
-
-      world->StepWorld(1);  // theoretical contact, but
-      {
-        if (box_model)
-        {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
-
-          gzdbg << "box time [" << t
-               << "] sim x [" << pose.pos.x
-               << "] ideal x [" << x
-               << "] sim vx [" << vel.x
-               << "] ideal vx [" << v
-               << "]\n";
-
-          if (i == 0)
-            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
-
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
-
-        }
-
-        physics::ModelPtr sphere_model = world->GetModel("sphere");
-        if (sphere_model)
-        {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          gzdbg << "sphere time [" << world->GetSimTime().Double()
-               << "] sim x [" << pose.pos.x
-               << "] ideal x [" << x
-               << "] sim vx [" << vel.x
-               << "] ideal vx [" << v
-               << "]\n";
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else if (t <= 1.00)
-          {
-            // no collision
-            EXPECT_EQ(pose.pos.x, 2);
-            EXPECT_EQ(vel.x, 0);
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
-        }
-      }
-
-/*
-      // integrate here to see when the collision should happen
-      double impulse = dt*f;
-      if (i == 0) v = v + impulse;
-      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
-      x = x + dt * v;
-*/
-
-      // integrate here to see when the collision should happen
-      double vold = v;
-      if (i == 0) v = vold + dt* (f / m);
-      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
-      x = x + dt * (v + vold) / 2.0;
-    }
-  }
-}
-TEST_F(PhysicsTest, InelasticCollisionODE)
-{
-  InelasticCollision("ode");
-}
-
-#ifdef HAVE_BULLET
-/// \TODO: bullet collision parameters needs tweaking
-// TEST_F(PhysicsTest, InelasticCollisionBullet)
-// {
-//   InelasticCollision("bullet");
-// }
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, InelasticCollisionSimbody)
-{
-  InelasticCollision("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 ////////////////////////////////////////////////////////////////////////
 // EmptyWorld:
@@ -199,24 +69,10 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(PhysicsTest, EmptyWorldODE)
+TEST_P(PhysicsTest, EmptyWorld)
 {
-  EmptyWorld("ode");
+  EmptyWorld(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, EmptyWorldBullet)
-{
-  EmptyWorld("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, EmptyWorldSimbody)
-{
-  EmptyWorld("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDrop:
@@ -325,8 +181,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_NEAR(vel1.x, 0, NUMERICAL_TOL);
-      EXPECT_NEAR(vel1.y, 0, NUMERICAL_TOL);
+      EXPECT_EQ(vel1.x, 0);
+      EXPECT_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
@@ -418,24 +274,10 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropODE)
+TEST_P(PhysicsTest, SpawnDrop)
 {
-  SpawnDrop("ode");
+  SpawnDrop(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropBullet)
-{
-  SpawnDrop("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, SpawnDropSimbody)
-{
-  SpawnDrop("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 ////////////////////////////////////////////////////////////////////////
 // SpawnDropCoGOffset:
@@ -710,24 +552,10 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SpawnDropCoGOffsetODE)
+TEST_P(PhysicsTest, SpawnDropCoGOffset)
 {
-  SpawnDropCoGOffset("ode");
+  SpawnDropCoGOffset(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SpawnDropCoGOffsetBullet)
-{
-  SpawnDropCoGOffset("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, SpawnDropCoGOffsetSimbody)
-{
-  SpawnDropCoGOffset("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
@@ -1029,7 +857,6 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         if (link)
         {
           // Disable gravity for links.
-          gzerr << "physics SetGravityMode\n";
           link->SetGravityMode(false);
         }
         else
@@ -1045,7 +872,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       {
         // Detach upper_joint.
         // joint->Detach();
-        // freeze joint limit instead
+        // Simbody and DART will not easily detach joints, freeze joint limit instead
         math::Angle curAngle = joint->GetAngle(0u);
         joint->SetLowStop(0, curAngle);
         joint->SetHighStop(0, curAngle);
@@ -1153,28 +980,14 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, RevoluteJointODE)
+TEST_P(PhysicsTest, RevoluteJoint)
 {
-  RevoluteJoint("ode");
+  RevoluteJoint(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, RevoluteJointBullet)
-{
-  RevoluteJoint("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, RevoluteJointSimbody)
-{
-  RevoluteJoint("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-TEST_F(PhysicsTest, State)
-{
-  /// \TODO: Redo state test
+/// \TODO: Redo state test
+// TEST_F(PhysicsTest, State)
+// {
   /*
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
@@ -1232,9 +1045,9 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
-}
+// }
 
-void PhysicsTest::JointDamping(const std::string &_physicsEngine)
+void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
@@ -1278,35 +1091,267 @@ void PhysicsTest::JointDamping(const std::string &_physicsEngine)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    EXPECT_NEAR(vel.y, -10.2007, PHYSICS_TOL);
-    EXPECT_NEAR(vel.z, -6.51766, PHYSICS_TOL);
+    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
     EXPECT_NEAR(pose.pos.x, 3.0, PHYSICS_TOL);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
-    EXPECT_NEAR(pose.pos.z, 10.101, PHYSICS_TOL);
-    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567336, PHYSICS_TOL);
+    EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().y, 0.0, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().z, 0.0, PHYSICS_TOL);
   }
 }
 
-TEST_F(PhysicsTest, JointDampingODE)
+TEST_P(PhysicsTest, JointDampingTest)
 {
-  JointDamping("ode");
+  JointDampingTest(GetParam());
+}
+
+void PhysicsTest::DropStuff(const std::string &_physicsEngine)
+{
+  Load("worlds/drop_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("cylinder") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get cylinder");
+
+  {
+    // todo: get parameters from drop_test.world
+    double test_duration = 1.5;
+    double z = 10.5;
+    double v = 0.0;
+    double g = -10.0;
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+
+    // world->StepWorld(1428);  // theoretical contact, but
+    // world->StepWorld(100);  // integration error requires few more steps
+
+    int steps = test_duration/dt;
+    bool post_contact_correction = false;
+
+    for (int i = 0; i < steps; ++i)
+    {
+      // integrate here to see when the collision should happen
+      v = v + dt * g;
+      z = z + dt * v;
+
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        physics::ModelPtr box_model = world->GetModel("box");
+        if (box_model)
+        {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
+          math::Pose pose = box_model->GetWorldPose();
+          // gzdbg << "box time [" << world->GetSimTime().Double()
+          //      << "] sim z [" << pose.pos.z
+          //      << "] exact z [" << z
+          //      << "] sim vz [" << vel.z
+          //      << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_LT(fabs(vel.z - v) , 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z) , 0.0001);
+          }
+          else
+          {
+            EXPECT_LT(fabs(vel.z), 0.0101);  // sometimes -0.01, why?
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+          }
+        }
+
+        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        if (sphere_model)
+        {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          math::Pose pose = sphere_model->GetWorldPose();
+          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          //       << "] sim z [" << pose.pos.z
+          //       << "] exact z [" << z
+          //       << "] sim vz [" << vel.z
+          //       << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_LT(fabs(vel.z - v), 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z), 0.0001);
+          }
+          else
+          {
+            EXPECT_LT(fabs(vel.z), 3e-5);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+          }
+        }
+
+        physics::ModelPtr cylinder_model = world->GetModel("cylinder");
+        if (cylinder_model)
+        {
+          math::Vector3 vel = cylinder_model->GetWorldLinearVel();
+          math::Pose pose = cylinder_model->GetWorldPose();
+          // gzdbg << "cylinder time [" << world->GetSimTime().Double()
+          //       << "] sim z [" << pose.pos.z
+          //       << "] exact z [" << z
+          //       << "] sim vz [" << vel.z
+          //       << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_LT(fabs(vel.z - v), 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z), 0.0001);
+          }
+          else
+          {
+            EXPECT_LT(fabs(vel.z), 0.011);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
+          }
+        }
+      }
+      if (z < 0.5) post_contact_correction = true;
+    }
+  }
+}
+
+// This test doesn't pass yet in Bullet
+TEST_F(PhysicsTest, DropStuff)
+{
+  DropStuff("ode");
+}
+
+void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
+{
+  // check conservation of mementum for linear inelastic collision
+  Load("worlds/collision_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("sphere") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get sphere");
+
+  {
+    // todo: get parameters from drop_test.world
+    double test_duration = 1.1;
+    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+
+    physics::ModelPtr box_model = world->GetModel("box");
+    physics::LinkPtr box_link = box_model->GetLink("link");
+    double f = 1000.0;
+    double v = 0;
+    double x = 0;
+    double m = box_link->GetInertial()->GetMass();
+
+    int steps = test_duration/dt;
+
+    for (int i = 0; i < steps; ++i)
+    {
+      double t = world->GetSimTime().Double();
+
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        if (box_model)
+        {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
+          math::Pose pose = box_model->GetWorldPose();
+
+          gzdbg << "box time [" << t
+               << "] sim x [" << pose.pos.x
+               << "] ideal x [" << x
+               << "] sim vx [" << vel.x
+               << "] ideal vx [" << v
+               << "]\n";
+
+          if (i == 0)
+            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+
+          if (t > 1.000 && t < 1.01)
+          {
+            // collision transition, do nothing
+          }
+          else
+          {
+            // collision happened
+            EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
+          }
+
+        }
+
+        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        if (sphere_model)
+        {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          math::Pose pose = sphere_model->GetWorldPose();
+          gzdbg << "sphere time [" << world->GetSimTime().Double()
+               << "] sim x [" << pose.pos.x
+               << "] ideal x [" << x
+               << "] sim vx [" << vel.x
+               << "] ideal vx [" << v
+               << "]\n";
+          if (t > 1.000 && t < 1.01)
+          {
+            // collision transition, do nothing
+          }
+          else if (t <= 1.00)
+          {
+            // no collision
+            EXPECT_EQ(pose.pos.x, 2);
+            EXPECT_EQ(vel.x, 0);
+          }
+          else
+          {
+            // collision happened
+            EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
+          }
+        }
+      }
+
+/*
+      // integrate here to see when the collision should happen
+      double impulse = dt*f;
+      if (i == 0) v = v + impulse;
+      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      x = x + dt * v;
+*/
+
+      // integrate here to see when the collision should happen
+      double vold = v;
+      if (i == 0) v = vold + dt* (f / m);
+      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      x = x + dt * (v + vold) / 2.0;
+    }
+  }
+}
+
+TEST_F(PhysicsTest, InelasticCollisionTestODE)
+{
+  InelasticCollisionTest("ode");
 }
 
 #ifdef HAVE_BULLET
-/// \TODO: not yet implemeneted in Bullet
-// TEST_F(PhysicsTest, JointDampingBullet)
+/// \TODO: bullet collision parameters needs tweaking
+// TEST_F(PhysicsTest, InelasticCollisionBullet)
 // {
-//   JointDamping("bullet");
+//   InelasticCollision("bullet");
 // }
 #endif  // HAVE_BULLET
 
 #ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, JointDampingSimbody)
+TEST_F(PhysicsTest, InelasticCollisionSimbody)
 {
-  JointDamping("simbody");
+  InelasticCollision("simbody");
 }
 #endif  // HAVE_SIMBODY
 
@@ -1457,24 +1502,10 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, SimplePendulumODE)
+TEST_P(PhysicsTest, SimplePendulum)
 {
-  SimplePendulum("ode");
+  SimplePendulum(GetParam());
 }
-
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, SimplePendulumBullet)
-{
-  SimplePendulum("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, SimplePendulumSimbody)
-{
-  SimplePendulum("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 ////////////////////////////////////////////////////////////////////////
 // CollisionFiltering:
@@ -1578,26 +1609,10 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PhysicsTest, CollisionFilteringODE)
+TEST_P(PhysicsTest, CollisionFiltering)
 {
-  CollisionFiltering("ode");
+  CollisionFiltering(GetParam());
 }
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-TEST_F(PhysicsTest, CollisionFilteringBullet)
-{
-  CollisionFiltering("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, CollisionFilteringSimbody)
-{
-  CollisionFiltering("simbody");
-}
-#endif  // HAVE_SIMBODY
-
 
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
@@ -1613,6 +1628,8 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model);
 }
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
 
 int main(int argc, char **argv)
 {

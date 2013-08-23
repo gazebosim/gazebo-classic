@@ -112,6 +112,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
+  // Joint force and torque feedback
+  if (_sdf->HasElement("physics"))
+  {
+    sdf::ElementPtr physics_elem = _sdf->GetElement("physics");
+    if (physics_elem->HasElement("provide_feedback"))
+    {
+      this->SetProvideFeedback(physics_elem->Get<bool>("provide_feedback"));
+    }
+  }
+
   sdf::ElementPtr parentElem = _sdf->GetElement("parent");
   sdf::ElementPtr childElem = _sdf->GetElement("child");
 
@@ -195,7 +205,15 @@ void Joint::LoadImpl(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
-  this->Attach(this->parentLink, this->childLink);
+  try
+  {
+    this->Attach(this->parentLink, this->childLink);
+  }
+  catch(...)
+  {
+    gzerr << "Attach joint failed" << std::endl;
+    return;
+  }
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
@@ -262,9 +280,7 @@ void Joint::Init()
     this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
   }
 
-  // \TODO: this requres Joint::GetGlobalAxis, which breaks Simbody's
-  // Init order, state has not been created yet.
-  // this->ComputeInertiaRatio();
+  this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////

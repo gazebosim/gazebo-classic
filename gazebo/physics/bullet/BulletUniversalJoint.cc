@@ -45,9 +45,9 @@ BulletUniversalJoint::~BulletUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletUniversalJoint::Init()
 {
-  UniversalJoint<BulletJoint>::Attach(_one, _two);
+  UniversalJoint<BulletJoint>::Init();
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -76,6 +76,9 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   // Allows access to impulse
   this->bulletUniversal->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -96,12 +99,6 @@ math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
   btVector3 axis = this->bulletUniversal->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
-}
-
-//////////////////////////////////////////////////
-void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////

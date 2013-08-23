@@ -57,4 +57,20 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
   // the pose change all the way back to bullet.
   // \TODO: consider using the dirtyPose mechanism employed by ODE.
   this->link->SetWorldPose(pose, false);
+
+  // below is inefficient as we end up double caching for some joints
+  // should consider adding a "dirty" flag.
+  // or trying doing this during BulletPhysics::InternalTickCallback(...)
+  Joint_V parentJoints = this->link->GetParentJoints();
+  for (unsigned int j = 0; j < parentJoints.size(); ++j)
+  {
+    JointPtr joint = parentJoints[j];
+    joint->CacheForceTorque();
+  }
+  Joint_V childJoints = this->link->GetChildJoints();
+  for (unsigned int j = 0; j < childJoints.size(); ++j)
+  {
+    JointPtr joint = childJoints[j];
+    joint->CacheForceTorque();
+  }
 }

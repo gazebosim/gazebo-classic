@@ -28,6 +28,7 @@ set (sources
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
+  SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
   Time.cc
@@ -61,6 +62,7 @@ set (headers
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
+  SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -89,6 +91,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
@@ -125,9 +128,13 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
-  rt
   pthread
 )
+
+if (NOT APPLE)
+  # rt is used for clock_gettime, which is not available on apple
+  target_link_libraries(gazebo_common rt)
+endif()
 
 if (HAVE_SDF)
   target_link_libraries(gazebo_common ${SDF_LIBRARIES})
