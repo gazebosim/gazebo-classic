@@ -103,7 +103,7 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
   EXPECT_EQ("GzTest", sensor->GetESSID());
   EXPECT_DOUBLE_EQ(sensor->GetFreq(), 2442.0);
   EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
-  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.5);
+  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.6);
 
   EXPECT_TRUE(sensor->IsActive());
 }
