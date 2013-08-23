@@ -53,6 +53,8 @@ namespace gazebo
     ///  \li sensors::ContactSensor
     ///  \li sensors::RFIDSensor
     ///  \li sensors::RFIDTag
+    ///  \li sensors::WirelessTransmitter
+    ///  \li sensors::WirelessReceiver
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
