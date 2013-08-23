@@ -1842,20 +1842,24 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
-      CameraVisualPtr cameraVis(new CameraVisual(
-            _msg->name()+"_GUIONLY_camera_vis", parentVis));
+      Visual_M::iterator iter = this->visuals.find(_msg->id());
+      if (iter == this->visuals.end())
+      {
+        CameraVisualPtr cameraVis(new CameraVisual(
+              _msg->name()+"_GUIONLY_camera_vis", parentVis));
 
-      // need to call AttachVisual in order for cameraVis to be added to
-      // parentVis' children list so that it can be properly deleted.
-      parentVis->AttachVisual(cameraVis);
+        // need to call AttachVisual in order for cameraVis to be added to
+        // parentVis' children list so that it can be properly deleted.
+        parentVis->AttachVisual(cameraVis);
 
-      cameraVis->SetPose(msgs::Convert(_msg->pose()));
+        cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
-      cameraVis->SetId(_msg->id());
-      cameraVis->Load(_msg->camera().image_size().x(),
-                      _msg->camera().image_size().y());
+        cameraVis->SetId(_msg->id());
+        cameraVis->Load(_msg->camera().image_size().x(),
+            _msg->camera().image_size().y());
 
-      this->visuals[cameraVis->GetId()] = cameraVis;
+        this->visuals[cameraVis->GetId()] = cameraVis;
+      }
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&

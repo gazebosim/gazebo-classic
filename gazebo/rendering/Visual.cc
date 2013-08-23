@@ -21,6 +21,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -1315,11 +1316,16 @@ void Visual::SetRotation(const math::Quaternion &_rot)
   GZ_ASSERT(this->sceneNode, "Visual SceneNode is NULL");
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+
+  if (this->GetName().find("_GUIONLY_camera_vis") != std::string::npos)
+    std::cout << "Vis::SetRotation GUIONLY VIs[" << _rot.GetAsEuler() << "]\n";
 }
 
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
+  if (dynamic_cast<CameraVisual*>(this))
+    std::cout << "SetPose[" << _pose << "]\n";
   this->SetPosition(_pose.pos);
   this->SetRotation(_pose.rot);
 }
@@ -1362,6 +1368,8 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
   this->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
+  if (this->GetName().find("_GUIONLY_camera_vis") != std::string::npos)
+    std::cout << "GUIONLY VIs[" << _q.GetAsEuler() << "]\n";
 }
 
 //////////////////////////////////////////////////

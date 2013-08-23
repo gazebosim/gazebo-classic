@@ -128,8 +128,13 @@ void CameraSensor::Init()
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
+    std::cout << "Camera attach to visual.\n";
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
+    //this->camera->Update();
+    std::cout << "Sensor Pose[" << cameraPose << "]\n";
+    // this->camera->SetWorldPose(cameraPose);
   }
   else
     gzerr << "No world name\n";
