@@ -113,7 +113,7 @@ TEST_P(PR2Test, StaticPR2)
   StaticPR2(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(PR2Test);
+INSTANTIATE_PHYSICS_ENGINES_TEST(PR2Test)
 
 int main(int argc, char **argv)
 {
