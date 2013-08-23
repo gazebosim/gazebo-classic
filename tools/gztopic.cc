@@ -59,7 +59,7 @@ void help(po::options_description &_options)
   std::cerr << "gztopic -- Tool to interact with gztopics on a "
     "Gazebo master\n\n";
 
-  std::cerr << "`gztopic` <command>\n\n";
+  std::cerr << "`gztopic` [options] <command>\n\n";
 
   std::cerr << "List information about published topics on a "
     "Gazebo master.\n\n";

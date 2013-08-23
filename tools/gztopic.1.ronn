@@ -3,7 +3,7 @@ gztopic -- Tool to interact with gztopics on a Gazebo master
 
 ## SYNOPSIS
 
-`gztopic` <command>
+`gztopic` [options] <command>
 
 ## DESCRIPTION
 
