@@ -71,6 +71,8 @@ TEST_F(WirelessReceiver_TEST, CreateWirelessReceiver)
 
   EXPECT_DOUBLE_EQ(sensor->GetMinFreqFiltered(), 2412.0);
   EXPECT_DOUBLE_EQ(sensor->GetMaxFreqFiltered(), 2484.0);
+  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.5);
   EXPECT_DOUBLE_EQ(sensor->GetSensitivity(), -90);
 
   EXPECT_TRUE(sensor->IsActive());

@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-#include <boost/algorithm/string/replace.hpp>
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -49,6 +48,8 @@ static std::string transmitterSensorString =
 "  </sensor>"
 "</sdf>";
 
+/////////////////////////////////////////////////
+/// \brief Constructor spawns a transmitter sensor
 WirelessTransmitter_TEST::WirelessTransmitter_TEST()
 {
   Load("worlds/empty.world");
@@ -56,10 +57,13 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTransmitter";
   std::string txEssid = "GzTest";
+  double freq = 2442.0;
+  double power = 14.5;
+  double gain = 2.6;
   math::Pose txPose(math::Vector3(0.0, 0.0, 0.055), math::Quaternion(0, 0, 0));
 
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), txEssid, 2442.0, 14.5, 2.6);
+      txPose.rot.GetAsEuler(), txEssid, freq, power, gain);
 
   this->tx = boost::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txSensorName));
@@ -68,7 +72,7 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
 }
 
 /////////////////////////////////////////////////
-/// \brief Test Creation of a wireless transmitter sensor
+/// \brief Test creation of a wireless transmitter sensor
 void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
 {
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -98,29 +102,32 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
 
   EXPECT_EQ("GzTest", sensor->GetESSID());
   EXPECT_DOUBLE_EQ(sensor->GetFreq(), 2442.0);
+  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.5);
 
   EXPECT_TRUE(sensor->IsActive());
 }
 
 /////////////////////////////////////////////////
-/// \brief Test Creation of a wireless transmitter sensor with an empty ESSID
+/// \brief Test the signal strength function
 void WirelessTransmitter_TEST::TestSignalStrength()
 {
   int samples = 100;
   double signalStrengthAvg = 0.0;
   math::Pose txPose2(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
 
-
+  // Take some samples and get the average signal strength
   for (int i = 0; i < samples; ++i)
   {
     signalStrengthAvg += tx->GetSignalStrength(txPose2, tx->GetGain());
   }
   signalStrengthAvg /= samples;
-  std::cout << signalStrengthAvg << std::endl;
 
-  EXPECT_NEAR(signalStrengthAvg, -62.0, 5.0);
+  EXPECT_NEAR(signalStrengthAvg, -62.0, this->tx->ModelStdDesv);
 }
 
+/////////////////////////////////////////////////
+/// \brief Callback executed for every propagation grid message received
 /////////////////////////////////////////////////
 void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 {
@@ -131,7 +138,7 @@ void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-/// \brief Test Creation of a wireless transmitter sensor with an empty ESSID
+/// \brief Test the publication of the propagation grid used for visualization
 void WirelessTransmitter_TEST::TestUpdateImpl()
 {
   // Initialize gazebo transport layer
@@ -143,10 +150,11 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
   transport::SubscriberPtr sub = node->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
+  // Make sure that the sensor is updated and some messages are published
   for (int i = 0; i < 10; ++i)
   {
     this->tx->Update(true);
-    common::Time::MSleep(100); 
+    common::Time::MSleep(100);
   }
 
   boost::mutex::scoped_lock lock(this->mutex);
