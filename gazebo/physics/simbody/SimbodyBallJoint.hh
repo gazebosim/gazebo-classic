@@ -46,6 +46,9 @@ namespace gazebo
       /// \brief Get joint's anchor point
       public: math::Vector3 GetAnchor(int _index) const;
 
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int _index, double _damping);
+
       /// \brief Set joint's anchor point
       public: void SetAnchor(int _index, const math::Vector3 &_anchor);
 

@@ -49,6 +49,12 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void SimbodyHinge2Joint::Init()
+{
+  gzerr << "Not implemented";
+}
+
+//////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetAnchor(int /*index*/) const
 {
   gzerr << "Not implemented";

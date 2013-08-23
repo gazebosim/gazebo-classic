@@ -41,6 +41,12 @@ SimbodyBallJoint::~SimbodyBallJoint()
 {
 }
 
+/////////////////////////////////////////////////
+void SimbodyBallJoint::Init()
+{
+  gzerr << "Not implemented\n";
+}
+
 //////////////////////////////////////////////////
 math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 {

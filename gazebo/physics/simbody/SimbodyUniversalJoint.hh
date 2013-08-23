@@ -47,6 +47,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Init();
 
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int _index, double _damping);
+
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 

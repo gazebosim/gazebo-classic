@@ -50,21 +50,9 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
+void SimbodyScrewJoint::Init()
 {
-  ScrewJoint<SimbodyJoint>::Attach(_one, _two);
-
-  SimbodyLinkPtr simbodyChildLink =
-    boost::shared_static_cast<SimbodyLink>(this->childLink);
-  SimbodyLinkPtr simbodyParentLink =
-    boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-  if (!simbodyChildLink || !simbodyParentLink)
-    gzthrow("Requires simbody bodies");
-
-  // Add the joint to the world
-
-  // Allows access to impulse
+  gzerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
