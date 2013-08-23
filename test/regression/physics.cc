@@ -1218,9 +1218,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 }
 
 // This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, DropStuff)
+TEST_P(PhysicsTest, DropStuff)
 {
-  DropStuff("ode");
+  DropStuff(GetParam());
 }
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
@@ -1335,25 +1335,10 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, InelasticCollisionTestODE)
+TEST_P(PhysicsTest, InelasticCollision)
 {
-  InelasticCollisionTest("ode");
+  InelasticCollision(GetParam());
 }
-
-#ifdef HAVE_BULLET
-/// \TODO: bullet collision parameters needs tweaking
-// TEST_F(PhysicsTest, InelasticCollisionBullet)
-// {
-//   InelasticCollision("bullet");
-// }
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_SIMBODY
-TEST_F(PhysicsTest, InelasticCollisionSimbody)
-{
-  InelasticCollision("simbody");
-}
-#endif  // HAVE_SIMBODY
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
