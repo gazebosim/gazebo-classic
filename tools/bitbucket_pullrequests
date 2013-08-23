@@ -47,10 +47,10 @@ class BitbucketPullRequests
 
   def prettyPrintSummary(pr)
     output = ""
-    output += pr["id"].to_s
-    output += "\t"+pr["source"]["commit"]["sha"]
-    output += "\t"+pr["destination"]["commit"]["sha"]
-    output += "\t"+pr["source"]["branch"]["name"]
+    output += pr["id"].to_s.rjust(5, ' ')
+    output += "    "+pr["source"]["commit"]["sha"]
+    output += "    "+pr["destination"]["commit"]["sha"]
+    output += "    "+pr["source"]["branch"]["name"]
     output += "\n"
     return output
   end
