@@ -304,6 +304,15 @@ void SimbodyPhysics::UpdatePhysics()
       this->world->dirtyPoses.push_back(
         boost::shared_static_cast<Entity>(*lx).get());
     }
+
+    physics::Joint_V joints = (*mi)->GetJoints();
+    for (physics::Joint_V::iterator jx = joints.begin();
+         jx != joints.end(); ++jx)
+    {
+      SimbodyJointPtr simbodyJoint =
+        boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+      simbodyJoint->CacheForceTorque();
+    }
   }
 
   // FIXME:  this needs to happen before forces are applied for the next step

@@ -143,86 +143,8 @@ void SimbodyJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-LinkPtr SimbodyJoint::GetJointLink(int _index) const
+void SimbodyJoint::CacheForceTorque()
 {
-  LinkPtr result;
-
-  if (_index == 0 || _index == 1)
-  {
-    SimbodyLinkPtr simbodyLink1 =
-      boost::shared_static_cast<SimbodyLink>(this->childLink);
-
-    SimbodyLinkPtr simbodyLink2 =
-      boost::shared_static_cast<SimbodyLink>(this->parentLink);
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-bool SimbodyJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
-{
-  return ((this->childLink.get() == _one.get() &&
-           this->parentLink.get() == _two.get()) ||
-          (this->childLink.get() == _two.get() &&
-           this->parentLink.get() == _one.get()));
-}
-
-//////////////////////////////////////////////////
-void SimbodyJoint::Detach()
-{
-  this->childLink.reset();
-  this->parentLink.reset();
-}
-
-//////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
-{
-  if (this->parentLink)
-  {
-    math::Pose parentModelPose = this->parentLink->GetModel()->GetWorldPose();
-
-    // Set joint axis
-    // assuming incoming axis is defined in the model frame, so rotate them
-    // into the inertial frame
-    // TODO: switch so the incoming axis is defined in the child frame.
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
-    }
-
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
-    }
-  }
-  else
-  {
-    // if parentLink is NULL, it's name be the world
-    this->sdf->GetElement("parent")->Set("world");
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
-    }
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-JointWrench SimbodyJoint::GetForceTorque(int _index)
-{
-  return this->GetForceTorque(static_cast<unsigned int>(_index));
-}
-
-//////////////////////////////////////////////////
-JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
-{
-  JointWrench wrench;
   const SimTK::State &state = this->simbodyPhysics->integ->getAdvancedState();
 
   // force calculation of reaction forces
@@ -285,15 +207,97 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.
-  wrench.body1Force =
+  this->wrench.body1Force =
     -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
-  wrench.body1Torque =
+  this->wrench.body1Torque =
     -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
 
-  wrench.body2Force =
+  this->wrench.body2Force =
     -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
-  wrench.body2Torque =
+  this->wrench.body2Torque =
     -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
 
-  return wrench;
+}
+
+//////////////////////////////////////////////////
+LinkPtr SimbodyJoint::GetJointLink(int _index) const
+{
+  LinkPtr result;
+
+  if (_index == 0 || _index == 1)
+  {
+    SimbodyLinkPtr simbodyLink1 =
+      boost::shared_static_cast<SimbodyLink>(this->childLink);
+
+    SimbodyLinkPtr simbodyLink2 =
+      boost::shared_static_cast<SimbodyLink>(this->parentLink);
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
+{
+  return ((this->childLink.get() == _one.get() &&
+           this->parentLink.get() == _two.get()) ||
+          (this->childLink.get() == _two.get() &&
+           this->parentLink.get() == _one.get()));
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::Detach()
+{
+  this->childLink.reset();
+  this->parentLink.reset();
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+{
+  if (this->parentLink)
+  {
+    math::Pose parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+
+    // Set joint axis
+    // assuming incoming axis is defined in the model frame, so rotate them
+    // into the inertial frame
+    // TODO: switch so the incoming axis is defined in the child frame.
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, parentModelPose.rot.RotateVector(
+            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
+    }
+
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, parentModelPose.rot.RotateVector(
+            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
+    }
+  }
+  else
+  {
+    // if parentLink is NULL, it's name be the world
+    this->sdf->GetElement("parent")->Set("world");
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+    }
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+JointWrench SimbodyJoint::GetForceTorque(int _index)
+{
+  return this->GetForceTorque(static_cast<unsigned int>(_index));
+}
+
+//////////////////////////////////////////////////
+JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
+{
+  return this->wrench;
 }

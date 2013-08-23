@@ -58,7 +58,7 @@ namespace gazebo
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
       /// \copydoc ScrewJoint::GetThreadPitch
-      public: virtual double GetThreadPitch(unsigned int _index)
+      public: virtual double GetThreadPitch(unsigned int /*_index*/)
               {
                 gzerr << "Not implemented in Simbody\n";
                 return 0;

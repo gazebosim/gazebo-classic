@@ -155,6 +155,9 @@ namespace gazebo
       // Keeps track if physics has been initialized
       public: bool physicsInitialized;
 
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
       /// \brief keep a pointer to the simbody physics engine for convenience
       protected: SimbodyPhysicsPtr simbodyPhysics;
 

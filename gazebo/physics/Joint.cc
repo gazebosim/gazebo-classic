@@ -58,6 +58,10 @@ Joint::Joint(BasePtr _parent)
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
   this->dampingCoefficient = 0;
+  this->wrench.body1Force = math::Vector3(0, 0, 0);
+  this->wrench.body1Torque = math::Vector3(0, 0, 0);
+  this->wrench.body2Force = math::Vector3(0, 0, 0);
+  this->wrench.body2Torque = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////

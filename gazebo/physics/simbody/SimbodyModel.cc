@@ -65,13 +65,6 @@ void SimbodyModel::Init()
       boost::static_pointer_cast<SimbodyModel>(*iter)->Init();
   }
 
-  // Initialize the joints last.
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
   for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
        iter != this->grippers.end(); ++iter)
   {
@@ -85,6 +78,13 @@ void SimbodyModel::Init()
       this->GetWorld()->GetPhysicsEngine());
   if (simbodyPhysics)
     simbodyPhysics->InitModel(this);
+
+  // Initialize the joints last.
+  for (Joint_V::iterator iter = this->joints.begin();
+       iter != this->joints.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
 
   // Initialize the joints messages for visualizer
   for (Joint_V::iterator iter = this->joints.begin();
