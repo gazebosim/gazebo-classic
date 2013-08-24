@@ -49,8 +49,11 @@ namespace gazebo
       /// \brief Load the SimbodyHinge2Joint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int _index, double _damping);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
@@ -60,9 +63,6 @@ namespace gazebo
 
       /// \brief Set the first axis of rotation
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;

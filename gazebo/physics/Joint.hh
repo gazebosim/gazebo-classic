@@ -457,6 +457,9 @@ namespace gazebo
       /// \param[in] _enable True to enable joint feedback.
       public: virtual void SetProvideFeedback(bool _enable);
 
+      /// \brief Cache Joint Force Torque Values if necessary for physics engine
+      public: virtual void CacheForceTorque() { }
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -531,6 +534,10 @@ namespace gazebo
 
       /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+
+      /// \brief Cache Joint force torque values in case physics engine
+      /// clears them at the end of update step.
+      protected: JointWrench wrench;
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;

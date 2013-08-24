@@ -40,25 +40,9 @@ SimbodyUniversalJoint::~SimbodyUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
+void SimbodyUniversalJoint::Init()
 {
-  UniversalJoint<SimbodyJoint>::Attach(_one, _two);
-
-  SimbodyLinkPtr simbodyChildLink =
-    boost::shared_static_cast<SimbodyLink>(this->childLink);
-  SimbodyLinkPtr simbodyParentLink =
-    boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-  if (!simbodyChildLink || !simbodyParentLink)
-    gzthrow("Requires simbody bodies");
-
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
-  math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
-
-  // Add the joint to the world
-
-  // Allows access to impulse
+  gzerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////

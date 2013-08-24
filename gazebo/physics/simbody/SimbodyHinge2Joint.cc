@@ -49,31 +49,9 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
+void SimbodyHinge2Joint::Init()
 {
-  Hinge2Joint<SimbodyJoint>::Attach(_one, _two);
-
-  SimbodyLinkPtr simbodyChildLink =
-    boost::shared_static_cast<SimbodyLink>(this->childLink);
-  SimbodyLinkPtr simbodyParentLink =
-    boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-  if (!simbodyChildLink || !simbodyParentLink)
-    gzthrow("Requires simbody bodies");
-
-  sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
-
-  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
-  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
-
-  SimTK::Vec3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  SimTK::Vec3 baxis1(axis1.x, axis1.y, axis1.z);
-  SimTK::Vec3 baxis2(axis2.x, axis2.y, axis2.z);
-
-  // Add the joint to the world
-
-  // Allows access to impulse
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////

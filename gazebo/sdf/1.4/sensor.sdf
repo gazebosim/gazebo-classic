@@ -7,7 +7,7 @@
   </attribute>
 
   <attribute name="type" type="string" default="__default__" required="1">
-    <description>The type name of the sensor. By default, SDF supports types camera, depth, multicamera, contact, imu, ir and ray.</description>
+    <description>The type name of the sensor. By default, SDF supports types camera, depth, multicamera, contact, gps, imu, ir and ray.</description>
   </attribute>
 
   <element name="always_on" type="bool" default="false" required="0">
@@ -33,11 +33,13 @@
   <include filename="plugin.sdf" required="*"/>
   <include filename="camera.sdf" required="0"/>
   <include filename="contact.sdf" required="0"/>
+  <include filename="gps.sdf" required="0"/>
   <include filename="imu.sdf" required="0"/>
   <include filename="ray.sdf" required="0"/>
   <include filename="rfid.sdf" required="0"/>
   <include filename="rfidtag.sdf" required="0"/>
   <include filename="sonar.sdf" required="0"/>
+  <include filename="transceiver.sdf" required="0"/>
   <include filename="forcetorque.sdf" required="0"/>
 
 </element> <!-- End Sensor -->

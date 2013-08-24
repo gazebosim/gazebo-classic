@@ -68,12 +68,8 @@ namespace gazebo
                 gzerr << "Not implement in Bullet\n";
               }
 
-      /// \brief Set the joint damping
-      public: virtual void SetDamping(int /*index*/,
-                                      const double /*damping*/)
-              {
-                gzerr << "Not implement in Bullet\n";
-              }
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
@@ -102,7 +98,7 @@ namespace gazebo
       public: virtual void SetAttribute(Attribute, int /*_index*/,
                                         double /*_value*/)
               {
-                gzerr << "Not implement in Bullet\n";
+                gzdbg << "Not implement in Bullet\n";
               }
 
       // Documentation inherited.
@@ -110,14 +106,14 @@ namespace gazebo
                                         int /*_index*/,
                                         const boost::any &/*_value*/)
               {
-                gzerr << "Not implement in Bullet\n";
+                gzdbg << "Not implement in Bullet\n";
               }
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &/*_key*/,
                                                 unsigned int /*_index*/)
               {
-                gzerr << "Not implement in Bullet\n";
+                gzdbg << "Not implement in Bullet\n";
                 return 0;
               }
 
@@ -125,10 +121,27 @@ namespace gazebo
       protected: btDynamicsWorld *bulletWorld;
 
       // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
+      // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      /// \brief: Setup joint feedback datatructure.
+      /// This is called after Joint::constraint is setup in Init.
+      protected: void SetupJointFeedback();
+
+      // Documentation inherited.
+      public: virtual void Init();
+
+      /// \brief Feedback data for this joint
+      private: btJointFeedback *feedback;
+
+      /// \brief internal variable to keep track if ConnectJointUpdate
+      /// has been called on a damping method
+      private: bool dampingInitialized;
     };
     /// \}
   }

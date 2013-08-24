@@ -47,14 +47,11 @@ namespace gazebo
       /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(int _index, double _threadPitch);

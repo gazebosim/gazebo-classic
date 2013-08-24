@@ -72,6 +72,10 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("provide_feedback"))
     {
+      gzwarn << "DEPRECATION WARNING:\n Starting with SDF 1.5\n"
+             << "<joint>\n  <physics>\n    <ode>\n      <provide_feedback>\n"
+             << "will be moved up one level directly into:\n"
+             << "<joint>\n  <physics>\n    <provide_feedback>\n";
       this->SetProvideFeedback(elem->Get<bool>("provide_feedback"));
     }
 
@@ -139,6 +143,25 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       }
     }
   }
+
+  if (this->sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -197,6 +220,10 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 
   if (!this->jointId)
     gzerr << "ODE Joint ID is invalid\n";
+
+  if (this->HasType(Base::HINGE2_JOINT) &&
+      (odechild == NULL || odeparent == NULL))
+    gzthrow("ODEHinge2Joint cannot be connected to the world");
 
   if (!odechild && odeparent)
   {
@@ -1168,6 +1195,8 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
       this->cfmDampingState[i] = ODEJoint::NONE;
   }
 
+  /// \TODO:  this check might not be needed?  attaching an object to a static
+  /// body should not affect damping application.
   bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
   bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
 
@@ -1178,7 +1207,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
         boost::bind(&ODEJoint::CFMDamping, this));
     else
       this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyDamping, this));
+        boost::bind(&Joint::ApplyDamping, this));
     this->dampingInitialized = true;
   }
 }
