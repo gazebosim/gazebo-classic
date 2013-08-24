@@ -60,6 +60,10 @@
               </ode>
             </contact>
             <friction>
+              <bullet>
+                <friction>1</friction>
+                <friction2>1</friction2>
+              </bullet>
               <ode>
                 <mu>1</mu>
                 <mu2>1</mu2>
