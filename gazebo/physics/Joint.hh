@@ -272,6 +272,8 @@ namespace gazebo
       /// not (lb-mass), etc.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
+      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
+      /// keep track of external forces only.
       public: virtual void SetForce(int _index, double _force);
 
       /// \brief @todo: not yet implemented.
@@ -482,6 +484,10 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       protected: double forceApplied[MAX_JOINT_AXIS];
+
+      protected: common::Time forceAppliedTime;
+
+      private: bool internalForce;
 
       /// \brief Store Joint effort limit as specified in SDF
       protected: double effortLimit[MAX_JOINT_AXIS];

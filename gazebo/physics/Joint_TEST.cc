@@ -359,11 +359,11 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       //       << "]\n";
     }
 
-    // if (physics->GetType() == "bullet" && (i == 3387))
-    // {
-    //   gzerr << "i " << i << ": "; getchar();
-    //   i = 0;
-    // }
+    if (physics->GetType() == "bullet" && (i == 3387))
+    {
+      gzerr << "i " << i << ": "; getchar();
+      i = 0;
+    }
   }
   // gzerr << "end test:"; getchar();
 }

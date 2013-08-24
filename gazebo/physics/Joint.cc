@@ -46,6 +46,7 @@ Joint::Joint(BasePtr _parent)
   this->AddType(Base::JOINT);
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->internalForce = false;
   this->effortLimit[0] = -1;
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
@@ -517,10 +518,29 @@ void Joint::SetState(const JointState &_state)
 //////////////////////////////////////////////////
 void Joint::SetForce(int _index, double _force)
 {
+  if (this->internalForce)
+    return;
+
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
   if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
-    this->forceApplied[_index] = _force;
+  {
+    gzerr << this->forceAppliedTime
+          << " : " << this->GetWorld()->GetSimTime()
+          << " : " << this->forceApplied[0]
+          << " : " << this->forceApplied[1] << "\n";
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0;
+    }
+
+    this->forceApplied[_index] += _force;
+
+    gzerr << _force << " : " << this->forceApplied[0]
+          << " : " << this->forceApplied[1] << "\n";
+  }
   else
     gzerr << "Something's wrong, joint [" << this->GetName()
           << "] index [" << _index
@@ -554,7 +574,12 @@ void Joint::ApplyDamping()
   // Take absolute value of dampingCoefficient, since negative values of
   // dampingCoefficient are used for adaptive damping to enforce stability.
   double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+
+  // do not change forceApplied if setting internal damping forces
+  this->internalForce = true;
   this->SetForce(0, dampingForce);
+  this->internalForce = false;
+
   // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
 }
 
