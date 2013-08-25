@@ -184,7 +184,7 @@ TEST_P(FactoryTest, Cylinder)
   */
 // }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(FactoryTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(FactoryTest)
 
 int main(int argc, char **argv)
 {

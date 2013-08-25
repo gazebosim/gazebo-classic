@@ -122,7 +122,7 @@ TEST_P(ServerFixtureTest, SpawnSDF)
   SpawnSDF(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest)
 
 int main(int argc, char **argv)
 {

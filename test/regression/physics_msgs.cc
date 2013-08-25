@@ -160,7 +160,7 @@ TEST_P(PhysicsMsgsTest, MoveTool)
   MoveTool(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsMsgsTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsMsgsTest)
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
