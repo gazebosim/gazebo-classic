@@ -111,7 +111,7 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
     // msg.set_range_min( this->GetRangeMin() );
     // msg.set_range_max( this->GetRangeMax() );
 
-    // for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    // for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
     // {
     //   msg.add_ranges(this->laserShape->GetRange(i));
     //   msg.add_intensities(0);

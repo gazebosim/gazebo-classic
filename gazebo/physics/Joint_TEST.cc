@@ -17,15 +17,63 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Joint_TEST.hh"
 
 #define TOL 1e-6
 using namespace gazebo;
 
-class Joint_TEST : public ServerFixture
+////////////////////////////////////////////////////////////////////////
+// Test for spawning each joint type
+void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine)
 {
-};
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::vector<std::string> types;
+  types.push_back("revolute");
+  types.push_back("prismatic");
+  types.push_back("screw");
+  types.push_back("universal");
+  types.push_back("ball");
+  types.push_back("revolute2");
+
+  physics::JointPtr joint;
+  for (std::vector<std::string>::iterator iter = types.begin();
+       iter != types.end(); ++iter)
+  {
+    gzdbg << "SpawnJoint " << *iter << " child parent" << std::endl;
+    joint = SpawnJoint(*iter, false, false);
+    EXPECT_TRUE(joint != NULL);
+
+    gzdbg << "SpawnJoint " << *iter << " child world" << std::endl;
+    joint = SpawnJoint(*iter, false, true);
+    EXPECT_TRUE(joint != NULL);
+
+    gzdbg << "SpawnJoint " << *iter << " world parent" << std::endl;
+    joint = SpawnJoint(*iter, true, false);
+    EXPECT_TRUE(joint != NULL);
+  }
+}
+
+TEST_F(Joint_TEST, SpawnJointTypesODE)
+{
+  SpawnJointTypes("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(Joint_TEST, SpawnJointTypesBullet)
+{
+  SpawnJointTypes("bullet");
+}
+#endif  // HAVE_BULLET
 
 ////////////////////////////////////////////////////////////////////////
 // Create a joint between link and world
@@ -308,7 +356,6 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
-
 
 int main(int argc, char **argv)
 {

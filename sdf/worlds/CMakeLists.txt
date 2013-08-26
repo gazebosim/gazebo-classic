@@ -14,6 +14,7 @@ set (files
   lights.world
   model_nesting.world
   pioneer2dx.world
+  openal.world
   trimesh_test.world
   cart_test.world
   double_pendulums.world

@@ -25,6 +25,9 @@
 #include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
 
+// Moved to top to avoid osx compilation errors
+#include "gazebo/math/Rand.hh"
+
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/common/Assert.hh"
@@ -32,7 +35,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -363,7 +365,7 @@ void Camera::Update()
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
-      if (this->moveToPositionQueue.size() > 0)
+      if (!this->moveToPositionQueue.empty())
       {
         this->MoveToPosition(this->moveToPositionQueue[0].first,
                              this->moveToPositionQueue[0].second);

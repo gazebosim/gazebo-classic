@@ -24,7 +24,7 @@
 #include <gazebo/gazebo.hh>
 
 #include <gazebo/common/Time.hh>
-#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportIface.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
 
@@ -52,21 +52,33 @@ boost::shared_ptr<google::protobuf::Message> g_echoMsg;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cerr << "This tool lists information about published topics on a "
-            << "Gazebo master.\n"
-            << "    list         : List all topics\n"
-            << "    info <topic> : Get information about a topic\n"
-            << "    echo <topic> : Output topic data to screen\n"
-            << "    view <topic> : View topic data using a QT widget\n"
-            << "    hz <topic>   : Get publish frequency\n"
-            << "    bw <topic>   : Get topic bandwidth\n"
-            << "    help         : This help text\n";
+  std::cerr << "gztopic -- Tool to interact with gztopics on a "
+    "Gazebo master\n\n";
+
+  std::cerr << "`gztopic` <command>\n\n";
+
+  std::cerr << "List information about published topics on a "
+    "Gazebo master.\n\n";
+
+  std::cerr << "Commands:\n"
+            << "    list          List all topics.\n"
+            << "    info <topic>  Get information about a topic.\n"
+            << "    echo <topic>  Output topic data to screen.\n"
+            << "    view <topic>  View topic data using a QT widget.\n"
+            << "    hz <topic>    Get publish frequency.\n"
+            << "    bw <topic>    Get topic bandwidth.\n"
+            << "    help          This help text.\n\n";
+
+  std::cerr << "See also:\n"
+    << "Examples and more information can be found at:"
+    << "http://gazebosim.org/wiki/Tools#Topic_Info\n";
 }
 
 /////////////////////////////////////////////////
 bool parse(int argc, char **argv)
 {
-  if (argc == 1 || std::string(argv[1]) == "help")
+  if (argc == 1 || std::string(argv[1]) == "help" ||
+      std::string(argv[1]) == "-h")
   {
     help();
     return false;
@@ -156,7 +168,17 @@ void list()
     request.set_id(0);
     request.set_request("get_publishers");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(data);
+
+    try
+    {
+      connection->Read(data);
+    }
+    catch(...)
+    {
+      gzerr << "An active gzserver is probably not present.\n";
+      connection.reset();
+      return;
+    }
 
     packet.ParseFromString(data);
     pubs.ParseFromString(packet.serialized_data());

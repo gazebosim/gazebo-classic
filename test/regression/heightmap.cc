@@ -16,21 +16,29 @@
 */
 #include <string.h>
 
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 #include "heights_cmp.h"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
+
 class HeightmapTest : public ServerFixture
 {
+  public: void PhysicsLoad(const std::string &_physicsEngine);
+  public: void WhiteAlpha(const std::string &_physicsEngine);
+  public: void WhiteNoAlpha(const std::string &_physicsEngine);
+  public: void NotSquareImage();
+  public: void InvalidSizeImage();
+  // public: void Heights(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, PhysicsLoad)
+void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
-  Load("worlds/heightmap_test.world");
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -83,14 +91,91 @@ TEST_F(HeightmapTest, PhysicsLoad)
 }
 
 /////////////////////////////////////////////////
-//
-// Disabled: segfaults ocassionally
-// See https://bitbucket.org/osrf/gazebo/issue/521 for details
+void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
+{
+  Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+
+  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  int x, y;
+  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  {
+    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    {
+      EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
+{
+  Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+
+  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  int x, y;
+  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  {
+    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    {
+      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::NotSquareImage()
+{
+  common::SystemPaths::Instance()->AddGazeboPaths(
+      TEST_REGRESSION_PATH);
+
+  this->server = new Server();
+  this->server->PreLoad();
+  EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
+               common::Exception);
+
+  this->server->Fini();
+  delete this->server;
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::InvalidSizeImage()
+{
+  common::SystemPaths::Instance()->AddGazeboPaths(
+      TEST_REGRESSION_PATH);
+
+  this->server = new Server();
+  this->server->PreLoad();
+  EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
+               common::Exception);
+
+  this->server->Fini();
+  delete this->server;
+}
 
 /*
-TEST_F(HeightmapTest, Heights)
+void HeightmapTest::Heights(const std::string &_physicsEngine)
 {
-  Load("worlds/heightmap_test.world");
+  Load("worlds/heightmap_test.world", _physicsEngine);
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -213,86 +298,50 @@ TEST_F(HeightmapTest, Heights)
 */
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteAlpha)
-{
-  Load("worlds/white_alpha_heightmap.world");
-  physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
-
-  physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
-
-  physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
-
-  EXPECT_TRUE(shape);
-  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
-
-  int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
-  {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
-    {
-      EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, WhiteNoAlpha)
-{
-  Load("worlds/white_no_alpha_heightmap.world");
-  physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
-
-  physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
-
-  physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
-
-  EXPECT_TRUE(shape);
-  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
-
-  int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
-  {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
-    {
-      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
-  common::SystemPaths::Instance()->AddGazeboPaths(
-      TEST_REGRESSION_PATH);
-
-  this->server = new Server();
-  EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
-               common::Exception);
-
-  this->server->Fini();
-  delete this->server;
+  NotSquareImage();
 }
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, InvalidSizeImage)
 {
-  common::SystemPaths::Instance()->AddGazeboPaths(
-      TEST_REGRESSION_PATH);
-
-  this->server = new Server();
-  EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
-               common::Exception);
-
-  this->server->Fini();
-  delete this->server;
+  InvalidSizeImage();
 }
 
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, PhysicsLoad)
+{
+  PhysicsLoad(GetParam());
+}
 
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, WhiteAlpha)
+{
+  WhiteAlpha(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, WhiteNoAlpha)
+{
+  WhiteNoAlpha(GetParam());
+}
+
+/////////////////////////////////////////////////
+//
+// Disabled: segfaults ocassionally
+// See https://bitbucket.org/osrf/gazebo/issue/521 for details
+
+/*
+TEST_P(HeightmapTest, Heights)
+{
+  Heights(GetParam());
+}
+*/
+
+INSTANTIATE_PHYSICS_ENGINES_TEST(HeightmapTest)
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -39,12 +39,13 @@ set (sources
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
-  Rendering.cc
+  RenderingIface.cc
   Road2d.cc
   RFIDVisual.cc
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -80,13 +81,14 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
-  Rendering.hh
+  RenderingIface.hh
   RenderTypes.hh
   Road2d.hh
   RFIDVisual.hh
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh
@@ -119,8 +121,11 @@ target_link_libraries( gazebo_rendering
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
-  X11 
 )
+
+if (NOT APPLE)
+  target_link_libraries(gazebo_rendering X11)
+endif()
 
 if (${OGRE_VERSION} GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
@@ -128,6 +133,9 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
+
+# Deprecated Rendering.hh
+gz_issue_775("Rendering")
 
 # unit tests
 set (gtest_sources

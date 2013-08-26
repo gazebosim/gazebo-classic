@@ -26,6 +26,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -50,33 +51,16 @@
 using namespace gazebo;
 using namespace physics;
 
-class LinkUpdate_TBB
-{
-  public: LinkUpdate_TBB(Link_V *_bodies) : bodies(_bodies) {}
-  public: void operator() (const tbb::blocked_range<size_t> &_r) const
-  {
-    for (size_t i = _r.begin(); i != _r.end(); i++)
-    {
-      (*this->bodies)[i]->Update();
-    }
-  }
-
-  private: Link_V *bodies;
-};
-
-
 //////////////////////////////////////////////////
 Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->updateMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  delete this->updateMutex;
 }
 
 //////////////////////////////////////////////////
@@ -131,6 +115,7 @@ void Model::LoadLinks()
       // bodies collisionetries
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
+      this->links.push_back(link);
     }
   }
 }
@@ -177,7 +162,7 @@ void Model::Init()
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
-       iter!= this->children.end(); ++iter)
+       iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
       boost::static_pointer_cast<Link>(*iter)->Init();
@@ -209,7 +194,7 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
@@ -218,7 +203,7 @@ void Model::Update()
   if (this->jointController)
     this->jointController->Update();
 
-  if (this->jointAnimations.size() > 0)
+  if (!this->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
@@ -253,8 +238,6 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
-
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -304,6 +287,11 @@ void Model::RemoveChild(EntityPtr _child)
         }
       }
     }
+
+    Link_V::iterator liter = std::find(this->links.begin(),
+        this->links.end(), _child);
+    if (liter != this->links.end())
+      this->links.erase(liter);
   }
 
   Entity::RemoveChild(_child->GetId());
@@ -321,6 +309,7 @@ void Model::Fini()
 
   this->attachedModels.clear();
   this->joints.clear();
+  this->links.clear();
   this->plugins.clear();
   this->canonicalLink.reset();
 }
@@ -374,15 +363,14 @@ void Model::Reset()
   }
 
   // reset link velocities when resetting model
-  Link_V links = this->GetLinks();
-  for (Link_V::iterator liter = links.begin();
-       liter!= links.end(); ++liter)
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
   {
     (*liter)->ResetPhysicsStates();
   }
 
   for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); ++jiter)
+       jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
@@ -391,14 +379,13 @@ void Model::Reset()
 //////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
-  for (Base_V::iterator iter = this->children.begin();
-      iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearVel(_vel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetLinearVel(_vel);
     }
   }
 }
@@ -406,15 +393,13 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularVel(_vel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetAngularVel(_vel);
     }
   }
 }
@@ -422,15 +407,13 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearAccel(_accel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetLinearAccel(_accel);
     }
   }
 }
@@ -438,15 +421,13 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularAccel(_accel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetAngularAccel(_accel);
     }
   }
 }
@@ -533,7 +514,7 @@ math::Box Model::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -595,26 +576,13 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 //////////////////////////////////////////////////
 Link_V Model::GetLinks() const
 {
-  Link_V links;
-  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
-  {
-    if (this->GetChild(i)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::static_pointer_cast<Link>(this->GetChild(i));
-      if (link)
-        links.push_back(link);
-      else
-        gzerr << "Child [" << this->GetChild(i)->GetName()
-              << "] has type Base::LINK, but cannot be dynamically casted\n";
-    }
-  }
-  return links;
+  return this->links;
 }
 
 //////////////////////////////////////////////////
 LinkPtr Model::GetLink(const std::string &_name) const
 {
-  Base_V::const_iterator biter;
+  Link_V::const_iterator iter;
   LinkPtr result;
 
   if (_name == "canonical")
@@ -623,12 +591,11 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
   else
   {
-    for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+    for (iter = this->links.begin(); iter != this->links.end(); ++iter)
     {
-      if (((*biter)->GetScopedName() == _name) ||
-          ((*biter)->GetName() == _name))
+      if (((*iter)->GetScopedName() == _name) || ((*iter)->GetName() == _name))
       {
-        result = boost::dynamic_pointer_cast<Link>(*biter);
+        result = *iter;
         break;
       }
     }
@@ -738,8 +705,8 @@ unsigned int Model::GetSensorCount() const
   unsigned int result = 0;
 
   // Count all the sensors on all the links
-  Link_V links = this->GetLinks();
-  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->links.begin();
+      iter != this->links.end(); ++iter)
   {
     result += (*iter)->GetSensorCount();
   }
@@ -777,7 +744,7 @@ void Model::SetGravityMode(const bool &_v)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -791,7 +758,7 @@ void Model::SetCollideMode(const std::string &_m)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -805,7 +772,7 @@ void Model::SetLaserRetro(const float _retro)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -825,13 +792,10 @@ void Model::FillMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (this->GetChild(j)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::dynamic_pointer_cast<Link>(this->GetChild(j));
-      link->FillMsg(*_msg.add_link());
-    }
+    (*iter)->FillMsg(*_msg.add_link());
   }
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
@@ -873,7 +837,7 @@ void Model::SetJointAnimation(
     const std::map<std::string, common::NumericAnimationPtr> _anims,
     boost::function<void()> _onComplete)
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
@@ -881,17 +845,15 @@ void Model::SetJointAnimation(
   }
   this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Model::StopAnimation()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   Entity::StopAnimation();
   this->onJointAnimationComplete.clear();
   this->jointAnimations.clear();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -993,13 +955,13 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 /////////////////////////////////////////////////
 void Model::SetAutoDisable(bool _auto)
 {
-  if (this->joints.size() > 0)
+  if (!this->joints.empty())
     return;
 
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+  Link_V::iterator iter;
+  for (iter = this->links.begin(); iter != this->links.end(); ++iter)
+    if (*iter)
+      (*iter)->SetAutoDisable(_auto);
 }
 
 /////////////////////////////////////////////////
