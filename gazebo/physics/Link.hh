@@ -470,8 +470,11 @@ namespace gazebo
       /// \brief Center of gravity visual elements.
       protected: std::vector<std::string> cgVisuals;
 
-      /// \brief Link visual elements.
+      /// \def Visuals_M
+      /// \brief Map of unique ID to visual message.
       typedef std::map<uint32_t, msgs::Visual> Visuals_M;
+
+      /// \brief Link visual elements.
       protected: Visuals_M visuals;
 
       /// \brief Linear acceleration.

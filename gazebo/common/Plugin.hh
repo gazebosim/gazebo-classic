@@ -77,7 +77,6 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-              std::cout << "Plugin destructor[" << this->filename << "]\n";
 #ifdef HAVE_DL
               dlclose(this->dlHandle);
 #endif
@@ -130,7 +129,6 @@ namespace gazebo
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
-              std::cout << "dlopen(" << fullname << ")\n";
               void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
               if (!dlHandle)
               {
