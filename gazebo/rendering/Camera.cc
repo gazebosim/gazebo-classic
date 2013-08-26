@@ -408,7 +408,6 @@ void Camera::Update()
     double pitchAdj = this->trackVisualPitchPID.Update(pitchError, 0.01);
     double yawAdj = this->trackVisualYawPID.Update(yawError, 0.01);
 
-    printf("ERRROR!!!\n\n\n\n");
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
@@ -582,16 +581,6 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 
   math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
-
-  Ogre::Quaternion pitchO = this->pitchNode->getOrientation();
-  Ogre::Quaternion pitchD = this->pitchNode->_getDerivedOrientation();
-
-  Ogre::Quaternion camO = this->camera->getOrientation();
-  Ogre::Quaternion camD = this->camera->getDerivedOrientation();
-
-  Ogre::Quaternion sceneO = this->sceneNode->getOrientation();
-  Ogre::Quaternion sceneD = this->sceneNode->_getDerivedOrientation();
-
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
 
   // As far as I can tell, OGRE is broken. It makes a strong assumption
@@ -601,34 +590,6 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   // The -1.0 to Roll is a hack to set the correct orientation. 
   s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
 
-  Ogre::Vector3 dir = this->camera->getDerivedDirection();
-
-  if (this->GetName() == "default::left_camera(0)")
-  {
-    printf("\n!!!!!!!!!!!!!!!!!!!!! SET WORLD ROTATION !!!!!!!!!!!!!!!!!!\n");
-    std::cout << "Derived dir[" << dir.x << " " << dir.y << " " << dir.z << "]\n";
-    std::cout << "-------[" << this->GetName() << "][" << rpy << "]\n";
-    std::cout << "Scene O[" << sceneO.getRoll() << " "
-      << sceneO.getPitch() << " " << sceneO.getYaw() << "]\n";
-    std::cout << "Scene D[" << sceneD.getRoll() << " "
-      << sceneD.getPitch() << " " << sceneD.getYaw() << "]\n";
-
-    std::cout << "Pitch O[" << pitchO.getRoll() << " "
-      << pitchO.getPitch() << " " << pitchO.getYaw() << "]\n";
-    std::cout << "Pitch D[" << pitchD.getRoll() << " "
-      << pitchD.getPitch() << " " << pitchD.getYaw() << "]\n";
-
-    std::cout << "Cam O[" << camO.getRoll() << " "
-      << camO.getPitch() << " " << camO.getYaw() << "]\n";
-    std::cout << "Cam D[" << camD.getRoll() << " "
-      << camD.getPitch() << " " << camD.getYaw() << "]\n";
-
-    std::cout << "P[" << p.GetAsEuler().x << " "
-      << p.GetAsEuler().y << " " << p.GetAsEuler().z << "]\n";
-    std::cout << "s[" << s.GetAsEuler().x << " "
-      << s.GetAsEuler().y << " " << s.GetAsEuler().z << "]\n";
-  }
-
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
@@ -637,37 +598,6 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 
   this->sceneNode->needUpdate();
   this->pitchNode->needUpdate();
-
-  pitchO = this->pitchNode->getOrientation();
-  pitchD = this->pitchNode->_getDerivedOrientation();
-
-  camO = this->camera->getOrientation();
-  camD = this->camera->getDerivedOrientation();
-
-  sceneO = this->sceneNode->getOrientation();
-  sceneD = this->sceneNode->_getDerivedOrientation();
-
-  if (this->GetName() == "default::left_camera(0)")
-  {
-    std::cout << "*******\n";
-    std::cout << "Scene O[" << sceneO.getRoll() << " "
-      << sceneO.getPitch() << " " << sceneO.getYaw() << "]\n";
-    std::cout << "Scene D[" << sceneD.getRoll() << " "
-      << sceneD.getPitch() << " " << sceneD.getYaw() << "]\n";
-
-    std::cout << "Pitch O[" << pitchO.getRoll() << " "
-      << pitchO.getPitch() << " " << pitchO.getYaw() << "]\n";
-    std::cout << "Pitch D[" << pitchD.getRoll() << " "
-      << pitchD.getPitch() << " " << pitchD.getYaw() << "]\n";
-
-
-    std::cout << "Cam O[" << camO.getRoll() << " "
-      << camO.getPitch() << " " << camO.getYaw() << "]\n";
-    std::cout << "Cam D[" << camD.getRoll() << " "
-      << camD.getPitch() << " " << camD.getYaw() << "]\n";
-
-    printf("\n!!!!!!!!!!!!!!!!!!!!! DONE SET WORLD ROTATION !!!!!!!!!!!!!!!\n");
-  }
 }
 
 //////////////////////////////////////////////////
@@ -1313,67 +1243,11 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-
   this->camera = this->scene->GetManager()->createCamera(this->name);
-
-  Ogre::Vector3 dirD = this->camera->getDerivedDirection();
-  Ogre::Vector3 dirR = this->camera->getDirection();
-  Ogre::Vector3 upR = this->camera->getUp();
-  Ogre::Vector3 upD = this->camera->getDerivedUp();
-  Ogre::Quaternion camR = this->camera->getOrientation();
-  Ogre::Quaternion camD = this->camera->getDerivedOrientation();
-
-  if (this->GetName() == "default::left_camera(0)")
-  {
-    printf("\n!!!!!!!!! CREATE CAMERA !!!!!!!!!!!!!!!!!!!\n");
-
-    std::cout << "Orig Cam Dir R[" << dirR.x << " " << dirR.y << " " << dirR.z << "]\n";
-    std::cout << "Orig Cam Dir D[" << dirD.x << " " << dirD.y << " " << dirD.z << "]\n";
-    std::cout << "Orig Cam Up R[" << upR.x << " " << upR.y << " " << upR.z << "]\n";
-    std::cout << "Orig Cam Up D[" << upD.x << " " << upD.y << " " << upD.z << "]\n";
-    std::cout << "Orig Cam R[" << camR.getRoll() << " "
-      << camR.getPitch() << " " << camR.getYaw() << "]\n";
-    std::cout << "Orig Cam D[" << camD.getRoll() << " "
-      << camD.getPitch() << " " << camD.getYaw() << "]\n";
-  }
-
-  // Use X/Y as horizon, Z up
-  // this->camera->yaw(Ogre::Degree(-90.0));
-  // this->camera->pitch(Ogre::Degree(90.0));
-  // this->camera->roll(Ogre::Degree(-90.0));
-
-  // Don't yaw along variable axis, causes leaning
-  // this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-  //this->camera->setDirection(1, 0, 0);
 
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
-
-  camR = this->camera->getOrientation();
-  camD = this->camera->getDerivedOrientation();
-  dirR = this->camera->getDirection();
-  dirD = this->camera->getDerivedDirection();
-  upR = this->camera->getUp();
-  upD = this->camera->getDerivedUp();
-
-  if (this->GetName() == "default::left_camera(0)")
-  {
-    std::cout << "*****\n";
-    std::cout << "Orig Cam Dir R[" << dirR.x << " " << dirR.y << " " << dirR.z << "]\n";
-    std::cout << "Orig Cam Dir D[" << dirD.x << " " << dirD.y << " " << dirD.z << "]\n";
-    std::cout << "Orig Cam Up R[" << upR.x << " " << upR.y << " " << upR.z << "]\n";
-    std::cout << "Orig Cam Up D[" << upD.x << " " << upD.y << " " << upD.z << "]\n";
-
-
-
-    std::cout << "Orig Cam R[" << camR.getRoll() << " "
-      << camR.getPitch() << " " << camR.getYaw() << "]\n";
-    std::cout << "Orig Cam D[" << camD.getRoll() << " "
-      << camD.getPitch() << " " << camD.getYaw() << "]\n";
-
-    printf("!!!!!!!!! DONE CREATE CAMERA !!!!!!!!!!!!!!!!!!!\n\n");
-  }
 }
 
 //////////////////////////////////////////////////
@@ -1575,12 +1449,9 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
     this->sceneNode->setInheritOrientation(_inheritOrientation);
-    gzwarn << "Connect Camera[" << this->GetName() << "] to visual. OrigPose[" << origPose.rot.GetAsEuler() << "]\n";
     this->SetWorldPose(origPose);
     return true;
   }
-  else
-    gzerr << "Unable to connect Camera[" << this->GetName() << "] to visual.\n";
 
   return false;
 }
