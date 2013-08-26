@@ -74,6 +74,12 @@ namespace gazebo
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
+    /// \brief Constructor
+    public: PluginT()
+            {
+              this->dlHandle = NULL;
+            }
+
     /// \brief Destructor
     public: virtual ~PluginT()
             {

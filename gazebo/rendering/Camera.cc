@@ -546,7 +546,7 @@ math::Quaternion Camera::GetWorldRotation() const
   // that the camera is always oriented along its local -Z axis, and that
   // the global coordinat frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
-  // This -1.0 multiplication is a hack to get back the correct orientation. 
+  // This -1.0 multiplication is a hack to get back the correct orientation.
   sRot.x *= -1.0;
 
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
@@ -587,7 +587,7 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   // that the camera is always oriented along its local -Z axis, and that
   // the global coordinat frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
-  // The -1.0 to Roll is a hack to set the correct orientation. 
+  // The -1.0 to Roll is a hack to set the correct orientation.
   s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
 
   this->sceneNode->setOrientation(

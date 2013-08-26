@@ -26,6 +26,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -233,6 +234,11 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
+  SensorPtr parentSensor = sensors::get_sensor(_parentName);
+  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
+
+  return this->CreateSensor(_elem, _worldName, _parentName,
+      parentSensor->GetId());
 }
 
 //////////////////////////////////////////////////

@@ -69,7 +69,7 @@ std::string sensors::create_sensor(sdf::ElementPtr _elem,
   SensorPtr parentSensor = get_sensor(_parentName);
   GZ_ASSERT(parentSensor, "Unable to get parent sensor");
 
-  return create_sensor(_elemn, _worldName, _parentName, parentSensor->GetId());
+  return create_sensor(_elem, _worldName, _parentName, parentSensor->GetId());
 }
 
 /////////////////////////////////////////////////
