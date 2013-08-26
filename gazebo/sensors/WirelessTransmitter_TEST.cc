@@ -128,7 +128,6 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 
 /////////////////////////////////////////////////
 /// \brief Callback executed for every propagation grid message received
-/////////////////////////////////////////////////
 void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
