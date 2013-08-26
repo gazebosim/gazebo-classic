@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -327,6 +328,9 @@ namespace gazebo
       /// \brief All the joints in the model.
       private: Joint_V joints;
 
+      /// \brief All the links in the model.
+      private: Link_V links;
+
       /// \brief All the grippers in the model.
       private: std::vector<Gripper*> grippers;
 
@@ -347,7 +351,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
-      private: boost::recursive_mutex *updateMutex;
+      private: mutable boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;

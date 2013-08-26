@@ -541,6 +541,14 @@ math::Quaternion Camera::GetWorldRotation() const
   math::Vector3 sRot, pRot;
 
   sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
+
+  // As far as I can tell, OGRE is broken. It makes a strong assumption
+  // that the camera is always oriented along its local -Z axis, and that
+  // the global coordinat frame is right-handed with +Y up, +X right, and +Z
+  // out of the screen.
+  // This -1.0 multiplication is a hack to get back the correct orientation. 
+  sRot.x *= -1.0;
+
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
 
   return math::Quaternion(sRot.x, pRot.y, sRot.z);
@@ -573,15 +581,22 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 
   math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
-  std::cout << "Camera[" << this->GetName() << "]::SetWorldRotation RPY[" << rpy << "]\n";
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
-  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
-  this->sceneNode->_setDerivedOrientation(
+  // As far as I can tell, OGRE is broken. It makes a strong assumption
+  // that the camera is always oriented along its local -Z axis, and that
+  // the global coordinat frame is right-handed with +Y up, +X right, and +Z
+  // out of the screen.
+  // The -1.0 to Roll is a hack to set the correct orientation. 
+  s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
+
+  this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
   this->pitchNode->setOrientation(
       Ogre::Quaternion(p.w, p.x, p.y, p.z));
+
+  this->sceneNode->needUpdate();
   this->pitchNode->needUpdate();
 }
 
@@ -1230,13 +1245,9 @@ void Camera::CreateCamera()
 {
   this->camera = this->scene->GetManager()->createCamera(this->name);
 
-  // Use X/Y as horizon, Z up
-  this->camera->pitch(Ogre::Degree(90));
-
-  // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
-  this->camera->setDirection(1, 0, 0);
+  this->camera->setFixedYawAxis(false);
+  this->camera->yaw(Ogre::Degree(-90.0));
+  this->camera->roll(Ogre::Degree(-90.0));
 }
 
 //////////////////////////////////////////////////
