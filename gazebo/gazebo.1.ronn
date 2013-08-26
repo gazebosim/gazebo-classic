@@ -1,13 +1,13 @@
-gzserver -- Run the Gazebo server.
+gazebo -- Run the Gazebo server and GUI.
 =============================================
 
 ## SYNPOSIS
 
-`gzserver` [options] <world_file>
+`gazebo` [options] <world_file>
 
 ## DESCRIPTION
 
-Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops.
+Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops. This also starts the Gazebo GUI client in a separate process.
 
 ## OPTIONS
 
@@ -34,15 +34,6 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * --minimal_comms :
  Reduce the messages output by gzserver
 * -s, --server-plugin arg :
- Load a plugin.
-
-## OPTIONS
-
-* -q, --quiet :
- Reduce output to stdout.
-* -h, --help :
- Produce this help message.
-* -g, --gui-plugin arg :
  Load a plugin.
 
 
