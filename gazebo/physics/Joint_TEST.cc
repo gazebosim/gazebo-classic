@@ -118,6 +118,7 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
     world->StepWorld(50);
     math::Pose childPose = child->GetWorldPose();
     math::Pose parentPose = parent->GetWorldPose();
+    EXPECT_TRUE(parentPose.pos != pos);
     EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
     EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
     EXPECT_TRUE(childPose.pos == parentPose.pos);
