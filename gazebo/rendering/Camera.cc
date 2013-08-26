@@ -23,6 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <sdf/sdf.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
