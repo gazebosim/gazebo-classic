@@ -229,14 +229,14 @@ namespace gazebo
       /// \return Pointer to the Light or NULL if index was invalid.
       public: LightPtr GetLight(uint32_t _index) const;
 
-      /// \brief Get a visual by name
+      /// \brief Get a visual by name.
       /// \param[in] _name Name of the visual to retrieve.
-      /// \return Pointer to the visual, NULL if not found
+      /// \return Pointer to the visual, NULL if not found.
       public: VisualPtr GetVisual(const std::string &_name) const;
 
-      /// \brief Get a visual by id
+      /// \brief Get a visual by id.
       /// \param[in] _id ID of the visual to retrieve.
-      /// \return Pointer to the visual, NULL if not found
+      /// \return Pointer to the visual, NULL if not found.
       public: VisualPtr GetVisual(uint32_t _id) const;
 
       /// \brief Select a visual by name.
@@ -378,7 +378,7 @@ namespace gazebo
 
       /// \brief Deprecated.
       public: VisualPtr CloneVisual(const std::string &_visualName,
-                  const std::string &_newName) GAZEBO_DEPRECATED(1.8);
+                  const std::string &_newName) GAZEBO_DEPRECATED(1.10);
 
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if

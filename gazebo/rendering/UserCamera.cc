@@ -101,7 +101,6 @@ void UserCamera::Init()
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
 
-
   this->SetHFOV(GZ_DTOR(60));
 
   // Careful when setting this value.

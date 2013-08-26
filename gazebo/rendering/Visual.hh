@@ -530,7 +530,7 @@ namespace gazebo
       /// \brief Connection for the pre render event.
       private: event::ConnectionPtr preRenderConnection;
 
-      /// \brief List of all the lines created
+      /// \brief List of all the lines created.
       private: std::list<DynamicLines*> lines;
 
       /// \brief Lines and their vertices connected to this visual.
@@ -551,7 +551,7 @@ namespace gazebo
       /// \brief Callback for the animation complete event.
       private: boost::function<void()> onAnimationComplete;
 
-      /// \brief True to use RT shader system
+      /// \brief True to use RT shader system.
       private: bool useRTShader;
 
       /// \brief True if initialized.
@@ -560,7 +560,7 @@ namespace gazebo
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
 
-      /// \brief Unique id of this visual
+      /// \brief Unique id of this visual.
       private: uint32_t id;
 
       /// \brief Counter used to create unique ids.

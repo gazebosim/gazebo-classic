@@ -91,7 +91,7 @@ namespace gazebo
       /// \brief Set the parent of the sensor.
       /// \param[in] _name Name of the parent.
       public: virtual void SetParent(const std::string &_name)
-              GAZEBO_DEPRECATED(1.8);
+              GAZEBO_DEPRECATED(1.10);
 
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.
