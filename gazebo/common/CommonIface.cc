@@ -16,10 +16,33 @@
 */
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#include <gazebo/gazebo_config.h>
+
+#ifdef HAVE_FFMPEG
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+}
+#endif
+
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
+
+/////////////////////////////////////////////////
+void common::load()
+{
+#ifdef HAVE_FFMPEG
+  static bool first = true;
+  if (first)
+  {
+    first = false;
+    avcodec_register_all();
+    av_register_all();
+  }
+#endif
+}
 
 /////////////////////////////////////////////////
 void common::add_search_path_suffix(const std::string &_suffix)

@@ -138,11 +138,10 @@ Visual::~Visual()
 
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
     delete *iter;
     */
   this->lines.clear();
-
 
   if (this->sceneNode != NULL)
   {
@@ -1503,12 +1502,12 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 }
 
 //////////////////////////////////////////////////
-DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
+DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->preRenderConnection = event::Events::ConnectPreRender(
       boost::bind(&Visual::Update, this));
 
-  DynamicLines *line = new DynamicLines(type);
+  DynamicLines *line = new DynamicLines(_type);
   this->lines.push_back(line);
   this->AttachObject(line);
   return line;
@@ -1519,7 +1518,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
   {
     if (*iter == _line)
     {

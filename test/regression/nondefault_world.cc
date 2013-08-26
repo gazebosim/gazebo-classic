@@ -41,7 +41,7 @@ TEST_P(NonDefaultWorld, Load)
   Load(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(NonDefaultWorld);
+INSTANTIATE_PHYSICS_ENGINES_TEST(NonDefaultWorld)
 
 int main(int argc, char **argv)
 {
