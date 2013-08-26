@@ -1908,7 +1908,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     VisualPtr transmitterVis(new TransmitterVisual(
           _msg->name() + "_GUIONLY_transmitter_vis", parentVis, _msg->topic()));
-    this->visuals[transmitterVis->GetName()] = transmitterVis;
+    this->visuals[transmitterVis->GetId()] = transmitterVis;
     transmitterVis->Load();
   }
 

@@ -28,7 +28,7 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/ContactManager.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"

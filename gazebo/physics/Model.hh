@@ -328,7 +328,7 @@ namespace gazebo
       /// \brief All the joints in the model.
       private: Joint_V joints;
 
-      /// \brief All the links in the model.
+      /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
 
       /// \brief All the grippers in the model.
@@ -355,9 +355,6 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
-
-      /// \brief Cached list of links. This is here for performance.
-      private: Link_V links;
 
       /// \brief True if plugins have been loaded.
       private: bool pluginsLoaded;
