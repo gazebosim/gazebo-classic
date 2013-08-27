@@ -147,7 +147,7 @@ bool Sensor::NeedsUpdate()
 
   if (simTime == this->lastUpdateTime)
     return false;
-    
+
   return (simTime - this->lastUpdateTime +
       this->updateDelay) >= this->updatePeriod;
 }
