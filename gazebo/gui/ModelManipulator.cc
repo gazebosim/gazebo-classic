@@ -272,7 +272,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     return;
   }
 
-  math::Vector3 newScale = this->mouseVisualScale * scale;
+  math::Vector3 newScale = this->mouseVisualScale * scale.GetAbs();
 
   if (this->mouseEvent.control)
   {
