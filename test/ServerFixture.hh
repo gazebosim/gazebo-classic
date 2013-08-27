@@ -72,22 +72,22 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
                common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
+                   TEST_INTEGRATION_PATH);
 
                // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
+               std::string path = TEST_INTEGRATION_PATH;
                path += "/../..";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../sdf";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../gazebo";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
@@ -904,7 +904,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
-  /// \param[in] _sensitivity Receiver sensitibity (dBm)             
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
@@ -958,7 +958,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  common::Time::MSleep(sleep_each);
                  ++i;
                }
-               EXPECT_LT(i, retries);   
+               EXPECT_LT(i, retries);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
