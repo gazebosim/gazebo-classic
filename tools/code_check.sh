@@ -29,7 +29,7 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
 CPPCHECK_FILES=`\
-  find ./plugins ./gazebo ./tools ./examples ./test/regression ./interfaces \
+  find ./plugins ./gazebo ./tools ./examples ./test/integration ./interfaces \
     -name "*.cc"`
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
@@ -57,7 +57,7 @@ fi
 
 # cpplint
 CPPLINT_DIRS=\
-"./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces"
+"./gazebo ./tools ./plugins ./examples ./test/integration ./interfaces"
 CPPLINT_FILES=`\
   find $CPPLINT_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
 if [ $xmlout -eq 1 ]; then
