@@ -24,8 +24,6 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-// Remove the gazebo_config and ifdefs in Gazebo 2.0
-#include "gazebo/gazebo_config.h"
 #include <sdf/sdf.hh>
 
 #include <gtest/gtest.h>
