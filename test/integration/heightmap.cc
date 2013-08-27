@@ -146,7 +146,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 void HeightmapTest::NotSquareImage()
 {
   common::SystemPaths::Instance()->AddGazeboPaths(
-      TEST_REGRESSION_PATH);
+      TEST_INTEGRATION_PATH);
 
   this->server = new Server();
   this->server->PreLoad();
@@ -161,7 +161,7 @@ void HeightmapTest::NotSquareImage()
 void HeightmapTest::InvalidSizeImage()
 {
   common::SystemPaths::Instance()->AddGazeboPaths(
-      TEST_REGRESSION_PATH);
+      TEST_INTEGRATION_PATH);
 
   this->server = new Server();
   this->server->PreLoad();
