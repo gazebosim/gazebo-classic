@@ -33,6 +33,7 @@ set(TEST_TYPE "PERFORMANCE")
 add_subdirectory(performance)
 set(TEST_TYPE "INTEGRATION")
 add_subdirectory(integration)
+add_subdirectory(regression)
 add_subdirectory(cmake)
 add_subdirectory(pkgconfig)
 
