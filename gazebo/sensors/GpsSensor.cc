@@ -111,7 +111,7 @@ void GpsSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void GpsSensor::UpdateImpl(bool /*_force*/)
+bool GpsSensor::UpdateImpl(bool /*_force*/)
 {
   // Get latest pose information
   if (this->parentLink)
@@ -157,6 +157,8 @@ void GpsSensor::UpdateImpl(bool /*_force*/)
 
   if (this->gpsPub)
     this->gpsPub->Publish(this->lastGpsMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

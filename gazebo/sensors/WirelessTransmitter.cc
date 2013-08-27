@@ -91,7 +91,7 @@ void WirelessTransmitter::Init()
 }
 
 //////////////////////////////////////////////////
-void WirelessTransmitter::UpdateImpl(bool /*_force*/)
+bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   this->referencePose =
         this->pose + this->parentEntity.lock()->GetWorldPose();
@@ -130,6 +130,8 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     }
     this->pub->Publish(msg);
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
