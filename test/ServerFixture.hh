@@ -26,9 +26,7 @@
 
 // Remove the gazebo_config and ifdefs in Gazebo 2.0
 #include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
 #include <sdf/sdf.hh>
-#endif
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -904,7 +902,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
-  /// \param[in] _sensitivity Receiver sensitibity (dBm)             
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
@@ -958,7 +956,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  common::Time::MSleep(sleep_each);
                  ++i;
                }
-               EXPECT_LT(i, retries);   
+               EXPECT_LT(i, retries);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
