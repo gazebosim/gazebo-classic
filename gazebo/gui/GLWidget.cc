@@ -255,7 +255,14 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     g_deleteAct->Signal(this->selectedVis->GetName());
 
   if (_event->key() == Qt::Key_Escape)
+  {
     event::Events::setSelectedEntity("", "normal");
+    if (this->state == "make_entity")
+    {
+      if (this->entityMaker)
+        this->entityMaker->Stop();
+    }
+  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -290,7 +297,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   }
 
   /// Switch between RTS modes
-  if (this->keyModifiers == Qt::NoModifier)
+  if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
   {
     if (_event->key() == Qt::Key_R)
       g_rotateAct->trigger();
@@ -298,6 +305,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_translateAct->trigger();
     else if (_event->key() == Qt::Key_S)
       g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_Escape)
+      g_arrowAct->trigger();
   }
 
   this->mouseEvent.control =
