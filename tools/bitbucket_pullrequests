@@ -61,7 +61,7 @@ class BitbucketPullRequests
     response = RestClient.get(url)
     output = ""
     response.lines.map(&:chomp).each do |line|
-      if line.include? '+++'
+      if line.include? '+++ b/'
         line["+++ b/"] = ""
         output += line + "\n"
       end
