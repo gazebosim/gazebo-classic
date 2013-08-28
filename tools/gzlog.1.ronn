@@ -1,7 +1,7 @@
 gzlog -- Tool to instrospect Gazebo log files
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzlog` [command] <options> [log file]
 

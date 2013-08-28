@@ -45,6 +45,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  SelectionObj.cc
   TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
@@ -88,6 +89,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  SelectionObj.hh
   TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
@@ -108,18 +110,18 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
 )
 
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
-  gazebo_common 
+  gazebo_common
   gazebo_skyx
   gazebo_selection_buffer
-  ${ogre_libraries} 
-  ${OPENGL_LIBRARIES} 
+  ${ogre_libraries}
+  ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
 
