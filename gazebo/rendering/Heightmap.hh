@@ -198,8 +198,6 @@ namespace gazebo
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
       private: void DefineTerrain(int _x, int _y);
-      private: void DefineTerrainCaguero(int _x, int _y);
-
 
       /// \brief Internal function used to setup shadows for the terrain.
       /// \param[in] _enabled True to enable shadows.
@@ -258,6 +256,9 @@ namespace gazebo
 
       private: Ogre::PagedWorld* world;
 
+      private: std::vector<std::vector<float> > subTerrains;
+
+      private: int terrainIdx;
     };
     /// \}
 

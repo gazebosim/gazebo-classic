@@ -55,6 +55,8 @@ Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
   this->terrainGlobals = NULL;
+
+  this->terrainIdx = 0;
 }
 
 //////////////////////////////////////////////////
@@ -149,6 +151,87 @@ common::Image Heightmap::GetImage() const
   return result;
 }
 
+void printHeight(const std::string &_title, std::vector<float> _heightmap)
+{
+  std::cout << _title << std::endl;
+  int width = sqrt(_heightmap.size());
+  for (unsigned int i = 1; i <= _heightmap.size(); ++i)
+  {
+      std::cout << std::setw(4) << _heightmap[i - 1] << " ";
+      if (i % width == 0)
+      {
+        std::cout << std::endl;  
+      }
+  }
+  std::cout << std::endl << std::endl;
+}
+
+//---
+void splitHeights(std::vector<float> _heightmap, const int _n,
+    std::vector<std::vector<float> > &_v)
+{
+  //ToDo: Sanity check (sqrt(_n) should be power of 2)
+  /*if (_n != 4)
+  {
+    std::cerr << "Invalid number of terrain divisions [" << _n << "]\n";
+    return;
+  }*/
+  
+  //257
+  int width = sqrt(_heightmap.size());
+  //5
+  int newWidth = 1 + (width - 1) / sqrt(_n);
+
+  // Memory allocation
+  _v.resize(_n);
+  
+  int count = 0;
+  int tileIndex = 0;
+
+  for (int tileR = 0; tileR < sqrt(_n); ++tileR)
+  {
+    tileIndex = tileR * sqrt(_n);
+    for (int row = 0; row < newWidth - 1; ++row)
+    {
+      for (int tileC = 0; tileC < sqrt(_n); ++tileC)
+      {
+        for (int col = 0; col < newWidth - 1; ++col)
+        {
+          _v[tileIndex].push_back(_heightmap[count]);
+          ++count;
+        }
+        // Copy last value into the last column
+        _v[tileIndex].push_back(_v[tileIndex].back());
+
+        tileIndex = tileR * sqrt(_n) + (tileIndex + 1) % int(sqrt(_n));
+
+        // Print
+        /*for (int i = 0; i < _v.size(); ++i)
+        {
+          std::ostringstream convert;
+          convert << i;
+          printHeight("During " + convert.str(), _v[i]);  
+        }
+        std::cout << "---\n";
+        std::string temp;
+        getline(std::cin, temp);*/ 
+
+
+      }
+      ++count;
+    }
+    // Recopy the last row
+    for (int i = 0; i < sqrt(_n); ++i)
+    {
+      tileIndex = tileR * sqrt(_n) + i;
+      std::vector<float> lastRow(_v[tileIndex].end() - newWidth,
+          _v[tileIndex].end());
+      _v[tileIndex].insert(_v[tileIndex].end(),
+          lastRow.begin(), lastRow.end());
+    }
+  }
+}
+
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
@@ -182,20 +265,47 @@ void Heightmap::Load()
   if (!math::isPowerOfTwo(this->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
+  // Testing splitting terrain
+  int N = 4;
+  splitHeights(this->heights, N, this->subTerrains);
+
+  for (int i = 0; i < N; ++i)
+  {
+    printHeight("Slice", this->subTerrains[i]);  
+  }
+  
+
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
   // Param 2: Alignment plane
   // Param 3: Number of vertices along one edge of the terrain (2^n+1).
   //          Terrains must be square, with each side a power of 2 in size
   // Param 4: World size of each terrain instance, in meters.
+  /*this->terrainGroup = new Ogre::TerrainGroup(
+      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
+      this->dataSize, this->terrainSize.x);*/
+
+  std::cout << "Size X: " << this->terrainSize.x << std::endl;
+  std::cout << "Data size: " << this->dataSize << std::endl;
+  std::cout << "New size: " << 1 + ((this->terrainSize.x - 1) / sqrt(N)) << std::endl;
+  std::cout << "Origen: " << this->terrainOrigin << std::endl;
+    std::cout << "Heightmap size: " << this->heights.size() << std::endl;
+
+
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      this->dataSize, this->terrainSize.x);
+      1 + ((this->dataSize - 1) / sqrt(N)), this->terrainSize.x / (sqrt(N)));
 
   this->terrainGroup->setFilenameConvention(
       Ogre::String("gazebo_terrain"), Ogre::String("dat"));
 
-  this->terrainGroup->setOrigin(Conversions::Convert(this->terrainOrigin));
+  math::Vector3 origin(-0.5 * this->terrainSize.x +
+      0.5 * this->terrainSize.x / sqrt(N), 
+      -0.5 * this->terrainSize.x +
+      0.5 * this->terrainSize.x / sqrt(N), 0);
+  //math::Vector3 origin(-0.5 * this->terrainSize.x / (sqrt(N)),
+  //    -0.5 * this->terrainSize.x / (sqrt(N)), 0);
+  this->terrainGroup->setOrigin(Conversions::Convert(origin));
 
   this->ConfigureTerrainDefaults();
 
@@ -220,21 +330,16 @@ void Heightmap::Load()
 
   this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
   this->world = mPageManager->createWorld();
-  mTerrainPaging->createWorldSection(world, this->terrainGroup, 2, 3, 
+  mTerrainPaging->createWorldSection(world, this->terrainGroup, 100, 120, 
     //TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
     //TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
-    0, 0, 1, 0);
+    0, 0, sqrt(N) - 1, sqrt(N) - 1);
 
   // caguero - Testing Paging
 
-  /*for (int x = 0; x <= 1; ++x)
-    for (int y = 0; y <= 0; ++y)
-      this->DefineTerrain(x, y);*/
-
-  DefineTerrainCaguero(0, 0);
-  DefineTerrainCaguero(0, 1);
-  DefineTerrainCaguero(1, 0);
-  DefineTerrainCaguero(1, 1);
+  for (int y = 0; y <= sqrt(N) - 1; ++y)
+    for (int x = 0; x <= sqrt(N) - 1; ++x)
+      this->DefineTerrain(x, y);
 
   // sync load since we want everything in place when we start
   this->terrainGroup->loadAllTerrains(true);
@@ -310,8 +415,8 @@ void Heightmap::ConfigureTerrainDefaults()
 
   defaultimp.inputScale = 1.0;
 
-  defaultimp.minBatchSize = 65;
-  defaultimp.maxBatchSize = 129;
+  defaultimp.minBatchSize = 17;
+  defaultimp.maxBatchSize = 65;
 
   // textures. The default material generator takes two materials per layer.
   //    1. diffuse_specular - diffuse texture with a specular map in the
@@ -372,39 +477,9 @@ void Heightmap::DefineTerrain(int _x, int _y)
   }
   else
   {
-    this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
-    this->terrainsImported = true;
-  }
-}
-
-/////////////////////////////////////////////////
-void Heightmap::DefineTerrainCaguero(int _x, int _y)
-{
-  Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
-
-  if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
-        this->terrainGroup->getResourceGroup(), filename))
-  {
-    this->terrainGroup->defineTerrain(_x, _y);
-  }
-  else
-  {
-    std::vector<float>::const_iterator first = this->heights.begin();
-    int half;
-    if (this->heights.size() % 2 == 0)
-    {
-      half = (this->heights.size() / 2) - 1;
-    }
-    else
-    {
-      half = (this->heights.size() / 2);
-    }
-
-    std::vector<float>::const_iterator last = this->heights.begin() + half + 1;
-    std::vector<float> newVec(first, last);
-    std::cout << "half vector1: " << half << std::endl;
-    std::cout << "Size new vector1: " << newVec.size() << std::endl;
-    this->terrainGroup->defineTerrain(_x, _y, &newVec[0]);
+    //this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+    this->terrainGroup->defineTerrain(_x, _y, &subTerrains[this->terrainIdx][0]);
+    ++terrainIdx;
     this->terrainsImported = true;
   }
 }
