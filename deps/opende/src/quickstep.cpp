@@ -1840,17 +1840,18 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
-              const dReal moi_ratio = 10.0;
+              const dReal max_moi_ratio = 10.0;
               bool modify_inertia = true;
-              if (moi_S1 > moi_ratio * moi_S2)
+              dReal moi_S1_new, moi_S2_new;
+              if (moi_S1 > max_moi_ratio * moi_S2)
               {
-                moi_S2 = (moi_sum)/(moi_ratio + 1.0);
-                moi_S1 = moi_ratio*moi_S2;
+                moi_S2_new = (moi_sum)/(max_moi_ratio + 1.0);
+                moi_S1_new = max_moi_ratio*moi_S2_new;
               }
-              else if (moi_S2 > moi_ratio * moi_S1)
+              else if (moi_S2 > max_moi_ratio * moi_S1)
               {
-                moi_S1 = (moi_sum)/(moi_ratio + 1.0);
-                moi_S2 = moi_ratio*moi_S1;
+                moi_S1_new = (moi_sum)/(max_moi_ratio + 1.0);
+                moi_S2_new = max_moi_ratio*moi_S1_new;
               }
               else
                 modify_inertia = false;
@@ -1858,13 +1859,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
               if (modify_inertia)
               {
 #ifdef DEBUG_INERTIA_PROPAGATION
-                printf(" distributed S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
+              printf("==========================\n");
+                printf(" original    S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
+                printf(" distributed S1 [%f] S2 [%f]\n", moi_S1_new, moi_S2_new);
 #endif
-                // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
+                // Modify MOI by adding delta scalar MOI in tensor form.
                 for (int si = 0; si < 12; ++si)
                 {
-                  MOI_ptr1[si] += moi_S1 * SS[si];
-                  MOI_ptr2[si] += moi_S2 * SS[si];
+                  MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                  MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
                 }
 
                 // Update invMOI by inverting analytically (may not be efficient).
