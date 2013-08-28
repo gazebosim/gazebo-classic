@@ -74,7 +74,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 
     while (*iter != physics->GetGravity())
     {
-      world->StepWorld(1);
+      world->Step(1);
       common::Time::MSleep(1);
     }
 
@@ -139,7 +139,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
       while (*iter != model->GetWorldPose())
       {
-        world->StepWorld(1);
+        world->Step(1);
         common::Time::MSleep(1);
       }
 

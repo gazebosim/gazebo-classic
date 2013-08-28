@@ -15,6 +15,7 @@
  *
 */
 #include <google/protobuf/descriptor.h>
+#include <set>
 #include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
@@ -235,6 +236,35 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
         pub->CopyFrom(iter->first);
       }
       conn->EnqueueMsg(msgs::Package("publisher_list", msg), true);
+    }
+    else if (req.request() == "get_topics")
+    {
+      std::set<std::string> topics;
+      msgs::GzString_V msg;
+
+      // Add all topics that are published
+      for (PubList::iterator iter = this->publishers.begin();
+          iter != this->publishers.end(); ++iter)
+      {
+        topics.insert(iter->first.topic());
+      }
+
+      // Add all topics that are subscribed
+      for (SubList::iterator iter = this->subscribers.begin();
+           iter != this->subscribers.end(); ++iter)
+      {
+        topics.insert(iter->first.topic());
+      }
+
+      // Construct the message of only unique names
+      for (std::set<std::string>::iterator iter =
+          topics.begin(); iter != topics.end(); ++iter)
+      {
+        msg.add_data(*iter);
+      }
+
+      // Send the topic list message
+      conn->EnqueueMsg(msgs::Package("topic_list", msg), true);
     }
     else if (req.request() == "topic_info")
     {

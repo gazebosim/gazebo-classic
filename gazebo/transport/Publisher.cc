@@ -270,9 +270,14 @@ void Publisher::Fini()
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
+  common::Time slept;
+
   // Wait for the message to be published
-  while (!this->pubIds.empty())
-    usleep(100);
+  while (!this->pubIds.empty() && slept < common::Time(1, 0))
+  {
+    common::Time::MSleep(10);
+    slept += common::Time(0, 10000000);
+  }
 
   this->node.reset();
 }

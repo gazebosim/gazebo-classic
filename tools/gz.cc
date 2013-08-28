@@ -87,8 +87,8 @@ void Command::ListOptions()
 {
   std::vector<std::string> pieces;
 
-  std::vector<boost::shared_ptr<po::option_description> >::const_iterator iter; 
-  for (iter = this->visibleOptions.options().begin(); 
+  std::vector<boost::shared_ptr<po::option_description> >::const_iterator iter;
+  for (iter = this->visibleOptions.options().begin();
       iter != this->visibleOptions.options().end(); ++iter)
   {
     pieces.clear();
@@ -379,7 +379,8 @@ ModelCommand::ModelCommand()
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("delete,d", "Delete a model.")
-    ("spawn-sdf,f", po::value<std::string>(), "Spawn model from SDF file.")
+    ("spawn-file,f", po::value<std::string>(), "Spawn model from SDF file.")
+    ("spawn-string,s", "Spawn model from SDF string, pass by a pipe.")
     ("pose-x,x", po::value<double>(), "x value")
     ("pose-y,y", po::value<double>(), "y value")
     ("pose-z,z", po::value<double>(), "z value")
@@ -444,9 +445,9 @@ bool ModelCommand::RunImpl()
     pub->Publish(*msg, true);
     delete msg;
   }
-  else if (this->vm.count("spawn-sdf"))
+  else if (this->vm.count("spawn-file"))
   {
-    std::string filename = this->vm["spawn-sdf"].as<std::string>();
+    std::string filename = this->vm["spawn-file"].as<std::string>();
 
     std::ifstream ifs(filename.c_str());
     if (!ifs)
@@ -468,27 +469,34 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    return this->ProcessSpawn(sdf, modelName, pose, node);
+  }
+  else if (this->vm.count("spawn-string"))
+  {
+    std::string input;
+    std::string sdfString;
 
-    if (!modelElem)
+    // Read input from the command line.
+    while(std::getline(std::cin, input))
     {
-      gzerr << "Unable to find <model> element.\n";
+      sdfString += input;
+    }
+
+    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    if (!sdf::init(sdf))
+    {
+      std::cerr << "Error: SDF parsing the xml failed" << std::endl;
       return false;
     }
 
-    // Get/Set the model name
-    if (modelName.empty())
-      modelName = modelElem->Get<std::string>("name");
-    else
-      modelElem->GetAttribute("name")->SetFromString(modelName);
+    std::cout << sdfString << std::endl;
+    if (!sdf::readString(sdfString, sdf))
+    {
+      std::cerr << "Error: SDF parsing the xml failed\n";
+      return false;
+    }
 
-    transport::PublisherPtr pub = node->Advertise<msgs::Factory>("~/factory");
-    pub->WaitForConnection();
-
-    msgs::Factory msg;
-    msg.set_sdf(sdf->ToString());
-    msgs::Set(msg.mutable_pose(), pose);
-    pub->Publish(msg, true);
+    return this->ProcessSpawn(sdf, modelName, pose, node);
   }
   else
   {
@@ -501,6 +509,33 @@ bool ModelCommand::RunImpl()
     msgs::Set(msg.mutable_pose(), pose);
     pub->Publish(msg, true);
   }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+    const std::string _name, const math::Pose &_pose, transport::NodePtr _node)
+{
+  sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
+
+  if (!modelElem)
+  {
+    gzerr << "Unable to find <model> element.\n";
+    return false;
+  }
+
+  // Set the model name
+  if (!_name.empty())
+    modelElem->GetAttribute("name")->SetFromString(_name);
+
+  transport::PublisherPtr pub = _node->Advertise<msgs::Factory>("~/factory");
+  pub->WaitForConnection();
+
+  msgs::Factory msg;
+  msg.set_sdf(_sdf->ToString());
+  msgs::Set(msg.mutable_pose(), _pose);
+  pub->Publish(msg, true);
 
   return true;
 }
@@ -637,6 +672,7 @@ void CameraCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool CameraCommand::RunImpl()
 {
+  std::cout << "Run camera\n";
   std::string cameraName, worldName;
 
   if (this->vm.count("world-name"))
@@ -991,7 +1027,6 @@ void HelpCommand::Help(const std::string &_command)
   }
   else if (g_commandMap.find(_command) != g_commandMap.end())
     g_commandMap[_command]->Help();
-
 }
 
 /////////////////////////////////////////////////

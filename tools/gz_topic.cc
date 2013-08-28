@@ -39,6 +39,7 @@ TopicCommand::TopicCommand()
      "View topic data using a QT widget.")
     ("hz,z", po::value<std::string>(), "Get publish frequency.")
     ("bw,b", po::value<std::string>(), "Get topic bandwidth.")
+    ("unformatted,u", "Output data from echo without formatting.")
     ("duration,d", po::value<double>(), "Duration (seconds) to run. "
      "Applicable with echo, hz, and bw");
 }
@@ -86,33 +87,23 @@ void TopicCommand::List()
   std::string data;
   msgs::Packet packet;
   msgs::Request request;
-  msgs::Publishers pubs;
+  msgs::GzString_V topics;
 
   transport::ConnectionPtr connection = this->ConnectToMaster();
 
   if (connection)
   {
     request.set_id(0);
-    request.set_request("get_publishers");
+    request.set_request("get_topics");
     connection->EnqueueMsg(msgs::Package("request", request), true);
     connection->Read(data);
 
     packet.ParseFromString(data);
-    pubs.ParseFromString(packet.serialized_data());
+    topics.ParseFromString(packet.serialized_data());
 
-    // This list is used to filter topic output.
-    std::list<std::string> listed;
-
-    for (int i = 0; i < pubs.publisher_size(); i++)
+    for (int i = 0; i < topics.data_size(); ++i)
     {
-      const msgs::Publish &p = pubs.publisher(i);
-      if (std::find(listed.begin(), listed.end(), p.topic()) == listed.end())
-      {
-        std::cout << p.topic() << std::endl;
-
-        // Record the topics that have been listed to prevent duplicates.
-        listed.push_back(p.topic());
-      }
+      std::cout << topics.data(i) << std::endl;
     }
   }
 
@@ -173,7 +164,10 @@ void TopicCommand::Info(const std::string &_topic)
 void TopicCommand::EchoCB(const std::string &_data)
 {
   this->echoMsg->ParseFromString(_data);
-  std::cout << this->echoMsg->DebugString() << "\n";
+  if (this->vm.count("unformatted") > 0)
+    std::cout << this->echoMsg->ShortDebugString() << "\n";
+  else
+    std::cout << this->echoMsg->DebugString() << "\n";
 }
 
 /////////////////////////////////////////////////

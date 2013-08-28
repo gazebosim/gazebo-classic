@@ -49,7 +49,7 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -83,7 +83,7 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
     joint_01->SetForce(0u, effort1);
     joint_12->SetForce(0u, effort2);
 
-    world->StepWorld(1);
+    world->Step(1);
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
 
@@ -166,7 +166,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -185,7 +185,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 1 (y)-------------------\n";
   physics->SetGravity(math::Vector3(0, 10, 0));
-  world->StepWorld(100);
+  world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0048295899143964149, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), 0.0, 1e-6);
@@ -197,7 +197,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 2 (x)-------------------\n";
   physics->SetGravity(math::Vector3(10, 0, 0));
-  world->StepWorld(100);
+  world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0050046318305403403, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.0048293115636619532, 1e-5);
@@ -209,7 +209,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 3 (joint limit)-------------------\n";
   physics->SetGravity(math::Vector3(1000, 1000, 0));
-  world->StepWorld(1000);
+  world->Step(1000);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.7, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.7, 0.001);
@@ -243,7 +243,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -263,7 +263,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   gzdbg << "-------------------Test 1-------------------\n";
   for (unsigned int i = 0; i < 5; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_NEAR(wrench_01.body1Force.x,    0.0, TOL);
@@ -317,12 +317,12 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
   joint_01->SetAttribute("stop_erp", 0, 0.02);
   joint_12->SetAttribute("stop_erp", 0, 0.02);
   // wait for dynamics to stabilize
-  world->StepWorld(2000);
+  world->Step(2000);
   // check force torques in new system
   gzdbg << "\n-------------------Test 2-------------------\n";
   for (unsigned int i = 0; i < 5; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
 
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
@@ -376,7 +376,7 @@ TEST_F(ODEJoint_TEST, GetForceTorque)
 
   // simulate a few steps
   int steps = 20;
-  world->StepWorld(steps);
+  world->Step(steps);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
   gzdbg << "t after 20 steps : " << t << "\n";

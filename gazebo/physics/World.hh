@@ -275,7 +275,11 @@ namespace gazebo
 
       /// \brief Step callback.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(1.9);
+
+      /// \brief Step callback.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.

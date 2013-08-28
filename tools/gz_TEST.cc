@@ -46,7 +46,7 @@ bool custom_exec(std::string _cmd)
 /////////////////////////////////////////////////
 std::string custom_exec_str(std::string _cmd)
 {
-  // _cmd += " 2>/dev/null";
+  _cmd += " 2>&1";
   FILE *pipe = popen(_cmd.c_str(), "r");
 
   if (!pipe)
@@ -118,7 +118,7 @@ void fini()
 
   g_pid = -1;
 }
-/*
+
 /////////////////////////////////////////////////
 void JointCmdCB(ConstJointCmdPtr &_msg)
 {
@@ -286,11 +286,36 @@ TEST(gz, Model)
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
-  // Test model spawn
+  // Test model spawn from file
   {
     std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
+
+    std::ifstream ifs(filename.c_str());
+    EXPECT_TRUE(ifs);
+
+    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    EXPECT_TRUE(sdf::init(sdf));
+
+    EXPECT_TRUE(sdf::readFile(filename, sdf));
+    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    modelElem->GetAttribute("name")->SetFromString("my_box");
+
+    gazebo::msgs::Factory msg;
+    msg.set_sdf(sdf->ToString());
+    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test model spawn from string
+  {
+    std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
+
+    std::string cmd = "cat ";
+    cmd += filename + " | gz model -w default -m my_box -s";
+    waitForMsg(cmd);
 
     std::ifstream ifs(filename.c_str());
     EXPECT_TRUE(ifs);
@@ -523,6 +548,10 @@ TEST(gz, Topic)
   output = custom_exec_str("gz topic -e /gazebo/default/world_stats -d 1");
   EXPECT_NE(output.find("real_time {"), std::string::npos);
 
+  // Echo unformatted
+  output = custom_exec_str("gz topic -e /gazebo/default/world_stats -u -d 1");
+  EXPECT_NE(output.find("real_time {"), std::string::npos);
+
   // Hz 
   output = custom_exec_str("gz topic -z /gazebo/default/world_stats -d 1");
   EXPECT_NE(output.find("Hz:"), std::string::npos);
@@ -559,7 +588,7 @@ TEST(gz, Stress)
 
   fini();
 }
-*/
+
 
 /////////////////////////////////////////////////
 TEST(gz, SDF)
@@ -583,6 +612,8 @@ TEST(gz, SDF)
   output = custom_exec_str("gz sdf -d -v 1.3");
   EXPECT_EQ(output, sdf_description_1_3);
 
+  EXPECT_TRUE(false);
+/* 
   // 1.0 doc
   output = custom_exec_str("gz sdf -o -v 1.0");
   EXPECT_EQ(output, sdf_doc_1_0);
@@ -620,6 +651,7 @@ TEST(gz, SDF)
   // Convert 1.3 SDF
   output = custom_exec_str(std::string("gz sdf -c ") + path.string());
   EXPECT_EQ(output, "Success\n");
+  */
 
   fini();
 }

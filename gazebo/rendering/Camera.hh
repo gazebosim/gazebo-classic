@@ -168,6 +168,10 @@ namespace gazebo
       /// \param[in] _pose The new math::Pose of the camera
       public: virtual void SetWorldPose(const math::Pose &_pose);
 
+      /// \brief Get the world pose.
+      /// \return The pose of the camera in the world coordinate frame.
+      public: math::Pose GetWorldPose() const;
+
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
       public: void SetWorldPosition(const math::Vector3 &_pos);
@@ -342,9 +346,13 @@ namespace gazebo
       /// \return Pointer to the raw data, null if data is not available.
       public: virtual const unsigned char *GetImageData(unsigned int i = 0);
 
-      /// \brief Get the camera's name
+      /// \brief Get the camera's short name
       /// \return The name of the camera
       public: std::string GetName() const;
+
+      /// \brief Get the camera's scoped name (scene_name::camera_name)
+      /// \return The name of the camera
+      public: std::string GetScopedName() const;
 
       /// \brief Set the camera's name
       /// \param[in] _name New name for the camera
@@ -565,6 +573,12 @@ namespace gazebo
 
       /// \brief Name of the camera.
       protected: std::string name;
+
+      /// \brief Scene ccoped name of the camera.
+      protected: std::string scopedName;
+
+      /// \brief Scene ccoped name of the camera with a unique ID.
+      protected: std::string scopedUniqueName;
 
       /// \brief Camera's SDF values.
       protected: sdf::ElementPtr sdf;

@@ -473,8 +473,7 @@ uint32_t Scene::GetGridCount() const
 //////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera(new Camera(this->name + "::" + _name,
-        shared_from_this(), _autoRender));
+  CameraPtr camera(new Camera(_name, shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;

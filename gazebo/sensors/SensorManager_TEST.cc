@@ -45,7 +45,7 @@ TEST_F(SensorManager_TEST, Data)
   sensors::SensorPtr sensor;
 
   // Load in a world with cameras and lasers
-  Load("worlds/test_camera_laser.world");
+  Load("worlds/camera_laser_test.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
   EXPECT_TRUE(mgr->SensorsInitialized());
 

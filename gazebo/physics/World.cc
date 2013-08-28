@@ -562,9 +562,15 @@ void World::Step()
 //////////////////////////////////////////////////
 void World::StepWorld(int _steps)
 {
+  this->Step(_steps);
+}
+
+//////////////////////////////////////////////////
+void World::Step(int _steps)
+{
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    gzwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
@@ -1052,6 +1058,7 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
+  printf("World::SetPaused\n");
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
     this->pause = _p;

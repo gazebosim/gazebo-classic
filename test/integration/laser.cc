@@ -225,7 +225,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   world->GetModel(box02)->SetWorldPose(
       math::Pose(math::Vector3(0, -(maxRange + 1), 0),
       math::Quaternion(0, 0, 0)));
-  world->StepWorld(1);
+  world->Step(1);
   raySensor->Update(true);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)

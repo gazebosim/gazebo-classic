@@ -72,22 +72,22 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
                common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
+                   TEST_INTEGRATION_PATH);
 
                // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
+               std::string path = TEST_INTEGRATION_PATH;
                path += "/../..";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../sdf";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../gazebo";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 

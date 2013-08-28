@@ -140,6 +140,16 @@ namespace gazebo
 
     // Documentation inherited
     protected: virtual bool RunImpl();
+
+    /// \brief Spawn helper function.
+    /// \param[in] _sdf SDF model to spawn.
+    /// \param[in] _name Name for the model.
+    /// \param[in] _pose Pose of the model.
+    /// \param[in] _node Node for communication.
+    /// \return True if the spawn message was sent.
+    private: bool ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+                 const std::string _name, const math::Pose &_pose,
+                 transport::NodePtr _node);
   };
 
   /// \brief Joint command
