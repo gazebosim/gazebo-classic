@@ -24,6 +24,7 @@ then
     echo This is not an hg repository
     exit
   fi
+  cd $hg_root
   hg log -r $QUICK_SOURCE > /dev/null
   if [ "$?" -ne "0" ] ; then
     echo $QUICK_SOURCE is not a valid changeset hash
