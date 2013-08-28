@@ -1840,17 +1840,17 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
-              const dReal moi_ratio = 2.0;
+              const dReal moi_ratio = 10.0;
               bool modify_inertia = true;
               if (moi_S1 > moi_ratio * moi_S2)
               {
-                moi_S1 = moi_ratio/(moi_ratio + 1.0)*(moi_sum);
-                moi_S2 = (moi_sum)/11.0;
+                moi_S2 = (moi_sum)/(moi_ratio + 1.0);
+                moi_S1 = moi_ratio*moi_S2;
               }
               else if (moi_S2 > moi_ratio * moi_S1)
               {
-                moi_S2 = moi_ratio/(moi_ratio + 1.0)*(moi_sum);
                 moi_S1 = (moi_sum)/(moi_ratio + 1.0);
+                moi_S2 = moi_ratio*moi_S1;
               }
               else
                 modify_inertia = false;
@@ -1858,7 +1858,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               if (modify_inertia)
               {
 #ifdef DEBUG_INERTIA_PROPAGATION
-                printf(" distributed S1 [%f] S2 [%f] = S [%f]\n", moi_S1, moi_S2, moi_S);
+                printf(" distributed S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
 #endif
                 // Modify MOI_ptr1 by adding delta scalar MOI in tensor form.
                 for (int si = 0; si < 12; ++si)
