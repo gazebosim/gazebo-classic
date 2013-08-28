@@ -18,6 +18,39 @@ class BitbucketPullRequests
   @url_prefix
   @url_suffix
 
+  class Summary
+    @id
+    @source
+    @destination
+    @branch
+
+    def initialize(jsonHash)
+      @id          = jsonHash["id"]
+      @source      = jsonHash["source"]["commit"]["sha"]
+      @destination = jsonHash["destination"]["commit"]["sha"]
+      @branch      = jsonHash["source"]["branch"]["name"]
+    end
+
+    def to_s
+      @id.to_s.rjust(5, ' ') + "    " +
+      @source + "    " +
+      @destination + "    " +
+      @branch + "\n"
+    end
+
+    def source
+      @source
+    end
+
+    def destination
+      @destination
+    end
+
+    def branch
+      @branch
+    end
+  end
+
   # constructor
   def initialize
     @url_domain = 'https://bitbucket.org'
@@ -29,11 +62,11 @@ class BitbucketPullRequests
     response = RestClient.get(@url_prefix)
     jsonHash = JSON.parse(response.body)
     output = ""
-    jsonHash["values"].each { |pr| output += prettyPrintSummary(pr) }
+    jsonHash["values"].each { |pr| output += Summary.new(pr).to_s }
     while jsonHash.has_key? "next"
       response = RestClient.get(@url_domain + jsonHash["next"])
       jsonHash = JSON.parse(response.body)
-      jsonHash["values"].each { |pr| output += prettyPrintSummary(pr) }
+      jsonHash["values"].each { |pr| output += Summary.new(pr).to_s }
     end
     return output
   end
@@ -42,39 +75,75 @@ class BitbucketPullRequests
   def getPullRequestSummary(id)
     response = RestClient.get(@url_prefix + "/" + id.to_s)
     jsonHash = JSON.parse(response.body)
-    return prettyPrintSummary(jsonHash)
-  end
-
-  def prettyPrintSummary(pr)
-    output = ""
-    output += pr["id"].to_s.rjust(5, ' ')
-    output += "    "+pr["source"]["commit"]["sha"]
-    output += "    "+pr["destination"]["commit"]["sha"]
-    output += "    "+pr["source"]["branch"]["name"]
-    output += "\n"
-    return output
+    return Summary.new(jsonHash)
   end
 
   # list of files changed by pull request
   def getPullRequestFiles(id)
     url = @url_prefix + "/" + id.to_s + "/patch"
     response = RestClient.get(url)
-    output = ""
+    files = []
     response.lines.map(&:chomp).each do |line|
       if line.include? '+++ b/'
         line["+++ b/"] = ""
-        output += line + "\n"
+        files << line
       end
     end
-    return output
+    return files
+  end
+
+  # get ids for open pull requests
+  def getOpenPullRequests()
+    response = RestClient.get(@url_prefix)
+    jsonHash = JSON.parse(response.body)
+    ids = []
+    jsonHash["values"].each { |pr| ids << pr["id"].to_i }
+    while jsonHash.has_key? "next"
+      response = RestClient.get(@url_domain + jsonHash["next"])
+      jsonHash = JSON.parse(response.body)
+      jsonHash["values"].each { |pr| ids << pr["id"].to_i }
+    end
+    return ids
+  end
+  # check changed files in pull request by id
+  def checkPullRequest(id, fork=true)
+    summary = getPullRequestSummary(id)
+    puts "checking pull request #{id}, branch #{summary.branch}"
+    files = getPullRequestFiles(id)
+    files_list = ""
+    files.each { |f| files_list += " "+f }
+    hg_root = `hg root`.chomp
+    `hg log -r #{summary.destination} 2>&1`
+    if $? != 0
+      puts "Unknown revision #{summary.destination}, try: hg pull"
+      return
+    end
+    `hg log -r #{summary.source} 2>&1`
+    if $? != 0
+      puts "Unknown revision #{summary.source}, try: hg pull "+
+           "(it could also be a fork)"
+      return
+    end
+    ancestor=`hg log -r "ancestor(#{summary.source},#{summary.destination})" | head -1 | sed -e 's@.*:@@'`.chomp
+    if ancestor != summary.destination
+      puts "Need to merge branch #{summary.branch} with #{summary.destination}"
+    end
+    if fork
+      # this will allow real-time console output
+      exec "echo #{files_list} | sh #{hg_root}/tools/code_check.sh --quick #{summary.source}"
+    else
+      puts `echo #{files_list} | sh "#{hg_root}"/tools/code_check.sh --quick #{summary.source}`
+    end
   end
 end
 
 # default options
-list    = false
-summary = nil
-files   = nil
-help    = false
+list     = false
+summary  = nil
+check    = false
+check_id = nil
+files    = nil
+help     = false
 opt_parser = OptionParser.new do |o|
   o.on("-l", "--list",
        "List open pull requests with fields:\n"+" "*37+
@@ -82,6 +151,8 @@ opt_parser = OptionParser.new do |o|
   o.on("-s", "--summary [id]", Integer,
        "Summarize a pull request with fields:\n"+" "*37+
        "[id] [source] [dest] [branch]")  { |s| summary = s }
+  o.on("-c", "--check [id]", Integer,
+       "")  { |id| check_id = id; check = true }
   o.on("-f", "--files [id]", Integer,
        "Show changed files in a pull request") { |f| files = f }
   o.on("-h", "--help", "Display this help message") do
@@ -98,6 +169,15 @@ elsif !summary.nil?
   puts client.getPullRequestSummary(summary)
 elsif !files.nil?
   puts client.getPullRequestFiles(files)
+elsif check
+  if check_id.nil?
+    # check all open pull requests
+    client.getOpenPullRequests().each { |id|
+      client.checkPullRequest(id, false)
+    }
+  else
+    client.checkPullRequest(check_id)
+  end
 else
   puts opt_parser
 end
