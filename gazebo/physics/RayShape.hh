@@ -77,6 +77,9 @@ namespace gazebo
       /// \return The ray length.
       public: double GetLength() const;
 
+      /// \brief Set the scale of the ray
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Update the ray collision.
       public: virtual void Update() = 0;
 
