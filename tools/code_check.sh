@@ -30,7 +30,7 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
 CPPCHECK_FILES=`\
   find ./plugins ./gazebo ./tools ./examples ./test/integration \
-    ./interfaces -name "*.cc"`
+    ./test/regression/interfaces -name "*.cc"`
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
 CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
