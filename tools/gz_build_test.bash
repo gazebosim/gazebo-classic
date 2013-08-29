@@ -47,7 +47,7 @@ start_time=`eval date +%s`
 
 export DISPLAY=:0
 export PATH=$BUILD_ROOT/install/bin:$PATH
-export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$BUILD_ROOT/install/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$BUILD_ROOT/install/lib/pkgconfig:$PKG_CONFIG_PATH
 ulimit -c unlimited
 
