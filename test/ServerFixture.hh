@@ -136,6 +136,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
                delete this->server;
                this->server = NULL;
 
+               this->serverRunning = false;
+
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -172,10 +174,12 @@ class ServerFixture : public testing::TestWithParam<const char*>
                // Use a 30 second timeout.
                waitCount = 0;
                maxWaitCount = 3000;
-               while ((!physics::get_world() ||
-                        physics::get_world()->IsPaused() != _paused) &&
+               while ((!this->serverRunning || (!physics::get_world() ||
+                        physics::get_world()->IsPaused() != _paused)) &&
                       ++waitCount < maxWaitCount)
+               {
                  common::Time::MSleep(100);
+               }
                ASSERT_LT(waitCount, maxWaitCount);
 
                this->factoryPub->WaitForConnection();

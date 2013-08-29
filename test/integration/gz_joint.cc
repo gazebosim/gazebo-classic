@@ -51,7 +51,7 @@ TEST_F(GzJoint, Force)
   custom_exec("gz joint -w default -m model -j joint -f 10.0");
 
   std::cout << "Is Paused[" << world->IsPaused() << "]\n";
-  world->Step(1);
+  world->Step(100);
 
   // Make sure the joint has moved.
   EXPECT_GT(joint->GetAngle(0).Radian(), 0.1);
@@ -87,7 +87,7 @@ TEST_F(GzJoint, PositionPID)
   world->Step(1000);
 
   // Make sure the sensor is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 3.1415, 0.1);
+  EXPECT_NEAR(joint->GetAngle(0).Radian(), 3.1415, 0.2);
 }
 
 /////////////////////////////////////////////////

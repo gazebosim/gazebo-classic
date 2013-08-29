@@ -1058,7 +1058,6 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
-  printf("World::SetPaused\n");
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
     this->pause = _p;
@@ -1943,4 +1942,10 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+uint32_t World::GetIterations() const
+{
+  return this->iterations;
 }

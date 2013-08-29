@@ -26,10 +26,10 @@ class GzPhysics : public ServerFixture
 // \brief Test setting the gravity. 
 TEST_F(GzPhysics, Gravity)
 {
-  Load("worlds/empty_test.world");
+  Load("worlds/empty.world");
 
   // Spawn a box that will eventually float up.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
+  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(0, 0, .5),
       math::Vector3(0, 0, 0));
 
   // Get a pointer to the world
@@ -40,7 +40,7 @@ TEST_F(GzPhysics, Gravity)
   physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model);
 
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(0,0,0,0,0,0));
+  EXPECT_EQ(model->GetWorldPose(), math::Pose(0, 0, .5, 0, 0, 0));
 
   SetPause(true);
 
@@ -53,22 +53,64 @@ TEST_F(GzPhysics, Gravity)
 }
 
 /////////////////////////////////////////////////
-// \brief Test setting the gravity. 
-TEST_F(GzPhysics, Gravity)
+// \brief Test setting the step size. 
+TEST_F(GzPhysics, StepSize)
 {
-  Load("worlds/empty_test.world");
+  Load("worlds/empty.world");
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
+  ASSERT_TRUE(world->GetPhysicsEngine());
 
   // Change step size
-  custom_exec("gz physics -g 0,0,9.8");
+  custom_exec("gz physics -s 0.002");
+  EXPECT_NEAR(world->GetPhysicsEngine()->GetMaxStepSize(), 0.002, 1e-5);
 
-  world->Step(100);
+  // Change step size
+  custom_exec("gz physics -s 0.001");
+  EXPECT_NEAR(world->GetPhysicsEngine()->GetMaxStepSize(), 0.001, 1e-5);
 }
 
+/////////////////////////////////////////////////
+// \brief Test setting the iterations. 
+TEST_F(GzPhysics, Iters)
+{
+  Load("worlds/empty.world");
 
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+  ASSERT_TRUE(world->GetPhysicsEngine());
+
+  // Change iterations
+  custom_exec("gz physics -i 35");
+  EXPECT_EQ(world->GetPhysicsEngine()->GetSORPGSIters(), 35);
+
+  // Change iterations
+  custom_exec("gz physics -i 200");
+  EXPECT_EQ(world->GetPhysicsEngine()->GetSORPGSIters(), 200);
+}
+
+/////////////////////////////////////////////////
+// \brief Test setting the update rate. 
+TEST_F(GzPhysics, UpdateRate)
+{
+  Load("worlds/empty.world");
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+  ASSERT_TRUE(world->GetPhysicsEngine());
+
+  // Change update rate
+  custom_exec("gz physics -u 2.0");
+  EXPECT_NEAR(world->GetPhysicsEngine()->GetRealTimeUpdateRate(), 2.0, 1e-3);
+
+  // Change update rate
+  custom_exec("gz physics -u 0.5");
+  EXPECT_NEAR(world->GetPhysicsEngine()->GetRealTimeUpdateRate(), 0.5, 1e-3);
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
