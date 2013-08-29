@@ -62,12 +62,12 @@ void DARTModel::Init()
   this->dartSkeleton->setImmobileState(this->IsStatic());
 
   // Check if this link is free floating body
-  Link_V links = this->GetLinks();
+  Link_V linkList = this->GetLinks();
 
-  for (unsigned int i = 0; i < links.size(); ++i)
+  for (unsigned int i = 0; i < linkList.size(); ++i)
   {
     dart::dynamics::BodyNode* dartBodyNode
-        = boost::static_pointer_cast<DARTLink>(links[i])->getDARTBodyNode();
+        = boost::static_pointer_cast<DARTLink>(linkList[i])->getDARTBodyNode();
 
     if (dartBodyNode->getParentJoint() == NULL)
     {
@@ -76,7 +76,7 @@ void DARTModel::Init()
 
       newFreeJoint->setParentBody(NULL);
       newFreeJoint->setTransformFromParentBody(
-            DARTUtils::ConvertPose(links[i]->GetWorldPose()));
+            DARTUtils::ConvertPose(linkList[i]->GetWorldPose()));
 
       newFreeJoint->setChildBody(dartBodyNode);
       newFreeJoint->setTransformFromChildBody(dart::math::SE3::Identity());
