@@ -231,7 +231,7 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
 
   _msg.mutable_heightmap()->set_width(this->vertSize);
-  _msg.mutable_heightmap()->set_height(this->vertSize);
+  _msg.mutable_heightmap()->set_height(this->vertSize);  
 
   for (unsigned int y = 0; y < this->vertSize; ++y)
   {

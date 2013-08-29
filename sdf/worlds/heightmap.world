@@ -82,6 +82,7 @@
         <visual name="visual_abcedf">
           <geometry>
             <heightmap>
+              <use_terrain_paging>true</use_terrain_paging>
               <texture>
                 <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>

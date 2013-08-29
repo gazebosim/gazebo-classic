@@ -31,4 +31,7 @@
       <description>Distance over which the blend occurs</description>
     </element>
   </element>
+  <element name="use_terrain_paging" type="bool" default="false" required="0">
+    <description>Set if the rendering engine will use terrain paging</description>
+  </element>
 </element>

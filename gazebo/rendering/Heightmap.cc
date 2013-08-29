@@ -40,12 +40,6 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
-// max range for a int16
-#define TERRAIN_PAGE_MIN_X (-0x7FFF)
-#define TERRAIN_PAGE_MIN_Y (-0x7FFF)
-#define TERRAIN_PAGE_MAX_X 0x7FFF
-#define TERRAIN_PAGE_MAX_Y 0x7FFF 
-
 using namespace gazebo;
 using namespace rendering;
 using namespace Ogre;
@@ -57,6 +51,8 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->terrainGlobals = NULL;
 
   this->terrainIdx = 0;
+  this->useTerrainPaging = false;
+  this->numSubTerrains = 1;
 }
 
 //////////////////////////////////////////////////
@@ -66,6 +62,8 @@ Heightmap::~Heightmap()
 
   delete this->terrainGlobals;
   this->terrainGlobals = NULL;
+
+  this->terrainGroup->removeAllTerrains();
 
   delete this->terrainGroup;
   this->terrainGroup = NULL;
@@ -95,6 +93,11 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
         _msg->geometry().heightmap().blend(i).min_height());
     this->blendFade.push_back(
         _msg->geometry().heightmap().blend(i).fade_dist());
+  }
+
+  if (_msg->geometry().heightmap().has_use_terrain_paging())
+  {
+    this->useTerrainPaging = _msg->geometry().heightmap().use_terrain_paging();
   }
 
   this->Load();
@@ -249,31 +252,16 @@ void Heightmap::Load()
   {
     geomMsg.ParseFromString(response->serialized_data());
 
-    std::cout << geomMsg.heightmap().width() << " , " <<
-        geomMsg.heightmap().height() << std::endl;
-
     // Copy the height data.
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
-
-    std::cout << this->heights.size() << std::endl;
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
-
-  // Testing splitting terrain
-  int N = 4;
-  splitHeights(this->heights, N, this->subTerrains);
-
-  for (int i = 0; i < N; ++i)
-  {
-    printHeight("Slice", this->subTerrains[i]);  
-  }
-  
 
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
@@ -285,12 +273,17 @@ void Heightmap::Load()
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
       this->dataSize, this->terrainSize.x);*/
 
-  std::cout << "Size X: " << this->terrainSize.x << std::endl;
+  /*std::cout << "Size X: " << this->terrainSize.x << std::endl;
   std::cout << "Data size: " << this->dataSize << std::endl;
   std::cout << "New size: " << 1 + ((this->terrainSize.x - 1) / sqrt(N)) << std::endl;
   std::cout << "Origen: " << this->terrainOrigin << std::endl;
-    std::cout << "Heightmap size: " << this->heights.size() << std::endl;
+    std::cout << "Heightmap size: " << this->heights.size() << std::endl;*/
 
+  int N = 1;
+  if (this->useTerrainPaging)
+  {
+    N = 16;
+  }
 
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
@@ -299,12 +292,13 @@ void Heightmap::Load()
   this->terrainGroup->setFilenameConvention(
       Ogre::String("gazebo_terrain"), Ogre::String("dat"));
 
+  Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(-0.5 * this->terrainSize.x +
       0.5 * this->terrainSize.x / sqrt(N), 
       -0.5 * this->terrainSize.x +
-      0.5 * this->terrainSize.x / sqrt(N), 0);
-  //math::Vector3 origin(-0.5 * this->terrainSize.x / (sqrt(N)),
-  //    -0.5 * this->terrainSize.x / (sqrt(N)), 0);
+      0.5 * this->terrainSize.x / sqrt(N),
+      orig.z);
+
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
 
   this->ConfigureTerrainDefaults();
@@ -312,30 +306,28 @@ void Heightmap::Load()
   this->SetupShadows(true);
 
   // caguero - Testing Paging
-
-  this->mPageManager = OGRE_NEW Ogre::PageManager();
-  this->mPageManager->setPageProvider(&this->mDummyPageProvider);
-
-  // Add cameras
-  //std::cout << "Cameras: " << this->scene->GetCameraCount() << std::endl;
-  for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
+  splitHeights(this->heights, N, this->subTerrains);
+  
+  if (this->useTerrainPaging)
   {
-    this->mPageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
-  }
-  //std::cout << "User Cameras: " << this->scene->GetUserCameraCount() << std::endl;
-  for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
-  {
-    this->mPageManager->addCamera(this->scene->GetUserCamera(i)->GetOgreCamera());
-  }
+    this->mPageManager = OGRE_NEW Ogre::PageManager();
+    this->mPageManager->setPageProvider(&this->mDummyPageProvider);
 
-  this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
-  this->world = mPageManager->createWorld();
-  mTerrainPaging->createWorldSection(world, this->terrainGroup, 100, 120, 
-    //TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
-    //TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
-    0, 0, sqrt(N) - 1, sqrt(N) - 1);
+    // Add cameras
+    for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
+    {
+      this->mPageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
+    }
+    for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
+    {
+      this->mPageManager->addCamera(this->scene->GetUserCamera(i)->GetOgreCamera());
+    }
 
-  // caguero - Testing Paging
+    this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
+    this->world = mPageManager->createWorld();
+    mTerrainPaging->createWorldSection(world, this->terrainGroup, 100, 120, 
+      0, 0, sqrt(N) - 1, sqrt(N) - 1);
+  }
 
   for (int y = 0; y <= sqrt(N) - 1; ++y)
     for (int x = 0; x <= sqrt(N) - 1; ++x)

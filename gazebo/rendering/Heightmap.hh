@@ -50,23 +50,19 @@ namespace gazebo
     class DummyPageProvider : public PageProvider
     {
       public:
-      bool prepareProceduralPage(Page* page, PagedWorldSection* section) {
-        std::cout << "Loading page\n";
+      bool prepareProceduralPage(Page*, PagedWorldSection*) {
         return true;
       }
-      bool loadProceduralPage(Page* page, PagedWorldSection* section)
+      bool loadProceduralPage(Page*, PagedWorldSection*)
       {
-        std::cout << "Preparing page\n";
         return true;
       }
-      bool unloadProceduralPage(Page* page, PagedWorldSection* section)
+      bool unloadProceduralPage(Page*, PagedWorldSection*)
       {
-        std::cout << "Unloading page\n";
         return true;
       }
-      bool unprepareProceduralPage(Page* page, PagedWorldSection* section)
+      bool unprepareProceduralPage(Page*, PagedWorldSection*)
       {
-        std::cout << "Unpreparing page\n";
         return true;
       }
     };
@@ -259,6 +255,10 @@ namespace gazebo
       private: std::vector<std::vector<float> > subTerrains;
 
       private: int terrainIdx;
+
+      private: bool useTerrainPaging;
+
+      private: int numSubTerrains;
     };
     /// \}
 
