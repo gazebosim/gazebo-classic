@@ -244,21 +244,27 @@ namespace gazebo
       /// \brief Pointer to the terrain material generator.
       private: GzTerrainMatGen *gzMatGen;
 
+      /// \brief A page provided is needed to use the paging system.
       private: DummyPageProvider mDummyPageProvider;
 
+      /// \brief Central registration point for extension classes,
+      /// such as the PageStrategy, PageContentFactory.
       private: Ogre::PageManager *mPageManager;
 
+      /// \brief Type of paging applied
       private: Ogre::TerrainPaging *mTerrainPaging;
 
+      /// \brief Collection of world content
       private: Ogre::PagedWorld* world;
 
+      /// \brief Collection of terrains. Every terrain might be paged.
       private: std::vector<std::vector<float> > subTerrains;
 
+      /// \brief Used to iterate over all the terrains
       private: int terrainIdx;
 
+      /// \brief Flag that enables/disables the terrain paging
       private: bool useTerrainPaging;
-
-      private: int numSubTerrains;
     };
     /// \}
 

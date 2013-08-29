@@ -52,7 +52,6 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
-  this->numSubTerrains = 1;
 }
 
 //////////////////////////////////////////////////
@@ -154,6 +153,7 @@ common::Image Heightmap::GetImage() const
   return result;
 }
 
+//////////////////////////////////////////////////
 void printHeight(const std::string &_title, std::vector<float> _heightmap)
 {
   std::cout << _title << std::endl;
@@ -169,27 +169,21 @@ void printHeight(const std::string &_title, std::vector<float> _heightmap)
   std::cout << std::endl << std::endl;
 }
 
-//---
-void splitHeights(std::vector<float> _heightmap, const int _n,
+//////////////////////////////////////////////////
+void splitHeights(std::vector<float> &_heightmap, int _n,
     std::vector<std::vector<float> > &_v)
 {
-  //ToDo: Sanity check (sqrt(_n) should be power of 2)
-  /*if (_n != 4)
-  {
-    std::cerr << "Invalid number of terrain divisions [" << _n << "]\n";
-    return;
-  }*/
+  // We support splitting the terrain in 4 or 16 pieces
+  GZ_ASSERT(_n == 4 || _n == 16,
+      "Invalid number of terrain divisions (it should be 4 or 16)");
   
-  //257
+  int count = 0;
+  int tileIndex = 0;
   int width = sqrt(_heightmap.size());
-  //5
   int newWidth = 1 + (width - 1) / sqrt(_n);
 
   // Memory allocation
   _v.resize(_n);
-  
-  int count = 0;
-  int tileIndex = 0;
 
   for (int tileR = 0; tileR < sqrt(_n); ++tileR)
   {
@@ -207,19 +201,6 @@ void splitHeights(std::vector<float> _heightmap, const int _n,
         _v[tileIndex].push_back(_v[tileIndex].back());
 
         tileIndex = tileR * sqrt(_n) + (tileIndex + 1) % int(sqrt(_n));
-
-        // Print
-        /*for (int i = 0; i < _v.size(); ++i)
-        {
-          std::ostringstream convert;
-          convert << i;
-          printHeight("During " + convert.str(), _v[i]);  
-        }
-        std::cout << "---\n";
-        std::string temp;
-        getline(std::cin, temp);*/ 
-
-
       }
       ++count;
     }
@@ -263,27 +244,19 @@ void Heightmap::Load()
   if (!math::isPowerOfTwo(this->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
+  // Number of terrain subdivisions
+  int N = 1;
+  if (this->useTerrainPaging)
+  {
+    N = 16;
+  }
+
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
   // Param 2: Alignment plane
   // Param 3: Number of vertices along one edge of the terrain (2^n+1).
   //          Terrains must be square, with each side a power of 2 in size
   // Param 4: World size of each terrain instance, in meters.
-  /*this->terrainGroup = new Ogre::TerrainGroup(
-      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      this->dataSize, this->terrainSize.x);*/
-
-  /*std::cout << "Size X: " << this->terrainSize.x << std::endl;
-  std::cout << "Data size: " << this->dataSize << std::endl;
-  std::cout << "New size: " << 1 + ((this->terrainSize.x - 1) / sqrt(N)) << std::endl;
-  std::cout << "Origen: " << this->terrainOrigin << std::endl;
-    std::cout << "Heightmap size: " << this->heights.size() << std::endl;*/
-
-  int N = 1;
-  if (this->useTerrainPaging)
-  {
-    N = 16;
-  }
 
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
@@ -293,23 +266,20 @@ void Heightmap::Load()
       Ogre::String("gazebo_terrain"), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
-  math::Vector3 origin(-0.5 * this->terrainSize.x +
-      0.5 * this->terrainSize.x / sqrt(N), 
-      -0.5 * this->terrainSize.x +
-      0.5 * this->terrainSize.x / sqrt(N),
+  math::Vector3 origin(
+      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(N), 
+      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(N),
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
-
   this->ConfigureTerrainDefaults();
-
   this->SetupShadows(true);
-
-  // caguero - Testing Paging
-  splitHeights(this->heights, N, this->subTerrains);
   
   if (this->useTerrainPaging)
   {
+    // Split the terrain. Every subterrain will be paged
+    splitHeights(this->heights, N, this->subTerrains);
+
     this->mPageManager = OGRE_NEW Ogre::PageManager();
     this->mPageManager->setPageProvider(&this->mDummyPageProvider);
 
@@ -346,6 +316,7 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
+    // Save all subterrains using files. This is required to reload the pages
     this->terrainGroup->saveAllTerrains(true);
   }
 
@@ -469,9 +440,16 @@ void Heightmap::DefineTerrain(int _x, int _y)
   }
   else
   {
-    //this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
-    this->terrainGroup->defineTerrain(_x, _y, &subTerrains[this->terrainIdx][0]);
-    ++terrainIdx;
+    if (this->useTerrainPaging)
+    {
+      this->terrainGroup->defineTerrain(_x, _y, 
+          &subTerrains[this->terrainIdx][0]);
+      ++terrainIdx;
+    }
+    else
+    {
+      this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+    }
     this->terrainsImported = true;
   }
 }
