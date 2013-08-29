@@ -273,12 +273,6 @@ void DARTLink::Fini()
 }
 
 //////////////////////////////////////////////////
-void DARTLink::Update()
-{
-  Link::Update();
-}
-
-//////////////////////////////////////////////////
 void DARTLink::OnPoseChange()
 {
   Link::OnPoseChange();
