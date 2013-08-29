@@ -138,6 +138,7 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
+    boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
     common::Time simTime;
     if (this->category == IMAGE && this->scene)
       simTime = this->scene->GetSimTime();
@@ -165,6 +166,9 @@ void Sensor::Update(bool _force)
         this->updateDelay = common::Time::Zero;
 
       this->lastUpdateTime = simTime;
+      // release the lock since we're done modifying lastUpdateTime
+      lock.unlock();
+
       this->UpdateImpl(_force);
       this->updated();
     }
@@ -320,5 +324,6 @@ SensorCategory Sensor::GetCategory() const
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
+  boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
 }
