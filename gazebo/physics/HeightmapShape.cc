@@ -28,7 +28,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/HeightmapShape.hh"
@@ -126,6 +126,15 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////

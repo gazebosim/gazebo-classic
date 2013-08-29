@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -25,13 +26,14 @@ set (sources
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
-  Gui.cc
+  GuiIface.cc
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
@@ -67,10 +69,11 @@ set (headers
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
-  Gui.hh
+  GuiIface.hh
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
+  ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
@@ -154,3 +157,6 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
+
+# Deprecated Gui.hh
+gz_issue_775("Gui")

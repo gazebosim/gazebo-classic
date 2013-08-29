@@ -25,7 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/math/Rand.hh"

@@ -57,6 +57,15 @@ else ()
 endif ()
 
 ########################################
+include (FindOpenAL)
+if (NOT OPENAL_FOUND)
+  BUILD_WARNING ("OpenAL not found, audio support will be disabled.")
+  set (HAVE_OPENAL OFF CACHE BOOL "HAVE OpenAL" FORCE)
+else ()
+  set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL" FORCE)
+endif ()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
 
@@ -287,8 +296,10 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
+  else ()
+    set (HAVE_FFMPEG FALSE)
   endif ()
 
   ########################################
@@ -433,6 +444,11 @@ if (libdl_library AND libdl_include_dir)
 else (libdl_library AND libdl_include_dir)
   SET (HAVE_DL FALSE)
 endif ()
+
+########################################
+# Include man pages stuff
+include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+add_manpage_target()
 
 ########################################
 # Find QWT (QT graphing library)

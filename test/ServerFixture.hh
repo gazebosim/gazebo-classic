@@ -39,12 +39,12 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -58,7 +58,7 @@ using namespace gazebo;
 
 std::string custom_exec(std::string _cmd);
 
-class ServerFixture : public testing::Test
+class ServerFixture : public testing::TestWithParam<const char*>
 {
   protected: ServerFixture()
              {
@@ -72,22 +72,22 @@ class ServerFixture : public testing::Test
 
                common::Console::Instance()->Init("test.log");
                common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
+                   TEST_INTEGRATION_PATH);
 
                // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
+               std::string path = TEST_INTEGRATION_PATH;
                path += "/../..";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../sdf";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../gazebo";
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
-               path = TEST_REGRESSION_PATH;
+               path = TEST_INTEGRATION_PATH;
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
@@ -668,23 +668,32 @@ class ServerFixture : public testing::Test
                  << "    </cylinder>" << std::endl
                  << "  </geometry>" << std::endl
                  << "</collision>" << std::endl
-                 << "  <sensor name ='" << _imuSensorName << "' type ='imu'>" << std::endl
+                 << "  <sensor name ='" << _imuSensorName
+                 << "' type ='imu'>" << std::endl
                  << "    <imu>" << std::endl;
 
                if (_noiseType.size() > 0)
                  newModelStr << "      <noise>" << std::endl
                  << "        <type>" << _noiseType << "</type>" << std::endl
                  << "        <rate>" << std::endl
-                 << "          <mean>" << _rateNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _rateNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _rateBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _rateBiasStdDev << "</bias_stddev>" << std::endl
+                 << "          <mean>" << _rateNoiseMean
+                 << "</mean>" << std::endl
+                 << "          <stddev>" << _rateNoiseStdDev
+                 << "</stddev>" << std::endl
+                 << "          <bias_mean>" << _rateBiasMean
+                 << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _rateBiasStdDev
+                 << "</bias_stddev>" << std::endl
                  << "        </rate>" << std::endl
                  << "        <accel>" << std::endl
-                 << "          <mean>" << _accelNoiseMean << "</mean>" << std::endl
-                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>" << std::endl
-                 << "          <bias_mean>" << _accelBiasMean << "</bias_mean>" << std::endl
-                 << "          <bias_stddev>" << _accelBiasStdDev << "</bias_stddev>" << std::endl
+                 << "          <mean>" << _accelNoiseMean << "</mean>"
+                 << std::endl
+                 << "          <stddev>" << _accelNoiseStdDev << "</stddev>"
+                 << std::endl
+                 << "          <bias_mean>" << _accelBiasMean
+                 << "</bias_mean>" << std::endl
+                 << "          <bias_stddev>" << _accelBiasStdDev
+                 << "</bias_stddev>" << std::endl
                  << "        </accel>" << std::endl
                  << "      </noise>" << std::endl;
 
@@ -838,6 +847,118 @@ class ServerFixture : public testing::Test
                  ++i;
                }
                EXPECT_LT(i, 50);
+             }
+
+  /// \brief Spawn an Wireless transmitter sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _essid Service set identifier (network name)
+  /// \param[in] _freq Frequency of transmission (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 const std::string &_essid,
+                 double _freq,
+                 double _power,
+                 double _gain)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>false</visualize>"
+                 << "    <transceiver>"
+                 << "      <essid>" << _essid << "</essid>"
+                 << "      <frequency>" << _freq << "</frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  /// \brief Spawn an Wireless receiver sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _minFreq Minimum frequency to be filtered (MHz)
+  /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)
+  protected: void SpawnWirelessReceiverSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 double _minFreq,
+                 double _maxFreq,
+                 double _power,
+                 double _gain,
+                 double _sensitivity)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>true</visualize>"
+                 << "    <transceiver>"
+                 << "      <min_frequency>" << _minFreq << "</min_frequency>"
+                 << "      <max_frequency>" << _maxFreq << "</max_frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "      <sensitivity>" << _sensitivity << "</sensitivity>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 20, 50);
+             }
+
+  /// \brief Wait for a number of ms. and attempts until the entity is spawned
+  /// \param[in] _name Model name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilEntitySpawn(const std::string &_name,
+                                     unsigned int sleep_each,
+                                     int retries)
+             {
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < retries)
+               {
+                 common::Time::MSleep(sleep_each);
+                 ++i;
+               }
+               EXPECT_LT(i, retries);
              }
 
   protected: void SpawnCylinder(const std::string &_name,

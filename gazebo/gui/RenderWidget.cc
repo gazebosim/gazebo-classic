@@ -17,11 +17,11 @@
 #include <iomanip>
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
@@ -60,10 +60,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_arrowAct);
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
+  actionGroup->addAction(g_scaleAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
   toolbar->addAction(g_rotateAct);
+  toolbar->addAction(g_scaleAct);
 
   toolbar->addSeparator();
   toolbar->addAction(g_boxCreateAct);

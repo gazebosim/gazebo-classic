@@ -40,7 +40,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Actor.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/transport/Node.hh"
 
@@ -328,13 +328,13 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     std::string animFile = _sdf->Get<std::string>("filename");
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
-    double scale = _sdf->Get<double>("scale");
+    double animScale = _sdf->Get<double>("scale");
     Skeleton *skel = NULL;
 
     if (extension == "bvh")
     {
       BVHLoader loader;
-      skel = loader.Load(animFile, scale);
+      skel = loader.Load(animFile, animScale);
     }
     else
       if (extension == "dae")
@@ -346,7 +346,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
         if (animMesh && animMesh->HasSkeleton())
         {
           skel = animMesh->GetSkeleton();
-          skel->Scale(scale);
+          skel->Scale(animScale);
         }
       }
 
