@@ -69,7 +69,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat)
+  pkg_check_modules(SDF sdformat>=1.4.7)
   if (NOT SDF_FOUND)
     BUILD_WARNING ("Missing: SDF. Required for reading and writing SDF files. The deprecated SDF version will be used. Pay attention to this warning, because it will become an error in Gazebo 2.0.")
     set (HAVE_SDF FALSE)
