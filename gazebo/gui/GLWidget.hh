@@ -87,9 +87,6 @@ namespace gazebo
       /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
 
-      /// \brief Process an object translate mouse move event.
-      private: void OnMouseMoveTranslate();
-
       /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
@@ -100,9 +97,6 @@ namespace gazebo
 
       /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
-
-      /// \brief Process an object translate mouse release event.
-      private: void OnMouseReleaseTranslate();
 
       /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
@@ -115,15 +109,10 @@ namespace gazebo
       /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
 
-      /// \brief Process an object translate mouse press event.
-      private: void OnMousePressTranslate();
-
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
 
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
@@ -137,14 +126,10 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void RotateEntity(rendering::VisualPtr &_vis);
-      private: void TranslateEntity(rendering::VisualPtr &_vis);
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
+
       private: void ClearSelection();
 
       /// \brief Copy an object by name
@@ -157,10 +142,6 @@ namespace gazebo
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
-
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
-      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       private: int windowId;
 
@@ -184,17 +165,15 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
+      private: rendering::VisualPtr hoverVis, selectedVis;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
 

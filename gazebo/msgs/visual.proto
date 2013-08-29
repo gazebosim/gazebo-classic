@@ -9,6 +9,7 @@ import "pose.proto";
 import "geometry.proto";
 import "material.proto";
 import "plugin.proto";
+import "vector3d.proto";
 
 message Visual
 {
@@ -25,4 +26,5 @@ message Visual
   optional bool delete_me      = 11;
   optional bool is_static      = 12;
   optional Plugin plugin       = 13;
+  optional Vector3d scale      = 14;
 }

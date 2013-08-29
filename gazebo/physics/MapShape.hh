@@ -74,9 +74,13 @@ namespace gazebo
       /// \return The image URI that was used to load the map.
       public: std::string GetURI() const;
 
+      /// \brief Set the scale of the map shape.
+      /// \param[in] _scale Scale to set the map shape to.
+      public: void SetScale(const math::Vector3 &_scale);
+
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      public: double GetScale() const;
+      public: virtual math::Vector3 GetScale() const;
 
       /// \brief Returns image threshold for this geometry.
       /// All regions in image with value larger than MapShape::scale
