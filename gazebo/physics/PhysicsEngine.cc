@@ -32,6 +32,7 @@
 
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 
@@ -105,6 +106,13 @@ PhysicsEngine::~PhysicsEngine()
 math::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->sdf->Get<math::Vector3>("gravity");
+}
+
+//////////////////////////////////////////////////
+ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
+{
+  ModelPtr ret(new Model(_base));
+  return ret;
 }
 
 //////////////////////////////////////////////////
