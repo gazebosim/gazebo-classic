@@ -102,6 +102,7 @@ set (gtest_sources
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
+  Tuple_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 
