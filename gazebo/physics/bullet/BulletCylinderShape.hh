@@ -87,13 +87,13 @@ namespace gazebo
                 }
                 else
                 {
-                  btVector3 scale = shape->getLocalScaling();
+                  btVector3 cylinderScale = shape->getLocalScaling();
                   double cylinderRadius = this->GetRadius();
                   double cylinderLength = this->GetLength();
-                  scale.setX(_radius / cylinderRadius);
-                  scale.setY(scale.x());
-                  scale.setZ(_length / cylinderLength);
-                  shape->setLocalScaling(scale);
+                  cylinderScale.setX(_radius / cylinderRadius);
+                  cylinderScale.setY(cylinderScale.x());
+                  cylinderScale.setZ(_length / cylinderLength);
+                  shape->setLocalScaling(cylinderScale);
                 }
               }
     };
