@@ -58,8 +58,6 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited.
-      public: virtual void UpdateBounds();
-
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
