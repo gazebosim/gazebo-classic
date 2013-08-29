@@ -45,16 +45,6 @@
 #include <OGRE/OgreFrameListener.h>
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreRenderObjectListener.h>
-
-#include <OGRE/Paging/OgrePageManager.h>
-#include <OGRE/Paging/OgrePagedWorld.h>
-#include <OGRE/Paging/OgrePagedWorldSection.h>
-#include <OGRE/Terrain/OgreTerrainPaging.h>
-
-
-#include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
-#include <OGRE/Terrain/OgreTerrain.h>
-#include <OGRE/Terrain/OgreTerrainGroup.h>
 #include <OGRE/OgreTechnique.h>
 #include <OGRE/OgrePass.h>
 #include <OGRE/OgreTextureUnitState.h>
@@ -62,6 +52,12 @@
 #include <OGRE/OgreHighLevelGpuProgramManager.h>
 #include <OGRE/OgreHardwarePixelBuffer.h>
 #include <OGRE/OgreShadowCameraSetupPSSM.h>
+#include <OGRE/Paging/OgrePageManager.h>
+#include <OGRE/Paging/OgrePagedWorld.h>
+#include <OGRE/Terrain/OgreTerrainPaging.h>
+#include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
+#include <OGRE/Terrain/OgreTerrain.h>
+#include <OGRE/Terrain/OgreTerrainGroup.h>
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>

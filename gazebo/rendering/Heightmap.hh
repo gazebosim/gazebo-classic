@@ -32,8 +32,6 @@
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
 
-using namespace Ogre;
-
 namespace Ogre
 {
   class TerrainGlobalOptions;
@@ -47,21 +45,21 @@ namespace gazebo
   {
     class GzTerrainMatGen;
 
-    class DummyPageProvider : public PageProvider
+    class DummyPageProvider : public Ogre::PageProvider
     {
       public:
-      bool prepareProceduralPage(Page*, PagedWorldSection*) {
+      bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*) {
         return true;
       }
-      bool loadProceduralPage(Page*, PagedWorldSection*)
+      bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
       {
         return true;
       }
-      bool unloadProceduralPage(Page*, PagedWorldSection*)
+      bool unloadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
       {
         return true;
       }
-      bool unprepareProceduralPage(Page*, PagedWorldSection*)
+      bool unprepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
       {
         return true;
       }

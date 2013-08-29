@@ -19,8 +19,6 @@
  * Date: 12 May 2009
  */
 
-#define PAGING
-
 #include <string.h>
 #include <math.h>
 
@@ -36,13 +34,10 @@
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
-
-#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
-using namespace Ogre;
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
