@@ -27,6 +27,9 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \brief Load the common library.
+    void load();
+
     /// \brief add path prefix to common::SystemPaths
     void add_search_path_suffix(const std::string &_suffix);
 
