@@ -160,7 +160,7 @@ common::Image Heightmap::GetImage() const
 }
 
 //////////////////////////////////////////////////
-void Heightmap::SplitHeights(std::vector<float> &_heightmap, int _n,
+void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
     std::vector<std::vector<float> > &_v)
 {
   // We support splitting the terrain in 4 or 16 pieces
@@ -274,23 +274,23 @@ void Heightmap::Load()
     // Split the terrain. Every subterrain will be paged
     this->SplitHeights(this->heights, nTerrains, this->subTerrains);
 
-    this->mPageManager = OGRE_NEW Ogre::PageManager();
-    this->mPageManager->setPageProvider(&this->mDummyPageProvider);
+    this->pageManager = OGRE_NEW Ogre::PageManager();
+    this->pageManager->setPageProvider(&this->dummyPageProvider);
 
     // Add cameras
     for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
     {
-      this->mPageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
+      this->pageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
     }
     for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
     {
-      this->mPageManager->addCamera(
+      this->pageManager->addCamera(
           this->scene->GetUserCamera(i)->GetOgreCamera());
     }
 
-    this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
-    this->world = mPageManager->createWorld();
-    mTerrainPaging->createWorldSection(world, this->terrainGroup,
+    this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
+    this->world = pageManager->createWorld();
+    terrainPaging->createWorldSection(world, this->terrainGroup,
         this->LoadRadiusFactor * this->terrainSize.x,
         this->HoldRadiusFactor * this->terrainSize.x,
         0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);

@@ -178,7 +178,7 @@ namespace gazebo
       /// \param[in] _heightmap Source vector of floats with the heights.
       /// \param[in] _n Number of subterrains.
       /// \param[out] _v Destination vector with the subterrains.
-      public: void SplitHeights(std::vector<float> &_heightmap, int _n,
+      public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
                   std::vector<std::vector<float> > &_v);
 
       /// \brief Modify the height at a specific point.
@@ -270,14 +270,14 @@ namespace gazebo
       private: GzTerrainMatGen *gzMatGen;
 
       /// \brief A page provided is needed to use the paging system.
-      private: DummyPageProvider mDummyPageProvider;
+      private: DummyPageProvider dummyPageProvider;
 
       /// \brief Central registration point for extension classes,
       /// such as the PageStrategy, PageContentFactory.
-      private: Ogre::PageManager *mPageManager;
+      private: Ogre::PageManager *pageManager;
 
       /// \brief Type of paging applied
-      private: Ogre::TerrainPaging *mTerrainPaging;
+      private: Ogre::TerrainPaging *terrainPaging;
 
       /// \brief Collection of world content
       private: Ogre::PagedWorld* world;
