@@ -43,6 +43,35 @@ namespace gazebo
     /// \brief DART physics engine
     class DARTPhysics : public PhysicsEngine
     {
+      /// \enum DARTParam
+      /// \brief DART physics parameter types.
+      public: enum DARTParam
+      {
+        // /// \brief Solve type
+        // SOLVER_TYPE,
+
+        // /// \brief Constraint force mixing
+        // GLOBAL_CFM,
+
+        // /// \brief Error reduction parameter
+        // GLOBAL_ERP,
+
+        // /// \brief Number of iterations
+        // PGS_ITERS,
+
+        // /// \brief SOR over-relaxation parameter
+        // SOR,
+
+        // /// \brief Surface layer depth
+        // CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Constructor
       public: DARTPhysics(WorldPtr _world);
  
@@ -99,6 +128,14 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(DARTParam _param) const;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);

@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
@@ -49,7 +50,7 @@
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTLink.hh"
 
-#include "DARTPhysics.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -294,6 +295,49 @@ void DARTPhysics::DebugPrint() const
   gzwarn << "Not implemented!\n";
 }
 
+boost::any DARTPhysics::GetParam(const std::string &_key) const
+{
+  DARTParam param;
+
+  if (_key == "max_contacts")
+    param = MAX_CONTACTS;
+  else if (_key == "min_step_size")
+    param = MIN_STEP_SIZE;
+  else
+  {
+    gzwarn << _key << " is not supported in ode" << std::endl;
+    return 0;
+  }
+  return this->GetParam(param);
+}
+
+boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
+{
+  sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+
+  boost::any value = 0;
+  switch (_param)
+  {
+    case MAX_CONTACTS:
+    {
+      value = dartElem->GetElement("max_contacts")->Get<int>();
+      break;
+    }
+    case MIN_STEP_SIZE:
+    {
+      value = dartElem->GetElement("solver")->Get<double>("min_step_size");
+      break;
+    }
+    default:
+    {
+      gzwarn << "Attribute not supported in bullet" << std::endl;
+      break;
+    }
+  }
+  return value;
+}
+
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 {
   msgs::Response response;
@@ -305,21 +349,13 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "physics_info")
   {
     msgs::Physics physicsMsg;
-//    physicsMsg.set_type(msgs::Physics::DART);
-//    physicsMsg.set_update_rate(this->GetUpdateRate());
-//    physicsMsg.set_solver_type(this->stepType);
-//    physicsMsg.set_dt(this->stepTimeDouble);
-//    physicsMsg.set_iters(this->GetSORPGSIters());
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-//    physicsMsg.set_sor(this->GetSORPGSW());
-//    physicsMsg.set_cfm(this->GetWorldCFM());
-//    physicsMsg.set_erp(this->GetWorldERP());
-//    physicsMsg.set_contact_max_correcting_vel(
-//        this->GetContactMaxCorrectingVel());
-//    physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
-//    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_type(msgs::Physics::DART);
+    // min_step_size is defined but not yet used
+//    physicsMsg.set_min_step_size(
+//        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+    physicsMsg.set_max_step_size(this->maxStepSize);
 
-//    response.set_type(physicsMsg.GetTypeName());
+    response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
     this->responsePub->Publish(response);
   }
