@@ -217,7 +217,7 @@ namespace gazebo
       /// a load radius that depends on the terrain size.
       private: static const double LoadRadiusFactor;
 
-      /// \brief The terrain pages are held in in memory but not loaded if they
+      /// \brief The terrain pages are held in memory but not loaded if they
       /// are not ready when the camera is within holdRadius distance. See
       /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
       /// multiplier applied to the terrain size to create a hold radius that
