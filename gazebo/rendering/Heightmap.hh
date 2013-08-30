@@ -72,6 +72,9 @@ namespace gazebo
     /// \brief Rendering a terrain using heightmap information
     class Heightmap
     {
+      /// \brief Number of pieces in which a terrain is subdivided for paging.
+      public: static const int NumTerrainSubdivisions;
+
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
       public: Heightmap(ScenePtr _scene);
@@ -169,6 +172,14 @@ namespace gazebo
       /// \return The result of the mouse ray hit.
       public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
                   math::Vector2i _mousePos);
+
+      /// \brief Split a terrain into subterrains
+      /// \param[in] _heightmap Source vector of floats with the heights.
+      /// \param[in] _n Number of subterrains.
+      /// \param[out] _v Destination vector with the subterrains.
+      /// \return The result of the mouse ray hit.
+      public: void SplitHeights(std::vector<float> &_heightmap, int _n,
+                  std::vector<std::vector<float> > &_v);
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.

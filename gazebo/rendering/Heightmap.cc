@@ -39,6 +39,8 @@
 using namespace gazebo;
 using namespace rendering;
 
+const int Heightmap::NumTerrainSubdivisions = 16;
+
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
 {
@@ -149,7 +151,7 @@ common::Image Heightmap::GetImage() const
 }
 
 //////////////////////////////////////////////////
-void printHeight(const std::string &_title, std::vector<float> _heightmap)
+void PrintHeight(const std::string &_title, std::vector<float> _heightmap)
 {
   std::cout << _title << std::endl;
   int width = sqrt(_heightmap.size());
@@ -165,7 +167,7 @@ void printHeight(const std::string &_title, std::vector<float> _heightmap)
 }
 
 //////////////////////////////////////////////////
-void splitHeights(std::vector<float> &_heightmap, int _n,
+void Heightmap::SplitHeights(std::vector<float> &_heightmap, int _n,
     std::vector<std::vector<float> > &_v)
 {
   // We support splitting the terrain in 4 or 16 pieces
@@ -217,6 +219,9 @@ void Heightmap::Load()
   if (this->terrainGlobals != NULL)
     return;
 
+  // The terraingGroup is composed by a number of terrains (1 by default)
+  int nTerrains = 1;
+
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
   msgs::Geometry geomMsg;
@@ -239,11 +244,10 @@ void Heightmap::Load()
   if (!math::isPowerOfTwo(this->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
-  // Number of terrain subdivisions
-  int N = 1;
+  // If the paging is enabled we 
   if (this->useTerrainPaging)
   {
-    N = 16;
+    nTerrains = this->NumTerrainSubdivisions;
   }
 
   // Create terrain group, which holds all the individual terrain instances.
@@ -255,15 +259,16 @@ void Heightmap::Load()
 
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      1 + ((this->dataSize - 1) / sqrt(N)), this->terrainSize.x / (sqrt(N)));
+      1 + ((this->dataSize - 1) / sqrt(nTerrains)),
+      this->terrainSize.x / (sqrt(nTerrains)));
 
   this->terrainGroup->setFilenameConvention(
       Ogre::String("gazebo_terrain"), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(
-      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(N), 
-      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(N),
+      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains), 
+      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains),
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -273,7 +278,7 @@ void Heightmap::Load()
   if (this->useTerrainPaging)
   {
     // Split the terrain. Every subterrain will be paged
-    splitHeights(this->heights, N, this->subTerrains);
+    this->SplitHeights(this->heights, nTerrains, this->subTerrains);
 
     this->mPageManager = OGRE_NEW Ogre::PageManager();
     this->mPageManager->setPageProvider(&this->mDummyPageProvider);
@@ -285,17 +290,18 @@ void Heightmap::Load()
     }
     for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
     {
-      this->mPageManager->addCamera(this->scene->GetUserCamera(i)->GetOgreCamera());
+      this->mPageManager->addCamera(
+          this->scene->GetUserCamera(i)->GetOgreCamera());
     }
 
     this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
     this->world = mPageManager->createWorld();
     mTerrainPaging->createWorldSection(world, this->terrainGroup, 100, 120, 
-      0, 0, sqrt(N) - 1, sqrt(N) - 1);
+      0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
   }
 
-  for (int y = 0; y <= sqrt(N) - 1; ++y)
-    for (int x = 0; x <= sqrt(N) - 1; ++x)
+  for (int y = 0; y <= sqrt(nTerrains) - 1; ++y)
+    for (int x = 0; x <= sqrt(nTerrains) - 1; ++x)
       this->DefineTerrain(x, y);
 
   // sync load since we want everything in place when we start
