@@ -1840,7 +1840,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
-              const dReal max_moi_ratio = 10.0;
+              const dReal max_moi_ratio = 100.0;
               bool modify_inertia = true;
               dReal moi_S1_new, moi_S2_new;
               if (moi_S1 > max_moi_ratio * moi_S2)
