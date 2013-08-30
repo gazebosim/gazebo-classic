@@ -335,6 +335,9 @@ namespace gazebo
       /// \brief The pose set by a physics engine.
       protected: math::Pose dirtyPose;
 
+      /// \brief Scale of the entity
+      protected: math::Vector3 scale;
+
       /// \brief Callback for when an animation completes.
       private: boost::function<void()> onAnimationComplete;
 

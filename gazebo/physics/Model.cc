@@ -794,6 +794,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_is_static(this->IsStatic());
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
+  msgs::Set(_msg.mutable_scale(), this->scale);
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
@@ -839,6 +840,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_is_static())
     this->SetStatic(_msg.is_static());
+
+  if (_msg.has_scale())
+    this->SetScale(msgs::Convert(_msg.scale()));
 }
 
 //////////////////////////////////////////////////
@@ -928,6 +932,24 @@ void Model::SetState(const ModelState &_state)
   //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
   //                          jointState.GetAngle(0).Radian());
   // }
+}
+
+/////////////////////////////////////////////////
+void Model::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  {
+    if (*iter && (*iter)->HasType(LINK))
+    {
+      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

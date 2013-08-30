@@ -565,6 +565,9 @@ namespace gazebo
 
       /// \brief Counter used to create unique ids.
       private: static uint32_t visualIdCount;
+
+      /// \brief Scale of visual.
+      private: math::Vector3 scale;
     };
     /// \}
   }

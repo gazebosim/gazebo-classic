@@ -1,7 +1,7 @@
 gzfactory -- Tool to spawn or delete models from  simulation
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzfactory` <spawn|delete> [options]
 

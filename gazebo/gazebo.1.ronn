@@ -1,7 +1,7 @@
 gazebo -- Run the Gazebo server and GUI.
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gazebo` [options] <world_file>
 
