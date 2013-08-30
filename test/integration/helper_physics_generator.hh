@@ -15,7 +15,7 @@
  *
 */
 
-#ifndef _TEST_GENERATOR_HH
+#ifndef _TEST_GENERATOR_HH_
 #define _TEST_GENERATOR_HH_
 
 #define ODE_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestODE, \
