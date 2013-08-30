@@ -521,7 +521,7 @@ namespace gazebo
         // Set if the rendering engine uses terrain paging
         bool useTerrainPaging =
             geomElem->Get<bool>("use_terrain_paging");
-        result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);        
+        result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);
       }
       else if (geomElem->GetName() == "mesh")
       {

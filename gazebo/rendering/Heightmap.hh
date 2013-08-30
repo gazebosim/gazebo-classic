@@ -48,7 +48,8 @@ namespace gazebo
     class DummyPageProvider : public Ogre::PageProvider
     {
       public:
-      bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*) {
+      bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
         return true;
       }
       bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
@@ -73,7 +74,7 @@ namespace gazebo
     class Heightmap
     {
       /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const int NumTerrainSubdivisions;
+      public: static const unsigned int NumTerrainSubdivisions;
 
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
