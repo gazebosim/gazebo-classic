@@ -178,7 +178,6 @@ namespace gazebo
       /// \param[in] _heightmap Source vector of floats with the heights.
       /// \param[in] _n Number of subterrains.
       /// \param[out] _v Destination vector with the subterrains.
-      /// \return The result of the mouse ray hit.
       public: void SplitHeights(std::vector<float> &_heightmap, int _n,
                   std::vector<std::vector<float> > &_v);
 
