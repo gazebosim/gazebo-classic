@@ -1,7 +1,7 @@
 gzsdf -- Tool to provide information about SDF files.
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzsdf` <command>
 

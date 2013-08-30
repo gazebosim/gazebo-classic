@@ -85,12 +85,12 @@ namespace gazebo
                 }
                 else
                 {
-                  btVector3 scale = shape->getLocalScaling();
+                  btVector3 boxScale = shape->getLocalScaling();
                   math::Vector3 boxSize = this->GetSize();
-                  scale.setX(size.x / boxSize.x);
-                  scale.setY(size.y / boxSize.y);
-                  scale.setZ(size.z / boxSize.z);
-                  shape->setLocalScaling(scale);
+                  boxScale.setX(size.x / boxSize.x);
+                  boxScale.setY(size.y / boxSize.y);
+                  boxScale.setZ(size.z / boxSize.z);
+                  shape->setLocalScaling(boxScale);
                 }
               }
     };

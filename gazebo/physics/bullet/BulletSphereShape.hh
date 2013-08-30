@@ -74,8 +74,9 @@ namespace gazebo
                 else
                 {
                   double sphereRadius = this->GetRadius();
-                  double scale = _radius / sphereRadius;
-                  shape->setLocalScaling(btVector3(scale, scale, scale));
+                  double sphereScale = _radius / sphereRadius;
+                  shape->setLocalScaling(btVector3(sphereScale, sphereScale,
+                      sphereScale));
                 }
               }
     };
