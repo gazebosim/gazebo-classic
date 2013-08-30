@@ -18,11 +18,7 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-if (NOT HAVE_SDF)
-  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface gazebo_common)
-else()
-  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
-endif()
+target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)
