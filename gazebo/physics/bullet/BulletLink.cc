@@ -470,6 +470,7 @@ void BulletLink::ClearCollisionCache()
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
 
+  bulletWorld->updateSingleAabb(this->rigidLink);
   bulletWorld->getBroadphase()->getOverlappingPairCache()->
       cleanProxyFromPairs(this->rigidLink->getBroadphaseHandle(),
       bulletWorld->getDispatcher());
