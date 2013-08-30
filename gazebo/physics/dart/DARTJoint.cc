@@ -83,10 +83,10 @@ void DARTJoint::Init()
 
   dart::dynamics::BodyNode* dartParentBody = NULL;
   dart::dynamics::BodyNode* dartChildBody = NULL;
-  dart::math::SE3 dartTransfParentLinkToJointLeft = dart::math::SE3::Identity();
-  dart::math::SE3 dartTransfChildLinkToJointRight = dart::math::SE3::Identity();
-  dart::math::SE3 dartTransfParentLink = dart::math::SE3::Identity();
-  dart::math::SE3 dartTransfChildLink = dart::math::SE3::Identity();
+  Eigen::Isometry3d dartTransfParentLinkToJointLeft = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dartTransfChildLinkToJointRight = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dartTransfParentLink = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dartTransfChildLink = Eigen::Isometry3d::Identity();
 
   if (theChildLink != NULL)
   {
@@ -370,9 +370,9 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   DARTLinkPtr theChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
-  dart::math::dse3 F1 = dart::math::dse3::Zero();
-  dart::math::dse3 F2 = dart::math::dse3::Zero();
-  dart::math::SE3 T12 = dartJoint->getLocalTransformation();
+  Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
+  Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
+  Eigen::Isometry3d T12 = dartJoint->getLocalTransformation();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in

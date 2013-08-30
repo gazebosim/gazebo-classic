@@ -93,7 +93,7 @@ void DARTLink::Init()
 
   // COG offset
   math::Vector3 cog = this->inertial->GetCoG();
-  this->dartBodyNode->setCOM(DARTUtils::ConvertVector3(cog));
+  this->dartBodyNode->setLocalCOM(DARTUtils::ConvertVector3(cog));
 
   // Transformation
   math::Pose bodyWorldPose = this->GetWorldPose();
@@ -203,7 +203,7 @@ void DARTLink::AddRelativeTorque(const math::Vector3& /*_torque*/)
 gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3& _offset) const
 {
-  const dart::math::Vec3& linVel
+  const Eigen::Vector3d& linVel
           = this->dartBodyNode->getVelocityWorldAtPoint(
               DARTUtils::ConvertVector3(_offset)).tail<3>();
 
@@ -217,7 +217,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Pose pose(_offset, _q);
 
-  dart::math::Vec3 linVel
+  Eigen::Vector3d linVel
     = this->dartBodyNode->getVelocityWorldAtFrame(
       DARTUtils::ConvertPose(pose)).tail<3>();
 
@@ -226,7 +226,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
-  const dart::math::Vec3& linVel
+  const Eigen::Vector3d& linVel
       = this->dartBodyNode->getVelocityWorldAtCOG().tail<3>();
 
   return DARTUtils::ConvertVector3(linVel);
@@ -235,7 +235,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldAngularVel() const
 {
-  const dart::math::Vec3& angVel
+  const Eigen::Vector3d& angVel
       = this->dartBodyNode->getVelocityWorld().head<3>();
 
   return DARTUtils::ConvertVector3(angVel);

@@ -41,29 +41,19 @@ namespace gazebo
       public: static void ConvMatToPose(math::Pose* _pose,
                                         const Eigen::Matrix4d& _mat);
 
-      public: static dart::math::Vec3 ConvertVector3(const math::Vector3& _vec3)
+      public: static Eigen::Vector3d ConvertVector3(const math::Vector3& _vec3)
       {
-        return dart::math::Vec3(_vec3.x, _vec3.y, _vec3.z);
+        return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
       }
 
-      public: static math::Vector3 ConvertVector3(const dart::math::Vec3& _vec3)
+      public: static math::Vector3 ConvertVector3(const Eigen::Vector3d& _vec3)
       {
         return math::Vector3(_vec3[0], _vec3[1], _vec3[2]);
       }
 
-      public: static dart::math::Axis ConvertAxis(const math::Vector3& _vec3)
+      public: static Eigen::Isometry3d ConvertPose(const math::Pose& _pose)
       {
-        return dart::math::Axis(_vec3.x, _vec3.y, _vec3.z);
-      }
-
-      public: static math::Vector3 ConvertAxis(const dart::math::Axis& _axis)
-      {
-        return math::Vector3(_axis(0), _axis(1), _axis(2));
-      }
-
-      public: static dart::math::SE3 ConvertPose(const math::Pose& _pose)
-      {
-        dart::math::SE3 T = dart::math::SE3::Identity();
+        Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
 
         Eigen::Matrix4d M = Eigen::Matrix4d::Identity();
 
@@ -76,7 +66,7 @@ namespace gazebo
         return T;
       }
 
-      public: static math::Pose ConvertPose(const dart::math::SE3& _T)
+      public: static math::Pose ConvertPose(const Eigen::Isometry3d& _T)
       {
         math::Pose pose;
 

@@ -84,11 +84,11 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
   // Axis in local frame of this joint
   dart::dynamics::RevoluteJoint* dartRevJoint
       = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
-  dart::math::Axis globalAxis = dartRevJoint->getAxisGlobal();
+  Eigen::Vector3d globalAxis = dartRevJoint->getAxisGlobal();
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  return DARTUtils::ConvertAxis(globalAxis);
+  return DARTUtils::ConvertVector3(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -97,12 +97,12 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   dart::dynamics::RevoluteJoint* dartRevJoint
       = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
 
-  dart::math::Axis dartAxis = DARTUtils::ConvertAxis(_axis);
+  Eigen::Vector3d dartAxis = DARTUtils::ConvertVector3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  dart::math::SE3 dartTransfJointLeftToParentLink
+  Eigen::Isometry3d dartTransfJointLeftToParentLink
       = dart::math::Inv(dartRevJoint->getLocalTransformationFromParentBody());
   dartAxis = dart::math::Rotate(dartTransfJointLeftToParentLink, dartAxis);
   //----------------------------------------------------------------------------

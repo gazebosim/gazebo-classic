@@ -79,7 +79,7 @@ void DARTModel::Init()
             DARTUtils::ConvertPose(linkList[i]->GetWorldPose()));
 
       newFreeJoint->setChildBody(dartBodyNode);
-      newFreeJoint->setTransformFromChildBody(dart::math::SE3::Identity());
+      newFreeJoint->setTransformFromChildBody(Eigen::Isometry3d::Identity());
 
       this->GetSkeleton()->addJoint(newFreeJoint);
     }
