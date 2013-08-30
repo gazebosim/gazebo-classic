@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <signal.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 

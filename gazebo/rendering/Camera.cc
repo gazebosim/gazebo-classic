@@ -121,7 +121,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->name = _name;
   this->scopedName = this->scene->GetName() + "::" + _name;
-  this->scopedUniqueName = this->scopedName + "(" + 
+  this->scopedUniqueName = this->scopedName + "(" +
     boost::lexical_cast<std::string>(++this->cameraCounter) + ")";
 
   this->renderTarget = NULL;
@@ -253,7 +253,7 @@ void Camera::Load()
         std::endl;
   }
 
-  // Only create a command subscription for real cameras. Ignore camera's 
+  // Only create a command subscription for real cameras. Ignore camera's
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
   {
@@ -267,7 +267,7 @@ void Camera::Init()
 {
   this->SetSceneNode(
       this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
-        this->GetName() + "_SceneNode"));
+        this->scopedUniqueName + "_SceneNode"));
 
   this->CreateCamera();
 
@@ -1250,7 +1250,8 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-  this->camera = this->scene->GetManager()->createCamera(this->name);
+  this->camera = this->scene->GetManager()->createCamera(
+      this->scopedUniqueName);
 
   // Use X/Y as horizon, Z up
   this->camera->pitch(Ogre::Degree(90));
