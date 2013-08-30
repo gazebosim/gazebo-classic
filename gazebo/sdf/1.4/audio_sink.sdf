@@ -1,4 +1,0 @@
-<!-- Audio Sink -->
-<element name="audio_sink" required="*">
-  <description>An audio sink.</description>
-</element>
