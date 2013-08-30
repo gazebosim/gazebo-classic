@@ -53,13 +53,24 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the force torque sensor
   sensors::ForceTorqueSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+  world->SetPaused(true);
+
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    world->Step(1);
+    mgr->Update();
+  }
 
   EXPECT_EQ(sensor->GetTorque(), math::Vector3(0, 0, 0));
   EXPECT_EQ(sensor->GetForce(), math::Vector3(0, 0, 0));

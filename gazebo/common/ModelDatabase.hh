@@ -74,7 +74,9 @@ namespace gazebo
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of
       /// models.
-      public: void GetModels(boost::function<
+      /// \return A boost shared pointer. This pointer must remain valid in
+      /// order to receive the callback.
+      public: boost::shared_ptr<bool> GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.
@@ -175,7 +177,8 @@ namespace gazebo
 
       /// \brief List of all callbacks set from the
       /// ModelDatabase::GetModels function.
-      private: std::list<CallbackFunc> callbacks;
+      private: std::list<
+               std::pair<boost::shared_ptr<bool>, CallbackFunc> > callbacks;
 
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.

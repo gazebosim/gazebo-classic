@@ -288,10 +288,12 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
       gzerr << "Unable to download model manifests\n";
     else
     {
-      for (std::list<CallbackFunc>::iterator iter = this->callbacks.begin();
-           iter != this->callbacks.end(); ++iter)
+      std::list<std::pair<boost::shared_ptr<bool>, CallbackFunc> >::iterator
+        iter = this->callbacks.begin();
+      for (; iter != this->callbacks.end(); ++iter)
       {
-        (*iter)(this->modelCache);
+        if (!(*iter).first || (*iter).first.use_count() > 1)
+          (*iter).second(this->modelCache);
       }
       this->callbacks.clear();
     }
@@ -348,11 +350,14 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::GetModels(
+boost::shared_ptr<bool> ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
-  this->callbacks.push_back(_func);
+  boost::shared_ptr<bool> refCount(new bool());
+  this->callbacks.push_back(std::make_pair(refCount, _func));
   this->updateCacheCondition.notify_one();
+
+  return refCount;
 }
 
 /////////////////////////////////////////////////
