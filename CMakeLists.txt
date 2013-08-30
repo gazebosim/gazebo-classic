@@ -57,6 +57,9 @@ endif()
 
 enable_testing()
 
+# Use GNUInstallDirst to get canonical paths
+include(GNUInstallDirs)
+
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
@@ -84,11 +87,10 @@ if(LD_LIBRARY_PATH)
 endif()
 
 
-set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
-set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
-set (BIN_INSTALL_DIR "bin" CACHE STRING "Installation directory for binaries (relative to CMAKE_INSTALL_PREFIX)") 
-
-
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
+    
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
 if (USE_FULL_RPATH)
@@ -161,7 +163,7 @@ message (STATUS "----------------------------------------\n")
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins)
-set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/share/gazebo_models)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
 set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
@@ -311,18 +313,12 @@ else (build_errors)
   gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}/)
   # Also install the setup.sh in an unversioned location
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
-  # This is only needed for backward compatibility with the internal
-  # version of SDF
-  if (NOT HAVE_SDF)
-    include_directories(${PROJECT_SOURCE_DIR}/gazebo)
-  endif()
-  
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
@@ -383,16 +379,11 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
   endif()
     
-  if (HAVE_SDF)
-    set(PKG_DEPENDS Boost Protobuf SDFormat)
-  else()
-    set(PKG_DEPENDS Boost Protobuf)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_sdf_interface)
-  endif()
+  set(PKG_DEPENDS Boost Protobuf SDFormat)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION share/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
 
 
   ########################################

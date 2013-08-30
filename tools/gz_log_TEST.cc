@@ -218,19 +218,11 @@ TEST(gz_log, Step)
 
   // Call gz log step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-#ifdef HAVE_SDF
   EXPECT_EQ(stepq1.length(), 124131u);
-#else
-  EXPECT_EQ(stepq1.length(), 124082u);
-#endif
 
   // Call gz log step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-#ifdef HAVE_SDF
   EXPECT_EQ(stepq2.length(), 132516u);
-#else
-  EXPECT_EQ(stepq2.length(), 132427u);
-#endif
 }
 
 /////////////////////////////////////////////////

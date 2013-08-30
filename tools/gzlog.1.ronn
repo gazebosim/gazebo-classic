@@ -1,7 +1,7 @@
 gzlog -- DEPRECATED(see 'gz help log')
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzlog` [command] <options> [log file]
 

@@ -57,15 +57,21 @@ else ()
 endif ()
 
 ########################################
+include (FindOpenAL)
+if (NOT OPENAL_FOUND)
+  BUILD_WARNING ("OpenAL not found, audio support will be disabled.")
+  set (HAVE_OPENAL OFF CACHE BOOL "HAVE OpenAL" FORCE)
+else ()
+  set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL" FORCE)
+endif ()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
 
   pkg_check_modules(SDF sdformat)
   if (NOT SDF_FOUND)
-    BUILD_WARNING ("Missing: SDF. Required for reading and writing SDF files. The deprecated SDF version will be used. Pay attention to this warning, because it will become an error in Gazebo 2.0.")
-    set (HAVE_SDF FALSE)
-  else()
-    set (HAVE_SDF TRUE)
+    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
 
   pkg_check_modules(CURL libcurl)
@@ -259,8 +265,10 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
+  else ()
+    set (HAVE_FFMPEG FALSE)
   endif ()
 
   ########################################

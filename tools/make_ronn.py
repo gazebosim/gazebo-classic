@@ -23,7 +23,7 @@ for i in range(len(lines)):
     f.write("%s\n" % lines[i])
     f.write("=============================================\n\n")
   elif i == 2:
-    f.write("## SYNPOSIS\n\n")
+    f.write("## SYNOPSIS\n\n")
     f.write('%s\n\n' % lines[i])
   elif i == 4:
     f.write("## DESCRIPTION\n\n")

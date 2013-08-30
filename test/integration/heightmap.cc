@@ -339,7 +339,7 @@ TEST_P(HeightmapTest, Heights)
 }
 */
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(HeightmapTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(HeightmapTest)
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -13,12 +13,6 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
-# Remove this whole if block in Gazebo 2.0
-if (NOT HAVE_SDF)
-  add_subdirectory(sdf)
-  include_directories(${PROJECT_SOURCE_DIR}/gazebo)
-endif()
-
 add_subdirectory(msgs)
 add_subdirectory(math)
 add_subdirectory(transport)
@@ -91,12 +85,6 @@ target_link_libraries(libgazebo
   gazebo_math
   pthread
 )
-
-if (NOT HAVE_SDF)
-  target_link_libraries(libgazebo gazebo_sdf_interface)
-  target_link_libraries(gazebo gazebo_sdf_interface)
-  target_link_libraries(gzserver gazebo_sdf_interface)
-endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)

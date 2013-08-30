@@ -1,7 +1,7 @@
 gzsdf -- DEPRECATED(see 'gz help sdf')
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzsdf` <command>
 

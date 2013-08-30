@@ -14,6 +14,7 @@ set (files
   lights.world
   model_nesting.world
   pioneer2dx.world
+  openal.world
   double_pendulums.world
   mud.world
   plugin.world

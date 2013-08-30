@@ -1,7 +1,7 @@
 gzfactory -- DEPRECATED(see 'gz help model')  simulation
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzfactory` <spawn|delete> [options]
 

@@ -1,7 +1,7 @@
 gzstats -- DEPRECATED(see 'gz help sdf')
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzstats` [options]
 
