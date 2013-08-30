@@ -35,14 +35,15 @@ static std::string forceTorqueSensorString =
 /// \brief Test Creation of a ForceTorque sensor
 TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
 {
-  Load("worlds/pioneer2dx.world");
+  Load("worlds/pioneer2dx.world", true);
+
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(forceTorqueSensorString, sdf);
 
-  // Create the Ray sensor
+  // Create the force torque sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
       "pioneer2dx::left_wheel_hinge");
 
@@ -60,17 +61,6 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
-
-  // Get a pointer to the world
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  world->SetPaused(true);
-
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    world->Step(1);
-    mgr->Update();
-  }
 
   EXPECT_EQ(sensor->GetTorque(), math::Vector3(0, 0, 0));
   EXPECT_EQ(sensor->GetForce(), math::Vector3(0, 0, 0));
