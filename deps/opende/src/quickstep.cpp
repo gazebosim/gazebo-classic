@@ -1772,14 +1772,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dVector3 tmp31;
               dMultiply0_133(tmp31, S, MOI_ptr1);
               dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
-#ifdef DEBUG_INERTIA_PROPAGATION
-              printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S1);
-
-              // printf("R1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
-              //   RJ1a[0*4+0],RJ1a[0*4+1],RJ1a[0*4+2],RJ1a[0*4+3],
-              //   RJ1a[1*4+0],RJ1a[1*4+1],RJ1a[1*4+2],RJ1a[1*4+3],
-              //   RJ1a[2*4+0],RJ1a[2*4+1],RJ1a[2*4+2],RJ1a[2*4+3]);
-#endif
 
               // dMatrix3 tmp33;
 
@@ -1799,7 +1791,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               // MOI_ptr2[2*4+3] = 0.0;
 
 #ifdef DEBUG_INERTIA_PROPAGATION
-              printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+              printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
                 MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
                 MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
                 MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
@@ -1810,7 +1802,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dMultiply0_133(tmp31, S, MOI_ptr2);
               dReal moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
 #ifdef DEBUG_INERTIA_PROPAGATION
-              printf("MOI b1[%d] S[%f %f %f] is %f\n",b1, S[0], S[1], S[2], moi_S2);
+              printf("----------------------------\n");
+              printf("MOI b1[%d] S[%f %f %f] = %f\n",b1, S[0], S[1], S[2], moi_S1);
+
+              // printf("R1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+              //   RJ1a[0*4+0],RJ1a[0*4+1],RJ1a[0*4+2],RJ1a[0*4+3],
+              //   RJ1a[1*4+0],RJ1a[1*4+1],RJ1a[1*4+2],RJ1a[1*4+3],
+              //   RJ1a[2*4+0],RJ1a[2*4+1],RJ1a[2*4+2],RJ1a[2*4+3]);
+              printf("MOI b2[%d] S[%f %f %f] = %f\n",b2, S[0], S[1], S[2], moi_S2);
 #endif
 
               // memcpy (MOI_ptr2, MOI_S2, 12 * sizeof(dReal));
@@ -1866,8 +1865,27 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 // Modify MOI by adding delta scalar MOI in tensor form.
                 for (int si = 0; si < 12; ++si)
                 {
-                  MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
-                  MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+                  if (si % 4 == 3)
+                  {
+                    // MOI_ptr1[si] = 0;
+                    // MOI_ptr2[si] = 0;
+                  }
+                  else if (si / 4 == si % 4)
+                  {
+                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+
+                    // check for error
+                    if (MOI_ptr1[si] <= 0)
+                      printf("\n***************** si[%d] MOI_ptr1[%f]  *****************\n\n", si, MOI_ptr1[si]);
+                    if (MOI_ptr2[si] <= 0)
+                      printf("\n***************** si[%d] MOI_ptr2[%f]  *****************\n\n", si, MOI_ptr2[si]);
+                  }
+                  else
+                  {
+                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+                  }
                 }
 
                 // Update invMOI by inverting analytically (may not be efficient).
@@ -1880,15 +1898,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
                 invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
                 invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
-                invMOI_ptr1[0*4+3] = 0.0;
+                // invMOI_ptr1[0*4+3] = 0.0;
                 invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
                 invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
                 invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
-                invMOI_ptr1[1*4+3] = 0.0;
+                // invMOI_ptr1[1*4+3] = 0.0;
                 invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
                 invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
                 invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
-                invMOI_ptr1[2*4+3] = 0.0;
+                // invMOI_ptr1[2*4+3] = 0.0;
 
                 dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
                             -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
@@ -1896,15 +1914,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
                 invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
                 invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
-                invMOI_ptr2[0*4+3] = 0.0;
+                // invMOI_ptr2[0*4+3] = 0.0;
                 invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
                 invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
                 invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
-                invMOI_ptr2[1*4+3] = 0.0;
+                // invMOI_ptr2[1*4+3] = 0.0;
                 invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
                 invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
                 invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
-                invMOI_ptr2[2*4+3] = 0.0;
+                // invMOI_ptr2[2*4+3] = 0.0;
 
 #ifdef DEBUG_INERTIA_PROPAGATION
                 printf("==========================\n");
