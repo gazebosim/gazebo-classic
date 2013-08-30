@@ -25,9 +25,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
-
 #include "gazebo/math/Helpers.hh"
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -35,11 +33,15 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "boost/filesystem.hpp"
 
 using namespace gazebo;
 using namespace rendering;
 
+const std::string Heightmap::PagingPath = "/tmp/gazebo_paging/";
 const unsigned int Heightmap::NumTerrainSubdivisions = 16;
+const double Heightmap::LoadRadiusFactor = 1.0;
+const double Heightmap::HoldRadiusFactor = 1.15;
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -49,6 +51,10 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
+
+  // Remove previous page files from disk
+  boost::filesystem::remove_all(this->PagingPath);
+  boost::filesystem::create_directory(this->PagingPath);
 }
 
 //////////////////////////////////////////////////
@@ -65,6 +71,9 @@ Heightmap::~Heightmap()
   this->terrainGroup = NULL;
 
   this->scene.reset();
+
+  // Remove page files from disk
+  boost::filesystem::remove_all(this->PagingPath);
 }
 
 //////////////////////////////////////////////////
@@ -248,7 +257,7 @@ void Heightmap::Load()
       this->terrainSize.x / (sqrt(nTerrains)));
 
   this->terrainGroup->setFilenameConvention(
-      Ogre::String("gazebo_terrain"), Ogre::String("dat"));
+    Ogre::String(this->PagingPath + "gazebo_terrain"), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(
@@ -281,8 +290,10 @@ void Heightmap::Load()
 
     this->mTerrainPaging = OGRE_NEW Ogre::TerrainPaging(this->mPageManager);
     this->world = mPageManager->createWorld();
-    mTerrainPaging->createWorldSection(world, this->terrainGroup, 100, 120,
-      0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
+    mTerrainPaging->createWorldSection(world, this->terrainGroup,
+        this->LoadRadiusFactor * this->terrainSize.x,
+        this->HoldRadiusFactor * this->terrainSize.x,
+        0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
   }
 
   for (int y = 0; y <= sqrt(nTerrains) - 1; ++y)

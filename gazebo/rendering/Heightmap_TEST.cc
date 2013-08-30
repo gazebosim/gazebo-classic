@@ -41,7 +41,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   gazebo::rendering::Heightmap *heightmap =
       new gazebo::rendering::Heightmap(scene);
 
-  // Check that heightmap is created
+  // Check that the heightmap is created
   EXPECT_TRUE(heightmap != NULL);
 
   std::vector<float> heights;

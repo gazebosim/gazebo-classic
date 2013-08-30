@@ -209,6 +209,22 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
+      /// \brief Path for the terrain pages generated on disk.
+      private: static const std::string PagingPath;
+
+      /// \brief The terrain pages are loaded if the distance from the camera is
+      /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
+      /// LoadRadiusFactor is a multiplier applied to the terrain size to create
+      /// a load radius that depends on the terrain size.
+      private: static const double LoadRadiusFactor;
+
+      /// \brief The terrain pages are held in in memory but not loaded if they
+      /// are not ready when the camera is within holdRadius distance. See
+      /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
+      /// multiplier applied to the terrain size to create a hold radius that
+      /// depends on the terrain size.
+      private: static const double HoldRadiusFactor;
+
       /// \brief The scene.
       private: ScenePtr scene;
 
