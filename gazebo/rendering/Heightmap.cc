@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -33,7 +34,6 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/UserCamera.hh"
-#include "boost/filesystem.hpp"
 
 using namespace gazebo;
 using namespace rendering;
