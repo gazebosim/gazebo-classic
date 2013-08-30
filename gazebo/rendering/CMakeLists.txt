@@ -46,6 +46,7 @@ set (sources
   RTShaderSystem.cc
   Scene.cc
   SelectionObj.cc
+  TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -89,6 +90,7 @@ set (headers
   RTShaderSystem.hh
   Scene.hh
   SelectionObj.hh
+  TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh

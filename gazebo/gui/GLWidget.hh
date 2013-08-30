@@ -118,7 +118,6 @@ namespace gazebo
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
       private: void OnRequest(ConstRequestPtr &_msg);
-
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
@@ -135,7 +134,6 @@ namespace gazebo
 
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 

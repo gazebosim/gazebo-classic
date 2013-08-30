@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+# based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
+
+# to install dependencies on Ubuntu (tested with Quantal):
+#sudo apt-get install ruby1.9.1-dev
+#sudo gem install rest-client json
+require 'rubygems'
+require 'rest_client'
+require 'json'
+
+class BitbucketPullRequests
+  # URL for bitbucket 2.0 api
+  @url_prefix
+  @url_suffix
+
+  # constructor
+  def initialize
+    @url_domain = 'https://bitbucket.org'
+    @url_prefix = @url_domain + '/api/2.0/repositories/osrf/gazebo/pullrequests'
+  end
+
+  # summary of open pull requests
+  def getPullRequestsSummary()
+    response = RestClient.get(@url_prefix)
+    jsonHash = JSON.parse(response.body)
+    output = ""
+    output += prettyPrintSummary(jsonHash)
+    while jsonHash.has_key? "next"
+      response = RestClient.get(@url_domain + jsonHash["next"])
+      jsonHash = JSON.parse(response.body)
+      output += prettyPrintSummary(jsonHash)
+    end
+    return output
+  end
+
+  def prettyPrintSummary(jsonHash)
+    output = ""
+    jsonHash["values"].each { |pr|
+      output += pr["id"].to_s
+      output += "\t"+pr["source"]["commit"]["sha"]
+      output += "\t"+pr["source"]["branch"]["name"]
+      output += "\n"
+    }
+    return output
+  end
+
+  # list of files changed by pull request
+  def getPullRequestDetail(id)
+    url = @url_prefix + "/" + id.to_s + "/patch"
+    response = RestClient.get(url)
+    output = ""
+    response.lines.map(&:chomp).each do |line|
+      if line.include? '+++'
+        line["+++ b/"] = ""
+        output += line + "\n"
+      end
+    end
+    return output
+  end
+end
+
+client = BitbucketPullRequests.new
+if ARGV.length == 1
+  puts client.getPullRequestDetail(ARGV[0].to_i)
+else
+  puts client.getPullRequestsSummary()
+end
+

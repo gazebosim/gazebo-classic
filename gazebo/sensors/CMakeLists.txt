@@ -18,6 +18,9 @@ set (sources
   SensorFactory.cc
   SensorManager.cc
   SonarSensor.cc
+  WirelessReceiver.cc
+  WirelessTransceiver.cc
+  WirelessTransmitter.cc
 ) 
 
 set (headers
@@ -39,6 +42,9 @@ set (headers
   SensorFactory.hh
   SensorManager.hh
   SonarSensor.hh
+  WirelessReceiver.hh
+  WirelessTransceiver.hh
+  WirelessTransmitter.hh
 )
 
 set (gtest_sources

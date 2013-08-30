@@ -49,6 +49,7 @@
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
+#include "gazebo/rendering/TransmitterVisual.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -1391,7 +1392,6 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
           _msg.visual(j)));
     if (_msg.has_scale())
     {
-//      msgs::Set(vm->mutable_scale(), _msg.scale());
       vm->mutable_scale()->set_x(_msg.scale().x());
       vm->mutable_scale()->set_y(_msg.scale().y());
       vm->mutable_scale()->set_z(_msg.scale().z());
@@ -1858,6 +1858,18 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDVisualPtr rfidVis(new RFIDVisual(
           _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     this->visuals[rfidVis->GetName()] = rfidVis;
+  }
+  else if (_msg->type() == "wireless_transmitter" && _msg->visualize() &&
+           !_msg->topic().empty())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
+    VisualPtr transmitterVis(new TransmitterVisual(
+          _msg->name() + "_GUIONLY_transmitter_vis", parentVis, _msg->topic()));
+    this->visuals[transmitterVis->GetName()] = transmitterVis;
+    transmitterVis->Load();
   }
 
   return true;

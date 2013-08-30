@@ -1,7 +1,7 @@
 gzclient -- Gazebo GUI Client
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzclient` [options]
 

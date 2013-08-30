@@ -18,7 +18,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -27,7 +27,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/MouseEventHandler.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
 
@@ -230,6 +230,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
+
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -260,8 +261,18 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
+  else if (_vis->GetName().find("unit_box") != std::string::npos)
+  {
+  }
+  else
+  {
+    // TODO scaling for complex models are not yet functional.
+    // Limit scaling to simple shapes for now.
+    gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+    return;
+  }
 
-  math::Vector3 newScale = this->mouseVisualScale * scale;
+  math::Vector3 newScale = this->mouseVisualScale * scale.GetAbs();
 
   if (this->mouseEvent.control)
   {
@@ -379,8 +390,11 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr mouseVis
       = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-  if (this->selectionObj->GetMode() == rendering::SelectionObj::SELECTION_NONE
-      || (mouseVis && mouseVis != this->selectionObj->GetParent()))
+  // set the new mouse vis only if there are no modifier keys pressed and the
+  // entity was different from the previously selected one.
+  if (!this->keyEvent.key && (this->selectionObj->GetMode() ==
+       rendering::SelectionObj::SELECTION_NONE
+      || (mouseVis && mouseVis != this->selectionObj->GetParent())))
   {
     vis = mouseVis;
   }
@@ -555,7 +569,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
         this->selectionObj->UpdateSize();
         this->PublishVisualScale(this->mouseMoveVis);
       }
-      this->PublishVisualPose(this->mouseMoveVis);
+      else
+        this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }

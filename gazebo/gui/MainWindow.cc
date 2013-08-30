@@ -1050,6 +1050,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   {
     this->CreateMenuBar();
     this->menuLayout->addWidget(this->menuBar);
+    this->setMenuBar(this->menuBar);
   }
   else
   {

@@ -17,7 +17,7 @@
 
 #include "gazebo/common/MeshManager.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -307,6 +307,8 @@ void SelectionObj::CreateTranslateVisual()
   transHeadXNode->setPosition(0, 0, 0.22);
   shaftXObj->setUserAny(Ogre::Any(std::string("trans_x")));
   headXObj->setUserAny(Ogre::Any(std::string("trans_x")));
+  shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *shaftYObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -328,6 +330,8 @@ void SelectionObj::CreateTranslateVisual()
   transHeadYNode->setPosition(0, 0, 0.22);
   shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
   headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *shaftZObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -349,6 +353,8 @@ void SelectionObj::CreateTranslateVisual()
   transHeadZNode->setPosition(0, 0, 0.22);
   shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
   headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   this->transXVisual->SetRotation(
       math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
@@ -399,6 +405,7 @@ void SelectionObj::CreateRotateVisual()
       "__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName());
   xNode->attachObject(rotXObj);
   rotXObj->setUserAny(Ogre::Any(std::string("rot_x")));
+  rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotYObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -408,6 +415,7 @@ void SelectionObj::CreateRotateVisual()
       "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
   yNode->attachObject(rotYObj);
   rotYObj->setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -417,6 +425,7 @@ void SelectionObj::CreateRotateVisual()
       "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
   zNode->attachObject(rotZObj);
   rotZObj->setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   this->rotXVisual->Load();
   this->rotYVisual->Load();
@@ -490,6 +499,8 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadXNode->setPosition(0, 0, 0.21);
   scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
   scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleShaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *scaleShaftYObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -511,6 +522,8 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadYNode->setPosition(0, 0, 0.21);
   scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
   scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleShaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *scaleShaftZObj =
       (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -532,6 +545,8 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadZNode->setPosition(0, 0, 0.21);
   scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
   scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   this->scaleXVisual->SetRotation(
       math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));

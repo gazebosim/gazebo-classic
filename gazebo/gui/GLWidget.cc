@@ -258,7 +258,14 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     g_deleteAct->Signal(this->selectedVis->GetName());
 
   if (_event->key() == Qt::Key_Escape)
+  {
     event::Events::setSelectedEntity("", "normal");
+    if (this->state == "make_entity")
+    {
+      if (this->entityMaker)
+        this->entityMaker->Stop();
+    }
+  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -309,12 +316,26 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_scaleAct->trigger();
   }
 
+  /// Switch between RTS modes
+  if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
+  {
+    if (_event->key() == Qt::Key_R)
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T)
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S)
+      g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_Escape)
+      g_arrowAct->trigger();
+  }
+
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
+
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
@@ -449,10 +470,8 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
                                    this->mouseEvent.pos, pose.pos))
       {
         this->userCamera->SetFocalPoint(pose.pos);
-
         math::Vector3 dir = pose.pos - camPose.pos;
         pose.pos = camPose.pos + (dir * 0.8);
-
         pose.rot = this->userCamera->GetWorldRotation();
         this->userCamera->MoveToPosition(pose, 0.5);
       }
@@ -466,9 +485,6 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
     return false;
 
   return true;
-}
-
-/////////////////////////////////////////////////
 void GLWidget::OnMousePressNormal()
 {
   if (!this->userCamera)
@@ -811,7 +827,6 @@ void GLWidget::OnOrbit()
       rendering::OrbitViewController::GetTypeString());
 }
 
-/////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected())
