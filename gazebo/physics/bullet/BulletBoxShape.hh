@@ -91,36 +91,14 @@ namespace gazebo
                   boxScale.setY(size.y / this->initialSize.y);
                   boxScale.setZ(size.z / this->initialSize.z);
 
-                  BulletLinkPtr bLink =
-                      boost::dynamic_pointer_cast<BulletLink>(
-                      bParent->GetLink());
-                  BulletPhysicsPtr bulletPhysics =
-                      boost::dynamic_pointer_cast<BulletPhysics>(
-                      bLink->GetWorld()->GetPhysicsEngine());
-                  btDynamicsWorld *bulletWorld =
-                      bulletPhysics->GetDynamicsWorld();
-
                   shape->setLocalScaling(boxScale);
 
-                  // clear bullet cache and re-add the collision shape
+                  // clear bullet cache
                   // otherwise collisions won't work properly after scaling
-                  bulletWorld->updateSingleAabb(bLink->GetBulletLink());
+                  BulletLinkPtr bLink =
+                    boost::dynamic_pointer_cast<BulletLink>(
+                    bParent->GetLink());
                   bLink->ClearCollisionCache();
-
-                  // remove and add the shape again
-                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
-                  {
-                    btCompoundShape *compoundShape =
-                        dynamic_cast<btCompoundShape *>(
-                        bLink->GetBulletLink()->getCollisionShape());
-
-                    compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
-                    compoundShape->addChildShape(
-                        BulletTypes::ConvertPose(relativePose), shape);
-                  }
                 }
               }
 

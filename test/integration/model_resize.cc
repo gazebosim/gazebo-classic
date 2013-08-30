@@ -179,7 +179,7 @@ TEST_P(ModelResizeTest, SimpleShapes)
   SimpleShapes(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ModelResizeTest);
+INSTANTIATE_PHYSICS_ENGINES_TEST(ModelResizeTest)
 
 int main(int argc, char **argv)
 {
