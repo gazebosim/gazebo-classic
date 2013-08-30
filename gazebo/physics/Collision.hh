@@ -113,6 +113,10 @@ namespace gazebo
       /// \return The collision shape.
       public: ShapePtr GetShape() const;
 
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const math::Vector3 &_scale);
+
       /// \brief Turn contact recording on or off.
       /// \param[in] _enable True to enable collision contacts.
       public: void SetContactsEnabled(bool _enable);

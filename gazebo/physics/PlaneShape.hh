@@ -72,6 +72,10 @@ namespace gazebo
       /// \return Size of the plane.
       public: math::Vector2d GetSize() const;
 
+      /// \brief Set the scale of the plane.
+      /// \return _scale Scale to set the plane to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.
       public: void FillMsg(msgs::Geometry &_msg);

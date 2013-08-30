@@ -77,6 +77,18 @@ math::Vector2d PlaneShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
+void PlaneShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  this->SetSize(size);
+}
+
+//////////////////////////////////////////////////
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
