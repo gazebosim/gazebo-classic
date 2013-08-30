@@ -925,7 +925,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
+                 << "  <sensor name='" << _sensorName
+                 << "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>false</visualize>"
@@ -942,7 +943,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
-               WaitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilEntitySpawn(_name, 100, 100);
              }
 
   /// \brief Spawn an Wireless receiver sensor on a link
@@ -973,7 +974,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
+                 << "  <sensor name='" << _sensorName
+                 << "' type='wireless_receiver'>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>true</visualize>"
                  << "    <transceiver>"
@@ -990,7 +992,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
-               WaitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilEntitySpawn(_name, 100, 100);
              }
 
   /// \brief Wait for a number of ms. and attempts until the entity is spawned
