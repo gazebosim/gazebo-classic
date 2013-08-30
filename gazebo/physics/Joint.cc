@@ -525,7 +525,8 @@ void Joint::SetForce(int _index, double _force)
   else
     gzerr << "Something's wrong, joint [" << this->GetName()
           << "] index [" << _index
-          << "] out of range.\n";
+          << "] out of range [" << this->GetAngleCount()
+          << "] when trying to set force.\n";
 }
 
 //////////////////////////////////////////////////
@@ -538,6 +539,7 @@ double Joint::GetForce(unsigned int _index)
   else
   {
     gzerr << "Invalid joint index [" << _index
+          << "] out of range [" << this->GetAngleCount()
           << "] when trying to get force\n";
     return 0;
   }
