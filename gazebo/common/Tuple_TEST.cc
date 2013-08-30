@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-typedef std::tr1::tuple<const char*, const char*> const_char2;
+typedef std::tr1::tuple<std::string, std::string> const_char2;
 class TupleTest : public ::testing::TestWithParam<const_char2>
 {
   public: virtual void SetUp()
