@@ -151,22 +151,6 @@ common::Image Heightmap::GetImage() const
 }
 
 //////////////////////////////////////////////////
-void PrintHeight(const std::string &_title, std::vector<float> _heightmap)
-{
-  std::cout << _title << std::endl;
-  int width = sqrt(_heightmap.size());
-  for (unsigned int i = 1; i <= _heightmap.size(); ++i)
-  {
-      std::cout << std::setw(4) << _heightmap[i - 1] << " ";
-      if (i % width == 0)
-      {
-        std::cout << std::endl;
-      }
-  }
-  std::cout << std::endl << std::endl;
-}
-
-//////////////////////////////////////////////////
 void Heightmap::SplitHeights(std::vector<float> &_heightmap, int _n,
     std::vector<std::vector<float> > &_v)
 {
