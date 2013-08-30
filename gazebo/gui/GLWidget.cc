@@ -485,6 +485,9 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
     return false;
 
   return true;
+}
+
+/////////////////////////////////////////////////
 void GLWidget::OnMousePressNormal()
 {
   if (!this->userCamera)

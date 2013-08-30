@@ -33,7 +33,7 @@
 
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/gui/model/PartGeneralTab.hh"
 #include "gazebo/gui/model/PartVisualTab.hh"

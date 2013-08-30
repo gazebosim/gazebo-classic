@@ -94,10 +94,6 @@ namespace gazebo
       /// \param[in] _scale Scale to set the link to.
       public: void SetScale(const math::Vector3 &_scale);
 
-      /// \brief Set the scale of the link.
-      /// \param[in] _scale Scale to set the link to.
-      public: void SetScale(const math::Vector3 _scale);
-
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
       public: virtual void SetEnabled(bool _enable) const = 0;
