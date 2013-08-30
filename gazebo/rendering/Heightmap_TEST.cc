@@ -45,7 +45,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   EXPECT_TRUE(heightmap != NULL);
 
   std::vector<float> heights;
-  std::vector<std::vector<float> > splitted;
+  std::vector<std::vector<float> > heightsSplit;
   std::vector<std::vector<float> > slices;
 
   // Initialize a 9 x 9 terrain with known values
@@ -56,9 +56,10 @@ TEST_F(Heightmap_TEST, splitTerrain)
     heights[i] = i + 1;
   }
 
-  heightmap->SplitHeights(heights, heightmap->NumTerrainSubdivisions, splitted);
+  heightmap->SplitHeights(heights, heightmap->NumTerrainSubdivisions,
+      heightsSplit);
 
-  EXPECT_TRUE(splitted.size() == heightmap->NumTerrainSubdivisions);
+  EXPECT_TRUE(heightsSplit.size() == heightmap->NumTerrainSubdivisions);
 
   // Precomputed subterrains for a known 9 x 9 terrain starting from 1 and with
   // consecutive values
@@ -83,7 +84,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   // Make sure that the subterrain heights matches the precomputed slices
   for (unsigned int i = 0; i < heightmap->NumTerrainSubdivisions; ++i)
   {
-    EXPECT_TRUE(std::equal(splitted[i].begin(), splitted[i].end(),
+    EXPECT_TRUE(std::equal(heightsSplit[i].begin(), heightsSplit[i].end(),
           slices[i].begin()));
   }
 }
