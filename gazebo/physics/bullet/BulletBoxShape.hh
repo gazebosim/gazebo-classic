@@ -105,10 +105,7 @@ namespace gazebo
                   // clear bullet cache and re-add the collision shape
                   // otherwise collisions won't work properly after scaling
                   bulletWorld->updateSingleAabb(bLink->GetBulletLink());
-                  bulletWorld->getBroadphase()->getOverlappingPairCache()->
-                      cleanProxyFromPairs(
-                      bLink->GetBulletLink()->getBroadphaseHandle(),
-                      bulletWorld->getDispatcher());
+                  bLink->ClearCollisionCache();
 
                   // remove and add the shape again
                   if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
