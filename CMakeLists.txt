@@ -318,12 +318,6 @@ else (build_errors)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
-  # This is only needed for backward compatibility with the internal
-  # version of SDF
-  if (NOT HAVE_SDF)
-    include_directories(${PROJECT_SOURCE_DIR}/gazebo)
-  endif()
-  
   message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
@@ -384,12 +378,7 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
   endif()
     
-  if (HAVE_SDF)
-    set(PKG_DEPENDS Boost Protobuf SDFormat)
-  else()
-    set(PKG_DEPENDS Boost Protobuf)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_sdf_interface)
-  endif()
+  set(PKG_DEPENDS Boost Protobuf SDFormat)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)

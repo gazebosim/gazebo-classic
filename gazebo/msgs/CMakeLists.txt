@@ -141,10 +141,6 @@ target_link_libraries(gazebo_msgs
   ${PROTOBUF_LIBRARY}
 )
 
-if (NOT HAVE_SDF)
-  target_link_libraries(gazebo_msgs gazebo_sdf_interface)
-endif()
-
 add_dependencies(gazebo_msgs gazebomsgs_out)
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")

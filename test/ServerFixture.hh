@@ -24,11 +24,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-// Remove the gazebo_config and ifdefs in Gazebo 2.0
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
 #include <sdf/sdf.hh>
-#endif
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
