@@ -564,15 +564,15 @@ LogCommand::LogCommand()
     ("info,i", "Output information about a log file.")
     ("echo,e", "Output the contents of a log file to screen.")
     ("step,s", "Step through the contents of a log file.")
-    ("record,r", po::value<bool>(),
+    ("record,d", po::value<bool>(),
      "Start/stop recording a log file from an active Gazebo server.")
     ("world-name,w", po::value<std::string>(), "World name, used when "
      "starting or stopping recording.")
     ("raw,r", "Output the data from echo and step without XML formatting.")
     ("stamp", po::value<std::string>(), "Add a timestamp to each line of "
      "output. Valid values are (sim,real,wall)")
-    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate.\
-     Only valid for echo and step commands.")
+    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
+     "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only for the echo and step commands");
@@ -597,7 +597,6 @@ bool LogCommand::TransportRequired()
 /////////////////////////////////////////////////
 bool LogCommand::RunImpl()
 {
-  printf("Run gz log\n");
   std::string filename, filter, stamp, worldName;
   double hz = 0;
   bool raw = false;
@@ -633,7 +632,6 @@ bool LogCommand::RunImpl()
       return false;
     }
 
-  printf("Run gz log load from file\n");
     // Load log file from string
     if (!this->LoadLogFromFile(filename))
       return false;
@@ -643,7 +641,6 @@ bool LogCommand::RunImpl()
   g_stateSdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", g_stateSdf);
 
-  printf("Run gz log here\n");
   if (this->vm.count("echo"))
     this->Echo(filter, raw, stamp, hz);
   else if (this->vm.count("step"))
@@ -659,7 +656,6 @@ bool LogCommand::RunImpl()
 /////////////////////////////////////////////////
 void LogCommand::Info(const std::string &_filename)
 {
-  printf("Info\n");
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
   // Get the SDF world description from the log file

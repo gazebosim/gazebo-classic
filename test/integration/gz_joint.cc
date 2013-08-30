@@ -45,12 +45,10 @@ TEST_F(GzJoint, Force)
 
   world->SetPaused(true);
 
-  std::cout << "Is Paused[" << world->IsPaused() << "]\n";
   // Tell the camera to follow the box. The camera should move toward the
   // box.
   custom_exec("gz joint -w default -m model -j joint -f 10.0");
 
-  std::cout << "Is Paused[" << world->IsPaused() << "]\n";
   world->Step(100);
 
   // Make sure the joint has moved.

@@ -28,6 +28,7 @@ set(tests
   factory.cc
   file_handling.cc
   gz_joint.cc
+  gz_log.cc
   gz_model.cc
   gz_physics.cc
   gz_world.cc

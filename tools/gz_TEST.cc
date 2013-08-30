@@ -612,7 +612,6 @@ TEST(gz, SDF)
   output = custom_exec_str("gz sdf -d -v 1.3");
   EXPECT_EQ(output, sdf_description_1_3);
 
-  EXPECT_TRUE(false);
 /* 
   // 1.0 doc
   output = custom_exec_str("gz sdf -o -v 1.0");
@@ -625,7 +624,8 @@ TEST(gz, SDF)
   // 1.3 doc
   output = custom_exec_str("gz sdf -o -v 1.3");
   EXPECT_EQ(output, sdf_doc_1_3);
-
+  */
+ 
   path = TEST_PATH;
   path /= "worlds/empty_different_name.world";
 
@@ -651,7 +651,6 @@ TEST(gz, SDF)
   // Convert 1.3 SDF
   output = custom_exec_str(std::string("gz sdf -c ") + path.string());
   EXPECT_EQ(output, "Success\n");
-  */
 
   fini();
 }

@@ -1032,7 +1032,7 @@ void HelpCommand::Help(const std::string &_command)
 /////////////////////////////////////////////////
 DebugCommand::DebugCommand()
   : Command("debug",
-      "Returns completion list associated with command")
+      "Returns completion list for a command. Used for bash completion.")
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
