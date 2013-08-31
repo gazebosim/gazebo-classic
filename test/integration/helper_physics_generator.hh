@@ -21,6 +21,7 @@
 #define ODE_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestODE, \
     testclass, ::testing::Values("ode"));
 #define BULLET_SUPPORT(testclass)
+#define DART_SUPPORT(testclass)
 
 #ifdef HAVE_BULLET
 #undef BULLET_SUPPORT
@@ -30,7 +31,7 @@
 
 #ifdef HAVE_DART
 #undef DART_SUPPORT
-#define DART_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
+#define DART_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestDART, \
     testclass, ::testing::Values("dart"));
 #endif
 
