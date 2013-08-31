@@ -1091,7 +1091,7 @@ TEST_F(PhysicsTest, JointDampingODE)
 #ifdef HAVE_DART
 TEST_F(PhysicsTest, JointDampingDART)
 {
-  JointDamping("dart");
+  JointDampingTest("dart");
 }
 #endif // HAVE_DART
 
