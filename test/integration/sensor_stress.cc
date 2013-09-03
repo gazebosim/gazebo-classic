@@ -21,7 +21,7 @@
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
-class Sensor_TEST : public ServerFixture
+class SensorStress_TEST : public ServerFixture
 {
 };
 
@@ -37,17 +37,15 @@ void ReceiveHokuyoMsg(ConstLaserScanStampedPtr &/*_msg*/)
 }
 
 /////////////////////////////////////////////////
-/// \brief Test that sensors will continue to update after Reset World
-///        See bitbucket issue #236 for more background.
-TEST_F(Sensor_TEST, UpdateAfterReset)
+/// \brief Reset world a bunch of times and verify that no assertions happen
+/// The assert "SensorManager.cc(479): Took negative time to update a sensor."
+/// has been observed in Jenkins testing.
+TEST_F(SensorStress_TEST, ResetWorldStressTest)
 {
   // Load in a world with lasers
   Load("worlds/ray_test.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-
-  unsigned int i;
-  double updateRate, now, then;
 
   // get the sensor manager
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -58,8 +56,8 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
   ASSERT_TRUE(sensor != NULL);
 
-  // set update rate to 30 Hz
-  updateRate = 30.0;
+  // set update rate to unlimited
+  double updateRate = 0.0;
   sensor->SetUpdateRate(updateRate);
   gzdbg << sensor->GetScopedName() << " loaded with update rate of "
         << sensor->GetUpdateRate() << " Hz\n";
@@ -77,64 +75,29 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
     boost::mutex countMutex;
     boost::mutex::scoped_lock lock(countMutex);
     g_countCondition.wait(lock);
+    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
   }
 
-  unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
-  now = world->GetSimTime().Double();
-
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now << " seconds\n";
-
-  // Expect at least 50% of specified update rate
-  EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
+  EXPECT_GT(g_hokuyoMsgCount, 19u);
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
     node->Advertise<msgs::WorldControl>("~/world_control");
+
+  // Copied from MainWindow::OnResetWorld
+  msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(true);
+  worldControlPub->Publish(msg);
+
+  common::Time::MSleep(300);
+
+  int i;
+  for (i = 0; i < 20; ++i)
   {
-    // Copied from MainWindow::OnResetWorld
-    msgs::WorldControl msg;
-    msg.mutable_reset()->set_all(true);
     worldControlPub->Publish(msg);
+    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
+    common::Time::MSleep(200);
   }
-  gzdbg << "sent reset world message\n";
-  common::Time::MSleep(100);
-  now = world->GetSimTime().Double();
-  gzdbg << "world time is now " << now << '\n';
-  EXPECT_LT(now, 0.12);
-
-  // Count messages again for 2 second
-  g_hokuyoMsgCount = 0;
-  for (i = 0; i < 20; ++i)
-  {
-    common::Time::MSleep(100);
-  }
-  hokuyoMsgCount = g_hokuyoMsgCount;
-  now = world->GetSimTime().Double() - now;
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now << " seconds. Expected[" << updateRate * now * 0.5 << "]\n";
-
-  // Expect at least 50% of specified update rate
-  // Note: this is where the failure documented in issue #236 occurs
-  EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*now * 0.5);
-
-  // Count messages again for 2 more seconds
-  then = now;
-  g_hokuyoMsgCount = 0;
-  for (i = 0; i < 20; ++i)
-  {
-    common::Time::MSleep(100);
-  }
-  hokuyoMsgCount = g_hokuyoMsgCount;
-  now = world->GetSimTime().Double();
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
-        << now - then << " seconds\n";
-
-  // Expect at least 50% of specified update rate
-  EXPECT_GT(static_cast<double>(hokuyoMsgCount),
-              updateRate*(now-then) * 0.5);
 }
 
 /////////////////////////////////////////////////

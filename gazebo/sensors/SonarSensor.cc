@@ -238,12 +238,12 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
 
   this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
-  this->sonarMsg.mutable_sonar()->set_range(0);
 
   math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
   math::Vector3 pos;
 
-  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
+  if (!this->incomingContacts.empty())
+    this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
   // Iterate over all the contact messages
   for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();

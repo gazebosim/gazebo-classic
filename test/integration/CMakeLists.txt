@@ -40,6 +40,7 @@ set(tests
   physics_msgs.cc
   pioneer2dx.cc
   transport.cc
+  sensor_stress.cc
   server_fixture.cc
   speed.cc
   #state_log.cc

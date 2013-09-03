@@ -75,5 +75,3 @@ install (PROGRAMS gzmodel_create gzmodel_create.sh
 if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
   message (WARNING "Installing deprecated gzmodel_create.sh. This should be removed after Gazebo 1.9")
 endif()
-
-install(FILES gz_completion DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo)

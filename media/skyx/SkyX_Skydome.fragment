@@ -44,7 +44,7 @@ uniform sampler2D uStarfield;
 
 void main(void)
 {
-    float cos = dot(uLightDir, vDirection) / length(vDirection);
+  float cos = dot(uLightDir, vDirection) / length(vDirection);
 	float cos2 = cos*cos;
 	
 	float rayleighPhase = 0.75 * (1.0 + 0.5*cos2);
@@ -63,15 +63,15 @@ void main(void)
 	
 #ifdef STARFIELD
 	#ifdef LDR
-		gl_FragColor.xyz += nightmult *(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight,3.0) + texture2D(uStarfield, vUV+uTime).xyz*(0.35 + clamp(-uLightDir.y*0.45, 0.0, 1.0))); 
+		gl_FragColor.xyz += nightmult *(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight, 3.0) + texture2D(uStarfield, vUV+uTime).xyz*(0.35 + clamp(-uLightDir.y*0.45, 0.0, 1.0))); 
 	#else // HDR (Linear pipeline -> Gamma correction)
-		gl_FragColor.xyz += nightmult *(pow(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight,3.0), 2.2) + texture2D(uStarfield, vUV+uTime).xyz*(0.35 + clamp(-uLightDir.y*0.45, 0.0, 1.0))); 
+		gl_FragColor.xyz += nightmult * (pow(vec3(0.05, 0.05, 0.1) * (2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight, 3.0), vec3(2.2, 2.2, 2.2)) + texture2D(uStarfield, vUV+uTime).xyz*(0.35 + clamp(-uLightDir.y*0.45, 0.0, 1.0))); 
 	#endif // LDR
 #else // NO STARFIELD
 	#ifdef LDR
 		gl_FragColor.xyz += nightmult *(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight,3.0)); 
 	#else // HDR (Linear pipeline -> Gamma correction)
-		gl_FragColor.xyz += nightmult * pow(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight,3.0), 2.2);  
+		gl_FragColor.xyz += nightmult * pow(vec3(0.05, 0.05, 0.1)*(2.0-0.75*clamp(-uLightDir.y, 0.0, 1.0))*pow(vHeight,3.0), vec3(2.2, 2.2, 2.2));
 	#endif // LDR
 #endif // STARFIELD	
 }
