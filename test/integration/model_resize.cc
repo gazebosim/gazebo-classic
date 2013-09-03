@@ -22,7 +22,8 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class ModelResizeTest : public ServerFixture
+class ModelResizeTest : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   public: void SimpleShapes(const std::string &_physicsEngine);
 };
