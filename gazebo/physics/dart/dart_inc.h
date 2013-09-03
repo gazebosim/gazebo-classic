@@ -11,7 +11,7 @@
 #include <dart/integration/EulerIntegrator.h>
 #include <dart/integration/RK4Integrator.h>
 
-#include <dart/dynamics/Dof.h>
+#include <dart/dynamics/GenCoord.h>
 #include <dart/dynamics/Joint.h>
 #include <dart/dynamics/Shape.h>
 #include <dart/dynamics/ShapeBox.h>
