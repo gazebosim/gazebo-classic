@@ -101,6 +101,9 @@ math::Vector3 BulletHinge2Joint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 {
+  if (!this->bulletHinge2)
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+
   btVector3 vec = this->bulletHinge2->getAxis1();
   return math::Vector3(vec.getX(), vec.getY(), vec.getZ());
 }
@@ -108,6 +111,9 @@ math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetAngle(int /*_index*/) const
 {
+  if (!this->bulletHinge2)
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+
   return this->bulletHinge2->getAngle1();
 }
 
@@ -163,18 +169,27 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setUpperLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setUpperLimit(_angle.Radian());
+  else
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setLowerLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setLowerLimit(_angle.Radian());
+  else
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
+  if (!this->bulletHinge2)
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
@@ -187,6 +202,9 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
+  if (!this->bulletHinge2)
+    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
