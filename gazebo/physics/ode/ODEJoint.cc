@@ -48,6 +48,9 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[0] = 0;
   this->dStable[1] = 0;
   this->dStable[2] = 0;
+  this->forceApplied[0] = 0;
+  this->forceApplied[1] = 0;
+  this->forceAppliedTime = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -1232,7 +1235,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
         boost::bind(&ODEJoint::CFMDamping, this));
     else
       this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&Joint::ApplyDamping, this));
+        boost::bind(&ODEJoint::ApplyDamping, this));
     this->dampingInitialized = true;
   }
 }
@@ -1251,4 +1254,62 @@ void ODEJoint::SetProvideFeedback(bool _enable)
     else
       gzerr << "ODE Joint ID is invalid\n";
   }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetForce(int _index, double _force)
+{
+  this->SaveForce(_index, _force);
+  Joint::SetForce(_index, _force);
+  this->SetForceImpl(_index, _force);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SaveForce(int _index, double _force)
+{
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
+  else
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetForce(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->forceApplied[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get force\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyDamping()
+{
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+
+  // do not change forceApplied if setting internal damping forces
+  this->SetForceImpl(0, dampingForce);
+
+  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
 }

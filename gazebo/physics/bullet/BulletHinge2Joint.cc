@@ -142,7 +142,7 @@ void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
+void BulletHinge2Joint::SetForceImpl(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
