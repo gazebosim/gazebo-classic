@@ -18,6 +18,7 @@
 #include <fstream>
 #include <string>
 #include <gazebo/transport/transport.hh>
+#include <gazebo/common/Common.hh>
 
 using namespace gazebo;
 namespace po = boost::program_options;
@@ -216,6 +217,8 @@ int main(int argc, char **argv)
     help(v_desc);
     return -1;
   }
+
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   if (vm.count("command"))
   {

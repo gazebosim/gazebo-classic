@@ -136,16 +136,13 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_libraries}
   ${TBB_LIBRARIES}
+  ${SDF_LIBRARIES}
   pthread
 )
 
 if (NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple
   target_link_libraries(gazebo_common rt)
-endif()
-
-if (HAVE_SDF)
-  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
 endif()
 
 if (HAVE_GTS)

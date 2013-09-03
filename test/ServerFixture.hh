@@ -24,11 +24,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-// Remove the gazebo_config and ifdefs in Gazebo 2.0
-#include "gazebo/gazebo_config.h"
-#ifdef HAVE_SDF
 #include <sdf/sdf.hh>
-#endif
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -58,7 +54,7 @@ using namespace gazebo;
 
 std::string custom_exec(std::string _cmd);
 
-class ServerFixture : public testing::TestWithParam<const char*>
+class ServerFixture : public testing::Test
 {
   protected: ServerFixture()
              {
@@ -882,7 +878,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
+                 << "  <sensor name='" << _sensorName
+                 <<         "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>false</visualize>"
@@ -930,7 +927,8 @@ class ServerFixture : public testing::TestWithParam<const char*>
                  << "<static>true</static>"
                  << "<pose>" << _pos << " " << _rpy << "</pose>"
                  << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
+                 << "  <sensor name='" << _sensorName
+                 <<         "' type='wireless_receiver'>"
                  << "    <update_rate>1</update_rate>"
                  << "    <visualize>true</visualize>"
                  << "    <transceiver>"
