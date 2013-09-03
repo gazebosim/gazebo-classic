@@ -24,7 +24,8 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture
+class PhysicsTest : public ServerFixture,
+                    public testing::WithParamInterface<const char*>
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
