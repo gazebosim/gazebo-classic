@@ -34,7 +34,7 @@ void OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow_TEST::Wireframe()
 {
-  this->resMaxPercentChange = 4.0;
+  this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
   this->Load("empty.world", false, false, true);

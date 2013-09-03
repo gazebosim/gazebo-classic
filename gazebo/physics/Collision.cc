@@ -57,6 +57,8 @@ Collision::Collision(LinkPtr _link)
 
   this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
+
+  this->collisionVisualId = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -351,8 +353,9 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+
   // Put in a unique ID because this is a special visual.
-  msg.set_id(physics::getUniqueId());
+  msg.set_id(this->collisionVisualId);
   msg.set_parent_name(this->parent->GetScopedName());
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
