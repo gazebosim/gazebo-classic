@@ -544,7 +544,7 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
       double accel = (curV - lastV) / dt;
       gzdbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
       lastV = curV;
-      EXPECT_DOUBLE_EQ(accel, torque / link->GetInertial()->GetIXX());
+      EXPECT_NEAR(accel, torque / link->GetInertial()->GetIXX(), TOL);
     }
 
     // remove the joint
@@ -602,7 +602,7 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
       double accel = (curV - lastV) / dt;
       gzdbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
       lastV = curV;
-      EXPECT_DOUBLE_EQ(accel, torque / link->GetInertial()->GetIZZ());
+      EXPECT_NEAR(accel, torque / link->GetInertial()->GetIZZ(), TOL);
     }
 
     // remove the joint
