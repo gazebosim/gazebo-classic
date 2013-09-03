@@ -20,7 +20,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class Pioneer2dx : public ServerFixture
+class Pioneer2dx : public ServerFixture,
+                   public testing::WithParamInterface<const char*>
 {
   public: void StraightLine(const std::string &_physicsEngine);
 };
