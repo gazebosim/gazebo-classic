@@ -89,6 +89,7 @@ endif()
 
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo") 
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+set (LIB_INSTALL_DIR_ARCH_INDEPENDENT "lib/")
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
     
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
@@ -339,7 +340,7 @@ else (build_errors)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR_ARCH_INDEPENDENT}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
   ########################################
