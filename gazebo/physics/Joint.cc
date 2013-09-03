@@ -525,10 +525,6 @@ void Joint::SetForce(int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
-    gzerr << this->forceAppliedTime
-          << " : " << this->GetWorld()->GetSimTime()
-          << " : " << this->forceApplied[0]
-          << " : " << this->forceApplied[1] << "\n";
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
       // reset forces if time step is new
@@ -537,9 +533,6 @@ void Joint::SetForce(int _index, double _force)
     }
 
     this->forceApplied[_index] += _force;
-
-    gzerr << _force << " : " << this->forceApplied[0]
-          << " : " << this->forceApplied[1] << "\n";
   }
   else
     gzerr << "Something's wrong, joint [" << this->GetName()

@@ -62,7 +62,6 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
   gzdbg << "-------------------Test 1-------------------\n";
-  // gzerr << "begin test:"; getchar();
   for (unsigned int i = 0; i < 10; ++i)
   {
     world->StepWorld(1);
@@ -132,7 +131,6 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
           << " / 0 0 0"
           << "]\n";
   }
-  // gzerr << "end test1:"; getchar();
 
   // perturbe joints so top link topples over, then remeasure
   physics->SetGravity(math::Vector3(-30, 10, -50));
@@ -214,8 +212,6 @@ void Joint_TEST::ForceTorque(const std::string &_physicsEngine)
           << "]\n";
   }
 
-  // gzerr << "end test:"; getchar();
-
   // simulate a few steps
   int steps = 20;
   world->StepWorld(steps);
@@ -281,14 +277,12 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   physics::JointPtr joint_12 = model_1->GetJoint("joint2");
 
   gzdbg << "------------------- PD CONTROL -------------------\n";
-  // gzerr << "begin test:"; getchar();
   static const double kp1 = 50000.0;
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
   for (unsigned int i = 0; i < 3388; ++i)
   {
-    // if (i % 10 == 0) { gzerr << i << ": "; getchar(); }
     // pd control
     double j1State = joint_01->GetAngle(0u).Radian();
     double j2State = joint_12->GetAngle(0u).Radian();
@@ -358,14 +352,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       //       << "] torque2 [" << wrench_12.body2Torque
       //       << "]\n";
     }
-
-    if (physics->GetType() == "bullet" && (i == 3387))
-    {
-      gzerr << "i " << i << ": "; getchar();
-      i = 0;
-    }
   }
-  // gzerr << "end test:"; getchar();
 }
 
 TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)
