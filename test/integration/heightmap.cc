@@ -25,7 +25,8 @@
 
 using namespace gazebo;
 
-class HeightmapTest : public ServerFixture
+class HeightmapTest : public ServerFixture,
+                      public testing::WithParamInterface<const char*>
 {
   public: void PhysicsLoad(const std::string &_physicsEngine);
   public: void WhiteAlpha(const std::string &_physicsEngine);

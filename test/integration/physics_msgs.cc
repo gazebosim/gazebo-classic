@@ -23,7 +23,8 @@
 
 using namespace gazebo;
 
-class PhysicsMsgsTest : public ServerFixture
+class PhysicsMsgsTest : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   public: void MoveTool(const std::string &_physicsEngine);
   public: void SetGravity(const std::string &_physicsEngine);

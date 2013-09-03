@@ -28,7 +28,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class FactoryTest : public ServerFixture
+class FactoryTest : public ServerFixture,
+                    public testing::WithParamInterface<const char*>
 {
   public: void BoxSdf(const std::string &_physicsEngine);
   public: void Box(const std::string &_physicsEngine);
