@@ -19,7 +19,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class ServerFixtureTest : public ServerFixture
+class ServerFixtureTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void LoadPaused(const std::string &_physicsType);
   public: void LoadEmptyOfType(const std::string &_physicsType);

@@ -23,7 +23,8 @@
 
 using namespace gazebo;
 
-class TransceiverTest : public ServerFixture
+class TransceiverTest : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   public: TransceiverTest();
   public: void TxRxEmptySpace(const std::string &_physicsEngine);
