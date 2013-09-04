@@ -34,7 +34,6 @@ class WirelessTransmitter_TEST : public ServerFixture
     private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
     private: sensors::WirelessTransmitterPtr txNoVisual;
-
 };
 
 static std::string transmitterSensorString =
@@ -141,7 +140,7 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   std::string transmitterSensorStringCopy =
       boost::regex_replace(transmitterSensorString, re,
         "<frequency>-1.0</frequency>");
-  
+
   sdf::readString(transmitterSensorStringCopy, sdf);
 
   // Create the wireless receiver sensor
