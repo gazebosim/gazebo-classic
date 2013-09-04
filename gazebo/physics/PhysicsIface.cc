@@ -177,5 +177,5 @@ bool physics::worlds_running()
 uint32_t physics::getUniqueId()
 {
   boost::mutex::scoped_lock lock(g_uniqueIdMutex);
-  return g_uniqueId++;
+  return ++g_uniqueId;
 }
