@@ -177,7 +177,7 @@ double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
+void BulletScrewJoint::SetForceImpl(int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
 }

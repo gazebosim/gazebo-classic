@@ -301,3 +301,48 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 {
   return this->wrench;
 }
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetForce(int _index, double _force)
+{
+  this->SaveForce(_index, _force);
+  Joint::SetForce(_index, _force);
+  this->SetForceImpl(_index, _force);
+}
+
+//////////////////////////////////////////////////
+double SimbodyJoint::GetForce(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->forceApplied[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get force\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SaveForce(int _index, double _force)
+{
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
+  else
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
+}

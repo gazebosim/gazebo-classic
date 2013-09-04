@@ -87,7 +87,7 @@ void SimbodyScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetForce(int /*_index*/, double /*_force*/)
+void SimbodyScrewJoint::SetForceImpl(int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
 }

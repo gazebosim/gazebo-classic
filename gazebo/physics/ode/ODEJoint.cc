@@ -48,6 +48,9 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[0] = 0;
   this->dStable[1] = 0;
   this->dStable[2] = 0;
+  this->forceApplied[0] = 0;
+  this->forceApplied[1] = 0;
+  this->forceAppliedTime = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -932,7 +935,7 @@ JointWrench ODEJoint::GetForceTorque(int _index)
 //////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  JointWrench wrench;
+  this->wrench;
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
@@ -941,10 +944,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
   {
     // kind of backwards here, body1 (parent) corresponds go f2, t2
     // and body2 (child) corresponds go f1, t1
-    wrench.body2Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
-    wrench.body2Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
-    wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
-    wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
+    this->wrench.body2Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
+    this->wrench.body2Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
+    this->wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
+    this->wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
     // get force applied through SetForce
     physics::JointWrench wrenchAppliedWorld;
@@ -993,20 +996,20 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // gzerr << "anchor [" << anchorPose
       //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
       //       << "] childMomentArm[" << childMomentArm
-      //       << "] f1[" << wrench.body2Force
-      //       << "] t1[" << wrench.body2Torque
-      //       << "] fxp[" << wrench.body2Force.Cross(childMomentArm)
+      //       << "] f1[" << this->wrench.body2Force
+      //       << "] t1[" << this->wrench.body2Torque
+      //       << "] fxp[" << this->wrench.body2Force.Cross(childMomentArm)
       //       << "]\n";
 
-      wrench.body2Torque += wrench.body2Force.Cross(childMomentArm);
+      this->wrench.body2Torque += this->wrench.body2Force.Cross(childMomentArm);
 
       // rotate resulting body2Force in world frame into link frame
-      wrench.body2Force = childPose.rot.RotateVectorReverse(
-        -wrench.body2Force);
+      this->wrench.body2Force = childPose.rot.RotateVectorReverse(
+        -this->wrench.body2Force);
 
       // rotate resulting body2Torque in world frame into link frame
-      wrench.body2Torque = childPose.rot.RotateVectorReverse(
-        -wrench.body2Torque);
+      this->wrench.body2Torque = childPose.rot.RotateVectorReverse(
+        -this->wrench.body2Torque);
     }
 
     // convert torque from about parent CG to joint anchor location
@@ -1048,26 +1051,40 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       //       << "] iarm[" << cgPose
       //       << "] anc2pcg[" << this->anchorPose - parentCGInChildLink
       //       << "] parentMomentArm[" << parentMomentArm
-      //       << "] f1[" << wrench.body1Force
-      //       << "] t1[" << wrench.body1Torque
-      //       << "] fxp[" << wrench.body1Force.Cross(parentMomentArm)
+      //       << "] f1[" << this->wrench.body1Force
+      //       << "] t1[" << this->wrench.body1Torque
+      //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
       //       << "]\n";
 
-      wrench.body1Torque += wrench.body1Force.Cross(parentMomentArm);
+      this->wrench.body1Torque +=
+        this->wrench.body1Force.Cross(parentMomentArm);
 
       // rotate resulting body1Force in world frame into link frame
-      wrench.body1Force = parentPose.rot.RotateVectorReverse(
-        -wrench.body1Force);
+      this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
+        -this->wrench.body1Force);
 
       // rotate resulting body1Torque in world frame into link frame
-      wrench.body1Torque = parentPose.rot.RotateVectorReverse(
-        -wrench.body1Torque);
+      this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
+        -this->wrench.body1Torque);
 
       if (!this->childLink)
       {
+        gzdbg << "Joint [" << this->GetName()
+              << "] with parent Link [" << this->parentLink->GetName()
+              << "] but no child Link.  Child Link must be world.\n";
         // if child link does not exist, use equal and opposite
-        wrench.body2Force = -wrench.body1Force;
-        wrench.body2Torque = -wrench.body1Torque;
+        this->wrench.body2Force = -this->wrench.body1Force;
+        this->wrench.body2Torque = -this->wrench.body1Torque;
+
+        // force/torque are in parent link frame, transform them into
+        // child link(world) frame.
+        math::Pose parentToWorldTransform = this->parentLink->GetWorldPose();
+        this->wrench.body1Force =
+          parentToWorldTransform.rot.RotateVector(
+          this->wrench.body1Force);
+        this->wrench.body1Torque =
+          parentToWorldTransform.rot.RotateVector(
+          this->wrench.body1Torque);
       }
     }
     else
@@ -1079,12 +1096,25 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       }
       else
       {
+        gzdbg << "Joint [" << this->GetName()
+              << "] with child Link [" << this->childLink->GetName()
+              << "] but no parent Link.  Parent Link must be world.\n";
         // if parentLink does not exist, use equal opposite body1 wrench
-        wrench.body1Force = -wrench.body2Force;
-        wrench.body1Torque = -wrench.body2Torque;
+        this->wrench.body1Force = -this->wrench.body2Force;
+        this->wrench.body1Torque = -this->wrench.body2Torque;
+
+        // force/torque are in child link frame, transform them into
+        // parent link frame.  Here, parent link is world, so zero transform.
+        math::Pose childToWorldTransform = this->childLink->GetWorldPose();
+        this->wrench.body1Force =
+          childToWorldTransform.rot.RotateVector(
+          this->wrench.body1Force);
+        this->wrench.body1Torque =
+          childToWorldTransform.rot.RotateVector(
+          this->wrench.body1Torque);
       }
     }
-    wrench = wrench - wrenchAppliedWorld;
+    this->wrench = this->wrench - wrenchAppliedWorld;
   }
   else
   {
@@ -1092,7 +1122,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     gzwarn << "GetForceTorque: forgot to set <provide_feedback>?\n";
   }
 
-  return wrench;
+  return this->wrench;
 }
 
 //////////////////////////////////////////////////
@@ -1226,4 +1256,62 @@ void ODEJoint::SetProvideFeedback(bool _enable)
     else
       gzerr << "ODE Joint ID is invalid\n";
   }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetForce(int _index, double _force)
+{
+  this->SaveForce(_index, _force);
+  Joint::SetForce(_index, _force);
+  this->SetForceImpl(_index, _force);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SaveForce(int _index, double _force)
+{
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
+  else
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetForce(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->forceApplied[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get force\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyDamping()
+{
+  // Take absolute value of dampingCoefficient, since negative values of
+  // dampingCoefficient are used for adaptive damping to enforce stability.
+  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+
+  // do not change forceApplied if setting internal damping forces
+  this->SetForceImpl(0, dampingForce);
+
+  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
 }

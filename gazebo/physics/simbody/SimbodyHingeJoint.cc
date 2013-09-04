@@ -120,7 +120,7 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetForce(int _index, double _torque)
+void SimbodyHingeJoint::SetForceImpl(int _index, double _torque)
 {
   SimbodyJoint::SetForce(_index, _torque);
 
@@ -233,7 +233,8 @@ math::Angle SimbodyHingeJoint::GetLowStop(int _index)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 {
-  if (this->simbodyPhysics->simbodyPhysicsStepped &&
+  if (this->simbodyPhysics &&
+      this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < static_cast<int>(this->GetAngleCount()))
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(

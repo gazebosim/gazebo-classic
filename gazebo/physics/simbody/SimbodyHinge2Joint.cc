@@ -109,7 +109,7 @@ void SimbodyHinge2Joint::SetDamping(int /*index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
+void SimbodyHinge2Joint::SetForceImpl(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }

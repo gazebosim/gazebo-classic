@@ -97,7 +97,7 @@ void SimbodyUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
+void SimbodyUniversalJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented\n";
 }

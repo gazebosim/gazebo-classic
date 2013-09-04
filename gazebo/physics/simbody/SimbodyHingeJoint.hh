@@ -66,9 +66,6 @@ namespace gazebo
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int _index);
 
-      /// \brief Set the torque of a joint.
-      public: void SetForce(int _index, double _torque);
-
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
@@ -86,6 +83,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the torque of a joint.
+      protected: void SetForceImpl(int _index, double _torque);
     };
     /// \}
   }

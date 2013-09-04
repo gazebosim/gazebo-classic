@@ -109,6 +109,12 @@ namespace gazebo
       protected: SimTK::MultibodySystem *world;
 
       // Documentation inherited.
+      public: virtual void SetForce(int _index, double _force);
+
+      // Documentation inherited.
+      public: virtual double GetForce(unsigned int _index);
+
+      // Documentation inherited.
       void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
@@ -116,6 +122,28 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      /// \brief Set the force applied to this physics::Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.
+      /// Force is additive (multiple calls
+      /// to SetForceImpl to the same joint in the same time
+      /// step will accumulate forces on that Joint).
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _force Force value.
+      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
+      /// keep track of external forces only.
+      protected: virtual void SetForceImpl(int _index, double _force) = 0;
+
+      /// \brief Save external forces applied to this Joint.
+      /// Force is additive (multiple calls
+      /// to SetForceImpl to the same joint in the same time
+      /// step will accumulate forces on that Joint).
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _force Force value.
+      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
+      /// keep track of external forces only.
+      private: void SaveForce(int _index, double _force);
 
       // Simbody specific variables
       public: bool mustBreakLoopHere;
@@ -161,6 +189,16 @@ namespace gazebo
       /// \brief keep a pointer to the simbody physics engine for convenience
       protected: SimbodyPhysicsPtr simbodyPhysics;
 
+      /// \brief Save force applied by user
+      /// This plus the joint feedback (joint contstraint forces) is the
+      /// equivalent of simulated force torque sensor reading
+      /// Allocate a 2 vector in case hinge2 joint is used.
+      /// This is used by Bullet to store external force applied by the user.
+      private: double forceApplied[MAX_JOINT_AXIS];
+
+      /// \brief Save time at which force is applied by user
+      /// This will let us know if it's time to clean up forceApplied.
+      private: common::Time forceAppliedTime;
     };
     /// \}
   }

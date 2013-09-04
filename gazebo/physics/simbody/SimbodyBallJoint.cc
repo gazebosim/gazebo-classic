@@ -41,12 +41,6 @@ SimbodyBallJoint::~SimbodyBallJoint()
 {
 }
 
-/////////////////////////////////////////////////
-void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
 //////////////////////////////////////////////////
 math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 {
@@ -56,6 +50,12 @@ math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 //////////////////////////////////////////////////
 void SimbodyBallJoint::SetAnchor(int /*_index*/,
                                 const math::Vector3 &/*_anchor*/)
+{
+  gzerr << "Not implemented\n";
+}
+
+/////////////////////////////////////////////////
+void SimbodyBallJoint::Init()
 {
   gzerr << "Not implemented\n";
 }
@@ -110,6 +110,12 @@ math::Vector3 SimbodyBallJoint::GetGlobalAxis(int /*_index*/) const
 math::Angle SimbodyBallJoint::GetAngleImpl(int /*_index*/) const
 {
   return math::Angle();
+}
+
+//////////////////////////////////////////////////
+void SimbodyBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////

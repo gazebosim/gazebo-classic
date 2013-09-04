@@ -61,3 +61,9 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
+}
