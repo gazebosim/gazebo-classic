@@ -57,6 +57,7 @@ const std::string WirelessReceiver_TEST::receiverSensorString =
     "  </sensor>"
     "</sdf>";
 
+/////////////////////////////////////////////////
 WirelessReceiver_TEST::WirelessReceiver_TEST()
     :sdf(new sdf::Element)
 {
@@ -131,8 +132,8 @@ void WirelessReceiver_TEST::TestIllegalPower()
   // Replace the power by an incorrect value
   boost::regex re("<power>.*<\\/power>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re,
-        "<power>-1.0</power>");
+      boost::regex_replace(this->receiverSensorString,
+          re, "<power>-1.0</power>");
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
