@@ -189,7 +189,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
 }
 
 /////////////////////////////////////////////////
-/// \brief Test the updateIml method with the visualization disabled
+/// \brief Test the updateImpl method with the visualization disabled
 void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
 {
   sensors::WirelessTransmitterPtr txNoVisual;
