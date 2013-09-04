@@ -102,7 +102,7 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != NULL);
 
   EXPECT_EQ("GzTest", sensor->GetESSID());
   EXPECT_DOUBLE_EQ(sensor->GetFreq(), 2442.0);

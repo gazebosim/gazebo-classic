@@ -88,7 +88,7 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
         this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != NULL);
 
   EXPECT_DOUBLE_EQ(sensor->GetMinFreqFiltered(), 2412.0);
   EXPECT_DOUBLE_EQ(sensor->GetMaxFreqFiltered(), 2484.0);
