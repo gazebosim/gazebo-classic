@@ -28,15 +28,31 @@
 
 using namespace gazebo;
 
-class Joint_TEST : public ServerFixture
+typedef std::tr1::tuple<std::string, std::string> std_string2;
+
+class Joint_TEST : public ServerFixture,
+                   public ::testing::WithParamInterface<std_string2>
 {
   protected: Joint_TEST() : ServerFixture(), spawnCount(0)
              {
              }
 
+  public: virtual void SetUp()
+          {
+            const ::testing::TestInfo* const test_info =
+              ::testing::UnitTest::GetInstance()->current_test_info();
+            if (test_info->value_param())
+            {
+              gzdbg << "Params: " << test_info->value_param() << std::endl;
+              std::tr1::tie(this->physicsEngine, this->jointType) = GetParam();
+            }
+          }
+
   /// \brief Spawn model with each type of joint.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void SpawnJointTypes(const std::string &_physicsEngine);
+  /// \param[in] _jointType Type of joint to spawn and test.
+  public: void SpawnJointTypes(const std::string &_physicsEngine,
+                               const std::string &_jointType);
 
   /// \brief Spawn a model with a joint connecting to the world. The function
   ///        will wait for duration _wait for the model to spawn and attempt
@@ -123,6 +139,12 @@ class Joint_TEST : public ServerFixture
             }
             return joint;
           }
+
+  /// \brief Physics engine for test.
+  protected: std::string physicsEngine;
+
+  /// \brief Joint type for test.
+  protected: std::string jointType;
 
   /// \brief Count of spawned models, used to ensure unique model names.
   private: unsigned int spawnCount;
