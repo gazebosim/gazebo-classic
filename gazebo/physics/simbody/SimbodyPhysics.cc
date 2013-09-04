@@ -173,6 +173,32 @@ void SimbodyPhysics::Init()
 //////////////////////////////////////////////////
 void SimbodyPhysics::InitModel(const physics::Model* _model)
 {
+
+  // Before building a new system, transfer all joints in existing
+  // models, save Simbody joint states in Gazebo Model.
+  const SimTK::State& currentState = this->integ->getState();
+  double stateTime = 0;
+  if (currentState.getSystemStage() != SimTK::Stage::Empty)
+  {
+    stateTime = currentState.getTime();
+    physics::Model_V models = this->world->GetModels();
+    for (physics::Model_V::iterator mi = models.begin();
+         mi != models.end(); ++mi)
+    {
+      if (mi->get() != _model)
+      {
+        physics::Joint_V joints = (*mi)->GetJoints();
+        for (physics::Joint_V::iterator jx = joints.begin();
+             jx != joints.end(); ++jx)
+        {
+          SimbodyJointPtr simbodyJoint =
+            boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+          simbodyJoint->SaveSimbodyState(currentState);
+        }
+      }
+    }
+  }
+
   try {
     //------------------------ CREATE SIMBODY SYSTEM ---------------------------
     // Add to Simbody System and populate it with new links and joints
@@ -204,9 +230,30 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   SimTK::State state = this->system.realizeTopology();
-  // gzerr << "realizeTopology\n";
 
+  // retsore state time.
+  state.setTime(stateTime);
+
+  // Restore Gazebo saved Joint states
+  // back into Simbody state.
+  physics::Model_V models = this->world->GetModels();
+  for (physics::Model_V::iterator mi = models.begin();
+       mi != models.end(); ++mi)
+  {
+    physics::Joint_V joints = (*mi)->GetJoints();
+    for (physics::Joint_V::iterator jx = joints.begin();
+         jx != joints.end(); ++jx)
+    {
+      SimbodyJointPtr simbodyJoint =
+        boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+      simbodyJoint->RestoreSimbodyState(state);
+    }
+  }
+
+  // initialize integrator from state
   this->integ->initialize(state);
+
+  // set gravity mode
   Link_V links = _model->GetLinks();
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -220,7 +267,6 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
 
   this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
-  // gzerr << "realize system\n";
 
   // mark links as initialized
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
@@ -247,6 +293,8 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
       gzerr << "simbodyJoint [" << (*ji)->GetName()
             << "]is not a SimbodyJointPtr\n";
   }
+
+  this->simbodyPhysicsInitialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -440,7 +488,6 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   
-  if (!math::equal(_gravity.GetLength(), 0.0))
   {
     if (this->simbodyPhysicsInitialized)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
@@ -448,13 +495,6 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
     else
       this->gravity.setDefaultGravityVector(
         SimbodyPhysics::Vector3ToVec3(_gravity));
-  }
-  else
-  {
-    if (this->simbodyPhysicsInitialized)
-      this->gravity.setMagnitude(this->integ->updAdvancedState(), 0.0);
-    else
-      this->gravity.setDefaultMagnitude(0.0);
   }
 }
 
@@ -629,7 +669,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     // This will reference the new mobilized body once we create it.
     MobilizedBody mobod; 
 
-    MobilizedBody parentMobod = gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
+    MobilizedBody parentMobod =
+      gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
 
     if (mob.isAddedBaseMobilizer()) {
         // There is no corresponding Gazebo joint for this mobilizer.

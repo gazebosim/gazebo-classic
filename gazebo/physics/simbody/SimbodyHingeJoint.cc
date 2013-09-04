@@ -35,6 +35,8 @@ SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
+  this->simbodyQ = 0.0;
+  this->simbodyU = 0.0;
   this->physicsInitialized = false;
 }
 
@@ -122,8 +124,6 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForceImpl(int _index, double _torque)
 {
-  SimbodyJoint::SetForce(_index, _torque);
-
   if (_index < static_cast<int>(this->GetAngleCount()))
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -299,4 +299,29 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
     gzerr << "index out of bound\n";
     return math::Angle(SimTK::NaN);
   }
+}
+
+//////////////////////////////////////////////////
+void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
+{
+  if (!this->mobod.isEmptyHandle())
+  {
+    this->simbodyQ = this->mobod.getOneQ(_state, 0);
+    this->simbodyU = this->mobod.getOneU(_state, 0);
+  }
+  else
+    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyHingeJoint::RestoreSimbodyState(SimTK::State &_state)
+{
+  if (!this->mobod.isEmptyHandle())
+  {
+   this->mobod.setOneQ(_state, 0, this->simbodyQ);
+   this->mobod.setOneU(_state, 0, this->simbodyU);
+  }
+  else
+    gzerr << "restoring model [" << this->GetScopedName()
+          << "] failed due to uninitialized mobod\n";
 }

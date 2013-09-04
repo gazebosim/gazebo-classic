@@ -176,7 +176,7 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
     v = this->masterMobod.findStationVelocityInGround(
-    this->simbodyPhysics->integ->getState(), station);
+      this->simbodyPhysics->integ->getState(), station);
   else
     gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
            << " not yet initialized\n";
@@ -303,6 +303,8 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 /////////////////////////////////////////////////
 SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
+  gzdbg << "SimbodyLink::GetMassProperties for [" << this->GetName() << "]\n";
+
   if (!this->IsStatic())
   {
     const SimTK::Real mass = this->inertial->GetMass();

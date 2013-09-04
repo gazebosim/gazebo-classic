@@ -86,6 +86,12 @@ namespace gazebo
 
       /// \brief Set the torque of a joint.
       protected: void SetForceImpl(int _index, double _torque);
+
+      public: virtual void SaveSimbodyState(const SimTK::State &_state);
+      public: virtual void RestoreSimbodyState(SimTK::State &_state);
+      private: double simbodyQ;
+      private: double simbodyU;
+      
     };
     /// \}
   }
