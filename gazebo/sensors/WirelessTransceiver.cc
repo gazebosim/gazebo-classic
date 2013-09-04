@@ -55,8 +55,6 @@ std::string WirelessTransceiver::GetTopic() const
 //////////////////////////////////////////////////
 void WirelessTransceiver::Load(const std::string &_worldName)
 {
-  std::ostringstream convert;
-
   Sensor::Load(_worldName);
 
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
@@ -77,16 +75,14 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   if (this->gain < 0)
   {
-    convert << gain;
-    gzthrow("Wireless transceiver gain must be > 0. Current value is [" +
-        convert.str() + "]");
+    gzthrow("Wireless transceiver gain must be > 0. Current value is [" <<
+        this->gain << "]");
   }
 
   if (this->power < 0)
   {
-    convert << power;
-    gzthrow("Wireless transceiver power must be > 0. Current value is [" +
-        convert.str() + "]");
+    gzthrow("Wireless transceiver power must be > 0. Current value is [" <<
+        this->power << "]");
   }
 }
 

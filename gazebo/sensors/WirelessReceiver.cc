@@ -52,8 +52,6 @@ void WirelessReceiver::Init()
 /////////////////////////////////////////////////
 void WirelessReceiver::Load(const std::string &_worldName)
 {
-  std::ostringstream convert;
-
   WirelessTransceiver::Load(_worldName);
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
@@ -68,21 +66,18 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   if (this->minFreq <= 0)
   {
-    convert << this->minFreq;
     gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
-      << convert.str() << "]");
+      << this->minFreq << "]");
   }
 
   if (this->maxFreq <= 0)
   {
-    convert << this->maxFreq;
     gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
       << this->maxFreq << "]");
   }
 
   if (this->sensitivity >= 0)
   {
-    convert << this->sensitivity;
     gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
       << this->sensitivity << "]");
   }

@@ -54,8 +54,6 @@ WirelessTransmitter::~WirelessTransmitter()
 /////////////////////////////////////////////////
 void WirelessTransmitter::Load(const std::string &_worldName)
 {
-  std::ostringstream convert;
-
   WirelessTransceiver::Load(_worldName);
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
@@ -66,9 +64,8 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 
   if (this->freq < 0)
   {
-    convert << this->freq;
     gzthrow("Wireless transmitter frequency must be > 0. Current value is ["
-      << convert.str() << "]");
+      << this->freq << "]");
     return;
   }
 
