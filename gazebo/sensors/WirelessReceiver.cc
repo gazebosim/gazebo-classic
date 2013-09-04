@@ -57,6 +57,8 @@ void WirelessReceiver::Load(const std::string &_worldName)
   WirelessTransceiver::Load(_worldName);
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
+  GZ_ASSERT(this->pub != NULL,
+      "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
 
@@ -89,49 +91,46 @@ void WirelessReceiver::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
-  if (this->pub)
+  std::string txEssid;
+  msgs::WirelessNodes msg;
+  double rxPower;
+  double txFreq;
+
+  this->referencePose =
+      this->pose + this->parentEntity.lock()->GetWorldPose();
+
+  math::Pose myPos = this->referencePose;
+  Sensor_V sensors = SensorManager::Instance()->GetSensors();
+  for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {
-    std::string txEssid;
-    msgs::WirelessNodes msg;
-    double rxPower;
-    double txFreq;
-
-    this->referencePose =
-        this->pose + this->parentEntity.lock()->GetWorldPose();
-
-    math::Pose myPos = this->referencePose;
-    Sensor_V sensors = SensorManager::Instance()->GetSensors();
-    for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
+    if ((*it)->GetType() == "wireless_transmitter")
     {
-      if ((*it)->GetType() == "wireless_transmitter")
+      boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
+          boost::static_pointer_cast<WirelessTransmitter>(*it);
+
+      txFreq = transmitter->GetFreq();
+      rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
+
+      // Discard if the frequency received is out of our frequency range,
+      // or if the received signal strengh is lower than the sensivity
+      if ((txFreq < this->GetMinFreqFiltered()) ||
+          (txFreq > this->GetMaxFreqFiltered()) ||
+          (rxPower < this->GetSensitivity()))
       {
-        boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
-            boost::static_pointer_cast<WirelessTransmitter>(*it);
-
-        txFreq = transmitter->GetFreq();
-        rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
-
-        // Discard if the frequency received is out of our frequency range,
-        // or if the received signal strengh is lower than the sensivity
-        if ((txFreq < this->GetMinFreqFiltered()) ||
-            (txFreq > this->GetMaxFreqFiltered()) ||
-            (rxPower < this->GetSensitivity()))
-        {
-          continue;
-        }
-
-        txEssid = transmitter->GetESSID();
-
-        msgs::WirelessNode *wirelessNode = msg.add_node();
-        wirelessNode->set_essid(txEssid);
-        wirelessNode->set_frequency(txFreq);
-        wirelessNode->set_signal_level(rxPower);
+        continue;
       }
+
+      txEssid = transmitter->GetESSID();
+
+      msgs::WirelessNode *wirelessNode = msg.add_node();
+      wirelessNode->set_essid(txEssid);
+      wirelessNode->set_frequency(txFreq);
+      wirelessNode->set_signal_level(rxPower);
     }
-    if (msg.node_size() > 0)
-    {
-      this->pub->Publish(msg);
-    }
+  }
+  if (msg.node_size() > 0)
+  {
+    this->pub->Publish(msg);
   }
 }
 
