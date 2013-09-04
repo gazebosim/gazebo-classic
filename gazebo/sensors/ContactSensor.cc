@@ -133,7 +133,7 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Don't do anything if there is no new data to process.
-  if (this->incomingContacts.size() == 0)
+  if (this->incomingContacts.empty())
     return false;
 
   std::vector<std::string>::iterator collIter;
