@@ -38,6 +38,7 @@
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
+
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
@@ -45,6 +46,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -165,6 +167,10 @@ void World::Load(sdf::ElementPtr _sdf)
            << this->name << "]) overwrites sdf world name\n!";
   else
     this->name = this->sdf->Get<std::string>("name");
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
+#endif
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -695,6 +701,10 @@ void World::Fini()
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Fini();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1468,9 +1478,14 @@ void World::ProcessModelMsgs()
       // FillMsg fills the visual components from initial sdf
       // but problem is that Visuals may have changed e.g. through ~/visual,
       // so don't publish them to subscribers.
-      msg.clear_visual();
       for (int i = 0; i < msg.link_size(); ++i)
+      {
         msg.mutable_link(i)->clear_visual();
+        for (int j = 0; j < msg.link(i).collision_size(); ++j)
+        {
+          msg.mutable_link(i)->mutable_collision(j)->clear_visual();
+        }
+      }
 
       this->modelPub->Publish(msg);
     }

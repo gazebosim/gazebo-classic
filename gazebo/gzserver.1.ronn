@@ -1,7 +1,7 @@
 gzserver -- Run the Gazebo server.
 =============================================
 
-## SYNPOSIS
+## SYNOPSIS
 
 `gzserver` [options] <world_file>
 
