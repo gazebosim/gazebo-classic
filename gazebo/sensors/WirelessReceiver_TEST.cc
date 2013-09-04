@@ -32,6 +32,7 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalMinFreq();
   public: void TestIllegalMaxFreq();
   public: void TestIllegalSensitivity();
+  public: void TestUpdateImpl();
 
   private: void CheckIllegalValue(std::string _sensorString);
 
@@ -187,6 +188,34 @@ void WirelessReceiver_TEST::TestIllegalSensitivity()
 }
 
 /////////////////////////////////////////////////
+/// \brief Test the updateImpl() method
+void WirelessReceiver_TEST::TestUpdateImpl()
+{
+  sdf::readString(this->receiverSensorString, this->sdf);
+
+  // Create the wireless receiver sensor
+  std::string sensorName = this->mgr->CreateSensor(this->sdf, "default",
+      "ground_plane::link");
+
+  // Make sure the returned sensor name is correct
+  EXPECT_EQ(sensorName,
+      std::string("default::ground_plane::link::wirelessReceiver"));
+
+  // Update the sensor manager so that it can process new sensors.
+  this->mgr->Update();
+
+  // Get a pointer to the wireless receiver sensor
+  sensors::WirelessReceiverPtr sensor =
+    boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
+        this->mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(sensor != NULL);
+
+  sensor->Update(true);  
+}
+
+/////////////////////////////////////////////////
 TEST_F(WirelessReceiver_TEST, TestCreateWilessReceiver)
 {
   TestCreateWirelessReceiver();
@@ -226,6 +255,12 @@ TEST_F(WirelessReceiver_TEST, TestIllegalMaxFreq)
 TEST_F(WirelessReceiver_TEST, TestIllegalSensitivity)
 {
   TestIllegalSensitivity();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestUpdateImpl)
+{
+  TestUpdateImpl();
 }
 
 /////////////////////////////////////////////////
