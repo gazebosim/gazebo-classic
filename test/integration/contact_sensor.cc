@@ -250,7 +250,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         EXPECT_EQ((expectedForce[vi] < 0), (actualForce[vi] < 0));
 
         // Verify torque with a large tolerance
-        double odeTorqueTol = 2;
+        double odeTorqueTol = 4;
         EXPECT_LT(fabs(actualTorque.x), odeTorqueTol);
         EXPECT_LT(fabs(actualTorque.y), odeTorqueTol);
         EXPECT_LT(fabs(actualTorque.z), odeTorqueTol);
