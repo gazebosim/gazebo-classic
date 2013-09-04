@@ -44,8 +44,6 @@ Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
-  this->forceApplied[0] = 0;
-  this->forceApplied[1] = 0;
   this->effortLimit[0] = -1;
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
@@ -57,7 +55,6 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
-  this->dampingCoefficient = 0;
   this->wrench.body1Force = math::Vector3(0, 0, 0);
   this->wrench.body1Torque = math::Vector3(0, 0, 0);
   this->wrench.body2Force = math::Vector3(0, 0, 0);
@@ -516,33 +513,38 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetForce(int _index, double _force)
+void Joint::SetForce(int _index, double _effort)
 {
-  // this bit of code actually doesn't do anything physical,
-  // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
-    this->forceApplied[_index] = _force;
-  else
-    gzerr << "Something's wrong, joint [" << this->GetName()
-          << "] index [" << _index
-          << "] out of range [" << this->GetAngleCount()
-          << "] when trying to set force.\n";
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling ODEUniversalJoint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return;
+  }
+
+  // truncating SetForce effort if velocity limit reached.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0.0)
+    _effort = math::clamp(_effort, -this->effortLimit[_index],
+      this->effortLimit[_index]);
+
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(unsigned int _index)
+double Joint::GetForce(unsigned int /*_index*/)
 {
-  if (_index < this->GetAngleCount())
-  {
-    return this->forceApplied[_index];
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] out of range [" << this->GetAngleCount()
-          << "] when trying to get force\n";
-    return 0;
-  }
+  gzerr << "Joint::GetForce should be overloaded by physics engines.\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -554,10 +556,7 @@ double Joint::GetForce(int _index)
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  // Take absolute value of dampingCoefficient, since negative values of
-  // dampingCoefficient are used for adaptive damping to enforce stability.
-  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
-  this->SetForce(0, dampingForce);
+  gzerr << "Joint::ApplyDamping should be overloaded by physics engines.\n";
 }
 
 //////////////////////////////////////////////////

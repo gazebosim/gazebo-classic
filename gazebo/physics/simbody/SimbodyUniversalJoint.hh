@@ -72,7 +72,7 @@ namespace gazebo
       public: virtual double GetVelocity(int _index) const;
 
       /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int _index, double _torque);
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);

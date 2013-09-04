@@ -121,7 +121,7 @@ double SimbodySliderJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetForce(int _index, double _torque)
+void SimbodySliderJoint::SetForceImpl(int _index, double _torque)
 {
   SimbodyJoint::SetForce(_index, _torque);
 

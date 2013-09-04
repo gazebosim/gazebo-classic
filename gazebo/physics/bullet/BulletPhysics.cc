@@ -339,6 +339,14 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
         << "] split[" << info.m_splitImpulse
         << "] split tol[" << info.m_splitImpulsePenetrationThreshold
         << "]\n";
+
+  // debugging
+  // info.m_numIterations = 1000;
+  // info.m_sor = 1.0;
+  // info.m_erp = 0.2;
+  // info.m_globalCfm = 0.0;
+  // info.m_splitImpulse = 0;
+  // info.m_splitImpulsePenetrationThreshold = 0.0;
 }
 
 //////////////////////////////////////////////////

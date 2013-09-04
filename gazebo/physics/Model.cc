@@ -174,7 +174,15 @@ void Model::Init()
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    (*iter)->Init();
+    try
+    {
+      (*iter)->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Init joint failed" << std::endl;
+      return;
+    }
   }
 
   for (std::vector<Gripper*>::iterator iter = this->grippers.begin();

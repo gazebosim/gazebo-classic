@@ -67,7 +67,7 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       /// \brief Set the slider force
-      public: virtual void SetForce(int _index, double _force);
+      protected: virtual void SetForceImpl(int _index, double _force);
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);

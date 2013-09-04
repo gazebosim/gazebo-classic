@@ -131,7 +131,7 @@ void BulletUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
+void BulletUniversalJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented\n";
 }

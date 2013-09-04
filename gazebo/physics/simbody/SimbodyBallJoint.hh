@@ -85,6 +85,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int /*_index*/, double /*_torque*/);
     };
 
     /// \}

@@ -120,7 +120,7 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetForce(int _index, double _torque)
+void SimbodyHingeJoint::SetForceImpl(int _index, double _torque)
 {
   SimbodyJoint::SetForce(_index, _torque);
 

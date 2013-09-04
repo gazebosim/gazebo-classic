@@ -76,9 +76,6 @@ namespace gazebo
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the torque
-      public: void SetForce(int _index, double _torque);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
@@ -102,6 +99,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the torque
+      protected: void SetForceImpl(int _index, double _torque);
     };
 
   /// \}

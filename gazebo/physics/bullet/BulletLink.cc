@@ -128,6 +128,10 @@ void BulletLink::Init()
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
+  /// \TODO: get friction from collision object
+  // this->rigidLink->setAnisotropicFriction(btVector3(0, 0, 0));
+  this->rigidLink->setFriction(0);  // Hack
+
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
   // math::Vector3 size = this->GetBoundingBox().GetSize();
