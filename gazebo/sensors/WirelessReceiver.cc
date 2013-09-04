@@ -76,6 +76,13 @@ void WirelessReceiver::Load(const std::string &_worldName)
       << this->maxFreq << "]");
   }
 
+  if (this->minFreq > this->maxFreq)
+  {
+    gzthrow("Wireless receiver min. frequency must be less or equal than max. "
+        << "frequency. Current min. frequency is [" << this->minFreq <<
+        "] and max frequency is [" << this->maxFreq << "]");
+  }
+
   if (this->sensitivity >= 0)
   {
     gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["

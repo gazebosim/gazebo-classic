@@ -31,6 +31,7 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalGain();
   public: void TestIllegalMinFreq();
   public: void TestIllegalMaxFreq();
+  public: void TestIllegalMinMaxFreq();
   public: void TestIllegalSensitivity();
   public: void TestUpdateImpl();
 
@@ -175,6 +176,24 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
 }
 
 /////////////////////////////////////////////////
+/// \brief Test min_frequency value greater than max_frequency
+void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
+{
+  // Swap min_frequency and max_frequency
+  boost::regex re("<max_frequency>.*<\\/max_frequency>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re,
+        "<max_frequency>2412.0</max_frequency>");
+
+  re = "<min_frequency>.*<\\/min_frequency>";
+  receiverSensorStringCopy =
+      boost::regex_replace(receiverSensorStringCopy, re,
+        "<min_frequency>2484.0</min_frequency>");
+
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
 /// \brief Test wrong sensitivity value for the transceiver element
 void WirelessReceiver_TEST::TestIllegalSensitivity()
 {
@@ -249,6 +268,12 @@ TEST_F(WirelessReceiver_TEST, TestIllegalMinFreq)
 TEST_F(WirelessReceiver_TEST, TestIllegalMaxFreq)
 {
   TestIllegalMaxFreq();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalMinMaxFreq)
+{
+  TestIllegalMinMaxFreq();
 }
 
 /////////////////////////////////////////////////
