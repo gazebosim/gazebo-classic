@@ -164,8 +164,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   this->testRay->GetIntersection(dist, entityName);
 
   // ToDo: The ray intersects with my own collision model. Fix it.
-  if (dist > 0 && entityName != "ground_plane::link::collision" &&
-      entityName != "")
+  if (entityName != "")
   {
     n = NObstacle;
   }
