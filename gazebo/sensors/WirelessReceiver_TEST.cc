@@ -25,14 +25,14 @@ class WirelessReceiver_TEST : public ServerFixture
 {
   public: static const std::string receiverSensorString;
   public: WirelessReceiver_TEST();
-  public: void TestCreateWirelessReceiver(const std::string &_physicsEngine);
-  public: void TestIllegalTransceiver(const std::string &_physicsEngine);
-  public: void TestIllegalPower(const std::string &_physicsEngine);
-  public: void TestIllegalGain(const std::string &_physicsEngine);
-  public: void TestIllegalMinFreq(const std::string &_physicsEngine);
-  public: void TestIllegalMaxFreq(const std::string &_physicsEngine);
-  public: void TestIllegalSensitivity(const std::string &_physicsEngine);
-  public: void TestUpdateImpl(const std::string &_physicsEngine);
+  public: void TestCreateWirelessReceiver();
+  public: void TestIllegalTransceiver();
+  public: void TestIllegalPower();
+  public: void TestIllegalGain();
+  public: void TestIllegalMinFreq();
+  public: void TestIllegalMaxFreq();
+  public: void TestIllegalSensitivity();
+  public: void TestUpdateImpl();
 
   private: void CheckIllegalValue(std::string _sensorString);
 
@@ -67,8 +67,7 @@ WirelessReceiver_TEST::WirelessReceiver_TEST()
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a wireless receiver sensor
-void WirelessReceiver_TEST::TestCreateWirelessReceiver(
-    const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 {
   sdf::readString(this->receiverSensorString, this->sdf);
 
@@ -114,8 +113,7 @@ void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 
 /////////////////////////////////////////////////
 /// \brief Test Non-existent transceiver element
-void WirelessReceiver_TEST::TestIllegalTransceiver(
-    const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalTransceiver()
 {
   // Make a copy of the sdf string for avoid affecting other tests
   std::string receiverSensorStringCopy = this->receiverSensorString;
@@ -127,7 +125,7 @@ void WirelessReceiver_TEST::TestIllegalTransceiver(
 
 /////////////////////////////////////////////////
 /// \brief Test wrong power value for the transceiver element
-void WirelessReceiver_TEST::TestIllegalPower(const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalPower()
 {
   // Replace the power by an incorrect value
   boost::regex re("<power>.*<\\/power>");
@@ -140,7 +138,7 @@ void WirelessReceiver_TEST::TestIllegalPower(const std::string &_physicsEngine)
 
 /////////////////////////////////////////////////
 /// \brief Test wrong gain value for the transceiver element
-void WirelessReceiver_TEST::TestIllegalGain(const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalGain()
 {
   // Replace the gain by an incorrect value
   boost::regex re("<gain>.*<\\/gain>");
@@ -152,8 +150,7 @@ void WirelessReceiver_TEST::TestIllegalGain(const std::string &_physicsEngine)
 
 /////////////////////////////////////////////////
 /// \brief Test wrong min_frequency value for the transceiver element
-void WirelessReceiver_TEST::TestIllegalMinFreq(
-    const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalMinFreq()
 {
   // Replace the min frequency by an incorrect value
   boost::regex re("<min_frequency>.*<\\/min_frequency>");
@@ -166,8 +163,7 @@ void WirelessReceiver_TEST::TestIllegalMinFreq(
 
 /////////////////////////////////////////////////
 /// \brief Test wrong max_frequency value for the transceiver element
-void WirelessReceiver_TEST::TestIllegalMaxFreq(
-    const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalMaxFreq()
 {
   // Replace the max frequency by an incorrect value
   boost::regex re("<max_frequency>.*<\\/max_frequency>");
@@ -180,8 +176,7 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq(
 
 /////////////////////////////////////////////////
 /// \brief Test wrong sensitivity value for the transceiver element
-void WirelessReceiver_TEST::TestIllegalSensitivity(
-    const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestIllegalSensitivity()
 {
   // Replace the sensitivity by an incorrect value
   boost::regex re("<sensitivity>.*<\\/sensitivity>");
@@ -194,7 +189,7 @@ void WirelessReceiver_TEST::TestIllegalSensitivity(
 
 /////////////////////////////////////////////////
 /// \brief Test the updateImpl() method
-void WirelessReceiver_TEST::TestUpdateImpl(const std::string &_physicsEngine)
+void WirelessReceiver_TEST::TestUpdateImpl()
 {
   sdf::readString(this->receiverSensorString, this->sdf);
 
@@ -221,62 +216,52 @@ void WirelessReceiver_TEST::TestUpdateImpl(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestCreateWilessReceiver)
+TEST_F(WirelessReceiver_TEST, TestCreateWilessReceiver)
 {
-  TestCreateWirelessReceiver(GetParam());
+  TestCreateWirelessReceiver();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalTransceiver)
+TEST_F(WirelessReceiver_TEST, TestIllegalTransceiver)
 {
-  TestIllegalTransceiver(GetParam());
+  TestIllegalTransceiver();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalPower)
+TEST_F(WirelessReceiver_TEST, TestIllegalPower)
 {
-  TestIllegalPower(GetParam());
+  TestIllegalPower();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalGain)
+TEST_F(WirelessReceiver_TEST, TestIllegalGain)
 {
-  TestIllegalGain(GetParam());
+  TestIllegalGain();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalMinFreq)
+TEST_F(WirelessReceiver_TEST, TestIllegalMinFreq)
 {
-  TestIllegalMinFreq(GetParam());
+  TestIllegalMinFreq();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalMaxFreq)
+TEST_F(WirelessReceiver_TEST, TestIllegalMaxFreq)
 {
-  TestIllegalMaxFreq(GetParam());
+  TestIllegalMaxFreq();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestIllegalSensitivity)
+TEST_F(WirelessReceiver_TEST, TestIllegalSensitivity)
 {
-  TestIllegalSensitivity(GetParam());
+  TestIllegalSensitivity();
 }
 
 /////////////////////////////////////////////////
-TEST_P(WirelessReceiver_TEST, TestUpdateImpl)
+TEST_F(WirelessReceiver_TEST, TestUpdateImpl)
 {
-  TestUpdateImpl(GetParam());
+  TestUpdateImpl();
 }
-
-/////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(WirelessReceiver_TEST_ODE, WirelessReceiver_TEST,
-    ::testing::Values("ode"));
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(WirelessReceiver_TEST_Bullet, WirelessReceiver_TEST,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
