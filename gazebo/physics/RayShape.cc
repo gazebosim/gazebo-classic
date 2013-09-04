@@ -128,6 +128,17 @@ void RayShape::SetLength(double _len)
 }
 
 //////////////////////////////////////////////////
+void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  /// TODO RayShape::SetScale not yet implemented.
+}
+
+//////////////////////////////////////////////////
 double RayShape::GetLength() const
 {
   return this->contactLen;

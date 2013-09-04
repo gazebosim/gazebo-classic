@@ -12,35 +12,13 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-# Disable the player test for now, until we figure out a better way to test them
-#if (INCLUDE_PLAYER)
-#  add_subdirectory(player)
-#endif()
-
 if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
 set(tests
-  bandwidth.cc
-  contact_sensor.cc
-  factory.cc
-  file_handling.cc
-  imu.cc
-  laser.cc
-  manpages.cc
-  nondefault_world.cc
-  physics.cc
-  physics_msgs.cc
-  pioneer2dx.cc
-  transport.cc
-  server_fixture.cc
-  speed.cc
-  #state_log.cc
-  surface_properties.cc
-  transceiver.cc
-  )
+)
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
   "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
@@ -55,24 +33,8 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
-  camera_sensor.cc
-  gpu_laser.cc
-  heightmap.cc
-  pr2.cc
-  projector.cc
-  rendering_sensor.cc
-  speed_pr2.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
     "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_dri_tests(${dri_tests})
-
-
-if (VALID_DRI_DISPLAY)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
-
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
-endif()

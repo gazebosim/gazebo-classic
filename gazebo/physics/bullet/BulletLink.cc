@@ -183,12 +183,6 @@ void BulletLink::Fini()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::Update()
-{
-  Link::Update();
-}
-
-//////////////////////////////////////////////////
 void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)
@@ -461,6 +455,25 @@ math::Vector3 BulletLink::GetWorldTorque() const
 btRigidBody *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
+}
+
+//////////////////////////////////////////////////
+void BulletLink::ClearCollisionCache()
+{
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to ClearCollisionCache" << std::endl;
+    return;
+  }
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+
+  bulletWorld->updateSingleAabb(this->rigidLink);
+  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+      cleanProxyFromPairs(this->rigidLink->getBroadphaseHandle(),
+      bulletWorld->getDispatcher());
 }
 
 //////////////////////////////////////////////////

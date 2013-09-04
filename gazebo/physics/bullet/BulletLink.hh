@@ -58,9 +58,6 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited.
-      public: virtual void Update();
-
-      // Documentation inherited.
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
@@ -114,6 +111,10 @@ namespace gazebo
       /// \brief Get the bullet rigid body.
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
+
+      /// \internal
+      /// \brief Clear bullet collision cache needed when the body is resized.
+      public: void ClearCollisionCache();
 
       // Documentation inherited.
       public: virtual void SetLinearDamping(double _damping);
