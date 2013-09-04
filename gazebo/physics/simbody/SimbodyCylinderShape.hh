@@ -44,8 +44,34 @@ namespace gazebo
       public: virtual ~SimbodyCylinderShape() {}
 
       /// \brief Set the size of the cylinder
+      /// \param[in] _radius Cylinder radius
+      /// \param[in] _length Cylinder length
       public: void SetSize(double _radius, double _length)
               {
+                if (_radius < 0)
+                {
+                  gzerr << "Cylinder shape does not support negative radius\n";
+                  return;
+                }
+                if (_length < 0)
+                {
+                  gzerr << "Cylinder shape does not support negative length\n";
+                  return;
+                }
+                if (math::equal(_radius, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  _radius = 1e-4;
+                }
+                if (math::equal(_length, 0.0))
+                {
+                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  _length = 1e-4;
+                }
+
                 CylinderShape::SetSize(_radius, _length);
                 SimbodyCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<SimbodyCollision>(

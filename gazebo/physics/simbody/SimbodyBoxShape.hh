@@ -45,12 +45,36 @@ namespace gazebo
       /// \brief Set the size of the box
       public: void SetSize(const math::Vector3 &_size)
               {
-                BoxShape::SetSize(_size);
+                if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+                {
+                  gzerr << "Box shape does not support negative size\n";
+                  return;
+                }
+                math::Vector3 size = _size;
+                if (math::equal(size.x, 0.0))
+                {
+                  // Warn user, but still create shape with very small value
+                  // otherwise later resize operations using setLocalScaling
+                  // will not be possible
+                  gzwarn << "Setting box shape's x to zero \n";
+                  size.x = 1e-4;
+                }
+                if (math::equal(size.y, 0.0))
+                {
+                  gzwarn << "Setting box shape's y to zero \n";
+                  size.y = 1e-4;
+                }
+                if (math::equal(size.z, 0.0))
+                {
+                  gzwarn << "Setting box shape's z to zero \n";
+                  size.z = 1e-4;
+                }
+
+                BoxShape::SetSize(size);
+
                 SimbodyCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<SimbodyCollision>(
                     this->collisionParent);
-
-                /// Simbody requires the half-extents of the box
               }
     };
     /// \}
