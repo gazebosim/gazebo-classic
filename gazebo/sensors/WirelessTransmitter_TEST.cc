@@ -34,7 +34,6 @@ class WirelessTransmitter_TEST : public ServerFixture
     private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
     private: sensors::WirelessTransmitterPtr txNoVisual;
-
 };
 
 static std::string transmitterSensorString =
@@ -60,13 +59,11 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
 
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTransmitter";
-  std::string txNoVisualSensorName = "wirelessTransmitterNoVisual";
   std::string txEssid = "GzTest";
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
   math::Pose txPose(math::Vector3(0.0, 0.0, 0.055), math::Quaternion(0, 0, 0));
-  math::Pose txPose2(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
 
   // Spawn a wireless transmitter with sensor visualization
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
@@ -74,18 +71,6 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
 
   this->tx = boost::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txSensorName));
-
-  // Spawn a wireless transmitter without sensor visualization
-  SpawnWirelessTransmitterSensor(txModelName + "NoVisual",
-      txNoVisualSensorName, txPose2.pos, txPose2.rot.GetAsEuler(),
-      txEssid + "NoVisual", freq + 10.0, power, gain, false);
-
-  this->txNoVisual = boost::static_pointer_cast<sensors::WirelessTransmitter>(
-      sensors::SensorManager::Instance()->GetSensor(txNoVisualSensorName));
-
-  // Spawn an obstacle
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, -1.5, 0.5),
-      math::Vector3(0, 0, 0), true);
 
   this->receivedMsg = false;
 }
@@ -141,7 +126,7 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   std::string transmitterSensorStringCopy =
       boost::regex_replace(transmitterSensorString, re,
         "<frequency>-1.0</frequency>");
-  
+
   sdf::readString(transmitterSensorStringCopy, sdf);
 
   // Create the wireless receiver sensor
@@ -154,7 +139,6 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 {
   int samples = 100;
   double signStrengthAvg = 0.0;
-  double signStrengthObsAvg = 0.0;
   math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
   math::Pose txPoseOccluded(math::Vector3(-3.0, -3.0, 0.055),
       math::Quaternion(0, 0, 0));
@@ -168,18 +152,6 @@ void WirelessTransmitter_TEST::TestSignalStrength()
   signStrengthAvg /= samples;
 
   EXPECT_NEAR(signStrengthAvg, -62.0, this->tx->ModelStdDesv);
-
-  // Take some samples from an occluded pos and get the average signal strength
-  for (int i = 0; i < samples; ++i)
-  {
-    this->tx->Update(true);
-    signStrengthObsAvg += tx->GetSignalStrength(txPoseOccluded, tx->GetGain());
-  }
-  signStrengthObsAvg /= samples;
-
-  // Check that the signal level in the not-occluded position is higher than
-  // the signal received from the occluded position
-  EXPECT_GT(signStrengthAvg, signStrengthObsAvg);
 }
 
 /////////////////////////////////////////////////
@@ -220,6 +192,23 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
 /// \brief Test the updateIml method with the visualization disabled
 void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
 {
+  sensors::WirelessTransmitterPtr txNoVisual;
+  std::string txModelName = "tx";
+  std::string txNoVisualSensorName = "wirelessTransmitterNoVisual";
+  std::string txEssid = "GzTest";
+  double freq = 2442.0;
+  double power = 14.5;
+  double gain = 2.6;
+  math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
+
+  // Spawn a wireless transmitter without sensor visualization
+  SpawnWirelessTransmitterSensor(txModelName + "NoVisual",
+      txNoVisualSensorName, txPose.pos, txPose.rot.GetAsEuler(),
+      txEssid + "NoVisual", freq, power, gain, false);
+
+  txNoVisual = boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      sensors::SensorManager::Instance()->GetSensor(txNoVisualSensorName));
+
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
   node->Init("default");
@@ -232,7 +221,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   // Make sure that the sensor is updated and some messages are published
   for (int i = 0; i < 10; ++i)
   {
-    this->txNoVisual->Update(true);
+    txNoVisual->Update(true);
     common::Time::MSleep(100);
   }
 
@@ -247,7 +236,7 @@ TEST_F(WirelessTransmitter_TEST, TestSensorCreation)
 }
 
 /////////////////////////////////////////////////
-TEST_F(WirelessTransmitter_TEST, TestEmptyESSID)
+TEST_F(WirelessTransmitter_TEST, TestInvalidFreq)
 {
   TestInvalidFreq();
 }

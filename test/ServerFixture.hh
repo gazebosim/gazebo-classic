@@ -885,7 +885,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
   msg.set_sdf(newModelStr.str());
   this->factoryPub->Publish(msg);
-  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilEntitySpawn(_name, 100, 100);
 }
 
   /// \brief Spawn an Wireless receiver sensor on a link
@@ -935,7 +935,7 @@ class ServerFixture : public testing::TestWithParam<const char*>
 
     msg.set_sdf(newModelStr.str());
     this->factoryPub->Publish(msg);
-    WaitUntilEntitySpawn(_name, 20, 50);
+    WaitUntilEntitySpawn(_name, 100, 100);
   }
 
   /// \brief Wait for a number of ms. and attempts until the entity is spawned

@@ -169,7 +169,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
 void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
-  
+
   double txFreq = this->MinFreq - 1.0;
   std::string tx1ModelName = "tx1";
   std::string tx1SensorName = "wirelessTransmitter1";
@@ -198,7 +198,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
   ASSERT_TRUE(tx2);
-  
+
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
@@ -236,7 +236,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
     common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
   }
-  
+
   EXPECT_FALSE(this->receivedMsg);
 }
 

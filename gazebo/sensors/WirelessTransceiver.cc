@@ -68,7 +68,7 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   if (!this->sdf->HasElement("transceiver"))
   {
-    gzthrow("Transceiver sensor is missing <transceiver> SDF element");  
+    gzthrow("Transceiver sensor is missing <transceiver> SDF element");
   }
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");

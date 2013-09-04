@@ -38,27 +38,26 @@ class WirelessReceiver_TEST : public ServerFixture
 
   private: sensors::SensorManager *mgr;
   private: sdf::ElementPtr sdf;
-
 };
 
 const std::string WirelessReceiver_TEST::receiverSensorString =
-"<sdf version='1.4'>"
-"  <sensor name='wirelessReceiver' type='wireless_receiver'>"
-"    <always_on>1</always_on>"
-"    <visualize>0</visualize>"
-"    <update_rate>1.0</update_rate>"
-"    <transceiver>"
-"      <min_frequency>2412.0</min_frequency>"
-"      <max_frequency>2484.0</max_frequency>"
-"      <power>14.5</power>"
-"      <gain>2.5</gain>"
-"      <sensitivity>-90.0</sensitivity>"
-"    </transceiver>"
-"  </sensor>"
-"</sdf>";
+    "<sdf version='1.4'>"
+    "  <sensor name='wirelessReceiver' type='wireless_receiver'>"
+    "    <always_on>1</always_on>"
+    "    <visualize>0</visualize>"
+    "    <update_rate>1.0</update_rate>"
+    "    <transceiver>"
+    "      <min_frequency>2412.0</min_frequency>"
+    "      <max_frequency>2484.0</max_frequency>"
+    "      <power>14.5</power>"
+    "      <gain>2.5</gain>"
+    "      <sensitivity>-90.0</sensitivity>"
+    "    </transceiver>"
+    "  </sensor>"
+    "</sdf>";
 
-WirelessReceiver_TEST::WirelessReceiver_TEST():
-  sdf(new sdf::Element)
+WirelessReceiver_TEST::WirelessReceiver_TEST()
+    :sdf(new sdf::Element)
 {
   Load("worlds/empty.world");
   this->mgr = sensors::SensorManager::Instance();
@@ -109,7 +108,7 @@ void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 
   // Create the wireless receiver sensor
   ASSERT_ANY_THROW(this->mgr->CreateSensor(this->sdf,
-      "default", "ground_plane::link"));  
+      "default", "ground_plane::link"));
 }
 
 /////////////////////////////////////////////////
@@ -120,7 +119,7 @@ void WirelessReceiver_TEST::TestIllegalTransceiver()
   std::string receiverSensorStringCopy = this->receiverSensorString;
   boost::replace_first(receiverSensorStringCopy, "<transceiver>", "");
   boost::replace_first(receiverSensorStringCopy, "</transceiver>", "");
-  
+
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
 
@@ -131,7 +130,8 @@ void WirelessReceiver_TEST::TestIllegalPower()
   // Replace the power by an incorrect value
   boost::regex re("<power>.*<\\/power>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re, "<power>-1.0</power>");
+      boost::regex_replace(this->receiverSensorString, re,
+        "<power>-1.0</power>");
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -144,7 +144,7 @@ void WirelessReceiver_TEST::TestIllegalGain()
   boost::regex re("<gain>.*<\\/gain>");
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re, "<gain>-1.0</gain>");
-  
+
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
 
@@ -157,7 +157,7 @@ void WirelessReceiver_TEST::TestIllegalMinFreq()
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re,
         "<min_frequency>-1.0</min_frequency>");
-  
+
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
 
@@ -170,7 +170,7 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re,
         "<max_frequency>-1.0</max_frequency>");
-  
+
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
 
@@ -183,7 +183,7 @@ void WirelessReceiver_TEST::TestIllegalSensitivity()
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re,
         "<sensitivity>1.0</sensitivity>");
-  
+
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
 
@@ -212,7 +212,7 @@ void WirelessReceiver_TEST::TestUpdateImpl()
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  sensor->Update(true);  
+  sensor->Update(true);
 }
 
 /////////////////////////////////////////////////
