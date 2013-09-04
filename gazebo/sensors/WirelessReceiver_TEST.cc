@@ -16,14 +16,31 @@
 */
 
 #include <gtest/gtest.h>
+#include <boost/algorithm/string/find.hpp>
+#include <boost/regex.hpp>
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
 class WirelessReceiver_TEST : public ServerFixture
 {
+  public: static const std::string receiverSensorString;
+  public: WirelessReceiver_TEST();
+  public: void TestCreateWirelessReceiver();
+  public: void TestIllegalTransceiver();
+  public: void TestIllegalPower();
+  public: void TestIllegalGain();
+  public: void TestIllegalMinFreq();
+  public: void TestIllegalMaxFreq();
+  public: void TestIllegalSensitivity();
+
+  private: void CheckIllegalValue(std::string _sensorString);
+
+  private: sensors::SensorManager *mgr;
+  private: sdf::ElementPtr sdf;
+
 };
 
-static std::string receiverSensorString =
+const std::string WirelessReceiver_TEST::receiverSensorString =
 "<sdf version='1.4'>"
 "  <sensor name='wirelessReceiver' type='wireless_receiver'>"
 "    <always_on>1</always_on>"
@@ -39,19 +56,23 @@ static std::string receiverSensorString =
 "  </sensor>"
 "</sdf>";
 
-/////////////////////////////////////////////////
-/// \brief Test Creation of a wireless receiver sensor
-TEST_F(WirelessReceiver_TEST, CreateWirelessReceiver)
+WirelessReceiver_TEST::WirelessReceiver_TEST():
+  sdf(new sdf::Element)
 {
   Load("worlds/empty.world");
-  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+  this->mgr = sensors::SensorManager::Instance();
 
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("sensor.sdf", sdf);
-  sdf::readString(receiverSensorString, sdf);
+  sdf::initFile("sensor.sdf", this->sdf);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Creation of a wireless receiver sensor
+void WirelessReceiver_TEST::TestCreateWirelessReceiver()
+{
+  sdf::readString(this->receiverSensorString, this->sdf);
 
   // Create the wireless receiver sensor
-  std::string sensorName = mgr->CreateSensor(sdf, "default",
+  std::string sensorName = this->mgr->CreateSensor(this->sdf, "default",
       "ground_plane::link");
 
   // Make sure the returned sensor name is correct
@@ -59,12 +80,12 @@ TEST_F(WirelessReceiver_TEST, CreateWirelessReceiver)
       std::string("default::ground_plane::link::wirelessReceiver"));
 
   // Update the sensor manager so that it can process new sensors.
-  mgr->Update();
+  this->mgr->Update();
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessReceiverPtr sensor =
     boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
-        mgr->GetSensor(sensorName));
+        this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
@@ -76,6 +97,135 @@ TEST_F(WirelessReceiver_TEST, CreateWirelessReceiver)
   EXPECT_DOUBLE_EQ(sensor->GetSensitivity(), -90);
 
   EXPECT_TRUE(sensor->IsActive());
+}
+
+/////////////////////////////////////////////////
+/// \brief Create a sensor with an illegal value and checks that an exception
+/// is thrown
+void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
+{
+  sdf::readString(_sensorString, this->sdf);
+
+  // Create the wireless receiver sensor
+  ASSERT_ANY_THROW(this->mgr->CreateSensor(this->sdf,
+      "default", "ground_plane::link"));  
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Non-existent transceiver element
+void WirelessReceiver_TEST::TestIllegalTransceiver()
+{
+  // Make a copy of the sdf string for avoid affecting other tests
+  std::string receiverSensorStringCopy = this->receiverSensorString;
+  boost::replace_first(receiverSensorStringCopy, "<transceiver>", "");
+  boost::replace_first(receiverSensorStringCopy, "</transceiver>", "");
+  
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test wrong power value for the transceiver element
+void WirelessReceiver_TEST::TestIllegalPower()
+{
+  // Replace the power by an incorrect value
+  boost::regex re("<power>.*<\\/power>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re, "<power>-1.0</power>");
+
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test wrong gain value for the transceiver element
+void WirelessReceiver_TEST::TestIllegalGain()
+{
+  // Replace the gain by an incorrect value
+  boost::regex re("<gain>.*<\\/gain>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re, "<gain>-1.0</gain>");
+  
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test wrong min_frequency value for the transceiver element
+void WirelessReceiver_TEST::TestIllegalMinFreq()
+{
+  // Replace the min frequency by an incorrect value
+  boost::regex re("<min_frequency>.*<\\/min_frequency>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re,
+        "<min_frequency>-1.0</min_frequency>");
+  
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test wrong max_frequency value for the transceiver element
+void WirelessReceiver_TEST::TestIllegalMaxFreq()
+{
+  // Replace the max frequency by an incorrect value
+  boost::regex re("<max_frequency>.*<\\/max_frequency>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re,
+        "<max_frequency>-1.0</max_frequency>");
+  
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test wrong sensitivity value for the transceiver element
+void WirelessReceiver_TEST::TestIllegalSensitivity()
+{
+  // Replace the sensitivity by an incorrect value
+  boost::regex re("<sensitivity>.*<\\/sensitivity>");
+  std::string receiverSensorStringCopy =
+      boost::regex_replace(this->receiverSensorString, re,
+        "<sensitivity>1.0</sensitivity>");
+  
+  this->CheckIllegalValue(receiverSensorStringCopy);
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestCreateWilessReceiver)
+{
+  TestCreateWirelessReceiver();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalTransceiver)
+{
+  TestIllegalTransceiver();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalPower)
+{
+  TestIllegalPower();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalGain)
+{
+  TestIllegalGain();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalMinFreq)
+{
+  TestIllegalMinFreq();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalMaxFreq)
+{
+  TestIllegalMaxFreq();
+}
+
+/////////////////////////////////////////////////
+TEST_F(WirelessReceiver_TEST, TestIllegalSensitivity)
+{
+  TestIllegalSensitivity();
 }
 
 /////////////////////////////////////////////////

@@ -849,42 +849,44 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _freq Frequency of transmission (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _visualize Enable sensor visualization             
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
-                 const std::string &_essid,
-                 double _freq,
-                 double _power,
-                 double _gain)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+    const std::string &_sensorName,
+    const math::Vector3 &_pos,
+    const math::Vector3 &_rpy,
+    const std::string &_essid,
+    double _freq,
+    double _power,
+    double _gain,
+    bool _visualize = true)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _name << "'>"
-                 << "<static>true</static>"
-                 << "<pose>" << _pos << " " << _rpy << "</pose>"
-                 << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
-                 << "    <always_on>1</always_on>"
-                 << "    <update_rate>1</update_rate>"
-                 << "    <visualize>true</visualize>"
-                 << "    <transceiver>"
-                 << "      <essid>" << _essid << "</essid>"
-                 << "      <frequency>" << _freq << "</frequency>"
-                 << "      <power>" << _power << "</power>"
-                 << "      <gain>" << _gain << "</gain>"
-                 << "    </transceiver>"
-                 << "  </sensor>"
-                 << "</link>"
-                 << "</model>"
-                 << "</sdf>";
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='link'>"
+    << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>1</update_rate>"
+    << "    <visualize>" << _visualize << "</visualize>"
+    << "    <transceiver>"
+    << "      <essid>" << _essid << "</essid>"
+    << "      <frequency>" << _freq << "</frequency>"
+    << "      <power>" << _power << "</power>"
+    << "      <gain>" << _gain << "</gain>"
+    << "    </transceiver>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
 
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-               WaitUntilEntitySpawn(_name, 20, 50);
-             }
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+  WaitUntilEntitySpawn(_name, 20, 50);
+}
 
   /// \brief Spawn an Wireless receiver sensor on a link
   /// \param[in] _name Model name
@@ -895,44 +897,46 @@ class ServerFixture : public testing::TestWithParam<const char*>
   /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
-  /// \param[in] _sensitivity Receiver sensitibity (dBm)             
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)
+  /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
-                 const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
-                 double _minFreq,
-                 double _maxFreq,
-                 double _power,
-                 double _gain,
-                 double _sensitivity)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+      const std::string &_sensorName,
+      const math::Vector3 &_pos,
+      const math::Vector3 &_rpy,
+      double _minFreq,
+      double _maxFreq,
+      double _power,
+      double _gain,
+      double _sensitivity,
+      bool _visualize = true)
+ {
+    msgs::Factory msg;
+    std::ostringstream newModelStr;
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _name << "'>"
-                 << "<static>true</static>"
-                 << "<pose>" << _pos << " " << _rpy << "</pose>"
-                 << "<link name ='link'>"
-                 << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
-                 << "    <update_rate>1</update_rate>"
-                 << "    <visualize>true</visualize>"
-                 << "    <transceiver>"
-                 << "      <min_frequency>" << _minFreq << "</min_frequency>"
-                 << "      <max_frequency>" << _maxFreq << "</max_frequency>"
-                 << "      <power>" << _power << "</power>"
-                 << "      <gain>" << _gain << "</gain>"
-                 << "      <sensitivity>" << _sensitivity << "</sensitivity>"
-                 << "    </transceiver>"
-                 << "  </sensor>"
-                 << "</link>"
-                 << "</model>"
-                 << "</sdf>";
+    newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+      << "<model name ='" << _name << "'>"
+      << "<static>true</static>"
+      << "<pose>" << _pos << " " << _rpy << "</pose>"
+      << "<link name ='link'>"
+      << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
+      << "    <update_rate>1</update_rate>"
+      << "    <visualize>" << _visualize << "</visualize>"
+      << "    <transceiver>"
+      << "      <min_frequency>" << _minFreq << "</min_frequency>"
+      << "      <max_frequency>" << _maxFreq << "</max_frequency>"
+      << "      <power>" << _power << "</power>"
+      << "      <gain>" << _gain << "</gain>"
+      << "      <sensitivity>" << _sensitivity << "</sensitivity>"
+      << "    </transceiver>"
+      << "  </sensor>"
+      << "</link>"
+      << "</model>"
+      << "</sdf>";
 
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-               WaitUntilEntitySpawn(_name, 20, 50);
-             }
+    msg.set_sdf(newModelStr.str());
+    this->factoryPub->Publish(msg);
+    WaitUntilEntitySpawn(_name, 20, 50);
+  }
 
   /// \brief Wait for a number of ms. and attempts until the entity is spawned
   /// \param[in] _name Model name

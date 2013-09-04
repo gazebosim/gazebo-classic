@@ -52,6 +52,8 @@ void WirelessReceiver::Init()
 /////////////////////////////////////////////////
 void WirelessReceiver::Load(const std::string &_worldName)
 {
+  std::ostringstream convert;
+
   WirelessTransceiver::Load(_worldName);
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
@@ -62,25 +64,25 @@ void WirelessReceiver::Load(const std::string &_worldName)
   this->maxFreq = transceiverElem->Get<double>("max_frequency");
   this->sensitivity = transceiverElem->Get<double>("sensitivity");
 
-  if (this->minFreq < 0)
+  if (this->minFreq <= 0)
   {
-    gzerr << "Wireless receiver min. frequency must be > 0. Current value is ["
-      << this->minFreq << "]\n";
-    return;
+    convert << this->minFreq;
+    gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
+      << convert.str() << "]");
   }
 
-  if (this->maxFreq < 0)
+  if (this->maxFreq <= 0)
   {
-    gzerr << "Wireless receiver max. frequency must be > 0. Current value is ["
-      << this->maxFreq << "]\n";
-    return;
+    convert << this->minFreq;
+    gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
+      << this->maxFreq << "]");
   }
 
-  if (this->sensitivity > 0)
+  if (this->sensitivity >= 0)
   {
-    gzerr << "Wireless receiver sensitivity must be < 0. Current value is ["
-      << this->sensitivity << "]\n";
-    return;
+    convert << this->minFreq;
+    gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
+      << this->sensitivity << "]");
   }
 }
 

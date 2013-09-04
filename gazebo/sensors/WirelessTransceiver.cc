@@ -15,6 +15,7 @@
  *
 */
 
+#include <sstream>
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -54,6 +55,8 @@ std::string WirelessTransceiver::GetTopic() const
 //////////////////////////////////////////////////
 void WirelessTransceiver::Load(const std::string &_worldName)
 {
+  std::ostringstream convert;
+
   Sensor::Load(_worldName);
 
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
@@ -63,28 +66,27 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
-  if (!transceiverElem)
+  if (!this->sdf->HasElement("transceiver"))
   {
-    gzerr << "Transceiver sensor is missing <transceiver> SDF element";
-    return;
+    gzthrow("Transceiver sensor is missing <transceiver> SDF element");  
   }
 
+  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
   this->gain = transceiverElem->Get<double>("gain");
   this->power = transceiverElem->Get<double>("power");
 
   if (this->gain < 0)
   {
-    gzerr << "Wireless transceiver gain must be > 0. Current value is ["
-      << this->gain << "]\n";
-    return;
+    convert << gain;
+    gzthrow("Wireless transceiver gain must be > 0. Current value is [" +
+        convert.str() + "]");
   }
 
   if (this->power < 0)
   {
-    gzerr << "Wireless transceiver power must be > 0. Current value is ["
-      << this->power << "]\n";
-    return;
+    convert << power;
+    gzthrow("Wireless transceiver power must be > 0. Current value is [" +
+        convert.str() + "]");
   }
 }
 

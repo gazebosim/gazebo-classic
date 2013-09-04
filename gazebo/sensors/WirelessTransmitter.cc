@@ -54,6 +54,8 @@ WirelessTransmitter::~WirelessTransmitter()
 /////////////////////////////////////////////////
 void WirelessTransmitter::Load(const std::string &_worldName)
 {
+  std::ostringstream convert;
+
   WirelessTransceiver::Load(_worldName);
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
@@ -62,21 +64,18 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   this->essid = transceiverElem->Get<std::string>("essid");
   this->freq = transceiverElem->Get<double>("frequency");
 
-  if (this->essid.empty())
-  {
-    gzerr << "Wireless transmitter ESSID must be a non-empty string.\n";
-    return;
-  }
-
   if (this->freq < 0)
   {
-    gzerr << "Wireless transmitter frequency must be > 0. Current value is ["
-      << this->freq << "]\n";
+    convert << this->freq;
+    gzthrow("Wireless transmitter frequency must be > 0. Current value is ["
+      << convert.str() << "]");
     return;
   }
 
   this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(),
         30);
+  GZ_ASSERT(this->pub != NULL,
+      "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
 
 //////////////////////////////////////////////////
@@ -94,9 +93,9 @@ void WirelessTransmitter::Init()
 void WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   this->referencePose =
-        this->pose + this->parentEntity.lock()->GetWorldPose();
+      this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  if (this->pub && this->visualize)
+  if (this->visualize)
   {
     msgs::PropagationGrid msg;
     math::Pose pos;
