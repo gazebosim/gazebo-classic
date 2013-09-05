@@ -72,6 +72,9 @@ Heightmap::~Heightmap()
 
   this->scene.reset();
 
+  OGRE_DELETE(this->pageManager);
+  OGRE_DELETE(this->terrainPaging);
+
   // Remove page files from disk
   boost::filesystem::remove_all(this->PagingPath);
 }
