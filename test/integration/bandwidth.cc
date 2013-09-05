@@ -22,7 +22,8 @@
 
 using namespace gazebo;
 
-class BandwidthTest : public ServerFixture
+class BandwidthTest : public ServerFixture,
+                      public testing::WithParamInterface<const char*>
 {
   public: void Bandwidth(const std::string &_physicsEngine);
 };
