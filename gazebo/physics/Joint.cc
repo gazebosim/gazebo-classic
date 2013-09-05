@@ -255,6 +255,7 @@ void Joint::Init()
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
 
+/* this repeats above, not needed right?
   // Set axis in physics engines
   if (this->sdf->HasElement("axis"))
   {
@@ -264,6 +265,7 @@ void Joint::Init()
   {
     this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
   }
+*/
 
   this->ComputeInertiaRatio();
 }
