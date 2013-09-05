@@ -62,21 +62,17 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   this->essid = transceiverElem->Get<std::string>("essid");
   this->freq = transceiverElem->Get<double>("frequency");
 
-  if (this->essid.empty())
-  {
-    gzerr << "Wireless transmitter ESSID must be a non-empty string.\n";
-    return;
-  }
-
   if (this->freq < 0)
   {
-    gzerr << "Wireless transmitter frequency must be > 0. Current value is ["
-      << this->freq << "]\n";
+    gzthrow("Wireless transmitter frequency must be > 0. Current value is ["
+      << this->freq << "]");
     return;
   }
 
   this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(),
         30);
+  GZ_ASSERT(this->pub != NULL,
+      "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
 
 //////////////////////////////////////////////////
@@ -94,9 +90,9 @@ void WirelessTransmitter::Init()
 bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   this->referencePose =
-        this->pose + this->parentEntity.lock()->GetWorldPose();
+      this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  if (this->pub && this->visualize)
+  if (this->visualize)
   {
     msgs::PropagationGrid msg;
     math::Pose pos;
@@ -167,8 +163,7 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   this->testRay->GetIntersection(dist, entityName);
 
   // ToDo: The ray intersects with my own collision model. Fix it.
-  if (dist > 0 && entityName != "ground_plane::link::collision" &&
-      entityName != "")
+  if (entityName != "")
   {
     n = NObstacle;
   }
