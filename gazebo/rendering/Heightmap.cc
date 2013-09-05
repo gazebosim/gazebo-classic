@@ -59,7 +59,7 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   // Remove previous page files from disk
   boost::filesystem::remove_all(tmpDir / gzPagingDir);
-  
+
   // Create a temporal and unique directory for page files
   boost::filesystem::create_directories(this->pagingPath);
 }
