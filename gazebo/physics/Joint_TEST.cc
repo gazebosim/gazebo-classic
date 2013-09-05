@@ -24,6 +24,12 @@
 #define TOL 1e-6
 using namespace gazebo;
 
+// Fixture for testing all joint types.
+class Joint_TEST_All : public Joint_TEST {};
+
+// Fixture for testing rotational joints.
+class Joint_TEST_Rotational : public Joint_TEST {};
+
 ////////////////////////////////////////////////////////////////////////
 // Test for spawning each joint type
 void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
@@ -53,12 +59,12 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   EXPECT_TRUE(joint != NULL);
 }
 
-TEST_P(Joint_TEST, SpawnJointTypes)
+TEST_P(Joint_TEST_All, SpawnJointTypes)
 {
   SpawnJointTypes(this->physicsEngine, this->jointType);
 }
 
-INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST, ::testing::Combine(
+INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_All, ::testing::Combine(
   PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"
