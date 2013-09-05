@@ -3,8 +3,8 @@
 #/ Get info on pull requests from gazebo's bitbucket repository
 # based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
 
-# to install dependencies on Ubuntu (tested with Quantal):
-#sudo apt-get install ruby1.9.1-dev
+# to install dependencies on Ubuntu (tested with Precise, Quantal and Raring):
+#sudo apt-get install ruby1.9.1-dev rubygems
 #sudo gem install rest-client json
 require 'rubygems'
 require 'rest_client'
@@ -14,15 +14,12 @@ require 'optparse'
 $stderr.sync = true
 
 class BitbucketPullRequests
-  # URL for bitbucket 2.0 api
-  @url_prefix
-  @url_suffix
-
+  # Pull request summary
   class Summary
-    @id
-    @source
-    @destination
-    @branch
+    attr_reader :id
+    attr_reader :source
+    attr_reader :destination
+    attr_reader :branch
 
     def initialize(jsonHash)
       @id          = jsonHash["id"]
@@ -36,18 +33,6 @@ class BitbucketPullRequests
       @source + "    " +
       @destination + "    " +
       @branch + "\n"
-    end
-
-    def source
-      @source
-    end
-
-    def destination
-      @destination
-    end
-
-    def branch
-      @branch
     end
   end
 
@@ -105,13 +90,14 @@ class BitbucketPullRequests
     end
     return ids
   end
+
   # check changed files in pull request by id
   def checkPullRequest(id, fork=true)
     summary = getPullRequestSummary(id)
     puts "checking pull request #{id}, branch #{summary.branch}"
     files = getPullRequestFiles(id)
     files_list = ""
-    files.each { |f| files_list += " "+f }
+    files.each { |f| files_list += " " + f }
     hg_root = `hg root`.chomp
     `hg log -r #{summary.destination} 2>&1`
     if $? != 0
@@ -120,7 +106,7 @@ class BitbucketPullRequests
     end
     `hg log -r #{summary.source} 2>&1`
     if $? != 0
-      puts "Unknown revision #{summary.source}, try: hg pull "+
+      puts "Unknown revision #{summary.source}, try: hg pull " +
            "(it could also be a fork)"
       return
     end
@@ -146,10 +132,10 @@ files    = nil
 help     = false
 opt_parser = OptionParser.new do |o|
   o.on("-l", "--list",
-       "List open pull requests with fields:\n"+" "*37+
+       "List open pull requests with fields:\n" + " "*37+
        "[id] [source] [dest] [branch]") { |l| list = l }
   o.on("-s", "--summary [id]", Integer,
-       "Summarize a pull request with fields:\n"+" "*37+
+       "Summarize a pull request with fields:\n" + " "*37+
        "[id] [source] [dest] [branch]")  { |s| summary = s }
   o.on("-c", "--check [id]", Integer,
        "")  { |id| check_id = id; check = true }
