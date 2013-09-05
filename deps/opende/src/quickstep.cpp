@@ -1837,6 +1837,37 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 SS[2*4+0],SS[2*4+1],SS[2*4+2],SS[2*4+3]);
 #endif
 
+              // get max ratio between matrices coupled through SS
+              //  MOI_ptr1[0*4+0] =
+              //  MOI_ptr1[0*4+1] =
+              //  MOI_ptr1[0*4+2] =
+
+              //  MOI_ptr1[1*4+0] = MOI_ptr1[0*4+1];
+              //  MOI_ptr1[1*4+1] =
+              //  MOI_ptr1[1*4+2] =
+
+              //  MOI_ptr1[2*4+0] = MOI_ptr1[0*4+2];
+              //  MOI_ptr1[2*4+1] = MOI_ptr1[1*4+2];
+              //  MOI_ptr1[2*4+2] =
+
+              //  MOI_ptr2[0*4+0] =
+              //  MOI_ptr2[0*4+1] =
+              //  MOI_ptr2[0*4+2] =
+
+              //  MOI_ptr2[1*4+0] = MOI_ptr2[0*4+1];
+              //  MOI_ptr2[1*4+1] =
+              //  MOI_ptr2[1*4+2] =
+
+              //  MOI_ptr2[2*4+0] = MOI_ptr2[0*4+2];
+              //  MOI_ptr2[2*4+1] = MOI_ptr2[1*4+2];
+              //  MOI_ptr2[2*4+2] =
+
+              //  for (int si = 0; si < 12; ++si)
+              //  {
+              //    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+              //    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+              //  }
+
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
               const dReal max_moi_ratio = 100.0;
