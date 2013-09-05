@@ -32,11 +32,10 @@ TEST_F(Heightmap_TEST, splitTerrain)
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
 
-  if (!scene)
-    scene = gazebo::rendering::create_scene("default", false);
+  scene = gazebo::rendering::create_scene("default", false);
 
   // Make sure that the scene is created
-  EXPECT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != NULL);
 
   gazebo::rendering::Heightmap *heightmap =
       new gazebo::rendering::Heightmap(scene);
@@ -59,7 +58,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   heightmap->SplitHeights(heights, heightmap->NumTerrainSubdivisions,
       heightsSplit);
 
-  EXPECT_TRUE(heightsSplit.size() == heightmap->NumTerrainSubdivisions);
+  ASSERT_TRUE(heightsSplit.size() == heightmap->NumTerrainSubdivisions);
 
   // Precomputed subterrains for a known 9 x 9 terrain starting from 1 and with
   // consecutive values
