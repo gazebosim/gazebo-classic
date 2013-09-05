@@ -39,6 +39,8 @@
 using namespace gazebo;
 using namespace physics;
 
+sdf::ElementPtr Joint::sdfJoint;
+
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
   : Base(_parent)
@@ -57,6 +59,12 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
+
+  if (!this->sdfJoint)
+  {
+    this->sdfJoint.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", this->sdfJoint);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -97,7 +105,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   // Joint is loaded without sdf from a model
   // Initialize this->sdf so it can be used for data storage
-  sdf::initFile("joint.sdf", this->sdf);
+  this->sdf = this->sdfJoint->Clone();
 
   this->LoadImpl(_pose);
 }
@@ -176,7 +184,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName());
+              this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       else
@@ -361,6 +369,7 @@ LinkPtr Joint::GetParent() const
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
+  _msg.set_id(this->GetId());
 
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
 
@@ -405,14 +414,26 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.mutable_axis1()->set_friction(0);
 
   if (this->GetParent())
+  {
     _msg.set_parent(this->GetParent()->GetScopedName());
+    _msg.set_parent_id(this->GetParent()->GetId());
+  }
   else
+  {
     _msg.set_parent("world");
+    _msg.set_parent_id(0);
+  }
 
   if (this->GetChild())
+  {
     _msg.set_child(this->GetChild()->GetScopedName());
+    _msg.set_child_id(this->GetChild()->GetId());
+  }
   else
+  {
     _msg.set_child("world");
+    _msg.set_parent_id(0);
+  }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
        iter != this->sensors.end(); ++iter)

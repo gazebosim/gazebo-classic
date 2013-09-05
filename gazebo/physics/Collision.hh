@@ -236,6 +236,9 @@ namespace gazebo
 
       /// \brief Number of contact points allowed for this collision.
       private: int maxContacts;
+
+      /// \brief Unique id for collision visual.
+      private: uint32_t collisionVisualId;
     };
     /// \}
   }

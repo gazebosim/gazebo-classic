@@ -399,6 +399,9 @@ namespace gazebo
       /// \param[in] _jointName Child Joint name.
       public: void RemoveChildJoint(const std::string &_jointName);
 
+      // Documentation inherited.
+      public: virtual void RemoveChild(EntityPtr _child);
+
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
       /// \param[in] _offset Pose relative to this link to place the model.
@@ -442,6 +445,10 @@ namespace gazebo
       /// \param[in] _enable True to enable publishing, false to stop publishing
       public: void SetPublishData(bool _enable);
 
+      /// \brief Remove a collision from the link.
+      /// \param[int] _name Name of the collision to remove.
+      public: void RemoveCollision(const std::string &_name);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -457,14 +464,21 @@ namespace gazebo
       /// \param[in] _msg Message that contains contact information.
       private: void OnCollision(ConstContactsPtr &_msg);
 
+      /// \brief Parse visuals from SDF
+      private: void ParseVisuals();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
       /// \brief Center of gravity visual elements.
       protected: std::vector<std::string> cgVisuals;
 
+      /// \def Visuals_M
+      /// \brief Map of unique ID to visual message.
+      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
+
       /// \brief Link visual elements.
-      protected: std::vector<std::string> visuals;
+      protected: Visuals_M visuals;
 
       /// \brief Linear acceleration.
       protected: math::Vector3 linearAccel;
@@ -507,6 +521,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the publishData variable
       private: boost::recursive_mutex *publishDataMutex;
+
+      /// \brief Cached list of collisions. This is here for performance.
+      private: Collision_V collisions;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

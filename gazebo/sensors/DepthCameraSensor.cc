@@ -53,12 +53,6 @@ DepthCameraSensor::~DepthCameraSensor()
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
-}
-
-//////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName,
                                    sdf::ElementPtr &_sdf)
 {
@@ -114,7 +108,7 @@ void DepthCameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
     this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
     this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";

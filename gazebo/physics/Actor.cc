@@ -117,6 +117,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
     this->visualName = actorName + "::" + actorName + "_pose::"
                              + actorName + "_visual";
 
+    this->visualId = gazebo::physics::getUniqueId();
+
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
       SkeletonNode* bone = iter->second;
@@ -524,6 +526,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
+  msg.set_model_id(this->visualId);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
   math::Pose mainLinkPose;

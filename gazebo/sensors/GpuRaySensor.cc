@@ -284,7 +284,7 @@ void GpuRaySensor::Init()
     this->laserCam->CreateRenderTexture(
         this->GetScopedName() + "_RttTex_Image");
     this->laserCam->SetWorldPose(this->pose);
-    this->laserCam->AttachToVisual(this->parentName, true);
+    this->laserCam->AttachToVisual(this->parentId, true);
 
     this->laserMsg.mutable_scan()->set_frame(this->parentName);
   }

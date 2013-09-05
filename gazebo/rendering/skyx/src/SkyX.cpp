@@ -185,7 +185,7 @@ namespace SkyX
 
   void SkyX::notifyCameraRender(Ogre::Camera* c)
   {
-    if (!mCreated || !this->mEnabled)
+    if (!mCreated || !this->mEnabled || !c)
     {
       return;
     }

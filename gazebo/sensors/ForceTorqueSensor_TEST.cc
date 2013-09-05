@@ -43,9 +43,13 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(forceTorqueSensorString, sdf);
 
+  physics::WorldPtr world = physics::get_world("default");
+  physics::ModelPtr model = world->GetModel("pioneer2dx");
+  physics::JointPtr joint = model->GetJoint("left_wheel_hinge");
+
   // Create the force torque sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "pioneer2dx::left_wheel_hinge");
+      "pioneer2dx::left_wheel_hinge", joint->GetId());
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName,

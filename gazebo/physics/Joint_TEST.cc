@@ -299,15 +299,15 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
       world->SetPaused(paused);
     }
 
-    world->Step(100);
+    world->Step(200);
 
     this->GetMemInfo(residentCur, shareCur);
 
     // give it 2 cycles to stabilize
     if (i > 1)
     {
-      EXPECT_LE(residentCur, residentLast);
-      EXPECT_LE(shareCur, shareLast);
+      EXPECT_LE(residentCur, residentLast + residentLast*0.01);
+      EXPECT_LE(shareCur, shareLast + shareLast*0.01);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur

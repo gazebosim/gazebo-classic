@@ -416,6 +416,18 @@ namespace gazebo
                   bool _inheritOrientation,
                   double _minDist = 0.0, double _maxDist = 0.0);
 
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      public: void AttachToVisual(uint32_t _id,
+                  bool _inheritOrientation,
+                  double _minDist = 0.0, double _maxDist = 0.0);
+
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
       public: void TrackVisual(const std::string &_visualName);
@@ -522,6 +534,19 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
+                     bool _inheritOrientation,
+                     double _minDist = 0, double _maxDist = 0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      /// \return True on success
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 

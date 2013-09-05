@@ -52,7 +52,7 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 
   // Create the IMU sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName, std::string("default::ground_plane::link::imu"));

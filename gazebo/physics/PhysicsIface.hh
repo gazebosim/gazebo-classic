@@ -101,6 +101,10 @@ namespace gazebo
     /// \brief Return true if any world is running.
     /// \return True if any world is running.
     bool worlds_running();
+
+    /// \brief Get a unique ID
+    /// \return A unique integer
+    uint32_t getUniqueId();
     /// \}
   }
 }
