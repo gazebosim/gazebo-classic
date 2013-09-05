@@ -293,7 +293,7 @@ namespace gazebo
       private: Ogre::TerrainPaging *terrainPaging;
 
       /// \brief Collection of world content
-      private: Ogre::PagedWorld* world;
+      private: Ogre::PagedWorld *world;
 
       /// \brief Collection of terrains. Every terrain might be paged.
       private: std::vector<std::vector<float> > subTerrains;
