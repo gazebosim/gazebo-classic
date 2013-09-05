@@ -56,7 +56,6 @@ Heightmap::Heightmap(ScenePtr _scene)
       boost::filesystem::unique_path("instance-%%%%%%%%%%");
 
   this->pagingPath = tmpDir / gzPagingDir / instanceDir;
-  std::cout << this->pagingPath << std::endl;
 
   // Remove previous page files from disk
   boost::filesystem::remove_all(tmpDir / gzPagingDir);
