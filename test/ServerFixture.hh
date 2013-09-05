@@ -908,7 +908,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _freq Frequency of transmission (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
-  /// \param[in] _visualize Enable sensor visualization             
+  /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
@@ -1011,7 +1011,7 @@ class ServerFixture : public testing::Test
                // Wait for the entity to spawn
                while (!this->HasEntity(_name) && i < _retries)
                {
-                 common::Time::MSleep(_sleepEeach);
+                 common::Time::MSleep(_sleepEach);
                  ++i;
                }
                EXPECT_LT(i, _retries);
