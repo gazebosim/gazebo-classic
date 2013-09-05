@@ -24,7 +24,8 @@
 #define IMU_TOL 1e-5
 
 using namespace gazebo;
-class ImuTest : public ServerFixture
+class ImuTest : public ServerFixture,
+                public testing::WithParamInterface<const char*>
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);

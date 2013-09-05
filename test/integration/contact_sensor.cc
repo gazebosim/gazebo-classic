@@ -25,7 +25,8 @@
 #define TOL 1e-4
 
 using namespace gazebo;
-class ContactSensor : public ServerFixture
+class ContactSensor : public ServerFixture,
+                      public testing::WithParamInterface<const char*>
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);

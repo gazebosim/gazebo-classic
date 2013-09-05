@@ -24,7 +24,8 @@ const double g_physics_tol = 1e-2;
 
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture
+class PhysicsTest : public ServerFixture,
+                    public testing::WithParamInterface<const char*>
 {
   public: void CollideWithoutContact(const std::string &_physicsEngine);
 };
