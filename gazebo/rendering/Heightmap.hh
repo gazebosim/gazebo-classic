@@ -24,9 +24,9 @@
 
 #include <string>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-
 #include "gazebo/common/Image.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
@@ -86,9 +86,6 @@ namespace gazebo
     /// \brief Rendering a terrain using heightmap information
     class Heightmap
     {
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int NumTerrainSubdivisions;
-
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
       public: Heightmap(ScenePtr _scene);
@@ -221,8 +218,11 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
+      /// \brief Number of pieces in which a terrain is subdivided for paging.
+      public: static const unsigned int NumTerrainSubdivisions;
+
       /// \brief Path for the terrain pages generated on disk.
-      private: static const std::string PagingPath;
+      private: boost::filesystem::path pagingPath;
 
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
