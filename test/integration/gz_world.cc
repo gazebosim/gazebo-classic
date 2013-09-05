@@ -23,7 +23,7 @@ class GzWorld : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-// \brief Test world pause. 
+// \brief Test world pause.
 TEST_F(GzWorld, Pause)
 {
   Load("worlds/empty_test.world");
@@ -46,7 +46,7 @@ TEST_F(GzWorld, Pause)
 }
 
 /////////////////////////////////////////////////
-// \brief Test world step. 
+// \brief Test world step.
 TEST_F(GzWorld, Step)
 {
   Load("worlds/empty_test.world", true);

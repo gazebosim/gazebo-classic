@@ -23,7 +23,7 @@ class GzPhysics : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-// \brief Test setting the gravity. 
+// \brief Test setting the gravity.
 TEST_F(GzPhysics, Gravity)
 {
   Load("worlds/empty.world");
@@ -49,11 +49,11 @@ TEST_F(GzPhysics, Gravity)
 
   world->Step(100);
 
-  EXPECT_GT(model->GetWorldPose().pos.z,0);
+  EXPECT_GT(model->GetWorldPose().pos.z, 0);
 }
 
 /////////////////////////////////////////////////
-// \brief Test setting the step size. 
+// \brief Test setting the step size.
 TEST_F(GzPhysics, StepSize)
 {
   Load("worlds/empty.world");
@@ -73,7 +73,7 @@ TEST_F(GzPhysics, StepSize)
 }
 
 /////////////////////////////////////////////////
-// \brief Test setting the iterations. 
+// \brief Test setting the iterations.
 TEST_F(GzPhysics, Iters)
 {
   Load("worlds/empty.world");
@@ -93,7 +93,7 @@ TEST_F(GzPhysics, Iters)
 }
 
 /////////////////////////////////////////////////
-// \brief Test setting the update rate. 
+// \brief Test setting the update rate.
 TEST_F(GzPhysics, UpdateRate)
 {
   Load("worlds/empty.world");

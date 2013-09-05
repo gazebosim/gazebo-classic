@@ -478,7 +478,7 @@ bool ModelCommand::RunImpl()
     std::string sdfString;
 
     // Read input from the command line.
-    while(std::getline(std::cin, input))
+    while (std::getline(std::cin, input))
     {
       sdfString += input;
     }

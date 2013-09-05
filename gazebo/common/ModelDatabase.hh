@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <utility>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 

@@ -536,7 +536,7 @@ TEST(gz, Topic)
   std::string helpOutput = custom_exec_str("gz help topic");
   EXPECT_NE(helpOutput.find("gz topic"), std::string::npos);
 
-  // List 
+  // List
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_NE(output.find("/gazebo/default/world_stats"), std::string::npos);
 
@@ -544,7 +544,7 @@ TEST(gz, Topic)
   output = custom_exec_str("gz topic -i /gazebo/default/world_stats");
   EXPECT_NE(output.find("gazebo.msgs.WorldStatistics"), std::string::npos);
 
-  // Echo 
+  // Echo
   output = custom_exec_str("gz topic -e /gazebo/default/world_stats -d 1");
   EXPECT_NE(output.find("real_time {"), std::string::npos);
 
@@ -552,15 +552,15 @@ TEST(gz, Topic)
   output = custom_exec_str("gz topic -e /gazebo/default/world_stats -u -d 1");
   EXPECT_NE(output.find("real_time {"), std::string::npos);
 
-  // Hz 
+  // Hz
   output = custom_exec_str("gz topic -z /gazebo/default/world_stats -d 1");
   EXPECT_NE(output.find("Hz:"), std::string::npos);
 
-  // Bw 
+  // Bw
   output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
   EXPECT_NE(output.find("Total["), std::string::npos);
 
- fini();
+  fini();
 }
 
 /////////////////////////////////////////////////
@@ -589,7 +589,6 @@ TEST(gz, Stress)
   fini();
 }
 
-
 /////////////////////////////////////////////////
 TEST(gz, SDF)
 {
@@ -601,31 +600,41 @@ TEST(gz, SDF)
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
   // 1.0 description
+  // Regenerate using:
+  // gz sdf -d -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -d -v 1.0");
   EXPECT_EQ(output, sdf_description_1_0);
 
   // 1.2 description
+  // Regenerate using:
+  // gz sdf -d -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -d -v 1.2");
   EXPECT_EQ(output, sdf_description_1_2);
 
   // 1.3 description
+  // Regenerate using:
+  // gz sdf -d -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -d -v 1.3");
   EXPECT_EQ(output, sdf_description_1_3);
 
-/* 
   // 1.0 doc
+  // Regenerate using:
+  // gz sdf -o -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -o -v 1.0");
   EXPECT_EQ(output, sdf_doc_1_0);
 
   // 1.2 doc
+  // Regenerate using:
+  // gz sdf -o -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -o -v 1.2");
   EXPECT_EQ(output, sdf_doc_1_2);
 
   // 1.3 doc
+  // Regenerate using:
+  // gz sdf -o -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str("gz sdf -o -v 1.3");
   EXPECT_EQ(output, sdf_doc_1_3);
-  */
- 
+
   path = TEST_PATH;
   path /= "worlds/empty_different_name.world";
 

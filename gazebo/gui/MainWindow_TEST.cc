@@ -103,7 +103,8 @@ void MainWindow_TEST::Wireframe()
   double avgPostWireframe = avgPreWireframe;
 
   // Redraw the screen
-  for (unsigned int i = 0; i < 100 && avgPostWireframe == avgPreWireframe; ++i)
+  for (unsigned int i = 0; i < 100 &&
+      gazebo::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
