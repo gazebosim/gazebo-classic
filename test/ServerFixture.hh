@@ -904,6 +904,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _freq Frequency of transmission (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _visualize Enable sensor visualization             
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
@@ -911,7 +912,8 @@ class ServerFixture : public testing::Test
                  const std::string &_essid,
                  double _freq,
                  double _power,
-                 double _gain)
+                 double _gain,
+                 bool _visualize = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -925,7 +927,7 @@ class ServerFixture : public testing::Test
                  <<         "' type='wireless_transmitter'>"
                  << "    <always_on>1</always_on>"
                  << "    <update_rate>1</update_rate>"
-                 << "    <visualize>false</visualize>"
+                 << "    <visualize>" << _visualize << "</visualize>"
                  << "    <transceiver>"
                  << "      <essid>" << _essid << "</essid>"
                  << "      <frequency>" << _freq << "</frequency>"
@@ -952,6 +954,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
   /// \param[in] _sensitivity Receiver sensitibity (dBm)
+  /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const math::Vector3 &_pos,
@@ -960,7 +963,8 @@ class ServerFixture : public testing::Test
                  double _maxFreq,
                  double _power,
                  double _gain,
-                 double _sensitivity)
+                 double _sensitivity,
+                 bool _visualize = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -973,7 +977,7 @@ class ServerFixture : public testing::Test
                  << "  <sensor name='" << _sensorName
                  <<         "' type='wireless_receiver'>"
                  << "    <update_rate>1</update_rate>"
-                 << "    <visualize>true</visualize>"
+                 << "    <visualize>" << _visualize << "</visualize>"
                  << "    <transceiver>"
                  << "      <min_frequency>" << _minFreq << "</min_frequency>"
                  << "      <max_frequency>" << _maxFreq << "</max_frequency>"
@@ -996,17 +1000,17 @@ class ServerFixture : public testing::Test
   /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
   private: void WaitUntilEntitySpawn(const std::string &_name,
-                                     unsigned int sleep_each,
-                                     int retries)
+                                     unsigned int _sleepEach,
+                                     int _retries)
              {
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < retries)
+               while (!this->HasEntity(_name) && i < _retries)
                {
-                 common::Time::MSleep(sleep_each);
+                 common::Time::MSleep(_sleepEeach);
                  ++i;
                }
-               EXPECT_LT(i, retries);
+               EXPECT_LT(i, _retries);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
