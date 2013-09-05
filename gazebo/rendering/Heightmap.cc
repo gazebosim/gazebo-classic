@@ -443,7 +443,7 @@ void Heightmap::DefineTerrain(int _x, int _y)
     if (this->useTerrainPaging)
     {
       this->terrainGroup->defineTerrain(_x, _y,
-          &subTerrains[this->terrainIdx][0]);
+          &this->subTerrains[this->terrainIdx][0]);
       ++terrainIdx;
     }
     else
