@@ -19,7 +19,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class NonDefaultWorld : public ServerFixture
+class NonDefaultWorld : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   public: void Load(const std::string &_physicsEngine);
 };
