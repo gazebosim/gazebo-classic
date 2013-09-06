@@ -330,7 +330,7 @@ void JointMaker::CreateHotSpot()
   camera->GetScene()->AddVisual(hotspotVisual);
   joint->hotspot = hotspotVisual;
 
-  this->joints[hotspotVisual->GetName()] = this->mouseJoint;
+  this->joints[hotspotVisual->GetName()] = joint;
   this->mouseJoint = NULL;
   joint->dirty = true;
 }
