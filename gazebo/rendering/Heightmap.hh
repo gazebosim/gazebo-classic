@@ -237,6 +237,10 @@ namespace gazebo
       /// depends on the terrain size.
       private: static const double HoldRadiusFactor;
 
+      /// \brief Hash filename that should be present for every terrain file
+      /// loaded using paging
+      private: static const std::string HashFilename;
+
       /// \brief The scene.
       private: ScenePtr scene;
 

@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <boost/uuid/sha1.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -40,6 +41,7 @@ using namespace rendering;
 const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const double Heightmap::LoadRadiusFactor = 1.0;
 const double Heightmap::HoldRadiusFactor = 1.15;
+const std::string Heightmap::HashFilename = "gzterrain.SHA1";
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -49,6 +51,9 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
+
+  this->pageManager = NULL;
+  this->terrainPaging = NULL;
 
   boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
   boost::filesystem::path gzPagingDir = "gazebo-paging";
@@ -64,7 +69,7 @@ Heightmap::Heightmap(ScenePtr _scene)
 //////////////////////////////////////////////////
 Heightmap::~Heightmap()
 {
-  this->terrainGroup->removeAllTerrains();
+  this->scene.reset();
 
   delete this->terrainGlobals;
   this->terrainGlobals = NULL;
@@ -74,10 +79,12 @@ Heightmap::~Heightmap()
   delete this->terrainGroup;
   this->terrainGroup = NULL;
 
-  this->scene.reset();
-
-  OGRE_DELETE(this->pageManager);
-  OGRE_DELETE(this->terrainPaging);
+  if (this->terrainPaging)
+  {
+    OGRE_DELETE this->terrainPaging;
+    pageManager->destroyWorld(this->world);
+    OGRE_DELETE this->pageManager;
+  }
 
   // Remove page files from disk
   boost::filesystem::remove_all(this->pagingPath);
@@ -215,6 +222,43 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
+std::string GetSHA1(boost::filesystem::path filename)
+{
+  std::cout << "Generating SHA1 from " << filename << std::endl;
+  std::ifstream ifs(filename.string().c_str(), std::ios::binary);
+  
+  if (!ifs.good())
+    return "";
+
+  boost::uuids::detail::sha1 sha1;
+  unsigned int hash[5];
+  char buf[1024];
+  while (ifs.good()) {
+    ifs.read(buf, sizeof(buf));
+    sha1.process_bytes(buf, ifs.gcount());
+  }
+
+  if (!ifs.eof())
+  {
+    return "";
+  }
+
+  ifs.close();
+
+  sha1.get_digest(hash);
+  
+  std::cout << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2);
+  
+  std::cout << sizeof(hash) / sizeof(hash[0]) << std::endl;
+  for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
+  {
+    std::cout << hash[i];
+  }
+
+  return "";
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
   if (this->terrainGlobals != NULL)
@@ -226,6 +270,8 @@ void Heightmap::Load()
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
   msgs::Geometry geomMsg;
+  boost::filesystem::path imgPath;
+  boost::filesystem::path terrainName;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
 
@@ -240,6 +286,12 @@ void Heightmap::Load()
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
+
+    // Get the full path of the image heightmap
+    imgPath = geomMsg.heightmap().filename();
+
+    // Get the name of the terrain as the filename without the extension
+    terrainName = imgPath.filename().stem();
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -279,8 +331,24 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    // Split the terrain. Every subterrain will be paged
-    this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    // Check if the terrain hast exists
+    boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
+    boost::filesystem::path gzPagingDir = "gazebo-paging";
+    boost::filesystem::path terrainHashFile = tmpDir / gzPagingDir /
+        terrainName / HashFilename;
+
+    // Compute SHA1 of the image heightmap
+    //GetSHA1(geomMsg.heightmap().filename());
+
+    /*if (boost::filesystem::exists(terrainHashFile))
+    {
+  
+    }
+    else
+    {*/
+      // Split the terrain. Every subterrain will be paged
+      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    //}
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);
