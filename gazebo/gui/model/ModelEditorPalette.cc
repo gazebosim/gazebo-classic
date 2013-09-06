@@ -410,13 +410,33 @@ void ModelEditorPalette::OnSave()
     this->modelCreator->SetModelName(this->modelName);
     this->modelCreator->GenerateSDF();
     this->modelCreator->SaveToSDF(this->saveLocation);
+    this->saveButton->setText("&Save");
   }
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnDiscard()
 {
-//  this->modelCreator->Discard();
+  int ret = QMessageBox::warning(0, QString("Discard"),
+      QString("Are you sure you want to discard\n"
+      "your model? All of your work will\n"
+      "be lost."),
+      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+
+  switch (ret)
+  {
+    case QMessageBox::Discard:
+      this->modelCreator->Reset();
+      this->saveButton->setText("&Save As");
+      this->saveLocation = QDir::homePath().toStdString();
+      break;
+    case QMessageBox::Cancel:
+      // Do nothing
+    break;
+    default:
+    break;
+  }
 }
 
 /////////////////////////////////////////////////
