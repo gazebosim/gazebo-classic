@@ -817,6 +817,7 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
+  _msg.set_is_static(this->IsStatic());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
@@ -897,6 +898,11 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.has_gravity())
   {
     this->SetGravityMode(_msg.gravity());
+    this->SetEnabled(true);
+  }
+  if (_msg.has_is_static())
+  {
+    this->SetStatic(_msg.is_static());
     this->SetEnabled(true);
   }
   if (_msg.has_kinematic())

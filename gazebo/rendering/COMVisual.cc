@@ -63,18 +63,43 @@ void COMVisual::Load(ConstLinkPtr &_msg)
                      _msg->inertial().pose().orientation().y(),
                      _msg->inertial().pose().orientation().z());
 
-  this->Load(math::Pose(xyz, q));
+  // Use principal moments of inertia to scale COM visual
+  // TODO: rotate COM to match principal axes when product terms are nonzero
+  double mass = _msg->inertial().mass();
+  double Ixx = _msg->inertial().ixx();
+  double Iyy = _msg->inertial().iyy();
+  double Izz = _msg->inertial().izz();
+  math::Vector3 boxScale;
+  if (_msg->has_is_static() && _msg->is_static())
+  {
+    // Don't show inertia for static objects, just COM location
+    this->Load(math::Pose(xyz, q));
+  }
+  if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
+      Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
+  {
+    gzerr << "The link " << _msg->name() << " has unrealistic inertia.\n";
+    this->Load(math::Pose(xyz, q));
+  }
+  else
+  {
+    boxScale.x = sqrt(6*(Izz + Iyy - Ixx) / mass);
+    boxScale.y = sqrt(6*(Izz + Ixx - Iyy) / mass);
+    boxScale.z = sqrt(6*(Ixx + Iyy - Izz) / mass);
+    this->Load(math::Pose(xyz, q), boxScale);
+  }
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(const math::Pose &_pose)
+void COMVisual::Load(const math::Pose &_pose,
+                     const math::Vector3 &_scale)
 {
-  math::Vector3 p1(0, 0, -0.04);
-  math::Vector3 p2(0, 0, 00.04);
-  math::Vector3 p3(0, -0.04, 0);
-  math::Vector3 p4(0, 00.04, 0);
-  math::Vector3 p5(-0.04, 0, 0);
-  math::Vector3 p6(00.04, 0, 0);
+  math::Vector3 p1(0, 0, -2*_scale.z);
+  math::Vector3 p2(0, 0,  2*_scale.z);
+  math::Vector3 p3(0, -2*_scale.y, 0);
+  math::Vector3 p4(0,  2*_scale.y, 0);
+  math::Vector3 p5(-2*_scale.x, 0, 0);
+  math::Vector3 p6( 2*_scale.x, 0, 0);
   p1 += _pose.pos;
   p2 += _pose.pos;
   p3 += _pose.pos;
@@ -109,7 +134,7 @@ void COMVisual::Load(const math::Pose &_pose)
     this->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
 
   this->boxNode->attachObject(boxObj);
-  this->boxNode->setScale(0.02, 0.02, 0.02);
+  this->boxNode->setScale(_scale.x, _scale.y, _scale.z);
   this->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
   this->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
                                                  _pose.rot.y, _pose.rot.z));
