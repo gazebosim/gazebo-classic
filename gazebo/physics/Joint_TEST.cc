@@ -170,24 +170,21 @@ INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_All,
                   , "screw"
                   , "universal"
                   , "ball"
-                  , "revolute2"
-                    )));
+                  , "revolute2")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_Rotational,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
-                  , "ball"
-                    )));
+                  , "ball")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 // Skip universal because it can't be connected to world in bullet.
 INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
-                  , "ball"
-                    )));
+                  , "ball")));
 
 ////////////////////////////////////////////////////////////////////////
 // Create a joint between link and world
