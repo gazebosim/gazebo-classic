@@ -458,6 +458,25 @@ btRigidBody *BulletLink::GetBulletLink() const
 }
 
 //////////////////////////////////////////////////
+void BulletLink::ClearCollisionCache()
+{
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to ClearCollisionCache" << std::endl;
+    return;
+  }
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+
+  bulletWorld->updateSingleAabb(this->rigidLink);
+  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+      cleanProxyFromPairs(this->rigidLink->getBroadphaseHandle(),
+      bulletWorld->getDispatcher());
+}
+
+//////////////////////////////////////////////////
 void BulletLink::SetLinearDamping(double _damping)
 {
   if (!this->rigidLink)
