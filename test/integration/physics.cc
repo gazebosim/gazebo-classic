@@ -1530,11 +1530,11 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   math::Vector3 vel;
 
   physics::Link_V links = model->GetLinks();
-  unsigned int linkCount = 2;
-  EXPECT_EQ(links.size(), linkCount);
+  EXPECT_EQ(links.size(), 2u);
   for (physics::Link_V::const_iterator iter = links.begin();
       iter != links.end(); ++iter)
   {
+    std::cout << "LinkName[" << (*iter)->GetScopedName() << "]\n";
     // Links should not repel each other hence expecting zero x, y vel
     vel = (*iter)->GetWorldLinearVel();
     EXPECT_EQ(vel.x, 0);
