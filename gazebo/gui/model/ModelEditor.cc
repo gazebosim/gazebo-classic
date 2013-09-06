@@ -61,7 +61,6 @@ void ModelEditor::OnEdit(bool _checked)
   }
 }
 
-
 /////////////////////////////////////////////////
 void ModelEditor::OnFinish()
 {

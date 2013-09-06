@@ -249,6 +249,9 @@ namespace gazebo
 
       /// \brief Joint maker.
       private: JointMaker *jointMaker;
+
+      /// \brief origin of the model.
+      private: math::Pose origin;
     };
     /// \}
 

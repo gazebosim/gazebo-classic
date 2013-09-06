@@ -92,7 +92,9 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     const math::Pose &_pose)
 {
   if (!this->modelVisual)
+  {
     this->Reset();
+  }
 
   std::ostringstream linkNameStream;
   linkNameStream << "unit_box_" << this->boxCounter++;
@@ -123,8 +125,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _size.z/2));
   }
-
-  gzerr << _pose << std::endl;
 
   this->CreatePart(visVisual);
 
@@ -601,6 +601,19 @@ void ModelCreator::GenerateSDF()
 
   boost::unordered_map<std::string, PartData *>::iterator partsIt;
 
+  // set center of all parts to be origin
+  math::Vector3 mid;
+  for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
+      ++partsIt)
+  {
+    PartData *part = partsIt->second;
+    rendering::VisualPtr visual = part->visuals[0];
+    mid += visual->GetParent()->GetWorldPose().pos;
+  }
+  mid /= this->allParts.size();
+  this->origin.pos = mid;
+  modelElem->GetElement("pose")->Set(this->origin);
+
   // loop through all parts and generate sdf
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
       ++partsIt)
@@ -615,8 +628,8 @@ void ModelCreator::GenerateSDF()
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
-    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
-
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose()
+        - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
@@ -690,7 +703,7 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-   qDebug() << this->modelSDF->ToString().c_str();
+  // qDebug() << this->modelSDF->ToString().c_str();
 }
 
 
