@@ -24,6 +24,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -684,6 +685,9 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       private: boost::mutex *receiveMutex;
+
+      /// \brief Mutex to lock the pose message buffers.
+      private: boost::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       private: transport::NodePtr node;
