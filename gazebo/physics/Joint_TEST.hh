@@ -39,12 +39,12 @@ class Joint_TEST : public ServerFixture,
 
   public: virtual void SetUp()
           {
-            const ::testing::TestInfo* const test_info =
+            const ::testing::TestInfo *const test_info =
               ::testing::UnitTest::GetInstance()->current_test_info();
             if (test_info->value_param())
             {
               gzdbg << "Params: " << test_info->value_param() << std::endl;
-              std::tr1::tie(physicsEngine, jointType) = GetParam();
+              std::tr1::tie(this->physicsEngine, this->jointType) = GetParam();
             }
           }
 
