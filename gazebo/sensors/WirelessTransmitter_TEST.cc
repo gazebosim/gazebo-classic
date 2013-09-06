@@ -87,7 +87,7 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
 
   // Create the wireless transmitter sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName,
@@ -130,7 +130,7 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::readString(transmitterSensorStringCopy, sdf);
 
   // Create the wireless receiver sensor
-  ASSERT_ANY_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link"));
+  ASSERT_ANY_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link", 0));
 }
 
 /////////////////////////////////////////////////
