@@ -99,7 +99,7 @@ void COMVisual::Load(const math::Pose &_pose,
   math::Vector3 p3(0, -2*_scale.y, 0);
   math::Vector3 p4(0,  2*_scale.y, 0);
   math::Vector3 p5(-2*_scale.x, 0, 0);
-  math::Vector3 p6( 2*_scale.x, 0, 0);
+  math::Vector3 p6(2*_scale.x,  0, 0);
   p1 += _pose.pos;
   p2 += _pose.pos;
   p3 += _pose.pos;
