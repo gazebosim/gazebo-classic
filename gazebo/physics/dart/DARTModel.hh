@@ -59,17 +59,16 @@ namespace gazebo
       // public: virtual void Reset();
 
       /// \brief
-      public: dynamics::SkeletonDynamics* GetSkeletonDynamics() {
-        return dartSkeletonDynamics;
-      }
+      public: dart::dynamics::Skeleton* GetSkeleton()
+      { return dartSkeleton; }
 
       /// \brief
-      public: void SetCanonicalJoint(kinematics::Joint* _joint) {
+      public: void SetCanonicalJoint(dart::dynamics::Joint* _joint) {
         dartCanonicalJoint = _joint;
       }
 
       /// \brief
-      public: kinematics::Joint* GetCanonicalJoint(void) const {
+      public: dart::dynamics::Joint* GetCanonicalJoint(void) const {
         return dartCanonicalJoint;
       }
 
@@ -77,10 +76,10 @@ namespace gazebo
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief
-      public: simulation::World* GetDARTWorld(void) const;
+      public: dart::simulation::World* GetDARTWorld(void) const;
 
       /// \brief
-      protected: dynamics::SkeletonDynamics* dartSkeletonDynamics;
+      protected: dart::dynamics::Skeleton* dartSkeleton;
 
       /// \brief Parent joint of the canonical link.
       /// When the canonical link of this model is free floating link, this link
@@ -91,7 +90,7 @@ namespace gazebo
       /// this member variable.
       /// B) If the canonical link does not have its parent joint, then create
       /// 6dof joint and store the joint in this member variable.
-      protected: kinematics::Joint* dartCanonicalJoint;
+      protected: dart::dynamics::Joint* dartCanonicalJoint;
     };
     /// \}
   }

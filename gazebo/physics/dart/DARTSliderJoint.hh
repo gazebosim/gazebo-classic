@@ -38,11 +38,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited.
+      public: virtual void Init();
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(int _index, const math::Vector3& _anchor);
+
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(int _index, const math::Vector3& _axis);
 
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
@@ -51,23 +60,19 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _vel);
+
+      // Documentation inherited
       public: virtual double GetVelocity(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
-
-      // Documentation inherited
-      public: virtual void SetForce(int _index, double _force);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(int _index, double _torque);
 
       // Documentation inherited
       public: virtual double GetMaxForce(int _index);
 
-      /// \brief callback to apply damping force to joint
-      public: void ApplyDamping();
-
+      // Documentation inherited
+      public: virtual void SetForce(int _index, double _torque);
     };
   }
 }

@@ -1,6 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${DART_INCLUDEDIR}
+include_directories(${DART_INCLUDE_DIRS}
                     ${FCL_INCLUDEDIR}
                     ${ASSIMP_INCLUDEDIR})
 
@@ -20,7 +20,7 @@ set (sources
     DARTHinge2Joint.cc
     DARTUniversalJoint.cc
     DARTBallJoint.cc
-    DARTTrimeshShape.cc
+    DARTMeshShape.cc
     DARTRayShape.cc
     DARTMultiRayShape.cc
     DARTHeightmapShape.cc
@@ -40,7 +40,7 @@ SET (headers
     DARTHinge2Joint.hh
     DARTUniversalJoint.hh
     DARTBallJoint.hh
-    DARTTrimeshShape.hh
+    DARTMeshShape.hh
     DARTRayShape.hh
     DARTMultiRayShape.hh
     DARTHeightmapShape.hh
@@ -60,3 +60,9 @@ gz_add_library(gazebo_physics_dart ${sources})
 target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp)
 
 gz_install_library(gazebo_physics_dart)
+
+# unit tests
+set (gtest_sources
+  DARTJoint_TEST.cc
+)
+gz_build_tests(${gtest_sources})

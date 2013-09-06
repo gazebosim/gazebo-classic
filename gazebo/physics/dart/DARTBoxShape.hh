@@ -17,14 +17,14 @@
 #ifndef _DARTBOXSHAPE_HH_
 #define _DARTBOXSHAPE_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/dart/DARTPhysics.hh"
-#include "physics/dart/DARTTypes.hh"
-#include "physics/dart/DARTCollision.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/physics/dart/DARTCollision.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {

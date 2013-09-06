@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
 namespace gazebo
@@ -41,6 +42,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Initialize a joint.
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void Reset();
@@ -83,9 +87,6 @@ namespace gazebo
       public: virtual double GetAttribute(const std::string &_key,
                                         unsigned int _index);
 
-      /// \brief
-      protected: kinematics::Joint* dartJoint;
-
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(int _index);
 
@@ -96,22 +97,25 @@ namespace gazebo
       public: virtual unsigned int GetAngleCount() const;
 
       /// \brief
+      public: DARTModelPtr GetDARTModel() const;
+
+      /// \brief Get DART joint pointer.
+      public: dart::dynamics::Joint* getDARTJoint() { return dartJoint; }
+
+      /// \brief
+      protected: dart::dynamics::Joint* dartJoint;
+
+      /// \brief
       public: math::Pose GetPose_ChildLinkToJoint() const
-      {
-        return poseChildLinkToJoint;
-      }
+      { return poseChildLinkToJoint; }
 
       /// \brief
       public: math::Pose GetPose_ParentLinkToJoint() const
-      {
-        return poseParentLinkToJoint;
-      }
+      { return poseParentLinkToJoint; }
 
       /// \brief
       public: math::Pose GetPose_JointToChildLink() const
-      {
-        return poseJointToChildLink;
-      }
+      { return poseJointToChildLink; }
 
       /// \brief
       protected: math::Pose poseChildLinkToJoint;

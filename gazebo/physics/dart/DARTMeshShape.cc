@@ -15,27 +15,42 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTHeightmapShape.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/physics/dart/DARTMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
+
 //////////////////////////////////////////////////
-DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
-    : HeightmapShape(_parent)
+DARTMeshShape::DARTMeshShape(CollisionPtr _parent) : MeshShape(_parent)
 {
 }
 
 //////////////////////////////////////////////////
-DARTHeightmapShape::~DARTHeightmapShape()
+DARTMeshShape::~DARTMeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-void DARTHeightmapShape::Init()
+void DARTMeshShape::Update()
+{
+  gzwarn << "Not implemented!\n";
+}
+
+//////////////////////////////////////////////////
+void DARTMeshShape::Load(sdf::ElementPtr _sdf)
+{
+  MeshShape::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
+void DARTMeshShape::Init()
 {
   gzwarn << "Not implemented!\n";
 }

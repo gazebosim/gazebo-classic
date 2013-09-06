@@ -38,46 +38,44 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTHinge2Joint();
 
-      // Documentation inherited.
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual void Init();
 
-      // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      // Documentation inherited.
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited.
+      // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      // Documentation inherited.
+      // Documentation inherited
+      public: virtual void SetAnchor(int _index, const math::Vector3& _anchor);
+
+      // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      // Documentation inherited.
+      // Documentation inherited
+      public: virtual void SetAxis(int _index, const math::Vector3& _axis);
+
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
+
+      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      // Documentation inherited.
+      // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _vel);
+
+      // Documentation inherited
       public: virtual double GetVelocity(int _index) const;
 
-      // Documentation inherited.
-      public: virtual void SetVelocity(int index, double angle);
+      // Documentation inherited
+      public: virtual void SetMaxForce(int _index, double _force);
 
-      // Documentation inherited.
-      public: virtual void SetMaxForce(int index, double t);
+      // Documentation inherited
+      public: virtual double GetMaxForce(int _index);
 
-      // Documentation inherited.
-      public: virtual double GetMaxForce(int index);
-
-      // Documentation inherited.
-      public: virtual void SetForce(int index, double torque);
-
-      // Documentation inherited.
-      public: virtual double GetParam(int parameter) const;
-
-      public: virtual void SetParam(int parameter, double value);
+      // Documentation inherited
+      public: virtual void SetForce(int _index, double _torque);
     };
   }
 }

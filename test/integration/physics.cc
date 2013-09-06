@@ -874,8 +874,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         //joint->Detach();
         // freeze joint limit instead
         math::Angle curAngle = joint->GetAngle(0u);
-        joint->SetLowStop(0, curAngle - 0.1);
-        joint->SetHighStop(0, curAngle + 0.1);
+        joint->SetLowStop(0, curAngle - 0.01);
+        joint->SetHighStop(0, curAngle + 0.01);
       }
       else
       {
@@ -1085,10 +1085,17 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 }
 
 // This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, JointDampingTest)
+TEST_F(PhysicsTest, JointDampingTestODE)
 {
   JointDampingTest("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, JointDampingTestDART)
+{
+  JointDampingTest("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
