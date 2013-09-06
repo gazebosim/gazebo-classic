@@ -23,16 +23,16 @@
 #define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include <sdf/sdf.hh>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/Camera.hh"
 
 namespace Ogre
 {

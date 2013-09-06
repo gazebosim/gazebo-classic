@@ -18,12 +18,14 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <gazebo/common/Time.hh>
 
 #include <stdio.h>
 #include <string>
 
 #include "test/data/pr2_state_log_expected.h"
 #include "test_config.h"
+#include "gazebo/gazebo_config.h"
 
 std::string custom_exec(std::string _cmd)
 {
@@ -48,7 +50,7 @@ std::string custom_exec(std::string _cmd)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gzlog info' returns correct information
-TEST(gz_log, Info)
+TEST(gzlog, Info)
 {
   std::string info = custom_exec(std::string("gzlog info ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
@@ -71,7 +73,7 @@ TEST(gz_log, Info)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gzlog echo' returns correct information
-TEST(gz_log, Echo)
+TEST(gzlog, Echo)
 {
   std::string echo = custom_exec(std::string("gzlog echo ") +
       PROJECT_SOURCE_PATH + "/test/data/empty_state.log");
@@ -126,7 +128,7 @@ TEST(gz_log, Echo)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gzlog echo --filter' returns correct information
-TEST(gz_log, EchoFilter)
+TEST(gzlog, EchoFilter)
 {
   std::string echo;
 
@@ -145,7 +147,7 @@ TEST(gz_log, EchoFilter)
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.x ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log 2>/dev/null");
   boost::trim_right(echo);
   EXPECT_EQ(pr2PoseXStateLog, echo);
 
@@ -172,7 +174,7 @@ TEST(gz_log, EchoFilter)
 
 /////////////////////////////////////////////////
 /// Check to Hz filtering
-TEST(gz_log, HzFilter)
+TEST(gzlog, HzFilter)
 {
   std::string echo, validEcho;
 
@@ -204,7 +206,7 @@ TEST(gz_log, HzFilter)
 /////////////////////////////////////////////////
 /// Check to make sure that 'gzlog step' returns correct information
 /// Just check number of characters returned for now
-TEST(gz_log, Step)
+TEST(gzlog, Step)
 {
   std::string stepCmd;
   stepCmd = std::string("gzlog step ") + PROJECT_SOURCE_PATH +
@@ -216,11 +218,21 @@ TEST(gz_log, Step)
 
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-  EXPECT_EQ(stepq1.length(), 132144u);
+  EXPECT_EQ(stepq1.length(), 124131u);
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-  EXPECT_EQ(stepq2.length(), 148392u);
+  EXPECT_EQ(stepq2.length(), 132516u);
+}
+
+/////////////////////////////////////////////////
+TEST(gzlog, HangCheck)
+{
+  gazebo::common::Time start = gazebo::common::Time::GetWallTime();
+  custom_exec("gzlog stop");
+  gazebo::common::Time end = gazebo::common::Time::GetWallTime();
+
+  EXPECT_LT(end - start, gazebo::common::Time(60, 0));
 }
 
 /////////////////////////////////////////////////

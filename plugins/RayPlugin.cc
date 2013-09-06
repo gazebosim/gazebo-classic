@@ -19,7 +19,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#include "physics/physics.hh"
+#include "gazebo/physics/physics.hh"
 #include "RayPlugin.hh"
 
 using namespace gazebo;
@@ -35,6 +35,10 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
+  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
+      this->newLaserScansConnection);
+  this->newLaserScansConnection.reset();
+
   this->parentSensor.reset();
   this->world.reset();
 }

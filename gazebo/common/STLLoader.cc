@@ -18,10 +18,10 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/STLLoader.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/STLLoader.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -168,8 +168,12 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     }
   }
 
+  result = subMesh->GetVertexCount() > 0;
+
   if (result)
     _mesh->AddSubMesh(subMesh);
+  else
+    delete subMesh;
 
   return result;
 }

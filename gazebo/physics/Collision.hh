@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/CollisionState.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/CollisionState.hh"
+#include "gazebo/physics/Entity.hh"
 
 namespace gazebo
 {
@@ -112,6 +112,10 @@ namespace gazebo
       /// \brief Get the collision shape.
       /// \return The collision shape.
       public: ShapePtr GetShape() const;
+
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Turn contact recording on or off.
       /// \param[in] _enable True to enable collision contacts.
@@ -227,7 +231,7 @@ namespace gazebo
       /// \brief The laser retro value.
       private: float laserRetro;
 
-      /// \brief Collision state.
+      /// \brief Stores collision state information.
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.

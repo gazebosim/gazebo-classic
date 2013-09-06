@@ -23,12 +23,14 @@
 #define _SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
@@ -221,12 +223,18 @@ namespace gazebo
       /// \brief Pointer to the world.
       protected: gazebo::physics::WorldPtr world;
 
+      /// \brief Pointer to the Scene
+      protected: gazebo::rendering::ScenePtr scene;
+
       /// \brief Desired time between updates, set indirectly by
       ///        Sensor::SetUpdateRate.
       protected: common::Time updatePeriod;
 
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
+
+      /// \brief Mutex to protect resetting lastUpdateTime.
+      protected: boost::mutex mutexLastUpdateTime;
 
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl

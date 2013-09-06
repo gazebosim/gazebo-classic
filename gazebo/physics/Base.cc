@@ -68,19 +68,21 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  if (_sdf)
+    this->sdf = _sdf;
 
-  this->sdf = _sdf;
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
 
   if (this->sdf->HasAttribute("name"))
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
   else
     this->name.clear();
 

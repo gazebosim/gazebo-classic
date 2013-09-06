@@ -20,15 +20,16 @@
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <iostream>
+
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -114,7 +115,10 @@ std::string ModelDatabase::GetURI()
   if (uriStr)
     result = uriStr;
   else
-    gzwarn << "GAZEBO_MODEL_DATABASE_URI not set\n";
+  {
+    // No env var.  Take compile-time default.
+    result = GAZEBO_MODEL_DATABASE_URI;
+  }
 
   if (result[result.size()-1] != '/')
     result += '/';

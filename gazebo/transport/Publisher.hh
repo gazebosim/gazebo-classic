@@ -27,7 +27,7 @@
 #include <list>
 #include <gazebo/common/Time.hh>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -63,6 +63,13 @@ namespace gazebo
       /// \brief Block until a connection has been established with this
       ///        publisher
       public: void WaitForConnection() const;
+
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      /// \param[in] _timeout Maxiumum time to wait. Use a negative time
+      /// value to wait forever.
+      /// \return True if a connection was established.
+      public: bool WaitForConnection(const common::Time &_timeout) const;
 
       /// \brief DEPRECATED in version 1.6
       /// \sa SetPublication
@@ -124,7 +131,8 @@ namespace gazebo
       public: MessagePtr GetPrevMsgPtr() const;
 
       /// \brief Callback when a publish is completed
-      private: void OnPublishComplete();
+      /// \param[in] _id ID associated with the publication.
+      private: void OnPublishComplete(uint32_t _id);
 
       /// \brief Topic on which messages are published.
       private: std::string topic;
@@ -162,6 +170,13 @@ namespace gazebo
 
       private: common::Time currentTime;
       private: common::Time prevPublishTime;
+
+      /// \brief True if waiting to here back about a sent message.
+      private: bool waiting;
+
+      /// \brief Current id of the sent message.
+      private: uint32_t pubId;
+      private: std::list<uint32_t> pubIds;
     };
     /// \}
   }

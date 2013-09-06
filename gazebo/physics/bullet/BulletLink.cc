@@ -71,7 +71,7 @@ void BulletLink::Init()
   Link::Init();
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
@@ -167,7 +167,7 @@ void BulletLink::Init()
     this->rigidLink->setDeactivationTime(1.0);
   }
 
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -180,12 +180,6 @@ void BulletLink::Fini()
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->removeRigidBody(this->rigidLink);
-}
-
-//////////////////////////////////////////////////
-void BulletLink::Update()
-{
-  Link::Update();
 }
 
 //////////////////////////////////////////////////
@@ -461,6 +455,25 @@ math::Vector3 BulletLink::GetWorldTorque() const
 btRigidBody *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
+}
+
+//////////////////////////////////////////////////
+void BulletLink::ClearCollisionCache()
+{
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to ClearCollisionCache" << std::endl;
+    return;
+  }
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+
+  bulletWorld->updateSingleAabb(this->rigidLink);
+  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+      cleanProxyFromPairs(this->rigidLink->getBroadphaseHandle(),
+      bulletWorld->getDispatcher());
 }
 
 //////////////////////////////////////////////////

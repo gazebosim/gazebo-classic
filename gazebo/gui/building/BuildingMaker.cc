@@ -30,7 +30,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 #ifdef HAVE_GTS
@@ -1107,7 +1107,6 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
   startings.insert(start);
 
   std::multiset<QPointF>::iterator startIt;
-  std::multiset<QRectF>::iterator filledIt;
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here

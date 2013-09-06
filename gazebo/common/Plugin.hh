@@ -31,15 +31,16 @@
 #include <list>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include <sdf/sdf.hh>
 
-#include "physics/PhysicsTypes.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

@@ -26,9 +26,9 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "common/common.hh"
-#include "math/gzmath.hh"
-#include "rendering/MovableText.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1

@@ -22,9 +22,9 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
 
 class btRigidBody;
 
@@ -56,9 +56,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Fini();
-
-      // Documentation inherited.
-      public: virtual void Update();
 
       // Documentation inherited.
       public: virtual void OnPoseChange();
@@ -114,6 +111,10 @@ namespace gazebo
       /// \brief Get the bullet rigid body.
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
+
+      /// \internal
+      /// \brief Clear bullet collision cache needed when the body is resized.
+      public: void ClearCollisionCache();
 
       // Documentation inherited.
       public: virtual void SetLinearDamping(double _damping);

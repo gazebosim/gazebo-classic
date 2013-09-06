@@ -15,11 +15,12 @@
  *
  */
 
-#include "gui/Actions.hh"
+#include "gazebo/gui/Actions.hh"
 
 QAction *gazebo::gui::g_arrowAct = 0;
 QAction *gazebo::gui::g_translateAct = 0;
 QAction *gazebo::gui::g_rotateAct = 0;
+QAction *gazebo::gui::g_scaleAct = 0;
 QAction *gazebo::gui::g_newAct = 0;
 QAction *gazebo::gui::g_openAct = 0;
 QAction *gazebo::gui::g_importAct = 0;

@@ -20,11 +20,11 @@
  * Date: 21 May 2009
  */
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/PhysicsFactory.hh"
-#include "common/Console.hh"
-#include "gazebo_config.h"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
 

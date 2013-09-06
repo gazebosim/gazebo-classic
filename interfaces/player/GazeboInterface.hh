@@ -24,7 +24,7 @@
 
 #include <string>
 #include "player.h"
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 /// \addtogroup player
 /// \brief Base class for all the player interfaces

@@ -19,9 +19,15 @@
  * Date: 13 Feb 2006
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
+#ifndef Q_OS_MAC  // Not Apple
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <GL/glx.h>
+#endif
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -30,30 +36,30 @@
 
 #include <boost/filesystem.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
-#include "common/Common.hh"
-#include "common/Color.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/SystemPaths.hh"
 
-#include "rendering/Material.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
-#include "rendering/Visual.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -136,12 +142,13 @@ void RenderEngine::Load()
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
-                                   bool _enableVisualizations)
+                                   bool _enableVisualizations,
+                                   bool _isServer)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
   this->scenes.push_back(scene);
 
   scene->Load();
@@ -312,6 +319,7 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -321,6 +329,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
+#endif
 
   this->initialized = false;
 }
@@ -333,7 +342,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -347,24 +356,32 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL");
-    plugins.push_back(path+"/Plugin_ParticleFX");
-    plugins.push_back(path+"/Plugin_BSPSceneManager");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager");
+#ifdef __APPLE__
+    std::string prefix = "lib";
+    std::string extension = ".dylib";
+#else
+    std::string prefix = "";
+    std::string extension = ".so";
+#endif
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
+    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter+".so");
+        this->root->loadPlugin(*piter+extension);
       }
       catch(Ogre::Exception &e)
       {
         try
         {
           // Load the debug plugin into OGRE
-          this->root->loadPlugin(*piter+"_d.so");
+          this->root->loadPlugin(*piter+"_d"+extension);
         }
         catch(Ogre::Exception &ed)
         {
@@ -406,7 +423,6 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
 
       // Parse all material files in the path if any exist
       boost::filesystem::path dir(path);
-      std::list<boost::filesystem::path> resultSet;
 
       if (boost::filesystem::exists(dir) &&
           boost::filesystem::is_directory(dir))
@@ -455,9 +471,9 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
       }
     }
   }
-  catch(Ogre::Exception)
+  catch(Ogre::Exception &/*_e*/)
   {
-    gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
+    gzthrow("Unable to load Ogre Resources.\nMake sure the"
         "resources path in the world file is set correctly.");
   }
 }
@@ -528,17 +544,17 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
             aiter->first, "FileSystem", aiter->second);
       }
-      catch(Ogre::Exception)
+      catch(Ogre::Exception &/*_e*/)
       {
-        gzthrow(std::string("Unable to load Ogre Resources.\n") +
-            "Make sure the resources path in the world file is set correctly.");
+        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+            "in the world file is set correctly.");
       }
     }
   }
@@ -599,6 +615,9 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
+#ifdef Q_OS_MAC
+  this->dummyDisplay = 0;
+#else
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -645,6 +664,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
+#endif
 
   return result;
 }

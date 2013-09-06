@@ -22,8 +22,8 @@
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/ScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
 
 class btSliderConstraint;
 

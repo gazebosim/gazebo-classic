@@ -28,6 +28,8 @@
 #include <list>
 #include <vector>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
@@ -36,7 +38,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -552,6 +553,9 @@ namespace gazebo
 
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
+
+      /// \brief Scale of visual.
+      private: math::Vector3 scale;
     };
     /// \}
   }

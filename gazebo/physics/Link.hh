@@ -28,6 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
+#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -38,6 +39,12 @@
 
 namespace gazebo
 {
+  namespace util
+  {
+    class OpenALSource;
+    class OpenALSink;
+  }
+
   namespace physics
   {
     class Model;
@@ -79,8 +86,13 @@ namespace gazebo
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Update the body.
-      public: virtual void Update();
+      /// \brief Update the collision.
+      /// \param[in] _info Update information.
+      public: void Update(const common::UpdateInfo &_info);
+
+      /// \brief Set the scale of the link.
+      /// \param[in] _scale Scale to set the link to.
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
@@ -107,7 +119,6 @@ namespace gazebo
       /// model.
       /// \param[in] _collid True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
-
 
       /// \brief Set the collide mode of the body.
       /// \param[in] _mode Collision Mode,
@@ -442,6 +453,10 @@ namespace gazebo
       /// entities.
       private: void SetInertialFromCollisions();
 
+      /// \brief On collision callback.
+      /// \param[in] _msg Message that contains contact information.
+      private: void OnCollision(ConstContactsPtr &_msg);
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
@@ -492,6 +507,18 @@ namespace gazebo
 
       /// \brief Mutex to protect the publishData variable
       private: boost::recursive_mutex *publishDataMutex;
+
+#ifdef HAVE_OPENAL
+      /// \brief All the audio sources
+      private: std::vector<util::OpenALSourcePtr> audioSources;
+
+      /// \brief An audio sink
+      private: util::OpenALSinkPtr audioSink;
+
+      /// \brief Subscriber to contacts with this collision. Used for audio
+      /// playback.
+      private: transport::SubscriberPtr audioContactsSub;
+#endif
     };
     /// \}
   }

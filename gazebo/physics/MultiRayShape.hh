@@ -49,6 +49,10 @@ namespace gazebo
       /// \brief Init the shape.
       public: virtual void Init();
 
+      /// \brief Set the scale of the multi ray shape.
+      /// \return _scale Scale to set the multi ray shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
       /// \returns Returns DBL_MAX for no detection.
@@ -105,7 +109,7 @@ namespace gazebo
       public: math::Angle GetVerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
-      /// \return Verticam max angle.
+      /// \return Vertical max angle.
       public: math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
@@ -126,12 +130,12 @@ namespace gazebo
       /// \return The connection, which must be kept in scope.
       public: template<typename T>
               event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
-              {return newLaserScans.Connect(_subscriber);}
+              {return this->newLaserScans.Connect(_subscriber);}
 
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              {newLaserScans.Disconnect(_conn);}
+              {this->newLaserScans.Disconnect(_conn);}
 
       /// \brief Physics engine specific method for updating the rays.
       protected: virtual void UpdateRays() = 0;

@@ -27,23 +27,26 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
+
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -55,9 +58,10 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 
-#include "physics/Collision.hh"
-#include "physics/ContactManager.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -100,6 +104,7 @@ World::World(const std::string &_name)
   this->logThread = NULL;
   this->stop = false;
 
+  this->currentStateBuffer = 0;
   this->stateToggle = 0;
 
   this->pluginsLoaded = false;
@@ -157,11 +162,15 @@ void World::Load(sdf::ElementPtr _sdf)
   this->loaded = false;
   this->sdf = _sdf;
 
-  if (this->sdf->GetValueString("name").empty())
+  if (this->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
+#endif
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -172,10 +181,18 @@ void World::Load(sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60.0);
+  // pose pub for server side, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory for efficiency.
+  this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/local/info", 10);
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
+  this->posePub = this->node->Advertise<msgs::PosesStamped>(
+    "~/pose/info", 10, 60);
+
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -197,7 +214,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -206,6 +223,25 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  // This should also come before loading of entities
+  {
+    sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
+    common::SphericalCoordinates::SurfaceType surfaceType =
+      common::SphericalCoordinates::Convert(
+        spherical->Get<std::string>("surface_model"));
+    math::Angle latitude, longitude, heading;
+    double elevation = spherical->Get<double>("elevation");
+    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
+    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
+    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+
+    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceType, latitude, longitude, elevation, heading));
+  }
+
+  if (this->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
@@ -301,6 +337,7 @@ void World::Init()
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
+  this->logPrevIteration = 0;
 
   // Mark the world initialization
   gzlog << "World::Init" << std::endl;
@@ -427,7 +464,7 @@ void World::LogStep()
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->GetValueString());
+                                    nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
@@ -515,7 +552,12 @@ void World::Step()
         this->stepInc--;
     }
     else
+    {
+      // Flush the log record buffer, if there is data in it.
+      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+        util::LogRecord::Instance()->Notify();
       this->pauseTime += stepTime;
+    }
   }
 
   this->ProcessMessages();
@@ -659,6 +701,10 @@ void World::Fini()
 
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Fini();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -677,6 +723,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+{
+  return this->sphericalCoordinates;
 }
 
 //////////////////////////////////////////////////
@@ -727,7 +779,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   else
   {
     gzerr << "SDF is missing the <model> tag:\n";
-    _sdf->PrintValues("  ");
   }
 
   this->PublishModelPose(model);
@@ -1225,8 +1276,8 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
 
@@ -1255,7 +1306,7 @@ void World::ProcessEntityMsgs()
     if (this->sdf->HasElement("model"))
     {
       sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->GetValueString("name") != (*iter))
+      while (childElem && childElem->Get<std::string>("name") != (*iter))
         childElem = childElem->GetNextElement("model");
       if (childElem)
         this->sdf->RemoveChild(childElem);
@@ -1264,7 +1315,7 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() > 0)
+  if (!this->deleteEntity.empty())
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
@@ -1427,9 +1478,14 @@ void World::ProcessModelMsgs()
       // FillMsg fills the visual components from initial sdf
       // but problem is that Visuals may have changed e.g. through ~/visual,
       // so don't publish them to subscribers.
-      msg.clear_visual();
       for (int i = 0; i < msg.link_size(); ++i)
+      {
         msg.mutable_link(i)->clear_visual();
+        for (int j = 0; j < msg.link(i).collision_size(); ++j)
+        {
+          msg.mutable_link(i)->mutable_collision(j)->clear_visual();
+        }
+      }
 
       this->modelPub->Publish(msg);
     }
@@ -1707,6 +1763,7 @@ void World::UpdateStateSDF()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
+  int bufferIndex = this->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
@@ -1717,38 +1774,43 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
   }
-  else if (this->states.size() >= 1)
+  else if (this->states[bufferIndex].size() >= 1)
   {
-    do
     {
-      size_t end = this->states.size();
+      boost::mutex::scoped_lock lock(this->logBufferMutex);
+      this->currentStateBuffer ^= 1;
+    }
+    for (std::deque<WorldState>::iterator iter =
+        this->states[bufferIndex].begin();
+        iter != this->states[bufferIndex].end(); ++iter)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>" << *iter << "</sdf>";
+    }
 
-      // Get the difference from the previous state.
-      for (size_t i = 0; i < end; ++i)
-      {
-        _stream << "<sdf version='" << SDF_VERSION << "'>"
-          << this->states[0] << "</sdf>";
-
-        this->states.pop_front();
-      }
-    } while (this->states.size() > 1000);
+    this->states[bufferIndex].clear();
   }
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
   if (!util::LogRecord::Instance()->GetRunning())
   {
-    boost::mutex::scoped_lock lock(this->logMutex);
+    boost::mutex::scoped_lock lock(this->logBufferMutex);
 
     // Output any data that may have been pushed onto the queue
-    for (size_t i = 0; i < this->states.size(); ++i)
+    for (size_t i = 0; i < this->states[this->currentStateBuffer^1].size(); ++i)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
-        << this->states[i] << "</sdf>";
+        << this->states[this->currentStateBuffer^1][i] << "</sdf>";
+    }
+    for (size_t i = 0; i < this->states[this->currentStateBuffer].size(); ++i)
+    {
+      _stream << "<sdf version='" << SDF_VERSION << "'>"
+        << this->states[this->currentStateBuffer][i] << "</sdf>";
     }
 
     // Clear everything.
-    this->states.clear();
+    this->states[0].clear();
+    this->states[1].clear();
     this->stateToggle = 0;
     this->prevStates[0] = WorldState();
     this->prevStates[1] = WorldState();
@@ -1762,36 +1824,47 @@ void World::ProcessMessages()
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-    msgs::Pose *poseMsg;
 
-    if (this->posePub && this->posePub->HasConnections() &&
-        this->publishModelPoses.size() > 0)
+    if ((this->posePub && this->posePub->HasConnections()) ||
+        (this->poseLocalPub && this->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-          iter != this->publishModelPoses.end(); ++iter)
+      if (!this->publishModelPoses.empty())
       {
-        poseMsg = msg.add_pose();
-
-        // Publish the model's relative pose
-        poseMsg->set_name((*iter)->GetScopedName());
-        msgs::Set(poseMsg, (*iter)->GetRelativePose());
-
-        // Publish each of the model's children relative poses
-        Link_V links = (*iter)->GetLinks();
-        for (Link_V::iterator linkIter = links.begin();
-            linkIter != links.end(); ++linkIter)
+        for (std::set<ModelPtr>::iterator iter =
+            this->publishModelPoses.begin();
+            iter != this->publishModelPoses.end(); ++iter)
         {
-          poseMsg = msg.add_pose();
-          poseMsg->set_name((*linkIter)->GetScopedName());
-          msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the model's relative pose
+          poseMsg->set_name((*iter)->GetScopedName());
+          msgs::Set(poseMsg, (*iter)->GetRelativePose());
+
+          // Publish each of the model's children relative poses
+          Link_V links = (*iter)->GetLinks();
+          for (Link_V::iterator linkIter = links.begin();
+              linkIter != links.end(); ++linkIter)
+          {
+            poseMsg = msg.add_pose();
+            poseMsg->set_name((*linkIter)->GetScopedName());
+            msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
+          }
         }
+        if (this->posePub && this->posePub->HasConnections())
+          this->posePub->Publish(msg);
       }
-      this->posePub->Publish(msg);
+
+      if (this->poseLocalPub && this->poseLocalPub->HasConnections())
+      {
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->poseLocalPub->Publish(msg);
+      }
     }
     this->publishModelPoses.clear();
   }
@@ -1816,7 +1889,8 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_iterations(this->iterations);
   this->worldStatsMsg.set_paused(this->IsPaused());
 
-  this->statPub->Publish(this->worldStatsMsg);
+  if (this->statPub && this->statPub->HasConnections())
+    this->statPub->Publish(this->worldStatsMsg);
   this->prevStatTime = common::Time::GetWallTime();
 }
 
@@ -1857,14 +1931,16 @@ void World::LogWorker()
     if (!diffState.IsZero())
     {
       this->stateToggle = currState;
-
-      // Store the entire current state (instead of the diffState). A slow
-      // moving link may never be captured if only diff state is recorded.
-      this->states.push_back(this->prevStates[currState]);
-
-      // Tell the logger to update, once the number of states exceeds 1000
-      if (this->states.size() > 1000)
-        util::LogRecord::Instance()->Notify();
+      {
+        // Store the entire current state (instead of the diffState). A slow
+        // moving link may never be captured if only diff state is recorded.
+        boost::mutex::scoped_lock bLock(this->logBufferMutex);
+        this->states[this->currentStateBuffer].push_back(
+            this->prevStates[currState]);
+        // Tell the logger to update, once the number of states exceeds 1000
+        if (this->states[this->currentStateBuffer].size() > 1000)
+          util::LogRecord::Instance()->Notify();
+      }
     }
 
     this->logContinueCondition.notify_all();

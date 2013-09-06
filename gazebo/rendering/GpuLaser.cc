@@ -23,9 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/RTShaderSystem.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -36,7 +34,6 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/math/Pose.hh"
 
-#include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -134,8 +131,6 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     this->Set1stPassTarget(
         this->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
-    RTShaderSystem::AttachViewport(this->firstPassViewports[i],
-                                   this->GetScene());
     this->firstPassTargets[i]->setAutoUpdated(false);
   }
 
@@ -154,7 +149,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->Set2ndPassTarget(
       this->secondPassTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->secondPassViewport, this->GetScene());
+
   this->secondPassTarget->setAutoUpdated(false);
 
   this->matSecondPass = (Ogre::Material*)(
@@ -389,8 +384,6 @@ void GpuLaser::RenderImpl()
 
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
-
   sceneMgr->_suppressRenderStateChanges(true);
   sceneMgr->addRenderObjectListener(this);
 
@@ -428,7 +421,6 @@ void GpuLaser::RenderImpl()
   this->visual->SetVisible(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->lastRenderDuration = firstPassDur + secondPassDur;
@@ -504,6 +496,8 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
       this->firstPassTargets[_index]->addViewport(this->camera);
     this->firstPassViewports[_index]->setClearEveryFrame(true);
     this->firstPassViewports[_index]->setOverlaysEnabled(false);
+    this->firstPassViewports[_index]->setShadowsEnabled(false);
+    this->firstPassViewports[_index]->setSkiesEnabled(false);
     this->firstPassViewports[_index]->setBackgroundColour(
         Ogre::ColourValue(this->far, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
@@ -527,6 +521,9 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
     this->secondPassViewport =
         this->secondPassTarget->addViewport(this->orthoCam);
     this->secondPassViewport->setClearEveryFrame(true);
+    this->secondPassViewport->setOverlaysEnabled(false);
+    this->secondPassViewport->setShadowsEnabled(false);
+    this->secondPassViewport->setSkiesEnabled(false);
     this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
     this->secondPassViewport->setVisibilityMask(

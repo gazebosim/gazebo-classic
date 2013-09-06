@@ -28,11 +28,16 @@ void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
 void RegisterMultiCameraSensor();
+void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
+void RegisterSonarSensor();
+void RegisterForceTorqueSensor();
+void RegisterWirelessTransmitter();
+void RegisterWirelessReceiver();
 
 using namespace gazebo;
 using namespace sensors;
@@ -46,11 +51,16 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
   RegisterDepthCameraSensor();
   RegisterMultiCameraSensor();
+  RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
+  RegisterSonarSensor();
+  RegisterForceTorqueSensor();
+  RegisterWirelessTransmitter();
+  RegisterWirelessReceiver();
 }
 
 /////////////////////////////////////////////////
