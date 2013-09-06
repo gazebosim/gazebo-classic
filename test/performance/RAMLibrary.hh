@@ -23,12 +23,13 @@
 #elif __linux
 #include <unistd.h>
 #include <iostream>
-#include <fstream> 
+#include <fstream>
 #include <limits>
+#include <string>
 
-namespace gazebo 
+namespace gazebo
 {
-  namespace test 
+  namespace test
   {
     namespace memory
     {
@@ -36,41 +37,41 @@ namespace gazebo
       ///        key given.
       /// \param[in] _key string represent keys in meminfo ended with a colon
       ///        example: "MemFree:"
-      unsigned long ParseProcMeminfo(const std::string key)
+      unsigned int64 ParseProcMeminfo(const std::string & key)
       {
           std::string token;
           std::ifstream file("/proc/meminfo");
-          while(file >> token) 
+          while (file >> token)
           {
-              if(token == key) 
+              if (token == key)
               {
-                  unsigned long mem;
-                  if(file >> mem)
+                  unsigned int64 mem;
+                  if (file >> mem)
                       return mem;
-                  else 
-                      return 0;       
+                  else
+                      return 0;
               }
               // ignore rest of the line
               file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
           }
-          return 0; // nothing found
+          return 0;  // nothing found
       }
 
       /// \brief Get the RAM memory available at the moment
       /// \return RAM ammount in Megabytes
-      unsigned long GetMemoryAvailable()
+      unsigned int64 GetMemoryAvailable()
       {
           return ParseProcMeminfo("MemFree:") / 1024;
       }
 
       /// \brief Get the total RAM memory present in the system
       /// \return RAM ammount in Megabytes
-      unsigned long GetTotalMemory()
+      unsigned int64 GetTotalMemory()
       {
           return ParseProcMeminfo("MemTotal:") / 1024;
       }
 
-      typedef unsigned long megabyte;
+      typedef unsigned int64 megabyte;
 
       /// \brief Check if a given ammount of RAM is available at the system
       /// \param[in] _ammount ammount of RAM desired for checking
