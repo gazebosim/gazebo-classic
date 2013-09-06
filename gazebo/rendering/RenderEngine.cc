@@ -294,7 +294,6 @@ void RenderEngine::Fini()
   for (unsigned int i = 0; i < this->scenes.size(); ++i)
   {
     this->scenes[i]->Clear();
-    this->scenes[i]->~Scene();
   }
   this->scenes.clear();
 
