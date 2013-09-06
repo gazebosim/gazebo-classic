@@ -8,6 +8,7 @@ set (sources
   JointMaker.cc
   ModelCreator.cc
   ModelEditor.cc
+  ModelEditorEvents.cc
   ModelEditorPalette.cc
   PartGeneralTab.cc
   PartInspector.cc
@@ -20,6 +21,7 @@ set (qt_headers
   JointMaker.hh
   ModelCreator.hh
   ModelEditor.hh
+  ModelEditorEvents.hh
   ModelEditorPalette.hh
   PartGeneralTab.hh
   PartInspector.hh

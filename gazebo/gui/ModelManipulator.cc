@@ -407,7 +407,9 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
     if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    {
       vis = vis->GetRootVisual();
+    }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 

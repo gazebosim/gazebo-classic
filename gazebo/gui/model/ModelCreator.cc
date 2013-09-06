@@ -109,7 +109,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -123,6 +123,8 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _size.z/2));
   }
+
+  gzerr << _pose << std::endl;
 
   this->CreatePart(visVisual);
 
@@ -153,7 +155,7 @@ std::string ModelCreator::AddSphere(double _radius,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -196,7 +198,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -243,7 +245,7 @@ std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_sca
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -275,7 +277,6 @@ void ModelCreator::CreatePart(rendering::VisualPtr _visual)
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
-  part->pose = _visual->GetParent()->GetWorldPose();
 
   part->inspector = new PartInspector;
   part->inspector->setModal(false);
@@ -328,7 +329,7 @@ void ModelCreator::Reset()
 
   this->jointMaker->Reset();
 
-  this->modelName = "default";
+  this->modelName = "defaultModel";
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -553,7 +554,7 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
       general->SetGravity(part->gravity);
       general->SetSelfCollide(part->selfCollide);
       general->SetKinematic(part->kinematic);
-      general->SetPose(part->pose);
+      general->SetPose(part->visuals[0]->GetParent()->GetWorldPose());
       general->SetMass(part->inertial->GetMass());
       general->SetInertialPose(part->inertial->GetPose());
       general->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
@@ -561,8 +562,6 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
           part->inertial->GetIXZ(), part->inertial->GetIYZ());
 
       part->inspector->show();
-      gzerr << " got model part " << vis->GetName() <<  std::endl;
-
       return true;
     }
   }
@@ -616,7 +615,8 @@ void ModelCreator::GenerateSDF()
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
     newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
-    newLinkElem->GetElement("pose")->Set(part->pose);
+    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
+
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
@@ -668,7 +668,6 @@ void ModelCreator::GenerateSDF()
       sdf::ElementPtr customElem = geomElem->AddElement("mesh");
       (customElem->GetElement("scale"))->Set(scale);
       (customElem->GetElement("uri"))->Set(visual->GetMeshName());
-      gzerr << "visual->GetMeshName() "<< visual->GetMeshName() << std::endl;
     }
     sdf::ElementPtr geomElemClone = geomElem->Clone();
     geomElem =  collisionElem->GetElement("geometry");
@@ -691,7 +690,7 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-//   qDebug() << this->modelSDF->ToString().c_str();
+   qDebug() << this->modelSDF->ToString().c_str();
 }
 
 

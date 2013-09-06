@@ -18,8 +18,9 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
-
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
 using namespace gazebo;
@@ -34,6 +35,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectFinishModel(
+      boost::bind(&ModelEditor::OnFinish, this)));
 }
 
 /////////////////////////////////////////////////
@@ -54,4 +59,12 @@ void ModelEditor::OnEdit(bool _checked)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
   }
+}
+
+
+/////////////////////////////////////////////////
+void ModelEditor::OnFinish()
+{
+  g_editModelAct->setChecked(!g_editModelAct->isChecked());
+  this->OnEdit(false);
 }

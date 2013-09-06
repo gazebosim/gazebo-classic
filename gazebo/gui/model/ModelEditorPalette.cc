@@ -31,6 +31,7 @@
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -239,8 +240,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       SLOT(OnJointAdded()));
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
-//  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
   frameLayout->addWidget(this->modelTreeWidget, 0);
@@ -319,8 +318,6 @@ void ModelEditorPalette::OnCustom()
     // this unchecks the custom button
     this->OnPartAdded();
   }
-//  OnCustom
-//  this->modelCreator->AddPart(ModelCreator::PART_CUSTOM);
 }
 
 
@@ -436,6 +433,6 @@ void ModelEditorPalette::OnDone()
     this->modelCreator->GenerateSDF();
     this->modelCreator->SaveToSDF(this->saveLocation);
     this->modelCreator->FinishModel();
+    gui::model::Events::finishModel();
   }
-
 }

@@ -43,6 +43,9 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief Callback when the model has been completed.
+      private: void OnFinish();
+
       /// \brief Contains all the model editor tools.
       private: ModelEditorPalette *modelPalette;
     };

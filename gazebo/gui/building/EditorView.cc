@@ -28,7 +28,7 @@
 #include "gazebo/gui/building/WallItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/EditorView.hh"
 
 using namespace gazebo;

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _EDITOR_EVENTS_HH_
-#define _EDITOR_EVENTS_HH_
+#ifndef _BUILDING_EDITOR_EVENTS_HH_
+#define _BUILDING_EDITOR_EVENTS_HH_
 
 #include <string>
 #include "gazebo/common/Event.hh"

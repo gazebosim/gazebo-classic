@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;

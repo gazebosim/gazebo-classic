@@ -331,8 +331,8 @@ void JointMaker::CreateHotSpot()
   joint->hotspot = hotspotVisual;
 
   this->joints[hotspotVisual->GetName()] = joint;
-  this->mouseJoint = NULL;
   joint->dirty = true;
+  this->mouseJoint = NULL;
 }
 
 /////////////////////////////////////////////////
