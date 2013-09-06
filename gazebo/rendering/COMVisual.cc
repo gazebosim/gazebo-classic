@@ -75,7 +75,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
     // Don't show inertia for static objects, just COM location
     this->Load(math::Pose(xyz, q));
   }
-  if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
+  else if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
     gzerr << "The link " << _msg->name() << " has unrealistic inertia.\n";
