@@ -23,6 +23,7 @@
 #define _SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <string>
 
@@ -248,6 +249,9 @@ namespace gazebo
 
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
+
+      /// \brief Mutex to protect resetting lastUpdateTime.
+      protected: boost::mutex mutexLastUpdateTime;
 
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
