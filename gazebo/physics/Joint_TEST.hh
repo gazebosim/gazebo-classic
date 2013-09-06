@@ -54,6 +54,55 @@ class Joint_TEST : public ServerFixture,
   public: void SpawnJointTypes(const std::string &_physicsEngine,
                                const std::string &_jointType);
 
+  /// \brief Spawn model with rotational joints. Set velocity on parent
+  ///        and make sure child follows. Also attach to world and make
+  ///        sure it doesn't fall.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SpawnJointRotational(const std::string &_physicsEngine);
+
+  /// \brief Class to hold parameters for spawning joints.
+  public: class SpawnJointOptions
+  {
+    /// \brief Constructor.
+    public: SpawnJointOptions() : worldChild(false), worldParent(false),
+              axis(math::Vector3(1, 0, 0))
+            {
+            }
+
+    /// \brief Destructor.
+    public: ~SpawnJointOptions()
+            {
+            }
+
+    /// \brief Type of joint to create.
+    public: std::string type;
+
+    /// \brief Flag to set child link to the world.
+    public: bool worldChild;
+
+    /// \brief Flag to set parent link to the world.
+    public: bool worldParent;
+
+    /// \brief Length of time to wait for model to spawn in order to return
+    ///        Joint pointer.
+    public: common::Time wait;
+
+    /// \brief Model pose for spawned model.
+    public: math::Pose modelPose;
+
+    /// \brief Child link pose for spawned model.
+    public: math::Pose childLinkPose;
+
+    /// \brief Parent link pose for spawned model.
+    public: math::Pose parentLinkPose;
+
+    /// \brief Joint pose for spawned joint.
+    public: math::Pose jointPose;
+
+    /// \brief Axis value for spawned joint.
+    public: math::Vector3 axis;
+  };
+
   /// \brief Spawn a model with a joint connecting to the world. The function
   ///        will wait for duration _wait for the model to spawn and attempt
   ///        to return a pointer to the spawned joint. This function is not
@@ -69,6 +118,22 @@ class Joint_TEST : public ServerFixture,
                                        bool _worldParent = false,
                                        common::Time _wait = common::Time(99, 0))
           {
+            SpawnJointOptions opt;
+            opt.type = _type;
+            opt.worldChild = _worldChild;
+            opt.worldParent = _worldParent;
+            opt.wait = _wait;
+            return SpawnJoint(opt);
+          }
+
+  /// \brief Spawn a model with a joint connecting to the world. The function
+  ///        will wait for duration _wait for the model to spawn and attempt
+  ///        to return a pointer to the spawned joint. This function is not
+  ///        guaranteed to return a valid JointPtr, so the output should be
+  ///        checked.
+  /// \param[in] _opt Options for spawned model and joint.
+  public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
+          {
             msgs::Factory msg;
             std::ostringstream modelStr;
             std::ostringstream modelName;
@@ -76,33 +141,36 @@ class Joint_TEST : public ServerFixture,
 
             modelStr
               << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>";
-            if (!_worldParent)
+              << "<model name ='" << modelName.str() << "'>"
+              << "  <pose>" << _opt.modelPose << "</pose>";
+            if (!_opt.worldParent)
             {
               modelStr
                 << "  <link name='parent'>"
+                << "    <pose>" << _opt.parentLinkPose << "</pose>"
                 << "  </link>";
             }
-            if (!_worldChild)
+            if (!_opt.worldChild)
             {
               modelStr
                 << "  <link name='child'>"
+                << "    <pose>" << _opt.childLinkPose << "</pose>"
                 << "  </link>";
             }
             modelStr
-              << "  <joint name='joint' type='" << _type << "'>"
-              << "    <pose>0 0 0  0 0 0</pose>";
-            if (_worldParent)
+              << "  <joint name='joint' type='" << _opt.type << "'>"
+              << "    <pose>" << _opt.jointPose << "</pose>";
+            if (_opt.worldParent)
               modelStr << "    <parent>world</parent>";
             else
               modelStr << "    <parent>parent</parent>";
-            if (_worldChild)
+            if (_opt.worldChild)
               modelStr << "    <child>world</child>";
             else
               modelStr << "    <child>child</child>";
             modelStr
               << "    <axis>"
-              << "      <xyz>0 0 1</xyz>"
+              << "      <xyz>" << _opt.axis << "</xyz>"
               << "    </axis>";
             modelStr
               << "  </joint>"
@@ -112,22 +180,22 @@ class Joint_TEST : public ServerFixture,
             this->factoryPub->Publish(msg);
 
             physics::JointPtr joint;
-            if (_wait != common::Time::Zero)
+            if (_opt.wait != common::Time::Zero)
             {
               common::Time wallStart = common::Time::GetWallTime();
               unsigned int waitCount = 0;
-              while (_wait > (common::Time::GetWallTime() - wallStart) &&
+              while (_opt.wait > (common::Time::GetWallTime() - wallStart) &&
                      !this->HasEntity(modelName.str()))
               {
                 common::Time::MSleep(100);
                 if (++waitCount % 10 == 0)
                 {
                   gzwarn << "Waiting " << waitCount / 10 << " seconds for "
-                         << _type << " joint to spawn." << std::endl;
+                         << _opt.type << " joint to spawn." << std::endl;
                 }
               }
               if (this->HasEntity(modelName.str()) && waitCount >= 10)
-                gzwarn << _type << " joint has spawned." << std::endl;
+                gzwarn << _opt.type << " joint has spawned." << std::endl;
 
               physics::WorldPtr world = physics::get_world("default");
               if (world != NULL)

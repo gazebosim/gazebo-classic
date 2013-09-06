@@ -52,23 +52,24 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHinge2Joint::Init()
 {
-  Hinge2Joint<BulletJoint>::Attach(_one, _two);
-
+  Hinge2Joint<BulletJoint>::Init();
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+    gzthrow("BulletHinge2Joint cannot be connected to the world");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
 
-  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
+  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
   math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
+
+  // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
   btVector3 baxis1(axis1.x, axis1.y, axis1.z);
@@ -166,13 +167,15 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setUpperLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setUpperLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setLowerLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setLowerLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
