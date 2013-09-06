@@ -290,6 +290,12 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
+  // Explcicitly deallocate memory for every scene
+  for (unsigned int i = 0; i < this->scenes.size(); ++i)
+  {
+    this->scenes[i]->Clear();
+    this->scenes[i]->~Scene();
+  }
   this->scenes.clear();
 
   // TODO: this was causing a segfault. Need to debug, and put back in
