@@ -174,6 +174,8 @@ void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
       this->bulletUniversal->setUpperLimit(
         this->GetHighStop(0).Radian(), _angle.Radian());
   }
+  else
+    gzerr << "bulletUniversal does not yet exist" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -188,6 +190,8 @@ void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
       this->bulletUniversal->setUpperLimit(
         this->GetLowStop(0).Radian(), _angle.Radian());
   }
+  else
+    gzerr << "bulletUniversal does not yet exist" << std::endl;
 }
 
 //////////////////////////////////////////////////
