@@ -1,0 +1,13 @@
+#!/bin/bash
+hg_root=`hg root`
+if [ "$?" -ne "0" ] ; then
+  echo This is not an hg repository
+  exit
+fi
+BRANCH=$1
+BRANCH_HEAD=`hg log -b $BRANCH | head -1 | sed -e 's@.*:@@'`
+CHANGED_FILES=`hg diff --stat -r $BRANCH_HEAD | sed -e 's@^ @@' -e 's@  *|.*@@' -e '$ d'`
+CURRENT_HASH=`hg id | sed -e 's@+* .*@@'`
+echo Checking parent $CURRENT_HASH against $BRANCH head $BRANCH_HEAD
+hg diff --stat -r $BRANCH_HEAD | tail -1
+echo $CHANGED_FILES | sh "$hg_root"/tools/code_check.sh --quick $CURRENT_HASH
