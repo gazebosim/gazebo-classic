@@ -30,6 +30,9 @@ class Joint_TEST_All : public Joint_TEST {};
 // Fixture for testing rotational joints.
 class Joint_TEST_Rotational : public Joint_TEST {};
 
+// Fixture for testing rotational joints that can be attached to world.
+class Joint_TEST_RotationalWorld : public Joint_TEST {};
+
 ////////////////////////////////////////////////////////////////////////
 // Test for spawning each joint type
 void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
@@ -59,16 +62,11 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   EXPECT_TRUE(joint != NULL);
 }
 
-TEST_P(Joint_TEST_All, SpawnJointTypes)
-{
-  SpawnJointTypes(this->physicsEngine, this->jointType);
-}
-
 ////////////////////////////////////////////////////////////////////////
 // Test for non-translational joints.
 // Set velocity to parent and make sure child follows.
-// Also attach to world and see if it doesn't fall.
-void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
+void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
+                                      const std::string &_jointType)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -80,91 +78,115 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Skip prismatic, screw, and revolute2 because they allow translation
-  std::vector<std::string> types;
-  types.push_back("revolute");
-  types.push_back("universal");
-  types.push_back("ball");
+  gzdbg << "SpawnJoint " << _jointType << std::endl;
+  physics::JointPtr joint = SpawnJoint(_jointType);
+  EXPECT_TRUE(joint != NULL);
+
+  physics::LinkPtr parent, child;
+  child = joint->GetChild();
+  parent = joint->GetParent();
+  EXPECT_TRUE(child != NULL);
+  EXPECT_TRUE(parent != NULL);
+
+  math::Vector3 pos(10, 10, 10);
+  math::Vector3 vel(10, 10, 10);
+  parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    parent->SetLinearVel(vel);
+    world->StepWorld(10);
+  }
+  world->StepWorld(50);
+  math::Pose childPose = child->GetWorldPose();
+  math::Pose parentPose = parent->GetWorldPose();
+  EXPECT_TRUE(parentPose.pos != pos);
+  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
+  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
+  EXPECT_TRUE(childPose.pos == parentPose.pos);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Test for non-translational joints that can attach to world.
+// Attach to world and see if it doesn't fall.
+void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
+                                           const std::string &_jointType)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::JointPtr joint;
-  for (std::vector<std::string>::iterator iter = types.begin();
-       iter != types.end(); ++iter)
+  for (unsigned int i = 0; i < 2; ++i)
   {
-    gzdbg << "SpawnJoint " << *iter << std::endl;
-    joint = SpawnJoint(*iter);
+    bool worldChild = (i == 0);
+    bool worldParent = (i == 1);
+    std::string child = worldChild ? "world" : "child";
+    std::string parent = worldParent ? "world" : "parent";
+    gzdbg << "SpawnJoint " << _jointType << " "
+          << child << " "
+          << parent << std::endl;
+    joint = SpawnJoint(_jointType, worldChild, worldParent);
     EXPECT_TRUE(joint != NULL);
 
-    physics::LinkPtr parent, child;
-    child = joint->GetChild();
-    parent = joint->GetParent();
-    EXPECT_TRUE(child != NULL);
-    EXPECT_TRUE(parent != NULL);
+    physics::LinkPtr link;
+    if (!worldChild)
+      link = joint->GetChild();
+    else if (!worldParent)
+      link = joint->GetParent();
+    EXPECT_TRUE(link != NULL);
 
-    math::Vector3 pos(10, 10, 10);
-    math::Vector3 vel(10, 10, 10);
-    parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      parent->SetLinearVel(vel);
-      world->StepWorld(10);
-    }
-    world->StepWorld(50);
-    math::Pose childPose = child->GetWorldPose();
-    math::Pose parentPose = parent->GetWorldPose();
-    EXPECT_TRUE(parentPose.pos != pos);
-    EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-    EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
-    EXPECT_TRUE(childPose.pos == parentPose.pos);
-  }
-
-  // Skip prismatic, screw, and revolute2 because they allow translation
-  // Skip universal because it can't be connected to world in bullet.
-  std::vector<std::string> typesWorld;
-  typesWorld.push_back("revolute");
-  typesWorld.push_back("ball");
-  for (std::vector<std::string>::iterator iter = typesWorld.begin();
-       iter != typesWorld.end(); ++iter)
-  {
-    for (unsigned int i = 0; i < 2; ++i)
-    {
-      bool worldChild = (i == 0);
-      bool worldParent = (i == 1);
-      std::string child = worldChild ? "world" : "child";
-      std::string parent = worldParent ? "world" : "parent";
-      gzdbg << "SpawnJoint " << *iter << " "
-            << child << " "
-            << parent << std::endl;
-      joint = SpawnJoint(*iter, worldChild, worldParent);
-      EXPECT_TRUE(joint != NULL);
-
-      physics::LinkPtr link;
-      if (!worldChild)
-        link = joint->GetChild();
-      else if (!worldParent)
-        link = joint->GetParent();
-      EXPECT_TRUE(link != NULL);
-
-      math::Pose initialPose = link->GetWorldPose();
-      world->StepWorld(100);
-      math::Pose afterPose = link->GetWorldPose();
-      EXPECT_TRUE(initialPose.pos == afterPose.pos);
-    }
+    math::Pose initialPose = link->GetWorldPose();
+    world->StepWorld(100);
+    math::Pose afterPose = link->GetWorldPose();
+    EXPECT_TRUE(initialPose.pos == afterPose.pos);
   }
 }
 
-TEST_P(Joint_TEST, SpawnJointRotational)
+TEST_P(Joint_TEST_All, SpawnJointTypes)
 {
-  SpawnJointRotational(GetParam());
+  SpawnJointTypes(this->physicsEngine, this->jointType);
 }
 
-INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_All, ::testing::Combine(
-  PHYSICS_ENGINE_VALUES,
+TEST_P(Joint_TEST_Rotational, SpawnJointRotational)
+{
+  SpawnJointRotational(this->physicsEngine, this->jointType);
+}
+
+TEST_P(Joint_TEST_RotationalWorld, SpawnJointRotationalWorld)
+{
+  SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
+}
+
+INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_All,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"
                   , "screw"
                   , "universal"
                   , "ball"
                   , "revolute2"
+                    )));
+
+// Skip prismatic, screw, and revolute2 because they allow translation
+INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_Rotational,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("revolute"
+                  , "universal"
+                  , "ball"
+                    )));
+
+// Skip prismatic, screw, and revolute2 because they allow translation
+// Skip universal because it can't be connected to world in bullet.
+INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_RotationalWorld,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("revolute"
+                  , "ball"
                     )));
 
 ////////////////////////////////////////////////////////////////////////
