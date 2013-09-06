@@ -504,7 +504,6 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
 
-
   // Cast two rays from the camera into the world
   gui::get_active_camera()->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
       origin1, dir1);
@@ -530,7 +529,6 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
       pose.pos.y = ceil(pose.pos.y);
     else if (pose.pos.y - floor(pose.pos.y) <= .4)
       pose.pos.y = floor(pose.pos.y);
-
   }
   pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
 
@@ -538,7 +536,6 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 
   return true;
 }
-
 
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)

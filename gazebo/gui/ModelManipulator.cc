@@ -220,7 +220,7 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-  math::Box bbox = _vis->GetBoundingBox();
+  math::Box bbox = this->mouseVisualBbox;
   math::Pose pose = _vis->GetWorldPose();
   math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
@@ -230,7 +230,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
-
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -629,7 +628,10 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->mouseMoveVis = _vis;
   if (_vis)
+  {
     this->mouseVisualScale = _vis->GetScale();
+    this->mouseVisualBbox = _vis->GetBoundingBox();
+  }
   else
     this->mouseVisualScale = math::Vector3::One;
 }

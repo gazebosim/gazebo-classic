@@ -162,6 +162,9 @@ namespace gazebo
       /// \brief Scale of the visual attached to the mouse.
       private: math::Vector3 mouseVisualScale;
 
+      /// \brief Bounding box of the visual attached to the mouse (for scaling).
+      private: math::Box mouseVisualBbox;
+
       /// \brief True to manipulate model in global frame.
       private: bool globalManip;
 
