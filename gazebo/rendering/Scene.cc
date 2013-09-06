@@ -1339,7 +1339,13 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    this->poseMsgs[_msg->model(i).id()] = _msg->model(i).pose();
+    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->model(i).id());
+    if (iter != this->poseMsgs.end())
+      iter->second.CopyFrom(_msg->model(i).pose());
+    else
+      this->poseMsgs.insert(
+          std::make_pair(_msg->model(i).id(), _msg->model(i).pose()));
+
     this->poseMsgs[_msg->model(i).id()].set_name(_msg->model(i).name());
     this->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
 
@@ -1449,7 +1455,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     linkName = modelName + _msg.link(j).name();
 
-    this->poseMsgs[_msg.link(j).id()] = _msg.link(j).pose();
+    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
+    if (iter != this->poseMsgs.end())
+      iter->second.CopyFrom(_msg.link(j).pose());
+    else
+      this->poseMsgs.insert(
+          std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
+
     this->poseMsgs[_msg.link(j).id()].set_name(linkName);
     this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
 
@@ -2339,7 +2351,12 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    this->poseMsgs[_msg->pose(i).id()] = _msg->pose(i);
+    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->pose(i).id());
+    if (iter != this->poseMsgs.end())
+      iter->second.CopyFrom(_msg->pose(i));
+    else
+      this->poseMsgs.insert(
+          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
   }
 }
 
