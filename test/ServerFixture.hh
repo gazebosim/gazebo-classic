@@ -152,7 +152,7 @@ class ServerFixture : public testing::Test
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
-               this->poseSub = this->node->Subscribe("~/pose/info",
+               this->poseSub = this->node->Subscribe("~/pose/local/info",
                    &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
