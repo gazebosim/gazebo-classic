@@ -192,7 +192,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   this->jointType = _type;
   if (_type != JointMaker::JOINT_NONE)
   {
-    // Add an event filter, which allows the TerrainEditor to capture
+    // Add an event filter, which allows the JointMaker to capture
     // mouse events.
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
         boost::bind(&JointMaker::OnMousePress, this, _1));

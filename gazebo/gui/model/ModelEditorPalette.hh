@@ -136,11 +136,8 @@ namespace gazebo
       /// \brief Plugin item in the tree widget.
       private: QTreeWidgetItem *pluginItem;
 
-      /// \brief Joints button group.
-      private: QButtonGroup *jointsButtonGroup;
-
-      /// \brief Parts button group.
-      private: QButtonGroup *partsButtonGroup;
+      /// \brief Parts and Joints button group.
+      private: QButtonGroup *partJointsButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;

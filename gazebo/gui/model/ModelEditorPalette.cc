@@ -129,12 +129,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
 
-  this->partsButtonGroup = new QButtonGroup;
-  this->partsButtonGroup->addButton(cylinderButton);
-  this->partsButtonGroup->addButton(sphereButton);
-  this->partsButtonGroup->addButton(boxButton);
-  this->partsButtonGroup->addButton(customButton);
-
   partsLayout->addWidget(partsLabel, 0, 0);
   partsLayout->addWidget(cylinderButton, 1, 0);
   partsLayout->addWidget(sphereButton, 1, 1);
@@ -187,14 +181,18 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   ballJointButton->setChecked(false);
   connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
 
-  jointsButtonGroup = new QButtonGroup;
-  this->jointsButtonGroup->addButton(fixedJointButton);
-  this->jointsButtonGroup->addButton(sliderJointButton);
-  this->jointsButtonGroup->addButton(hingeJointButton);
-  this->jointsButtonGroup->addButton(hinge2JointButton);
-  this->jointsButtonGroup->addButton(screwJointButton);
-  this->jointsButtonGroup->addButton(universalJointButton);
-  this->jointsButtonGroup->addButton(ballJointButton);
+  partJointsButtonGroup = new QButtonGroup;
+  this->partJointsButtonGroup->addButton(cylinderButton);
+  this->partJointsButtonGroup->addButton(sphereButton);
+  this->partJointsButtonGroup->addButton(boxButton);
+  this->partJointsButtonGroup->addButton(customButton);
+  this->partJointsButtonGroup->addButton(fixedJointButton);
+  this->partJointsButtonGroup->addButton(sliderJointButton);
+  this->partJointsButtonGroup->addButton(hingeJointButton);
+  this->partJointsButtonGroup->addButton(hinge2JointButton);
+  this->partJointsButtonGroup->addButton(screwJointButton);
+  this->partJointsButtonGroup->addButton(universalJointButton);
+  this->partJointsButtonGroup->addButton(ballJointButton);
 
   jointsLayout->addWidget(jointsLabel, 0, 0);
 //  jointsLayout->addWidget(fixedJointButton, 1, 0);
@@ -216,7 +214,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->pluginItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Plugin")));
-    this->modelTreeWidget->addTopLevelItem(this->pluginItem);
+  // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
 
   // save buttons
   QPushButton *discardButton = new QPushButton(tr("Discard"));
@@ -290,6 +288,7 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
+
   this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
@@ -366,19 +365,19 @@ void ModelEditorPalette::OnBallJoint()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointAdded()
 {
-  this->jointsButtonGroup->setExclusive(false);
-  if (this->jointsButtonGroup->checkedButton())
-    this->jointsButtonGroup->checkedButton()->setChecked(false);
-  this->jointsButtonGroup->setExclusive(true);
+  this->partJointsButtonGroup->setExclusive(false);
+  if (this->partJointsButtonGroup->checkedButton())
+    this->partJointsButtonGroup->checkedButton()->setChecked(false);
+  this->partJointsButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnPartAdded()
 {
-  this->partsButtonGroup->setExclusive(false);
-  if (this->partsButtonGroup->checkedButton())
-    this->partsButtonGroup->checkedButton()->setChecked(false);
-  this->partsButtonGroup->setExclusive(true);
+  this->partJointsButtonGroup->setExclusive(false);
+  if (this->partJointsButtonGroup->checkedButton())
+    this->partJointsButtonGroup->checkedButton()->setChecked(false);
+  this->partJointsButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////

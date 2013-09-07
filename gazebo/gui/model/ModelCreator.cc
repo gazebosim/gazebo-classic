@@ -82,9 +82,9 @@ std::string ModelCreator::CreateModel()
 /////////////////////////////////////////////////
 void ModelCreator::AddJoint(JointMaker::JointType _type)
 {
+  // this->AddPart(JOINT_NONE);
   if (this->jointMaker)
     this->jointMaker->CreateJoint(_type);
-
 }
 
 /////////////////////////////////////////////////
@@ -447,6 +447,7 @@ std::string ModelCreator::GetTemplateSDFString()
 /////////////////////////////////////////////////
 void ModelCreator::AddPart(PartType _type)
 {
+  // this->AddJoint(JOINT_NONE);
   this->addPartType = _type;
   if (_type != PART_NONE)
   {
