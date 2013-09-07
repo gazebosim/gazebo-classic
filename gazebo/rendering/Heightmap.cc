@@ -46,6 +46,8 @@ Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
   this->terrainGlobals = NULL;
+  this->terrainPaging = NULL;
+  this->pageManager = NULL;
 
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
@@ -64,7 +66,7 @@ Heightmap::Heightmap(ScenePtr _scene)
 //////////////////////////////////////////////////
 Heightmap::~Heightmap()
 {
-  this->terrainGroup->removeAllTerrains();
+  this->scene.reset();
 
   delete this->terrainGlobals;
   this->terrainGlobals = NULL;
@@ -74,10 +76,12 @@ Heightmap::~Heightmap()
   delete this->terrainGroup;
   this->terrainGroup = NULL;
 
-  this->scene.reset();
-
-  OGRE_DELETE(this->pageManager);
-  OGRE_DELETE(this->terrainPaging);
+  if (this->terrainPaging)
+  {
+    OGRE_DELETE this->terrainPaging;
+    pageManager->destroyWorld(this->world);
+    OGRE_DELETE this->pageManager;
+  }
 
   // Remove page files from disk
   boost::filesystem::remove_all(this->pagingPath);
