@@ -306,8 +306,8 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     // give it 2 cycles to stabilize
     if (i > 1)
     {
-      EXPECT_LE(residentCur, residentLast + residentLast*0.01);
-      EXPECT_LE(shareCur, shareLast + shareLast*0.01);
+      EXPECT_LE(residentCur, residentLast * 1.01);
+      EXPECT_LE(shareCur, shareLast * 1.01);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
