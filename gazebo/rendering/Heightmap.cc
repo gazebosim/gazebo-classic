@@ -248,12 +248,18 @@ std::string GetSHA1(boost::filesystem::path filename)
   sha1.get_digest(hash);
   
   std::cout << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2);
-  
-  std::cout << sizeof(hash) / sizeof(hash[0]) << std::endl;
+  std::stringstream stream;
+  stream << std::setfill ('0') << std::setw(sizeof(int) * 2) << std::hex;
+
+ // std::cout << sizeof(hash) / sizeof(hash[0]) << std::endl;
   for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
   {
+    stream << hash[i];
     std::cout << hash[i];
   }
+
+  std::cout << endl;
+  std::cout << stream.str() << std::endl;
 
   return "";
 }
