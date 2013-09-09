@@ -181,7 +181,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // spawn some simple shapes with unit size
   double z0 = 0.5;
-  std::map<std::string, math::Vector3> modelPos, modelPos2;
+  std::map<std::string, math::Vector3> modelPos;
   modelPos["test_box"] = math::Vector3(0, 0, z0);
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);

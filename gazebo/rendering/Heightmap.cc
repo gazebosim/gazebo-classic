@@ -48,6 +48,8 @@ Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
   this->terrainGlobals = NULL;
+  this->terrainPaging = NULL;
+  this->pageManager = NULL;
 
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
@@ -57,13 +59,13 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
   boost::filesystem::path gzPagingDir = "gazebo-paging";
-  boost::filesystem::path instanceDir =
+  /*boost::filesystem::path instanceDir =
       boost::filesystem::unique_path("instance-%%%%%%%%%%");
 
   this->pagingPath = tmpDir / gzPagingDir / instanceDir;
 
   // Create a temporal and unique directory for page files
-  boost::filesystem::create_directories(this->pagingPath);
+  boost::filesystem::create_directories(this->pagingPath);*/
 }
 
 //////////////////////////////////////////////////
@@ -87,7 +89,7 @@ Heightmap::~Heightmap()
   }
 
   // Remove page files from disk
-  boost::filesystem::remove_all(this->pagingPath);
+  //boost::filesystem::remove_all(this->pagingPath);
 }
 
 //////////////////////////////////////////////////
@@ -224,7 +226,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 //////////////////////////////////////////////////
 std::string GetSHA1(boost::filesystem::path filename)
 {
-  std::cout << "Generating SHA1 from " << filename << std::endl;
+  //std::cout << "Generating SHA1 from " << filename << std::endl;
   std::ifstream ifs(filename.string().c_str(), std::ios::binary);
   
   if (!ifs.good())
@@ -247,21 +249,21 @@ std::string GetSHA1(boost::filesystem::path filename)
 
   sha1.get_digest(hash);
   
-  std::cout << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2);
+  //std::cout << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2);
   std::stringstream stream;
-  stream << std::setfill ('0') << std::setw(sizeof(int) * 2) << std::hex;
+  stream << std::setfill('0') << std::setw(sizeof(int) * 2) << std::hex;
 
  // std::cout << sizeof(hash) / sizeof(hash[0]) << std::endl;
   for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
   {
     stream << hash[i];
-    std::cout << hash[i];
+    //std::cout << hash[i];
   }
 
-  std::cout << endl;
-  std::cout << stream.str() << std::endl;
+  //std::cout << std::endl;
+  //std::cout << stream.str() << std::endl;
 
-  return "";
+  return stream.str();
 }
 
 //////////////////////////////////////////////////
@@ -278,6 +280,7 @@ void Heightmap::Load()
   msgs::Geometry geomMsg;
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
+  bool updateHash = false;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
 
@@ -340,21 +343,44 @@ void Heightmap::Load()
     // Check if the terrain hast exists
     boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
     boost::filesystem::path gzPagingDir = "gazebo-paging";
-    boost::filesystem::path terrainHashFile = tmpDir / gzPagingDir /
+    boost::filesystem::path terrainHashFullPath = tmpDir / gzPagingDir /
         terrainName / HashFilename;
+    std::string imgHash;
 
     // Compute SHA1 of the image heightmap
-    //GetSHA1(geomMsg.heightmap().filename());
+    imgHash = GetSHA1(geomMsg.heightmap().filename());
 
-    /*if (boost::filesystem::exists(terrainHashFile))
+    if (!boost::filesystem::exists(terrainHashFullPath))
     {
-  
+      updateHash = true;
     }
     else
-    {*/
+    {
+      std::ifstream in(terrainHashFullPath.string().c_str());
+      std::stringstream buffer;
+      buffer << in.rdbuf();
+      std::string terrainHash(buffer.str());
+      if (terrainHash != imgHash)
+      {
+        updateHash = true;
+      }
+    }
+
+    if (updateHash)
+    {
+      std::cout << "Updating hash\n";
+      // Create the subdirectories if they do not exist
+      boost::filesystem::create_directories(tmpDir / gzPagingDir / terrainName);
+
+      // Update the terrain hash
+      std::ofstream terrainHashFile;
+      terrainHashFile.open(terrainHashFullPath.string().c_str());
+      terrainHashFile << imgHash;
+      terrainHashFile.close();
+
       // Split the terrain. Every subterrain will be paged
       this->SplitHeights(this->heights, nTerrains, this->subTerrains);
-    //}
+    }
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);
@@ -395,8 +421,11 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-    // Save all subterrains using files. This is required to reload the pages
-    this->terrainGroup->saveAllTerrains(true);
+    if (updateHash)
+    {
+      // Save all subterrains using files. This is required to reload the pages
+      this->terrainGroup->saveAllTerrains(true);
+    }
   }
 
   this->terrainGroup->freeTemporaryResources();

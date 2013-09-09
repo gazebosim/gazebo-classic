@@ -293,10 +293,8 @@ void RenderEngine::Fini()
   // Deallocate memory for every scene
   while (this->scenes.size() != 0)
   {
-    this->RemoveScene(this->scenes.front()->GetName());       
+    this->RemoveScene(this->scenes.front()->GetName());
   }
-
-  //this->scenes.clear();
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
