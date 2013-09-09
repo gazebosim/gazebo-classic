@@ -249,13 +249,13 @@ void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
     case 0:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     case 1:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     case 2:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -269,13 +269,13 @@ void DARTJoint::SetLowStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
   case 0:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   case 1:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   case 2:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -288,11 +288,11 @@ math::Angle DARTJoint::GetHighStop(int _index)
   switch (_index)
   {
   case 0:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   case 1:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   case 2:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -306,11 +306,11 @@ math::Angle DARTJoint::GetLowStop(int _index)
   switch (_index)
   {
   case 0:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   case 1:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   case 2:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };

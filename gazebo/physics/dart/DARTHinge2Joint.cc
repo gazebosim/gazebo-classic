@@ -87,9 +87,9 @@ math::Angle DARTHinge2Joint::GetAngleImpl(int _index) const
   math::Angle result;
 
   if (_index == 0)
-    result = this->dartJoint->getDof(0)->get_q();
+    result = this->dartJoint->getGenCoord(0)->get_q();
   else
-    result = this->dartJoint->getDof(1)->get_q();
+    result = this->dartJoint->getGenCoord(1)->get_q();
 
   return result;
 }

@@ -126,7 +126,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
   assert(this->dartJoint->getDOF() == 1);
 
   // Hinge joint has only one dof.
-  double radianAngle = this->dartJoint->getDof(0)->get_q();
+  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
   result.SetFromRadian(radianAngle);
 
   return result;
@@ -137,7 +137,7 @@ double DARTSliderJoint::GetVelocity(int /*index*/) const
 {
   double result;
 
-  result = this->dartJoint->getDof(0)->get_dq();
+  result = this->dartJoint->getGenCoord(0)->get_dq();
 
   return result;
 }
@@ -169,7 +169,7 @@ void DARTSliderJoint::SetMaxForce(int _index, double _torque)
 {
   DARTJoint::SetForce(_index, _torque);
 
-  dartJoint->getDof(0)->set_tau(_torque);
+  dartJoint->getGenCoord(0)->set_tau(_torque);
 }
 
 
