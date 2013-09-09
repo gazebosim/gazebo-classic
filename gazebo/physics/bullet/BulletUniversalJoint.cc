@@ -60,8 +60,10 @@ void BulletUniversalJoint::Init()
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
-  if (!bulletChildLink || !bulletParentLink)
-    gzthrow("BulletUniversalJoint cannot be connected to the world");
+  if (!bulletParentLink)
+    gzthrow("BulletUniversalJoint cannot be connected to the world (parent)");
+  if (!bulletChildLink)
+    gzthrow("BulletUniversalJoint cannot be connected to the world (child)");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
