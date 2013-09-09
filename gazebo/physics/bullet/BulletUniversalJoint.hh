@@ -54,14 +54,8 @@ namespace gazebo
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
       /// \brief Set the first axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Get the first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;

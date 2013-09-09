@@ -138,13 +138,6 @@ void BulletHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAnchor(int /*_index*/,
-                                  const math::Vector3 &/*_anchor*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
 void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
@@ -179,7 +172,7 @@ void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
   if (this->bulletHinge2)
     this->bulletHinge2->setUpperLimit(_angle.Radian());
   else
-    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+    gzerr << "Joint must be created first.\n";
 }
 
 //////////////////////////////////////////////////
@@ -188,21 +181,24 @@ void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
   if (this->bulletHinge2)
     this->bulletHinge2->setLowerLimit(_angle.Radian());
   else
-    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+    gzerr << "Joint must be created first.\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
   if (!this->bulletHinge2)
-    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+  {
+    gzerr << "Joint must be created first.\n";
+    return math::Angle();
+  }
 
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
-  gzthrow("Unable to get high stop for axis _index[" << _index << "]");
+  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
   return 0;
 }
 
@@ -210,14 +206,14 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
   if (!this->bulletHinge2)
-    gzthrow("Joint must be created first.  Change this throw to gzerr.");
+    gzerr << "Joint must be created first.\n";
 
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 
-  gzthrow("Unable to get high stop for axis _index[" << _index << "]");
+  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
   return 0;
 }
 

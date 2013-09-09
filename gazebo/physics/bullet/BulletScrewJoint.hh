@@ -53,6 +53,7 @@ namespace gazebo
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);
 
+
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 

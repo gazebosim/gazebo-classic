@@ -142,19 +142,6 @@ math::Vector3 BulletBallJoint::GetAnchor(int /*_index*/) const
   return this->anchorPos;
 }
 
-//////////////////////////////////////////////////
-void BulletBallJoint::SetAnchor(int /*_index*/,
-                                const math::Vector3 &/*_anchor*/)
-{
-  // The anchor (pivot in Bullet lingo), can only be set on creation
-}
-
-//////////////////////////////////////////////////
-void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
 /////////////////////////////////////////////////
 void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {

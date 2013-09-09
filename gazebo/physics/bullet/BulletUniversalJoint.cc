@@ -98,23 +98,10 @@ math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetAnchor(int /*_index*/,
-                                     const math::Vector3 &/*_anchor*/)
-{
-  // The anchor (pivot in Bullet lingo), can only be set on creation
-}
-
-//////////////////////////////////////////////////
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
   btVector3 axis = this->bulletUniversal->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
-}
-
-//////////////////////////////////////////////////
-void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
