@@ -19,7 +19,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <math/gzmath.hh>
+#include <gazebo/math/gzmath.hh>
 
 #include <iostream>
 
