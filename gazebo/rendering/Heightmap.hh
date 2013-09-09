@@ -233,6 +233,13 @@ namespace gazebo
       private: void UpdateTerrainHash(std::string _hash,
           boost::filesystem::path _terrainDir);
 
+      /// \brief It checks if the terrain was previously loaded. In negative
+      /// case, it splits the original terrain into pieces and creates a hash
+      /// file.
+      /// \param[in] _imgPath Path to the heighmap image file.
+      /// \return True if the terrain requires to regenerate the terrain files.
+      private: bool PrepareTerrainPaging(boost::filesystem::path _imgPath);
+
       /// \brief Number of pieces in which a terrain is subdivided for paging.
       public: static const unsigned int NumTerrainSubdivisions;
 
