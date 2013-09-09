@@ -46,6 +46,9 @@ namespace gazebo
       public: virtual ~BulletUniversalJoint();
 
       // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
       public: virtual void Init();
 
       /// \brief Get the anchor point
@@ -56,6 +59,9 @@ namespace gazebo
 
       /// \brief Set the first axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);
+
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Get the first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;

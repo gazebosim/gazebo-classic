@@ -45,6 +45,12 @@ BulletUniversalJoint::~BulletUniversalJoint()
 }
 
 //////////////////////////////////////////////////
+void BulletUniversalJoint::Load(sdf::ElementPtr _sdf)
+{
+  UniversalJoint<BulletJoint>::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
 void BulletUniversalJoint::Init()
 {
   UniversalJoint<BulletJoint>::Init();
@@ -55,11 +61,15 @@ void BulletUniversalJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+    gzthrow("BulletUniversalJoint cannot be connected to the world");
 
-  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
-  math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
+  sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
+  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
+
+  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
+  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
+
+  // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   this->bulletUniversal = new btUniversalConstraint(
       *bulletParentLink->GetBulletLink(),
@@ -91,7 +101,7 @@ math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 void BulletUniversalJoint::SetAnchor(int /*_index*/,
                                      const math::Vector3 &/*_anchor*/)
 {
-  gzerr << "Not implemented\n";
+  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -102,10 +112,16 @@ math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
+void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
+{
+  gzerr << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////
 void BulletUniversalJoint::SetAxis(int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented\n";
+  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -162,7 +178,7 @@ void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
         this->GetHighStop(0).Radian(), _angle.Radian());
   }
   else
-    gzthrow("Joint must be created first");
+    gzerr << "bulletUniversal does not yet exist" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -178,7 +194,7 @@ void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
         this->GetLowStop(0).Radian(), _angle.Radian());
   }
   else
-    gzthrow("Joint must be created first");
+    gzerr << "bulletUniversal does not yet exist" << std::endl;
 }
 
 //////////////////////////////////////////////////
