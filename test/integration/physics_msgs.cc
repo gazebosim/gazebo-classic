@@ -17,10 +17,12 @@
 #include <string.h>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
+#define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
 class PhysicsMsgsTest : public ServerFixture,
@@ -28,6 +30,7 @@ class PhysicsMsgsTest : public ServerFixture,
 {
   public: void MoveTool(const std::string &_physicsEngine);
   public: void SetGravity(const std::string &_physicsEngine);
+  public: void SimpleShapeResize(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -149,6 +152,149 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   }
 }
 
+////////////////////////////////////////////////////////////////////////
+// SimpleShapeResize: (Test adapted from PhysicsTest::SpawnDrop)
+// Load a world, check that gravity points along z axis, spawn simple
+// shapes (box, sphere, cylinder), resize them to be smaller, verify that they
+// then start falling.
+////////////////////////////////////////////////////////////////////////
+void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LE(g.z, -9.8);
+
+  // get physics time step
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // spawn some simple shapes with unit size
+  double z0 = 0.5;
+  std::map<std::string, math::Vector3> modelPos;
+  modelPos["test_box"] = math::Vector3(0, 0, z0);
+  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
+  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+
+  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
+      math::Vector3::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
+      math::Vector3::Zero);
+
+  // spawn another set of shapes and use messages to resize these
+  modelPos["test_box2"] = math::Vector3(0, 9, z0);
+  modelPos["test_sphere2"] = math::Vector3(4, 9, z0);
+  modelPos["test_cylinder2"] = math::Vector3(8, 9, z0);
+
+  SpawnBox("test_box2", math::Vector3(1, 1, 1), modelPos["test_box2"],
+      math::Vector3::Zero);
+  SpawnSphere("test_sphere2", modelPos["test_sphere2"], math::Vector3::Zero);
+  SpawnCylinder("test_cylinder2", modelPos["test_cylinder2"],
+      math::Vector3::Zero);
+
+  // advertise on "~/model/modify" to generate resize messages
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  int steps = 2;
+  physics::ModelPtr model;
+  math::Pose pose1, pose2;
+  math::Vector3 vel1, vel2;
+  double x0, y0;
+
+  // Allow objects to settle on ground_plane
+  world->StepWorld(100);
+
+  // Verify the initial model pose is where we set it to be.
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
+  {
+    std::string name = iter->first;
+    // Make sure the model is loaded
+    model = world->GetModel(name);
+    EXPECT_TRUE(model != NULL);
+
+    pose1 = model->GetWorldPose();
+    x0 = modelPos[name].x;
+    y0 = modelPos[name].y;
+
+    EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.pos.z, z0, PHYSICS_TOL);
+  }
+
+  // resize model to half of it's size
+  double scaleFactor = 0.5;
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
+  {
+    std::string name = iter->first;
+    model = world->GetModel(name);
+    if (*(name.rbegin()) == '2')
+    {
+      // Use a message to resize this one
+      msgs::Model msg;
+      msg.set_name(name);
+      msg.set_id(model->GetId());
+      msgs::Set(msg.mutable_scale(), scaleFactor * math::Vector3::One);
+      modelPub->Publish(msg);
+    }
+    else
+    {
+      // Use physics API to resize
+      model->SetScale(scaleFactor * math::Vector3::One);
+    }
+  }
+
+  // Predict time of contact with ground plane.
+  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.z));
+  // Time to advance, allow 0.5 s settling time.
+  // This assumes inelastic collisions with the ground.
+  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  steps = ceil(dtHit / dt);
+  EXPECT_GT(steps, 0);
+  world->StepWorld(steps);
+
+  // This loop checks the velocity and pose of each model 0.5 seconds
+  // after the time of predicted ground contact. The pose is expected to be
+  // underneath the initial pose.
+  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
+    iter != modelPos.end(); ++iter)
+  {
+    std::string name = iter->first;
+    // Make sure the model is loaded
+    model = world->GetModel(name);
+    if (model != NULL)
+    {
+      gzdbg << "Check ground contact of model " << name << '\n';
+      // Check that model is resting on ground
+      pose1 = model->GetWorldPose();
+      x0 = modelPos[name].x;
+      y0 = modelPos[name].y;
+      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
+    }
+    else
+    {
+      gzerr << "Error loading model " << name << '\n';
+      EXPECT_TRUE(model != NULL);
+    }
+  }
+}
+
+
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)
 {
@@ -159,6 +305,12 @@ TEST_P(PhysicsMsgsTest, SetGravity)
 TEST_P(PhysicsMsgsTest, MoveTool)
 {
   MoveTool(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, SimpleShapeResize)
+{
+  SimpleShapeResize(GetParam());
 }
 
 INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsMsgsTest)
