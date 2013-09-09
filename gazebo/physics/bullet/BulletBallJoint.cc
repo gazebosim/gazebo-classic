@@ -139,12 +139,6 @@ math::Vector3 BulletBallJoint::GetAnchor(int /*_index*/) const
   return this->anchorPos;
 }
 
-//////////////////////////////////////////////////
-void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
 /////////////////////////////////////////////////
 void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {

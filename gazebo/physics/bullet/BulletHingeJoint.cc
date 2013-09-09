@@ -208,12 +208,6 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
 math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
