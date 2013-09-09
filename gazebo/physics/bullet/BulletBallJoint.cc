@@ -197,6 +197,8 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
     // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
   }
+  else
+    gzerr << "bulletBall does not yet exist" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -211,5 +213,7 @@ void BulletBallJoint::SetLowStop(int /*_index*/,
     // this->bulletBall->setLimit(-_angle.Radian(),
     //                         this->bulletBall->getUpperLimit());
   }
+  else
+    gzerr << "bulletBall does not yet exist" << std::endl;
 }
 
