@@ -218,6 +218,21 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
+      /// \brief Compute the SHA1 hash of a file.
+      /// \param[in] _filename Input file.
+      /// \return The string representation (40 character) of the SHA1 hash.
+      private: std::string GetSHA1(boost::filesystem::path _filename);
+
+      /// \brief Update the hash of a terrain file. The hash will be written in 
+      /// a file called gzterrain.SHA1 . This method will be used when the
+      /// paging is enabled and the terrain is loaded for the first time or if
+      /// the heightmap's image has been modified.
+      /// \param[in] _hash New hash value
+      /// \param[in] _terrainDir Directory where the terrain hash and the
+      /// terrain pages are stored. Ex: /tmp/gazebo-paging/heigthmap_bowl
+      private: void UpdateTerrainHash(std::string _hash,
+          boost::filesystem::path _terrainDir);
+
       /// \brief Number of pieces in which a terrain is subdivided for paging.
       public: static const unsigned int NumTerrainSubdivisions;
 
@@ -240,6 +255,11 @@ namespace gazebo
       /// \brief Hash filename that should be present for every terrain file
       /// loaded using paging
       private: static const std::string HashFilename;
+
+      /// \brief When the terrain paging is enabled, the terrain information
+      /// for every piece of terrain is stored in disk. This is the name of
+      /// the top level directory where these files are located
+      private: static const boost::filesystem::path GzPagingDir;
 
       /// \brief The scene.
       private: ScenePtr scene;

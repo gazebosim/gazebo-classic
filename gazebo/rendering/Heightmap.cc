@@ -41,6 +41,8 @@ using namespace rendering;
 const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const double Heightmap::LoadRadiusFactor = 1.0;
 const double Heightmap::HoldRadiusFactor = 1.15;
+const boost::filesystem::path Heightmap::GzPagingDir =
+    boost::filesystem::temp_directory_path() / "gazebo-paging";
 const std::string Heightmap::HashFilename = "gzterrain.SHA1";
 
 //////////////////////////////////////////////////
@@ -56,16 +58,6 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   this->pageManager = NULL;
   this->terrainPaging = NULL;
-
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
-  boost::filesystem::path gzPagingDir = "gazebo-paging";
-  /*boost::filesystem::path instanceDir =
-      boost::filesystem::unique_path("instance-%%%%%%%%%%");
-
-  this->pagingPath = tmpDir / gzPagingDir / instanceDir;
-
-  // Create a temporal and unique directory for page files
-  boost::filesystem::create_directories(this->pagingPath);*/
 }
 
 //////////////////////////////////////////////////
@@ -87,9 +79,6 @@ Heightmap::~Heightmap()
     pageManager->destroyWorld(this->world);
     OGRE_DELETE this->pageManager;
   }
-
-  // Remove page files from disk
-  //boost::filesystem::remove_all(this->pagingPath);
 }
 
 //////////////////////////////////////////////////
@@ -224,9 +213,8 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
-std::string GetSHA1(boost::filesystem::path filename)
+std::string Heightmap::GetSHA1(boost::filesystem::path filename)
 {
-  //std::cout << "Generating SHA1 from " << filename << std::endl;
   std::ifstream ifs(filename.string().c_str(), std::ios::binary);
   
   if (!ifs.good())
@@ -249,21 +237,39 @@ std::string GetSHA1(boost::filesystem::path filename)
 
   sha1.get_digest(hash);
   
-  //std::cout << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2);
   std::stringstream stream;
   stream << std::setfill('0') << std::setw(sizeof(int) * 2) << std::hex;
 
- // std::cout << sizeof(hash) / sizeof(hash[0]) << std::endl;
   for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
   {
     stream << hash[i];
-    //std::cout << hash[i];
   }
 
-  //std::cout << std::endl;
-  //std::cout << stream.str() << std::endl;
-
   return stream.str();
+}
+
+//////////////////////////////////////////////////
+void Heightmap::UpdateTerrainHash(std::string _hash,
+    boost::filesystem::path _terrainDir)
+{
+  std::ofstream terrainHashFile;
+  boost::filesystem::path terrainHashFullPath;
+
+  // Create the subdirectories if they do not exist
+  boost::filesystem::create_directories(_terrainDir);
+
+  terrainHashFullPath = _terrainDir / this->HashFilename;
+
+  // Update the terrain hash
+  terrainHashFile.open(terrainHashFullPath.string().c_str());
+
+  // Throw an error if we couldn't open the file for writing.
+  if (!terrainHashFile.is_open())
+    gzthrow("Unable to open file for creating a terrain hash: [" +
+        terrainHashFullPath.string() + "]");
+
+  terrainHashFile << _hash;
+  terrainHashFile.close();
 }
 
 //////////////////////////////////////////////////
@@ -341,14 +347,11 @@ void Heightmap::Load()
   if (this->useTerrainPaging)
   {
     // Check if the terrain hast exists
-    boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
-    boost::filesystem::path gzPagingDir = "gazebo-paging";
-    boost::filesystem::path terrainHashFullPath = tmpDir / gzPagingDir /
+    boost::filesystem::path terrainHashFullPath = this->GzPagingDir /
         terrainName / HashFilename;
-    std::string imgHash;
 
     // Compute SHA1 of the image heightmap
-    imgHash = GetSHA1(geomMsg.heightmap().filename());
+    std::string imgHash = GetSHA1(geomMsg.heightmap().filename());
 
     if (!boost::filesystem::exists(terrainHashFullPath))
     {
@@ -368,15 +371,14 @@ void Heightmap::Load()
 
     if (updateHash)
     {
-      std::cout << "Updating hash\n";
-      // Create the subdirectories if they do not exist
-      boost::filesystem::create_directories(tmpDir / gzPagingDir / terrainName);
-
-      // Update the terrain hash
-      std::ofstream terrainHashFile;
-      terrainHashFile.open(terrainHashFullPath.string().c_str());
-      terrainHashFile << imgHash;
-      terrainHashFile.close();
+      // Update the terrain hash with the SHA1 of the image file
+      try
+      {
+        this->UpdateTerrainHash(imgHash, this->GzPagingDir / terrainName);
+      }
+      catch(...)
+      {  
+      }
 
       // Split the terrain. Every subterrain will be paged
       this->SplitHeights(this->heights, nTerrains, this->subTerrains);
