@@ -123,13 +123,6 @@ void BulletHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAnchor(int /*_index*/,
-                                  const math::Vector3 &/*_anchor*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
 void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
