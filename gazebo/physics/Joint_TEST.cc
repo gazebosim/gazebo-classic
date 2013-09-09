@@ -365,7 +365,12 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
   double residentLast = 0, shareLast = 0;
   double residentCur = 0, shareCur = 0;
 
-  for (unsigned int i = 0; i < 100; ++i)
+  // The memory footprint on osx can take around 190 cycles to stabilize.
+  // So this test gives 250 cycles to stabilize and then verifies stability
+  // for another 250.
+  unsigned int cyclesMax = 500;
+  unsigned int cyclesStabilize = cyclesMax / 2;
+  for (unsigned int i = 0; i < cyclesMax; ++i)
   {
     // try creating a joint
     {
@@ -412,10 +417,10 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     gazebo::common::Time::MSleep(10);
 
     this->GetMemInfo(residentCur, shareCur);
-    if (i > 1)  // give it 2 cycles to stabilize
+    if (i > cyclesStabilize)  // give it quite a few cycles to stabilize
     {
-      EXPECT_LE(residentCur, residentLast * 1.01);
-      EXPECT_LE(shareCur, shareLast * 1.01);
+      EXPECT_LE(residentCur, residentLast);
+      EXPECT_LE(shareCur, shareLast);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
