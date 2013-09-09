@@ -1,5 +1,4 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include (${gazebo_cmake_dir}/FindSSE.cmake)
 include (CheckCXXSourceCompiles)
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
