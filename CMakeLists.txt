@@ -191,6 +191,8 @@ endif()
 
 #####################################
 # Handle CFlags
+unset (CMAKE_C_FLAGS_ALL CACHE)
+unset (CMAKE_CXX_FLAGS CACHE)
 
 # USE_HOST_CFLAGS (default TRUE)
 # Will check building host machine for proper cflags 
@@ -201,7 +203,7 @@ endif()
 
 # USE_UPSTREAM_CFLAGS (default TRUE)
 # Will use predefined gazebo developers cflags
-if(NOT DEFINED USE_UPSTREAM_FLAGS OR USE_UPSTREAM_CFLAGS)
+if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
   message(STATUS "Enable upstream CFlags")
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()
@@ -264,7 +266,11 @@ else (build_errors)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
-  message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
+  if (DEFINED CMAKE_CXX_FLAGS)
+    message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
+  else()
+    message (STATUS "Use default CFlags")
+  endif()
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
