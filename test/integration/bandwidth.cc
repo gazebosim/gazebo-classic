@@ -89,7 +89,7 @@ TEST_P(BandwidthTest, Bandwidth)
   Bandwidth(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(BandwidthTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, BandwidthTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

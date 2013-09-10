@@ -15,30 +15,19 @@
  *
 */
 
-#ifndef _TEST_GENERATOR_HH_
-#define _TEST_GENERATOR_HH_
+#ifndef _HELPER_PHYSICS_GENERATOR_HH_
+#define _HELPER_PHYSICS_GENERATOR_HH_
 
-#define ODE_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestODE, \
-    testclass, ::testing::Values("ode"));
-#define BULLET_SUPPORT(testclass)
-#define DART_SUPPORT(testclass)
+#define BULLET_SUPPORT
 
 #ifdef HAVE_BULLET
-#undef BULLET_SUPPORT
-#define BULLET_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
-    testclass, ::testing::Values("bullet"));
+# undef BULLET_SUPPORT
+# define BULLET_SUPPORT , "bullet"
 #endif
 
-#ifdef HAVE_DART
-#undef DART_SUPPORT
-#define DART_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestDART, \
-    testclass, ::testing::Values("dart"));
-#endif
-
-/// \brief Helper macro to instantiate gtest for using different physics engines
-#define INSTANTIATE_PHYSICS_ENGINES_TEST(testclass) \
-    ODE_SUPPORT(testclass) \
-    BULLET_SUPPORT(testclass) \
-    DART_SUPPORT(testclass)
+/// \brief Helper macro to instantiate gtest for different physics engines
+#define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
+  BULLET_SUPPORT \
+  )
 
 #endif

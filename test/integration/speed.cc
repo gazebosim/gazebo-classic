@@ -103,7 +103,7 @@ TEST_P(SpeedTest, ShapesWorld)
   ShapesWorld(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(SpeedTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
