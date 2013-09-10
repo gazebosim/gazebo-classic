@@ -420,7 +420,7 @@ TEST_F(Joint_TEST, JointCreationDestructionTest)
     this->GetMemInfo(residentCur, shareCur);
 
     // give it 2 cycles to stabilize
-    if (i > 1)
+    if (i > cyclesStabilize)
     {
       EXPECT_LE(residentCur, residentLast * 1.01);
       EXPECT_LE(shareCur, shareLast * 1.01);
