@@ -311,7 +311,8 @@ void BulletJoint::CacheForceTorque()
   {
     if (!this->childLink)
     {
-      gzerr << "Both parent and child links are invalid, abort.\n";
+      gzerr << "Joint [" << this->GetScopedName()
+            << "]: Both parent and child links are invalid, abort.\n";
       return;
     }
     else
