@@ -244,9 +244,17 @@ math::Vector3 DARTLink::GetWorldAngularVel() const
 /////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldForce() const
 {
+  // TODO: Need verification
   math::Vector3 force;
 
-  gzwarn << "Not implemented!\n";
+  const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getGeneralizedInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getVelocityBody();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getAcceleration();
+
+  Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
+
+  force = DARTUtils::ConvertVector3(W.rotation().transpose() * F.tail<3>());
 
   return force;
 }
@@ -254,9 +262,17 @@ math::Vector3 DARTLink::GetWorldForce() const
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldTorque() const
 {
+  // TODO: Need verification
   math::Vector3 torque;
 
-  gzwarn << "Not implemented!\n";
+  const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getGeneralizedInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getVelocityBody();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getAcceleration();
+
+  Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
+
+  force = DARTUtils::ConvertVector3(W.rotation().transpose() * F.head<3>());
 
   return torque;
 }
@@ -280,15 +296,25 @@ bool DARTLink::GetGravityMode() const
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetSelfCollide(bool /*_collide*/)
+void DARTLink::SetSelfCollide(bool _collide)
 {
-  gzwarn << "Not implemented!\n";
+  this->sdf->GetElement("self_collide")->Set(_collide);
+
+  // see: https://github.com/dartsim/dart/issues/84
+  gzlog << "DART does not support SetSelfCollide() yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetLinearDamping(double /*_damping*/)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping()"
+          << std::endl;
+    return;
+  }
+  gzlog << "DART does not support SetLinearDamping yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
