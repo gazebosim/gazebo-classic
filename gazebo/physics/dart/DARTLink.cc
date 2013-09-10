@@ -228,7 +228,8 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3& _force,
   if (!this->dartBodyNode)
   {
     gzlog << "DART rigid body for link [" << this->GetName() << "]"
-          << " does not exist, unable to AddForceAtRelativePosition" << std::endl;
+          << " does not exist, unable to AddForceAtRelativePosition"
+          << std::endl;
     return;
   }
 
@@ -378,13 +379,24 @@ void DARTLink::SetLinearDamping(double /*_damping*/)
           << std::endl;
     return;
   }
+
+  // see: https://github.com/dartsim/dart/issues/85
   gzlog << "DART does not support SetLinearDamping yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularDamping(double /*_damping*/)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping()"
+          << std::endl;
+    return;
+  }
+
+  // see: https://github.com/dartsim/dart/issues/85
+  gzlog << "DART does not support SetLinearDamping yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
