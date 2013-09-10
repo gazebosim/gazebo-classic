@@ -19,8 +19,9 @@
  * Date: 21 May 2003
  */
 
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -42,16 +43,15 @@ SimbodyBallJoint::~SimbodyBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
+void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 {
-  return this->anchorPos;
+  BallJoint<SimbodyJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetAnchor(int /*_index*/,
-                                const math::Vector3 &/*_anchor*/)
+math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
+  return this->anchorPos;
 }
 
 /////////////////////////////////////////////////
@@ -94,21 +94,16 @@ void SimbodyBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 }
 
 /////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetAngle(int /*_index*/) const
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
 math::Vector3 SimbodyBallJoint::GetGlobalAxis(int /*_index*/) const
 {
+  gzerr << "Not implemented\n";
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
 math::Angle SimbodyBallJoint::GetAngleImpl(int /*_index*/) const
 {
+  gzerr << "Not implemented\n";
   return math::Angle();
 }
 

@@ -48,43 +48,43 @@ namespace gazebo
       /// \brief Load the SimbodyHingeJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set the axis of rotation
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
-
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, double _damping);
 
-       /// \brief Set the velocity of an axis(index).
+      // Documentation inherited.
+      public: void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual void SetVelocity(int _index, double _rate);
 
-      /// \brief Get the rotation rate
+      // Documentation inherited.
       public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Set the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Get the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual double GetMaxForce(int _index);
 
-      /// \brief Set the high stop of an axis(index).
+      // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
-      /// \brief Set the low stop of an axis(index).
+      // Documentation inherited.
       public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the high stop of an axis(index).
+      // Documentation inherited.
       public: virtual math::Angle GetHighStop(int _index);
 
-      /// \brief Get the low stop of an axis(index).
+      // Documentation inherited.
       public: virtual math::Angle GetLowStop(int _index);
 
-      /// \brief Get the axis of rotation
+      // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Get the angle of rotation
+      // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Set the torque of a joint.
+      // Documentation inherited.
       protected: void SetForceImpl(int _index, double _torque);
 
       public: virtual void SaveSimbodyState(const SimTK::State &_state);

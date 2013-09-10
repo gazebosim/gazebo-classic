@@ -272,8 +272,6 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _effort Force value.
-      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
-      /// keep track of external forces only.
       public: virtual void SetForce(int _index, double _effort);
 
       /// \brief @todo: not yet implemented.

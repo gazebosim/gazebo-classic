@@ -40,6 +40,12 @@ SimbodyUniversalJoint::~SimbodyUniversalJoint()
 }
 
 //////////////////////////////////////////////////
+void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
+{
+  UniversalJoint<SimbodyJoint>::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
 void SimbodyUniversalJoint::Init()
 {
   gzerr << "Not implemented in simbody\n";
@@ -49,13 +55,6 @@ void SimbodyUniversalJoint::Init()
 math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*index*/) const
 {
   return this->anchorPos;
-}
-
-//////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetAnchor(int /*_index*/,
-                                     const math::Vector3 &/*_anchor*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -131,7 +130,7 @@ void SimbodyUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
 math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 {
   math::Angle result;
-
+  gzerr << "Not implemented\n";
   return result;
 }
 
@@ -139,7 +138,7 @@ math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 math::Angle SimbodyUniversalJoint::GetLowStop(int _index)
 {
   math::Angle result;
-
+  gzerr << "Not implemented\n";
   return result;
 }
 

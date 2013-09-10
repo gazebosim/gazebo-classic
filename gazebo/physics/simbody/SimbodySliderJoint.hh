@@ -51,9 +51,6 @@ namespace gazebo
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, const double _damping);
-
        /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _rate);
 
@@ -68,6 +65,9 @@ namespace gazebo
 
       /// \brief Set the slider force
       protected: virtual void SetForceImpl(int _index, double _force);
+
+      // Documentation inherited.
+      public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);

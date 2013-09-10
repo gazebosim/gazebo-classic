@@ -45,14 +45,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletBallJoint();
 
-      /// \brief Get joint's anchor point
-      public: math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Set joint's anchor point
-      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Init();
+
+      /// \brief Get joint's anchor point
+      public: math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int /*_index*/) const
@@ -83,7 +83,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited.
-      protected: void SetForceImpl(int /*_index*/, double /*_torque*/);
+      protected: void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to Bullet ball constraint
       private: btPoint2PointConstraint *bulletBall;

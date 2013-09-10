@@ -19,8 +19,9 @@
  * Date: 21 May 2003
  */
 
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -57,7 +58,6 @@ void SimbodyHinge2Joint::Init()
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetAnchor(int /*index*/) const
 {
-  gzerr << "Not implemented";
   return this->anchorPos;
 }
 
@@ -84,13 +84,6 @@ double SimbodyHinge2Joint::GetVelocity(int /*_index*/) const
 
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetAnchor(int /*_index*/,
-                                  const math::Vector3 &/*_anchor*/)
 {
   gzerr << "Not implemented";
 }

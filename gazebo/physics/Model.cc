@@ -185,12 +185,6 @@ void Model::Init()
     }
   }
 
-  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
-       iter != this->grippers.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
   // Initialize the joints messages for visualizer
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
@@ -201,6 +195,12 @@ void Model::Init()
     msgs::Joint msg;
     (*iter)->FillMsg(msg);
     this->jointPub->Publish(msg);
+  }
+
+  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
+       iter != this->grippers.end(); ++iter)
+  {
+    (*iter)->Init();
   }
 }
 

@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyHinge2Joint();
 
-      /// \brief Load the SimbodyHinge2Joint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Set joint damping, not yet implemented
@@ -54,9 +54,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Init();
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Get anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;

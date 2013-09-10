@@ -43,17 +43,17 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyBallJoint();
 
-      /// \brief Get joint's anchor point
-      public: math::Vector3 GetAnchor(int _index) const;
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief Set joint's anchor point
-      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
-
       // Documentation inherited.
       public: virtual void Init();
+
+      /// \brief Get joint's anchor point
+      public: math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int /*_index*/) const
@@ -77,17 +77,14 @@ namespace gazebo
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int _index) const;
-
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
-
-      /// \brief Get the angle of rotation
+      // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited.
-      protected: void SetForceImpl(int /*_index*/, double /*_torque*/);
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int _index, double _torque);
     };
 
     /// \}

@@ -136,9 +136,6 @@
         </sensor>
         <physics>
           <provide_feedback>true</provide_feedback>
-          <ode>
-            <provide_feedback>true</provide_feedback>
-          </ode>
         </physics>
       </joint>
 
@@ -169,9 +166,6 @@
         </sensor>
         <physics>
           <provide_feedback>true</provide_feedback>
-          <ode>
-            <provide_feedback>true</provide_feedback>
-          </ode>
         </physics>
       </joint>
     </model>

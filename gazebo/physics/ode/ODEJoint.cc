@@ -1069,7 +1069,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
       if (!this->childLink)
       {
-        gzdbg << "Joint [" << this->GetName()
+        gzlog << "Joint [" << this->GetName()
               << "] with parent Link [" << this->parentLink->GetName()
               << "] but no child Link.  Child Link must be world.\n";
         // if child link does not exist, use equal and opposite
@@ -1096,7 +1096,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       }
       else
       {
-        gzdbg << "Joint [" << this->GetName()
+        gzlog << "Joint [" << this->GetName()
               << "] with child Link [" << this->childLink->GetName()
               << "] but no parent Link.  Parent Link must be world.\n";
         // if parentLink does not exist, use equal opposite body1 wrench
@@ -1237,7 +1237,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
         boost::bind(&ODEJoint::CFMDamping, this));
     else
       this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&Joint::ApplyDamping, this));
+        boost::bind(&ODEJoint::ApplyDamping, this));
     this->dampingInitialized = true;
   }
 }

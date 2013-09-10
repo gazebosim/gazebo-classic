@@ -47,14 +47,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletHinge2Joint();
 
-      /// \brief Load the BulletHinge2Joint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Init();
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Get anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;

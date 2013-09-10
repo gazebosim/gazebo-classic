@@ -45,6 +45,9 @@ namespace gazebo
       public: virtual ~SimbodyUniversalJoint();
 
       // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
       public: virtual void Init();
 
       /// \brief Set joint damping, not yet implemented
@@ -52,9 +55,6 @@ namespace gazebo
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Set the first axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);

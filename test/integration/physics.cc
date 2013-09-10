@@ -1615,7 +1615,7 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   ASSERT_TRUE(model);
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
