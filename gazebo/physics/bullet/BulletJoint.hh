@@ -117,9 +117,6 @@ namespace gazebo
                 return 0;
               }
 
-      protected: btTypedConstraint *constraint;
-      protected: btDynamicsWorld *bulletWorld;
-
       // Documentation inherited.
       public: virtual void CacheForceTorque();
 
@@ -166,6 +163,9 @@ namespace gazebo
       /// internal force, e.g. damping forces.  This way, Joint::appliedForce
       /// keep track of external forces only.
       private: void SaveForce(int _index, double _force);
+
+      protected: btTypedConstraint *constraint;
+      protected: btDynamicsWorld *bulletWorld;
 
       /// \brief Feedback data for this joint
       private: btJointFeedback *feedback;
