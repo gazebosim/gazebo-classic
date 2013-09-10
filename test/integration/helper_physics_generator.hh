@@ -25,9 +25,17 @@
 # define BULLET_SUPPORT , "bullet"
 #endif
 
+#define DART_SUPPORT
+
+#ifdef HAVE_DART
+# undef DART_SUPPORT
+# define DART_SUPPORT , "dart"
+#endif
+
 /// \brief Helper macro to instantiate gtest for different physics engines
 #define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
   BULLET_SUPPORT \
+  DART_SUPPORT \
   )
 
 #endif
