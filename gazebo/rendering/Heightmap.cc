@@ -282,8 +282,8 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path _imgPath)
 {
   std::string imgHash;
   boost::filesystem::path terrainHashFullPath;
-  std::string terrainName;
-  bool updateHash = false;
+  boost::filesystem::path terrainName;
+  bool updateHash = true;
 
   // Compute the original heightmap's image.
   try
@@ -297,13 +297,10 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path _imgPath)
   }
 
   // Check if the terrain hash exists
-  terrainName = imgPath.filename().stem();
+  terrainName = _imgPath.filename().stem();
   terrainHashFullPath = this->GzPagingDir / terrainName / HashFilename;
-  if (!boost::filesystem::exists(terrainHashFullPath))
-  {
-    updateHash = true;
-  }
-  else
+
+  if (boost::filesystem::exists(terrainHashFullPath))
   {
     try
     {
@@ -314,7 +311,7 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path _imgPath)
       std::string terrainHash(buffer.str());
       updateHash = terrainHash != imgHash;
     }
-    catch (...)
+    catch (std::ifstream::failure &e)
     {
       gzerr << "Terrain paging error: Unable to read terrain hash\n";
     }
@@ -342,7 +339,6 @@ void Heightmap::Load()
 
   msgs::Geometry geomMsg;
   boost::filesystem::path imgPath;
-  boost::filesystem::path terrainName;
   bool regenerateTerrains = false;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
@@ -361,9 +357,6 @@ void Heightmap::Load()
 
     // Get the full path of the image heightmap
     imgPath = geomMsg.heightmap().filename();
-
-    // Get the name of the terrain as the filename without the extension
-    terrainName = imgPath.filename().stem();
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -403,7 +396,7 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    regenerateTerrains = this->PrepareTerrainPaging();
+    regenerateTerrains = this->PrepareTerrainPaging(imgPath);
     if (regenerateTerrains)
     {
       // Split the terrain. Every subterrain will be paged
