@@ -199,9 +199,9 @@ void BulletJoint::CacheForceTorque()
   }
   else
   {
-    /// \TODO: fix for multi-axis joints
-    gzerr << "force torque for joint type [" << this->GetType()
-          << "] not implemented, returns false results!!\n";
+    /// \TODO: implement for other joint types
+    // gzerr << "force torque for joint type [" << this->GetType()
+    //       << "] not implemented, returns false results!!\n";
   }
 
   // convert wrench from child cg location to child link frame
