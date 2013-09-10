@@ -28,7 +28,7 @@
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *,const char *> std_string2;
+typedef std::tr1::tuple<const char *, const char *> std_string2;
 
 class Joint_TEST : public ServerFixture,
                    public ::testing::WithParamInterface<std_string2>
