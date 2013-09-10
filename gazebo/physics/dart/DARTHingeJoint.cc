@@ -51,8 +51,6 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTHingeJoint::Init()
 {
-  // Create dart joint first.
-  //this->dartJoint = new dart::dynamics::RevoluteJoint();
   HingeJoint<DARTJoint>::Init();
   this->dartJoint->setDampingCoefficient(0, dampingCoefficient);
 }
