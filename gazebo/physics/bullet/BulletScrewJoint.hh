@@ -53,7 +53,7 @@ namespace gazebo
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
+      // Documentation inherited.
       public: virtual void SetDamping(int _index, double _damping);
 
       /// \copydoc ScrewJoint::SetThreadPitch

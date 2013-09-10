@@ -1628,9 +1628,16 @@ void World::ProcessFactoryMsgs()
   for (std::list<sdf::ElementPtr>::iterator iter2 = modelsToLoad.begin();
        iter2 != modelsToLoad.end(); ++iter2)
   {
-    ModelPtr model = this->LoadModel(*iter2, this->rootElement);
-    model->Init();
-    model->LoadPlugins();
+    try
+    {
+      ModelPtr model = this->LoadModel(*iter2, this->rootElement);
+      model->Init();
+      model->LoadPlugins();
+    }
+    catch(...)
+    {
+      gzerr << "Loading model from factory message failed\n";
+    }
   }
 }
 
