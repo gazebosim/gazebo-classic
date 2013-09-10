@@ -213,14 +213,14 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
-std::string Heightmap::GetSHA1(boost::filesystem::path _filename)
+std::string Heightmap::GetSHA1(boost::filesystem::path &_filename)
 {
   boost::uuids::detail::sha1 sha1;
   unsigned int hash[5];
   char buf[1024];
   std::stringstream stream;
   std::ifstream ifs(_filename.string().c_str(), std::ios::binary);
-  
+
   if (!ifs.good())
     gzthrow("Unable to open image file for generating a SHA1 hash: [" +
         _filename.string() + "]");
@@ -238,8 +238,8 @@ std::string Heightmap::GetSHA1(boost::filesystem::path _filename)
   ifs.close();
 
   sha1.get_digest(hash);
-  
-  stream << std::setfill('0') << std::setw(sizeof(int) * 2) << std::hex;
+
+  stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
 
   for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
   {
@@ -250,8 +250,8 @@ std::string Heightmap::GetSHA1(boost::filesystem::path _filename)
 }
 
 //////////////////////////////////////////////////
-void Heightmap::UpdateTerrainHash(std::string _hash,
-    boost::filesystem::path _terrainDir)
+void Heightmap::UpdateTerrainHash(std::string &_hash,
+    boost::filesystem::path &_terrainDir)
 {
   std::ofstream terrainHashFile;
   boost::filesystem::path terrainHashFullPath;
@@ -278,40 +278,40 @@ void Heightmap::UpdateTerrainHash(std::string _hash,
 }
 
 //////////////////////////////////////////////////
-bool Heightmap::PrepareTerrainPaging(boost::filesystem::path _imgPath)
+bool Heightmap::PrepareTerrainPaging(boost::filesystem::path &_imgPath,
+    boost::filesystem::path &_terrainDirPath)
 {
   std::string imgHash;
   boost::filesystem::path terrainHashFullPath;
-  boost::filesystem::path terrainName;
   bool updateHash = true;
 
   // Compute the original heightmap's image.
   try
   {
     imgHash = GetSHA1(_imgPath);
+    std::cout << "Image SHA1 computed\n";
   }
   catch(common::Exception &e)
   {
-    gzerr << "Terrain paging error: " << e.GetErrorStr() << "\n";  
+    gzerr << "Terrain paging error: " << e.GetErrorStr() << "\n";
     return true;
   }
 
   // Check if the terrain hash exists
-  terrainName = _imgPath.filename().stem();
-  terrainHashFullPath = this->GzPagingDir / terrainName / HashFilename;
-
+  terrainHashFullPath = _terrainDirPath / this->HashFilename;
   if (boost::filesystem::exists(terrainHashFullPath))
   {
     try
     {
       // Read the terrain hash
-      std::ifstream in(terrainHashFullPath.string().c_str());      
+      std::ifstream in(terrainHashFullPath.string().c_str());
       std::stringstream buffer;
       buffer << in.rdbuf();
       std::string terrainHash(buffer.str());
       updateHash = terrainHash != imgHash;
+      std::cout << "Terrain hash read. Update hash? " << updateHash << "\n";
     }
-    catch (std::ifstream::failure &e)
+    catch(std::ifstream::failure &e)
     {
       gzerr << "Terrain paging error: Unable to read terrain hash\n";
     }
@@ -320,7 +320,8 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path _imgPath)
   // Update the terrain hash and split the terrain into small pieces
   if (updateHash)
   {
-    this->UpdateTerrainHash(imgHash, this->GzPagingDir / terrainName);
+    std::cout << "Terrain hash updated\n";
+    this->UpdateTerrainHash(imgHash, _terrainDirPath);
   }
 
   return updateHash;
@@ -339,6 +340,8 @@ void Heightmap::Load()
 
   msgs::Geometry geomMsg;
   boost::filesystem::path imgPath;
+  boost::filesystem::path terrainName;
+  boost::filesystem::path terrainDirPath;
   bool regenerateTerrains = false;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
@@ -357,6 +360,8 @@ void Heightmap::Load()
 
     // Get the full path of the image heightmap
     imgPath = geomMsg.heightmap().filename();
+    terrainName = imgPath.filename().stem();
+    terrainDirPath = this->GzPagingDir / terrainName;
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -380,7 +385,8 @@ void Heightmap::Load()
       1 + ((this->dataSize - 1) / sqrt(nTerrains)),
       this->terrainSize.x / (sqrt(nTerrains)));
 
-  boost::filesystem::path prefix = this->pagingPath / "gazebo_terrain";
+  boost::filesystem::path prefix = terrainDirPath / "gazebo_terrain";
+  std::cout << prefix << std::endl;
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
@@ -396,11 +402,13 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    regenerateTerrains = this->PrepareTerrainPaging(imgPath);
+    std::cout << "Using terrain paging\n";
+    regenerateTerrains = this->PrepareTerrainPaging(imgPath, terrainDirPath);
     if (regenerateTerrains)
     {
+      std::cout << "Splitting terrain\n";
       // Split the terrain. Every subterrain will be paged
-      this->SplitHeights(this->heights, nTerrains, this->subTerrains); 
+      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
     }
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
@@ -444,6 +452,7 @@ void Heightmap::Load()
     }
     if (regenerateTerrains)
     {
+      std::cout << "Saving all terrains\n";
       // Save all subterrains using files. This is required to reload the pages
       this->terrainGroup->saveAllTerrains(true);
     }
@@ -561,22 +570,26 @@ void Heightmap::SetWireframe(bool _show)
 void Heightmap::DefineTerrain(int _x, int _y)
 {
   Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
+  std::cout << "Looking for " << filename << std::endl;
 
   if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
         this->terrainGroup->getResourceGroup(), filename))
   {
     this->terrainGroup->defineTerrain(_x, _y);
+    std::cout << "Resource exists\n";
   }
   else
   {
     if (this->useTerrainPaging)
     {
+      std::cout << "Resource does not exist. Paging enabled\n";
       this->terrainGroup->defineTerrain(_x, _y,
           &this->subTerrains[this->terrainIdx][0]);
       ++terrainIdx;
     }
     else
     {
+      std::cout << "Resource does not exist. Paging disabled\n";
       this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
     }
     this->terrainsImported = true;
