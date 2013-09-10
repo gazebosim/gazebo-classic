@@ -206,6 +206,10 @@ namespace gazebo
 
       public: static std::string GetTypeString(physics::Base::EntityType _type);
 
+      protected: virtual void OnRequest(ConstRequestPtr &_msg);
+
+      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
       /// \brief true if initialized
       public: bool simbodyPhysicsInitialized;
       public: bool simbodyPhysicsStepped;

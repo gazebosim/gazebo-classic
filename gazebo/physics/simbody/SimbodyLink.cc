@@ -150,6 +150,29 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
 /// changed
 void SimbodyLink::OnPoseChange()
 {
+  if (!this->simbodyPhysics->simbodyPhysicsInitialized)
+    return;
+
+  Link::OnPoseChange();
+
+  if (!this->masterMobod.isEmptyHandle() &&
+      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  {
+    // it’s a Free mobilizer
+    gzerr << "Free [" << this->GetScopedName()
+          << "] P[" << this->GetWorldPose()
+          << "] NumQ["
+          << this->masterMobod.getNumQ(this->simbodyPhysics->integ->getState())
+          << "]\n";
+    this->masterMobod.setQToFitTransform(
+       this->simbodyPhysics->integ->updAdvancedState(),
+       SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+  }
+  else
+    gzdbg << "Joint [" << this->GetScopedName()
+          << "] P[" << this->GetWorldPose() << "]\n";
+
+
   /*
   math::Pose pose = this->GetWorldPose();
 

@@ -54,6 +54,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 
+#include "gazebo/transport/Publisher.hh"
+
 #include "SimbodyPhysics.hh"
 
 // include simbody
@@ -155,6 +157,116 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     simbodyContactElem->Get<double>("override_impact_capture_velocity");
   this->contactImpactCaptureVelocity =
     simbodyContactElem->Get<double>("override_stiction_transition_velocity");
+}
+
+/////////////////////////////////////////////////
+void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
+{
+  msgs::Response response;
+  response.set_id(_msg->id());
+  response.set_request(_msg->request());
+  response.set_response("success");
+  std::string *serializedData = response.mutable_serialized_data();
+
+  if (_msg->request() == "physics_info")
+  {
+    msgs::Physics physicsMsg;
+    physicsMsg.set_type(msgs::Physics::SIMBODY);
+    // physicsMsg.set_solver_type(this->stepType);
+    // min_step_size is defined but not yet used
+    physicsMsg.set_min_step_size(this->GetStepTime());
+    // physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
+    // physicsMsg.set_iters(this->GetSORPGSIters());
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    // physicsMsg.set_sor(this->GetSORPGSW());
+    // physicsMsg.set_cfm(this->GetWorldCFM());
+    // physicsMsg.set_erp(this->GetWorldERP());
+    // physicsMsg.set_contact_max_correcting_vel(
+    //     this->GetContactMaxCorrectingVel());
+    // physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
+    physicsMsg.set_max_step_size(this->maxStepSize);
+
+    response.set_type(physicsMsg.GetTypeName());
+    physicsMsg.SerializeToString(serializedData);
+    this->responsePub->Publish(response);
+  }
+}
+
+/////////////////////////////////////////////////
+void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
+{
+  // if (_msg->has_solver_type())
+  // {
+  //   sdf::ElementPtr solverElem =
+  //     this->sdf->GetElement("ode")->GetElement("solver");
+  //   if (_msg->solver_type() == "quick")
+  //   {
+  //     solverElem->GetElement("type")->Set("quick");
+  //     this->physicsStepFunc = &dWorldQuickStep;
+  //   }
+  //   else if (_msg->solver_type() == "world")
+  //   {
+  //     solverElem->GetElement("type")->Set("world");
+  //     this->physicsStepFunc = &dWorldStep;
+  //   }
+  // }
+
+  // if (_msg->has_precon_iters())
+  //   this->SetSORPGSPreconIters(_msg->precon_iters());
+
+  // if (_msg->has_iters())
+  //   this->SetSORPGSIters(_msg->iters());
+
+  // if (_msg->has_sor())
+  //   this->SetSORPGSW(_msg->sor());
+
+  // if (_msg->has_cfm())
+  //   this->SetWorldCFM(_msg->cfm());
+
+  // if (_msg->has_erp())
+  //   this->SetWorldERP(_msg->erp());
+
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
+
+  // if (_msg->has_contact_max_correcting_vel())
+  //   this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+
+  // if (_msg->has_contact_surface_layer())
+  //   this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+  else if (_msg->has_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->update_rate());
+    gzwarn <<
+        "Physics update rate is deprecated by real time update rate\n";
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+  else if (_msg->has_dt())
+  {
+    this->SetMaxStepSize(_msg->dt());
+    gzwarn << "Physics dt is deprecated by max step size\n";
+  }
+
+  /// Make sure all models get at least on update cycle.
+  this->world->EnableAllModels();
 }
 
 //////////////////////////////////////////////////
@@ -318,8 +430,15 @@ void SimbodyPhysics::UpdatePhysics()
 
   while (integ->getTime() < this->world->GetSimTime().Double())
   {
-    this->integ->stepTo(this->world->GetSimTime().Double(),
-                       this->world->GetSimTime().Double());
+    // try
+    // {
+      this->integ->stepTo(this->world->GetSimTime().Double(),
+                         this->world->GetSimTime().Double());
+    // }
+    // catch (...)
+    // {
+    //   gzerr << "simbody step failed\n";
+    // }
   }
 
   this->simbodyPhysicsStepped = true;
