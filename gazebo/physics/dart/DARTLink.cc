@@ -150,53 +150,117 @@ void DARTLink::SetAngularVel(const math::Vector3& /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetForce(const math::Vector3& /*_force*/)
+void DARTLink::SetForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->setExtForce(Eigen::Vector3d::Zero(),
+                                  DARTUtils::ConvertVector3(_force));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetTorque(const math::Vector3& /*_torque*/)
+void DARTLink::SetTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->setExtTorque(DARTUtils::ConvertVector3(_torque));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddForce(const math::Vector3& /*_force*/)
+void DARTLink::AddForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
+                                  DARTUtils::ConvertVector3(_force));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeForce(const math::Vector3& /*_force*/)
+void DARTLink::AddRelativeForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
+                                  DARTUtils::ConvertVector3(_force),
+                                  true, true);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtWorldPosition(const math::Vector3& /*_force*/,
-                                        const math::Vector3& /*_pos*/)
+void DARTLink::AddForceAtWorldPosition(const math::Vector3& _force,
+                                        const math::Vector3& _pos)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtWorldPosition" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(DARTUtils::ConvertVector3(_pos),
+                                  DARTUtils::ConvertVector3(_force),
+                                  false, false);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const math::Vector3& /*_force*/,
-                                           const math::Vector3& /*_relpos*/)
+void DARTLink::AddForceAtRelativePosition(const math::Vector3& _force,
+                                          const math::Vector3& _relpos)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtRelativePosition" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(DARTUtils::ConvertVector3(_relpos),
+                                  DARTUtils::ConvertVector3(_force),
+                                  true, true);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddTorque(const math::Vector3& /*_torque*/)
+void DARTLink::AddTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtTorque(DARTUtils::ConvertVector3(_torque));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeTorque(const math::Vector3& /*_torque*/)
+void DARTLink::AddRelativeTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtTorque(DARTUtils::ConvertVector3(_torque), true);
 }
 
 //////////////////////////////////////////////////
@@ -272,7 +336,7 @@ math::Vector3 DARTLink::GetWorldTorque() const
 
   Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
 
-  force = DARTUtils::ConvertVector3(W.rotation().transpose() * F.head<3>());
+  torque = DARTUtils::ConvertVector3(W.rotation().transpose() * F.head<3>());
 
   return torque;
 }
