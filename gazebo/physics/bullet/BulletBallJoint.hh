@@ -83,7 +83,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited.
-      protected: void SetForceImpl(int /*_index*/, double /*_torque*/);
+      protected: void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to Bullet ball constraint
       private: btPoint2PointConstraint *bulletBall;

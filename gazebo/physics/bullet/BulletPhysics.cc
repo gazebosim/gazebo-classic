@@ -331,7 +331,7 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_sor =
       boost::any_cast<double>(this->GetParam(SOR));
 
-  gzdbg << " debug physics: "
+  gzlog << " debug physics: "
         << " iters[" << info.m_numIterations
         << "] sor[" << info.m_sor
         << "] erp[" << info.m_erp
