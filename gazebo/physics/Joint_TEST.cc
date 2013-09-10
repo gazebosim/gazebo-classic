@@ -52,7 +52,7 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   gzlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
-  EXPECT_NEAR(t, dt, dt*1e-2);
+  EXPECT_DOUBLE_EQ(t, dt);
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
