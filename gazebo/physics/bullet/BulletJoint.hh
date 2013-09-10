@@ -65,7 +65,7 @@ namespace gazebo
       public: virtual void SetAnchor(int /*index*/,
                                      const gazebo::math::Vector3 & /*anchor*/)
               {
-                gzerr << "Not implement in Bullet\n";
+                // nothing to do here for bullet.
               }
 
       // Documentation inherited
