@@ -159,18 +159,19 @@ void SimbodyLink::OnPoseChange()
       SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
   {
     // it’s a Free mobilizer
-    gzerr << "Free [" << this->GetScopedName()
-          << "] P[" << this->GetWorldPose()
-          << "] NumQ["
-          << this->masterMobod.getNumQ(this->simbodyPhysics->integ->getState())
-          << "]\n";
+    // gzerr << "Free [" << this->GetScopedName()
+    //       << "] P[" << this->GetWorldPose()
+    //       << "] NumQ["
+    //       << this->masterMobod.getNumQ(
+    //          this->simbodyPhysics->integ->getState())
+    //       << "]\n";
     this->masterMobod.setQToFitTransform(
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
   }
-  else
-    gzdbg << "Joint [" << this->GetScopedName()
-          << "] P[" << this->GetWorldPose() << "]\n";
+  // else
+  //   gzdbg << "Joint [" << this->GetScopedName()
+  //         << "] P[" << this->GetWorldPose() << "]\n";
 
 
   /*
