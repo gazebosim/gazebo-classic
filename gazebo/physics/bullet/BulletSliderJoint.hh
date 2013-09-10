@@ -55,7 +55,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
+      // Documentation inherited.
       public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Set the high stop of an axis(index).
