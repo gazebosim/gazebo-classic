@@ -1931,8 +1931,6 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
         childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
-    jointVis->GetSceneNode()->_setDerivedOrientation(
-        Ogre::Quaternion(1, 0, 0, 0));
 
     this->visuals[jointVis->GetName()] = jointVis;
   }
