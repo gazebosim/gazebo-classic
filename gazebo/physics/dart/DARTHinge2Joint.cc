@@ -21,8 +21,6 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTHinge2Joint.hh"
 
-#include "dart/kinematics/Dof.h"
-
 using namespace gazebo;
 using namespace physics;
 
@@ -42,6 +40,11 @@ DARTHinge2Joint::~DARTHinge2Joint()
 void DARTHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
   Hinge2Joint<DARTJoint>::Load(_sdf);
+}
+
+void DARTHinge2Joint::Init()
+{
+
 }
 
 //////////////////////////////////////////////////
@@ -84,9 +87,9 @@ math::Angle DARTHinge2Joint::GetAngleImpl(int _index) const
   math::Angle result;
 
   if (_index == 0)
-    result = this->dartJoint->getDof(0)->getValue();
+    result = this->dartJoint->getGenCoord(0)->get_q();
   else
-    result = this->dartJoint->getDof(1)->getValue();
+    result = this->dartJoint->getGenCoord(1)->get_q();
 
   return result;
 }
@@ -125,19 +128,6 @@ void DARTHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
-{
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
-double DARTHinge2Joint::GetParam(int /*_parameter*/) const
-{
-  gzwarn << "Not implemented!\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void DARTHinge2Joint::SetParam(int /*_parameter*/, double /*_value*/)
 {
   gzwarn << "Not implemented!\n";
 }

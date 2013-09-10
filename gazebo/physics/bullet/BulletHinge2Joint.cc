@@ -52,23 +52,26 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHinge2Joint::Init()
 {
-  Hinge2Joint<BulletJoint>::Attach(_one, _two);
-
+  Hinge2Joint<BulletJoint>::Init();
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
-  if (!bulletChildLink || !bulletParentLink)
-    gzthrow("Requires bullet bodies");
+  if (!bulletParentLink)
+    gzthrow("BulletHinge2Joint cannot be connected to the world (parent)");
+  if (!bulletChildLink)
+    gzthrow("BulletHinge2Joint cannot be connected to the world (child)");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
   math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
 
-  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
+  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
   math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
+
+  // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
   btVector3 baxis1(axis1.x, axis1.y, axis1.z);
@@ -122,13 +125,6 @@ void BulletHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAnchor(int /*_index*/,
-                                  const math::Vector3 &/*_anchor*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
 void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
@@ -136,12 +132,6 @@ void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
   ((btHingeConstraint*)this->btHinge)->setAxis(vec);
   */
-}
-
-//////////////////////////////////////////////////
-void BulletHinge2Joint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -166,13 +156,15 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setUpperLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setUpperLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->bulletHinge2->setLowerLimit(_angle.Radian());
+  if (this->bulletHinge2)
+    this->bulletHinge2->setLowerLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

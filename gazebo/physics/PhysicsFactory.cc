@@ -31,6 +31,7 @@ void RegisterODEPhysics();
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
 #endif
+
 #ifdef HAVE_DART
   void RegisterDARTPhysics();
 #endif
@@ -49,6 +50,7 @@ void PhysicsFactory::RegisterAll()
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
 #endif
+
 #ifdef HAVE_DART
   RegisterDARTPhysics();
 #endif

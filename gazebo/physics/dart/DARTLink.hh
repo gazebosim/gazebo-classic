@@ -60,12 +60,6 @@ namespace gazebo
       public: virtual bool GetEnabled() const;
 
       // Documentation inherited
-      public: virtual void UpdateMass();
-
-      // Documentation inherited
-      public: virtual void UpdateSurface();
-
-      // Documentation inherited
       public: virtual void SetLinearVel(const math::Vector3 &_vel);
 
       // Documentation inherited
@@ -147,17 +141,21 @@ namespace gazebo
       public: void updateDirtyPoseFromDARTTransformation();
 
       /// \brief
-      public: dynamics::BodyNodeDynamics* GetBodyNode() const
+      public: dart::dynamics::BodyNode* GetBodyNode() const
       {return dartBodyNode;}
 
       /// \brief
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief
-      public: simulation::World* GetDARTWorld(void) const;
+      public: dart::simulation::World* GetDARTWorld(void) const;
 
       /// \brief
       public: DARTModelPtr GetDARTModel() const;
+
+      /// \brief
+      public: dart::dynamics::BodyNode* getDARTBodyNode() const
+      { return dartBodyNode; }
 
       /// \brief
       public: void SetDARTParentJoint(DARTJointPtr _dartParentJoint);
@@ -165,17 +163,18 @@ namespace gazebo
       /// \brief
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
-      /// \brief
-      private: dynamics::BodyNodeDynamics* dartBodyNode;
+      /// \brief Pointer to the DART physics engine.
+      private: DARTPhysicsPtr dartPhysics;
 
       /// \brief
-      //private: DARTPhysicsPtr dartPhysics;
+      private: dart::dynamics::BodyNode* dartBodyNode;
 
       /// \brief
       private: DARTJointPtr dartParentJoint;
 
       /// \brief
       private: std::vector<DARTJointPtr> dartChildJoints;
+
     };
     /// \}
   }

@@ -39,6 +39,7 @@ if(HAVE_DART)
   add_dependencies(gazebo_physics_dart gazebo_msgs)
 endif()
 
+
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 

@@ -19,7 +19,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class ServerFixtureTest : public ServerFixture
+class ServerFixtureTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void LoadPaused(const std::string &_physicsType);
   public: void LoadEmptyOfType(const std::string &_physicsType);
@@ -122,7 +123,8 @@ TEST_P(ServerFixtureTest, SpawnSDF)
   SpawnSDF(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ServerFixtureTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

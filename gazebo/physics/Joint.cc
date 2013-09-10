@@ -57,6 +57,7 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
+  this->dampingCoefficient = 0;
 }
 
 //////////////////////////////////////////////////
@@ -254,16 +255,6 @@ void Joint::Init()
   // Set parent name: if parentLink is NULL, it's name be the world
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
-
-  // Set axis in physics engines
-  if (this->sdf->HasElement("axis"))
-  {
-    this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
-  }
-  if (this->sdf->HasElement("axis2"))
-  {
-    this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-  }
 
   this->ComputeInertiaRatio();
 }

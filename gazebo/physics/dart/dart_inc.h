@@ -1,36 +1,35 @@
 #ifndef _DART_INC_H_
 #define _DART_INC_H_
 
-#include <math/UtilsRotation.h>
+// This disables warning messages for ODE
+#pragma GCC system_header
 
-#include <integration/Integrator.h>
-#include <integration/EulerIntegrator.h>
-#include <integration/RK4Integrator.h>
+#include <dart/math/Helpers.h>
+#include <dart/math/Geometry.h>
 
-#include <kinematics/BodyNode.h>
-#include <kinematics/Dof.h>
-#include <kinematics/Joint.h>
-#include <kinematics/Shape.h>
-#include <kinematics/ShapeBox.h>
-#include <kinematics/ShapeCylinder.h>
-#include <kinematics/ShapeEllipsoid.h>
-#include <kinematics/ShapeMesh.h>
-#include <kinematics/Transformation.h>
-#include <kinematics/TrfmRotateEuler.h>
-#include <kinematics/TrfmRotateExpmap.h>
-#include <kinematics/TrfmRotateAxis.h>
-#include <kinematics/TrfmRotateQuat.h>
-#include <kinematics/TrfmTranslate.h>
+#include <dart/integration/Integrator.h>
+#include <dart/integration/EulerIntegrator.h>
+#include <dart/integration/RK4Integrator.h>
 
-#include <dynamics/BodyNodeDynamics.h>
-#include <dynamics/ClosedLoopConstraint.h>
-#include <dynamics/Constraint.h>
-#include <dynamics/ConstraintDynamics.h>
-#include <dynamics/ContactDynamics.h>
-#include <dynamics/PointConstraint.h>
-#include <dynamics/SkeletonDynamics.h>
+#include <dart/dynamics/GenCoord.h>
+#include <dart/dynamics/Joint.h>
+#include <dart/dynamics/Shape.h>
+#include <dart/dynamics/BoxShape.h>
+#include <dart/dynamics/CylinderShape.h>
+#include <dart/dynamics/EllipsoidShape.h>
+#include <dart/dynamics/MeshShape.h>
+#include <dart/dynamics/BodyNode.h>
+#include <dart/dynamics/Skeleton.h>
+#include <dart/dynamics/BallJoint.h>
+#include <dart/dynamics/ScrewJoint.h>
+#include <dart/dynamics/RevoluteJoint.h>
+#include <dart/dynamics/PrismaticJoint.h>
+#include <dart/dynamics/FreeJoint.h>
+#include <dart/dynamics/WeldJoint.h>
 
-#include <simulation/World.h>
+#include <dart/constraint/Constraint.h>
+#include <dart/constraint/ConstraintDynamics.h>
 
+#include <dart/simulation/World.h>
 
 #endif

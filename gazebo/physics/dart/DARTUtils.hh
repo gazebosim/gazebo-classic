@@ -41,23 +41,46 @@ namespace gazebo
       public: static void ConvMatToPose(math::Pose* _pose,
                                         const Eigen::Matrix4d& _mat);
 
-      /// \brief Create kinematics::TrfmTranslate from math::Vector3.
-      public: static kinematics::TrfmTranslate* CreateTrfmTranslate(
-          const math::Vector3& _vec);
+      public: static Eigen::Vector3d ConvertVector3(const math::Vector3& _vec3)
+      {
+        return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
+      }
 
-      /// \brief Create kinematics::TrfmRotateQuat from math::Vector3.
-      public: static kinematics::TrfmRotateQuat* CreateTrfmRotateQuat(
-          const math::Quaternion& _quat);
+      public: static math::Vector3 ConvertVector3(const Eigen::Vector3d& _vec3)
+      {
+        return math::Vector3(_vec3[0], _vec3[1], _vec3[2]);
+      }
 
-      /// \brief addTransform from math::Pose.
-      public: static void AddTransformToDARTJoint(
-          kinematics::Joint* _rtl8Joint,
-          const math::Pose& _pose);
+      public: static Eigen::Isometry3d ConvertPose(const math::Pose& _pose)
+      {
+        Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
 
-      /// \brief Add 6dof joint for free floating body.
-//      public: static void Add6DOFToDARTJoint(
-//          kinematics::Joint* _dartJoint,
-//          const math::Pose& _initialPose);
+        Eigen::Matrix4d M = Eigen::Matrix4d::Identity();
+
+        M.topRightCorner<3,1>() = ConvertVector3(_pose.pos);
+        M.topLeftCorner<3,3>() = Eigen::Matrix3d(
+              Eigen::Quaterniond(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z));
+
+        T = M;
+
+        return T;
+      }
+
+      public: static math::Pose ConvertPose(const Eigen::Isometry3d& _T)
+      {
+        math::Pose pose;
+
+        pose.pos = ConvertVector3(_T.matrix().topRightCorner<3,1>());
+
+        Eigen::Quaterniond quat = Eigen::Quaterniond(
+                    _T.matrix().topLeftCorner<3,3>());
+        pose.rot.w = quat.w();
+        pose.rot.x = quat.x();
+        pose.rot.y = quat.y();
+        pose.rot.z = quat.z();
+
+        return pose;
+      }
     };
     /// \}
   }

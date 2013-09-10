@@ -1,6 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${DART_INCLUDEDIR}
+include_directories(${DART_INCLUDE_DIRS}
                     ${FCL_INCLUDEDIR}
                     ${ASSIMP_INCLUDEDIR})
 
@@ -54,9 +54,20 @@ SET (headers
     DARTUtils.hh
 )
 
+set (gtest_sources
+  #DARTPhysics_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 gz_add_library(gazebo_physics_dart ${sources})
 
 # these flags should probably go into dart.pc
 target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp)
 
 gz_install_library(gazebo_physics_dart)
+
+# unit tests
+set (gtest_sources
+  DARTJoint_TEST.cc
+)
+gz_build_tests(${gtest_sources})

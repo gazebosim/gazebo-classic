@@ -24,7 +24,8 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture
+class PhysicsTest : public ServerFixture,
+                    public testing::WithParamInterface<const char*>
 {
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
@@ -870,7 +871,10 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       if (joint)
       {
         // Detach upper_joint.
-        joint->Detach();
+        // joint->Detach();
+        math::Angle curAngle = joint->GetAngle(0u);
+        joint->SetLowStop(0, curAngle - 0.01);
+        joint->SetHighStop(0, curAngle + 0.1);
       }
       else
       {
@@ -1080,10 +1084,17 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 }
 
 // This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, JointDampingTest)
+TEST_F(PhysicsTest, JointDampingODE)
 {
   JointDampingTest("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, JointDampingDART)
+{
+  JointDampingTest("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
@@ -1565,7 +1576,7 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   ASSERT_TRUE(model);
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

@@ -109,13 +109,6 @@ math::Vector3 PhysicsEngine::GetGravity() const
 }
 
 //////////////////////////////////////////////////
-ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
-{
-  ModelPtr ret(new Model(_base));
-  return ret;
-}
-
-//////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
                                             const std::string &_linkName)
 {
@@ -151,6 +144,14 @@ double PhysicsEngine::GetUpdatePeriod()
     return 1.0/updateRate;
   else
     return 0;
+}
+
+//////////////////////////////////////////////////
+ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
+{
+  ModelPtr ret(new Model(_base));
+
+  return ret;
 }
 
 //////////////////////////////////////////////////

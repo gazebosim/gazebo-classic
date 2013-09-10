@@ -65,10 +65,10 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// @brief DART body node associated with this collision.
-      public: dynamics::BodyNodeDynamics* dartBodyNode;
+      public: dart::dynamics::BodyNode* dartBodyNode;
 
       /// @brief DART collision shape associated with this collision.
-      public: kinematics::Shape* dartCollShape;
+      public: dart::dynamics::Shape* dartCollShape;
     };
   }
 }
