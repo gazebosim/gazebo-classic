@@ -158,7 +158,6 @@
         <physics>
           <provide_feedback>true</provide_feedback>
           <ode>
-            <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>
           </ode>
         </physics>
@@ -182,7 +181,6 @@
         <physics>
           <provide_feedback>true</provide_feedback>
           <ode>
-            <provide_feedback>true</provide_feedback>
             <cfm_damping>true</cfm_damping>
           </ode>
         </physics>
