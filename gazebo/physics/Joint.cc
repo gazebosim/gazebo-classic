@@ -267,7 +267,8 @@ void Joint::Init()
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
 
-  this->ComputeInertiaRatio();
+  // for debugging only
+  // this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
