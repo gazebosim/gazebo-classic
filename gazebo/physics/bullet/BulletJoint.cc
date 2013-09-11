@@ -199,9 +199,9 @@ void BulletJoint::CacheForceTorque()
   }
   else
   {
-    /// \TODO: fix for multi-axis joints
-    gzerr << "force torque for joint type [" << this->GetType()
-          << "] not implemented, returns false results!!\n";
+    /// \TODO: implement for other joint types
+    // gzerr << "force torque for joint type [" << this->GetType()
+    //       << "] not implemented, returns false results!!\n";
   }
 
   // convert wrench from child cg location to child link frame
@@ -311,7 +311,8 @@ void BulletJoint::CacheForceTorque()
   {
     if (!this->childLink)
     {
-      gzerr << "Both parent and child links are invalid, abort.\n";
+      gzerr << "Joint [" << this->GetScopedName()
+            << "]: Both parent and child links are invalid, abort.\n";
       return;
     }
     else
@@ -390,9 +391,13 @@ void BulletJoint::SetDamping(int /*_index*/, double _damping)
 //////////////////////////////////////////////////
 void BulletJoint::SetForce(int _index, double _force)
 {
-  this->SaveForce(_index, _force);
-  Joint::SetForce(_index, _force);
-  this->SetForceImpl(_index, _force);
+  double force = Joint::CheckAndTruncateForce(_index, _force);
+  this->SaveForce(_index, force);
+  this->SetForceImpl(_index, force);
+
+  // for engines that supports auto-disable of links
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////

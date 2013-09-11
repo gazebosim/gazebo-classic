@@ -50,7 +50,6 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->dStable[2] = 0;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
-  this->forceAppliedTime = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -935,7 +934,6 @@ JointWrench ODEJoint::GetForceTorque(int _index)
 //////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  this->wrench;
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
@@ -1261,9 +1259,13 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 //////////////////////////////////////////////////
 void ODEJoint::SetForce(int _index, double _force)
 {
-  this->SaveForce(_index, _force);
-  Joint::SetForce(_index, _force);
-  this->SetForceImpl(_index, _force);
+  double force = Joint::CheckAndTruncateForce(_index, _force);
+  this->SaveForce(_index, force);
+  this->SetForceImpl(_index, force);
+
+  // for engines that supports auto-disable of links
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////

@@ -305,9 +305,13 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyJoint::SetForce(int _index, double _force)
 {
-  this->SaveForce(_index, _force);
-  Joint::SetForce(_index, _force);
-  this->SetForceImpl(_index, _force);
+  double force = Joint::CheckAndTruncateForce(_index, _force);
+  this->SaveForce(_index, force);
+  this->SetForceImpl(_index, force);
+
+  // for engines that supports auto-disable of links
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
