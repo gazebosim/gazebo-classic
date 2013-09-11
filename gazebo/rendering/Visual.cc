@@ -1550,6 +1550,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }

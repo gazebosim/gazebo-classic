@@ -104,6 +104,9 @@ namespace gazebo
       /// \return Joint type in string.
       public: static std::string GetTypeAsString(JointMaker::JointType _type);
 
+      /// \brief Stop the process of adding joint to the model.
+      public: void Stop();
+
       /// \brief Mouse event filter callback when mouse button is pressed .
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled

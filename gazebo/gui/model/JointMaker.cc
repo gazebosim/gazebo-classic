@@ -95,10 +95,11 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
   JointData *joint = this->joints[_jointName];
   if (joint)
   {
-    joint->visual.reset();
     rendering::ScenePtr scene = joint->hotspot->GetScene();
     scene->RemoveVisual(joint->hotspot);
+    scene->RemoveVisual(joint->visual);
     joint->hotspot.reset();
+    joint->visual.reset();
     joint->parent.reset();
     joint->child.reset();
     delete joint->line;
@@ -116,6 +117,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
+//  scene->SelectVisual("", "normal");
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 //  if (vis)
@@ -132,6 +134,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       if (this->mouseJoint)
         return false;
 
+      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
@@ -146,7 +149,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
       jointLine->AddPoint(math::Vector3(0, 0, 0.01));
       jointVis->GetSceneNode()->setInheritScale(false);
       jointVis->GetSceneNode()->setInheritOrientation(false);
-
 
       JointData *jointData = new JointData;
       jointData->dirty = false;
@@ -170,9 +172,9 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     else if (this->selectedVis != vis)
     {
       if (this->hoverVis)
-        this->hoverVis->SetHighlighted(false);
+        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
       if (this->selectedVis)
-        this->selectedVis->SetHighlighted(false);
+        this->selectedVis->SetEmissive(common::Color(0, 0, 0));
       this->mouseJoint->child = vis;
 
       // reset variables.
@@ -194,6 +196,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   {
     // Add an event filter, which allows the JointMaker to capture
     // mouse events.
+    //event::Events::setSelectedEntity("", "normal");
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
         boost::bind(&JointMaker::OnMousePress, this, _1));
 
@@ -208,6 +211,30 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   }
 }
 
+
+/////////////////////////////////////////////////
+void JointMaker::Stop()
+{
+  if (this->jointType != JointMaker::JOINT_NONE && this->mouseJoint)
+  {
+    this->newJointCreated = false;
+    if (this->hoverVis)
+      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    if (this->selectedVis)
+      this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+
+    this->mouseJoint->visual->DeleteDynamicLine(this->mouseJoint->line);
+    rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
+    scene->RemoveVisual(this->mouseJoint->visual);
+    this->mouseJoint->visual.reset();
+    delete this->mouseJoint->inspector;
+    delete this->mouseJoint;
+    this->mouseJoint = NULL;
+    this->CreateJoint(JointMaker::JOINT_NONE);
+    this->selectedVis.reset();
+    this->hoverVis.reset();
+  }
+}
 
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
@@ -226,17 +253,18 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (vis)
   {
     if (this->hoverVis && this->hoverVis != this->selectedVis)
-      this->hoverVis->SetHighlighted(false);
+      this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
 
     // only highlight editor parts
-    if (!gui::get_entity_id(vis->GetName()))
+    rendering::VisualPtr rootVis = vis->GetRootVisual();
+    if (rootVis->IsPlane())
+      this->hoverVis = vis;
+    else if (!gui::get_entity_id(rootVis->GetName()))
     {
       this->hoverVis = vis;
-      if (!this->hoverVis->IsPlane())
-      {
-        this->hoverVis->SetHighlighted(true);
-  //    event::Events::setSelectedEntity(vis->GetName(), "normal");
-      }
+      if (!this->selectedVis ||
+           (this->selectedVis && this->hoverVis != this->selectedVis))
+        this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
     }
   }
 

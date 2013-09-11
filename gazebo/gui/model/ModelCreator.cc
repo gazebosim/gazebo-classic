@@ -31,6 +31,7 @@
 
 #include "gazebo/physics/Inertial.hh"
 
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -82,7 +83,7 @@ std::string ModelCreator::CreateModel()
 /////////////////////////////////////////////////
 void ModelCreator::AddJoint(JointMaker::JointType _type)
 {
-  // this->AddPart(JOINT_NONE);
+  this->AddPart(PART_NONE);
   if (this->jointMaker)
     this->jointMaker->CreateJoint(_type);
 }
@@ -475,6 +476,19 @@ void ModelCreator::AddPart(PartType _type)
   else
   {
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::Stop()
+{
+  if (this->addPartType != PART_NONE && this->mouseVisual)
+  {
+    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
+        this->RemovePart(this->mouseVisual->GetChild(0)->GetName());
+    this->mouseVisual.reset();
+  }
+  if (this->jointMaker)
+    this->jointMaker->Stop();
 }
 
 /////////////////////////////////////////////////

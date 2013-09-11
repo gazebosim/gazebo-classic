@@ -26,9 +26,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
-
 #include "gazebo/math/Pose.hh"
-
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
@@ -141,6 +139,9 @@ namespace gazebo
 
       /// \brief Reset the model creator and the SDF.
       public: void Reset();
+
+      /// \brief Stop the process of adding a part or joint to the model.
+      public: void Stop();
 
       /// \brief Get joint maker
       /// \return Joint maker

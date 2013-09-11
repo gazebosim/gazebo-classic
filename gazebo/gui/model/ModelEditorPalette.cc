@@ -24,10 +24,10 @@
 #include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SaveDialog.hh"
-
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -253,6 +253,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
   this->modelName = "default";
+
+  KeyEventHandler::Instance()->AddPressFilter("model_editor",
+    boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -288,7 +291,6 @@ void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
-
   this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
@@ -454,4 +456,18 @@ void ModelEditorPalette::OnDone()
     this->modelCreator->FinishModel();
     gui::model::Events::finishModel();
   }
+}
+
+/////////////////////////////////////////////////
+bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    this->modelCreator->Stop();
+    // call the slots to uncheck the buttons
+    this->OnPartAdded();
+    this->OnJointAdded();
+    return true;
+  }
+  return false;
 }

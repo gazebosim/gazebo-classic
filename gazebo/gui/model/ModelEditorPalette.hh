@@ -22,7 +22,7 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -55,17 +55,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
-      /// \brief Mouse event filter callback when mouse button is pressed in
-      /// create part mode.
-      /// \param[in] _event The mouse event.
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
       /// \return True if the event was handled
-      private: bool OnMousePressPart(const common::MouseEvent &_event);
-
-      /// \brief Mouse event filter callback when mouse is moved in create
-      /// part mode.
-      /// \param[in] _event The mouse event.
-      /// \return True if the event was handled
-      private: bool OnMouseMovePart(const common::MouseEvent &_event);
+      private: bool OnKeyPress(const common::KeyEvent &_event);
 
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
