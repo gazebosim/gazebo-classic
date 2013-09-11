@@ -200,8 +200,6 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
-      /// keep track of external forces only.
       protected: virtual void SetForceImpl(int _index, double _force) = 0;
 
       /// \brief Save external forces applied to this Joint.
@@ -210,8 +208,6 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      /// internal force, e.g. damping forces.  This way, Joint::appliedForce
-      /// keep track of external forces only.
       private: void SaveForce(int _index, double _force);
 
       /// \brief This is our ODE ID
