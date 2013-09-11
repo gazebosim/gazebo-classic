@@ -178,13 +178,6 @@ math::Vector3 BulletHingeJoint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAnchor(int /*_index*/,
-                                 const math::Vector3 &/*_anchor*/)
-{
-  // The anchor (pivot in Bullet lingo), can only be set on creation
-}
-
-//////////////////////////////////////////////////
 void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
@@ -212,12 +205,6 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
