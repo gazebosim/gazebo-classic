@@ -33,52 +33,43 @@ namespace gazebo
     /// \brief DART Utils class
     class DARTUtils
     {
-      /// \brief Convert from gazebo::math::Pose to Eigen::Matrix4d.
-      public: static void ConvPoseToMat(Eigen::Matrix4d* _mat,
-                                        const math::Pose& _pose);
-
-      /// \brief Convert from Eigen::Matrix4d to gazebo::math::Pose.
-      public: static void ConvMatToPose(math::Pose* _pose,
-                                        const Eigen::Matrix4d& _mat);
-
-      public: static Eigen::Vector3d ConvertVector3(const math::Vector3& _vec3)
+      /// \brief
+      public: static Eigen::Vector3d ConvVec3(const math::Vector3& _vec3)
       {
         return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
       }
 
-      public: static math::Vector3 ConvertVector3(const Eigen::Vector3d& _vec3)
+      /// \brief
+      public: static math::Vector3 ConvVec3(const Eigen::Vector3d& _vec3)
       {
-        return math::Vector3(_vec3[0], _vec3[1], _vec3[2]);
+        return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
       }
 
-      public: static Eigen::Isometry3d ConvertPose(const math::Pose& _pose)
+      /// \brief
+      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion& _quat)
       {
-        Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
-
-        Eigen::Matrix4d M = Eigen::Matrix4d::Identity();
-
-        M.topRightCorner<3,1>() = ConvertVector3(_pose.pos);
-        M.topLeftCorner<3,3>() = Eigen::Matrix3d(
-              Eigen::Quaterniond(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z));
-
-        T = M;
-
-        return T;
+        return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
       }
 
-      public: static math::Pose ConvertPose(const Eigen::Isometry3d& _T)
+      /// \brief
+      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond& _quat)
+      {
+        return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
+      }
+
+      /// \brief
+      public: static Eigen::Isometry3d ConvPose(const math::Pose& _pose)
+      {
+        return Eigen::Translation3d(ConvVec3(_pose.pos)) *
+            Eigen::Quaterniond(ConvQuat(_pose.rot));
+      }
+
+      /// \brief
+      public: static math::Pose ConvPose(const Eigen::Isometry3d& _T)
       {
         math::Pose pose;
-
-        pose.pos = ConvertVector3(_T.matrix().topRightCorner<3,1>());
-
-        Eigen::Quaterniond quat = Eigen::Quaterniond(
-                    _T.matrix().topLeftCorner<3,3>());
-        pose.rot.w = quat.w();
-        pose.rot.x = quat.x();
-        pose.rot.y = quat.y();
-        pose.rot.z = quat.z();
-
+        pose.pos = ConvVec3(_T.translation());
+        pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
         return pose;
       }
     };

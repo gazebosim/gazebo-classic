@@ -76,7 +76,7 @@ void DARTModel::Init()
 
       newFreeJoint->setParentBody(NULL);
       newFreeJoint->setTransformFromParentBody(
-            DARTUtils::ConvertPose(linkList[i]->GetWorldPose()));
+            DARTUtils::ConvPose(linkList[i]->GetWorldPose()));
 
       newFreeJoint->setChildBody(dartBodyNode);
       newFreeJoint->setTransformFromChildBody(Eigen::Isometry3d::Identity());

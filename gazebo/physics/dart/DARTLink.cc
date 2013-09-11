@@ -93,11 +93,11 @@ void DARTLink::Init()
 
   // COG offset
   math::Vector3 cog = this->inertial->GetCoG();
-  this->dartBodyNode->setLocalCOM(DARTUtils::ConvertVector3(cog));
+  this->dartBodyNode->setLocalCOM(DARTUtils::ConvVec3(cog));
 
   // Transformation
   math::Pose bodyWorldPose = this->GetWorldPose();
-  this->dartBodyNode->setWorldTransform(DARTUtils::ConvertPose(bodyWorldPose));
+  this->dartBodyNode->setWorldTransform(DARTUtils::ConvPose(bodyWorldPose));
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -118,7 +118,7 @@ void DARTLink::OnPoseChange()
   Link::OnPoseChange();
 
   const math::Pose& currentPose = this->GetWorldPose();
-  this->dartBodyNode->setWorldTransform(DARTUtils::ConvertPose(currentPose));
+  this->dartBodyNode->setWorldTransform(DARTUtils::ConvPose(currentPose));
 }
 
 //////////////////////////////////////////////////
@@ -160,7 +160,7 @@ void DARTLink::SetForce(const math::Vector3& _force)
   }
 
   this->dartBodyNode->setExtForce(Eigen::Vector3d::Zero(),
-                                  DARTUtils::ConvertVector3(_force));
+                                  DARTUtils::ConvVec3(_force));
 }
 
 //////////////////////////////////////////////////
@@ -173,7 +173,7 @@ void DARTLink::SetTorque(const math::Vector3& _torque)
     return;
   }
 
-  this->dartBodyNode->setExtTorque(DARTUtils::ConvertVector3(_torque));
+  this->dartBodyNode->setExtTorque(DARTUtils::ConvVec3(_torque));
 }
 
 //////////////////////////////////////////////////
@@ -187,7 +187,7 @@ void DARTLink::AddForce(const math::Vector3& _force)
   }
 
   this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
-                                  DARTUtils::ConvertVector3(_force));
+                                  DARTUtils::ConvVec3(_force));
 }
 
 /////////////////////////////////////////////////
@@ -201,7 +201,7 @@ void DARTLink::AddRelativeForce(const math::Vector3& _force)
   }
 
   this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
-                                  DARTUtils::ConvertVector3(_force),
+                                  DARTUtils::ConvVec3(_force),
                                   true, true);
 }
 
@@ -216,8 +216,8 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3& _force,
     return;
   }
 
-  this->dartBodyNode->addExtForce(DARTUtils::ConvertVector3(_pos),
-                                  DARTUtils::ConvertVector3(_force),
+  this->dartBodyNode->addExtForce(DARTUtils::ConvVec3(_pos),
+                                  DARTUtils::ConvVec3(_force),
                                   false, false);
 }
 
@@ -233,8 +233,8 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3& _force,
     return;
   }
 
-  this->dartBodyNode->addExtForce(DARTUtils::ConvertVector3(_relpos),
-                                  DARTUtils::ConvertVector3(_force),
+  this->dartBodyNode->addExtForce(DARTUtils::ConvVec3(_relpos),
+                                  DARTUtils::ConvVec3(_force),
                                   true, true);
 }
 
@@ -248,7 +248,7 @@ void DARTLink::AddTorque(const math::Vector3& _torque)
     return;
   }
 
-  this->dartBodyNode->addExtTorque(DARTUtils::ConvertVector3(_torque));
+  this->dartBodyNode->addExtTorque(DARTUtils::ConvVec3(_torque));
 }
 
 /////////////////////////////////////////////////
@@ -261,7 +261,7 @@ void DARTLink::AddRelativeTorque(const math::Vector3& _torque)
     return;
   }
 
-  this->dartBodyNode->addExtTorque(DARTUtils::ConvertVector3(_torque), true);
+  this->dartBodyNode->addExtTorque(DARTUtils::ConvVec3(_torque), true);
 }
 
 //////////////////////////////////////////////////
@@ -270,9 +270,9 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
 {
   const Eigen::Vector3d& linVel
           = this->dartBodyNode->getVelocityWorldAtPoint(
-              DARTUtils::ConvertVector3(_offset)).tail<3>();
+              DARTUtils::ConvVec3(_offset)).tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTUtils::ConvVec3(linVel);
 }
 
 //////////////////////////////////////////////////
@@ -282,11 +282,10 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Pose pose(_offset, _q);
 
-  Eigen::Vector3d linVel
-    = this->dartBodyNode->getVelocityWorldAtFrame(
-      DARTUtils::ConvertPose(pose)).tail<3>();
+  Eigen::Vector3d linVel = this->dartBodyNode->getVelocityWorldAtFrame(
+      DARTUtils::ConvPose(pose)).tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTUtils::ConvVec3(linVel);
 }
 
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
@@ -294,7 +293,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
   const Eigen::Vector3d& linVel
       = this->dartBodyNode->getVelocityWorldAtCOG().tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTUtils::ConvVec3(linVel);
 }
 
 //////////////////////////////////////////////////
@@ -303,7 +302,7 @@ math::Vector3 DARTLink::GetWorldAngularVel() const
   const Eigen::Vector3d& angVel
       = this->dartBodyNode->getVelocityWorld().head<3>();
 
-  return DARTUtils::ConvertVector3(angVel);
+  return DARTUtils::ConvVec3(angVel);
 }
 
 /////////////////////////////////////////////////
@@ -319,7 +318,7 @@ math::Vector3 DARTLink::GetWorldForce() const
 
   Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
 
-  force = DARTUtils::ConvertVector3(W.rotation().transpose() * F.tail<3>());
+  force = DARTUtils::ConvVec3(W.linear().transpose() * F.tail<3>());
 
   return force;
 }
@@ -337,7 +336,7 @@ math::Vector3 DARTLink::GetWorldTorque() const
 
   Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
 
-  torque = DARTUtils::ConvertVector3(W.rotation().transpose() * F.head<3>());
+  torque = DARTUtils::ConvVec3(W.linear().transpose() * F.head<3>());
 
   return torque;
 }
@@ -421,7 +420,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 {
   //-- Step 1: get dart body's transformation
   //-- Step 2: set gazebo link's pose using the transformation
-  math::Pose newPose = DARTUtils::ConvertPose(
+  math::Pose newPose = DARTUtils::ConvPose(
                          this->dartBodyNode->getWorldTransform());
 
   // Set the new pose to this link

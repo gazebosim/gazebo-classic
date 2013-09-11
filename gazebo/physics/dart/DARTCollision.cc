@@ -108,7 +108,7 @@ void DARTCollision::Init()
 
   // Offset
   math::Pose relativePose = this->GetRelativePose();
-  this->dartCollShape->setOffset(DARTUtils::ConvertVector3(relativePose.pos));
+  this->dartCollShape->setOffset(DARTUtils::ConvVec3(relativePose.pos));
 }
 
 //////////////////////////////////////////////////

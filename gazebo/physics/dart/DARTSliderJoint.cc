@@ -82,7 +82,7 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  return DARTUtils::ConvertVector3(globalAxis);
+  return DARTUtils::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -91,14 +91,14 @@ void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
   dart::dynamics::PrismaticJoint* dartPrismaticJoint
       = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
 
-  Eigen::Vector3d dartVec3 = DARTUtils::ConvertVector3(_axis);
+  Eigen::Vector3d dartVec3 = DARTUtils::ConvVec3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
       = dartPrismaticJoint->getLocalTransformationFromParentBody().inverse();
-  dartVec3 = dartTransfJointLeftToParentLink.rotation() * dartVec3;
+  dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
   //----------------------------------------------------------------------------
 
   dartPrismaticJoint->setAxis(dartVec3);
