@@ -223,7 +223,6 @@ TEST(gz_log, Step)
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
   EXPECT_EQ(stepq0, "6d3af4f4d1214fe3a4860ab42777eb4d0f89c6b2  -\n");
 
-
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
   EXPECT_EQ(stepq1, "43eacb140e00ef0525d54667bc558d63dac3d21f  -\n");
