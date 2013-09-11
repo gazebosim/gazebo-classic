@@ -502,13 +502,13 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetForce(int _index, double _effort)
+double Joint::CheckAndTruncateForce(int _index, double _effort)
 {
   if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
   {
-    gzerr << "Calling ODEUniversalJoint::SetForce with an index ["
+    gzerr << "Calling Joint::SetForce with an index ["
           << _index << "] out of range\n";
-    return;
+    return _effort;
   }
 
   // truncating SetForce effort if velocity limit reached.
@@ -525,8 +525,7 @@ void Joint::SetForce(int _index, double _effort)
     _effort = math::clamp(_effort, -this->effortLimit[_index],
       this->effortLimit[_index]);
 
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  return _effort;
 }
 
 //////////////////////////////////////////////////

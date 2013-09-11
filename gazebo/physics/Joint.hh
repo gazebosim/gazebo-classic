@@ -266,13 +266,20 @@ namespace gazebo
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// Force is additive (multiple calls
+      /// of the simulation scales.  Force is additive (multiple calls
       /// to SetForce to the same joint in the same time
       /// step will accumulate forces on that Joint).
+      /// Forces are truncated by effortLimit before applied.
       /// \param[in] _index Index of the axis.
       /// \param[in] _effort Force value.
-      public: virtual void SetForce(int _index, double _effort);
+      public: virtual void SetForce(int _index, double _effort) = 0;
+
+      /// \brief check if the force against velocityLimit and effortLimit,
+      /// truncate if necessary.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _effort Force value.
+      /// \return truncated effort
+      public: virtual double CheckAndTruncateForce(int _index, double _effort);
 
       /// \brief @todo: not yet implemented.
       /// Get external forces applied at this Joint.
