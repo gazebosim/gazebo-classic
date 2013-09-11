@@ -279,7 +279,7 @@ TEST_P(ImuTest, EmptyWorldBias)
   Stationary_EmptyWorld_Bias(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ImuTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
