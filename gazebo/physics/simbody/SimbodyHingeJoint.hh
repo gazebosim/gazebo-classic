@@ -87,11 +87,17 @@ namespace gazebo
       // Documentation inherited.
       protected: void SetForceImpl(int _index, double _torque);
 
+      /// \brief save simbody state for spawning
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
+
+      /// \brief restore  simbody state for spawning
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
-      private: double simbodyQ;
-      private: double simbodyU;
-      
+
+      /// \brief save simbody state for reconstructing simbody model graph
+      private: std::vector<double> simbodyQ;
+
+      /// \brief save simbody state for reconstructing simbody model graph
+      private: std::vector<double> simbodyU;
     };
     /// \}
   }

@@ -148,6 +148,18 @@ namespace gazebo
       /// \copydoc Link::SetAutoDisable(bool)
       public: virtual void SetAutoDisable(bool _disable);
 
+      // Save current Simbody State
+      public: virtual void SaveSimbodyState(const SimTK::State &_state);
+
+      // Restore saved Simbody State
+      public: virtual void RestoreSimbodyState(SimTK::State &_state);
+
+      /// \brief save simbody free state for reconstructing simbody model graph
+      private: std::vector<double> simbodyQ;
+
+      /// \brief save simbody free state for reconstructing simbody model graph
+      private: std::vector<double> simbodyU;
+
       /// \brief keep a pointer to the simbody physics engine for convenience
       private: SimbodyPhysicsPtr simbodyPhysics;
 

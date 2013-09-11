@@ -290,6 +290,8 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   // models, save Simbody joint states in Gazebo Model.
   const SimTK::State& currentState = this->integ->getState();
   double stateTime = 0;
+  bool simbodyStateSaved = false;
+
   if (currentState.getSystemStage() != SimTK::Stage::Empty)
   {
     stateTime = currentState.getTime();
@@ -307,8 +309,18 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
             boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
           simbodyJoint->SaveSimbodyState(currentState);
         }
+
+        physics::Link_V links = (*mi)->GetLinks();
+        for (physics::Link_V::iterator lx = links.begin();
+             lx != links.end(); ++lx)
+        {
+          SimbodyLinkPtr simbodyLink =
+            boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+          simbodyLink->SaveSimbodyState(currentState);
+        }
       }
     }
+    simbodyStateSaved = true;
   }
 
   try {
@@ -343,22 +355,33 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
 
   SimTK::State state = this->system.realizeTopology();
 
-  // retsore state time.
-  state.setTime(stateTime);
-
   // Restore Gazebo saved Joint states
   // back into Simbody state.
-  physics::Model_V models = this->world->GetModels();
-  for (physics::Model_V::iterator mi = models.begin();
-       mi != models.end(); ++mi)
+  if (simbodyStateSaved)
   {
-    physics::Joint_V joints = (*mi)->GetJoints();
-    for (physics::Joint_V::iterator jx = joints.begin();
-         jx != joints.end(); ++jx)
+    // set/retsore state time.
+    state.setTime(stateTime);
+
+    physics::Model_V models = this->world->GetModels();
+    for (physics::Model_V::iterator mi = models.begin();
+         mi != models.end(); ++mi)
     {
-      SimbodyJointPtr simbodyJoint =
-        boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
-      simbodyJoint->RestoreSimbodyState(state);
+      physics::Joint_V joints = (*mi)->GetJoints();
+      for (physics::Joint_V::iterator jx = joints.begin();
+           jx != joints.end(); ++jx)
+      {
+        SimbodyJointPtr simbodyJoint =
+          boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+        simbodyJoint->RestoreSimbodyState(state);
+      }
+      physics::Link_V links = (*mi)->GetLinks();
+      for (physics::Link_V::iterator lx = links.begin();
+           lx != links.end(); ++lx)
+      {
+        SimbodyLinkPtr simbodyLink =
+          boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+        simbodyLink->RestoreSimbodyState(state);
+      }
     }
   }
 

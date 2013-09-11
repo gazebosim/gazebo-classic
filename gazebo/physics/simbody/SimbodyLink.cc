@@ -181,6 +181,44 @@ void SimbodyLink::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
+void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
+{
+  if (!this->masterMobod.isEmptyHandle() &&
+      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  {
+    if (this->simbodyQ.empty())
+      this->simbodyQ.resize(this->masterMobod.getNumQ(_state));
+
+    if (this->simbodyU.empty())
+      this->simbodyU.resize(this->masterMobod.getNumU(_state));
+
+    for(int i = 0; i < this->simbodyQ.size(); ++i)
+      this->simbodyQ[i] = this->masterMobod.getOneQ(_state, i);
+
+    for(int i = 0; i < this->simbodyU.size(); ++i)
+      this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
+  }
+  else
+    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
+{
+  if (!this->masterMobod.isEmptyHandle() &&
+      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  {
+    for(int i = 0; i < this->simbodyQ.size(); ++i)
+      this->masterMobod.setOneQ(_state, i, this->simbodyQ[i]);
+
+    for(int i = 0; i < this->simbodyU.size(); ++i)
+      this->masterMobod.setOneU(_state, i, this->simbodyU[i]);
+  }
+  else
+    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+}
+
+//////////////////////////////////////////////////
 void SimbodyLink::SetEnabled(bool /*_enable*/) const
 {
 }

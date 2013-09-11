@@ -35,8 +35,6 @@ SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
-  this->simbodyQ = 0.0;
-  this->simbodyU = 0.0;
   this->physicsInitialized = false;
 }
 
@@ -306,8 +304,17 @@ void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
 {
   if (!this->mobod.isEmptyHandle())
   {
-    this->simbodyQ = this->mobod.getOneQ(_state, 0);
-    this->simbodyU = this->mobod.getOneU(_state, 0);
+    if (this->simbodyQ.empty())
+      this->simbodyQ.resize(this->mobod.getNumQ(_state));
+
+    if (this->simbodyU.empty())
+      this->simbodyU.resize(this->mobod.getNumU(_state));
+
+    for(int i = 0; i < this->simbodyQ.size(); ++i)
+      this->simbodyQ[i] = this->mobod.getOneQ(_state, i);
+
+    for(int i = 0; i < this->simbodyU.size(); ++i)
+      this->simbodyU[i] = this->mobod.getOneU(_state, i);
   }
   else
     gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
@@ -318,8 +325,11 @@ void SimbodyHingeJoint::RestoreSimbodyState(SimTK::State &_state)
 {
   if (!this->mobod.isEmptyHandle())
   {
-   this->mobod.setOneQ(_state, 0, this->simbodyQ);
-   this->mobod.setOneU(_state, 0, this->simbodyU);
+    for(int i = 0; i < this->simbodyQ.size(); ++i)
+      this->mobod.setOneQ(_state, i, this->simbodyQ[i]);
+
+    for(int i = 0; i < this->simbodyU.size(); ++i)
+      this->mobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else
     gzerr << "restoring model [" << this->GetScopedName()
