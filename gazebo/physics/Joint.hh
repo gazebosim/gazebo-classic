@@ -279,7 +279,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _effort Force value.
       /// \return truncated effort
-      public: virtual double CheckAndTruncateForce(int _index, double _effort);
+      public: double CheckAndTruncateForce(int _index, double _effort);
 
       /// \brief @todo: not yet implemented.
       /// Get external forces applied at this Joint.
