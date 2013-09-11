@@ -317,7 +317,9 @@ void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
       this->simbodyU[i] = this->mobod.getOneU(_state, i);
   }
   else
-    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -332,6 +334,8 @@ void SimbodyHingeJoint::RestoreSimbodyState(SimTK::State &_state)
       this->mobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else
-    gzerr << "restoring model [" << this->GetScopedName()
-          << "] failed due to uninitialized mobod\n";
+  {
+    // gzerr << "restoring model [" << this->GetScopedName()
+    //       << "] failed due to uninitialized mobod\n";
+  }
 }

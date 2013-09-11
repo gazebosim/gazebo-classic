@@ -199,7 +199,9 @@ void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
       this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
   }
   else
-    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -215,7 +217,9 @@ void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
       this->masterMobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else
-    gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
 }
 
 //////////////////////////////////////////////////
