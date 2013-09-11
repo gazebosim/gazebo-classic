@@ -101,8 +101,8 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = dart::math::Inv(dartRevJoint->getLocalTransformationFromParentBody());
-  dartAxis = dart::math::Rotate(dartTransfJointLeftToParentLink, dartAxis);
+      = dartRevJoint->getLocalTransformationFromParentBody().inverse();
+  dartAxis = dartTransfJointLeftToParentLink.rotation() * dartAxis;
   //----------------------------------------------------------------------------
 
   dartRevJoint->setAxis(dartAxis);
