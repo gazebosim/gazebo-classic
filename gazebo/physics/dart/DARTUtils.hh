@@ -33,45 +33,7 @@ namespace gazebo
     /// \brief DART Utils class
     class DARTUtils
     {
-      /// \brief
-      public: static Eigen::Vector3d ConvVec3(const math::Vector3& _vec3)
-      {
-        return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
-      }
 
-      /// \brief
-      public: static math::Vector3 ConvVec3(const Eigen::Vector3d& _vec3)
-      {
-        return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
-      }
-
-      /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion& _quat)
-      {
-        return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
-      }
-
-      /// \brief
-      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond& _quat)
-      {
-        return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
-      }
-
-      /// \brief
-      public: static Eigen::Isometry3d ConvPose(const math::Pose& _pose)
-      {
-        return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-            Eigen::Quaterniond(ConvQuat(_pose.rot));
-      }
-
-      /// \brief
-      public: static math::Pose ConvPose(const Eigen::Isometry3d& _T)
-      {
-        math::Pose pose;
-        pose.pos = ConvVec3(_T.translation());
-        pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
-        return pose;
-      }
     };
     /// \}
   }

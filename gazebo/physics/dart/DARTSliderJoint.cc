@@ -82,7 +82,7 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  return DARTUtils::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
   dart::dynamics::PrismaticJoint* dartPrismaticJoint
       = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
 
-  Eigen::Vector3d dartVec3 = DARTUtils::ConvVec3(_axis);
+  Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494

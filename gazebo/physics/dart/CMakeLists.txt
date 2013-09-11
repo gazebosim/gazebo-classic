@@ -26,7 +26,6 @@ set (sources
     DARTHeightmapShape.cc
     DARTScrewJoint.cc
     DARTModel.cc
-    DARTUtils.cc
 )
 
 SET (headers
@@ -51,7 +50,6 @@ SET (headers
     DARTTypes.hh
     DARTScrewJoint.hh
     DARTModel.hh
-    DARTUtils.hh
 )
 
 set (gtest_sources

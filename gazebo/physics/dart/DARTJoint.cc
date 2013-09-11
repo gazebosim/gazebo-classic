@@ -94,9 +94,9 @@ void DARTJoint::Init()
     assert(dartChildBody);
 
     math::Pose poseChildLink = theChildLink->GetWorldPose();
-    dartTransfChildLink = DARTUtils::ConvPose(poseChildLink);
+    dartTransfChildLink = DARTTypes::ConvPose(poseChildLink);
   }
-  dartTransfChildLinkToJointRight = DARTUtils::ConvPose(this->anchorPose);
+  dartTransfChildLinkToJointRight = DARTTypes::ConvPose(this->anchorPose);
 
   if (theParentLink != NULL)
   {
@@ -104,7 +104,7 @@ void DARTJoint::Init()
     assert(dartParentBody);
 
     math::Pose poseParentLink = theParentLink->GetWorldPose();
-    dartTransfParentLink = DARTUtils::ConvPose(poseParentLink);
+    dartTransfParentLink = DARTTypes::ConvPose(poseParentLink);
   }
   // TODO: If the joint is not home position, then we need to care about it
   //       by multiply jointLocalTransformation.inverse() to the end of below
