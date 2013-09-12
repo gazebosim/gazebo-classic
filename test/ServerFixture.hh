@@ -150,7 +150,8 @@ class ServerFixture : public testing::Test
                       << " seconds\n";
 
                if (waitCount >= maxWaitCount)
-                   this->launchTimeoutFailure("while waiting for Load() function", waitCount);
+                 this->launchTimeoutFailure(
+                     "while waiting for Load() function", waitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -190,18 +191,19 @@ class ServerFixture : public testing::Test
              {
                // Wait for the scene to get loaded.
                int i = 0;
-               int timeout_ds = 20;
-               while (rendering::get_scene(_sceneName) == NULL && i < timeout_ds)
+               int timeoutDS = 20;
+               while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= timeout_ds)
+               if (i >= timeoutDS)
                {
                  gzerr << "Unable to load the rendering scene.\n"
                        << "Test will fail";
-                 this->launchTimeoutFailure("while waiting to load rendering scene", i);
+                 this->launchTimeoutFailure(
+                     "while waiting to load rendering scene", i);
                }
 
                return rendering::get_scene(_sceneName);
@@ -494,16 +496,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 50;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeout_ds)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing Camera", i);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing Camera", i);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
@@ -565,16 +568,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 100;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeout_ds)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing RaySensor", i);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing RaySensor", i);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -637,16 +641,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 100;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeout_ds)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing GpuRaySensor", i);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing GpuRaySensor", i);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -717,16 +722,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 1000;
+               int timeoutDS = 1000;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeout_ds)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing ImuSensor", i);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -791,15 +797,16 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 100;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < timeout_ds)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing ContactSensor", i);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ContactSensor", i);
              }
 
   /// \brief Spawn an IMU sensor on a link
@@ -862,27 +869,27 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
-               int timeout_ds = 50;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < timeout_ds)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(20);
                  ++i;
                }
 
-               if (i >= timeout_ds)
-                 this->launchTimeoutFailure("while waiting for spawing ImuSensor", i);
- 
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
              }
 
-  /// \brief generate a gtest failure from a timeout error and display a log message 
-  ///        about the problem. 
+  /// \brief generate a gtest failure from a timeout error and display a
+  /// log message about the problem.
   /// \param[in] log_msg: error msg related to the timeout
-  /// \param[in] timeout_cs: failing period (in centiseconds)
-  private: void launchTimeoutFailure(const char * log_msg, const int timeout_cs)
+  /// \param[in] timeoutCS: failing period (in centiseconds)
+  private: void launchTimeoutFailure(const char *_logMsg, const int _timeoutCS)
   {
-      FAIL() << "ServerFixture timeout (wait more than " << timeout_cs / 100
-             << "s): " << log_msg;
+      FAIL() << "ServerFixture timeout (wait more than " << _timeoutCS / 100
+             << "s): " << _logMsg;
   }
 
   /// \brief Spawn an Wireless transmitter sensor on a link
