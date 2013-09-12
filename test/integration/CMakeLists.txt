@@ -73,7 +73,7 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_dri_tests(${dri_tests})
 
 
-if (VALID_DRI_DISPLAY)
+if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
 
