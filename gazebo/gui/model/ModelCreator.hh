@@ -192,6 +192,10 @@ namespace gazebo
       /// \brief Get a template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
 
+      /// \brief Qt callback when a delete signal has been emitted.
+      /// \param[in] _name Name of the part or model to delete.
+      private slots: void OnDelete(const std::string &_name="");
+
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
 
@@ -236,6 +240,9 @@ namespace gazebo
 
       /// \brief Counter for the number of custom parts in the model.
       private: int customCounter;
+
+      /// \brief Counter for generating a unique model name.
+      private: int modelCounter;
 
       /// \brief Type of part being added.
       private: PartType addPartType;

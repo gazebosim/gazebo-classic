@@ -32,6 +32,7 @@
 
 #include "gazebo/physics/Inertial.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -58,6 +59,7 @@ ModelCreator::ModelCreator()
   this->boxCounter = 0;
   this->cylinderCounter = 0;
   this->sphereCounter = 0;
+  this->modelCounter = 0;
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -65,6 +67,9 @@ ModelCreator::ModelCreator()
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->jointMaker = new JointMaker();
+
+  connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
+          SLOT(OnDelete(const std::string &)));
 
   this->Reset();
 }
@@ -296,14 +301,14 @@ void ModelCreator::CreatePart(rendering::VisualPtr _visual)
 void ModelCreator::RemovePart(const std::string &_partName)
 {
   if (!this->modelVisual)
+  {
     this->Reset();
+    return;
+  }
 
   PartData *part = this->allParts[_partName];
   if (!part)
-  {
-    gzerr << _partName << " does not exist\n";
     return;
-  }
 
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
@@ -329,9 +334,21 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
+  KeyEventHandler::Instance()->AddPressFilter("model_part",
+      boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
+
+  MouseEventHandler::Instance()->AddPressFilter("model_part",
+      boost::bind(&ModelCreator::OnMousePressPart, this, _1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_part",
+      boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
+      boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
+
   this->jointMaker->Reset();
 
-  this->modelName = "defaultModel";
+  this->modelName = "defaultModel_" + this->modelCounter++;
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -352,18 +369,6 @@ void ModelCreator::Reset()
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
   scene->AddVisual(this->modelVisual);
-
-  KeyEventHandler::Instance()->AddPressFilter("model_part",
-      boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
-
-  MouseEventHandler::Instance()->AddPressFilter("model_part",
-      boost::bind(&ModelCreator::OnMousePressPart, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
-
-  MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -494,6 +499,21 @@ void ModelCreator::Stop()
   }
   if (this->jointMaker)
     this->jointMaker->Stop();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnDelete(const std::string &_part)
+{
+  if (_part == this->modelName)
+  {
+    this->Reset();
+    return;
+  }
+
+  if (this->jointMaker)
+    this->jointMaker->RemoveJointsByPart(_part);
+
+  this->RemovePart(_part);
 }
 
 /////////////////////////////////////////////////

@@ -36,10 +36,6 @@ using namespace gui;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
-  this->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&JointMaker::Update, this)));
-
   this->newJointCreated = false;
   this->mouseJoint = NULL;
   this->modelSDF.reset();
@@ -55,6 +51,10 @@ JointMaker::JointMaker()
 
   MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&JointMaker::Update, this)));
 }
 
 /////////////////////////////////////////////////
@@ -109,6 +109,27 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 }
 
 /////////////////////////////////////////////////
+void JointMaker::RemoveJointsByPart(const std::string &_partName)
+{
+  std::vector<std::string> toDelete;
+  boost::unordered_map<std::string, JointData *>::iterator it;
+  for (it = this->joints.begin(); it != this->joints.end(); ++it)
+  {
+    JointData *joint = it->second;
+    if (joint->child->GetName() == _partName ||
+        joint->parent->GetName() == _partName)
+    {
+      toDelete.push_back(it->first);
+    }
+  }
+
+  for (unsigned i = 0; i < toDelete.size(); ++i)
+    this->RemoveJoint(toDelete[i]);
+
+  toDelete.clear();
+}
+
+/////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
@@ -117,11 +138,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
-//  scene->SelectVisual("", "normal");
-
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-//  if (vis)
-//    vis = vis->GetRootVisual();
 
   if (this->hoverVis)
   {
@@ -194,9 +211,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   this->jointType = _type;
   if (_type != JointMaker::JOINT_NONE)
   {
-    // Add an event filter, which allows the JointMaker to capture
-    // mouse events.
-    //event::Events::setSelectedEntity("", "normal");
+    // Add an event filter, which allows the JointMaker to capture mouse events.
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
         boost::bind(&JointMaker::OnMousePress, this, _1));
 

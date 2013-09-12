@@ -89,6 +89,10 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
+      /// \brief Remove all joints connected to part
+      /// \param[in] _partName Name of joint to be removed.
+      public: void RemoveJointsByPart(const std::string &_partName);
+
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
 
@@ -174,6 +178,8 @@ namespace gazebo
 
       /// \brief Counter for the number of joints in the model.
       private: int jointCounter;
+
+      private: std::vector<std::string> jointsToDelete;
     };
     /// \}
 
