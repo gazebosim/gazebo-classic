@@ -21,11 +21,6 @@ if(HAVE_DART)
   link_directories ( ${DART_LIBRARY_DIRS} )
 endif()
 
-if(HAVE_DART)
-  include_directories ( ${DART_INCLUDEDIR} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
-endif()
-
 set(tests
 )
 

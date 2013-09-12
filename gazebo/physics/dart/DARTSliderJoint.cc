@@ -82,7 +82,7 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  return DARTUtils::ConvertVector3(globalAxis);
+  return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -91,14 +91,14 @@ void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
   dart::dynamics::PrismaticJoint* dartPrismaticJoint
       = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
 
-  Eigen::Vector3d dartVec3 = DARTUtils::ConvertVector3(_axis);
+  Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = dart::math::Inv(dartPrismaticJoint->getLocalTransformationFromParentBody());
-  dartVec3 = dart::math::Rotate(dartTransfJointLeftToParentLink, dartVec3);
+      = dartPrismaticJoint->getTransformFromParentBodyNode().inverse();
+  dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
   //----------------------------------------------------------------------------
 
   dartPrismaticJoint->setAxis(dartVec3);
@@ -126,7 +126,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
   assert(this->dartJoint->getDOF() == 1);
 
   // Hinge joint has only one dof.
-  double radianAngle = this->dartJoint->getDof(0)->get_q();
+  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
   result.SetFromRadian(radianAngle);
 
   return result;
@@ -137,7 +137,7 @@ double DARTSliderJoint::GetVelocity(int /*index*/) const
 {
   double result;
 
-  result = this->dartJoint->getDof(0)->get_dq();
+  result = this->dartJoint->getGenCoord(0)->get_dq();
 
   return result;
 }
@@ -169,7 +169,7 @@ void DARTSliderJoint::SetMaxForce(int _index, double _torque)
 {
   DARTJoint::SetForce(_index, _torque);
 
-  dartJoint->getDof(0)->set_tau(_torque);
+  dartJoint->getGenCoord(0)->set_tau(_torque);
 }
 
 

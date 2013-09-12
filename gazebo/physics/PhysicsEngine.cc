@@ -150,6 +150,7 @@ double PhysicsEngine::GetUpdatePeriod()
 ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
 {
   ModelPtr ret(new Model(_base));
+
   return ret;
 }
 

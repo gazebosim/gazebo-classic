@@ -4,7 +4,6 @@ add_subdirectory(ode)
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
-
 if (HAVE_DART)
   add_subdirectory(dart)
 endif()

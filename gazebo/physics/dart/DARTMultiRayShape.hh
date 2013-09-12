@@ -19,11 +19,16 @@
 #define _DARTMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/physics/dart/DARTTypes.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+
     /// \brief DART specific version of MultiRayShape
     class DARTMultiRayShape : public MultiRayShape
     {
@@ -36,6 +41,12 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void UpdateRays();
+
+      /// \brief Add a ray to the collision
+      protected: void AddRay(const math::Vector3 &_start,
+                             const math::Vector3 &_end);
+
+      private: DARTPhysicsPtr physicsEngine;
     };
   }
 }

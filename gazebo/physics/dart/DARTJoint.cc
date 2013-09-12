@@ -94,9 +94,9 @@ void DARTJoint::Init()
     assert(dartChildBody);
 
     math::Pose poseChildLink = theChildLink->GetWorldPose();
-    dartTransfChildLink = DARTUtils::ConvertPose(poseChildLink);
+    dartTransfChildLink = DARTTypes::ConvPose(poseChildLink);
   }
-  dartTransfChildLinkToJointRight = DARTUtils::ConvertPose(this->anchorPose);
+  dartTransfChildLinkToJointRight = DARTTypes::ConvPose(this->anchorPose);
 
   if (theParentLink != NULL)
   {
@@ -104,20 +104,20 @@ void DARTJoint::Init()
     assert(dartParentBody);
 
     math::Pose poseParentLink = theParentLink->GetWorldPose();
-    dartTransfParentLink = DARTUtils::ConvertPose(poseParentLink);
+    dartTransfParentLink = DARTTypes::ConvPose(poseParentLink);
   }
   // TODO: If the joint is not home position, then we need to care about it
   //       by multiply jointLocalTransformation.inverse() to the end of below
   //       line.
-  dartTransfParentLinkToJointLeft = dart::math::Inv(dartTransfParentLink)
+  dartTransfParentLinkToJointLeft = dartTransfParentLink.inverse()
                                     * dartTransfChildLink
                                     * dartTransfChildLinkToJointRight;
   //* Inv(this->dartJoint->getLocalTransformation());
 
-  this->dartJoint->setParentBody(dartParentBody);
-  this->dartJoint->setChildBody(dartChildBody);
-  this->dartJoint->setTransformFromParentBody(dartTransfParentLinkToJointLeft);
-  this->dartJoint->setTransformFromChildBody(dartTransfChildLinkToJointRight);
+  this->dartJoint->setParentBodyNode(dartParentBody);
+  this->dartJoint->setChildBodyNode(dartChildBody);
+  this->dartJoint->setTransformFromParentBodyNode(dartTransfParentLinkToJointLeft);
+  this->dartJoint->setTransformFromChildBodyNode(dartTransfChildLinkToJointRight);
 
   //----------------------------------------------------------------------------
   // TODO: Currently, dampingCoefficient seems not to be initialized when
@@ -249,13 +249,13 @@ void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
     case 0:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     case 1:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     case 2:
-      this->dartJoint->getDof(_index)->set_qMax(_angle.Radian());
+      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -269,13 +269,13 @@ void DARTJoint::SetLowStop(int _index, const math::Angle& _angle)
   switch (_index)
   {
   case 0:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   case 1:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   case 2:
-    this->dartJoint->getDof(_index)->set_qMin(_angle.Radian());
+    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -288,11 +288,11 @@ math::Angle DARTJoint::GetHighStop(int _index)
   switch (_index)
   {
   case 0:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   case 1:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   case 2:
-    return this->dartJoint->getDof(_index)->get_qMax();
+    return this->dartJoint->getGenCoord(_index)->get_qMax();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -306,11 +306,11 @@ math::Angle DARTJoint::GetLowStop(int _index)
   switch (_index)
   {
   case 0:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   case 1:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   case 2:
-    return this->dartJoint->getDof(_index)->get_qMin();
+    return this->dartJoint->getGenCoord(_index)->get_qMin();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -372,7 +372,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dartJoint->getLocalTransformation();
+  Eigen::Isometry3d T12 = dartJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -381,7 +381,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dartJoint->getLocalTransformationFromChildBody(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dartJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains

@@ -93,11 +93,11 @@ void DARTLink::Init()
 
   // COG offset
   math::Vector3 cog = this->inertial->GetCoG();
-  this->dartBodyNode->setLocalCOM(DARTUtils::ConvertVector3(cog));
+  this->dartBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
 
   // Transformation
   math::Pose bodyWorldPose = this->GetWorldPose();
-  this->dartBodyNode->setWorldTransform(DARTUtils::ConvertPose(bodyWorldPose));
+  this->dartBodyNode->setWorldTransform(DARTTypes::ConvPose(bodyWorldPose));
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -118,7 +118,7 @@ void DARTLink::OnPoseChange()
   Link::OnPoseChange();
 
   const math::Pose& currentPose = this->GetWorldPose();
-  this->dartBodyNode->setWorldTransform(DARTUtils::ConvertPose(currentPose));
+  this->dartBodyNode->setWorldTransform(DARTTypes::ConvPose(currentPose));
 }
 
 //////////////////////////////////////////////////
@@ -150,53 +150,118 @@ void DARTLink::SetAngularVel(const math::Vector3& /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetForce(const math::Vector3& /*_force*/)
+void DARTLink::SetForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->setExtForce(Eigen::Vector3d::Zero(),
+                                  DARTTypes::ConvVec3(_force));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetTorque(const math::Vector3& /*_torque*/)
+void DARTLink::SetTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->setExtTorque(DARTTypes::ConvVec3(_torque));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddForce(const math::Vector3& /*_force*/)
+void DARTLink::AddForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
+                                  DARTTypes::ConvVec3(_force));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeForce(const math::Vector3& /*_force*/)
+void DARTLink::AddRelativeForce(const math::Vector3& _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeForce" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(Eigen::Vector3d::Zero(),
+                                  DARTTypes::ConvVec3(_force),
+                                  true, true);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtWorldPosition(const math::Vector3& /*_force*/,
-                                        const math::Vector3& /*_pos*/)
+void DARTLink::AddForceAtWorldPosition(const math::Vector3& _force,
+                                        const math::Vector3& _pos)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtWorldPosition" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(DARTTypes::ConvVec3(_pos),
+                                  DARTTypes::ConvVec3(_force),
+                                  false, false);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const math::Vector3& /*_force*/,
-                                           const math::Vector3& /*_relpos*/)
+void DARTLink::AddForceAtRelativePosition(const math::Vector3& _force,
+                                          const math::Vector3& _relpos)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddForceAtRelativePosition"
+          << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtForce(DARTTypes::ConvVec3(_relpos),
+                                  DARTTypes::ConvVec3(_force),
+                                  true, true);
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddTorque(const math::Vector3& /*_torque*/)
+void DARTLink::AddTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtTorque(DARTTypes::ConvVec3(_torque));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeTorque(const math::Vector3& /*_torque*/)
+void DARTLink::AddRelativeTorque(const math::Vector3& _torque)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to AddRelativeTorque" << std::endl;
+    return;
+  }
+
+  this->dartBodyNode->addExtTorque(DARTTypes::ConvVec3(_torque), true);
 }
 
 //////////////////////////////////////////////////
@@ -204,10 +269,10 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3& _offset) const
 {
   const Eigen::Vector3d& linVel
-          = this->dartBodyNode->getVelocityWorldAtPoint(
-              DARTUtils::ConvertVector3(_offset)).tail<3>();
+          = this->dartBodyNode->getWorldVelocityAtPoint(
+              DARTTypes::ConvVec3(_offset)).tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTTypes::ConvVec3(linVel);
 }
 
 //////////////////////////////////////////////////
@@ -217,36 +282,43 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Pose pose(_offset, _q);
 
-  Eigen::Vector3d linVel
-    = this->dartBodyNode->getVelocityWorldAtFrame(
-      DARTUtils::ConvertPose(pose)).tail<3>();
+  Eigen::Vector3d linVel = this->dartBodyNode->getWorldVelocityAtFrame(
+      DARTTypes::ConvPose(pose)).tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTTypes::ConvVec3(linVel);
 }
 
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   const Eigen::Vector3d& linVel
-      = this->dartBodyNode->getVelocityWorldAtCOG().tail<3>();
+      = this->dartBodyNode->getWorldVelocityAtCOM().tail<3>();
 
-  return DARTUtils::ConvertVector3(linVel);
+  return DARTTypes::ConvVec3(linVel);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldAngularVel() const
 {
   const Eigen::Vector3d& angVel
-      = this->dartBodyNode->getVelocityWorld().head<3>();
+      = this->dartBodyNode->getWorldVelocity().head<3>();
 
-  return DARTUtils::ConvertVector3(angVel);
+  return DARTTypes::ConvVec3(angVel);
 }
 
 /////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldForce() const
 {
+  // TODO: Need verification
   math::Vector3 force;
 
-  gzwarn << "Not implemented!\n";
+  const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getBodyVelocity();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getBodyAcceleration();
+
+  Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
+
+  force = DARTTypes::ConvVec3(W.linear().transpose() * F.tail<3>());
 
   return force;
 }
@@ -254,9 +326,17 @@ math::Vector3 DARTLink::GetWorldForce() const
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldTorque() const
 {
+  // TODO: Need verification
   math::Vector3 torque;
 
-  gzwarn << "Not implemented!\n";
+  const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getBodyVelocity();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getBodyAcceleration();
+
+  Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
+
+  torque = DARTTypes::ConvVec3(W.linear().transpose() * F.head<3>());
 
   return torque;
 }
@@ -280,21 +360,42 @@ bool DARTLink::GetGravityMode() const
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetSelfCollide(bool /*_collide*/)
+void DARTLink::SetSelfCollide(bool _collide)
 {
-  gzwarn << "Not implemented!\n";
+  this->sdf->GetElement("self_collide")->Set(_collide);
+
+  // see: https://github.com/dartsim/dart/issues/84
+  gzlog << "DART does not support SetSelfCollide() yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetLinearDamping(double /*_damping*/)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping()"
+          << std::endl;
+    return;
+  }
+
+  // see: https://github.com/dartsim/dart/issues/85
+  gzlog << "DART does not support SetLinearDamping yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularDamping(double /*_damping*/)
 {
-  gzwarn << "Not implemented!\n";
+  if (!this->dartBodyNode)
+  {
+    gzlog << "DART rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to SetLinearDamping()"
+          << std::endl;
+    return;
+  }
+
+  // see: https://github.com/dartsim/dart/issues/85
+  gzlog << "DART does not support SetLinearDamping yet." << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -319,7 +420,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 {
   //-- Step 1: get dart body's transformation
   //-- Step 2: set gazebo link's pose using the transformation
-  math::Pose newPose = DARTUtils::ConvertPose(
+  math::Pose newPose = DARTTypes::ConvPose(
                          this->dartBodyNode->getWorldTransform());
 
   // Set the new pose to this link

@@ -558,6 +558,11 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
   SpawnDropCoGOffset(GetParam());
 }
 
+TEST_P(PhysicsTest, SpawnDropCoGOffsetDART)
+{
+  SpawnDropCoGOffset("dart");
+}
+
 ////////////////////////////////////////////////////////////////////////
 // RevoluteJoint:
 // Load 8 double pendulums arranged in a circle.
@@ -871,7 +876,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       if (joint)
       {
         // Detach upper_joint.
-        //joint->Detach();
+        // joint->Detach();
         // freeze joint limit instead
         math::Angle curAngle = joint->GetAngle(0u);
         joint->SetLowStop(0, curAngle - 0.01);
@@ -1212,6 +1217,13 @@ TEST_F(PhysicsTest, DropStuff)
   DropStuff("ode");
 }
 
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, DropStuffDART)
+{
+  DropStuff("dart");
+}
+#endif // HAVE_DART
+
 void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear inelastic collision
@@ -1302,6 +1314,13 @@ TEST_F(PhysicsTest, CollisionTest)
 {
   CollisionTest("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, CollisionTestDART)
+{
+  CollisionTest("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
