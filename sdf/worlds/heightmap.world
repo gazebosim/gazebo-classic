@@ -84,7 +84,7 @@
             <heightmap>
               <use_terrain_paging>false</use_terrain_paging>
               <texture>
-                <diffurinsImpoe>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
+                <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>
                 <size>1</size>
               </texture>
