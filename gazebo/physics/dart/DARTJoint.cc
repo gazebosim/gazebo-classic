@@ -114,10 +114,10 @@ void DARTJoint::Init()
                                     * dartTransfChildLinkToJointRight;
   //* Inv(this->dartJoint->getLocalTransformation());
 
-  this->dartJoint->setParentBody(dartParentBody);
-  this->dartJoint->setChildBody(dartChildBody);
-  this->dartJoint->setTransformFromParentBody(dartTransfParentLinkToJointLeft);
-  this->dartJoint->setTransformFromChildBody(dartTransfChildLinkToJointRight);
+  this->dartJoint->setParentBodyNode(dartParentBody);
+  this->dartJoint->setChildBodyNode(dartChildBody);
+  this->dartJoint->setTransformFromParentBodyNode(dartTransfParentLinkToJointLeft);
+  this->dartJoint->setTransformFromChildBodyNode(dartTransfChildLinkToJointRight);
 
   //----------------------------------------------------------------------------
   // TODO: Currently, dampingCoefficient seems not to be initialized when
@@ -381,7 +381,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dartJoint->getLocalTransformationFromChildBody(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dartJoint->getTransformationFromChildBodyNode(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains

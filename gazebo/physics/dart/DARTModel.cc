@@ -74,12 +74,12 @@ void DARTModel::Init()
       // If this link has no parent joint, then we add 6-dof free joint.
       dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
 
-      newFreeJoint->setParentBody(NULL);
-      newFreeJoint->setTransformFromParentBody(
+      newFreeJoint->setParentBodyNode(NULL);
+      newFreeJoint->setTransformFromParentBodyNode(
             DARTTypes::ConvPose(linkList[i]->GetWorldPose()));
 
-      newFreeJoint->setChildBody(dartBodyNode);
-      newFreeJoint->setTransformFromChildBody(Eigen::Isometry3d::Identity());
+      newFreeJoint->setChildBodyNode(dartBodyNode);
+      newFreeJoint->setTransformFromChildBodyNode(Eigen::Isometry3d::Identity());
 
       this->GetSkeleton()->addJoint(newFreeJoint);
     }
