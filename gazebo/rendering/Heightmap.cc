@@ -417,8 +417,9 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    this->terrainHashChanged = this->PrepareTerrainPaging(imgPath, terrainDirPath);
-    
+    this->terrainHashChanged = this->PrepareTerrainPaging(imgPath,
+        terrainDirPath);
+
     // Split the terrain. Every subterrain will be saved on disk and paged
     this->SplitHeights(this->heights, nTerrains, this->subTerrains);
 
@@ -584,7 +585,7 @@ void Heightmap::DefineTerrain(int _x, int _y)
   if (!this->useTerrainPaging)
   {
     this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
-  }  
+  }
   else if ((Ogre::ResourceGroupManager::getSingleton().resourceExists(
              this->terrainGroup->getResourceGroup(), filename)) &&
           (!this->terrainHashChanged))
