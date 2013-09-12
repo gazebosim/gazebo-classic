@@ -53,11 +53,18 @@ namespace gazebo
       /// \return True if the box is visual.
       public: bool GetVisible() const;
 
+      /// \brief Get the wireframe box.
+      /// \return The wireframe box.
+      public: math::Box GetBox() const;
+
       /// \brief The lines which outline the box.
       private: DynamicLines *lines;
 
       /// \brief The visual which this box is attached to.
       private: VisualPtr parent;
+
+      /// \brief Dimension of the box being drawn.
+      private: math::Box box;
     };
     /// \}
   }

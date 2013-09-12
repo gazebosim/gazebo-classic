@@ -155,11 +155,6 @@ namespace gazebo
       /// \brief Generate the SDF from model part and joint visuals.
       public: void GenerateSDF();
 
-      /// \brief Mouse event filter callback when mouse button is pressed
-      /// \param[in] _event The mouse event.
-      /// \return True if the event was handled
-      private: bool OnMousePressPart(const common::MouseEvent &_event);
-
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled

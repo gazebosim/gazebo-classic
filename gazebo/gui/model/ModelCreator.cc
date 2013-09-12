@@ -343,9 +343,6 @@ void ModelCreator::Reset()
   KeyEventHandler::Instance()->AddPressFilter("model_part",
       boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
 
-  MouseEventHandler::Instance()->AddPressFilter("model_part",
-      boost::bind(&ModelCreator::OnMousePressPart, this, _1));
-
   MouseEventHandler::Instance()->AddReleaseFilter("model_part",
       boost::bind(&ModelCreator::OnMouseReleasePart, this, _1));
 
@@ -491,9 +488,6 @@ void ModelCreator::AddPart(PartType _type)
         break;
     }
   }
-  else
-  {
-  }
 }
 
 /////////////////////////////////////////////////
@@ -543,24 +537,21 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
-{
-  if (!this->mouseVisual || _event.button != common::MouseEvent::LEFT)
-    return false;
-
-  emit PartAdded();
-  this->mouseVisual.reset();
-  this->AddPart(PART_NONE);
-  return true;
-}
-
-/////////////////////////////////////////////////
 bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
-  // select a part in normal mode
+  if (this->mouseVisual)
+  {
+    emit PartAdded();
+    this->mouseVisual.reset();
+    this->AddPart(PART_NONE);
+    return true;
+  }
+
+  // In mouse normal mode, let users select a part if the parent model
+  // is currently selected.
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {

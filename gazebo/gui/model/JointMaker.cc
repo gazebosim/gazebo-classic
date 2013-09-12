@@ -53,7 +53,7 @@ JointMaker::JointMaker()
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      event::Events::ConnectRender(
         boost::bind(&JointMaker::Update, this)));
 }
 
@@ -130,7 +130,7 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::OnMousePress(const common::MouseEvent &_event)
+bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
@@ -213,7 +213,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   {
     // Add an event filter, which allows the JointMaker to capture mouse events.
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
-        boost::bind(&JointMaker::OnMousePress, this, _1));
+        boost::bind(&JointMaker::OnMouseRelease, this, _1));
 
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
         boost::bind(&JointMaker::OnMouseMove, this, _1));
@@ -349,9 +349,11 @@ void JointMaker::CreateHotSpot()
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
+  std::string hotSpotName = joint->visual->GetName() + "_HOTSPOT_";
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(joint->visual->GetName() + "_HOTSPOT_",
-      joint->visual, false));
+      new rendering::Visual(hotSpotName, joint->visual, false));
+
+  joint->hotspot = hotspotVisual;
 
   hotspotVisual->InsertMesh("unit_sphere");
 
@@ -372,10 +374,8 @@ void JointMaker::CreateHotSpot()
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
+  this->joints[hotSpotName] = joint;
   camera->GetScene()->AddVisual(hotspotVisual);
-  joint->hotspot = hotspotVisual;
-
-  this->joints[hotspotVisual->GetName()] = joint;
   joint->dirty = true;
   this->mouseJoint = NULL;
 }
@@ -514,6 +514,11 @@ int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   return 0;
 }
 
+/////////////////////////////////////////////////
+JointMaker::JointType JointMaker::GetState() const
+{
+  return this->jointType;
+}
 
 /////////////////////////////////////////////////
 void JointData::OnApply()

@@ -108,13 +108,18 @@ namespace gazebo
       /// \return Joint type in string.
       public: static std::string GetTypeAsString(JointMaker::JointType _type);
 
+      /// \brief Get state
+      /// \return State of JointType if joint creation is in process, otherwise
+      /// JOINT_NONE
+      public: JointMaker::JointType GetState() const;
+
       /// \brief Stop the process of adding joint to the model.
       public: void Stop();
 
-      /// \brief Mouse event filter callback when mouse button is pressed .
+      /// \brief Mouse event filter callback when mouse button is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
@@ -126,20 +131,6 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
-/*      /// \brief Set parent of joint.
-      /// \param[in] _parent Pointer to parent visual.
-      /// \param[in] _offset Offset relative to parent origin where the joint
-      /// is to be attached to.
-      public: void SetParent(rendering::VisualPtr _parent,
-          math::Vector3 _offset = math::Vector3::Zero);
-
-      /// \brief Set child of joint.
-      /// \param[in] _child Pointer to child visual.
-      /// \param[in] _offset Offset relative to child origin where the joint
-      /// is to be attached to.
-      public: void SetChild(rendering::VisualPtr _child,
-          math::Vector3 _offset = math::Vector3::Zero);*/
-
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
 
@@ -148,8 +139,6 @@ namespace gazebo
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
-
-//      private: rendering::UserCameraPtr userCamera;
 
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
@@ -178,8 +167,6 @@ namespace gazebo
 
       /// \brief Counter for the number of joints in the model.
       private: int jointCounter;
-
-      private: std::vector<std::string> jointsToDelete;
     };
     /// \}
 
