@@ -289,10 +289,18 @@ class ServerFixture : public testing::Test
 
   protected: bool HasEntity(const std::string &_name)
              {
-               boost::mutex::scoped_lock lock(this->receiveMutex);
-               std::map<std::string, math::Pose>::iterator iter;
-               iter = this->poses.find(_name);
-               return iter != this->poses.end();
+               physics::WorldPtr world = physics::get_world();
+               if (world)
+               {
+                 return (world->GetEntity(_name) != NULL);
+               }
+               else
+               {
+                 boost::mutex::scoped_lock lock(this->receiveMutex);
+                 std::map<std::string, math::Pose>::iterator iter;
+                 iter = this->poses.find(_name);
+                 return iter != this->poses.end();
+               }
              }
 
   protected: void PrintImage(const std::string &_name, unsigned char **_image,
