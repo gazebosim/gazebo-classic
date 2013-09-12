@@ -59,6 +59,7 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->pageManager = NULL;
   this->terrainPaging = NULL;
   this->terrainHashChanged = true;
+  this->terrainsImported = true;
 }
 
 //////////////////////////////////////////////////
@@ -589,6 +590,7 @@ void Heightmap::DefineTerrain(int _x, int _y)
           (!this->terrainHashChanged))
   {
     this->terrainGroup->defineTerrain(_x, _y);
+    this->terrainsImported = false;
   }
   else
   {
@@ -596,7 +598,6 @@ void Heightmap::DefineTerrain(int _x, int _y)
           &this->subTerrains[this->terrainIdx][0]);
       ++terrainIdx;
   }
-  this->terrainsImported = true;
 }
 
 /////////////////////////////////////////////////
