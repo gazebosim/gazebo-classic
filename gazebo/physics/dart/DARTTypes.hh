@@ -80,7 +80,7 @@ namespace gazebo
       public: static Eigen::Isometry3d ConvPose(const math::Pose& _pose)
         {
             return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-                    Eigen::Quaterniond(ConvQuat(_pose.rot));
+                    ConvQuat(_pose.rot);
         }
 
         /// \brief
