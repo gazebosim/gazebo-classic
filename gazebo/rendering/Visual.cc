@@ -621,7 +621,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
 
-  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
