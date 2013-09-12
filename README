@@ -12,7 +12,7 @@ Instructions are located at
 
   http://gazebosim.org/documentation.html
 
-Own gazebo cmake parameters available at configuring time:
+Gazebo cmake parameters available at configuring time:
  - USE_LOW_MEMORY_TEST (bool) [default False]
    Use reduced version of tests which need less quantity of RAM memory
    available.
