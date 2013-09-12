@@ -878,7 +878,7 @@ class ServerFixture : public testing::Test
   /// \brief generate a gtest failure from a timeout error and display a log message 
   ///        about the problem. 
   /// \param[in] log_msg: error msg related to the timeout
-  /// \param[in] timeout_ms: failing period (in centiseconds)
+  /// \param[in] timeout_cs: failing period (in centiseconds)
   private: void launchTimeoutFailure(const char * log_msg, const int timeout_cs)
   {
       FAIL() << "ServerFixture timeout (wait more than " << timeout_cs / 100
