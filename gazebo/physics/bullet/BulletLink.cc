@@ -130,7 +130,7 @@ void BulletLink::Init()
 
   /// \TODO: get friction from collision object
   // this->rigidLink->setAnisotropicFriction(btVector3(0, 0, 0));
-  this->rigidLink->setFriction(0);  // Hack
+  this->rigidLink->setFriction(1.0);  // Hack
 
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);

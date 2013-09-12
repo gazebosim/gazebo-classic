@@ -443,10 +443,10 @@ namespace gazebo
       public: void SetPublishData(bool _enable);
 
       /// \brief Get the parent joints.
-      public: Joint_V GetParentJoints() {return this->parentJoints;}
+      public: Joint_V GetParentJoints() const {return this->parentJoints;}
 
       /// \brief Get the child joints.
-      public: Joint_V GetChildJoints() {return this->childJoints;}
+      public: Joint_V GetChildJoints() const {return this->childJoints;}
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
