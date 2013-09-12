@@ -109,8 +109,8 @@ struct dxSORLCPParameters {
     const int* findex;
     dRealPtr hi;
     dRealPtr lo;
-    dRealPtr invI;
-    dRealPtr I;
+    dRealPtr invMOI;
+    dRealPtr MOI;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
     dRealMutablePtr rhs;
@@ -186,7 +186,7 @@ static void Multiply1_12q1 (dReal *A, const dReal *B, const dReal *C, int q)
 // compute iMJ = inv(M)*J'
 
 static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
-  dxBody * const *body, dRealPtr invI)
+  dxBody * const *body, dRealPtr invMOI)
 {
   dRealMutablePtr iMJ_ptr = iMJ;
   dRealPtr J_ptr = J;
@@ -195,13 +195,13 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
     int b2 = jb[i*2+1];
     dReal k1 = body[b1]->invMass;
     for (int j=0; j<3; j++) iMJ_ptr[j] = k1*J_ptr[j];
-    const dReal *invIrow1 = invI + 12*b1;
-    dMultiply0_331 (iMJ_ptr + 3, invIrow1, J_ptr + 3);
+    const dReal *invMOIrow1 = invMOI + 12*b1;
+    dMultiply0_331 (iMJ_ptr + 3, invMOIrow1, J_ptr + 3);
     if (b2 >= 0) {
       dReal k2 = body[b2]->invMass;
       for (int j=0; j<3; j++) iMJ_ptr[j+6] = k2*J_ptr[j+6];
-      const dReal *invIrow2 = invI + 12*b2;
-      dMultiply0_331 (iMJ_ptr + 9, invIrow2, J_ptr + 9);
+      const dReal *invMOIrow2 = invMOI + 12*b2;
+      dMultiply0_331 (iMJ_ptr + 9, invMOIrow2, J_ptr + 9);
     }
   }
 }
@@ -293,7 +293,7 @@ static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
+  dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -301,7 +301,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
-  compute_invM_JT (m,J,iMJ,jb,body,invI);
+  compute_invM_JT (m,J,iMJ,jb,body,invMOI);
 
   dReal last_rho = 0;
   dReal *r = context->AllocateArray<dReal> (m);
@@ -401,7 +401,7 @@ static int compare_index_error (const void *a, const void *b)
 #endif
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
-                      dRealPtr I, dxBody * const *body,
+                      dRealPtr MOI, dxBody * const *body,
                       const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
@@ -423,16 +423,16 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       // tmp1 = M*v/h + fe
       //
       dReal *tmp1curr = tmp1;
-      const dReal *Irow = I;
+      const dReal *MOIrow = MOI;
       dxBody *const *const bodyend = body + nb;
-      for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, Irow+=12, bodycurr++) {
+      for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, MOIrow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         // dReal body_mass = b_ptr->mass.mass;
         for (int j=0; j<3; j++)
           tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
         dReal tmpa[3];
         for (int j=0; j<3; j++) tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
-        dMultiply0_331 (tmp1curr + 3,Irow,tmpa);
+        dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
         for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
       //
@@ -1121,7 +1121,7 @@ static void ComputeRows(
 // nb is the number of bodies in the body array.
 // J is an m*12 matrix of constraint rows
 // jb is an array of first and second body numbers for each constraint row
-// invI is the global frame inverse inertia for each body (stacked 3x3 matrices)
+// invMOI is the global frame inverse inertia for each body (stacked 3x3 matrices)
 //
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda,
@@ -1131,7 +1131,7 @@ static void ComputeRows(
 //
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
@@ -1144,7 +1144,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
-  compute_invM_JT (m,J,iMJ,jb,body,invI);
+  compute_invM_JT (m,J,iMJ,jb,body,invMOI);
 
 #ifdef WARM_STARTING
   // compute cforce=(inv(M)*J')*lambda
@@ -1385,8 +1385,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].findex = findex;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
-    params[thread_id].invI = invI;
-    params[thread_id].I= I;
+    params[thread_id].invMOI = invMOI;
+    params[thread_id].MOI= MOI;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
     params[thread_id].rhs = rhs;
@@ -1467,29 +1467,32 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
   // for all bodies, compute the inertia tensor and its inverse in the global
   // frame, and compute the rotational force and add it to the torque
-  // accumulator. I and invI are a vertical stack of 3x4 matrices, one per body.
-  dReal *invI = context->AllocateArray<dReal> (3*4*nb);
-  dReal *I = context->AllocateArray<dReal> (3*4*nb);
+  // accumulator. MOI and invMOI are a vertical stack of 3x4 matrices, one per body.
+  dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
+  dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
+  // TODO: possible optimization: move this to inside joint getInfo2, for inertia tweaking
+  // update tacc from external force and inertia tensor in inerial frame
+  // for now, modify MOI and invMOI after getInfo2 is called
   {
-    dReal *invIrow = invI;
-    dReal *Irow = I;
+    dReal *invMOIrow = invMOI;
+    dReal *MOIrow = MOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invIrow += 12, Irow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
       dMatrix3 tmp;
       dxBody *b_ptr = *bodycurr;
 
       // compute inverse inertia tensor in global frame
       dMultiply2_333 (tmp,b_ptr->invI,b_ptr->posr.R);
-      dMultiply0_333 (invIrow,b_ptr->posr.R,tmp);
+      dMultiply0_333 (invMOIrow,b_ptr->posr.R,tmp);
 
-      // also store I for later use by preconditioner
+      // also store MOI for later use by preconditioner
       dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
-      dMultiply0_333 (Irow,b_ptr->posr.R,tmp);
+      dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
 
       if (b_ptr->flags & dxBodyGyroscopic) {
         // compute rotational force
-        dMultiply0_331 (tmp,Irow,b_ptr->avel);
+        dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
         dSubtractVectorCross3(b_ptr->tacc,b_ptr->avel,tmp);
       }
     }
@@ -1590,31 +1593,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_orig = NULL;
   int *jb = NULL;
 
-  dReal *vnew = NULL;
-#ifdef PENETRATION_JVERROR_CORRECTION
-  // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
-  vnew = context->AllocateArray<dReal> (nb*6);
-  {
-    dRealMutablePtr vnewcurr = vnew;
-    dxBody* const* bodyend = body + nb;
-    const dReal *invIrow = invI;
-    dReal tmp_tacc[3];
-    for (dxBody* const* bodycurr = body; bodycurr != bodyend;
-         invIrow += 12, vnewcurr += 6, bodycurr++) {
-      dxBody *b_ptr = *bodycurr;
-
-      // add stepsize * invM * fe to the body velocity
-      dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
-      for (int j=0; j<3; j++) {
-        vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
-        vnewcurr[j+3] = b_ptr->avel[j];
-        tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
-      }
-      dMultiplyAdd0_331 (vnewcurr+3, invIrow, tmp_tacc);
-
-    }
-  }
-#endif
+  dReal *vnew = NULL; // used by PENETRATION_JVERROR_CORRECTION
 
   dReal *cforce = context->AllocateArray<dReal> (nb*6);
   dReal *caccel = context->AllocateArray<dReal> (nb*6);
@@ -1623,6 +1602,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *caccel_corr = context->AllocateArray<dReal> (nb*6);
 #endif
 
+  // Get Joint Information, setup Jacobians by calling getInfo2.
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
     dReal *c_v_max;
@@ -1688,6 +1668,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
         Jinfo.rowskip = 12;
         Jinfo.fps = stepsize1;
 
+        int *jb_ptr = jb;
+
         dReal *Jcopyrow = Jcopy;
         unsigned ofsi = 0;
         const dJointWithInfo1 *jicurr = jointiinfos;
@@ -1730,19 +1712,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               findex_ofsi[j] = fival + ofsi;
           }
 
-          ofsi += infom;
-        }
-      }
-
-      {
-        // create an array of body numbers for each joint row
-        int *jb_ptr = jb;
-        const dJointWithInfo1 *jicurr = jointiinfos;
-        const dJointWithInfo1 *const jiend = jicurr + nj;
-        for (; jicurr != jiend; jicurr++) {
-          dxJoint *joint = jicurr->joint;
-          const int infom = jicurr->info.m;
-
+          // create an array of body numbers for each joint row
           int b1 = (joint->node[0].body) ? (joint->node[0].body->tag) : -1;
           int b2 = (joint->node[1].body) ? (joint->node[1].body->tag) : -1;
           for (int j=0; j<infom; j++) {
@@ -1750,14 +1720,312 @@ void dxQuickStepper (dxWorldProcessContext *context,
             jb_ptr[1] = b2;
             jb_ptr += 2;
           }
+
+#undef DEBUG_INERTIA_PROPAGATION
+#ifdef DEBUG_INERTIA_PROPAGATION
+          printf("ofsi [%d]:\n", ofsi);
+#endif
+
+          /// INERTIA PROPAGATION ACROSS CONSTRAINED JOINTS
+          for (int j=0; j<infom; j++) {
+
+#ifdef DEBUG_INERTIA_PROPAGATION
+            printf("j [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n", j,
+                   Jinfo.J1l[0+j*Jinfo.rowskip],Jinfo.J1l[1+j*Jinfo.rowskip],Jinfo.J1l[2+j*Jinfo.rowskip],
+                   Jinfo.J2l[0+j*Jinfo.rowskip],Jinfo.J2l[1+j*Jinfo.rowskip],Jinfo.J2l[2+j*Jinfo.rowskip],
+                   Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip],
+                   Jinfo.J2a[0+j*Jinfo.rowskip],Jinfo.J2a[1+j*Jinfo.rowskip],Jinfo.J2a[2+j*Jinfo.rowskip]);
+#endif
+            /// \FIXME: For now, implement only for the two non-free axial rotation constraints for hinge joints.
+            /// this only makes sense if joint connects two dynamic bodies (b2 >= 0)
+            if (b2 >= 0 && jicurr->joint->type() == dJointTypeHinge && (j == 3 || j == 4))
+            {
+              /// In hinge joint, pure rotational constraint,
+              /// J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
+              /// to each other.  J1a or J2a indicates the constrained axis direction.
+              /// For this implementation, determine constrained axis(s) direction from J1a for hinge joints.
+
+
+              /// get the MOI for parent and child bodies constrained by J1a and J2a.
+              /// MOI and invMOI are already in inertial frame (previously rotated by body.posr.R)
+              /// get pointers to our invMOI/MOI matrices
+              dReal *invMOI_ptr1 = invMOI + b1 * 12;
+              dReal *MOI_ptr1 = MOI + b1 * 12;
+
+              // ode seems to leave these values uninitialized, unused too
+              // MOI_ptr1[0*4+3] = 0.0;
+              // MOI_ptr1[1*4+3] = 0.0;
+              // MOI_ptr1[2*4+3] = 0.0;
+
+#ifdef DEBUG_INERTIA_PROPAGATION
+              printf("--------------------------\n");
+              printf("MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+                MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+                MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+#endif
+
+              // compute scalar MOI in line with S:
+              //   moi_S = S' * I * S
+              dVector3 S = // line about which we want to compute MOI along
+                   { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
+              dVector3 tmp31;
+              dMultiply0_133(tmp31, S, MOI_ptr1);
+              dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+
+              // dMatrix3 tmp33;
+
+              // dMultiply2_333 (tmp33,invMOI_ptr1,RJ1a);
+              // dMultiply0_333 (invMOI_ptr1,RJ1a,tmp33);
+
+              // dMultiply2_333 (tmp33,MOI_ptr1,RJ1a);
+              // dMultiply0_333 (MOI_ptr1,RJ1a,tmp33);
+
+              // get MOI from body 2
+              dReal *invMOI_ptr2 = invMOI + b2 * 12;
+              dReal *MOI_ptr2 = MOI + b2 * 12;
+
+              // ode seems to leave these values uninitialized, unused too
+              // MOI_ptr2[0*4+3] = 0.0;
+              // MOI_ptr2[1*4+3] = 0.0;
+              // MOI_ptr2[2*4+3] = 0.0;
+
+#ifdef DEBUG_INERTIA_PROPAGATION
+              printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+                MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+                MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+                MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+#endif
+
+              // FIXME:  check that directions of J1a == J2a
+              // compute scalar MOI in line with S:
+              dMultiply0_133(tmp31, S, MOI_ptr2);
+              dReal moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+#ifdef DEBUG_INERTIA_PROPAGATION
+              printf("----------------------------\n");
+              printf("MOI b1[%d] S[%f %f %f] = %f\n",b1, S[0], S[1], S[2], moi_S1);
+
+              // printf("R1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+              //   RJ1a[0*4+0],RJ1a[0*4+1],RJ1a[0*4+2],RJ1a[0*4+3],
+              //   RJ1a[1*4+0],RJ1a[1*4+1],RJ1a[1*4+2],RJ1a[1*4+3],
+              //   RJ1a[2*4+0],RJ1a[2*4+1],RJ1a[2*4+2],RJ1a[2*4+3]);
+              printf("MOI b2[%d] S[%f %f %f] = %f\n",b2, S[0], S[1], S[2], moi_S2);
+#endif
+
+              // memcpy (MOI_ptr2, MOI_S2, 12 * sizeof(dReal));
+
+              // dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
+              // dMultiply0_333 (invMOI_ptr2,RJ1a,tmp33);
+
+              // dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
+              // dMultiply0_333 (MOI_ptr2,RJ1a,tmp33);
+
+              // full MOI tensor for S needs matrix outer product of S:
+              //   SS = [ S * S' ]
+              dMatrix3 SS = {
+                   S[0]*S[0], S[0]*S[1], S[0]*S[2], 0,
+                   S[1]*S[0], S[1]*S[1], S[1]*S[2], 0,
+                   S[2]*S[0], S[2]*S[1], S[2]*S[2], 0};
+              // memcpy (MOI_ptr1, MOI_S1, 12 * sizeof(dReal));
+
+#ifdef DEBUG_INERTIA_PROPAGATION
+              printf("==========================\n");
+
+              printf("SS [%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                SS[0*4+0],SS[0*4+1],SS[0*4+2],SS[0*4+3],
+                SS[1*4+0],SS[1*4+1],SS[1*4+2],SS[1*4+3],
+                SS[2*4+0],SS[2*4+1],SS[2*4+2],SS[2*4+3]);
+#endif
+
+              // get max ratio between matrices coupled through SS
+              //  MOI_ptr1[0*4+0] =
+              //  MOI_ptr1[0*4+1] =
+              //  MOI_ptr1[0*4+2] =
+
+              //  MOI_ptr1[1*4+0] = MOI_ptr1[0*4+1];
+              //  MOI_ptr1[1*4+1] =
+              //  MOI_ptr1[1*4+2] =
+
+              //  MOI_ptr1[2*4+0] = MOI_ptr1[0*4+2];
+              //  MOI_ptr1[2*4+1] = MOI_ptr1[1*4+2];
+              //  MOI_ptr1[2*4+2] =
+
+              //  MOI_ptr2[0*4+0] =
+              //  MOI_ptr2[0*4+1] =
+              //  MOI_ptr2[0*4+2] =
+
+              //  MOI_ptr2[1*4+0] = MOI_ptr2[0*4+1];
+              //  MOI_ptr2[1*4+1] =
+              //  MOI_ptr2[1*4+2] =
+
+              //  MOI_ptr2[2*4+0] = MOI_ptr2[0*4+2];
+              //  MOI_ptr2[2*4+1] = MOI_ptr2[1*4+2];
+              //  MOI_ptr2[2*4+2] =
+
+              //  for (int si = 0; si < 12; ++si)
+              //  {
+              //    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+              //    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+              //  }
+
+              // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
+              dReal moi_sum = (moi_S1 + moi_S2);
+              const dReal max_moi_ratio = 100.0;
+              bool modify_inertia = true;
+              dReal moi_S1_new, moi_S2_new;
+              if (moi_S1 > max_moi_ratio * moi_S2)
+              {
+                moi_S2_new = (moi_sum)/(max_moi_ratio + 1.0);
+                moi_S1_new = max_moi_ratio*moi_S2_new;
+              }
+              else if (moi_S2 > max_moi_ratio * moi_S1)
+              {
+                moi_S1_new = (moi_sum)/(max_moi_ratio + 1.0);
+                moi_S2_new = max_moi_ratio*moi_S1_new;
+              }
+              else
+                modify_inertia = false;
+
+              if (modify_inertia)
+              {
+#ifdef DEBUG_INERTIA_PROPAGATION
+              printf("==========================\n");
+                printf(" original    S1 [%f] S2 [%f]\n", moi_S1, moi_S2);
+                printf(" distributed S1 [%f] S2 [%f]\n", moi_S1_new, moi_S2_new);
+#endif
+                // Modify MOI by adding delta scalar MOI in tensor form.
+                for (int si = 0; si < 12; ++si)
+                {
+                  if (si % 4 == 3)
+                  {
+                    // MOI_ptr1[si] = 0;
+                    // MOI_ptr2[si] = 0;
+                  }
+                  else if (si / 4 == si % 4)
+                  {
+                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+
+                    // check for error
+                    if (MOI_ptr1[si] <= 0)
+                      printf("\n***************** si[%d] MOI_ptr1[%f]  *****************\n\n", si, MOI_ptr1[si]);
+                    if (MOI_ptr2[si] <= 0)
+                      printf("\n***************** si[%d] MOI_ptr2[%f]  *****************\n\n", si, MOI_ptr2[si]);
+                  }
+                  else
+                  {
+                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+                  }
+                }
+
+                // Update invMOI by inverting analytically (may not be efficient).
+                // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
+                //   (http://math.stackexchange.com/questions/17776/inverse-of-the-sum-of-matrices)
+                // try taking advantage of symmetry of MOI
+                dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
+                            -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
+                            +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
+                invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
+                invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
+                invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
+                // invMOI_ptr1[0*4+3] = 0.0;
+                invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
+                invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
+                invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
+                // invMOI_ptr1[1*4+3] = 0.0;
+                invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
+                invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
+                invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
+                // invMOI_ptr1[2*4+3] = 0.0;
+
+                dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
+                            -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
+                            +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
+                invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
+                invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
+                invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
+                // invMOI_ptr2[0*4+3] = 0.0;
+                invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
+                invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
+                invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
+                // invMOI_ptr2[1*4+3] = 0.0;
+                invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
+                invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
+                invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
+                // invMOI_ptr2[2*4+3] = 0.0;
+
+#ifdef DEBUG_INERTIA_PROPAGATION
+                printf("==========================\n");
+
+                printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                  MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+                  MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+                  MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+
+                // Modify MOI_ptr2
+                printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+                  MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+                  MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+                  MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+                printf("--------------------------\n");
+                printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+                  invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
+                  invMOI_ptr1[1*4+0],invMOI_ptr1[1*4+1],invMOI_ptr1[1*4+2],invMOI_ptr1[1*4+3],
+                  invMOI_ptr1[2*4+0],invMOI_ptr1[2*4+1],invMOI_ptr1[2*4+2],invMOI_ptr1[2*4+3]);
+
+                // Modify invMOI_ptr2
+                printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+                  invMOI_ptr2[0*4+0],invMOI_ptr2[0*4+1],invMOI_ptr2[0*4+2],invMOI_ptr2[0*4+3],
+                  invMOI_ptr2[1*4+0],invMOI_ptr2[1*4+1],invMOI_ptr2[1*4+2],invMOI_ptr2[1*4+3],
+                  invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
+                printf("--------------------------\n");
+#endif
+              }
+            }
+          }
+          ///     *. get scalar axis MOI in the constrained axis direction.
+          ///     *. get full axis MOI tensor representing the scalar axis MOI.
+          ///     *. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
+          ///        constrained direction.
+          ///     *. keep parent/child MOI/invMOI in inertial frame.
+
+
+
+          // update index for next joint
+          ofsi += infom;
+
+          // double check jb_ptr length
+          dIASSERT (jb_ptr == jb+2*m);
         }
-        dIASSERT (jb_ptr == jb+2*m);
-        //printf("jjjjjjjjj %d %d\n",jb[0],jb[1]);
       }
 
+      // Inertia tweaking for better convergence
+      // modify MOI and invMOI per constraint
+      if (0)
+      {
+        dReal *invMOIrow = invMOI;
+        dReal *MOIrow = MOI;
+        dxBody *const *const bodyend = body + nb;
+        for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
+          dMatrix3 tmp;
+          dxBody *b_ptr = *bodycurr;
 
+          // compute inverse inertia tensor in global frame
+          dMultiply2_333 (tmp,b_ptr->invI,b_ptr->posr.R);
+          dMultiply0_333 (invMOIrow,b_ptr->posr.R,tmp);
 
+          // also store MOI for later use by preconditioner
+          dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
+          dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
 
+          if (b_ptr->flags & dxBodyGyroscopic) {
+            // compute rotational force
+            dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
+            dSubtractVectorCross3(b_ptr->tacc,b_ptr->avel,tmp);
+          }
+        }
+      }
 
       BEGIN_STATE_SAVE(context, tmp1state) {
         IFTIMING (dTimerNow ("compute rhs"));
@@ -1766,16 +2034,16 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
         dReal *tmp1curr = tmp1;
-        const dReal *invIrow = invI;
+        const dReal *invMOIrow = invMOI;
         dxBody *const *const bodyend = body + nb;
         for (dxBody *const *bodycurr = body;
              bodycurr != bodyend;
-             tmp1curr+=6, invIrow+=12, bodycurr++) {
+             tmp1curr+=6, invMOIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
             tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
-          dMultiply0_331 (tmp1curr + 3,invIrow,b_ptr->tacc);
+          dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
           for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
@@ -1802,7 +2070,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // compute rhs_precon
       if (world->qs.precon_iterations > 0)
-        computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
+        computeRHSPrecon(context,m,nb,MOI,body,stepsize1,c,J,jb,rhs_precon);
 
 
 
@@ -1819,6 +2087,31 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int j=0; j<m; j++) cfm[j] *= stepsize1;
 
     } END_STATE_SAVE(context, cstate);
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+    // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
+    vnew = context->AllocateArray<dReal> (nb*6);
+    {
+      dRealMutablePtr vnewcurr = vnew;
+      dxBody* const* bodyend = body + nb;
+      const dReal *invMOIrow = invMOI;
+      dReal tmp_tacc[3];
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend;
+           invMOIrow += 12, vnewcurr += 6, bodycurr++) {
+        dxBody *b_ptr = *bodycurr;
+
+        // add stepsize * invM * fe to the body velocity
+        dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
+        for (int j=0; j<3; j++) {
+          vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
+          vnewcurr[j+3] = b_ptr->avel[j];
+          tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
+        }
+        dMultiplyAdd0_331 (vnewcurr+3, invMOIrow, tmp_tacc);
+
+      }
+    }
+#endif
 
     // load lambda from the value saved on the previous iteration
     dReal *lambda = context->AllocateArray<dReal> (m);
@@ -1860,7 +2153,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
       SOR_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,body,
-               invI,I,lambda,lambda_erp,
+               invMOI,MOI,lambda,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
@@ -1964,16 +2257,16 @@ void dxQuickStepper (dxWorldProcessContext *context,
     IFTIMING (dTimerNow ("compute velocity update"));
     // compute the velocity update:
     // add stepsize * invM * fe to the body velocity
-    const dReal *invIrow = invI;
+    const dReal *invMOIrow = invMOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invIrow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
       for (int j=0; j<3; j++) {
         b_ptr->lvel[j] += body_invMass_mul_stepsize * b_ptr->facc[j];
         b_ptr->tacc[j] *= stepsize;
       }
-      dMultiplyAdd0_331 (b_ptr->avel, invIrow, b_ptr->tacc);
+      dMultiplyAdd0_331 (b_ptr->avel, invMOIrow, b_ptr->tacc);
       // printf("fe [%f %f %f] [%f %f %f]\n"
       //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
       //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
@@ -2101,7 +2394,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       // add correction term dlambda = J*v(n+1)/dt
       // and caccel += dt*invM*JT*dlambda (dt's cancel out)
       dReal *iMJ = context->AllocateArray<dReal> (m*12);
-      compute_invM_JT (m,J,iMJ,jb,body,invI);
+      compute_invM_JT (m,J,iMJ,jb,body,invMOI);
       // compute caccel_corr=(inv(M)*J')*dlambda, correction term
       // as we change lambda.
       multiply_invM_JT (m,nb,iMJ,jb,tmp,caccel_corr);
@@ -2191,8 +2484,8 @@ size_t dxEstimateQuickStepMemoryRequirements (
 
   size_t res = 0;
 
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I (inertia) needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invMOI
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for MOI (inertia) needed by preconditioner
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
