@@ -18,6 +18,7 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -83,7 +84,7 @@ std::string ModelCreator::CreateModel()
 /////////////////////////////////////////////////
 void ModelCreator::AddJoint(JointMaker::JointType _type)
 {
-  this->AddPart(PART_NONE);
+  this->Stop();
   if (this->jointMaker)
     this->jointMaker->CreateJoint(_type);
 }
@@ -352,6 +353,9 @@ void ModelCreator::Reset()
   this->modelVisual->SetPose(this->modelPose);
   scene->AddVisual(this->modelVisual);
 
+  KeyEventHandler::Instance()->AddPressFilter("model_part",
+      boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
+
   MouseEventHandler::Instance()->AddPressFilter("model_part",
       boost::bind(&ModelCreator::OnMousePressPart, this, _1));
 
@@ -448,7 +452,8 @@ std::string ModelCreator::GetTemplateSDFString()
 /////////////////////////////////////////////////
 void ModelCreator::AddPart(PartType _type)
 {
-  // this->AddJoint(JOINT_NONE);
+  this->Stop();
+
   this->addPartType = _type;
   if (_type != PART_NONE)
   {
@@ -489,6 +494,16 @@ void ModelCreator::Stop()
   }
   if (this->jointMaker)
     this->jointMaker->Stop();
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    this->Stop();
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////

@@ -463,7 +463,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
-    this->modelCreator->Stop();
+    // this->modelCreator->Stop();
     // call the slots to uncheck the buttons
     this->OnPartAdded();
     this->OnJointAdded();

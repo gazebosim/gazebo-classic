@@ -215,22 +215,24 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointMaker::Stop()
 {
-  if (this->jointType != JointMaker::JOINT_NONE && this->mouseJoint)
+  if (this->jointType != JointMaker::JOINT_NONE)
   {
     this->newJointCreated = false;
+    if (this->mouseJoint)
+    {
+      this->mouseJoint->visual->DeleteDynamicLine(this->mouseJoint->line);
+      rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
+      scene->RemoveVisual(this->mouseJoint->visual);
+      this->mouseJoint->visual.reset();
+      delete this->mouseJoint->inspector;
+      delete this->mouseJoint;
+      this->mouseJoint = NULL;
+    }
+    this->CreateJoint(JointMaker::JOINT_NONE);
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
     if (this->selectedVis)
       this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-
-    this->mouseJoint->visual->DeleteDynamicLine(this->mouseJoint->line);
-    rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
-    scene->RemoveVisual(this->mouseJoint->visual);
-    this->mouseJoint->visual.reset();
-    delete this->mouseJoint->inspector;
-    delete this->mouseJoint;
-    this->mouseJoint = NULL;
-    this->CreateJoint(JointMaker::JOINT_NONE);
     this->selectedVis.reset();
     this->hoverVis.reset();
   }

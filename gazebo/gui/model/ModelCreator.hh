@@ -25,6 +25,7 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -168,6 +169,11 @@ namespace gazebo
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
       private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
+
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
+      /// \return True if the event was handled
+      private: bool OnKeyPressPart(const common::KeyEvent &_event);
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
