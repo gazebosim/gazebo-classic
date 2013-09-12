@@ -57,13 +57,7 @@ namespace gazebo
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
       public: virtual void SetVelocity(int _index, double _vel);
