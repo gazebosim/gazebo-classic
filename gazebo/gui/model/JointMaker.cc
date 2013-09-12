@@ -61,7 +61,7 @@ JointMaker::JointMaker()
 JointMaker::~JointMaker()
 {
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
-  this->hoverVis.reset();
+  this->Reset();
 }
 
 /////////////////////////////////////////////////

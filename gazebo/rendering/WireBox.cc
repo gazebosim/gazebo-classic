@@ -103,3 +103,9 @@ void WireBox::SetVisible(bool _visible)
 {
   this->lines->setVisible(_visible);
 }
+
+/////////////////////////////////////////////////
+bool WireBox::GetVisible() const
+{
+  return this->lines->isVisible();
+}

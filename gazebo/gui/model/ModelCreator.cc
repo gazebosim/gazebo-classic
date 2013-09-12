@@ -44,7 +44,6 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
-
 using namespace gazebo;
 using namespace gui;
 
@@ -77,6 +76,14 @@ ModelCreator::ModelCreator()
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
+  this->Reset();
+  this->node->Fini();
+  this->node.reset();
+  this->modelTemplateSDF.reset();
+  this->requestPub.reset();
+  this->makerPub.reset();
+
+  delete jointMaker;
 }
 
 /////////////////////////////////////////////////
@@ -290,7 +297,6 @@ void ModelCreator::CreatePart(rendering::VisualPtr _visual)
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
 
-
   part->inertial = new physics::Inertial;
   part->sensorData = new SensorData;
 
@@ -340,6 +346,9 @@ void ModelCreator::Reset()
   MouseEventHandler::Instance()->AddPressFilter("model_part",
       boost::bind(&ModelCreator::OnMousePressPart, this, _1));
 
+  MouseEventHandler::Instance()->AddReleaseFilter("model_part",
+      boost::bind(&ModelCreator::OnMouseReleasePart, this, _1));
+
   MouseEventHandler::Instance()->AddMoveFilter("model_part",
       boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
 
@@ -347,6 +356,7 @@ void ModelCreator::Reset()
       boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
 
   this->jointMaker->Reset();
+  this->selectedVis.reset();
 
   this->modelName = "defaultModel_" + this->modelCounter++;
 
@@ -412,7 +422,6 @@ void ModelCreator::FinishModel()
   event::Events::setSelectedEntity("", "normal");
   this->Reset();
   this->CreateTheEntity();
-//  this->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -452,7 +461,6 @@ std::string ModelCreator::GetTemplateSDFString()
 
   return newModelStr.str();
 }
-
 
 /////////////////////////////////////////////////
 void ModelCreator::AddPart(PartType _type)
@@ -523,6 +531,14 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
   {
     this->Stop();
   }
+  else if (_event.key == Qt::Key_Delete)
+  {
+    if (this->selectedVis)
+    {
+      this->OnDelete(this->selectedVis->GetName());
+      this->selectedVis.reset();
+    }
+  }
   return false;
 }
 
@@ -531,13 +547,46 @@ bool ModelCreator::OnMousePressPart(const common::MouseEvent &_event)
 {
   if (!this->mouseVisual || _event.button != common::MouseEvent::LEFT)
     return false;
-  else
+
+  emit PartAdded();
+  this->mouseVisual.reset();
+  this->AddPart(PART_NONE);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
+  // select a part in normal mode
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  if (vis)
   {
-    emit PartAdded();
-    this->mouseVisual.reset();
-    this->AddPart(PART_NONE);
-    return true;
+    if (this->allParts.find(vis->GetName()) !=
+        this->allParts.end())
+    {
+      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
+          == this->modelVisual || this->selectedVis)
+      {
+        if (this->selectedVis)
+          this->selectedVis->SetHighlighted(false);
+        else
+          event::Events::setSelectedEntity("", "normal");
+
+        this->selectedVis = vis;
+        this->selectedVis->SetHighlighted(true);
+        return true;
+      }
+    }
+    else if (this->selectedVis)
+    {
+      this->selectedVis->SetHighlighted(false);
+      this->selectedVis.reset();
+    }
   }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -752,7 +801,6 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
   // qDebug() << this->modelSDF->ToString().c_str();
 }
-
 
 /////////////////////////////////////////////////
 void PartData::OnApply()

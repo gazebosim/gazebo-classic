@@ -165,6 +165,11 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseMovePart(const common::MouseEvent &_event);
 
+      /// \brief Mouse event filter callback when mouse is released.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseReleasePart(const common::MouseEvent &_event);
+
       /// \brief Mouse event filter callback when mouse is double clicked.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -266,6 +271,9 @@ namespace gazebo
 
       /// \brief origin of the model.
       private: math::Pose origin;
+
+      /// \brief Selected partv visual;
+      private: rendering::VisualPtr selectedVis;
     };
     /// \}
 

@@ -1237,6 +1237,15 @@ void Visual::SetHighlighted(bool _highlighted)
 }
 
 //////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)

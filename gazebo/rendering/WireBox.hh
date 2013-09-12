@@ -49,6 +49,10 @@ namespace gazebo
       /// \param[in] _visible True to make the box visible, False to hide.
       public: void SetVisible(bool _visible);
 
+      /// \brief Get the visibility of the box.
+      /// \return True if the box is visual.
+      public: bool GetVisible() const;
+
       /// \brief The lines which outline the box.
       private: DynamicLines *lines;
 
