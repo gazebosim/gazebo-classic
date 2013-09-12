@@ -31,9 +31,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
-  : HingeJoint<DARTJoint>(_parent)
+  : HingeJoint<DARTJoint>(_parent),
+    dartRevJoint(new dart::dynamics::RevoluteJoint())
 {
-  this->dartJoint = new dart::dynamics::RevoluteJoint();
+  this->dartJoint = this->dartRevJoint;
 }
 
 //////////////////////////////////////////////////
@@ -52,21 +53,13 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 void DARTHingeJoint::Init()
 {
   HingeJoint<DARTJoint>::Init();
-  this->dartJoint->setDampingCoefficient(0, dampingCoefficient);
+  this->dartRevJoint->setDampingCoefficient(0, dampingCoefficient);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 {
-  math::Vector3 result;
-
-  // setting anchor relative to gazebo link frame pose
-  if (this->childLink)
-    result = poseChildLinkToJoint.pos + this->childLink->GetWorldPose().pos;
-  else
-    result = math::Vector3(0, 0, 0);
-
-  return result;
+  return DARTTypes::ConvVec3(this->dartRevJoint->getOrigin());
 }
 
 //////////////////////////////////////////////////
@@ -80,8 +73,6 @@ void DARTHingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
   // Axis in local frame of this joint
-  dart::dynamics::RevoluteJoint* dartRevJoint
-      = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
   Eigen::Vector3d globalAxis = dartRevJoint->getAxisGlobal();
 
   // TODO: Issue #494
@@ -92,16 +83,13 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 {
-  dart::dynamics::RevoluteJoint* dartRevJoint
-      = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
-
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = dartRevJoint->getTransformationFromParentBodyNode().inverse();
+      = dartRevJoint->getTransformFromParentBodyNode().inverse();
   dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
   //----------------------------------------------------------------------------
 
@@ -114,9 +102,6 @@ void DARTHingeJoint::SetDamping(int _index, double _damping)
   assert(_index == 0);
   assert(_damping >= 0.0);
 
-  dart::dynamics::RevoluteJoint* dartRevJoint
-      = dynamic_cast<dart::dynamics::RevoluteJoint*>(this->dartJoint);
-
   this->dampingCoefficient = _damping;
   dartRevJoint->setDampingCoefficient(0, _damping);
 }
@@ -126,11 +111,11 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result;
 
-  assert(this->dartJoint);
-  assert(this->dartJoint->getDOF() == 1);
+  assert(this->dartRevJoint);
+  assert(this->dartRevJoint->getDOF() == 1);
 
   // Hinge joint has only one dof.
-  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+  double radianAngle = this->dartRevJoint->getGenCoord(0)->get_q();
   result.SetFromRadian(radianAngle);
 
   return result;
@@ -139,11 +124,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetVelocity(int /*index*/) const
 {
-  double result;
-
-  result = this->dartJoint->getGenCoord(0)->get_dq();
-
-  return result;
+  return this->dartRevJoint->getGenCoord(0)->get_dq();
 }
 
 //////////////////////////////////////////////////
