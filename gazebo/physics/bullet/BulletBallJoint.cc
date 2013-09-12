@@ -131,6 +131,9 @@ void BulletBallJoint::Init()
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -167,21 +170,16 @@ void BulletBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngle(int /*_index*/) const
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
 math::Vector3 BulletBallJoint::GetGlobalAxis(int /*_index*/) const
 {
+  gzerr << "Not implemented\n";
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
 math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
 {
+  gzerr << "Not implemented\n";
   return math::Angle();
 }
 
@@ -199,6 +197,12 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
   }
   else
     gzerr << "bulletBall does not yet exist" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void BulletBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////

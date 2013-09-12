@@ -138,7 +138,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     CollisionPtr collisionPtr2 = link2->GetCollision(colIndex);
 
     if (!collisionPtr1 || !collisionPtr2)
-      return;
+      continue;
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
@@ -151,7 +151,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         collisionPtr1->GetWorld()->GetSimTime());
 
     if (!contactFeedback)
-      return;
+      continue;
 
     math::Pose body1Pose = link1->GetWorldPose();
     math::Pose body2Pose = link2->GetWorldPose();
@@ -209,11 +209,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 }
 
 //////////////////////////////////////////////////
-bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper */*_obj0*/, int /*_partId0*/,
-    int /*_index0*/, const btCollisionObjectWrapper */*_obj1*/,
-    int /*_partId1*/, int /*_index1*/)
+bool ContactCallback(btManifoldPoint &_cp,
+    const btCollisionObjectWrapper *_obj0, int /*_partId0*/, int /*_index0*/,
+    const btCollisionObjectWrapper *_obj1, int /*_partId1*/, int /*_index1*/)
 {
+  _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
+    _obj0->m_collisionObject->getFriction());
+  //this return value is currently ignored, but to be on the safe side:
+  //  return false if you don't calculate friction
   return true;
 }
 
@@ -312,8 +315,8 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // but can lead to improper stacking of objects, see
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
-  info.m_splitImpulse = 1;
-  info.m_splitImpulsePenetrationThreshold = -0.02;
+  info.m_splitImpulse = 0;
+  info.m_splitImpulsePenetrationThreshold = 0.00;
 
   // Use multiple friction directions.
   // This is important for rolling without slip (see issue #480)
@@ -330,6 +333,23 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
       boost::any_cast<int>(this->GetParam(PGS_ITERS));
   info.m_sor =
       boost::any_cast<double>(this->GetParam(SOR));
+
+  gzlog << " debug physics: "
+        << " iters[" << info.m_numIterations
+        << "] sor[" << info.m_sor
+        << "] erp[" << info.m_erp
+        << "] cfm[" << info.m_globalCfm
+        << "] split[" << info.m_splitImpulse
+        << "] split tol[" << info.m_splitImpulsePenetrationThreshold
+        << "]\n";
+
+  // debugging
+  // info.m_numIterations = 1000;
+  // info.m_sor = 1.0;
+  // info.m_erp = 0.2;
+  // info.m_globalCfm = 0.0;
+  // info.m_splitImpulse = 0;
+  // info.m_splitImpulsePenetrationThreshold = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -451,11 +471,7 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  // common::Time currTime =  this->world->GetRealTime();
-
-  this->dynamicsWorld->stepSimulation(
-      this->maxStepSize, 1, this->maxStepSize);
-  // this->lastUpdateTime = currTime;
+  this->dynamicsWorld->stepSimulation(this->maxStepSize, 0);
 }
 
 //////////////////////////////////////////////////

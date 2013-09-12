@@ -76,9 +76,6 @@ namespace gazebo
        /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the slider force
-      public: virtual void SetForce(int _index, double _effort);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _force);
 
@@ -90,6 +87,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the slider force
+      protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Pointer to bullet slider constraint
       private: btSliderConstraint *bulletSlider;

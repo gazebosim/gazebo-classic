@@ -65,6 +65,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int /*index*/) const
               {return math::Angle(0);}
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int _index, double _torque);
     };
   }
 }
