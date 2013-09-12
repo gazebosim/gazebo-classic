@@ -117,9 +117,6 @@ namespace gazebo
                 return 0;
               }
 
-      protected: btTypedConstraint *constraint;
-      protected: btDynamicsWorld *bulletWorld;
-
       // Documentation inherited.
       public: virtual void CacheForceTorque();
 
@@ -161,6 +158,9 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
       private: void SaveForce(int _index, double _force);
+
+      protected: btTypedConstraint *constraint;
+      protected: btDynamicsWorld *bulletWorld;
 
       /// \brief Feedback data for this joint
       private: btJointFeedback *feedback;

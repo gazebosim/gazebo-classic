@@ -13,6 +13,10 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 add_subdirectory(msgs)
 add_subdirectory(math)
 add_subdirectory(transport)

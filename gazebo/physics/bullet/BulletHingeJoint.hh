@@ -89,6 +89,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _effort);
+
       /// \brief Pointer to bullet hinge constraint.
       private: btHingeConstraint *bulletHinge;
 
@@ -99,9 +102,6 @@ namespace gazebo
       /// \brief Initial value of joint axis, expressed as unit vector
       ///        in world frame.
       private: math::Vector3 initialWorldAxis;
-
-      // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _effort);
     };
     /// \}
   }
