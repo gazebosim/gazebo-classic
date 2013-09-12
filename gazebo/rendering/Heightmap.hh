@@ -334,6 +334,9 @@ namespace gazebo
 
       /// \brief Flag that enables/disables the terrain paging
       private: bool useTerrainPaging;
+
+      /// \brief True if the terrain's hash does not match the image's hash
+      private: bool terrainHashChanged;
     };
     /// \}
 

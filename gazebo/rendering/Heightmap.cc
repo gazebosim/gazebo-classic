@@ -58,6 +58,7 @@ Heightmap::Heightmap(ScenePtr _scene)
 
   this->pageManager = NULL;
   this->terrainPaging = NULL;
+  this->terrainHashChanged = true;
 }
 
 //////////////////////////////////////////////////
@@ -289,7 +290,6 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path &_imgPath,
   try
   {
     imgHash = GetSHA1(_imgPath);
-    std::cout << "Image SHA1 computed\n";
   }
   catch(common::Exception &e)
   {
@@ -309,7 +309,6 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path &_imgPath,
       buffer << in.rdbuf();
       std::string terrainHash(buffer.str());
       updateHash = terrainHash != imgHash;
-      std::cout << "Terrain hash read. Update hash? " << updateHash << "\n";
     }
     catch(std::ifstream::failure &e)
     {
@@ -320,7 +319,6 @@ bool Heightmap::PrepareTerrainPaging(boost::filesystem::path &_imgPath,
   // Update the terrain hash and split the terrain into small pieces
   if (updateHash)
   {
-    std::cout << "Terrain hash updated\n";
     this->UpdateTerrainHash(imgHash, _terrainDirPath);
   }
 
@@ -342,7 +340,6 @@ void Heightmap::Load()
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
   boost::filesystem::path terrainDirPath;
-  bool regenerateTerrains = false;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
 
@@ -358,10 +355,28 @@ void Heightmap::Load()
 
     this->dataSize = geomMsg.heightmap().width();
 
-    // Get the full path of the image heightmap
-    imgPath = geomMsg.heightmap().filename();
-    terrainName = imgPath.filename().stem();
-    terrainDirPath = this->GzPagingDir / terrainName;
+    if (geomMsg.heightmap().has_filename())
+    {
+      // Get the full path of the image heightmap
+      imgPath = geomMsg.heightmap().filename();
+      terrainName = imgPath.filename().stem();
+      terrainDirPath = this->GzPagingDir / terrainName;
+
+      // Add the top level terrain paging directory to the OGRE
+      // ResourceGroupManager
+      if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+            this->GzPagingDir.string(), "General"))
+      {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+            this->GzPagingDir.string(), "FileSystem", "General", true);
+        Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+            "General");
+      }
+    }
+    else
+    {
+      this->useTerrainPaging = false;
+    }
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -386,7 +401,6 @@ void Heightmap::Load()
       this->terrainSize.x / (sqrt(nTerrains)));
 
   boost::filesystem::path prefix = terrainDirPath / "gazebo_terrain";
-  std::cout << prefix << std::endl;
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
@@ -402,14 +416,10 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    std::cout << "Using terrain paging\n";
-    regenerateTerrains = this->PrepareTerrainPaging(imgPath, terrainDirPath);
-    if (regenerateTerrains)
-    {
-      std::cout << "Splitting terrain\n";
-      // Split the terrain. Every subterrain will be paged
-      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
-    }
+    this->terrainHashChanged = this->PrepareTerrainPaging(imgPath, terrainDirPath);
+    
+    // Split the terrain. Every subterrain will be saved on disk and paged
+    this->SplitHeights(this->heights, nTerrains, this->subTerrains);
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);
@@ -437,7 +447,7 @@ void Heightmap::Load()
     for (int x = 0; x <= sqrt(nTerrains) - 1; ++x)
       this->DefineTerrain(x, y);
 
-  // sync load since we want everything in place when we start
+  // Sync load since we want everything in place when we start
   this->terrainGroup->loadAllTerrains(true);
 
   // Calculate blend maps
@@ -450,10 +460,9 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-    if (regenerateTerrains)
+    if (this->terrainHashChanged)
     {
-      std::cout << "Saving all terrains\n";
-      // Save all subterrains using files. This is required to reload the pages
+      // Save all subterrains using files.
       this->terrainGroup->saveAllTerrains(true);
     }
   }
@@ -570,30 +579,24 @@ void Heightmap::SetWireframe(bool _show)
 void Heightmap::DefineTerrain(int _x, int _y)
 {
   Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
-  std::cout << "Looking for " << filename << std::endl;
 
-  if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
-        this->terrainGroup->getResourceGroup(), filename))
+  if (!this->useTerrainPaging)
+  {
+    this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+  }  
+  else if ((Ogre::ResourceGroupManager::getSingleton().resourceExists(
+             this->terrainGroup->getResourceGroup(), filename)) &&
+          (!this->terrainHashChanged))
   {
     this->terrainGroup->defineTerrain(_x, _y);
-    std::cout << "Resource exists\n";
   }
   else
   {
-    if (this->useTerrainPaging)
-    {
-      std::cout << "Resource does not exist. Paging enabled\n";
       this->terrainGroup->defineTerrain(_x, _y,
           &this->subTerrains[this->terrainIdx][0]);
       ++terrainIdx;
-    }
-    else
-    {
-      std::cout << "Resource does not exist. Paging disabled\n";
-      this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
-    }
-    this->terrainsImported = true;
   }
+  this->terrainsImported = true;
 }
 
 /////////////////////////////////////////////////
