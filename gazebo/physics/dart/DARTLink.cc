@@ -269,7 +269,7 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3& _offset) const
 {
   const Eigen::Vector3d& linVel
-          = this->dartBodyNode->getVelocityWorldAtPoint(
+          = this->dartBodyNode->getWorldVelocityAtPoint(
               DARTTypes::ConvVec3(_offset)).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
@@ -282,7 +282,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   math::Pose pose(_offset, _q);
 
-  Eigen::Vector3d linVel = this->dartBodyNode->getVelocityWorldAtFrame(
+  Eigen::Vector3d linVel = this->dartBodyNode->getWorldVelocityAtFrame(
       DARTTypes::ConvPose(pose)).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
@@ -291,7 +291,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   const Eigen::Vector3d& linVel
-      = this->dartBodyNode->getVelocityWorldAtCOG().tail<3>();
+      = this->dartBodyNode->getWorldVelocityAtCOM().tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -300,7 +300,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 math::Vector3 DARTLink::GetWorldAngularVel() const
 {
   const Eigen::Vector3d& angVel
-      = this->dartBodyNode->getVelocityWorld().head<3>();
+      = this->dartBodyNode->getWorldVelocity().head<3>();
 
   return DARTTypes::ConvVec3(angVel);
 }
@@ -312,9 +312,9 @@ math::Vector3 DARTLink::GetWorldForce() const
   math::Vector3 force;
 
   const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
-  const Eigen::Matrix6d& G = this->dartBodyNode->getGeneralizedInertia();
-  const Eigen::VectorXd& V = this->dartBodyNode->getVelocityBody();
-  const Eigen::VectorXd& dV = this->dartBodyNode->getAcceleration();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getBodyVelocity();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getBodyAcceleration();
 
   Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
 
@@ -330,9 +330,9 @@ math::Vector3 DARTLink::GetWorldTorque() const
   math::Vector3 torque;
 
   const Eigen::Isometry3d& W = this->dartBodyNode->getWorldInvTransform();
-  const Eigen::Matrix6d& G = this->dartBodyNode->getGeneralizedInertia();
-  const Eigen::VectorXd& V = this->dartBodyNode->getVelocityBody();
-  const Eigen::VectorXd& dV = this->dartBodyNode->getAcceleration();
+  const Eigen::Matrix6d& G = this->dartBodyNode->getInertia();
+  const Eigen::VectorXd& V = this->dartBodyNode->getBodyVelocity();
+  const Eigen::VectorXd& dV = this->dartBodyNode->getBodyAcceleration();
 
   Eigen::Vector6d F = G * dV - dart::math::dad(V, G * V);
 

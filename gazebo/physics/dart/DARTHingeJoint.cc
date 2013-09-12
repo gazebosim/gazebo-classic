@@ -59,13 +59,13 @@ void DARTHingeJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 {
-  return DARTTypes::ConvVec3(this->dartRevJoint->getOrigin());
+  return DARTTypes::ConvVec3(this->dartRevJoint->getWorldOrigin());
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 {
-  // TODO: We do not do anything here because DART does not store the positon
+  // We do not do anything here because DART does not store the positon
   // of the joint.
 }
 
@@ -73,7 +73,7 @@ void DARTHingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
   // Axis in local frame of this joint
-  Eigen::Vector3d globalAxis = dartRevJoint->getAxisGlobal();
+  Eigen::Vector3d globalAxis = dartRevJoint->getWorldAxis();
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
