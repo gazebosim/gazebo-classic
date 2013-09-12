@@ -157,8 +157,8 @@ if (PKG_CONFIG_FOUND)
     #target_link_libraries(foo ${EIGEN3_LIBRARY})
   endif()
 
-  pkg_check_modules(fcl fcl)
-  pkg_check_modules(assimp assimp)
+  pkg_check_modules(fcl FCL)
+  pkg_check_modules(assimp ASSIMP)
   #################################################
 
   #################################################
