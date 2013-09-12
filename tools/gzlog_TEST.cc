@@ -25,6 +25,9 @@
 
 // This header file isn't needed if shasums are used
 // #include "test/data/pr2_state_log_expected.h"
+// Note that we are currently using a non-portable command-line tool
+// to compute SHA1 sums. Issue #837 is tracking the conversion
+// of this functionality to using a Boost library.
 #include "test_config.h"
 #include "gazebo/gazebo_config.h"
 
