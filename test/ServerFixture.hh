@@ -148,7 +148,10 @@ class ServerFixture : public testing::Test
                       << " seconds, timeout after "
                       << static_cast<double>(maxWaitCount)/100.0
                       << " seconds\n";
-               ASSERT_LT(waitCount, maxWaitCount);
+
+               if (waitCount >= maxWaitCount)
+                 this->launchTimeoutFailure(
+                     "while waiting for Load() function", waitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -188,17 +191,21 @@ class ServerFixture : public testing::Test
              {
                // Wait for the scene to get loaded.
                int i = 0;
-               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               int timeoutDS = 20;
+               while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= 20)
+               if (i >= timeoutDS)
+               {
                  gzerr << "Unable to load the rendering scene.\n"
-                   << "Test will fail";
+                       << "Test will fail";
+                 this->launchTimeoutFailure(
+                     "while waiting to load rendering scene", i);
+               }
 
-               EXPECT_LT(i, 20);
                return rendering::get_scene(_sceneName);
              }
 
@@ -489,13 +496,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing Camera", i);
 
                i = 0;
                while (sensors::get_sensor(_cameraName) == NULL && i < 100)
@@ -565,13 +576,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing RaySensor", i);
 
                i = 0;
                while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
@@ -642,13 +657,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               ASSERT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing GpuRaySensor", i);
 
                i = 0;
                while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
@@ -729,13 +748,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 1000;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               ASSERT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
 
                i = 0;
                while (sensors::get_sensor(_imuSensorName) == NULL && i < 100)
@@ -808,13 +831,16 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 100)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               ASSERT_LT(i, 100);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ContactSensor", i);
 
                i = 0;
                while (sensors::get_sensor(_sensorName) == NULL && i < 100)
@@ -885,13 +911,17 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 50)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(20);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
 
                i = 0;
                while (sensors::get_sensor(_sensorName) == NULL && i < 100)
@@ -901,6 +931,16 @@ class ServerFixture : public testing::Test
                }
                ASSERT_LT(i, 100);
              }
+
+  /// \brief generate a gtest failure from a timeout error and display a
+  /// log message about the problem.
+  /// \param[in] log_msg: error msg related to the timeout
+  /// \param[in] timeoutCS: failing period (in centiseconds)
+  private: void launchTimeoutFailure(const char *_logMsg, const int _timeoutCS)
+  {
+      FAIL() << "ServerFixture timeout (wait more than " << _timeoutCS / 100
+             << "s): " << _logMsg;
+  }
 
   /// \brief Spawn an Wireless transmitter sensor on a link
   /// \param[in] _name Model name
@@ -1019,6 +1059,12 @@ class ServerFixture : public testing::Test
                }
                EXPECT_LT(i, _retries);
              }
+
+             if (i >= _retries)
+               FAIL() << "ServerFixture timeout: max number of retries ("
+                      << _retries
+                      << ") exceeded while awaiting the spawn of " << _name;
+           }
 
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
