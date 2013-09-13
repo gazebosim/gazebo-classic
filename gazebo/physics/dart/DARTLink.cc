@@ -86,7 +86,7 @@ void DARTLink::Init()
   double Ixy = this->inertial->GetIXY();
   double Ixz = this->inertial->GetIXZ();
   double Iyz = this->inertial->GetIYZ();
-  this->dartBodyNode->setMomentOfInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
+  this->dartBodyNode->setInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
 
   // Visual
   this->visuals;

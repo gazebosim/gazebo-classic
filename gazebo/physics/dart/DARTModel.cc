@@ -105,13 +105,6 @@ void DARTModel::Fini()
 }
 
 //////////////////////////////////////////////////
-//void DARTModel::Reset()
-//{
-//  Model::Reset();
-
-//}
-
-//////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const {
   return boost::shared_dynamic_cast<DARTPhysics>(this->GetWorld()->GetPhysicsEngine());
 }

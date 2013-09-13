@@ -361,14 +361,84 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 {
+  if (_msg->has_solver_type())
+  {
+//    sdf::ElementPtr solverElem =
+//      this->sdf->GetElement("dart")->GetElement("solver");
+//    if (_msg->solver_type() == "quick")
+//    {
+//      solverElem->GetElement("type")->Set("quick");
+//      this->physicsStepFunc = &dWorldQuickStep;
+//    }
+//    else if (_msg->solver_type() == "world")
+//    {
+//      solverElem->GetElement("type")->Set("world");
+//      this->physicsStepFunc = &dWorldStep;
+//    }
+  }
+
+//  if (_msg->has_precon_iters())
+//    this->SetSORPGSPreconIters(_msg->precon_iters());
+
+//  if (_msg->has_iters())
+//    this->SetSORPGSIters(_msg->iters());
+
+//  if (_msg->has_sor())
+//    this->SetSORPGSW(_msg->sor());
+
+//  if (_msg->has_cfm())
+//    this->SetWorldCFM(_msg->cfm());
+
+//  if (_msg->has_erp())
+//    this->SetWorldERP(_msg->erp());
+
+//  if (_msg->has_enable_physics())
+//    this->world->EnablePhysicsEngine(_msg->enable_physics());
+
+//  if (_msg->has_contact_max_correcting_vel())
+//    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+
+//  if (_msg->has_contact_surface_layer())
+//    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+
+//  if (_msg->has_gravity())
+//    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+//  if (_msg->has_real_time_factor())
+//    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+//  if (_msg->has_real_time_update_rate())
+//  {
+//    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+//  }
+//  else if (_msg->has_update_rate())
+//  {
+//    this->SetRealTimeUpdateRate(_msg->update_rate());
+//    gzwarn <<
+//        "Physics update rate is deprecated by real time update rate\n";
+//  }
+
+  if (_msg->has_max_step_size())
+  {
+    std::cout << "HERE" << std::endl;
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+  else if (_msg->has_dt())
+  {
+    std::cout << "HERE dt" << std::endl;
+    this->SetMaxStepSize(_msg->dt());
+    gzwarn << "Physics dt is deprecated by max step size\n";
+  }
+
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
 }
 
 void DARTPhysics::SetMaxStepSize(double _stepSize)
 {
+  std::cout << "trying to change time step: " << _stepSize << std::endl;
   PhysicsEngine::SetMaxStepSize(_stepSize);
 
   this->dartWorld->setTimeStep(_stepSize);
