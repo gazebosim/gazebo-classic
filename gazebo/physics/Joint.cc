@@ -110,10 +110,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   // Joint force and torque feedback
   if (_sdf->HasElement("physics"))
   {
-    sdf::ElementPtr physics_elem = _sdf->GetElement("physics");
-    if (physics_elem->HasElement("provide_feedback"))
+    sdf::ElementPtr physicsElem = _sdf->GetElement("physics");
+    if (physicsElem->HasElement("provide_feedback"))
     {
-      this->SetProvideFeedback(physics_elem->Get<bool>("provide_feedback"));
+      this->SetProvideFeedback(physicsElem->Get<bool>("provide_feedback"));
     }
   }
 
