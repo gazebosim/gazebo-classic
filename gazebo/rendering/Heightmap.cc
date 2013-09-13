@@ -215,7 +215,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
-std::string Heightmap::GetSHA1(boost::filesystem::path &_filename)
+std::string Heightmap::GetSHA1(const boost::filesystem::path &_filename)
 {
   boost::uuids::detail::sha1 sha1;
   unsigned int hash[5];
@@ -252,8 +252,8 @@ std::string Heightmap::GetSHA1(boost::filesystem::path &_filename)
 }
 
 //////////////////////////////////////////////////
-void Heightmap::UpdateTerrainHash(std::string &_hash,
-    boost::filesystem::path &_terrainDir)
+void Heightmap::UpdateTerrainHash(const std::string &_hash,
+    const boost::filesystem::path &_terrainDir)
 {
   std::ofstream terrainHashFile;
   boost::filesystem::path terrainHashFullPath;
@@ -280,8 +280,8 @@ void Heightmap::UpdateTerrainHash(std::string &_hash,
 }
 
 //////////////////////////////////////////////////
-bool Heightmap::PrepareTerrainPaging(boost::filesystem::path &_imgPath,
-    boost::filesystem::path &_terrainDirPath)
+bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
+    const boost::filesystem::path &_terrainDirPath)
 {
   std::string imgHash;
   boost::filesystem::path terrainHashFullPath;

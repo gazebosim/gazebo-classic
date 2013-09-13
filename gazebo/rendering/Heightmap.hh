@@ -221,7 +221,7 @@ namespace gazebo
       /// \brief Compute the SHA1 hash of a file.
       /// \param[in] _filename Input file.
       /// \return The string representation (40 character) of the SHA1 hash.
-      private: std::string GetSHA1(boost::filesystem::path &_filename);
+      private: std::string GetSHA1(const boost::filesystem::path &_filename);
 
       /// \brief Update the hash of a terrain file. The hash will be written in
       /// a file called gzterrain.SHA1 . This method will be used when the
@@ -230,8 +230,8 @@ namespace gazebo
       /// \param[in] _hash New hash value
       /// \param[in] _terrainDir Directory where the terrain hash and the
       /// terrain pages are stored. Ex: /tmp/gazebo-paging/heigthmap_bowl
-      private: void UpdateTerrainHash(std::string &_hash,
-          boost::filesystem::path &_terrainDir);
+      private: void UpdateTerrainHash(const std::string &_hash,
+          const boost::filesystem::path &_terrainDir);
 
       /// \brief It checks if the terrain was previously loaded. In negative
       /// case, it splits the original terrain into pieces and creates a hash
@@ -240,8 +240,9 @@ namespace gazebo
       /// \param[in] _terrainDirPath Path to the directory containing the
       /// terrain pages and hash.
       /// \return True if the terrain requires to regenerate the terrain files.
-      private: bool PrepareTerrainPaging(boost::filesystem::path &_imgPath,
-        boost::filesystem::path &_terrainDirPath);
+      private: bool PrepareTerrainPaging(
+        const boost::filesystem::path &_imgPath,
+        const boost::filesystem::path &_terrainDirPath);
 
       /// \brief Number of pieces in which a terrain is subdivided for paging.
       public: static const unsigned int NumTerrainSubdivisions;
