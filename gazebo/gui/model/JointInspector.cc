@@ -89,21 +89,21 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     axisXSpinBox->setSingleStep(0.01);
     axisXSpinBox->setDecimals(3);
     axisXSpinBox->setValue(0.000);
-    axisXSpinBoxes.push_back(axisXSpinBox);
+    this->axisXSpinBoxes.push_back(axisXSpinBox);
 
     QDoubleSpinBox *axisYSpinBox = new QDoubleSpinBox;
     axisYSpinBox->setRange(-1000, 1000);
     axisYSpinBox->setSingleStep(0.01);
     axisYSpinBox->setDecimals(3);
     axisYSpinBox->setValue(0.000);
-    axisYSpinBoxes.push_back(axisYSpinBox);
+    this->axisYSpinBoxes.push_back(axisYSpinBox);
 
     QDoubleSpinBox *axisZSpinBox = new QDoubleSpinBox;
     axisZSpinBox->setRange(-1000, 1000);
     axisZSpinBox->setSingleStep(0.01);
     axisZSpinBox->setDecimals(3);
     axisZSpinBox->setValue(0.000);
-    axisZSpinBoxes.push_back(axisZSpinBox);
+    this->axisZSpinBoxes.push_back(axisZSpinBox);
 
     QGridLayout *axisLayout = new QGridLayout;
     axisLayout->addWidget(axisXLabel, 0, 0);
@@ -113,10 +113,41 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
     axisLayout->addWidget(axisZLabel), 2, 0;
     axisLayout->addWidget(axisZSpinBox, 2, 1);
 
+    QLabel *lowerLimitLabel = new QLabel(tr("Lower: "));
+    QLabel *upperLimitLabel = new QLabel(tr("Upper: "));
+
+    QDoubleSpinBox *lowerLimitSpinBox = new QDoubleSpinBox;
+    lowerLimitSpinBox->setRange(-1000, 1000);
+    lowerLimitSpinBox->setSingleStep(0.01);
+    lowerLimitSpinBox->setDecimals(3);
+    lowerLimitSpinBox->setValue(-1e16);
+    this->lowerLimitSpinBoxes.push_back(lowerLimitSpinBox);
+
+    QDoubleSpinBox *upperLimitSpinBox = new QDoubleSpinBox;
+    upperLimitSpinBox->setRange(-1000, 1000);
+    upperLimitSpinBox->setSingleStep(0.01);
+    upperLimitSpinBox->setDecimals(3);
+    upperLimitSpinBox->setValue(1e16);
+    this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
+
+
+    QGridLayout *limitLayout = new QGridLayout;
+    limitLayout->addWidget(lowerLimitLabel, 0, 0);
+    limitLayout->addWidget(lowerLimitSpinBox, 0, 1);
+    limitLayout->addWidget(upperLimitLabel), 1, 0;
+    limitLayout->addWidget(upperLimitSpinBox, 1, 1);
+
+    QGroupBox *limitGroupBox = new QGroupBox(tr("Limit"));
+    limitGroupBox->setLayout(limitLayout);
+
+    QVBoxLayout *axisAllLayout = new QVBoxLayout;
+    axisAllLayout->addLayout(axisLayout);
+    axisAllLayout->addWidget(limitGroupBox);
+
     std::stringstream ss;
     ss << "Axis" << (i+1);
     QGroupBox *axisGroupBox = new QGroupBox(tr(ss.str().c_str()));
-    axisGroupBox->setLayout(axisLayout);
+    axisGroupBox->setLayout(axisAllLayout);
     this->axisGroupBoxes.push_back(axisGroupBox);
   }
 
@@ -176,6 +207,30 @@ math::Vector3 JointInspector::GetAxis(int _index) const
 }
 
 /////////////////////////////////////////////////
+double JointInspector::GetLowerLimit(int _index) const
+{
+  if (_index < 0 || _index > static_cast<int>(this->lowerLimitSpinBoxes.size()))
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->lowerLimitSpinBoxes[_index]->value();
+}
+
+/////////////////////////////////////////////////
+double JointInspector::GetUpperLimit(int _index) const
+{
+  if (_index < 0 || _index > static_cast<int>(this->upperLimitSpinBoxes.size()))
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->upperLimitSpinBoxes[_index]->value();
+}
+
+/////////////////////////////////////////////////
 JointMaker::JointType JointInspector::GetType() const
 {
   return this->jointType;
@@ -227,6 +282,30 @@ void JointInspector::SetAxis(int _index, const math::Vector3 &_axis)
   this->axisXSpinBoxes[_index]->setValue(_axis.x);
   this->axisYSpinBoxes[_index]->setValue(_axis.y);
   this->axisZSpinBoxes[_index]->setValue(_axis.z);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetLowerLimit(int _index, double _lower)
+{
+  if (_index < 0 || _index > static_cast<int>(this->lowerLimitSpinBoxes.size()))
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return;
+  }
+
+  this->lowerLimitSpinBoxes[_index]->setValue(_lower);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetUpperLimit(int _index, double _upper)
+{
+  if (_index < 0 || _index > static_cast<int>(this->upperLimitSpinBoxes.size()))
+  {
+    gzerr << "Axis index is out of range" << std::endl;
+    return;
+  }
+
+  this->upperLimitSpinBoxes[_index]->setValue(_upper);
 }
 
 /////////////////////////////////////////////////

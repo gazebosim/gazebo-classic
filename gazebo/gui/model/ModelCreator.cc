@@ -355,7 +355,9 @@ void ModelCreator::Reset()
   this->jointMaker->Reset();
   this->selectedVis.reset();
 
-  this->modelName = "defaultModel_" + this->modelCounter++;
+  std::stringstream ss;
+  ss << "defaultModel_" << this->modelCounter++;
+  this->modelName = ss.str();
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
@@ -775,22 +777,23 @@ void ModelCreator::GenerateSDF()
     geomElem->InsertElement(geomElemClone->GetFirstElement());
   }
 
-  // Add joints sdf
+  // Add joint sdf elements
   this->jointMaker->GenerateSDF();
   sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
+
   sdf::ElementPtr jointElem;
   if (jointsElem->HasElement("joint"))
     jointElem = jointsElem->GetElement("joint");
   while (jointElem)
   {
-    modelElem->InsertElement(jointElem);
+    modelElem->InsertElement(jointElem->Clone());
     jointElem = jointElem->GetNextElement("joint");
   }
 
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-  // qDebug() << this->modelSDF->ToString().c_str();
+  qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////

@@ -143,6 +143,9 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
+      /// \brief Visual that is previously hovered over by the mouse
+      private: rendering::VisualPtr prevHoverVis;
+
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
@@ -197,6 +200,12 @@ namespace gazebo
 
       /// \brief Joint axis direction.
       public: math::Vector3 axis[2];
+
+      /// \brief Joint lower limit.
+      public: double lowerLimit[2];
+
+      /// \brief Joint upper limit.
+      public: double upperLimit[2];
 
       /// \brief Joint anchor point.
       public: math::Vector3 anchor;

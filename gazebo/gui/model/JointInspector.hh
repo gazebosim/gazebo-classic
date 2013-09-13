@@ -53,6 +53,16 @@ namespace gazebo
       /// \return Axis direction.
       public: math::Vector3 GetAxis(int _index) const;
 
+      /// \brief Get axis lower limit.
+      /// \param[in] _index Index of axis
+      /// \return Lower limit.
+      public: double GetLowerLimit(int _index) const;
+
+      /// \brief Get axis upper limit.
+      /// \param[in] _index Index of axis
+      /// \return Upper limit.
+      public: double GetUpperLimit(int _index) const;
+
       /// \brief Get joint type.
       /// \return Joint type.
       public: JointMaker::JointType GetType() const;
@@ -70,6 +80,16 @@ namespace gazebo
       /// \param[in] _index Index of axis.
       /// \param[in] _axis Axis direction.
       public: void SetAxis(int _index, const math::Vector3 &_axis);
+
+      /// \brief Set axis lower limit.
+      /// \param[in] _index Index of axis.
+      /// \param[in] _lower Lower limit.
+      public: void SetLowerLimit(int _index, double _lower);
+
+      /// \brief Set axis upper limit.
+      /// \param[in] _index Index of axis.
+      /// \param[in] _upper Upper limit.
+      public: void SetUpperLimit(int _index, double _upper);
 
       /// \brief Set joint type.
       /// \param[in] _type joint type.
@@ -110,6 +130,12 @@ namespace gazebo
 
       /// \brief Spin box for configuring the Z direction of the axis.
       private: std::vector<QDoubleSpinBox *> axisZSpinBoxes;
+
+      /// \brief Spin box for configuring the lower limit of the axis.
+      private: std::vector<QDoubleSpinBox *> lowerLimitSpinBoxes;
+
+      /// \brief Spin box for configuring the upper limit of the axis.
+      private: std::vector<QDoubleSpinBox *> upperLimitSpinBoxes;
 
       /// \brief Type of joint.
       private: JointMaker::JointType jointType;

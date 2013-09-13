@@ -53,7 +53,7 @@ JointMaker::JointMaker()
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
 
   this->connections.push_back(
-      event::Events::ConnectRender(
+      event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 }
 
@@ -80,8 +80,7 @@ void JointMaker::Reset()
   this->jointType = JointMaker::JOINT_NONE;
   this->selectedVis.reset();
   this->hoverVis.reset();
-
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  this->prevHoverVis.reset();
 
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
@@ -138,7 +137,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
   if (this->hoverVis)
   {
@@ -180,24 +178,29 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 
       int axisCount = JointMaker::GetJointAxisCount(jointData->type);
       for (int i = 0; i < axisCount; ++i)
+      {
         jointData->axis[i] = math::Vector3::UnitX;
+        jointData->lowerLimit[i] = -1e16;
+        jointData->upperLimit[i] = 1e16;
+      }
       jointData->anchor = math::Vector3::Zero;
       this->mouseJoint = jointData;
       jointData->line->setMaterial(this->jointMaterials[jointData->type]);
     }
     // Pressed child part
-    else if (this->selectedVis != vis)
+    else if (this->selectedVis != this->hoverVis)
     {
       if (this->hoverVis)
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
       if (this->selectedVis)
         this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-      this->mouseJoint->child = vis;
+      this->mouseJoint->child = this->hoverVis;
 
       // reset variables.
       this->selectedVis.reset();
       this->hoverVis.reset();
       this->CreateJoint(JointMaker::JOINT_NONE);
+
       this->newJointCreated = true;
       emit JointAdded();
     }
@@ -212,7 +215,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   if (_type != JointMaker::JOINT_NONE)
   {
     // Add an event filter, which allows the JointMaker to capture mouse events.
-    MouseEventHandler::Instance()->AddPressFilter("model_joint",
+    MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
         boost::bind(&JointMaker::OnMouseRelease, this, _1));
 
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
@@ -221,11 +224,10 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   else
   {
     // Remove the event filters.
-    MouseEventHandler::Instance()->RemovePressFilter("model_joint");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
   }
 }
-
 
 /////////////////////////////////////////////////
 void JointMaker::Stop()
@@ -256,8 +258,7 @@ void JointMaker::Stop()
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT ||
-      _event.dragging)
+  if (_event.dragging)
     return false;
 
   // Get the active camera and scene.
@@ -330,7 +331,12 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
       joint->inspector->SetAnchor(0, joint->anchor);
       int axisCount = JointMaker::GetJointAxisCount(joint->type);
       for (int i = 0; i < axisCount; ++i)
+      {
         joint->inspector->SetAxis(i, joint->axis[i]);
+        joint->inspector->SetAxis(i, joint->axis[i]);
+        joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
+        joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
+      }
     }
     joint->inspector->show();
     return true;
@@ -355,21 +361,16 @@ void JointMaker::CreateHotSpot()
 
   joint->hotspot = hotspotVisual;
 
-  hotspotVisual->InsertMesh("unit_sphere");
+ hotspotVisual->InsertMesh("unit_sphere");
 
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + joint->visual->GetName(), "unit_sphere"));
-  hotspotObj->setUserAny(Ogre::Any(hotspotVisual->GetName()));
+  hotspotObj->setUserAny(Ogre::Any(hotSpotName));
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
   hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
-
-  hotspotVisual->SetWorldPosition(
-      joint->parent->GetWorldPose().pos +
-      (joint->child->GetWorldPose().pos -
-      joint->parent->GetWorldPose().pos)/2.0);
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
@@ -377,7 +378,6 @@ void JointMaker::CreateHotSpot()
   this->joints[hotSpotName] = joint;
   camera->GetScene()->AddVisual(hotspotVisual);
   joint->dirty = true;
-  this->mouseJoint = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -386,23 +386,28 @@ void JointMaker::Update()
   if (this->newJointCreated)
   {
     this->CreateHotSpot();
+    this->mouseJoint = NULL;
     this->newJointCreated = false;
   }
 
+  // update joint line and hotspot position.
   boost::unordered_map<std::string, JointData *>::iterator it;
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
     if (joint->dirty)
     {
-      joint->line->SetPoint(1,
-          joint->child->GetWorldPose().pos -
-          joint->parent->GetWorldPose().pos);
+      if (joint->child && joint->parent)
+      {
+        joint->line->SetPoint(1,
+            joint->child->GetWorldPose().pos -
+            joint->parent->GetWorldPose().pos);
 
-      joint->hotspot->SetWorldPosition(
+        joint->hotspot->SetWorldPosition(
           joint->parent->GetWorldPose().pos +
           (joint->child->GetWorldPose().pos -
           joint->parent->GetWorldPose().pos)/2.0);
+      }
     }
   }
 }
@@ -410,17 +415,8 @@ void JointMaker::Update()
 /////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
-  sdf::ElementPtr jointElem;
-  sdf::ElementPtr parentElem;
-  sdf::ElementPtr childElem;
-  sdf::ElementPtr axisElem[2];
-  sdf::ElementPtr poseElem;
-
   this->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->modelSDF);
-
-  jointElem = this->modelSDF->GetElement("joint");
-  jointElem = jointElem->Clone();
   this->modelSDF->ClearElements();
 
   boost::unordered_map<std::string, JointData *>::iterator jointsIt;
@@ -429,13 +425,16 @@ void JointMaker::GenerateSDF()
       ++jointsIt)
   {
     JointData *joint = jointsIt->second;
+    sdf::ElementPtr jointElem = this->modelSDF->AddElement("joint");
 
     jointElem->GetAttribute("name")->Set(joint->visual->GetName());
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
-    parentElem = jointElem->GetElement("parent");
+    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     parentElem->Set(joint->parent->GetParent()->GetName());
-    childElem = jointElem->GetElement("child");
+    sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetParent()->GetName());
+    sdf::ElementPtr poseElem = jointElem->GetElement("pose");
+    poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {
@@ -443,10 +442,14 @@ void JointMaker::GenerateSDF()
       ss << "axis";
       if (i > 0)
         ss << (i+1);
-      axisElem[i] = jointElem->GetElement(ss.str());
-      axisElem[i]->Set(joint->axis[i]);
+      sdf::ElementPtr axisElem = jointElem->GetElement(ss.str());
+      axisElem->GetElement("xyz")->Set(joint->axis[i]);
+
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+      limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
+      limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
+      //gzerr << axisElem->ToString("") << std::endl;;
     }
-    this->modelSDF->InsertElement(jointElem->Clone());
   }
 }
 
@@ -527,6 +530,10 @@ void JointData::OnApply()
   this->type = this->inspector->GetType();
   int axisCount = JointMaker::GetJointAxisCount(this->type);
   for (int i = 0; i < axisCount; ++i)
+  {
     this->axis[i] = this->inspector->GetAxis(i);
+    this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
+    this->upperLimit[i] = this->inspector->GetUpperLimit(i);
+  }
 
 }
