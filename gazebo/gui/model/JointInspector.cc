@@ -241,11 +241,8 @@ void JointInspector::SetType(JointMaker::JointType _type)
 {
   this->jointType =  _type;
 
-  std::string jointTypeStr = "";
-  int axisCount = 0;
-
-  jointTypeStr = JointMaker::GetTypeAsString(_type);
-  axisCount = JointMaker::GetJointAxisCount(_type);
+  std::string jointTypeStr = JointMaker::GetTypeAsString(_type);
+  int axisCount = JointMaker::GetJointAxisCount(_type);
 
   this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
 
