@@ -1007,8 +1007,9 @@ class ServerFixture : public testing::Test
              }
 
              if (i >= retries)
-               FAIL() << "ServerFixture timeout: max number of retries (" << retries
-                      << ") exceeded while waiting the spawned of " << _name;
+               FAIL() << "ServerFixture timeout: max number of retries ("
+                      << retries
+                      << ") exceeded while awaiting the spawn of " << _name;
            }
 
   protected: void SpawnCylinder(const std::string &_name,
