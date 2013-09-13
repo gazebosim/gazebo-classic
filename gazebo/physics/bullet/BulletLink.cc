@@ -86,7 +86,7 @@ void BulletLink::Init()
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
-  /// FIXME:  Friction Parameters
+  /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
   /// <collision> shapes in bullet.  Each child shape could have a
   /// different mu1 and mu2.  This is not ideal as friction is set
