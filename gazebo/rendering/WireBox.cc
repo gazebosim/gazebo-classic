@@ -30,6 +30,7 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->parent->AttachObject(this->lines);
   this->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
+  this->box = _box;
   this->Init(_box);
 }
 
@@ -99,7 +100,19 @@ void WireBox::Init(const math::Box &_box)
 }
 
 /////////////////////////////////////////////////
+math::Box WireBox::GetBox() const
+{
+  return this->box;
+}
+
+/////////////////////////////////////////////////
 void WireBox::SetVisible(bool _visible)
 {
   this->lines->setVisible(_visible);
+}
+
+/////////////////////////////////////////////////
+bool WireBox::GetVisible() const
+{
+  return this->lines->isVisible();
 }

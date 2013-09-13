@@ -1232,8 +1232,23 @@ void Visual::SetHighlighted(bool _highlighted)
   }
   else if (this->boundingBox)
   {
+    math::Box box = this->GetBoundingBox();
+    if (!(box == this->boundingBox->GetBox()))
+    {
+      this->boundingBox->Init(box);
+    }
     this->boundingBox->SetVisible(false);
   }
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1550,6 +1565,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }

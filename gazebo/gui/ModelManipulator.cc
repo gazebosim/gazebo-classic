@@ -131,7 +131,6 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   _vis->SetWorldRotation(rot);
 }
 
-
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
@@ -220,7 +219,7 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-  math::Box bbox = _vis->GetBoundingBox();
+  math::Box bbox = this->mouseVisualBbox;
   math::Pose pose = _vis->GetWorldPose();
   math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
@@ -230,7 +229,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
-
   if (this->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
@@ -389,7 +387,6 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr vis;
   rendering::VisualPtr mouseVis
       = this->userCamera->GetVisual(this->mouseEvent.pos);
-
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
   if (!this->keyEvent.key && (this->selectionObj->GetMode() ==
@@ -407,7 +404,9 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
     if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    {
       vis = vis->GetRootVisual();
+    }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
@@ -627,7 +626,10 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->mouseMoveVis = _vis;
   if (_vis)
+  {
     this->mouseVisualScale = _vis->GetScale();
+    this->mouseVisualBbox = _vis->GetBoundingBox();
+  }
   else
     this->mouseVisualScale = math::Vector3::One;
 }
