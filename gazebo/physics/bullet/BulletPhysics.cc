@@ -215,7 +215,7 @@ bool ContactCallback(btManifoldPoint &_cp,
 {
   _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
     _obj0->m_collisionObject->getFriction());
-  //this return value is currently ignored, but to be on the safe side:
+  // this return value is currently ignored, but to be on the safe side:
   //  return false if you don't calculate friction
   return true;
 }
