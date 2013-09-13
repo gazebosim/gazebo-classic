@@ -124,10 +124,6 @@ namespace gazebo
       private: void OnCreateEntity(const std::string &_type,
                                    const std::string &_data);
 
-      /// \brief Callback for a joint creation event
-      /// \param[in] _type Type of joint
-      private: void OnCreateJoint(const std::string &_type);
-
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);

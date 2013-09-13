@@ -298,23 +298,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   {
     this->PopHistory();
   }
-  else if (_event->key() == Qt::Key_R)
-    g_rotateAct->trigger();
-  else if (_event->key() == Qt::Key_T)
-    g_translateAct->trigger();
-  else if (_event->key() == Qt::Key_S)
-    g_scaleAct->trigger();
-
-  /// Switch between RTS modes
-  if (this->keyModifiers == Qt::NoModifier)
-  {
-    if (_event->key() == Qt::Key_R)
-      g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T)
-      g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S)
-      g_scaleAct->trigger();
-  }
 
   /// Switch between RTS modes
   if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
@@ -829,6 +812,7 @@ void GLWidget::OnOrbit()
       rendering::OrbitViewController::GetTypeString());
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected())

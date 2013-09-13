@@ -891,13 +891,6 @@ void MainWindow::CreateActions()
   g_scaleAct->setToolTip(tr("Scale Mode (S)"));
   connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
 
-  g_scaleAct = new QAction(QIcon(":/images/scale.png"),
-      tr("Scale Mode"), this);
-  g_scaleAct->setStatusTip(tr("Scale an object"));
-  g_scaleAct->setCheckable(true);
-  g_scaleAct->setChecked(false);
-  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
-
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));
   g_boxCreateAct->setCheckable(true);
@@ -1402,7 +1395,7 @@ void MainWindow::CreateEditors()
   // Create a Building Editor
   this->editors.push_back(new BuildingEditor(this));
 
-  // Create a Building Editor
+  // Create a Model Editor
   this->editors.push_back(new ModelEditor(this));
 }
 

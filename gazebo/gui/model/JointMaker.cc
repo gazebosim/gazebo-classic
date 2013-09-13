@@ -340,8 +340,8 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
       return true;
     }
   }
-  else
-    return false;
+
+  return false;
 }
 
 /////////////////////////////////////////////////

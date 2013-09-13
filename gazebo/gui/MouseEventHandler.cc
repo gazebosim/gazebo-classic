@@ -58,7 +58,6 @@ void MouseEventHandler::AddDoubleClickFilter(const std::string &_name,
   this->Add(_name, _filter, this->doubleClickFilters);
 }
 
-
 /////////////////////////////////////////////////
 void MouseEventHandler::RemovePressFilter(const std::string &_name)
 {

@@ -36,15 +36,6 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { createEntity.Disconnect(_subscriber); }
 
-      /////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the create joint signal
-      public: template<typename T>
-              static event::ConnectionPtr ConnectCreateJoint(T _subscriber)
-              { return createJoint.Connect(_subscriber); }
-      public: static void DisconnectCreateJoint(
-                  event::ConnectionPtr _subscriber)
-              { createJoint.Disconnect(_subscriber); }
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the move mode signal
       public: template<typename T>
@@ -124,9 +115,6 @@ namespace gazebo
 
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;
-
-      /// \brief indicates that the user signals to create a joint
-      public: static event::EventT<void (std::string)> createJoint;
 
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
       public: static event::EventT<void (bool)> fullScreen;

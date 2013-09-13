@@ -21,7 +21,6 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void (std::string, std::string)> Events::createEntity;
-event::EventT<void (std::string)> Events::createJoint;
 event::EventT<void (bool)> Events::moveMode;
 event::EventT<void (std::string)> Events::manipMode;
 event::EventT<void (bool)> Events::fullScreen;
