@@ -1058,13 +1058,12 @@ class ServerFixture : public testing::Test
                  ++i;
                }
                EXPECT_LT(i, _retries);
-             }
 
-             if (i >= _retries)
-               FAIL() << "ServerFixture timeout: max number of retries ("
-                      << _retries
-                      << ") exceeded while awaiting the spawn of " << _name;
-           }
+               if (i >= _retries)
+                 FAIL() << "ServerFixture timeout: max number of retries ("
+                        << _retries
+                        << ") exceeded while awaiting the spawn of " << _name;
+             }
 
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
