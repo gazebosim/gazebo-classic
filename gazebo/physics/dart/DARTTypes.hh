@@ -79,8 +79,16 @@ namespace gazebo
         /// \brief
       public: static Eigen::Isometry3d ConvPose(const math::Pose& _pose)
         {
-            return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-                    ConvQuat(_pose.rot);
+            // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
+            //return Eigen::Translation3d(ConvVec3(_pose.pos)) *
+            //        ConvQuat(_pose.rot);
+
+            Eigen::Isometry3d res;
+
+            res.translation() = ConvVec3(_pose.pos);
+            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
+
+            return res;
         }
 
         /// \brief
