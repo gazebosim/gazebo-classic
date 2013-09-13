@@ -53,31 +53,31 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
-{
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (this->modelVisual)
-  {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
-  }
-
-  // This function is currently not executed. Commenting out the following
-  // line to prevent a compile warning.
-  // this->modelVisual =
-  // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
-
-  if (!this->modelVisual)
-  {
-    gzerr << "Unable to clone\n";
-    return false;
-  }
-
-  this->clone = true;
-
-  return true;
-}
+// bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
+// {
+//   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+//   if (this->modelVisual)
+//   {
+//     scene->RemoveVisual(this->modelVisual);
+//     this->modelVisual.reset();
+//     this->visuals.clear();
+//   }
+//
+//   // This function is currently not executed. Commenting out the following
+//   // line to prevent a compile warning.
+//   // this->modelVisual =
+//   // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
+//
+//   if (!this->modelVisual)
+//   {
+//     gzerr << "Unable to clone\n";
+//     return false;
+//   }
+//
+//   this->clone = true;
+//
+//   return true;
+// }
 
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)

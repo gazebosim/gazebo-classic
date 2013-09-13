@@ -8,7 +8,7 @@ package gazebo.msgs;
 message TrackVisual
 {
   required string name              = 1;
-  required uint32 id                = 2;
+  optional uint32 id                = 2;
   optional bool inherit_orientation = 3;
   optional double min_dist          = 4;
   optional double max_dist          = 5;
