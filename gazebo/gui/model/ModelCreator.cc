@@ -236,8 +236,8 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_scale,
-    const math::Pose &_pose)
+std::string ModelCreator::AddCustom(const std::string &_path,
+    const math::Vector3 &_scale, const math::Pose &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -282,7 +282,7 @@ std::string ModelCreator::AddCustom(std::string _path, const math::Vector3 &_sca
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreatePart(rendering::VisualPtr _visual)
+void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData;
   part->name = _visual->GetName();
@@ -710,7 +710,6 @@ void ModelCreator::GenerateSDF()
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    std::string name = partsIt->first;
     PartData *part = partsIt->second;
     rendering::VisualPtr visual = part->visuals[0];
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
@@ -793,7 +792,6 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-  qDebug() << this->modelSDF->ToString().c_str();
 }
 
 /////////////////////////////////////////////////

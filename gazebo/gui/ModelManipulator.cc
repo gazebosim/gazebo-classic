@@ -131,7 +131,6 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   _vis->SetWorldRotation(rot);
 }
 
-
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const

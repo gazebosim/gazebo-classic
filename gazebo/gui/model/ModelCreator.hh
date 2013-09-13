@@ -113,7 +113,7 @@ namespace gazebo
       /// \param[in] _scale Scale of the custom part.
       /// \param[in] _pose Pose of the custom part.
       /// \return Name of the custom that has been added.
-      public: std::string AddCustom(std::string _name,
+      public: std::string AddCustom(const std::string &_name,
           const math::Vector3 &_scale = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero);
 
@@ -177,7 +177,7 @@ namespace gazebo
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
-      private: void CreatePart(rendering::VisualPtr _visual);
+      private: void CreatePart(const rendering::VisualPtr &_visual);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();

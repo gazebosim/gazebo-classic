@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ JointMaker::~JointMaker()
 /////////////////////////////////////////////////
 void JointMaker::Reset()
 {
- if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
     return;
 
   this->newJointCreated = false;
@@ -85,7 +85,6 @@ void JointMaker::Reset()
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
   this->joints.clear();
-
 }
 
 /////////////////////////////////////////////////
@@ -337,9 +336,9 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
         joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
         joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
       }
+      joint->inspector->show();
+      return true;
     }
-    joint->inspector->show();
-    return true;
   }
   else
     return false;
@@ -361,7 +360,7 @@ void JointMaker::CreateHotSpot()
 
   joint->hotspot = hotspotVisual;
 
- hotspotVisual->InsertMesh("unit_sphere");
+  hotspotVisual->InsertMesh("unit_sphere");
 
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
@@ -448,7 +447,6 @@ void JointMaker::GenerateSDF()
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
       limitElem->GetElement("lower")->Set(joint->lowerLimit[i]);
       limitElem->GetElement("upper")->Set(joint->upperLimit[i]);
-      //gzerr << axisElem->ToString("") << std::endl;;
     }
   }
 }
@@ -535,5 +533,4 @@ void JointData::OnApply()
     this->lowerLimit[i] = this->inspector->GetLowerLimit(i);
     this->upperLimit[i] = this->inspector->GetUpperLimit(i);
   }
-
 }

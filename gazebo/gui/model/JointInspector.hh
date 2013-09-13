@@ -19,6 +19,7 @@
 #define _JOINT_INSPECTOR_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"

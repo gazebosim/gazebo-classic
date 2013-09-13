@@ -15,9 +15,6 @@
  *
 */
 
-//#include "gazebo/rendering/Scene.hh"
-//#include "gazebo/rendering/UserCamera.hh"
-
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
