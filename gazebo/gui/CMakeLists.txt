@@ -121,7 +121,7 @@ target_link_libraries(gazebo_gui
   gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
-                                gazebo_gui_model
+  gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
@@ -139,7 +139,7 @@ target_link_libraries(gzclient
   gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
-                                gazebo_gui_model
+  gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
