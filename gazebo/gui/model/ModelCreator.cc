@@ -810,5 +810,4 @@ void PartData::OnApply()
       general->GetInertiaIXZ(), general->GetInertiaIYZ());
   this->pose = general->GetPose();
   this->visuals[0]->GetParent()->SetWorldPose(this->pose);
-
 }
