@@ -229,9 +229,6 @@ if (PKG_CONFIG_FOUND)
     set(ogre_cflags ${ogre_cflags} ${OGRE_CFLAGS})
   endif ()
 
-  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
-       CACHE INTERNAL "Ogre include path")
-
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   if (OGRE-Terrain_FOUND)
     set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
@@ -240,6 +237,9 @@ if (PKG_CONFIG_FOUND)
     set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
+
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
+       CACHE INTERNAL "Ogre include path")
 
   # Also find OGRE's plugin directory, which is provided in its .pc file as the
   # `plugindir` variable.  We have to call pkg-config manually to get it.
