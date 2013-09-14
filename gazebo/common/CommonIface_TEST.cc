@@ -55,7 +55,7 @@ TEST(CommonIface_TEST, GetSHA1)
   // Remove the temporary file
   boost::filesystem::remove(testFilePath);
 
-  //Try to compute a SHA1 of a non-existent file
+  // Try to compute a SHA1 of a non-existent file
   boost::filesystem::path nonExistentPath =
       boost::filesystem::unique_path("non-existent-file-%%%%%%%%%%");
   ASSERT_ANY_THROW(common::GetSHA1(nonExistentPath));

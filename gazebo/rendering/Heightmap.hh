@@ -240,29 +240,29 @@ namespace gazebo
         const boost::filesystem::path &_terrainDirPath);
 
       /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int NumTerrainSubdivisions;
+      public: static const unsigned int numTerrainSubdivisions;
 
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
       /// LoadRadiusFactor is a multiplier applied to the terrain size to create
       /// a load radius that depends on the terrain size.
-      private: static const double LoadRadiusFactor;
+      private: static const double loadRadiusFactor;
 
       /// \brief The terrain pages are held in memory but not loaded if they
       /// are not ready when the camera is within holdRadius distance. See
       /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
       /// multiplier applied to the terrain size to create a hold radius that
       /// depends on the terrain size.
-      private: static const double HoldRadiusFactor;
+      private: static const double holdRadiusFactor;
 
       /// \brief Hash filename that should be present for every terrain file
       /// loaded using paging
-      private: static const std::string HashFilename;
+      private: static const std::string hashFilename;
 
       /// \brief When the terrain paging is enabled, the terrain information
       /// for every piece of terrain is stored in disk. This is the name of
       /// the top level directory where these files are located
-      private: static const boost::filesystem::path GzPagingDir;
+      private: static const boost::filesystem::path gzPagingDir;
 
       /// \brief The scene.
       private: ScenePtr scene;

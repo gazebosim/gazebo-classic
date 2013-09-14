@@ -37,12 +37,12 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::NumTerrainSubdivisions = 16;
-const double Heightmap::LoadRadiusFactor = 1.0;
-const double Heightmap::HoldRadiusFactor = 1.15;
-const boost::filesystem::path Heightmap::GzPagingDir =
+const unsigned int Heightmap::numTerrainSubdivisions = 16;
+const double Heightmap::loadRadiusFactor = 1.0;
+const double Heightmap::holdRadiusFactor = 1.15;
+const boost::filesystem::path Heightmap::gzPagingDir =
     boost::filesystem::temp_directory_path() / "gazebo-paging";
-const std::string Heightmap::HashFilename = "gzterrain.SHA1";
+const std::string Heightmap::hashFilename = "gzterrain.SHA1";
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -223,7 +223,7 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
   // Create the subdirectories if they do not exist
   boost::filesystem::create_directories(_terrainDir);
 
-  terrainHashFullPath = _terrainDir / this->HashFilename;
+  terrainHashFullPath = _terrainDir / this->hashFilename;
 
   // Update the terrain hash
   terrainHashFile.open(terrainHashFullPath.string().c_str());
@@ -261,7 +261,7 @@ bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
   }
 
   // Check if the terrain hash exists
-  terrainHashFullPath = _terrainDirPath / this->HashFilename;
+  terrainHashFullPath = _terrainDirPath / this->hashFilename;
   if (boost::filesystem::exists(terrainHashFullPath))
   {
     try
@@ -323,15 +323,15 @@ void Heightmap::Load()
       // Get the full path of the image heightmap
       imgPath = geomMsg.heightmap().filename();
       terrainName = imgPath.filename().stem();
-      terrainDirPath = this->GzPagingDir / terrainName;
+      terrainDirPath = this->gzPagingDir / terrainName;
 
       // Add the top level terrain paging directory to the OGRE
       // ResourceGroupManager
       if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-            this->GzPagingDir.string(), "General"))
+            this->gzPagingDir.string(), "General"))
       {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            this->GzPagingDir.string(), "FileSystem", "General", true);
+            this->gzPagingDir.string(), "FileSystem", "General", true);
         Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
             "General");
       }
@@ -348,7 +348,7 @@ void Heightmap::Load()
   // If the paging is enabled we modify the number of subterrains
   if (this->useTerrainPaging)
   {
-    nTerrains = this->NumTerrainSubdivisions;
+    nTerrains = this->numTerrainSubdivisions;
   }
 
   // Create terrain group, which holds all the individual terrain instances.
@@ -402,8 +402,8 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->LoadRadiusFactor * this->terrainSize.x,
-        this->HoldRadiusFactor * this->terrainSize.x,
+        this->loadRadiusFactor * this->terrainSize.x,
+        this->holdRadiusFactor * this->terrainSize.x,
         0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
   }
 
