@@ -218,11 +218,6 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
-      /// \brief Compute the SHA1 hash of a file.
-      /// \param[in] _filename Input file.
-      /// \return The string representation (40 character) of the SHA1 hash.
-      private: std::string GetSHA1(const boost::filesystem::path &_filename);
-
       /// \brief Update the hash of a terrain file. The hash will be written in
       /// a file called gzterrain.SHA1 . This method will be used when the
       /// paging is enabled and the terrain is loaded for the first time or if

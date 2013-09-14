@@ -19,6 +19,7 @@
 #define _COMMONIFACE_HH_
 
 #include <string>
+#include <boost/filesystem/path.hpp>
 
 namespace gazebo
 {
@@ -48,6 +49,11 @@ namespace gazebo
     /// \param[in] _file the file name to look for
     /// \return The path containing the file
     std::string find_file_path(const std::string &_file);
+
+    /// \brief Compute the SHA1 hash of a file.
+    /// \param[in] _filename Input file.
+    /// \return The string representation (40 character) of the SHA1 hash.
+    std::string GetSHA1(const boost::filesystem::path &_filename);
 
     /// \}
   }

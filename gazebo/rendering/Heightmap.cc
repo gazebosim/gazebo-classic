@@ -21,7 +21,6 @@
 
 #include <string.h>
 #include <math.h>
-#include <boost/uuid/sha1.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -215,43 +214,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
-std::string Heightmap::GetSHA1(const boost::filesystem::path &_filename)
-{
-  boost::uuids::detail::sha1 sha1;
-  unsigned int hash[5];
-  char buf[1024];
-  std::stringstream stream;
-  std::ifstream ifs(_filename.string().c_str(), std::ios::binary);
-
-  if (!ifs.good())
-    gzthrow("Unable to open image file for generating a SHA1 hash: [" +
-        _filename.string() + "]");
-
-  while (ifs.good())
-  {
-    ifs.read(buf, sizeof(buf));
-    sha1.process_bytes(buf, ifs.gcount());
-  }
-
-  if (!ifs.eof())
-    gzthrow("Unable to read image file (EoF not found) for generating a SHA1" <<
-        " hash: [" + _filename.string() + "]");
-
-  ifs.close();
-
-  sha1.get_digest(hash);
-
-  stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
-
-  for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
-  {
-    stream << hash[i];
-  }
-
-  return stream.str();
-}
-
-//////////////////////////////////////////////////
 void Heightmap::UpdateTerrainHash(const std::string &_hash,
     const boost::filesystem::path &_terrainDir)
 {
@@ -290,7 +252,7 @@ bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
   // Compute the original heightmap's image.
   try
   {
-    imgHash = GetSHA1(_imgPath);
+    imgHash = common::GetSHA1(_imgPath);
   }
   catch(common::Exception &e)
   {
