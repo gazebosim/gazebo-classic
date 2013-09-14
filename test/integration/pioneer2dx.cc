@@ -29,14 +29,24 @@ class Pioneer2dx : public ServerFixture,
 /////////////////////////////////////////////////
 void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
-  Load("worlds/pioneer2dx.world", false, _physicsEngine);
+  Load("worlds/pioneer2dx.world", true, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
-  int i = 0;
-  for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
-    common::Time::MSleep(500);
-  ASSERT_LT(i, 1000);
+  int i = 0, msDelay = 1, waitReport = 4;
+  while (!this->HasEntity("pioneer2dx"))
+  {
+    common::Time::MSleep(msDelay);
+    if (++i > waitReport)
+    {
+      double wait = i*msDelay;
+      gzdbg << "Waiting " << wait / 1000 << " seconds for pioneer2dx to load\n";
+      waitReport *= 2;
+    }
+  }
+
+  physics::WorldPtr world = physics::get_world();
+  world->SetPaused(false);
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
