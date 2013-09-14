@@ -183,7 +183,7 @@ void Model::Init()
     this->jointPub->Publish(msg);
   }
 
-  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
+  for (std::vector<GripperPtr>::iterator iter = this->grippers.begin();
        iter != this->grippers.end(); ++iter)
   {
     (*iter)->Init();
@@ -635,8 +635,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
-  Gripper *gripper = new Gripper(
-      boost::static_pointer_cast<Model>(shared_from_this()));
+  GripperPtr gripper(new Gripper(
+      boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
 }
@@ -990,4 +990,25 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->Get<bool>("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+JointControllerPtr Model::GetJointController()
+{
+  return this->jointController;
+}
+
+/////////////////////////////////////////////////
+GripperPtr Model::GetGripper(size_t _index) const
+{
+  if (_index < this->grippers.size())
+    return this->grippers[_index];
+  else
+    return GripperPtr();
+}
+
+/////////////////////////////////////////////////
+size_t Model::GetGripperCount() const
+{
+  return this->grippers.size();
 }

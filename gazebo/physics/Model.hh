@@ -312,8 +312,16 @@ namespace gazebo
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController()
-        { return this->jointController; }
+      public: JointControllerPtr GetJointController();
+
+      /// \brief Get a gripper based on an index.
+      /// \return A pointer to a Gripper. Null if the _index is invalid.
+      public: GripperPtr GetGripper(size_t _index) const;
+
+      /// \brief Get the number of grippers in this model.
+      /// \return Size of this->grippers array.
+      /// \sa Model::GetGripper()
+      public: size_t GetGripperCount() const;
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

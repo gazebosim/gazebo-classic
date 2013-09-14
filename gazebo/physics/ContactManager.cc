@@ -17,6 +17,7 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/common/Time.hh"
 
@@ -207,18 +208,21 @@ void ContactManager::PublishContacts()
   }
 
   // publish to default topic, ~/physics/contacts
-  msgs::Contacts msg;
-  for (unsigned int i = 0; i < this->contactIndex; ++i)
+  if (!transport::getMinimalComms())
   {
-    if (this->contacts[i]->count == 0)
-      continue;
+    msgs::Contacts msg;
+    for (unsigned int i = 0; i < this->contactIndex; ++i)
+    {
+      if (this->contacts[i]->count == 0)
+        continue;
 
-    msgs::Contact *contactMsg = msg.add_contact();
-    this->contacts[i]->FillMsg(*contactMsg);
+      msgs::Contact *contactMsg = msg.add_contact();
+      this->contacts[i]->FillMsg(*contactMsg);
+    }
+
+    msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+    this->contactPub->Publish(msg);
   }
-
-  msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-  this->contactPub->Publish(msg);
 
   // publish to other custom topics
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
@@ -248,6 +252,19 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 {
   std::vector<std::string> collisions;
   collisions.push_back(_collision);
+  return this->CreateFilter(_name, collisions);
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::map<std::string, physics::CollisionPtr> &_collisions)
+{
+  std::vector<std::string> collisions;
+  for (std::map<std::string, physics::CollisionPtr>::const_iterator iter =
+      _collisions.begin(); iter != _collisions.end(); ++iter)
+  {
+    collisions.push_back(iter->first);
+  }
   return this->CreateFilter(_name, collisions);
 }
 

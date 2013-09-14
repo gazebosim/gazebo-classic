@@ -131,6 +131,16 @@ namespace gazebo
       public: std::string CreateFilter(const std::string &_topic,
                   const std::string &_collision);
 
+      /// \brief Create a filter for contacts. A new publisher will be created
+      /// that publishes contacts associated to the input collision.
+      /// param[in] _name Filter name.
+      /// param[in] _collisions A map of collision name to collision
+      /// object. 
+      /// \return New topic where filtered messages will be published to.
+      public: std::string CreateFilter(const std::string &_name,
+                  const std::map<std::string, physics::CollisionPtr>
+                  &_collisions);
+
       private: std::vector<Contact*> contacts;
 
       private: unsigned int contactIndex;
