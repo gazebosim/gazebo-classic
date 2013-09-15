@@ -338,7 +338,7 @@ namespace gazebo
       private: Link_V links;
 
       /// \brief All the grippers in the model.
-      private: std::vector<Gripper*> grippers;
+      private: std::vector<GripperPtr> grippers;
 
       /// \brief All the model plugins.
       private: std::vector<ModelPluginPtr> plugins;
