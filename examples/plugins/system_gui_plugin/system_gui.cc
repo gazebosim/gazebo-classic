@@ -27,6 +27,14 @@ namespace gazebo
   class SystemGUI : public SystemPlugin
   {
     /////////////////////////////////////////////
+    /// \brief Destructor
+    public: virtual ~SystemGUI()
+    {
+      if (this->userCam)
+        this->userCam->EnableSaveFrame(false);
+    }
+
+    /////////////////////////////////////////////
     /// \brief Called after the plugin has been constructed.
     public: void Load(int /*_argc*/, char ** /*_argv*/)
     {
