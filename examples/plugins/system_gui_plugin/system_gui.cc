@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+
+// Include Rand.hh first due to compilation error on osx (boost #5010)
+// https://svn.boost.org/trac/boost/ticket/5010
+#include <gazebo/math/Rand.hh>
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gazebo.hh>
