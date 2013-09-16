@@ -68,5 +68,4 @@ void ModelEditor::OnEdit(bool /*_checked*/)
 void ModelEditor::OnFinish()
 {
   this->OnEdit(g_editModelAct->isChecked());
-  g_editModelAct->setChecked(!g_editModelAct->isChecked());
 }

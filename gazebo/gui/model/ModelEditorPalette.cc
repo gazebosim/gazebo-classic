@@ -45,8 +45,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
+  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+
+  this->modelTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
+      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   // Create a top-level tree item for the path
   this->modelSettingsItem =
@@ -142,19 +145,19 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(fixedJointButton, SIGNAL(clicked()), this, SLOT(OnFixedJoint()));
 
   // Hinge joint button
-  QPushButton *hingeJointButton = new QPushButton(tr("Hinge"), this);
+  QPushButton *hingeJointButton = new QPushButton(tr("Revolute"), this);
   hingeJointButton->setCheckable(true);
   hingeJointButton->setChecked(false);
   connect(hingeJointButton, SIGNAL(clicked()), this, SLOT(OnHingeJoint()));
 
   // Hinge2 joint button
-  QPushButton *hinge2JointButton = new QPushButton(tr("Hinge2"), this);
+  QPushButton *hinge2JointButton = new QPushButton(tr("Revolute2"), this);
   hinge2JointButton->setCheckable(true);
   hinge2JointButton->setChecked(false);
   connect(hinge2JointButton, SIGNAL(clicked()), this, SLOT(OnHinge2Joint()));
 
   // slider joint button
-  QPushButton *sliderJointButton = new QPushButton(tr("Slider"), this);
+  QPushButton *sliderJointButton = new QPushButton(tr("Prismatic"), this);
   sliderJointButton->setCheckable(true);
   sliderJointButton->setChecked(false);
   connect(sliderJointButton, SIGNAL(clicked()), this, SLOT(OnSliderJoint()));
@@ -261,28 +264,11 @@ ModelEditorPalette::~ModelEditorPalette()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnModelSelection(QTreeWidgetItem *_item,
+void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
-  if (_item)
-  {
-   /* std::string path, filename;
-
-    if (_item->parent())
-      path = _item->parent()->text(0).toStdString() + "/";
-
-    path = _item->data(0, Qt::UserRole).toString().toStdString();
-
-    if (!path.empty())
-    {
-      //QApplication::setOverrideCursor(Qt::BusyCursor);
-      //filename = common::ModelDatabase::Instance()->GetModelFile(path);
-      //gui::Events::createEntity("model", filename);
-
-      //this->fileTreeWidget->clearSelection();
-      //QApplication::setOverrideCursor(Qt::ArrowCursor);
-    }*/
-  }
+  if (_item && _item->childCount() > 0)
+    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -399,6 +385,7 @@ void ModelEditorPalette::OnStatic()
 void ModelEditorPalette::OnSave()
 {
   SaveDialog saveDialog;
+  saveDialog.SetTitle("Save Model");
   saveDialog.SetSaveName(this->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
   if (saveDialog.exec() == QDialog::Accepted)
@@ -441,6 +428,7 @@ void ModelEditorPalette::OnDiscard()
 void ModelEditorPalette::OnDone()
 {
   SaveDialog saveDialog;
+  saveDialog.SetTitle("Save Model");
   saveDialog.SetSaveName(this->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
   if (saveDialog.exec() == QDialog::Accepted)

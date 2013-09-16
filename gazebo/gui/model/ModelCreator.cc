@@ -402,6 +402,7 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
   boost::filesystem::path path;
   path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
   savefile.open(path.string().c_str());
+  savefile <<  "<?xml version='1.0' ?>\n";
   savefile << this->modelSDF->ToString();
   savefile.close();
 }

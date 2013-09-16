@@ -90,9 +90,9 @@ void JointMaker::Reset()
 /////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointName)
 {
-  JointData *joint = this->joints[_jointName];
-  if (joint)
+  if (this->joints.find(_jointName) != this->joints.end())
   {
+    JointData *joint = this->joints[_jointName];
     rendering::ScenePtr scene = joint->hotspot->GetScene();
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
@@ -125,6 +125,34 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
     this->RemoveJoint(toDelete[i]);
 
   toDelete.clear();
+}
+
+
+/////////////////////////////////////////////////
+bool JointMaker::OnMousePress(const common::MouseEvent &_event)
+{
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
+  if (this->jointType != JointMaker::JOINT_NONE)
+    return false;
+
+  // intercept mouse press events when user clicks on the joint hotspot visual
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  rendering::ScenePtr scene = camera->GetScene();
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (this->joints.find(vis->GetName()) != this->joints.end())
+    {
+      // stop event propagation as we don't want users to manipulate the
+      // hotspot for now.
+      return true;
+    }
+    return false;
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -204,6 +232,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       emit JointAdded();
     }
   }
+
   return true;
 }
 
@@ -225,6 +254,12 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+
+    // Press event added only after a joint is created. Needs to be added here
+    // instead of in the constructor otherwise GLWidget would get the event
+    // first and JoinMaker would not receive it.
+    MouseEventHandler::Instance()->AddPressFilter("model_joint",
+        boost::bind(&JointMaker::OnMousePress, this, _1));
   }
 }
 
@@ -322,9 +357,9 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    JointData *joint = this->joints[vis->GetName()];
-    if (joint)
+    if (this->joints.find(vis->GetName()) != this->joints.end())
     {
+      JointData *joint = this->joints[vis->GetName()];
       joint->inspector->SetType(joint->type);
       joint->inspector->SetName(joint->visual->GetName());
       joint->inspector->SetAnchor(0, joint->anchor);

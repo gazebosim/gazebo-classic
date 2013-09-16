@@ -24,6 +24,7 @@ using namespace gui;
 ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
+  this->setWindowTitle("Custom Part");
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(

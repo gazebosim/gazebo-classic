@@ -60,8 +60,10 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Received model selection user input
-      private slots: void OnModelSelection(QTreeWidgetItem *_item, int _column);
+      /// \brief Received item selection user input.
+      /// \param[in] _item Item selected.
+      /// \param[in] _column Column index.
+      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
 
       /// \brief Qt callback when cylinder button is clicked.
       private slots: void OnCylinder();
