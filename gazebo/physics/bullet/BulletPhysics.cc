@@ -215,6 +215,7 @@ bool ContactCallback(btManifoldPoint &_cp,
 {
   _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
     _obj0->m_collisionObject->getFriction());
+
   // this return value is currently ignored, but to be on the safe side:
   //  return false if you don't calculate friction
   return true;
@@ -492,14 +493,17 @@ void BulletPhysics::Reset()
 
 //////////////////////////////////////////////////
 
-// //////////////////////////////////////////////////
-// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
-// {
-//   // TODO: set SDF parameter
-//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-//   // Line below commented out because it wasn't helping pendulum test.
-//   // info.m_numIterations = _iters;
-// }
+//////////////////////////////////////////////////
+void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+{
+  // TODO: set SDF parameter
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+  // Line below commented out because it wasn't helping pendulum test.
+  info.m_numIterations = _iters;
+
+  this->sdf->GetElement("bullet")->GetElement(
+      "solver")->GetElement("iters")->Set(_iters);
+}
 
 
 //////////////////////////////////////////////////
