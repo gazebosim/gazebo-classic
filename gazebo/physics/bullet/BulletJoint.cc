@@ -103,12 +103,6 @@ void BulletJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-JointWrench BulletJoint::GetForceTorque(int _index)
-{
-  return this->GetForceTorque(static_cast<unsigned int>(_index));
-}
-
-//////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench wrench;

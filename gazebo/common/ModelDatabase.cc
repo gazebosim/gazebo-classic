@@ -183,12 +183,6 @@ std::string ModelDatabase::GetModelConfig(const std::string &_uri)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest(const std::string &_uri)
-{
-  return this->GetModelConfig(_uri);
-}
-
-/////////////////////////////////////////////////
 std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
 {
   std::string xmlString;

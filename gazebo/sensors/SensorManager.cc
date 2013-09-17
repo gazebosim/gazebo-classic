@@ -68,12 +68,6 @@ SensorManager::~SensorManager()
 }
 
 //////////////////////////////////////////////////
-void SensorManager::Run()
-{
-  this->RunThreads();
-}
-
-//////////////////////////////////////////////////
 void SensorManager::RunThreads()
 {
   // Start the non-image sensor containers. The first item in the

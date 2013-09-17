@@ -71,12 +71,6 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
-{
-  this->Load(_parent, _child, math::Pose(_pos, math::Quaternion()));
-}
-
-//////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
   if (_parent)
@@ -138,12 +132,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   this->anchorPose = _sdf->Get<math::Pose>("pose");
   this->LoadImpl(this->anchorPose);
-}
-
-/////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Vector3 &_pos)
-{
-  this->LoadImpl(math::Pose(_pos, math::Quaternion()));
 }
 
 /////////////////////////////////////////////////
@@ -516,12 +504,6 @@ double Joint::GetForce(unsigned int _index)
           << "] when trying to get force\n";
     return 0;
   }
-}
-
-//////////////////////////////////////////////////
-double Joint::GetForce(int _index)
-{
-  return this->GetForce(static_cast<unsigned int>(_index));
 }
 
 //////////////////////////////////////////////////
