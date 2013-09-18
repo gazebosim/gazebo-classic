@@ -159,7 +159,10 @@ namespace gazebo
       /// \param[in] _force Force value.
       private: void SaveForce(int _index, double _force);
 
+      /// \brief Pointer to a contraint object in Bullet.
       protected: btTypedConstraint *constraint;
+
+      /// \brief Pointer to Bullet's btDynamicsWorld.
       protected: btDynamicsWorld *bulletWorld;
 
       /// \brief Feedback data for this joint
