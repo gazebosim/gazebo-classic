@@ -11,6 +11,10 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 set (test_sources 
   gzlog_TEST.cc 
 )

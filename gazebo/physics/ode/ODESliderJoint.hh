@@ -59,9 +59,6 @@ namespace gazebo
       public: virtual void SetVelocity(int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _effort);
-
-      // Documentation inherited
       public: virtual void SetMaxForce(int _index, double _t);
 
       // Documentation inherited
@@ -72,6 +69,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(int _parameter, double _value);
+
+      // Documentation inherited
+      protected: virtual void SetForceImpl(int _index, double _effort);
     };
   }
 }
