@@ -277,14 +277,6 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief @todo: not yet implemented.
-      /// Get external forces applied at this Joint.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] _index Index of the axis.
-      /// \return The force applied to an axis.
       public: virtual double GetForce(unsigned int _index);
 
       /// \brief get internal force and torque values at a joint
