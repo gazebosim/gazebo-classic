@@ -435,6 +435,10 @@ namespace gazebo
       /// \return The current simulation time in Scene
       public: common::Time GetSimTime() const;
 
+      /// \brief Get the number of visuals.
+      /// \return The number of visuals in the Scene.
+      public: uint32_t GetVisualCount() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 

@@ -320,8 +320,6 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
-
-  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -661,6 +659,12 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetVisualCount() const
+{
+  return this->visuals.size();
 }
 
 //////////////////////////////////////////////////
@@ -1621,7 +1625,10 @@ void Scene::PreRender()
   for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
   {
     if (this->ProcessSceneMsg(*sIter))
+    {
+      this->initialized = true;
       sceneMsgsCopy.erase(sIter++);
+    }
     else
       ++sIter;
   }
@@ -2002,8 +2009,6 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
             _msg->name() + "_JOINT_VISUAL__", childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
-    jointVis->GetSceneNode()->_setDerivedOrientation(
-        Ogre::Quaternion(1, 0, 0, 0));
     if (_msg->has_id())
       jointVis->SetId(_msg->id());
 

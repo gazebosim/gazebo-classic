@@ -37,6 +37,35 @@ class Joint_TEST : public ServerFixture,
              {
              }
 
+  /// \brief Load example world with a few joints
+  /// Measure / verify static force torques against analytical answers.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ForceTorque1(const std::string &_physicsEngine);
+
+  /// \brief Load example world with a few joints
+  /// Measure / verify static force torques against analytical answers.
+  /// Change gravity to tip over the joints.
+  /// Wait until joint stops are hit and joint motion settles,
+  /// then check force torques values against analytical values.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ForceTorque2(const std::string &_physicsEngine);
+
+  /// \brief Load example world with a few joints.
+  /// Servo the joints to a fixed target position using simple PID controller.
+  /// Measure / verify static force torques against analytical answers.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void GetForceTorqueWithAppliedForce(
+    const std::string &_physicsEngine);
+
+  /// \brief Create a hinge joint between link and world.
+  /// Apply force and check acceleration against analytical solution.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void JointTorqueTest(const std::string &_physicsEngine);
+
+  /// \brief Create and destroy joints repeatedly, monitors memory usage.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
+
   public: virtual void SetUp()
           {
             const ::testing::TestInfo *const test_info =

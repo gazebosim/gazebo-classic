@@ -445,6 +445,12 @@ namespace gazebo
       /// \param[in] _enable True to enable publishing, false to stop publishing
       public: void SetPublishData(bool _enable);
 
+      /// \brief Get the parent joints.
+      public: Joint_V GetParentJoints() const;
+
+      /// \brief Get the child joints.
+      public: Joint_V GetChildJoints() const;
+
       /// \brief Remove a collision from the link.
       /// \param[int] _name Name of the collision to remove.
       public: void RemoveCollision(const std::string &_name);
