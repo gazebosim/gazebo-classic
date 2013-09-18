@@ -231,12 +231,10 @@ namespace gazebo
       /// \brief It checks if the terrain was previously loaded. In negative
       /// case, it splits the original terrain into pieces and creates a hash
       /// file.
-      /// \param[in] _imgPath Path to the heighmap image file.
       /// \param[in] _terrainDirPath Path to the directory containing the
       /// terrain pages and hash.
       /// \return True if the terrain requires to regenerate the terrain files.
       private: bool PrepareTerrainPaging(
-        const boost::filesystem::path &_imgPath,
         const boost::filesystem::path &_terrainDirPath);
 
       /// \brief Number of pieces in which a terrain is subdivided for paging.
@@ -255,14 +253,18 @@ namespace gazebo
       /// depends on the terrain size.
       private: static const double holdRadiusFactor;
 
-      /// \brief Hash filename that should be present for every terrain file
-      /// loaded using paging
-      private: static const std::string hashFilename;
+      /// \brief Hash file name that should be present for every terrain file
+      /// loaded using paging.
+      private: static const boost::filesystem::path hashFilename;
+
+      /// \brief Name of the top level directory where all the paging info is
+      /// stored
+      private: static const boost::filesystem::path pagingDirname;
 
       /// \brief When the terrain paging is enabled, the terrain information
-      /// for every piece of terrain is stored in disk. This is the name of
-      /// the top level directory where these files are located
-      private: static const boost::filesystem::path gzPagingDir;
+      /// for every piece of terrain is stored in disk. This is the path of
+      /// the top level directory where these files are located.
+      private: boost::filesystem::path gzPagingDir;
 
       /// \brief The scene.
       private: ScenePtr scene;

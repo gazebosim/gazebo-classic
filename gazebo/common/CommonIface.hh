@@ -20,6 +20,7 @@
 
 #include <string>
 #include <boost/filesystem/path.hpp>
+#include <vector>
 
 namespace gazebo
 {
@@ -50,10 +51,11 @@ namespace gazebo
     /// \return The path containing the file
     std::string find_file_path(const std::string &_file);
 
-    /// \brief Compute the SHA1 hash of a file.
-    /// \param[in] _filename Input file.
+    /// \brief Compute the SHA1 hash of an array of bytes.
+    /// \param[in] _buffer Input sequence of bytes.
+    /// \param[in] _byte_count Size of the input sequence in bytes
     /// \return The string representation (40 character) of the SHA1 hash.
-    std::string GetSHA1(const boost::filesystem::path &_filename);
+    std::string GetSHA1(void const *_buffer, std::size_t byte_count);
 
     /// \}
   }

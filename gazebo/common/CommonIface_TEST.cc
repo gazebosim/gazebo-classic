@@ -28,37 +28,17 @@ using namespace gazebo;
 /// \brief Test CommonIface::GetSHA1
 TEST(CommonIface_TEST, GetSHA1)
 {
-  // Create a temporal file
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
-  boost::filesystem::path tmpFile =
-      boost::filesystem::unique_path("testfile-%%%%%%%%%%");
-  boost::filesystem::path testFilePath = tmpDir / tmpFile;
-
-  // Open and write content on the file
-  std::ofstream fs(testFilePath.string().c_str());
-  if (!fs)
-  {
-    FAIL();
-  }
   // Do not forget to update 'precomputedSHA1' if you modify this text
-  fs << "Marty McFly: Wait a minute, Doc. Ah... Are you telling me that you" <<
-        " built a time machine... out of a DeLorean?\n";
-  fs << "Dr. Emmett Brown: The way I see it, if you're gonna build a time" <<
-        " machine into a car, why not do it with some style?";
-  fs.close();
+  std::string s;
+  s = "Marty McFly: Wait a minute, Doc. Ah... Are you telling me that you"
+      " built a time machine... out of a DeLorean?\n"
+      "Dr. Emmett Brown: The way I see it, if you're gonna build a time"
+      " machine into a car, why not do it with some style?";
 
   // Compute the SHA1 of the file and compare it with the precomputed SHA1
   std::string precomputedSHA1 = "a370ddc4d61d936b2bb40f98bae061dc15fd8923";
-  std::string computedSHA1 = common::GetSHA1(testFilePath);
+  std::string computedSHA1 = common::GetSHA1(s.data(), s.size());
   EXPECT_EQ(precomputedSHA1, computedSHA1);
-
-  // Remove the temporary file
-  boost::filesystem::remove(testFilePath);
-
-  // Try to compute a SHA1 of a non-existent file
-  boost::filesystem::path nonExistentPath =
-      boost::filesystem::unique_path("non-existent-file-%%%%%%%%%%");
-  ASSERT_ANY_THROW(common::GetSHA1(nonExistentPath));
 }
 
 /////////////////////////////////////////////////

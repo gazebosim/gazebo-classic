@@ -25,6 +25,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -40,9 +41,8 @@ using namespace rendering;
 const unsigned int Heightmap::numTerrainSubdivisions = 16;
 const double Heightmap::loadRadiusFactor = 1.0;
 const double Heightmap::holdRadiusFactor = 1.15;
-const boost::filesystem::path Heightmap::gzPagingDir =
-    boost::filesystem::temp_directory_path() / "gazebo-paging";
-const std::string Heightmap::hashFilename = "gzterrain.SHA1";
+const boost::filesystem::path Heightmap::pagingDirname = "paging";
+const boost::filesystem::path Heightmap::hashFilename = "gzterrain.SHA1";
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -59,6 +59,9 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->terrainPaging = NULL;
   this->terrainHashChanged = true;
   this->terrainsImported = true;
+
+  this->gzPagingDir =
+      common::SystemPaths::Instance()->GetLogPath() / this->pagingDirname;
 }
 
 //////////////////////////////////////////////////
@@ -242,23 +245,16 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
 }
 
 //////////////////////////////////////////////////
-bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
+bool Heightmap::PrepareTerrainPaging(
     const boost::filesystem::path &_terrainDirPath)
 {
-  std::string imgHash;
+  std::string heightmapHash;
   boost::filesystem::path terrainHashFullPath;
   bool updateHash = true;
 
   // Compute the original heightmap's image.
-  try
-  {
-    imgHash = common::GetSHA1(_imgPath);
-  }
-  catch(common::Exception &e)
-  {
-    gzerr << "Terrain paging error: " << e.GetErrorStr() << "\n";
-    return true;
-  }
+  heightmapHash = common::GetSHA1(&(this->heights[0]),
+      this->heights.size() * sizeof(this->heights[0]));
 
   // Check if the terrain hash exists
   terrainHashFullPath = _terrainDirPath / this->hashFilename;
@@ -271,7 +267,7 @@ bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
       std::stringstream buffer;
       buffer << in.rdbuf();
       std::string terrainHash(buffer.str());
-      updateHash = terrainHash != imgHash;
+      updateHash = terrainHash != heightmapHash;
     }
     catch(std::ifstream::failure &e)
     {
@@ -282,7 +278,7 @@ bool Heightmap::PrepareTerrainPaging(const boost::filesystem::path &_imgPath,
   // Update the terrain hash and split the terrain into small pieces
   if (updateHash)
   {
-    this->UpdateTerrainHash(imgHash, _terrainDirPath);
+    this->UpdateTerrainHash(heightmapHash, _terrainDirPath);
   }
 
   return updateHash;
@@ -379,8 +375,7 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    this->terrainHashChanged = this->PrepareTerrainPaging(imgPath,
-        terrainDirPath);
+    this->terrainHashChanged = this->PrepareTerrainPaging(terrainDirPath);
 
     // Split the terrain. Every subterrain will be saved on disk and paged
     this->SplitHeights(this->heights, nTerrains, this->subTerrains);

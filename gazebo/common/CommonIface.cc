@@ -84,30 +84,13 @@ std::string common::find_file_path(const std::string &_file)
 }
 
 //////////////////////////////////////////////////
-std::string common::GetSHA1(const boost::filesystem::path &_filename)
+std::string common::GetSHA1(void const *_buffer, std::size_t byte_count)
 {
   boost::uuids::detail::sha1 sha1;
   unsigned int hash[5];
-  char buf[1024];
   std::stringstream stream;
-  std::ifstream ifs(_filename.string().c_str(), std::ios::binary);
 
-  if (!ifs.good())
-    gzthrow("Unable to open image file for generating a SHA1 hash: [" +
-        _filename.string() + "]");
-
-  while (ifs.good())
-  {
-    ifs.read(buf, sizeof(buf));
-    sha1.process_bytes(buf, ifs.gcount());
-  }
-
-  if (!ifs.eof())
-    gzthrow("Unable to read image file (EoF not found) for generating a SHA1" <<
-        " hash: [" + _filename.string() + "]");
-
-  ifs.close();
-
+  sha1.process_bytes(_buffer, byte_count);
   sha1.get_digest(hash);
 
   stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
