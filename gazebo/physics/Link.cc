@@ -155,8 +155,8 @@ void Link::Load(sdf::ElementPtr _sdf)
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
         std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-            this->GetScopedName(), this->GetId());
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
