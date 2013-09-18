@@ -511,7 +511,8 @@ double Joint::CheckAndTruncateForce(int _index, double _effort)
     return _effort;
   }
 
-  // truncating SetForce effort if velocity limit reached.
+  // truncating SetForce effort if velocity limit is reached and
+  // effort is applied in the same direction.
   if (this->velocityLimit[_index] >= 0)
   {
     if (this->GetVelocity(_index) > this->velocityLimit[_index])
