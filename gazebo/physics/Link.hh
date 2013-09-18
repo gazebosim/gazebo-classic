@@ -434,6 +434,12 @@ namespace gazebo
       /// \param[in] _enable True to enable publishing, false to stop publishing
       public: void SetPublishData(bool _enable);
 
+      /// \brief Get the parent joints.
+      public: Joint_V GetParentJoints() const;
+
+      /// \brief Get the child joints.
+      public: Joint_V GetChildJoints() const;
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 

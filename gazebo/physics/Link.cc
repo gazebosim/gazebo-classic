@@ -524,6 +524,18 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 }
 
 /////////////////////////////////////////////////
+Joint_V Link::GetParentJoints() const
+{
+  return this->parentJoints;
+}
+
+/////////////////////////////////////////////////
+Joint_V Link::GetChildJoints() const
+{
+  return this->childJoints;
+}
+
+/////////////////////////////////////////////////
 Link_V Link::GetChildJointsLinks() const
 {
   Link_V links;
