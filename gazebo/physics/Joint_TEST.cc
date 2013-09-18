@@ -856,8 +856,8 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
     // give it 2 cycles to stabilize
     if (i > cyclesStabilize)
     {
-      EXPECT_LE(residentCur, residentLast);// + residentLast*0.01);
-      EXPECT_LE(shareCur, shareLast);// + shareLast*0.01);
+      EXPECT_LE(residentCur, residentLast);
+      EXPECT_LE(shareCur, shareLast);
     }
     // gzdbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
