@@ -377,8 +377,11 @@ void Heightmap::Load()
   {
     this->terrainHashChanged = this->PrepareTerrainPaging(terrainDirPath);
 
-    // Split the terrain. Every subterrain will be saved on disk and paged
-    this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    if (this->terrainHashChanged)
+    {
+      // Split the terrain. Every subterrain will be saved on disk and paged
+      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    }
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);
