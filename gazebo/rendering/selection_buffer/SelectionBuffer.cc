@@ -112,7 +112,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->renderTexture->addListener(this->selectionTargetListener);
   this->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->renderTexture->getViewport(0)->setVisibilityMask(
-      ~GZ_VISIBILITY_NOT_SELECTABLE);
+      GZ_VISIBILITY_SELECTABLE);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 
