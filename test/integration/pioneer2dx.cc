@@ -79,7 +79,7 @@ TEST_P(Pioneer2dx, StraightLine)
   StraightLine(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Pioneer2dx, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

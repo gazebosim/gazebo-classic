@@ -138,22 +138,25 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    common::Time simTime;
-    if (this->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
-    else
-      simTime = this->world->GetSimTime();
-
-    if (simTime == this->lastUpdateTime && !_force)
-      return;
-
-    // Adjust time-to-update period to compensate for delays caused by another
-    // sensor's update in the same thread.
-    common::Time adjustedElapsed = simTime - this->lastUpdateTime +
-        this->updateDelay;
-
-    if (adjustedElapsed >= this->updatePeriod || _force)
     {
+      boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+      common::Time simTime;
+      if (this->category == IMAGE && this->scene)
+        simTime = this->scene->GetSimTime();
+      else
+        simTime = this->world->GetSimTime();
+
+      if (simTime == this->lastUpdateTime && !_force)
+        return;
+
+      // Adjust time-to-update period to compensate for delays caused by another
+      // sensor's update in the same thread.
+      common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+          this->updateDelay;
+
+      if (adjustedElapsed < this->updatePeriod && !_force)
+        return;
+
       this->updateDelay = std::max(common::Time::Zero,
           adjustedElapsed - this->updatePeriod);
 
@@ -165,9 +168,9 @@ void Sensor::Update(bool _force)
         this->updateDelay = common::Time::Zero;
 
       this->lastUpdateTime = simTime;
-      this->UpdateImpl(_force);
-      this->updated();
     }
+    this->UpdateImpl(_force);
+    this->updated();
   }
 }
 
@@ -320,5 +323,6 @@ SensorCategory Sensor::GetCategory() const
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
+  boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
 }

@@ -18,7 +18,7 @@
 #include <fstream>
 #include <string>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/common/Common.hh>
+#include <gazebo/common/CommonIface.hh>
 
 using namespace gazebo;
 namespace po = boost::program_options;

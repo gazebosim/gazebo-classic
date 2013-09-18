@@ -24,7 +24,7 @@ const double g_physics_tol = 1e-2;
 
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture,
+class SurfaceTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
   public: void CollideWithoutContact(const std::string &_physicsEngine);
@@ -36,7 +36,7 @@ class PhysicsTest : public ServerFixture,
 // a larger static box with a contact sensor. One of the boxes should be
 // detected by the contact sensor but not experience contact forces.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
+void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 {
   // load an empty world
   Load("worlds/collide_without_contact.world", true, _physicsEngine);
@@ -163,14 +163,14 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(PhysicsTest, CollideWithoutContact)
+TEST_P(SurfaceTest, CollideWithoutContact)
 {
   CollideWithoutContact(GetParam());
 }
 
 // This test doesn't yet work in bullet, so we'll declare it only for ode.
-// INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
-INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
+// INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
 
 int main(int argc, char **argv)
 {

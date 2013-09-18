@@ -410,7 +410,7 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ContactSensor)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
