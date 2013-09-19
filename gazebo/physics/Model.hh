@@ -320,6 +320,7 @@ namespace gazebo
 
       /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
+
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
 
