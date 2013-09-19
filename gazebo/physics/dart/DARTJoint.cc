@@ -403,7 +403,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dartJoint->getDOF();
+  angleCount = this->dartJoint->getNumGenCoords();
 
   return angleCount;
 }
