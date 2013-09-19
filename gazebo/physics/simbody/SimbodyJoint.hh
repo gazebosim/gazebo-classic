@@ -128,9 +128,6 @@ namespace gazebo
       void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(int _index);
-
-      // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       /// \brief Set the force applied to this physics::Joint.

@@ -89,6 +89,3 @@ target_link_libraries(gazebo_sensors
 
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
-
-# Deprecated Sensors.hh
-gz_issue_775("Sensors")

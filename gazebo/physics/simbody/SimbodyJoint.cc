@@ -291,12 +291,6 @@ void SimbodyJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-JointWrench SimbodyJoint::GetForceTorque(int _index)
-{
-  return this->GetForceTorque(static_cast<unsigned int>(_index));
-}
-
-//////////////////////////////////////////////////
 JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 {
   return this->wrench;

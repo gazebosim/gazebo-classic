@@ -76,29 +76,9 @@ namespace gazebo
       /// \param[in] _seed The random number seed.
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
-      /// \brief Set the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
-      /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
-      /// \return Update rate.
-      public: double GetUpdateRate() GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
-
-      /// \brief Set the simulation step time.
-      /// This funciton is deprecated, use World::SetMaxStepSize.
-      /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation step time.
-      /// This funciton is deprecated, use World::GetMaxStepSize.
-      /// \return Simulation step time.
-      public: virtual double GetStepTime() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get target real time factor
       /// \return Target real time factor

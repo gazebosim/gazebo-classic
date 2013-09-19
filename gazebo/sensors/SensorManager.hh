@@ -108,10 +108,6 @@ namespace gazebo
       /// \brief Init all the sensors
       public: void Init();
 
-      /// \brief Deprecated
-      /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED(1.5);
-
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
       public: void RunThreads();
