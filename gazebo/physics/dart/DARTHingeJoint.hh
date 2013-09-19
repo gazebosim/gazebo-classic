@@ -77,6 +77,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetForce(int _index, double _torque);
 
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _effort);
+
       /// \brief
       protected: dart::dynamics::RevoluteJoint* dartRevJoint;
     };

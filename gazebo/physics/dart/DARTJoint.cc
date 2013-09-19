@@ -36,6 +36,8 @@ DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
     dartJoint(NULL)
 {
+  this->forceApplied[0] = 0.0;
+  this->forceApplied[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -399,6 +401,31 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   return wrench;
 }
 
+void DARTJoint::SetForce(int _index, double _force)
+{
+  double force = Joint::CheckAndTruncateForce(_index, _force);
+  this->SaveForce(_index, force);
+  this->SetForceImpl(_index, force);
+
+  // for engines that supports auto-disable of links
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
+}
+
+double DARTJoint::GetForce(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->forceApplied[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get force\n";
+    return 0;
+  }
+}
+
 unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
@@ -411,4 +438,25 @@ unsigned int DARTJoint::GetAngleCount() const
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
   return boost::shared_dynamic_cast<DARTModel>(this->model);
+}
+
+void DARTJoint::SaveForce(int _index, double _force)
+{
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0.0;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
+  else
+    gzerr << "Something's wrong, joint [" << this->GetName()
+          << "] index [" << _index
+          << "] out of range.\n";
 }

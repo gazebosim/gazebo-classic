@@ -97,7 +97,7 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetDamping(int /*_index*/, double _damping)
+void DARTHingeJoint::SetDamping(int _index, double _damping)
 {
   assert(_index == 0);
   assert(_damping >= 0.0);
@@ -112,7 +112,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
   math::Angle result;
 
   assert(this->dartRevJoint);
-  assert(this->dartRevJoint->getDOF() == 1);
+  assert(this->dartRevJoint->getNumGenCoords() == 1);
 
   // Hinge joint has only one dof.
   double radianAngle = this->dartRevJoint->getGenCoord(0)->get_q();
@@ -154,4 +154,16 @@ void DARTHingeJoint::SetForce(int _index, double _torque)
   DARTJoint::SetForce(_index, _torque);
 
   dartJoint->getGenCoord(0)->set_tau(_torque);
+}
+
+void DARTHingeJoint::SetForceImpl(int /*_index*/, double _effort)
+{
+  if (this->dartRevJoint)
+  {
+    dartRevJoint->getGenCoord(0)->set_tau(_effort);
+  }
+  else
+  {
+    gzerr << "DART revolute joint is invalid\n";
+  }
 }

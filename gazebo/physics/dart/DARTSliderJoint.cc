@@ -123,7 +123,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
   math::Angle result;
 
   assert(this->dartJoint);
-  assert(this->dartJoint->getDOF() == 1);
+  assert(this->dartJoint->getNumGenCoords() == 1);
 
   // Hinge joint has only one dof.
   double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
