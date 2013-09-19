@@ -122,7 +122,8 @@ double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForceImpl(int _index, double _torque)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < static_cast<int>(this->GetAngleCount()) &&
+      this->physicsInitialized)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
