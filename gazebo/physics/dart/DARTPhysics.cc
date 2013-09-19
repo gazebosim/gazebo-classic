@@ -130,47 +130,34 @@ void DARTPhysics::UpdateCollision()
 //////////////////////////////////////////////////
 void DARTPhysics::UpdatePhysics()
 {
+  // need to lock, otherwise might conflict with world resetting
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+
+  // common::Time currTime =  this->world->GetRealTime();
+
+  this->dartWorld->step();
+
+  // Update all the transformation of DART's links to gazebo's links
+  // TODO: How to visit all the links in the world?
+  unsigned int modelCount = this->world->GetModelCount();
+  ModelPtr modelItr;
+
+  for (unsigned int i = 0; i < modelCount; ++i)
   {
-    // need to lock, otherwise might conflict with world resetting
-    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    //this->physicsUpdateMutex->lock();
+    modelItr = this->world->GetModel(i);
+    // TODO: need to improve speed
+    Link_V links = modelItr->GetLinks();
+    unsigned int linkCount = links.size();
+    DARTLinkPtr dartLinkItr;
 
-//    std::vector<Eigen::VectorXd> dofs = this->dartWorld->getDofs();
-//    Eigen::VectorXd FirstDof = dofs[0];
-//    double state = FirstDof[0];
-
-    //common::Time currTime =  this->world->GetRealTime();
-    this->dartWorld->step();
-
-//    dofs = this->dartWorld->getDofs();
-//    FirstDof = dofs[0];
-//    state = FirstDof[0];
-    //gzerr << (this->dartWorld->getDofs().at(0))[0];
-    //this->dartWorld->updateKinematics();
-    //this->lastUpdateTime = currTime;
-
-    // Update all the transformation of DART's links to gazebo's links
-    // TODO: How to visit all the links in the world?
-    unsigned int modelCount = this->world->GetModelCount();
-    ModelPtr modelItr;
-
-    for (unsigned int i = 0; i < modelCount; ++i)
+    for (unsigned int j = 0; j < linkCount; ++j)
     {
-      modelItr = this->world->GetModel(i);
-      // TODO: need to improve speed
-      Link_V links = modelItr->GetLinks();
-      unsigned int linkCount = links.size();
-      DARTLinkPtr dartLinkItr;
-
-      for (unsigned int j = 0; j < linkCount; ++j)
-      {
-        dartLinkItr
-            = boost::shared_dynamic_cast<DARTLink>(links.at(j));
-        dartLinkItr->updateDirtyPoseFromDARTTransformation();
-      }
+      dartLinkItr
+          = boost::shared_dynamic_cast<DARTLink>(links.at(j));
+      dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
-    //this->physicsUpdateMutex->unlock();
   }
+  // this->lastUpdateTime = currTime;
 }
 
 //////////////////////////////////////////////////
@@ -403,8 +390,8 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 //  if (_msg->has_contact_surface_layer())
 //    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
-//  if (_msg->has_gravity())
-//    this->SetGravity(msgs::Convert(_msg->gravity()));
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
 
 //  if (_msg->has_real_time_factor())
 //    this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -422,12 +409,10 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   if (_msg->has_max_step_size())
   {
-    std::cout << "HERE" << std::endl;
     this->SetMaxStepSize(_msg->max_step_size());
   }
   else if (_msg->has_dt())
   {
-    std::cout << "HERE dt" << std::endl;
     this->SetMaxStepSize(_msg->dt());
     gzwarn << "Physics dt is deprecated by max step size\n";
   }
@@ -438,7 +423,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
 void DARTPhysics::SetMaxStepSize(double _stepSize)
 {
-  std::cout << "trying to change time step: " << _stepSize << std::endl;
   PhysicsEngine::SetMaxStepSize(_stepSize);
 
   this->dartWorld->setTimeStep(_stepSize);
