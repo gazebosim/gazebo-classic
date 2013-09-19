@@ -17,6 +17,7 @@ set (plugins
   ForceTorquePlugin
   GpuRayPlugin
   JointTrajectoryPlugin
+  ModelPropShop
   ModelTrajectoryTestPlugin
   MudPlugin
   PressurePlugin

@@ -280,7 +280,8 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  this->SetSky();
+  if (this->sdf->HasElement("sky"))
+    this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
