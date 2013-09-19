@@ -414,11 +414,6 @@ namespace gazebo
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
 
-      /// \brief Helper function to load a joint.
-      /// This function is deprecated, use LoadImpl(math::Pose &)
-      /// \param[in] _pos Position of the anchor.
-      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
-
       /// \brief Computes inertiaRatio for this joint during Joint::Init
       /// The inertia ratio for each joint between [1, +inf] gives a sense
       /// of how well this model will perform in iterative LCP methods.
@@ -450,10 +445,9 @@ namespace gazebo
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
 
-      public: double GetDampingCoefficient()
-              {
-                return this->dampingCoefficient;
-              }
+      /// \brief Get damping coefficient of this joint
+      /// \return viscous joint damping coefficient
+      public: double GetDampingCoefficient() const;
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
