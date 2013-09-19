@@ -87,7 +87,8 @@ double SimbodyHingeJoint::GetVelocity(int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->physicsInitialized &&
+        this->simbodyPhysics->simbodyPhysicsInitialized)
       return this->mobod.getOneU(
         this->simbodyPhysics->integ->getState(),
         SimTK::MobilizerUIndex(_index));
@@ -282,7 +283,8 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->physicsInitialized &&
+        this->simbodyPhysics->simbodyPhysicsInitialized)
       return math::Angle(this->mobod.getOneQ(
         this->simbodyPhysics->integ->getState(), _index));
     else
