@@ -125,6 +125,14 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 }
 
 //////////////////////////////////////////////////
+ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
+{
+  ModelPtr ret(new Model(_base));
+
+  return ret;
+}
+
+//////////////////////////////////////////////////
 double PhysicsEngine::GetUpdatePeriod()
 {
   double updateRate = this->GetRealTimeUpdateRate();
@@ -135,29 +143,6 @@ double PhysicsEngine::GetUpdatePeriod()
 }
 
 //////////////////////////////////////////////////
-<<<<<<< local
-ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
-{
-  ModelPtr ret(new Model(_base));
-
-  return ret;
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetStepTime(double _value)
-{
-  this->SetMaxStepSize(_value);
-}
-
-//////////////////////////////////////////////////
-double PhysicsEngine::GetStepTime()
-{
-  return this->GetMaxStepSize();
-}
-
-//////////////////////////////////////////////////
-=======
->>>>>>> other
 double PhysicsEngine::GetTargetRealTimeFactor() const
 {
   return this->targetRealTimeFactor;

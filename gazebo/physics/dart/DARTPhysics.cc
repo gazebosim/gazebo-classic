@@ -411,11 +411,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   {
     this->SetMaxStepSize(_msg->max_step_size());
   }
-  else if (_msg->has_dt())
-  {
-    this->SetMaxStepSize(_msg->dt());
-    gzwarn << "Physics dt is deprecated by max step size\n";
-  }
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
