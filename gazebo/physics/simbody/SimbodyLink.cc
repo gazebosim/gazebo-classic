@@ -200,10 +200,10 @@ void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
     if (this->simbodyU.empty())
       this->simbodyU.resize(this->masterMobod.getNumU(_state));
 
-    for(int i = 0; i < this->simbodyQ.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->simbodyQ[i] = this->masterMobod.getOneQ(_state, i);
 
-    for(int i = 0; i < this->simbodyU.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
   }
   else
@@ -219,10 +219,10 @@ void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
   if (!this->masterMobod.isEmptyHandle() &&
       SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
   {
-    for(int i = 0; i < this->simbodyQ.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->masterMobod.setOneQ(_state, i, this->simbodyQ[i]);
 
-    for(int i = 0; i < this->simbodyU.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->masterMobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else
@@ -456,7 +456,8 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
 // appropriate mass properties to use for each fragment. Per Simbody's
 // convention, COM is measured from, and inertia taken about, the link 
 // origin and both are expressed in the link frame.
-SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(int _numFragments) const
+SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
+  int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
     assert(_numFragments > 0); // must be at least 1 for the master

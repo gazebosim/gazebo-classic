@@ -205,7 +205,8 @@ namespace gazebo
       // Where Simbody MassProperties contains mass,
       // center of mass location, and unit inertia about body origin.
       public: SimTK::MassProperties GetMassProperties() const;
-      public: SimTK::MassProperties GetEffectiveMassProps(int _numFragments) const;
+      public: SimTK::MassProperties GetEffectiveMassProps(
+        int _numFragments) const;
       public: void SetDirtyPose(math::Pose _pose)
               {
                 this->dirtyPose = _pose;
