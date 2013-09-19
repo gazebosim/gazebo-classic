@@ -46,7 +46,10 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
+
+#ifdef HAVE_SIMBODY
   RegisterSimbodyPhysics();
+#endif
 
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
