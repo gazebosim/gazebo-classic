@@ -29,7 +29,6 @@ set (sources
   SimbodyHeightmapShape.cc)
 
 gz_add_library(gazebo_physics_simbody ${sources})
-#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
 
 gz_install_library(gazebo_physics_simbody)
