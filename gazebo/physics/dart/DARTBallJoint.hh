@@ -36,17 +36,24 @@ namespace gazebo
       public: virtual ~DARTBallJoint();
 
       // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
+
+      // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(int /*_index*/,
+                                     const math::Vector3& /*_anchor*/)
+      {
+        // nothing to do here for DART.
+      }
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int /*_index*/) const
               {return math::Vector3();}
-
-      // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
@@ -63,6 +70,15 @@ namespace gazebo
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int /*index*/) const
               {return math::Angle(0);}
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int /*_index*/, double /*_torque*/)
+      {
+        gzerr << "Not implemented";
+      }
+
+      /// \brief
+      protected: dart::dynamics::BallJoint* dartBallJoint;
     };
   }
 }

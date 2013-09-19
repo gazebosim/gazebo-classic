@@ -49,7 +49,6 @@ void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 void DARTSliderJoint::Init()
 {
   SliderJoint<DARTJoint>::Init();
-  this->dartPrismaticJoint->setDampingCoefficient(0, dampingCoefficient);
 }
 
 //////////////////////////////////////////////////

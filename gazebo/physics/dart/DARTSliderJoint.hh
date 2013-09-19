@@ -65,7 +65,7 @@ namespace gazebo
       {
         // TODO: Do nothing because DART accept only torques (forces) of joint
         // as input.
-        gzwarn << "Not implemented DARTHingeJoint::SetVelocity().\n";
+        gzwarn << "Not implemented DARTSliderJoint::SetVelocity().\n";
       }
 
       // Documentation inherited

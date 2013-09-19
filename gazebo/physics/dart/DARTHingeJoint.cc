@@ -49,7 +49,6 @@ void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 void DARTHingeJoint::Init()
 {
   HingeJoint<DARTJoint>::Init();
-  this->dartRevJoint->setDampingCoefficient(0, dampingCoefficient);
 }
 
 //////////////////////////////////////////////////

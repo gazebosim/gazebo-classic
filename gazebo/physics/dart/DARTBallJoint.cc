@@ -17,15 +17,19 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
+#include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
+#include "gazebo/physics/dart/DARTUtils.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
-: BallJoint<DARTJoint>(_parent)
+  : BallJoint<DARTJoint>(_parent),
+    dartBallJoint(new dart::dynamics::BallJoint())
 {
+  this->dartJoint = this->dartBallJoint;
 }
 
 //////////////////////////////////////////////////
@@ -34,22 +38,19 @@ DARTBallJoint::~DARTBallJoint()
 }
 
 //////////////////////////////////////////////////
+void DARTBallJoint::Load(sdf::ElementPtr _sdf)
+{
+  BallJoint<DARTJoint>::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::Init()
+{
+  BallJoint<DARTJoint>::Init();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 {
-  gzwarn << "Not implemented!\n";
-
-  return math::Vector3(0, 0, 0);
-}
-
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetAnchor(int /*_index*/, const math::Vector3& /*_anchor*/)
-{
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzwarn << "Not implemented!\n";
+  return DARTTypes::ConvVec3(this->dartBallJoint->getWorldOrigin());
 }
