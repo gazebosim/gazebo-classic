@@ -72,15 +72,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
-    if (elem->HasElement("provide_feedback"))
-    {
-      gzwarn << "DEPRECATION WARNING:\n Starting with SDF 1.5\n"
-             << "<joint>\n  <physics>\n    <ode>\n      <provide_feedback>\n"
-             << "will be moved up one level directly into:\n"
-             << "<joint>\n  <physics>\n    <provide_feedback>\n";
-      this->SetProvideFeedback(elem->Get<bool>("provide_feedback"));
-    }
-
     if (elem->HasElement("cfm_damping"))
     {
       this->useCFMDamping = elem->Get<bool>("cfm_damping");
