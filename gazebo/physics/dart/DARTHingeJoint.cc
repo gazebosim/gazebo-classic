@@ -18,11 +18,8 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
-
 #include "gazebo/common/Console.hh"
-
 #include "gazebo/physics/Link.hh"
-#include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTHingeJoint.hh"
 #include "gazebo/physics/dart/DARTUtils.hh"
 
@@ -46,7 +43,6 @@ DARTHingeJoint::~DARTHingeJoint()
 void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<DARTJoint>::Load(_sdf);
-
 }
 
 //////////////////////////////////////////////////
@@ -65,7 +61,7 @@ math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-  Eigen::Vector3d globalAxis = dartRevJoint->getWorldAxis();
+  Eigen::Vector3d globalAxis = this->dartRevJoint->getWorldAxis();
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
@@ -85,7 +81,7 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
   //----------------------------------------------------------------------------
 
-  dartRevJoint->setAxis(dartAxis);
+  this->dartRevJoint->setAxis(dartAxis);
 }
 
 //////////////////////////////////////////////////
@@ -93,11 +89,11 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result;
 
-  assert(this->dartRevJoint);
-  assert(this->dartRevJoint->getNumGenCoords() == 1);
+  assert(this->dartJoint);
+  assert(this->dartJoint->getNumGenCoords() == 1);
 
   // Hinge joint has only one dof.
-  double radianAngle = this->dartRevJoint->getGenCoord(0)->get_q();
+  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
   result.SetFromRadian(radianAngle);
 
   return result;
@@ -106,19 +102,19 @@ math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetVelocity(int /*index*/) const
 {
-  return this->dartRevJoint->getGenCoord(0)->get_dq();
+  return this->dartJoint->getGenCoord(0)->get_dq();
 }
 
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetMaxForce(int /*index*/, double _force)
 {
-  this->dartRevJoint->getGenCoord(0)->set_tauMax(_force);
+  this->dartJoint->getGenCoord(0)->set_tauMax(_force);
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(int /*index*/)
 {
-  return this->dartRevJoint->getGenCoord(0)->get_tauMax();
+  return this->dartJoint->getGenCoord(0)->get_tauMax();
 }
 
 //////////////////////////////////////////////////
@@ -126,7 +122,7 @@ void DARTHingeJoint::SetForce(int _index, double _torque)
 {
   DARTJoint::SetForce(_index, _torque);
 
-  dartJoint->getGenCoord(0)->set_tau(_torque);
+  this->dartJoint->getGenCoord(0)->set_tau(_torque);
 }
 
 //////////////////////////////////////////////////
@@ -134,7 +130,7 @@ void DARTHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 {
   if (this->dartRevJoint)
   {
-    dartRevJoint->getGenCoord(0)->set_tau(_effort);
+    this->dartJoint->getGenCoord(0)->set_tau(_effort);
   }
   else
   {

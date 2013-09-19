@@ -66,8 +66,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetVelocity(int /*_index*/, double /*_vel*/)
       {
-        // TODO: Do nothing because DART accept only torques (forces) of joint as
-        // input.
+        // TODO: Do nothing because DART accept only torques (forces) of joint
+        // as input.
         gzwarn << "Not implemented DARTHingeJoint::SetVelocity().\n";
       }
 

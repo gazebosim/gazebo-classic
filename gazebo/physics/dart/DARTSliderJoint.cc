@@ -19,8 +19,6 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 #include "gazebo/physics/dart/DARTUtils.hh"
@@ -28,12 +26,12 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
-    : SliderJoint<DARTJoint>(_parent)
+    : SliderJoint<DARTJoint>(_parent),
+      dartPrismaticJoint(new dart::dynamics::PrismaticJoint())
 {
-  this->dartJoint = new dart::dynamics::PrismaticJoint();
+  this->dartJoint = this->dartPrismaticJoint;
 }
 
 //////////////////////////////////////////////////
@@ -45,40 +43,25 @@ DARTSliderJoint::~DARTSliderJoint()
 void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<DARTJoint>::Load(_sdf);
-
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::Init()
 {
-  // Create dart joint first.
-  //this->dartJoint = new dart::dynamics::PrismaticJoint();
   SliderJoint<DARTJoint>::Init();
-  this->dartJoint->setDampingCoefficient(0, dampingCoefficient);
-}
-
-math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
-{
-  math::Vector3 result;
-
-  gzwarn << "Not implemented.\n";
-
-  return result;
+  this->dartPrismaticJoint->setDampingCoefficient(0, dampingCoefficient);
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAnchor(int /*_index*/, const math::Vector3& /*_anchor*/)
+math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
 {
-  gzwarn << "Not implemented.\n";
+  return DARTTypes::ConvVec3(this->dartPrismaticJoint->getWorldOrigin());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 {
-  // Axis in local frame of this joint
-  dart::dynamics::PrismaticJoint* dartPrismaticJoint
-      = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
-  Eigen::Vector3d globalAxis = dartPrismaticJoint->getAxisGlobal();
+  Eigen::Vector3d globalAxis = this->dartPrismaticJoint->getWorldAxis();
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
@@ -88,33 +71,17 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
-  dart::dynamics::PrismaticJoint* dartPrismaticJoint
-      = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
-
   Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
 
   //----------------------------------------------------------------------------
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = dartPrismaticJoint->getTransformFromParentBodyNode().inverse();
+      = this->dartPrismaticJoint->getTransformFromParentBodyNode().inverse();
   dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
   //----------------------------------------------------------------------------
 
-  dartPrismaticJoint->setAxis(dartVec3);
-}
-
-//////////////////////////////////////////////////
-void DARTSliderJoint::SetDamping(int _index, double _damping)
-{
-  assert(_index == 0);
-  assert(_damping >= 0.0);
-
-  dart::dynamics::PrismaticJoint* dartPrismaticJoint
-      = dynamic_cast<dart::dynamics::PrismaticJoint*>(this->dartJoint);
-
-  this->dampingCoefficient = _damping;
-  dartPrismaticJoint->setDampingCoefficient(0, _damping);
+  this->dartPrismaticJoint->setAxis(dartVec3);
 }
 
 //////////////////////////////////////////////////
@@ -135,33 +102,19 @@ math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetVelocity(int /*index*/) const
 {
-  double result;
-
-  result = this->dartJoint->getGenCoord(0)->get_dq();
-
-  return result;
+  return this->dartJoint->getGenCoord(0)->get_dq();
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetVelocity(int /*index*/, double /*_angle*/)
+void DARTSliderJoint::SetForce(int /*index*/, double _force)
 {
-  // TODO: Do nothing because DART accept only torques (forces) of joint as
-  // input.
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
-void DARTSliderJoint::SetForce(int /*index*/, double /*_force*/)
-{
-  gzwarn << "Not implemented!\n";
+  this->dartJoint->getGenCoord(0)->set_tauMax(_force);
 }
 
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetMaxForce(int /*_index*/)
 {
-  gzwarn << "Not implemented!\n";
-
-  return 0;
+  return this->dartJoint->getGenCoord(0)->get_tauMax();
 }
 
 //////////////////////////////////////////////////
@@ -169,10 +122,21 @@ void DARTSliderJoint::SetMaxForce(int _index, double _torque)
 {
   DARTJoint::SetForce(_index, _torque);
 
-  dartJoint->getGenCoord(0)->set_tau(_torque);
+  this->dartJoint->getGenCoord(0)->set_tau(_torque);
 }
 
-
+//////////////////////////////////////////////////
+void DARTSliderJoint::SetForceImpl(int /*_index*/, double _effort)
+{
+  if (this->dartJoint)
+  {
+    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+  }
+  else
+  {
+    gzerr << "DART revolute joint is invalid\n";
+  }
+}
 
 
 
