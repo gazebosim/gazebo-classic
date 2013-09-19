@@ -619,7 +619,7 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), "ode");
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // create some fake links
   physics::ModelPtr model = world->GetModel("model_1");
@@ -785,7 +785,7 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), "ode");
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // create some fake links
   physics::ModelPtr model = world->GetModel("model_1");
