@@ -213,7 +213,6 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       //   gzerr << "wait: ";
       //   getchar();
       // }
-
     }
     else
     {
