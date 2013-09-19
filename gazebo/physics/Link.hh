@@ -443,10 +443,10 @@ namespace gazebo
       public: void SetPublishData(bool _enable);
 
       /// \brief Get the parent joints.
-      public: Joint_V GetParentJoints() const {return this->parentJoints;}
+      public: Joint_V GetParentJoints() const;
 
       /// \brief Get the child joints.
-      public: Joint_V GetChildJoints() const {return this->childJoints;}
+      public: Joint_V GetChildJoints() const;
 
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise

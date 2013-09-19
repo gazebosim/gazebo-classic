@@ -110,10 +110,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   // Joint force and torque feedback
   if (_sdf->HasElement("physics"))
   {
-    sdf::ElementPtr physics_elem = _sdf->GetElement("physics");
-    if (physics_elem->HasElement("provide_feedback"))
+    sdf::ElementPtr physicsElem = _sdf->GetElement("physics");
+    if (physicsElem->HasElement("provide_feedback"))
     {
-      this->SetProvideFeedback(physics_elem->Get<bool>("provide_feedback"));
+      this->SetProvideFeedback(physicsElem->Get<bool>("provide_feedback"));
     }
   }
 
@@ -511,7 +511,8 @@ double Joint::CheckAndTruncateForce(int _index, double _effort)
     return _effort;
   }
 
-  // truncating SetForce effort if velocity limit reached.
+  // truncating SetForce effort if velocity limit is reached and
+  // effort is applied in the same direction.
   if (this->velocityLimit[_index] >= 0)
   {
     if (this->GetVelocity(_index) > this->velocityLimit[_index])

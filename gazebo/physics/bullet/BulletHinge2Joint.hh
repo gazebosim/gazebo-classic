@@ -95,11 +95,11 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Pointer to bullet hinge2 constraint
-      private: btHinge2Constraint *bulletHinge2;
-
       /// \brief Set the torque
       protected: void SetForceImpl(int _index, double _torque);
+
+      /// \brief Pointer to bullet hinge2 constraint
+      private: btHinge2Constraint *bulletHinge2;
     };
 
   /// \}

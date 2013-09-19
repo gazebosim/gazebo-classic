@@ -173,8 +173,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetProvideFeedback(bool _enable);
 
-      /// \brief Feedback data for this joint
-      private: dJointFeedback *feedback;
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(int _index);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
@@ -184,9 +184,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetForce(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(int _index);
 
       // Documentation inherited.
       public: virtual void ApplyDamping();
@@ -209,6 +206,9 @@ namespace gazebo
 
       /// \brief This is our ODE ID
       protected: dJointID jointId;
+
+      /// \brief Feedback data for this joint
+      private: dJointFeedback *feedback;
 
       /// \brief CFM for joint's limit constraint
       private: double stopCFM;

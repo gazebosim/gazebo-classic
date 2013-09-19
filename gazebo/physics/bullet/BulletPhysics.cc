@@ -209,11 +209,15 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 }
 
 //////////////////////////////////////////////////
-bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper */*_obj0*/, int /*_partId0*/,
-    int /*_index0*/, const btCollisionObjectWrapper */*_obj1*/,
-    int /*_partId1*/, int /*_index1*/)
+bool ContactCallback(btManifoldPoint &_cp,
+    const btCollisionObjectWrapper *_obj0, int /*_partId0*/, int /*_index0*/,
+    const btCollisionObjectWrapper *_obj1, int /*_partId1*/, int /*_index1*/)
 {
+  _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
+    _obj0->m_collisionObject->getFriction());
+
+  // this return value is currently ignored, but to be on the safe side:
+  //  return false if you don't calculate friction
   return true;
 }
 
@@ -468,7 +472,8 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  this->dynamicsWorld->stepSimulation(this->maxStepSize, 0);
+  this->dynamicsWorld->stepSimulation(
+    this->maxStepSize, 1, this->maxStepSize);
 }
 
 //////////////////////////////////////////////////
@@ -488,14 +493,17 @@ void BulletPhysics::Reset()
 
 //////////////////////////////////////////////////
 
-// //////////////////////////////////////////////////
-// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
-// {
-//   // TODO: set SDF parameter
-//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-//   // Line below commented out because it wasn't helping pendulum test.
-//   // info.m_numIterations = _iters;
-// }
+//////////////////////////////////////////////////
+void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+{
+  // TODO: set SDF parameter
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+  // Line below commented out because it wasn't helping pendulum test.
+  info.m_numIterations = _iters;
+
+  this->sdf->GetElement("bullet")->GetElement(
+      "solver")->GetElement("iters")->Set(_iters);
+}
 
 
 //////////////////////////////////////////////////
