@@ -156,6 +156,13 @@ TEST_F(Joint_TEST, ForceTorque1Bullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, ForceTorque1DART)
+{
+  ForceTorque1("dart");
+}
+#endif  // HAVE_DART
+
 void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 {
   // Load our force torque test world
@@ -302,6 +309,13 @@ TEST_F(Joint_TEST, ForceTorque2Bullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, ForceTorque2DART)
+{
+  ForceTorque2("dart");
+}
+#endif  // HAVE_DART
+
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
 {
@@ -436,6 +450,13 @@ TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
   // GetForceTorqueWithAppliedForce("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceDART)
+{
+  GetForceTorqueWithAppliedForce("dart");
+}
+#endif  // HAVE_DART
 
 // Fixture for testing all joint types.
 class Joint_TEST_All : public Joint_TEST {};
@@ -769,6 +790,14 @@ TEST_F(Joint_TEST, JointTorqueTestBullet)
 }
 #endif  // HAVE_BULLET
 
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, JointTorqueTestDART)
+{
+  JointTorqueTest("dart");
+}
+#endif  // HAVE_DART
+
+
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
@@ -888,6 +917,13 @@ TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
   gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, JointCreationDestructionTestDART)
+{
+  JointCreationDestructionTest("dart");
+}
+#endif  // HAVE_DART
 
 TEST_F(Joint_TEST, joint_SDF14)
 {
