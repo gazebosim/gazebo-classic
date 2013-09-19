@@ -154,18 +154,6 @@ ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetStepTime(double _value)
-{
-  this->SetMaxStepSize(_value);
-}
-
-//////////////////////////////////////////////////
-double PhysicsEngine::GetStepTime()
-{
-  return this->GetMaxStepSize();
-}
-
-//////////////////////////////////////////////////
 double PhysicsEngine::GetTargetRealTimeFactor() const
 {
   return this->targetRealTimeFactor;

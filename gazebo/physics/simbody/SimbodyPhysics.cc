@@ -122,7 +122,7 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->stepTimeDouble = this->GetStepTime();
+  this->stepTimeDouble = this->GetMaxStepSize();
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
@@ -174,7 +174,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_type(msgs::Physics::SIMBODY);
     // physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
-    physicsMsg.set_min_step_size(this->GetStepTime());
+    physicsMsg.set_min_step_size(this->GetMaxStepSize());
     // physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     // physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
@@ -502,21 +502,6 @@ void SimbodyPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Fini()
 {
-}
-
-//////////////////////////////////////////////////
-void SimbodyPhysics::SetStepTime(double _value)
-{
-  this->sdf->GetElement("simbody")->GetElement(
-      "solver")->GetAttribute("min_step_size")->Set(_value);
-
-  this->stepTimeDouble = _value;
-}
-
-//////////////////////////////////////////////////
-double SimbodyPhysics::GetStepTime()
-{
-  return this->stepTimeDouble;
 }
 
 //////////////////////////////////////////////////

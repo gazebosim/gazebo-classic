@@ -83,12 +83,6 @@ namespace gazebo
       public: virtual std::string GetType() const
                       { return "simbody"; }
 
-      /// \brief Set the simulation step time
-      public: virtual void SetStepTime(double _value);
-
-      /// \brief Get the simulation step time
-      public: virtual double GetStepTime();
-
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
