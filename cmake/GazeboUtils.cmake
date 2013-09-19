@@ -1,4 +1,3 @@
-
 ################################################################################
 #APPEND_TO_CACHED_STRING(_string _cacheDesc [items...])
 # Appends items to a cached list.
@@ -205,7 +204,7 @@ endif()
 # Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
 include(CheckCXXCompilerFlag)
 
-macro(filter_valid_compiler_warnigns) 
+macro(filter_valid_compiler_warnings) 
   foreach(flag ${ARGN})
     CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
     if(${R${flag}})
