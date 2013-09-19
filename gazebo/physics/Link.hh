@@ -443,7 +443,7 @@ namespace gazebo
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
-      public: virtual void SetLinkStatic(bool /*_static*/) { }
+      public: virtual void SetLinkStatic(bool _static) = 0;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();

@@ -596,3 +596,9 @@ void BulletLink::SetAutoDisable(bool /*_disable*/)
 {
   gzlog << "BulletLink::SetAutoDisable not yet implemented." << std::endl;
 }
+
+//////////////////////////////////////////////////
+void BulletLink::SetLinkStatic(bool _static)
+{
+  gzlog << "To be implemneted\n";
+}

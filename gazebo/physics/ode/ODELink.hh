@@ -162,6 +162,9 @@ namespace gazebo
       /// \param[in] _id Id of the body.
       public: static void MoveCallback(dBodyID _id);
 
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
       /// \brief ODE link handle
       private: dBodyID linkId;
 
