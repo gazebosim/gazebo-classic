@@ -9,6 +9,10 @@
       <sky>false</sky>
     </scene>
 
+    <include>
+      <uri>model://pr2</uri>
+    </include>
+    <!--
     <model name="box">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
@@ -31,6 +35,7 @@
         </visual>
       </link>
     </model>
+-->
 
   </world>
 </sdf>
