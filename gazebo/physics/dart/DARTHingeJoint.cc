@@ -97,7 +97,7 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetDamping(int _index, double _damping)
+void DARTHingeJoint::SetDamping(int /*_index*/, double _damping)
 {
   assert(_index == 0);
   assert(_damping >= 0.0);
