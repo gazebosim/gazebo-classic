@@ -94,12 +94,6 @@ void DARTScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::ApplyDamping()
-{
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
 void DARTScrewJoint::SetForce(int /*index*/, double /*_force*/)
 {
   gzwarn << "Not implemented!\n";

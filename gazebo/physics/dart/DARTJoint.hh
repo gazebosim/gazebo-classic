@@ -21,6 +21,7 @@
 #include <boost/any.hpp>
 #include <string>
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -55,10 +56,24 @@ namespace gazebo
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
       // Documentation inherited.
-      public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
+      public: virtual void Attach(LinkPtr _parent, LinkPtr _child)
+      {
+        Joint::Attach(_parent, _child);
+
+        gzerr << "DART does not support joint attach\n";
+      }
 
       // Documentation inherited.
-      public: virtual void Detach();
+      public: virtual void Detach()
+      {
+        this->childLink.reset();
+        this->parentLink.reset();
+
+        gzerr << "DART does not support joint attach\n";
+      }
+
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
@@ -80,7 +95,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,
-                                      const boost::any &_value);
+                                        const boost::any &_value);
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &_key,
@@ -101,26 +116,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const;
 
-      /// \brief
-      public: DARTModelPtr GetDARTModel() const;
-
-      /// \brief Get DART joint pointer.
-      public: dart::dynamics::Joint* getDARTJoint() { return dartJoint; }
-
-      /// \brief
-      protected: dart::dynamics::Joint* dartJoint;
-
-      /// \brief
-      public: math::Pose GetPose_ChildLinkToJoint() const
-      { return poseChildLinkToJoint; }
-
-      /// \brief
-      public: math::Pose GetPose_ParentLinkToJoint() const
-      { return poseParentLinkToJoint; }
-
-      /// \brief
-      public: math::Pose GetPose_JointToChildLink() const
-      { return poseJointToChildLink; }
+      // Documentation inherited.
+      public: virtual void ApplyDamping();
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
@@ -137,14 +134,11 @@ namespace gazebo
       /// \param[in] _force Force value.
       private: void SaveForce(int _index, double _force);
 
-      /// \brief
-      protected: math::Pose poseChildLinkToJoint;
+      /// \brief Get DART model pointer.
+      public: DARTModelPtr GetDARTModel() const;
 
-      /// \brief
-      protected: math::Pose poseParentLinkToJoint;
-
-      /// \brief
-      protected: math::Pose poseJointToChildLink;
+      /// \brief Get DART joint pointer.
+      public: dart::dynamics::Joint* getDARTJoint() { return dartJoint; }
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
@@ -156,6 +150,9 @@ namespace gazebo
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
+
+      /// \brief DART joint pointer
+      protected: dart::dynamics::Joint* dartJoint;
     };
   }
 }

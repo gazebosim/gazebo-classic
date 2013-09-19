@@ -73,9 +73,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(int _parameter, double _value);
-
-      /// \brief Callback to apply damping force to joint.
-      public: void ApplyDamping();
     };
   }
 }
