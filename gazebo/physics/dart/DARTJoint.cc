@@ -416,8 +416,7 @@ void DARTJoint::SetAttribute(const std::string &_key, int _index,
   {
     try
     {
-      gzerr << "Unable to handle joint attribute["
-            << boost::any_cast<std::string>(_value) << "]\n";
+      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
     }
     catch(boost::bad_any_cast &e)
     {
