@@ -63,16 +63,8 @@ math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
-{
-  // We do not do anything here because DART does not store the positon
-  // of the joint.
-}
-
-//////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-  // Axis in local frame of this joint
   Eigen::Vector3d globalAxis = dartRevJoint->getWorldAxis();
 
   // TODO: Issue #494
@@ -89,7 +81,7 @@ void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
   Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = dartRevJoint->getTransformFromParentBodyNode().inverse();
+      = this->dartRevJoint->getTransformFromParentBodyNode().inverse();
   dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
   //----------------------------------------------------------------------------
 
@@ -118,24 +110,15 @@ double DARTHingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetVelocity(int /*index*/, double /*_vel*/)
+void DARTHingeJoint::SetMaxForce(int /*index*/, double _force)
 {
-  // TODO: Do nothing because DART accept only torques (forces) of joint as
-  // input.
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetMaxForce(int /*index*/, double /*_force*/)
-{
-  gzwarn << "Not implemented!\n";
+  this->dartRevJoint->getGenCoord(0)->set_tauMax(_force);
 }
 
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(int /*index*/)
 {
-  gzwarn << "Not implemented!\n";
-  return 0.0;
+  return this->dartRevJoint->getGenCoord(0)->get_tauMax();
 }
 
 //////////////////////////////////////////////////
@@ -146,6 +129,7 @@ void DARTHingeJoint::SetForce(int _index, double _torque)
   dartJoint->getGenCoord(0)->set_tau(_torque);
 }
 
+//////////////////////////////////////////////////
 void DARTHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 {
   if (this->dartRevJoint)
