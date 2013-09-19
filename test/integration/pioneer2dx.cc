@@ -20,7 +20,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class Pioneer2dx : public ServerFixture
+class Pioneer2dx : public ServerFixture,
+                   public testing::WithParamInterface<const char*>
 {
   public: void StraightLine(const std::string &_physicsEngine);
 };
@@ -78,7 +79,7 @@ TEST_P(Pioneer2dx, StraightLine)
   StraightLine(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(Pioneer2dx)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Pioneer2dx, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

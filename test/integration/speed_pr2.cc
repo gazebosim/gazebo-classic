@@ -18,7 +18,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class SpeedPR2Test : public ServerFixture
+class SpeedPR2Test : public ServerFixture,
+                     public testing::WithParamInterface<const char*>
 {
   public: void PR2World(const std::string &_physicsEngine);
 };
@@ -54,7 +55,7 @@ TEST_P(SpeedPR2Test, PR2World)
   PR2World(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(SpeedPR2Test)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedPR2Test, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

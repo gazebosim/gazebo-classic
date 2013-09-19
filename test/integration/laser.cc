@@ -26,7 +26,8 @@
 #define DOUBLE_TOL 1e-6
 
 using namespace gazebo;
-class LaserTest : public ServerFixture
+class LaserTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void LaserUnitBox(const std::string &_physicsEngine);
@@ -299,7 +300,7 @@ TEST_P(LaserTest, LaserNoise)
   LaserUnitNoise(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(LaserTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

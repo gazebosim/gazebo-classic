@@ -23,7 +23,11 @@
 #include <stdio.h>
 #include <string>
 
-#include "test/data/pr2_state_log_expected.h"
+// This header file isn't needed if shasums are used
+// #include "test/data/pr2_state_log_expected.h"
+// Note that we are currently using a non-portable command-line tool
+// to compute SHA1 sums. Issue #837 is tracking the conversion
+// of this functionality to using a Boost library.
 #include "test_config.h"
 #include "gazebo/gazebo_config.h"
 
@@ -135,41 +139,47 @@ TEST(gzlog, EchoFilter)
   // Test model filter
   echo = custom_exec(
       std::string("gzlog echo --filter pr2 ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2StateLog, echo);
+  // EXPECT_EQ(pr2StateLog, echo);
+  EXPECT_EQ(echo, "0bf1f293b164bbe820267f970c4b419acdca4b01  -");
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2PoseStateLog, echo);
+  // EXPECT_EQ(pr2PoseStateLog, echo);
+  EXPECT_EQ(echo, "33db2cbd0841466a67abd7d2bbc69cf2cfae19b6  -");
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.x ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log 2>/dev/null");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2PoseXStateLog, echo);
+  // EXPECT_EQ(pr2PoseXStateLog, echo);
+  EXPECT_EQ(echo, "07113f16d44e2484f769fd1947ff5dca93f55cf4  -");
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.[x,y] ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2PoseXYStateLog, echo);
+  // EXPECT_EQ(pr2PoseXYStateLog, echo);
+  EXPECT_EQ(echo, "7f34f3fac505707727a74ac8659bb8736932ab07  -");
 
   // Test link filter
   echo = custom_exec(
       std::string("gzlog echo --filter pr2/r_upper*.pose ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2LinkStateLog, echo);
+  // EXPECT_EQ(pr2LinkStateLog, echo);
+  EXPECT_EQ(echo, "d52ba4333511b7e4339db3eb71814c73473fba36  -");
 
   // Test joint filter
   echo = custom_exec(
       std::string("gzlog echo --filter pr2//r_upper_arm_roll_joint ") +
-      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log | shasum");
   boost::trim_right(echo);
-  EXPECT_EQ(pr2JointStateLog, echo);
+  // EXPECT_EQ(pr2JointStateLog, echo);
+  EXPECT_EQ(echo, "2f689dadc66171a76f7f3400bc218485a923c324  -");
 }
 
 /////////////////////////////////////////////////
@@ -210,19 +220,19 @@ TEST(gzlog, Step)
 {
   std::string stepCmd;
   stepCmd = std::string("gzlog step ") + PROJECT_SOURCE_PATH +
-    std::string("/test/data/pr2_state.log");
+    std::string("/test/data/pr2_state.log | shasum");
 
   // Call gzlog step and press q immediately
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
-  EXPECT_EQ(stepq0.length(), 115569u);
+  EXPECT_EQ(stepq0, "6d3af4f4d1214fe3a4860ab42777eb4d0f89c6b2  -\n");
 
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
-  EXPECT_EQ(stepq1.length(), 124131u);
+  EXPECT_EQ(stepq1, "43eacb140e00ef0525d54667bc558d63dac3d21f  -\n");
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
-  EXPECT_EQ(stepq2.length(), 132516u);
+  EXPECT_EQ(stepq2, "37e133d15d3f74cbc686bfceb26b8db46e2f6bf5  -\n");
 }
 
 /////////////////////////////////////////////////

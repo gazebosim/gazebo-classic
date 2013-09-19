@@ -24,7 +24,8 @@
 #define IMU_TOL 1e-5
 
 using namespace gazebo;
-class ImuTest : public ServerFixture
+class ImuTest : public ServerFixture,
+                public testing::WithParamInterface<const char*>
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);
@@ -278,7 +279,7 @@ TEST_P(ImuTest, EmptyWorldBias)
   Stationary_EmptyWorld_Bias(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ImuTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

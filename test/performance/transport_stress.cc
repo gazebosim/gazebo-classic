@@ -139,7 +139,7 @@ TEST_F(TransportStressTest, ManyNodes)
   #endif
 
   // Check if there is enough memory available
-  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
+  if (!gazebo::test::memory::IsMemoryAvailable(requiredMB))
   {
     gzdbg << "Skipped test since " << requiredMB <<
               "Mb of RAM were not available \n";

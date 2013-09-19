@@ -29,7 +29,6 @@ set(tests
   file_handling.cc
   imu.cc
   laser.cc
-  manpages.cc
   nondefault_world.cc
   physics.cc
   physics_msgs.cc
@@ -41,6 +40,11 @@ set(tests
   surface_properties.cc
   transceiver.cc
   )
+
+if (MANPAGES_SUPPORT)
+  set (tests ${tests}
+	      manpages.cc)
+endif()
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
   "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
@@ -69,7 +73,7 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_dri_tests(${dri_tests})
 
 
-if (VALID_DRI_DISPLAY)
+if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
 

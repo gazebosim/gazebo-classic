@@ -89,6 +89,20 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
               updateRate*now * 0.5);
 
+  // Wait another 1.5 seconds
+  for (i = 0; i < 15; ++i)
+    common::Time::MSleep(100);
+
+  hokuyoMsgCount = g_hokuyoMsgCount;
+  now = world->GetSimTime().Double();
+
+  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+        << now << " seconds\n";
+
+  // Expect at least 50% of specified update rate
+  EXPECT_GT(static_cast<double>(hokuyoMsgCount),
+              updateRate*now * 0.5);
+
   // Send reset world message
   transport::PublisherPtr worldControlPub =
     node->Advertise<msgs::WorldControl>("~/world_control");
