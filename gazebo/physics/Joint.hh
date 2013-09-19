@@ -105,16 +105,6 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose);
 
-      /// \brief Set parent and child links of a physics::Joint and its
-      /// anchor offset position.
-      /// This funciton is deprecated, use
-      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
-      /// \param[in] _parent Parent link.
-      /// \param[in] _child Child link.
-      /// \param[in] _pos Joint Anchor offset from child link.
-      public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
-
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -287,25 +277,7 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief @todo: not yet implemented.
-      /// Get external forces applied at this Joint.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] _index Index of the axis.
-      /// \return The force applied to an axis.
       public: virtual double GetForce(unsigned int _index);
-
-      /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
-      public: virtual JointWrench GetForceTorque(int _index)
-        GAZEBO_DEPRECATED(1.5) = 0;
 
       /// \brief get internal force and torque values at a joint
       /// Note that you must set
@@ -426,11 +398,6 @@ namespace gazebo
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
-
-      /// \brief Helper function to load a joint.
-      /// This function is deprecated, use LoadImpl(math::Pose &)
-      /// \param[in] _pos Position of the anchor.
-      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Computes inertiaRatio for this joint during Joint::Init
       /// The inertia ratio for each joint between [1, +inf] gives a sense

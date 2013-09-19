@@ -126,10 +126,6 @@ namespace gazebo
       /// This function is called before the camera is destructed
       public: virtual void Fini();
 
-      /// Deprecated.
-      /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
-
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
       public: bool GetInitialized() const;

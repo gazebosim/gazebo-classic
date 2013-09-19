@@ -608,7 +608,6 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
 
-  event::Events::worldUpdateStart();
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);

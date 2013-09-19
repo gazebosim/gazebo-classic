@@ -121,9 +121,6 @@ namespace gazebo
       public: virtual void CacheForceTorque();
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(int _index);
-
-      // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       // Documentation inherited.

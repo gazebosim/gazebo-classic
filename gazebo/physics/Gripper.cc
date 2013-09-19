@@ -83,7 +83,6 @@ void Gripper::Load(sdf::ElementPtr _sdf)
         = this->collisions.find(collision->GetScopedName());
       if (collIter != this->collisions.end())
         continue;
-      collision->SetContactsEnabled(true);
 
       this->collisions[collision->GetScopedName()] = collision;
     }

@@ -1688,12 +1688,6 @@ void Camera::AnimationComplete()
 }
 
 //////////////////////////////////////////////////
-bool Camera::IsInitialized() const
-{
-  return this->GetInitialized();
-}
-
-//////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
   return this->initialized && this->scene->GetInitialized();
