@@ -154,6 +154,26 @@ namespace gazebo
       // Restore saved Simbody State
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
+      /// \brief If the inboard body of this link is ground, simply
+      /// lock the inboard joint to freeze it to ground.  Otherwise,
+      /// add a weld constraint to simulate freeze to ground effect.
+      /// \param[in] _static if true, freeze link to ground.  Otherwise
+      /// unfreeze link.
+      public: virtual void SetLinkStatic(bool _static);
+
+      /// \biref Internal call to make link static if
+      /// staticLinkDirty and staticLink are true.
+      private: void ProcessSetLinkStatic();
+
+      /// \biref Trigger setting of link according to staticLink.
+      private: bool staticLinkDirty;
+
+      /// \biref If true, freeze link to world (inertial) frame.
+      private: bool staticLink;
+
+      /// \brief Event connection for SetLinkStatic
+      private: event::ConnectionPtr staticLinkConnection;
+
       /// \brief save simbody free state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;
 

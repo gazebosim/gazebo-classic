@@ -36,10 +36,10 @@ BulletJoint::BulletJoint(BasePtr _parent)
 {
   this->constraint = NULL;
   this->bulletWorld = NULL;
+  this->feedback = NULL;
   this->dampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
-  this->forceAppliedTime = common::Time(0);
 }
 
 //////////////////////////////////////////////////

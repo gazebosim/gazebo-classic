@@ -84,14 +84,14 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      // Documentation inherited.
-      protected: void SetForceImpl(int _index, double _torque);
-
       /// \brief save simbody state for spawning
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
 
       /// \brief restore  simbody state for spawning
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int _index, double _torque);
 
       /// \brief save simbody state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;

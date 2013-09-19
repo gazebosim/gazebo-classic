@@ -156,6 +156,10 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     << "</sdf>";
   SpawnSDF(linkOffsetStream.str());
 
+  /// \TODO: bullet needs this to pass
+  if (physics->GetType()  == "bullet")
+    physics->SetSORPGSIters(300);
+
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
   // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
@@ -198,6 +202,18 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       pose2 = model->GetWorldPose();
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
+
+      // if (physics->GetType()  == "bullet")
+      // {
+      //   gzerr << "m[" << model->GetName()
+      //         << "] p[" << model->GetWorldPose()
+      //         << "] v[" << model->GetWorldLinearVel()
+      //         << "]\n";
+
+      //   gzerr << "wait: ";
+      //   getchar();
+      // }
+
     }
     else
     {
@@ -213,7 +229,30 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
+
   world->StepWorld(steps);
+
+  // debug
+  // for (int i = 0; i < steps; ++i)
+  // {
+  //   world->StepWorld(1);
+  //   if (physics->GetType()  == "bullet")
+  //   {
+  //     model = world->GetModel("link_offset_box");
+  //     gzerr << "m[" << model->GetName()
+  //           << "] i[" << i << "/" << steps
+  //           << "] pm[" << model->GetWorldPose()
+  //           << "] pb[" << model->GetLink("body")->GetWorldPose()
+  //           << "] v[" << model->GetWorldLinearVel()
+  //           << "]\n";
+
+  //     if (model->GetWorldPose().pos.z < 0.6)
+  //     {
+  //       gzerr << "wait: ";
+  //       getchar();
+  //     }
+  //   }
+  // }
 
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The velocity is expected
@@ -242,6 +281,19 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       x0 = modelPos[name].x;
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+
+      // debug
+      // if (physics->GetType()  == "bullet")
+      // {
+      //   gzerr << "m[" << model->GetName()
+      //         << "] p[" << model->GetWorldPose()
+      //         << "] v[" << model->GetWorldLinearVel()
+      //         << "]\n";
+
+      //   gzerr << "wait: ";
+      //   getchar();
+      // }
+
       if (name == "test_empty")
       {
         EXPECT_NEAR(pose1.pos.z, z0+g.z/2*t*t,
@@ -894,7 +946,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         double oldVel, newVel, force;
         oldVel = joint->GetVelocity(0);
         // Apply positive torque to the lower_joint and step forward.
-        force = 10;
+        force = 1;
 
         for (int i = 0; i < 10; ++i)
         {
@@ -931,7 +983,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
         }
         // Apply negative torque to lower_joint
-        force = -30;
+        force = -3;
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
@@ -1095,12 +1147,12 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
     EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
     EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 
-    EXPECT_NEAR(pose.pos.x, 3.0, PHYSICS_TOL);
+    EXPECT_DOUBLE_EQ(pose.pos.x, 3.0);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
     EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
-    EXPECT_NEAR(pose.rot.GetAsEuler().y, 0.0, PHYSICS_TOL);
-    EXPECT_NEAR(pose.rot.GetAsEuler().z, 0.0, PHYSICS_TOL);
+    EXPECT_DOUBLE_EQ(pose.rot.GetAsEuler().y, 0.0);
+    EXPECT_DOUBLE_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
 }
 

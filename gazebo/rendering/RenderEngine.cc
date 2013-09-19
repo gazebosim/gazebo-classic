@@ -291,7 +291,7 @@ void RenderEngine::Fini()
   RTShaderSystem::Instance()->Fini();
 
   // Deallocate memory for every scene
-  while (this->scenes.size() != 0)
+  while (!this->scenes.empty())
   {
     this->RemoveScene(this->scenes.front()->GetName());
   }

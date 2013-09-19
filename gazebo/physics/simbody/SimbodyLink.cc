@@ -39,6 +39,8 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
   this->mustBeBaseLink = false;
   this->physicsInitialized = false;
   this->simbodyPhysics.reset();
+  this->staticLinkDirty = false;
+  this->staticLink = false;
 }
 
 //////////////////////////////////////////////////
@@ -87,6 +89,10 @@ void SimbodyLink::Init()
 
   // Create a construction info object
   // Create the new rigid body
+
+  // lock or unlock the link if requested by user
+  this->staticLinkConnection = event::Events::ConnectWorldUpdateEnd(
+    boost::bind(&SimbodyLink::ProcessSetLinkStatic, this));
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +104,7 @@ void SimbodyLink::Fini()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
+  this->sdf->GetElement("gravity")->Set(_mode);
   this->gravityMode = _mode;
   if (this->physicsInitialized)
   {
@@ -155,16 +162,16 @@ void SimbodyLink::OnPoseChange()
 
   Link::OnPoseChange();
 
-  if (!this->masterMobod.isEmptyHandle() &&
-      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  /// \TODO: limited functionality for now.
+  /// Setting 6 dof pose of a link works in simbody only if
+  /// the inboard joint is a free joint to the ground for now.
+
+  if (this->masterMobod.isEmptyHandle())
+    return;
+
+  if (!this->masterMobod.isGround() &&
+      this->masterMobod.getParentMobilizedBody().isGround())
   {
-    // it’s a Free mobilizer
-    // gzerr << "Free [" << this->GetScopedName()
-    //       << "] P[" << this->GetWorldPose()
-    //       << "] NumQ["
-    //       << this->masterMobod.getNumQ(
-    //          this->simbodyPhysics->integ->getState())
-    //       << "]\n";
     this->masterMobod.setQToFitTransform(
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
@@ -183,6 +190,7 @@ void SimbodyLink::OnPoseChange()
 //////////////////////////////////////////////////
 void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
 {
+  // skip if not a free joint, state is saved in SimbodyJoint::mobod
   if (!this->masterMobod.isEmptyHandle() &&
       SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
   {
@@ -207,6 +215,7 @@ void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
 //////////////////////////////////////////////////
 void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
 {
+  // skip if not a free joint, state is restored by SimbodyJoint::mobod
   if (!this->masterMobod.isEmptyHandle() &&
       SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
   {
@@ -223,6 +232,48 @@ void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
 }
 
 //////////////////////////////////////////////////
+void SimbodyLink::SetLinkStatic(bool _static)
+{
+  if (!this->staticLinkDirty)
+  {
+    this->staticLinkDirty = true;
+    this->staticLink = _static;
+  }
+  else
+    gzerr << "Trying to SetLinkStatic before last setting is processed.\n";
+}
+
+
+//////////////////////////////////////////////////
+void SimbodyLink::ProcessSetLinkStatic()
+{
+  if (this->masterMobod.isEmptyHandle())
+    return;
+
+  // check if inboard body is ground
+  if (this->staticLinkDirty &&
+      this->masterMobod.getParentMobilizedBody().isGround())
+  {
+    if (this->staticLink)
+      this->masterMobod.lock(
+       this->simbodyPhysics->integ->updAdvancedState());
+    else
+      this->masterMobod.unlock(
+       this->simbodyPhysics->integ->updAdvancedState());
+
+    // re-realize
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+  }
+  else
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
+
+  this->staticLinkDirty = false;
+}
+
+//////////////////////////////////////////////////
 void SimbodyLink::SetEnabled(bool /*_enable*/) const
 {
 }
@@ -236,7 +287,6 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 math::Vector3 SimbodyLink::GetWorldLinearVel(
   const math::Vector3& _offset) const
 {
-
   SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
   SimTK::Vec3 v;
 
