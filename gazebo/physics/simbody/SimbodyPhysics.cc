@@ -933,7 +933,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
                 : gzJoint->defX_AB.R();
             ballJoint.setDefaultRotation(defR_FM);
             mobod = ballJoint;
-        } 
+        } else {
+          gzerr << "Simbody joint type [" << type << "] not implemented.\n";
+        }
 
         // Created a mobilizer that corresponds to gzJoint. Keep track.
         gzJoint->mobod = mobod;
