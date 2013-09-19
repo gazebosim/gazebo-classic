@@ -28,7 +28,9 @@
 
 void RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
 void RegisterSimbodyPhysics();
+#endif
 
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
