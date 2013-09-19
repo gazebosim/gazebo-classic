@@ -171,7 +171,7 @@ Camera::~Camera()
   this->renderTexture = NULL;
   this->renderTarget = NULL;
 
-  if (this->camera)
+  if (this->camera && this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
