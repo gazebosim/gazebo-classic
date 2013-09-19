@@ -183,17 +183,23 @@ LinkPtr DARTJoint::GetJointLink(int _index) const
 //////////////////////////////////////////////////
 bool DARTJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  //  DARTLinkPtr dartLink1 = boost::shared_dynamic_cast<DARTLink>(_one);
-  //  DARTLinkPtr dartLink2 = boost::shared_dynamic_cast<DARTLink>(_two);
+  bool res = false;
 
-  //  if (dartLink1 == NULL || dartLink2 == NULL)
-  //    gzthrow("DARTJoint requires DART bodies\n");
+  DARTLinkPtr dartLink1 = boost::shared_dynamic_cast<DARTLink>(_one);
+  DARTLinkPtr dartLink2 = boost::shared_dynamic_cast<DARTLink>(_two);
 
-  gzerr << "Not implemented...\n";
+  if (dartLink1 == NULL || dartLink2 == NULL)
+    gzthrow("DARTJoint requires DART bodies\n");
 
-  //  return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
-  return (this->childLink.get() == _one.get() && this->parentLink.get() == _two.get())
-      || (this->childLink.get() == _two.get() && this->parentLink.get() == _one.get());
+  if (this->dartJoint->getParentBodyNode() == dartLink1->getDARTBodyNode())
+    if (this->dartJoint->getChildBodyNode() == dartLink2->getDARTBodyNode())
+      res = true;
+
+  if (this->dartJoint->getParentBodyNode() == dartLink2->getDARTBodyNode())
+    if (this->dartJoint->getChildBodyNode() == dartLink1->getDARTBodyNode())
+      res = true;
+
+  return res;
 }
 
 //////////////////////////////////////////////////
