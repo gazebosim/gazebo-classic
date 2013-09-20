@@ -924,7 +924,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       {
         // Detach upper_joint.
         // joint->Detach();
-        // Simbody and DART will not easily detach joints, freeze joint limit instead
+        // Simbody and DART will not easily detach joints,
+        // freeze joint limit instead
         math::Angle curAngle = joint->GetAngle(0u);
         joint->SetLowStop(0, curAngle);
         joint->SetHighStop(0, curAngle);
@@ -1337,7 +1338,6 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
             EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
             EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
           }
-
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
