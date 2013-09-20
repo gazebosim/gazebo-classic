@@ -59,7 +59,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     _sdf->GetElement("physics")->HasElement("simbody"))
   {
     this->mustBreakLoopHere = _sdf->GetElement("physics")->
-      GetElement("simbody")->GetValueBool("must_be_loop_joint");
+      GetElement("simbody")->Get<bool>("must_be_loop_joint");
   }
 
   if (this->sdf->HasElement("axis"))
@@ -73,7 +73,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       /// \TODO: check all physics engines
       if (dynamicsElem->HasElement("damping"))
       {
-        this->dampingCoefficient = dynamicsElem->GetValueDouble("damping");
+        this->dampingCoefficient = dynamicsElem->Get<double>("damping");
       }
     }
   }
@@ -253,41 +253,25 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
+  math::Pose parentModelPose;
   if (this->parentLink)
-  {
-    math::Pose parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+    parentModelPose = this->parentLink->GetModel()->GetWorldPose();
 
-    // Set joint axis
-    // assuming incoming axis is defined in the model frame, so rotate them
-    // into the inertial frame
-    // TODO: switch so the incoming axis is defined in the child frame.
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
-    }
+  // Set joint axis
+  // assuming incoming axis is defined in the model frame, so rotate them
+  // into the inertial frame
+  // TODO: switch so the incoming axis is defined in the child frame.
+  math::Vector3 axis = parentModelPose.rot.RotateVector(
+    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
 
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, parentModelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
-    }
-  }
+  if (_index == 0)
+    this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
+  else if (_index == 1)
+    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(axis);
   else
-  {
-    // if parentLink is NULL, it's name be the world
-    this->sdf->GetElement("parent")->Set("world");
-    if (this->sdf->HasElement("axis"))
-    {
-      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
-    }
-    if (this->sdf->HasElement("axis2"))
-    {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-    }
-  }
+    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////
