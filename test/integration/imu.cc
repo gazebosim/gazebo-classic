@@ -211,6 +211,10 @@ TEST_P(ImuTest, EmptyWorldNoise)
 
 void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
+  // static models not fully working in simbody yet
+  if (_physicsEngine == "simbody")
+    return;
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
