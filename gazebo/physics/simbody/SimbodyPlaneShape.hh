@@ -55,7 +55,7 @@ namespace gazebo
               {
                 PlaneShape::CreatePlane();
                 SimbodyCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<SimbodyCollision>(
+                bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
                     this->collisionParent);
 
                 math::Vector3 n = this->GetNormal();

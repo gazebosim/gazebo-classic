@@ -48,7 +48,7 @@ SimbodyJoint::~SimbodyJoint()
 void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
   // store a pointer to the simbody physics engine for convenience
-  this->simbodyPhysics = boost::shared_dynamic_cast<SimbodyPhysics>(
+  this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
     this->model->GetWorld()->GetPhysicsEngine());
 
   Joint::Load(_sdf);
@@ -227,10 +227,10 @@ LinkPtr SimbodyJoint::GetJointLink(int _index) const
   if (_index == 0 || _index == 1)
   {
     SimbodyLinkPtr simbodyLink1 =
-      boost::shared_static_cast<SimbodyLink>(this->childLink);
+      boost::static_pointer_cast<SimbodyLink>(this->childLink);
 
     SimbodyLinkPtr simbodyLink2 =
-      boost::shared_static_cast<SimbodyLink>(this->parentLink);
+      boost::static_pointer_cast<SimbodyLink>(this->parentLink);
   }
 
   return result;

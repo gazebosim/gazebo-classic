@@ -295,7 +295,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
              jx != joints.end(); ++jx)
         {
           SimbodyJointPtr simbodyJoint =
-            boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+            boost::dynamic_pointer_cast<physics::SimbodyJoint>(*jx);
           simbodyJoint->SaveSimbodyState(currentState);
         }
 
@@ -304,7 +304,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
              lx != links.end(); ++lx)
         {
           SimbodyLinkPtr simbodyLink =
-            boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+            boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
           simbodyLink->SaveSimbodyState(currentState);
         }
       }
@@ -360,7 +360,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
            jx != joints.end(); ++jx)
       {
         SimbodyJointPtr simbodyJoint =
-          boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+          boost::dynamic_pointer_cast<physics::SimbodyJoint>(*jx);
         simbodyJoint->RestoreSimbodyState(state);
       }
       physics::Link_V links = (*mi)->GetLinks();
@@ -368,7 +368,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
            lx != links.end(); ++lx)
       {
         SimbodyLinkPtr simbodyLink =
-          boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+          boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
         simbodyLink->RestoreSimbodyState(state);
       }
     }
@@ -382,7 +382,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
-      boost::shared_dynamic_cast<physics::SimbodyLink>(*li);
+      boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
     if (simbodyLink)
       simbodyLink->SetGravityMode(simbodyLink->gravityMode);
     else
@@ -396,7 +396,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
-      boost::shared_dynamic_cast<physics::SimbodyLink>(*li);
+      boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
     if (simbodyLink)
       simbodyLink->physicsInitialized = true;
     else
@@ -410,7 +410,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
        ji != joints.end(); ++ji)
   {
     SimbodyJointPtr simbodyJoint =
-      boost::shared_dynamic_cast<SimbodyJoint>(*ji);
+      boost::dynamic_pointer_cast<SimbodyJoint>(*ji);
     if (simbodyJoint)
       simbodyJoint->physicsInitialized = true;
     else
@@ -476,12 +476,12 @@ void SimbodyPhysics::UpdatePhysics()
          lx != links.end(); ++lx)
     {
       physics::SimbodyLinkPtr simbodyLink =
-        boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+        boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
       math::Pose pose = SimbodyPhysics::Transform2Pose(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dirtyPoses.push_back(
-        boost::shared_static_cast<Entity>(*lx).get());
+        boost::static_pointer_cast<Entity>(*lx).get());
     }
 
     physics::Joint_V joints = (*mi)->GetJoints();
@@ -489,7 +489,7 @@ void SimbodyPhysics::UpdatePhysics()
          jx != joints.end(); ++jx)
     {
       SimbodyJointPtr simbodyJoint =
-        boost::shared_dynamic_cast<physics::SimbodyJoint>(*jx);
+        boost::dynamic_pointer_cast<physics::SimbodyJoint>(*jx);
       simbodyJoint->CacheForceTorque();
     }
   }
@@ -533,7 +533,7 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   SimbodyCollisionPtr collision =
-    boost::shared_dynamic_cast<SimbodyCollision>(_collision);
+    boost::dynamic_pointer_cast<SimbodyCollision>(_collision);
 
   if (_type == "plane")
     shape.reset(new SimbodyPlaneShape(collision));
@@ -654,7 +654,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   for (physics::Link_V::iterator li = links.begin();
        li != links.end(); ++li)
   {
-    SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
+    SimbodyLinkPtr simbodyLink = boost::dynamic_pointer_cast<SimbodyLink>(*li);
 
     // gzerr << "debug : " << (*li)->GetName() << "\n";
 
@@ -672,7 +672,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   for (physics::Joint_V::iterator ji = joints.begin();
        ji != joints.end(); ++ji)
   {
-    SimbodyJointPtr simbodyJoint = boost::shared_dynamic_cast<SimbodyJoint>(*ji);
+    SimbodyJointPtr simbodyJoint = boost::dynamic_pointer_cast<SimbodyJoint>(*ji);
     if (simbodyJoint)
       if ((*ji)->GetParent())
         _mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
@@ -723,7 +723,7 @@ void SimbodyPhysics::AddStaticModelToSimbodySystem(const physics::Model* _model)
   for (physics::Link_V::iterator li = links.begin();
        li != links.end(); ++li)
   {
-    SimbodyLinkPtr simbodyLink = boost::shared_dynamic_cast<SimbodyLink>(*li);
+    SimbodyLinkPtr simbodyLink = boost::dynamic_pointer_cast<SimbodyLink>(*li);
     if (simbodyLink)
     {
       this->AddCollisionsToLink(simbodyLink.get(), this->matter.updGround(),
@@ -961,7 +961,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
          lx != links.end(); ++lx)
     {
       physics::SimbodyLinkPtr link =
-        boost::shared_dynamic_cast<physics::SimbodyLink>(*lx);
+        boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
       if (link->slaveMobods.empty()) continue;
       for (unsigned i=0; i < link->slaveMobods.size(); ++i) {
           Constraint::Weld weld(link->masterMobod, link->slaveMobods[i]);
@@ -1088,7 +1088,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::PLANE_SHAPE:
       {
         boost::shared_ptr<physics::PlaneShape> p =
-          boost::shared_dynamic_cast<physics::PlaneShape>((*ci)->GetShape());
+          boost::dynamic_pointer_cast<physics::PlaneShape>((*ci)->GetShape());
 
         // Add a contact surface to represent the ground.
         // Half space normal is -x; must rotate about y to make it +z.
@@ -1115,7 +1115,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::SPHERE_SHAPE:
       {
         boost::shared_ptr<physics::SphereShape> s =
-          boost::shared_dynamic_cast<physics::SphereShape>((*ci)->GetShape());
+          boost::dynamic_pointer_cast<physics::SphereShape>((*ci)->GetShape());
         double r = s->GetRadius();
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
@@ -1127,7 +1127,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::CYLINDER_SHAPE:
       {
         boost::shared_ptr<physics::CylinderShape> c =
-          boost::shared_dynamic_cast<physics::CylinderShape>((*ci)->GetShape());
+          boost::dynamic_pointer_cast<physics::CylinderShape>((*ci)->GetShape());
         double r = c->GetRadius();
         double len = c->GetLength();
 
@@ -1150,7 +1150,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
       case physics::Entity::BOX_SHAPE:
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
-          (boost::shared_dynamic_cast<physics::BoxShape>(
+          (boost::dynamic_pointer_cast<physics::BoxShape>(
           (*ci)->GetShape()))->GetSize())/2;
 
         /// \TODO: make collision resolution an adjustable parameter

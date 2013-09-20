@@ -195,7 +195,7 @@ namespace gazebo
 
       public: static std::string GetTypeString(unsigned int _type)
       {
-        return SimbodyPhysics::GetTypeString(physics::Base::EntityType(_type));
+        return GetTypeString(physics::Base::EntityType(_type));
       }
 
       public: static std::string GetTypeString(physics::Base::EntityType _type);

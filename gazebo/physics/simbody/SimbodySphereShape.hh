@@ -62,7 +62,7 @@ namespace gazebo
 
                 SphereShape::SetRadius(_radius);
                 SimbodyCollisionPtr bParent;
-                bParent = boost::shared_dynamic_cast<SimbodyCollision>(
+                bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
                     this->collisionParent);
 
                 // set collision shape
