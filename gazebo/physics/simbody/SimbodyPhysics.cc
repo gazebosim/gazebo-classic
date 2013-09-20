@@ -332,7 +332,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
   catch (const std::exception& e)
   {
-      gzthrow(std::string("Simbody build EXCEPTION: ") + e.what());
+    gzthrow(std::string("Simbody build EXCEPTION: ") + e.what());
   }
 
   try
@@ -343,7 +343,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   }
   catch (const std::exception& e)
   {
-      gzthrow(std::string("Simbody init EXCEPTION: ") + e.what());
+    gzthrow(std::string("Simbody init EXCEPTION: ") + e.what());
   }
 
   SimTK::State state = this->system.realizeTopology();
@@ -676,7 +676,8 @@ void SimbodyPhysics::CreateMultibodyGraph(
   for (physics::Joint_V::iterator ji = joints.begin();
        ji != joints.end(); ++ji)
   {
-    SimbodyJointPtr simbodyJoint = boost::dynamic_pointer_cast<SimbodyJoint>(*ji);
+    SimbodyJointPtr simbodyJoint =
+      boost::dynamic_pointer_cast<SimbodyJoint>(*ji);
     if (simbodyJoint)
       if ((*ji)->GetParent())
         _mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
