@@ -306,27 +306,45 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
   const math::Vector3 &_offset,
   const math::Quaternion &_q) const
 {
-  SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
-  SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
-  SimTK::Vec3 p_W(R_WF * p_F);
-  const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
-    this->simbodyPhysics->integ->getState());
-  SimTK::Vec3 p_B(~R_WL * p_W);
-  SimTK::Vec3 v = 
-    this->masterMobod.findStationVelocityInGround(
-    this->simbodyPhysics->integ->getState(), p_B);
-  return SimbodyPhysics::Vec3ToVector3(v);
+  math::Vector3 v;
+
+  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
+    SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
+    SimTK::Vec3 p_W(R_WF * p_F);
+    const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
+      this->simbodyPhysics->integ->getState());
+    SimTK::Vec3 p_B(~R_WL * p_W);
+    v = SimbodyPhysics::Vec3ToVector3(
+      this->masterMobod.findStationVelocityInGround(
+      this->simbodyPhysics->integ->getState(), p_B));
+  }
+  else
+    gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
+           << " not yet initialized\n";
+
+  return v;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 {
-  SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
-     this->simbodyPhysics->integ->getState());
-  SimTK::Vec3 v = 
-    this->masterMobod.findStationVelocityInGround(
-    this->simbodyPhysics->integ->getState(), station);
-  return SimbodyPhysics::Vec3ToVector3(v);
+  math::Vector3 v;
+
+  if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
+       this->simbodyPhysics->integ->getState());
+    v = SimbodyPhysics::Vec3ToVector3(
+      this->masterMobod.findStationVelocityInGround(
+      this->simbodyPhysics->integ->getState(), station));
+  }
+  else
+    gzwarn << "SimbodyLink::GetWorldCoGLinearVel: simbody physics"
+           << " not yet initialized\n";
+
+  return v;
 }
 
 //////////////////////////////////////////////////
