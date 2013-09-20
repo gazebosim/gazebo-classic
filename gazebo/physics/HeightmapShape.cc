@@ -77,7 +77,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
+  std::string filename = common::FindFile(this->sdf->Get<std::string>("uri"));
   if (filename.empty())
   {
     gzthrow("Unable to find heightmap[" +

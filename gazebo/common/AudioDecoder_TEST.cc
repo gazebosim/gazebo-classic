@@ -56,7 +56,7 @@ TEST(AudioDecoder, BufferSizeInvalid)
   common::AudioDecoder audio;
   boost::filesystem::path path;
 
-  common::load();
+  common::Load();
 
   path = PROJECT_SOURCE_PATH;
   path /= "media/audio/cheer.wav";
@@ -73,7 +73,7 @@ TEST(AudioDecoder, DataBuffer)
   boost::filesystem::path path;
   common::AudioDecoder audio;
 
-  common::load();
+  common::Load();
 
   path = PROJECT_SOURCE_PATH;
   path /= "media/audio/cheer.wav";
@@ -94,7 +94,7 @@ TEST(AudioDecoder, DataBuffer)
 /////////////////////////////////////////////////
 TEST(AudioDecoder, NoCodec)
 {
-  common::load();
+  common::Load();
   common::AudioDecoder audio;
   boost::filesystem::path path;
 
@@ -106,7 +106,7 @@ TEST(AudioDecoder, NoCodec)
 /////////////////////////////////////////////////
 TEST(AudioDecoder, CheerFile)
 {
-  common::load();
+  common::Load();
   common::AudioDecoder audio;
   boost::filesystem::path path;
 

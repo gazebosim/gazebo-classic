@@ -45,7 +45,7 @@ BVHLoader::~BVHLoader()
 /////////////////////////////////////////////////
 Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
 {
-  std::string fullname = common::find_file(_filename);
+  std::string fullname = common::FindFile(_filename);
 
   Skeleton *skeleton = NULL;
   std::ifstream file;

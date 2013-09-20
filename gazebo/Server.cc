@@ -272,7 +272,7 @@ bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
   // Quick test for a valid file
-  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
+  FILE *test = fopen(common::FindFile(_filename).c_str(), "r");
   if (!test)
   {
     gzerr << "Could not open file[" << _filename << "]\n";
@@ -288,7 +288,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(common::find_file(_filename), sdf))
+  if (!sdf::readFile(common::FindFile(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;

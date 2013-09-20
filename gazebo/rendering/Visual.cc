@@ -1453,7 +1453,7 @@ std::string Visual::GetNormalMap() const
   std::string file = this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->Get<std::string>();
 
-  std::string uriFile = common::find_file(file);
+  std::string uriFile = common::FindFile(file);
   if (!uriFile.empty())
     file = uriFile;
 
@@ -2115,7 +2115,7 @@ std::string Visual::GetMeshName() const
         return std::string();
       }
 
-      filename = common::find_file(uri);
+      filename = common::FindFile(uri);
 
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";

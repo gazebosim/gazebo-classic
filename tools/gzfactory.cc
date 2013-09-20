@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+  sdf::setFindCallback(boost::bind(&gazebo::common::FindFile, _1));
 
   if (vm.count("command"))
   {

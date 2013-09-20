@@ -49,7 +49,7 @@ Image::Image(const std::string &_filename)
   this->bitmap = NULL;
   if (!_filename.empty())
   {
-    std::string filename = common::find_file(_filename);
+    std::string filename = common::FindFile(_filename);
     if (!filename.empty())
       this->Load(filename);
     else
@@ -75,7 +75,7 @@ int Image::Load(const std::string &_filename)
 {
   this->fullName = _filename;
   if (!boost::filesystem::exists(boost::filesystem::path(this->fullName)))
-    this->fullName = common::find_file(_filename);
+    this->fullName = common::FindFile(_filename);
 
   if (boost::filesystem::exists(boost::filesystem::path(this->fullName)))
   {

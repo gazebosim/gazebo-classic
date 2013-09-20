@@ -57,7 +57,7 @@ void MeshShape::Init()
 
   if (!this->mesh)
   {
-    meshStr = common::find_file(this->sdf->Get<std::string>("uri"));
+    meshStr = common::FindFile(this->sdf->Get<std::string>("uri"));
 
     if (meshStr == "__default__" || meshStr.empty())
     {

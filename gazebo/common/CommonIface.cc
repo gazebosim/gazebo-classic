@@ -31,7 +31,7 @@ extern "C" {
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-void common::load()
+void common::Load()
 {
 #ifdef HAVE_FFMPEG
   static bool first = true;
@@ -45,27 +45,27 @@ void common::load()
 }
 
 /////////////////////////////////////////////////
-void common::add_search_path_suffix(const std::string &_suffix)
+void common::AddSearchPathSuffix(const std::string &_suffix)
 {
   common::SystemPaths::Instance()->AddSearchPathSuffix(_suffix);
 }
 
 /////////////////////////////////////////////////
-std::string common::find_file(const std::string &_file)
+std::string common::FindFile(const std::string &_file)
 {
   return common::SystemPaths::Instance()->FindFile(_file, true);
 }
 
 /////////////////////////////////////////////////
-std::string common::find_file(const std::string &_file, bool _searchLocalPath)
+std::string common::FindFile(const std::string &_file, bool _searchLocalPath)
 {
   return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////
-std::string common::find_file_path(const std::string &_file)
+std::string common::FindFilePath(const std::string &_file)
 {
-  std::string filepath = common::find_file(_file);
+  std::string filepath = common::FindFile(_file);
 
   boost::filesystem::path path(filepath);
   if (boost::filesystem::is_directory(path))

@@ -109,7 +109,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     */
   }
 
-  std::string fullname = common::find_file(_filename);
+  std::string fullname = common::FindFile(_filename);
 
   if (!fullname.empty())
   {

@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
   // We must set the findFile callback here so that gzsdf check/print
   // can find resource files when parsing the sdf in readFile().
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+  sdf::setFindCallback(boost::bind(&gazebo::common::FindFile, _1));
 
   if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {

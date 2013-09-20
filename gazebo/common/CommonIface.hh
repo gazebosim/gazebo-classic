@@ -28,26 +28,26 @@ namespace gazebo
     /// \{
 
     /// \brief Load the common library.
-    void load();
+    void Load();
 
     /// \brief add path prefix to common::SystemPaths
-    void add_search_path_suffix(const std::string &_suffix);
+    void AddSearchPathSuffix(const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
-    std::string find_file(const std::string &_file);
+    std::string FindFile(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
-    std::string find_file(const std::string &_file,
+    std::string FindFile(const std::string &_file,
                           bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for
     /// \return The path containing the file
-    std::string find_file_path(const std::string &_file);
+    std::string FindFilePath(const std::string &_file);
 
     /// \}
   }

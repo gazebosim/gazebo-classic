@@ -30,7 +30,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 TEST(OpenAL, SourceInvalid)
 {
-  common::load();
+  common::Load();
   util::OpenALSourcePtr source;
   EXPECT_EQ(util::OpenAL::Instance()->CreateSource(sdf::ElementPtr()), source);
 
@@ -39,7 +39,7 @@ TEST(OpenAL, SourceInvalid)
 /////////////////////////////////////////////////
 TEST(OpenAL, DefaultDevice)
 {
-  common::load();
+  common::Load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("world.sdf", sdf->root);
@@ -61,7 +61,7 @@ TEST(OpenAL, DefaultDevice)
 /////////////////////////////////////////////////
 TEST(OpenAL, NonDefaultDevice)
 {
-  common::load();
+  common::Load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("world.sdf", sdf->root);
@@ -82,7 +82,7 @@ TEST(OpenAL, NonDefaultDevice)
 /////////////////////////////////////////////////
 TEST(OpenAL, BadSDF)
 {
-  common::load();
+  common::Load();
   util::OpenALSourcePtr source;
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -99,7 +99,7 @@ TEST(OpenAL, BadSDF)
 /////////////////////////////////////////////////
 TEST(OpenAL, BadValues)
 {
-  common::load();
+  common::Load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -135,7 +135,7 @@ TEST(OpenAL, BadValues)
 TEST(OpenAL, SourcePlay)
 {
   util::OpenALSourcePtr source;
-  common::load();
+  common::Load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -200,7 +200,7 @@ TEST(OpenAL, SourcePlay)
 TEST(OpenAL, SourceVelPose)
 {
   util::OpenALSourcePtr source;
-  common::load();
+  common::Load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("audio_source.sdf", sdf->root);
@@ -228,7 +228,7 @@ TEST(OpenAL, SourceVelPose)
 /////////////////////////////////////////////////
 TEST(OpenAL, Sourcevalid)
 {
-  common::load();
+  common::Load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -279,7 +279,7 @@ TEST(OpenAL, SinkCreate)
 {
   util::OpenALSinkPtr sink1;
   util::OpenALSinkPtr sink2;
-  common::load();
+  common::Load();
 
   sink1 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   sink2 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
@@ -295,7 +295,7 @@ TEST(OpenAL, SinkCreate)
 TEST(OpenAL, SinkVelPose)
 {
   util::OpenALSinkPtr sink;
-  common::load();
+  common::Load();
 
   sink = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   EXPECT_TRUE(sink != NULL);

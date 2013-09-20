@@ -488,7 +488,7 @@ bool OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
 /////////////////////////////////////////////////
 void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 {
-  std::string fullPathAudioFile = common::find_file(_audioFile);
+  std::string fullPathAudioFile = common::FindFile(_audioFile);
 
   // Try to open the audio file in the current directory
   FILE *testFile = fopen(fullPathAudioFile.c_str(), "r");

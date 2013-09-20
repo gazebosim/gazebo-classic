@@ -95,9 +95,9 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(common::find_file(
+    this->diffuseTextures.push_back(common::FindFile(
         _msg->geometry().heightmap().texture(i).diffuse()));
-    this->normalTextures.push_back(common::find_file(
+    this->normalTextures.push_back(common::FindFile(
         _msg->geometry().heightmap().texture(i).normal()));
     this->worldSizes.push_back(
         _msg->geometry().heightmap().texture(i).size());

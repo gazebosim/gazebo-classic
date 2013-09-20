@@ -407,7 +407,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
   if (_uri == "__default__" || _uri.empty())
     return;
 
-  std::string path = common::find_file_path(_uri);
+  std::string path = common::FindFilePath(_uri);
 
   if (path.empty())
   {
