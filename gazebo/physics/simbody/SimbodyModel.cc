@@ -83,7 +83,15 @@ void SimbodyModel::Init()
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    (*iter)->Init();
+    try
+    {
+      (*iter)->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Init joint failed" << std::endl;
+      return;
+    }
   }
 
   // Initialize the joints messages for visualizer
