@@ -32,10 +32,11 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHinge2Joint::SimbodyHinge2Joint(SimTK::MultibodySystem *_world,
+SimbodyHinge2Joint::SimbodyHinge2Joint(SimTK::MultibodySystem * /*_world*/,
                                        BasePtr _parent)
     : Hinge2Joint<SimbodyJoint>(_parent)
 {
+  this->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////

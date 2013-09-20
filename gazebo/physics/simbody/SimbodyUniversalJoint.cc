@@ -29,9 +29,10 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyUniversalJoint::SimbodyUniversalJoint(SimTK::MultibodySystem *_world,
+SimbodyUniversalJoint::SimbodyUniversalJoint(SimTK::MultibodySystem* /*_world*/,
   BasePtr _parent) : UniversalJoint<SimbodyJoint>(_parent)
 {
+  this->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -58,7 +59,7 @@ math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAxis(int _index) const
+math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
 {
   return math::Vector3();
 }
@@ -77,7 +78,7 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetAngle(int _index) const
+math::Angle SimbodyUniversalJoint::GetAngle(int /*_index*/) const
 {
   return math::Angle();
 }
@@ -115,19 +116,21 @@ double SimbodyUniversalJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
+void SimbodyUniversalJoint::SetHighStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
+void SimbodyUniversalJoint::SetLowStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
+math::Angle SimbodyUniversalJoint::GetHighStop(int /*_index*/)
 {
   math::Angle result;
   gzerr << "Not implemented\n";
@@ -135,7 +138,7 @@ math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetLowStop(int _index)
+math::Angle SimbodyUniversalJoint::GetLowStop(int /*_index*/)
 {
   math::Angle result;
   gzerr << "Not implemented\n";
