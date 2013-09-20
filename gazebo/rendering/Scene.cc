@@ -2790,3 +2790,14 @@ void Scene::SetSkyXMode(unsigned int _mode)
   this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
   this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
 }
+
+/////////////////////////////////////////////////
+void Scene::RemoveProjectors()
+{
+  for(std::map<std::string, Projector *>::iterator iter =
+      this->projectors.begin(); iter != this->projectors.end(); ++iter)
+  {
+    delete iter->second;
+  }
+  this->projectors.clear();
+}

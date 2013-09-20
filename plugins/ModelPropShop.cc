@@ -37,6 +37,9 @@ ModelPropShop::~ModelPropShop()
 /////////////////////////////////////////////
 void ModelPropShop::Load(int _argc, char **_argv)
 {
+  // Turn off sensors.
+  gazebo::sensors::disable();
+
   po::options_description v_desc("Options");
   v_desc.add_options()
     ("propshop-save", po::value<std::string>(),
@@ -106,10 +109,6 @@ void ModelPropShop::Init()
   this->updateConn = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this));
 
-  // Turn off sensors.
-  gazebo::sensors::stop();
-  gazebo::sensors::fini();
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->pub = this->node->Advertise<msgs::ServerControl>(
@@ -150,9 +149,11 @@ void ModelPropShop::Update()
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
   }
 
-  event::Events::preRender();
+  if (this->camera && this->scene)
+    event::Events::preRender();
 
-  if (this->scene->GetInitialized())
+  if (this->camera && this->scene->GetInitialized() &&
+      this->camera->GetInitialized())
   {
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
@@ -182,7 +183,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(this->savePath / "top_view.png");
+      this->camera->SaveFrame((this->savePath / "top_view.png").string());
 
       // Front view
       pose.pos.Set(1.8, 0, 0);
@@ -191,7 +192,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(this->savePath / "front_view.png");
+      this->camera->SaveFrame((this->savePath / "front_view.png").string());
 
       // Side view
       pose.pos.Set(0, 1.8, 0);
@@ -200,7 +201,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(this->savePath / "side_view.png");
+      this->camera->SaveFrame((this->savePath / "side_view.png").string());
 
       // Back view
       pose.pos.Set(-1.8, 0, 0);
@@ -209,7 +210,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(this->savePath / "back_view.png");
+      this->camera->SaveFrame((this->savePath / "back_view.png").string());
 
       // Perspective view
       pose.pos.Set(0.9, -0.9, 0.9);
@@ -218,7 +219,8 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame(this->savePath / "perspective_view.png");
+      this->camera->SaveFrame(
+          (this->savePath / "perspective_view.png").string());
 
       event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
