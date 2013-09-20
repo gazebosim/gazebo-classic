@@ -259,19 +259,6 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 std::string ContactManager::CreateFilter(const std::string &_name,
     const std::map<std::string, physics::CollisionPtr> &_collisions)
 {
-  std::vector<std::string> collisions;
-  for (std::map<std::string, physics::CollisionPtr>::const_iterator iter =
-      _collisions.begin(); iter != _collisions.end(); ++iter)
-  {
-    collisions.push_back(iter->first);
-  }
-  return this->CreateFilter(_name, collisions);
-}
-
-/////////////////////////////////////////////////
-std::string ContactManager::CreateFilter(const std::string &_name,
-    const std::vector<std::string> &_collisions)
-{
   if (_collisions.empty())
     return "";
 
@@ -293,25 +280,56 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
-  contactPublisher->collisionNames = _collisions;
-  // convert collision names to pointers
-  std::vector<std::string>::iterator iter;
-  for (iter = contactPublisher->collisionNames.begin();
-      iter != contactPublisher->collisionNames.end();)
+
+  std::map<std::string, physics::CollisionPtr>::const_iterator iter;
+  for (iter = _collisions.begin(); iter != _collisions.end(); ++iter)
   {
-    Collision *col = boost::dynamic_pointer_cast<Collision>(
-       this->world->GetByName(*iter)).get();
-    if (!col)
-    {
-      ++iter;
-      continue;
-    }
-    else
-      iter = contactPublisher->collisionNames.erase(iter);
-    contactPublisher->collisions.insert(col);
+    Collision *col = iter->second.get();
+    if (col)
+      contactPublisher->collisions.insert(col);
   }
 
   this->customContactPublishers[name] = contactPublisher;
+
+  return topic;
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::vector<std::string> &_collisions)
+{
+  if (_collisions.empty())
+    return "";
+
+  std::map<std::string, physics::CollisionPtr> collisionMap;
+
+  // some collisions may not be loaded yet, so store their names in
+  // collisionNames and try to find them later.
+  std::vector<std::string> collisionNames;
+  for (unsigned int i = 0; i < _collisions.size(); ++i)
+  {
+    CollisionPtr colPtr = boost::dynamic_pointer_cast<Collision>(
+       this->world->GetByName(_collisions[i]));
+    if (colPtr)
+    {
+      collisionMap[_collisions[i]] = colPtr;
+    }
+    else
+    {
+      collisionNames.push_back(_collisions[i]);
+    }
+  }
+
+  std::string topic  = this->CreateFilter(_name, collisionMap);
+
+  // The filter should be created in the last call.
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+  GZ_ASSERT(this->customContactPublishers.count(name) > 0,
+      "Failed to create a custom filter");
+
+  // Let it know about collisions not yet found.
+  this->customContactPublishers[name]->collisionNames = collisionNames;
 
   return topic;
 }
