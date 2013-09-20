@@ -53,5 +53,5 @@ void SimbodyMeshShape::Init()
   MeshShape::Init();
 
   SimbodyCollisionPtr bParent =
-    boost::shared_static_cast<SimbodyCollision>(this->collisionParent);
+    boost::static_pointer_cast<SimbodyCollision>(this->collisionParent);
 }
