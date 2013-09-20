@@ -122,26 +122,28 @@ double SimbodyHinge2Joint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
+void SimbodyHinge2Joint::SetHighStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
+void SimbodyHinge2Joint::SetLowStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetHighStop(int _index)
+math::Angle SimbodyHinge2Joint::GetHighStop(int /*_index*/)
 {
   gzerr << "Not implemented";
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetLowStop(int _index)
+math::Angle SimbodyHinge2Joint::GetLowStop(int /*_index*/)
 {
   gzerr << "Not implemented";
   return math::Angle();
