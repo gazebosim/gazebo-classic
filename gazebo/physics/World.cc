@@ -1191,7 +1191,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 //////////////////////////////////////////////////
 /*void World::ModelUpdateTBB()
 {
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
+  tbb::parallel_for (tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models));
 }*/
 

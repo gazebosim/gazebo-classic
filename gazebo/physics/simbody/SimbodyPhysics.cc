@@ -274,7 +274,6 @@ void SimbodyPhysics::Init()
 //////////////////////////////////////////////////
 void SimbodyPhysics::InitModel(const physics::Model* _model)
 {
-
   // Before building a new system, transfer all joints in existing
   // models, save Simbody joint states in Gazebo Model.
   const SimTK::State& currentState = this->integ->getState();
@@ -312,7 +311,8 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
     simbodyStateSaved = true;
   }
 
-  try {
+  try
+  {
     //------------------------ CREATE SIMBODY SYSTEM ---------------------------
     // Add to Simbody System and populate it with new links and joints
     if (_model->IsStatic())
@@ -329,16 +329,20 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
 
       SimbodyPhysics::AddDynamicModelToSimbodySystem(mbgraph, _model);
     }
-
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e)
+  {
       gzthrow(std::string("Simbody build EXCEPTION: ") + e.what());
   }
 
-  try {
+  try
+  {
     //------------------------ CREATE SIMBODY SYSTEM ---------------------------
     // Create a Simbody System and populate it with Subsystems we'll need.
     SimbodyPhysics::InitSimbodySystem();
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e)
+  {
       gzthrow(std::string("Simbody init EXCEPTION: ") + e.what());
   }
 
@@ -379,7 +383,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
 
   // set gravity mode
   Link_V links = _model->GetLinks();
-  for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
+  for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
       boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
@@ -393,7 +397,7 @@ void SimbodyPhysics::InitModel(const physics::Model* _model)
   this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
 
   // mark links as initialized
-  for(Link_V::iterator li = links.begin(); li != links.end(); ++li)
+  for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
       boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);

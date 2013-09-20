@@ -200,10 +200,10 @@ void SimbodyLink::SaveSimbodyState(const SimTK::State &_state)
     if (this->simbodyU.empty())
       this->simbodyU.resize(this->masterMobod.getNumU(_state));
 
-    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
+    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->simbodyQ[i] = this->masterMobod.getOneQ(_state, i);
 
-    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
+    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
   }
   else
@@ -219,10 +219,10 @@ void SimbodyLink::RestoreSimbodyState(SimTK::State &_state)
   if (!this->masterMobod.isEmptyHandle() &&
       SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
   {
-    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
+    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->masterMobod.setOneQ(_state, i, this->simbodyQ[i]);
 
-    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
+    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->masterMobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else

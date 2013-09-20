@@ -104,7 +104,10 @@ namespace gazebo
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &/*_key*/,
                                                 unsigned int /*_index*/)
-              {gzdbg << "Not implement in Simbody\n"; return 0;}
+              {
+                gzdbg << "Not implement in Simbody\n";
+                return 0;
+              }
 
 
       // Save current Simbody State
@@ -149,9 +152,9 @@ namespace gazebo
       public: bool mustBreakLoopHere;
 
       // Normally A=F, B=M. But if reversed, then B=F, A=M.
-      public: SimTK::Transform    X_PA; // parent body frame to mobilizer frame
-      public: SimTK::Transform    X_CB; // child body frame to mobilizer frame
-      public: SimTK::Transform defX_AB; // default mobilizer pose
+      public: SimTK::Transform    X_PA;  // parent body frame to mobilizer frame
+      public: SimTK::Transform    X_CB;  // child body frame to mobilizer frame
+      public: SimTK::Transform defX_AB;  // default mobilizer pose
 
       // Members below here are set when we build the Simbody model.
 
