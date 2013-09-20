@@ -36,7 +36,7 @@ namespace gazebo
     private: void Update();
 
     /// \brief The connections.
-    private: std::vector<event::ConnectionPtr> connections;
+    private: event::ConnectionPtr updateConn;
 
     /// \brief Node for communication.
     private: transport::NodePtr node;
@@ -44,10 +44,20 @@ namespace gazebo
     /// \brief Publisher used to stop the server.
     private: transport::PublisherPtr pub;
 
+    /// \brief Publisher used to spawn the model.
+    private: transport::PublisherPtr factoryPub;
+
     /// \brief Pointer to the scene.
     private: rendering::ScenePtr scene;
 
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
+
+    private: boost::shared_ptr<sdf::SDF> sdf;
+
+    private: std::string modelName;
+
+    /// \brief Path in which to save the output images.
+    private: boost::filesystem::path savePath;
   };
 }

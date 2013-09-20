@@ -8,34 +8,5 @@
       <grid>false</grid>
       <sky>false</sky>
     </scene>
-
-    <include>
-      <uri>model://pr2</uri>
-    </include>
-    <!--
-    <model name="box">
-      <pose>0 0 0.5 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
-        </visual>
-      </link>
-    </model>
--->
-
   </world>
 </sdf>

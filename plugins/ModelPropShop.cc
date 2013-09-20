@@ -14,12 +14,15 @@
  * limitations under the License.
  *
 */
+#include <boost/program_options.hpp>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "ModelPropShop.hh"
 
 using namespace gazebo;
+namespace po = boost::program_options;
 
 // Register this plugin with the simulator
 GZ_REGISTER_SYSTEM_PLUGIN(ModelPropShop)
@@ -32,16 +35,76 @@ ModelPropShop::~ModelPropShop()
 }
 
 /////////////////////////////////////////////
-void ModelPropShop::Load(int /*_argc*/, char ** /*_argv*/)
+void ModelPropShop::Load(int _argc, char **_argv)
 {
+  po::options_description v_desc("Options");
+  v_desc.add_options()
+    ("propshop-save", po::value<std::string>(),
+     "Path to save image files into.")
+    ("propshop-model", po::value<std::string>(), "Model to spawn.");
+
+  po::options_description desc("Options");
+  desc.add(v_desc);
+
+  po::variables_map vm;
+  try
+  {
+    po::store(po::command_line_parser(_argc, _argv).options(
+          desc).allow_unregistered().run(), vm);
+    po::notify(vm);
+  } catch(boost::exception &_e)
+  {
+    std::cerr << "Error. Invalid arguments\n";
+    return;
+  }
+
+  // Get the directory in which to save the images.
+  if (vm.count("propshop-save"))
+  {
+    this->savePath = boost::filesystem::path(
+        vm["propshop-save"].as<std::string>());
+    if (!boost::filesystem::exists(this->savePath))
+      boost::filesystem::create_directories(this->savePath);
+  }
+  else
+    this->savePath = boost::filesystem::temp_directory_path();
+
+  std::string modelFile;
+
+  if (vm.count("propshop-model"))
+    modelFile = vm["propshop-model"].as<std::string>();
+  else
+    return;
+
+  std::ifstream ifs(modelFile.c_str());
+  if (!ifs)
+  {
+    std::cerr << "Error: Unable to open file[" << modelFile << "]\n";
+    return;
+  }
+
+  this->sdf.reset(new sdf::SDF());
+  if (!sdf::init(this->sdf))
+  {
+    std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
+    return;
+  }
+
+  if (!sdf::readFile(modelFile, this->sdf))
+  {
+    std::cerr << "Error: SDF parsing the xml failed\n";
+    return;
+  }
+
+  sdf::ElementPtr modelElem = this->sdf->root->GetElement("model");
+  this->modelName = modelElem->Get<std::string>("name");
 }
 
 /////////////////////////////////////////////
 void ModelPropShop::Init()
 {
-  this->connections.push_back(
-      event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&ModelPropShop::Update, this)));
+  this->updateConn = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&ModelPropShop::Update, this));
 
   // Turn off sensors.
   gazebo::sensors::stop();
@@ -51,6 +114,16 @@ void ModelPropShop::Init()
   this->node->Init();
   this->pub = this->node->Advertise<msgs::ServerControl>(
       "/gazebo/server/control");
+
+  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->factoryPub->WaitForConnection();
+
+  if (this->sdf)
+  {
+    msgs::Factory msg;
+    msg.set_sdf(this->sdf->ToString());
+    this->factoryPub->Publish(msg, true);
+  }
 }
 
 /////////////////////////////////////////////
@@ -65,7 +138,6 @@ void ModelPropShop::Update()
 
     sdf::ElementPtr cameraSDF(new sdf::Element);
     sdf::initFile("camera.sdf", cameraSDF);
-
 
     this->scene = rendering::create_scene("default", false, true);
     this->camera = this->scene->CreateCamera("propshopcamera", false);
@@ -82,7 +154,7 @@ void ModelPropShop::Update()
 
   if (this->scene->GetInitialized())
   {
-    rendering::VisualPtr vis = this->scene->GetVisual("pr2");
+    rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
       math::Box bbox = vis->GetBoundingBox();
@@ -110,7 +182,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame("/tmp/top_view.png");
+      this->camera->SaveFrame(this->savePath / "top_view.png");
 
       // Front view
       pose.pos.Set(1.8, 0, 0);
@@ -119,7 +191,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame("/tmp/front_view.png");
+      this->camera->SaveFrame(this->savePath / "front_view.png");
 
       // Side view
       pose.pos.Set(0, 1.8, 0);
@@ -128,7 +200,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame("/tmp/side_view.png");
+      this->camera->SaveFrame(this->savePath / "side_view.png");
 
       // Back view
       pose.pos.Set(-1.8, 0, 0);
@@ -137,7 +209,7 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame("/tmp/back_view.png");
+      this->camera->SaveFrame(this->savePath / "back_view.png");
 
       // Perspective view
       pose.pos.Set(0.9, -0.9, 0.9);
@@ -146,7 +218,10 @@ void ModelPropShop::Update()
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
-      this->camera->SaveFrame("/tmp/perspective_view.png");
+      this->camera->SaveFrame(this->savePath / "perspective_view.png");
+
+      event::Events::DisconnectWorldUpdateBegin(this->updateConn);
+      this->updateConn.reset();
 
       // Clean up the camera.
       this->camera.reset();
