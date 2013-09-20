@@ -108,12 +108,10 @@ namespace gazebo
 
 
       // Save current Simbody State
-      public: virtual void SaveSimbodyState(const SimTK::State &_state)
-      {}
+      public: virtual void SaveSimbodyState(const SimTK::State &_state);
 
       // Restore saved Simbody State
-      public: virtual void RestoreSimbodyState(SimTK::State &_state)
-      {}
+      public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;

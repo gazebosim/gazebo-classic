@@ -344,3 +344,15 @@ void SimbodyJoint::SaveForce(int _index, double _force)
           << "] index [" << _index
           << "] out of range.\n";
 }
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SaveSimbodyState(const SimTK::State &/*_state*/)
+{
+  // Not implemented
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
+{
+  // Not implemented
+}
