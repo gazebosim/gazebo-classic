@@ -68,7 +68,7 @@ TEST_F(GripperTest, Grasp)
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
   {
-    common::Time::MSleep(200);
+    common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
@@ -88,7 +88,7 @@ TEST_F(GripperTest, Grasp)
   i = 0;
   while (gripper->IsAttached() && i < 100)
   {
-    common::Time::MSleep(200);
+    common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
