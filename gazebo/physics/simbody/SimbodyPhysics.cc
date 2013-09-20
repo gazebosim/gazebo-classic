@@ -772,12 +772,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     // note: do not use boost shared pointer here, on scope out the
     // original pointer get scrambled
     SimbodyLink* gzInb = static_cast<SimbodyLink*>(mob.getInboardBodyRef());
-    SimbodyLink* gzOutb = static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
+    SimbodyLink* gzOutb =
+      static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
     const MassProperties massProps =
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());
 
-/* debug
+    /* debug
     if (gzInb)
       gzerr << "debug: Inb: " << gzInb->GetName() << "\n";
     if (gzOutb)
@@ -785,7 +786,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             << " mass: " << gzOutb->GetInertial()->GetMass()
             << " efm: " << massProps
             << "\n";
-*/
+    */
 
     // This will reference the new mobilized body once we create it.
     MobilizedBody mobod;
@@ -797,7 +798,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // There is no corresponding Gazebo joint for this mobilizer.
         // Create the joint and set its default position to be the default
         // pose of the base link relative to the Ground frame.
-        assert(type=="free"); // May add more types later
+        assert(type=="free");  // May add more types later
         if (type == "free") {
             MobilizedBody::Free freeJoint(
                 parentMobod,  Transform(),
@@ -850,7 +851,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         } else if (type == "revolute") {
             UnitVec3 axis(
               SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
-            Rotation R_JZ(axis, ZAxis); // Simbody's pin is along Z
+            Rotation R_JZ(axis, ZAxis);  // Simbody's pin is along Z
             Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
             Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
             MobilizedBody::Pin pinJoint(
@@ -882,18 +883,18 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             // is zero.  This will allow user to change damping coefficients
             // on the fly.
             gzJoint->damper =
-              Force::MobilityLinearDamper(this->forces,mobod,0,
+              Force::MobilityLinearDamper(this->forces, mobod, 0,
                                        gzJoint->GetDampingCoefficient());
 
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
-            Force::MobilityLinearSpring(this->forces,mobod,0,
-                                        30*massProps.getMass(),0);
+            Force::MobilityLinearSpring(this->forces, mobod, 0,
+                                        30*massProps.getMass(), 0);
             #endif
         } else if (type == "prismatic") {
             UnitVec3 axis(
               SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
-            Rotation R_JX(axis, XAxis); // Simbody's slider is along X
+            Rotation R_JX(axis, XAxis);  // Simbody's slider is along X
             Transform X_IF(X_IF0.R()*R_JX, X_IF0.p());
             Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
             MobilizedBody::Slider sliderJoint(
@@ -920,13 +921,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             // is zero.  This will allow user to change damping coefficients
             // on the fly.
             gzJoint->damper =
-              Force::MobilityLinearDamper(this->forces,mobod,0,
+              Force::MobilityLinearDamper(this->forces, mobod, 0,
                                        gzJoint->GetDampingCoefficient());
 
             #ifdef ADD_JOINT_SPRINGS
             // KLUDGE add spring (stiffness proportional to mass)
-            Force::MobilityLinearSpring(this->forces,mobod,0,
-                                        30*massProps.getMass(),0);
+            Force::MobilityLinearSpring(this->forces, mobod, 0,
+                                        30*massProps.getMass(), 0);
             #endif
         } else if (type == "ball") {
             MobilizedBody::Ball ballJoint(
@@ -970,7 +971,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       if (link->slaveMobods.empty()) continue;
       for (unsigned i=0; i < link->slaveMobods.size(); ++i) {
           Constraint::Weld weld(link->masterMobod, link->slaveMobods[i]);
-          link->slaveWelds.push_back(weld); // in case we want to know later
+          link->slaveWelds.push_back(weld);  // in case we want to know later
       }
     }
   }
@@ -1097,7 +1098,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
 
         // Add a contact surface to represent the ground.
         // Half space normal is -x; must rotate about y to make it +z.
-        this->matter.Ground().updBody().addContactSurface(Rotation(Pi/2,YAxis),
+        this->matter.Ground().updBody().addContactSurface(Rotation(Pi/2, YAxis),
            ContactSurface(ContactGeometry::HalfSpace(), material));
 
         Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
@@ -1136,13 +1137,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
         double r = c->GetRadius();
         double len = c->GetLength();
 
-        const int resolution = 1; // chunky hexagonal shape
+        const int resolution = 1;  // chunky hexagonal shape
         const PolygonalMesh mesh = PolygonalMesh::
-            createCylinderMesh(ZAxis,r,len/2,resolution);
+            createCylinderMesh(ZAxis, r, len/2, resolution);
         const ContactGeometry::TriangleMesh triMesh(mesh);
-        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+        ContactSurface surface(triMesh, material, 1 /*Thickness*/);
 
-        // Vec3 esz = Vec3(r,r,len/2); // Use ellipsoid instead
+        // Vec3 esz = Vec3(r, r, len/2);  // Use ellipsoid instead
         // ContactSurface surface(ContactGeometry::Ellipsoid(esz),
         //                        material);
 
@@ -1164,7 +1165,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink* _link,
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);
         const ContactGeometry::TriangleMesh triMesh(mesh);
-        ContactSurface surface(triMesh, material,1 /*Thickness*/);
+        ContactSurface surface(triMesh, material, 1 /*Thickness*/);
 
         // ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
         //                        material);

@@ -82,10 +82,8 @@ void SimbodyLink::Init()
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
-
     }
   }
-
 
   // Create a construction info object
   // Create the new rigid body
@@ -445,10 +443,10 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
       this->inertial->GetPose());
-    const SimTK::Vec3 &com_L = X_LI.p(); // vector from Lo to com, exp. in L
+    const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
     if (math::equal(mass, 0.0))
-      return SimTK::MassProperties(mass,com_L,SimTK::UnitInertia(1,1,1));
+      return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.
     SimTK::Inertia Ic_I(this->inertial->GetIXX(),
@@ -458,15 +456,16 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
                  this->inertial->GetIXZ(),
                  this->inertial->GetIYZ());
     // Re-express the central inertia from the I frame to the L frame.
-    SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R()); // Ic_L=R_LI*Ic_I*R_IL
+    SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R());  // Ic_L=R_LI*Ic_I*R_IL
     // Shift to L frame origin.
     SimTK::Inertia Io_L = Ic_L.shiftFromMassCenter(-com_L, mass);
-    return SimTK::MassProperties(mass, com_L, Io_L); // converts to unit inertia
+    return SimTK::MassProperties(mass, com_L, Io_L);  // convert to unit inertia
   }
   else
   {
     gzerr << "inertial block no specified, using unit mass properties\n";
-    return SimTK::MassProperties(1,SimTK::Vec3(0),SimTK::UnitInertia(0.1,0.1,0.1));
+    return SimTK::MassProperties(1, SimTK::Vec3(0),
+      SimTK::UnitInertia(0.1, 0.1, 0.1));
   }
 }
 
@@ -479,7 +478,7 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    assert(_numFragments > 0); // must be at least 1 for the master
+    assert(_numFragments > 0);  // must be at least 1 for the master
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());
