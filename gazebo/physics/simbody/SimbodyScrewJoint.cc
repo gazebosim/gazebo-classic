@@ -31,10 +31,11 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyScrewJoint::SimbodyScrewJoint(SimTK::MultibodySystem *_world,
+SimbodyScrewJoint::SimbodyScrewJoint(SimTK::MultibodySystem * /*_world*/,
                                      BasePtr _parent)
     : ScrewJoint<SimbodyJoint>(_parent)
 {
+  this->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -93,12 +94,14 @@ void SimbodyScrewJoint::SetForceImpl(int /*_index*/, double /*_force*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
+void SimbodyScrewJoint::SetHighStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
+void SimbodyScrewJoint::SetLowStop(int /*_index*/,
+  const math::Angle &/*_angle*/)
 {
 }
 
