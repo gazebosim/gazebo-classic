@@ -120,6 +120,10 @@ void RenderEngine::Load()
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+
     // Load all the plugins
     this->LoadPlugins();
 
@@ -731,4 +735,10 @@ void RenderEngine::CheckSystemCapabilities()
 WindowManagerPtr RenderEngine::GetWindowManager() const
 {
   return this->windowManager;
+}
+
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
 }

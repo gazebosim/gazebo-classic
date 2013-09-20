@@ -103,11 +103,12 @@ namespace gazebo
       /// \return The Hz rate
       public: double GetRenderRate() const;
 
-      /// \brief Render the camera
-      ///
+      /// \brief Render the camera.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
       /// Called after the pre-render signal. This function will generate
       /// camera images
-      public: void Render();
+      public: void Render(bool _force = false);
 
       /// \brief Post render
       ///

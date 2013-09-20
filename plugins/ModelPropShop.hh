@@ -19,18 +19,35 @@
 
 namespace gazebo
 {
+  /// \brief This plugin will generate 4 pictures of a model: perspective,
+  /// top, left, front, back.
   class ModelPropShop : public SystemPlugin
   {
+    /// \brief Destructor
+    public: virtual ~ModelPropShop();
+
+    /// \brief Load the plugin.
     public: void Load(int /*_argc*/, char ** /*_argv*/);
 
+    /// \brief Initialize the plugin.
     private: void Init();
-    
+
+    /// \brief Update the plugin.
     private: void Update();
 
-    private: rendering::ScenePtr scene;
-    private: rendering::CameraPtr camera;
+    /// \brief The connections.
     private: std::vector<event::ConnectionPtr> connections;
 
-    private: int renderCount;
+    /// \brief Node for communication.
+    private: transport::NodePtr node;
+
+    /// \brief Publisher used to stop the server.
+    private: transport::PublisherPtr pub;
+
+    /// \brief Pointer to the scene.
+    private: rendering::ScenePtr scene;
+
+    /// \brief Pointer to the camera.
+    private: rendering::CameraPtr camera;
   };
 }

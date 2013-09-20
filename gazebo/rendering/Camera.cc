@@ -145,7 +145,7 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   if (_autoRender)
   {
     this->connections.push_back(
-        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+        event::Events::ConnectRender(boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
@@ -417,9 +417,9 @@ void Camera::Update()
 
 
 //////////////////////////////////////////////////
-void Camera::Render()
+void Camera::Render(bool _force)
 {
-  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
+  if (_force || common::Time::GetWallTime() - this->lastRenderWallTime >=
       this->renderPeriod)
   {
     this->newData = true;
@@ -1196,7 +1196,12 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+      Ogre::TU_RENDERTARGET
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+      // This #if allows ogre to antialias offscreen rendering
+      , NULL, false, 4
+#endif
+      )).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
   this->initialized = true;

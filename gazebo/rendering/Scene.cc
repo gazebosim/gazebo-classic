@@ -257,6 +257,11 @@ void Scene::Load()
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
   this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+  this->manager->addRenderQueueListener(
+      RenderEngine::Instance()->GetOverlaySystem());
+#endif
 }
 
 //////////////////////////////////////////////////

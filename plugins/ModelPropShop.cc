@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "ModelPropShop.hh"
 
@@ -23,9 +25,15 @@ using namespace gazebo;
 GZ_REGISTER_SYSTEM_PLUGIN(ModelPropShop)
 
 /////////////////////////////////////////////
+/// \brief Destructor
+ModelPropShop::~ModelPropShop()
+{
+  rendering::fini();
+}
+
+/////////////////////////////////////////////
 void ModelPropShop::Load(int /*_argc*/, char ** /*_argv*/)
 {
-  printf("ModelPropShop::Load\n");
 }
 
 /////////////////////////////////////////////
@@ -35,9 +43,14 @@ void ModelPropShop::Init()
       event::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this)));
 
-  this->renderCount = 0;
+  // Turn off sensors.
   gazebo::sensors::stop();
   gazebo::sensors::fini();
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->pub = this->node->Advertise<msgs::ServerControl>(
+      "/gazebo/server/control");
 }
 
 /////////////////////////////////////////////
@@ -53,11 +66,15 @@ void ModelPropShop::Update()
     sdf::ElementPtr cameraSDF(new sdf::Element);
     sdf::initFile("camera.sdf", cameraSDF);
 
+
     this->scene = rendering::create_scene("default", false, true);
-    this->camera = this->scene->CreateCamera("propshopcamera", true);
+    this->camera = this->scene->CreateCamera("propshopcamera", false);
     this->camera->SetCaptureData(true);
     this->camera->Load(cameraSDF);
     this->camera->Init();
+    this->camera->SetHFOV(GZ_DTOR(60));
+    this->camera->SetImageWidth(640);
+    this->camera->SetImageHeight(480);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
   }
 
@@ -65,64 +82,80 @@ void ModelPropShop::Update()
 
   if (this->scene->GetInitialized())
   {
-    /*if (this->renderCount < 100)
-    {
-      this->renderCount++;
-      return;
-    }*/
-
     rendering::VisualPtr vis = this->scene->GetVisual("pr2");
     if (vis)
     {
       math::Box bbox = vis->GetBoundingBox();
-      std::cout << "Box[" << bbox << "]\n";
+
+      // Compute model scaling.
+      double scaling = 1.0/ bbox.GetSize().GetMax();
+
+      // Compute the model translation.
+      math::Vector3 trans = bbox.GetCenter();
+      trans *= -scaling;
 
       // Normalize the size of the visual
-      vis->SetScale(math::Vector3(1, 1, 1) / bbox.GetSize());
+      vis->SetScale(math::Vector3(scaling, scaling, scaling));
+      vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
 
       // Place the visual at the origin
-      vis->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
+      bbox = vis->GetBoundingBox();
 
       math::Pose pose;
 
       // Top view
-      pose.pos.Set(0, 0, 2.0);
+      pose.pos.Set(0, 0, 1.8);
       pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
       this->camera->SetWorldPose(pose);
       this->camera->Update();
-      this->camera->Render();
+      this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame("/tmp/top_view.png");
 
       // Front view
-      pose.pos.Set(1.5, 0, 0.5);
+      pose.pos.Set(1.8, 0, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
+      this->camera->SetWorldPose(pose);
       this->camera->Update();
-      this->camera->Render();
+      this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame("/tmp/front_view.png");
 
       // Side view
-      pose.pos.Set(0, 1.5, 0.5);
+      pose.pos.Set(0, 1.8, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
-      this->camera->Render();
+      this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame("/tmp/side_view.png");
 
       // Back view
-      pose.pos.Set(-1.5, 0, 0.5);
+      pose.pos.Set(-1.8, 0, 0);
       pose.rot.SetFromEuler(0, 0, 0);
       this->camera->SetWorldPose(pose);
       this->camera->Update();
-      this->camera->Render();
+      this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame("/tmp/back_view.png");
 
-      rendering::fini();
-      gazebo::stop();
-      gazebo::fini();
+      // Perspective view
+      pose.pos.Set(0.9, -0.9, 0.9);
+      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-220));
+      this->camera->SetWorldPose(pose);
+      this->camera->Update();
+      this->camera->Render(true);
+      this->camera->PostRender();
+      this->camera->SaveFrame("/tmp/perspective_view.png");
+
+      // Clean up the camera.
+      this->camera.reset();
+      this->scene->RemoveCamera("propshopcamera");
+
+      // Tell the server to stop.
+      msgs::ServerControl msg;
+      msg.set_stop(true);
+      this->pub->Publish(msg);
     }
   }
 }

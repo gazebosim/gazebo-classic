@@ -37,7 +37,6 @@
 #include <OGRE/OgreColourValue.h>
 #include <OGRE/OgreQuaternion.h>
 #include <OGRE/OgreMesh.h>
-#include <OGRE/OgreFontManager.h>
 #include <OGRE/OgreHardwareBufferManager.h>
 #include <OGRE/OgreCamera.h>
 #include <OGRE/OgreNode.h>
@@ -61,6 +60,16 @@
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#endif
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+#include <OGRE/Overlay/OgreOverlayManager.h>
+#include <OGRE/Overlay/OgreOverlayElement.h>
+#include <OGRE/Overlay/OgreOverlayContainer.h>
+#include <OGRE/Overlay/OgreFontManager.h>
+#include <OGRE/Overlay/OgreOverlaySystem.h>
+#else
+#include <OGRE/OgreFontManager.h>
 #endif
 
 #endif
