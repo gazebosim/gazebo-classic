@@ -1228,15 +1228,12 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 {
   Joint::SetProvideFeedback(_enable);
 
-  if (this->provideFeedback)
-  {
-    this->feedback = new dJointFeedback;
+  this->feedback = new dJointFeedback;
 
-    if (this->jointId)
-      dJointSetFeedback(this->jointId, this->feedback);
-    else
-      gzerr << "ODE Joint ID is invalid\n";
-  }
+  if (this->jointId)
+    dJointSetFeedback(this->jointId, this->feedback);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////

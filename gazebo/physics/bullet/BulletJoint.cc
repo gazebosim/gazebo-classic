@@ -154,9 +154,6 @@ void BulletJoint::Detach()
 //////////////////////////////////////////////////
 void BulletJoint::CacheForceTorque()
 {
-  if (!this->provideFeedback)
-    return;
-
   // caching force torque for the joint
   // if cached, GetForceTorque should use this value
   // this->wrench
@@ -344,21 +341,18 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 void BulletJoint::SetupJointFeedback()
 {
-  if (this->provideFeedback)
-  {
-    this->feedback = new btJointFeedback;
-    this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+  this->feedback = new btJointFeedback;
+  this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
+  this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
+  this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
+  this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
 
-    if (this->constraint)
-      this->constraint->setJointFeedback(this->feedback);
-    else
-    {
-      gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
-      getchar();
-    }
+  if (this->constraint)
+    this->constraint->setJointFeedback(this->feedback);
+  else
+  {
+    gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
+    getchar();
   }
 }
 

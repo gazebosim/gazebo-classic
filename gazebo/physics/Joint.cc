@@ -56,7 +56,6 @@ Joint::Joint(BasePtr _parent)
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
   this->dampingCoefficient = 0;
-  this->provideFeedback = false;
 }
 
 //////////////////////////////////////////////////
@@ -629,5 +628,4 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetProvideFeedback(bool _enable)
 {
-  this->provideFeedback = _enable;
 }

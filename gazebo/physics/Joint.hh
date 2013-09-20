@@ -456,9 +456,6 @@ namespace gazebo
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
 
-      /// \brief Provide Feedback data for contact forces
-      protected: bool provideFeedback;
-
       /// \brief Names of all the sensors attached to the link.
       private: std::vector<std::string> sensors;
 
