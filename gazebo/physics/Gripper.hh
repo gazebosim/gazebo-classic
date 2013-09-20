@@ -102,7 +102,7 @@ namespace gazebo
       /// \brief The collisions for the links in the gripper.
       private: std::map<std::string, physics::CollisionPtr> collisions;
 
-      /// \brief The current contacts that.
+      /// \brief The current contacts.
       private: std::vector<msgs::Contact> contacts;
 
       /// \brief True if the gripper has an object.
@@ -138,7 +138,7 @@ namespace gazebo
       /// \brief Steps touching before engaging fixed joint
       private: int attachSteps;
 
-      /// \brief Steps not touching before deisengaging fixed joint
+      /// \brief Steps not touching before disengaging fixed joint
       private: int detachSteps;
 
       /// \brief Name of the gripper.
