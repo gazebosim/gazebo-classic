@@ -157,10 +157,10 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
 /// changed
 void SimbodyLink::OnPoseChange()
 {
+  Link::OnPoseChange();
+
   if (!this->simbodyPhysics->simbodyPhysicsInitialized)
     return;
-
-  Link::OnPoseChange();
 
   /// \TODO: limited functionality for now.
   /// Setting 6 dof pose of a link works in simbody only if
