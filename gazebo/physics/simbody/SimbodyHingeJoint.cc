@@ -313,10 +313,10 @@ void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
     if (this->simbodyU.empty())
       this->simbodyU.resize(this->mobod.getNumU(_state));
 
-    for(int i = 0; i < this->simbodyQ.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->simbodyQ[i] = this->mobod.getOneQ(_state, i);
 
-    for(int i = 0; i < this->simbodyU.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->simbodyU[i] = this->mobod.getOneU(_state, i);
   }
   else
@@ -330,10 +330,10 @@ void SimbodyHingeJoint::RestoreSimbodyState(SimTK::State &_state)
 {
   if (!this->mobod.isEmptyHandle())
   {
-    for(int i = 0; i < this->simbodyQ.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->mobod.setOneQ(_state, i, this->simbodyQ[i]);
 
-    for(int i = 0; i < this->simbodyU.size(); ++i)
+    for(unsigned int i = 0; i < this->simbodyU.size(); ++i)
       this->mobod.setOneU(_state, i, this->simbodyU[i]);
   }
   else
