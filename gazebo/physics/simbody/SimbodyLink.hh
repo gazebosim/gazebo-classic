@@ -194,7 +194,7 @@ namespace gazebo
       // Keeps track if physics has been initialized
       public: bool physicsInitialized;
 
-      // If this link got split into a master and slaves, these are the 
+      // If this link got split into a master and slaves, these are the
       // MobilizedBodies used to mobilize the slaves.
       public: std::vector<SimTK::MobilizedBody>      slaveMobods;
 

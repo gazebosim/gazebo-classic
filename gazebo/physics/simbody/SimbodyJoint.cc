@@ -132,7 +132,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;
-    this->X_PA = X_PC*this->X_CB; // i.e., A spatially coincident with B 
+    this->X_PA = X_PC*this->X_CB; // i.e., A spatially coincident with B
   }
 }
 

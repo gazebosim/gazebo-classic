@@ -355,7 +355,7 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
-  SimTK::Vec3 w = 
+  SimTK::Vec3 w =
     this->masterMobod.getBodyAngularVelocity(
     this->simbodyPhysics->integ->getState());
   return SimbodyPhysics::Vec3ToVector3(w);
@@ -473,7 +473,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
 // When a link is broken into several fragments (master and slaves), they
 // share the mass equally. Given the number of fragments, this returns the
 // appropriate mass properties to use for each fragment. Per Simbody's
-// convention, COM is measured from, and inertia taken about, the link 
+// convention, COM is measured from, and inertia taken about, the link
 // origin and both are expressed in the link frame.
 SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const

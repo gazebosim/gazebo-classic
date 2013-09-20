@@ -603,7 +603,7 @@ void SimbodyPhysics::ConvertMass(void * /*_engineMass*/,
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  
+
   {
     if (this->simbodyPhysicsInitialized)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
@@ -645,7 +645,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   // skip loop joints for now
   _mbgraph.addJointType(GetTypeString(physics::Base::BALL_JOINT), 3, false);
 
-  // Step 2: Tell it about all the links we read from the input file, 
+  // Step 2: Tell it about all the links we read from the input file,
   // starting with world, and provide a reference pointer.
   _mbgraph.addBody("world", SimTK::Infinity,
                   false);
@@ -718,7 +718,7 @@ void SimbodyPhysics::InitSimbodySystem()
 
 void SimbodyPhysics::AddStaticModelToSimbodySystem(const physics::Model* _model)
 {
-  
+
   physics::Link_V links = _model->GetLinks();
   for (physics::Link_V::iterator li = links.begin();
        li != links.end(); ++li)
@@ -769,7 +769,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     SimbodyLink* gzInb = static_cast<SimbodyLink*>(mob.getInboardBodyRef());
     SimbodyLink* gzOutb = static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
-    const MassProperties massProps = 
+    const MassProperties massProps =
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());
 
 /* debug
@@ -783,7 +783,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 */
 
     // This will reference the new mobilized body once we create it.
-    MobilizedBody mobod; 
+    MobilizedBody mobod;
 
     MobilizedBody parentMobod =
       gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
@@ -836,7 +836,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         if (type == "free") {
             MobilizedBody::Free freeJoint(
                 parentMobod,  X_IF0,
-                massProps,          X_OM0, 
+                massProps,          X_OM0,
                 direction);
             Transform defX_FM = isReversed ? Transform(~gzJoint->defX_AB)
                                            : gzJoint->defX_AB;
@@ -850,7 +850,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
             MobilizedBody::Pin pinJoint(
                 parentMobod,      X_IF,
-                massProps,              X_OM, 
+                massProps,              X_OM,
                 direction);
             mobod = pinJoint;
 
@@ -893,7 +893,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
             MobilizedBody::Slider sliderJoint(
                 parentMobod,      X_IF,
-                massProps,              X_OM, 
+                massProps,              X_OM,
                 direction);
             mobod = sliderJoint;
 
@@ -926,9 +926,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         } else if (type == "ball") {
             MobilizedBody::Ball ballJoint(
                 parentMobod,  X_IF0,
-                massProps,          X_OM0, 
+                massProps,          X_OM0,
                 direction);
-            Rotation defR_FM = isReversed 
+            Rotation defR_FM = isReversed
                 ? Rotation(~gzJoint->defX_AB.R())
                 : gzJoint->defX_AB.R();
             ballJoint.setDefaultRotation(defR_FM);
@@ -981,11 +981,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       SimbodyLinkPtr  child(loop.getChildBodyRef());
 
       if (joint.type == "weld") {
-          Constraint::Weld weld(parent.masterMobod, joint.X_PA, 
+          Constraint::Weld weld(parent.masterMobod, joint.X_PA,
                                 child.masterMobod,  joint.X_CB);
           joint.constraint = weld;
       } else if (joint.type == "ball") {
-          Constraint::Ball ball(parent.masterMobod, joint.X_PA.p(), 
+          Constraint::Ball ball(parent.masterMobod, joint.X_PA.p(),
                                 child.masterMobod,  joint.X_CB.p());
           joint.constraint = ball;
       } else if (joint.type == "free") {
@@ -1027,7 +1027,7 @@ std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
       gzerr << "Unrecognized joint type\n";
       return "UNRECOGNIZED";
   }
-*/ 
+*/
   if (_type & physics::Base::BALL_JOINT)
     return "ball";
   else if (_type & physics::Base::HINGE2_JOINT)

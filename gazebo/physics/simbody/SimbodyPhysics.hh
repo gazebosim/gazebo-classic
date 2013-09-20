@@ -122,7 +122,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
-      
+
       private: SimTK::MultibodySystem *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
@@ -170,7 +170,7 @@ namespace gazebo
         SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
                          _pose.rot.z);
         SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-        SimTK::Transform frame(SimTK::Rotation(q), v); 
+        SimTK::Transform frame(SimTK::Rotation(q), v);
         return frame;
       }
 
@@ -225,7 +225,7 @@ namespace gazebo
       private: void AddCollisionsToLink(const physics::SimbodyLink* _link,
         SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
 
-      
+
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;
 
