@@ -102,6 +102,17 @@ set (headers
   cegui.h
 )
 
+set (gtest_sources
+  Heightmap_TEST.cc
+)
+
+gz_build_tests(${gtest_sources})
+
+set (gtest_sources_dri
+  GpuLaser_TEST.cc)
+
+gz_build_dri_tests(${gtest_sources_dri})
+
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
@@ -135,11 +146,3 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
-
-# Deprecated Rendering.hh
-gz_issue_775("Rendering")
-
-# unit tests
-set (gtest_sources
-  GpuLaser_TEST.cc)
-gz_build_dri_tests(${gtest_sources})

@@ -383,14 +383,6 @@ namespace gazebo
       /// \param[in] _joint Joint that is a parent of this link.
       public: void AddParentJoint(JointPtr _joint);
 
-      /// \brief Remove Joints that have this Link as a parent Link.
-      /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Remove Joints that have this Link as a child Link
-      /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint) GAZEBO_DEPRECATED(1.5);
-
       /// \brief Remove Joints that have this Link as a child Link.
       /// \param[in] _jointName Parent Joint name.
       public: void RemoveParentJoint(const std::string &_jointName);
@@ -441,6 +433,12 @@ namespace gazebo
       /// \brief Enable/Disable link data publishing
       /// \param[in] _enable True to enable publishing, false to stop publishing
       public: void SetPublishData(bool _enable);
+
+      /// \brief Get the parent joints.
+      public: Joint_V GetParentJoints() const;
+
+      /// \brief Get the child joints.
+      public: Joint_V GetChildJoints() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
