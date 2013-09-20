@@ -596,29 +596,41 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
 
 TEST_P(Joint_TEST_All, SpawnJointTypes)
 {
+#ifdef HAVE_DART
   if (this->physicsEngine == "dart")
     gzerr << "SpawnJointTypesDART fails because dynamic joint creating/removing "
           << "is not yet working\n";
   else
     SpawnJointTypes(this->physicsEngine, this->jointType);
+#else
+  SpawnJointTypes(this->physicsEngine, this->jointType);
+#endif
 }
 
 TEST_P(Joint_TEST_Rotational, SpawnJointRotational)
 {
+#ifdef HAVE_DART
   if (this->physicsEngine == "dart")
     gzerr << "SpawnJointRotationalDART fails because dynamic joint creating/removing "
           << "is not yet working\n";
   else
     SpawnJointRotational(this->physicsEngine, this->jointType);
+#else
+  SpawnJointRotational(this->physicsEngine, this->jointType);
+#endif
 }
 
 TEST_P(Joint_TEST_RotationalWorld, SpawnJointRotationalWorld)
 {
+#ifdef HAVE_DART
   if (this->physicsEngine == "dart")
     gzerr << "SpawnJointRotationalWorldDART fails because dynamic joint creating/removing "
           << "is not yet working\n";
   else
     SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
+#else
+  SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
+#endif
 }
 
 INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_All,
