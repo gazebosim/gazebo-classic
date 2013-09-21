@@ -84,7 +84,7 @@ std::string common::find_file_path(const std::string &_file)
 }
 
 //////////////////////////////////////////////////
-std::string common::GetSHA1(void const *_buffer, std::size_t byte_count)
+std::string common::get_sha1(void const *_buffer, std::size_t byte_count)
 {
   boost::uuids::detail::sha1 sha1;
   unsigned int hash[5];

@@ -37,7 +37,7 @@ TEST(CommonIface_TEST, GetSHA1)
 
   // Compute the SHA1 of the file and compare it with the precomputed SHA1
   std::string precomputedSHA1 = "a370ddc4d61d936b2bb40f98bae061dc15fd8923";
-  std::string computedSHA1 = common::GetSHA1(s.data(), s.size());
+  std::string computedSHA1 = common::get_sha1(s.data(), s.size());
   EXPECT_EQ(precomputedSHA1, computedSHA1);
 }
 
