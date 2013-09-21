@@ -2,6 +2,7 @@ set (files
   actor.world
   actor_demo.world
   actor_circle.world
+  blank.world
   two_actors.world
   camera.world
   joint_damping_demo.world

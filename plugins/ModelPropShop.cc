@@ -144,8 +144,8 @@ void ModelPropShop::Update()
     this->camera->Load(cameraSDF);
     this->camera->Init();
     this->camera->SetHFOV(GZ_DTOR(60));
-    this->camera->SetImageWidth(640);
-    this->camera->SetImageHeight(480);
+    this->camera->SetImageWidth(960);
+    this->camera->SetImageHeight(540);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
   }
 
@@ -176,51 +176,52 @@ void ModelPropShop::Update()
 
       math::Pose pose;
 
-      // Top view
-      pose.pos.Set(0, 0, 1.8);
-      pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
-      this->camera->SetWorldPose(pose);
-      this->camera->Update();
-      this->camera->Render(true);
-      this->camera->PostRender();
-      this->camera->SaveFrame((this->savePath / "top_view.png").string());
-
-      // Front view
-      pose.pos.Set(1.8, 0, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
-      this->camera->SetWorldPose(pose);
-      this->camera->Update();
-      this->camera->Render(true);
-      this->camera->PostRender();
-      this->camera->SaveFrame((this->savePath / "front_view.png").string());
-
-      // Side view
-      pose.pos.Set(0, 1.8, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
-      this->camera->SetWorldPose(pose);
-      this->camera->Update();
-      this->camera->Render(true);
-      this->camera->PostRender();
-      this->camera->SaveFrame((this->savePath / "side_view.png").string());
-
-      // Back view
-      pose.pos.Set(-1.8, 0, 0);
-      pose.rot.SetFromEuler(0, 0, 0);
-      this->camera->SetWorldPose(pose);
-      this->camera->Update();
-      this->camera->Render(true);
-      this->camera->PostRender();
-      this->camera->SaveFrame((this->savePath / "back_view.png").string());
-
       // Perspective view
-      pose.pos.Set(0.9, -0.9, 0.9);
-      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-220));
+      pose.pos.Set(1.6, -1.6, 1.2);
+      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame(
-          (this->savePath / "perspective_view.png").string());
+          (this->savePath / "1.png").string());
+
+      // Top view
+      pose.pos.Set(0, 0, 2.2);
+      pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
+      this->camera->SetWorldPose(pose);
+      this->camera->Update();
+      this->camera->Render(true);
+      this->camera->PostRender();
+      this->camera->SaveFrame((this->savePath / "2.png").string());
+
+      // Front view
+      pose.pos.Set(2.2, 0, 0);
+      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
+      this->camera->SetWorldPose(pose);
+      this->camera->Update();
+      this->camera->Render(true);
+      this->camera->PostRender();
+      this->camera->SaveFrame((this->savePath / "3.png").string());
+
+      // Side view
+      pose.pos.Set(0, 2.2, 0);
+      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
+      this->camera->SetWorldPose(pose);
+      this->camera->Update();
+      this->camera->Render(true);
+      this->camera->PostRender();
+      this->camera->SaveFrame((this->savePath / "4.png").string());
+
+      // Back view
+      pose.pos.Set(-2.2, 0, 0);
+      pose.rot.SetFromEuler(0, 0, 0);
+      this->camera->SetWorldPose(pose);
+      this->camera->Update();
+      this->camera->Render(true);
+      this->camera->PostRender();
+      this->camera->SaveFrame((this->savePath / "5.png").string());
+
 
       event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
