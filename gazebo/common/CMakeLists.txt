@@ -161,6 +161,3 @@ endif()
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
-
-# Deprecated Common.hh
-gz_issue_775("Common")

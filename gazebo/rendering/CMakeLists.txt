@@ -146,6 +146,3 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
-
-# Deprecated Rendering.hh
-gz_issue_775("Rendering")
