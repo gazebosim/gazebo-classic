@@ -961,8 +961,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     }
 
     // Link gzOutb has been mobilized; keep track for later.
-    if (isSlave) gzOutb->slaveMobods.push_back(mobod);
-    else gzOutb->masterMobod = mobod;
+    if (isSlave)
+      gzOutb->slaveMobods.push_back(mobod);
+    else
+      gzOutb->masterMobod = mobod;
 
     // A mobilizer has been created; now add the collision
     // geometry for the new mobilized body.
