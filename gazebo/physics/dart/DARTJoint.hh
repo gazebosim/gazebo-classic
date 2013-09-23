@@ -153,6 +153,9 @@ namespace gazebo
 
       /// \brief DART joint pointer
       protected: dart::dynamics::Joint* dartJoint;
+
+      /// \brief DART joint pointer
+      protected: dart::dynamics::BodyNode* dartChildBodyNode;
     };
   }
 }

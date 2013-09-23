@@ -33,7 +33,8 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
-    dartJoint(NULL)
+    dartJoint(NULL),
+    dartChildBodyNode(NULL)
 {
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
@@ -88,6 +89,8 @@ void DARTJoint::Init()
 
     math::Pose poseChildLink = theChildLink->GetWorldPose();
     dartTransfChildLink = DARTTypes::ConvPose(poseChildLink);
+
+    dartChildBody->setParentJoint(this->dartJoint);
   }
   dartTransfChildLinkToJointRight = DARTTypes::ConvPose(this->anchorPose);
 
@@ -98,6 +101,8 @@ void DARTJoint::Init()
 
     math::Pose poseParentLink = theParentLink->GetWorldPose();
     dartTransfParentLink = DARTTypes::ConvPose(poseParentLink);
+
+    dartParentBody->addChildBodyNode(dartChildBody);
   }
   // TODO: If the joint is not home position, then we need to care about it
   //       by multiply jointLocalTransformation.inverse() to the end of below
@@ -106,8 +111,6 @@ void DARTJoint::Init()
                                     * dartTransfChildLink
                                     * dartTransfChildLinkToJointRight;
 
-  this->dartJoint->setParentBodyNode(dartParentBody);
-  this->dartJoint->setChildBodyNode(dartChildBody);
   this->dartJoint->setTransformFromParentBodyNode(dartTransfParentLinkToJointLeft);
   this->dartJoint->setTransformFromChildBodyNode(dartTransfChildLinkToJointRight);
 
@@ -152,8 +155,6 @@ void DARTJoint::Init()
       }
     }
   }
-
-  this->GetDARTModel()->GetSkeleton()->addJoint(dartJoint);
 }
 
 //////////////////////////////////////////////////
@@ -196,16 +197,15 @@ bool DARTJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
   DARTLinkPtr dartLink1 = boost::shared_dynamic_cast<DARTLink>(_one);
   DARTLinkPtr dartLink2 = boost::shared_dynamic_cast<DARTLink>(_two);
 
+  dart::dynamics::BodyNode* dartBodyNode1 = dartLink1->getDARTBodyNode();
+  dart::dynamics::BodyNode* dartBodyNode2 = dartLink2->getDARTBodyNode();
+
   if (dartLink1 == NULL || dartLink2 == NULL)
     gzthrow("DARTJoint requires DART bodies\n");
 
-  if (this->dartJoint->getParentBodyNode() == dartLink1->getDARTBodyNode())
-    if (this->dartJoint->getChildBodyNode() == dartLink2->getDARTBodyNode())
-      res = true;
-
-  if (this->dartJoint->getParentBodyNode() == dartLink2->getDARTBodyNode())
-    if (this->dartJoint->getChildBodyNode() == dartLink1->getDARTBodyNode())
-      res = true;
+  if (dartBodyNode1->getParentBodyNode() == dartBodyNode2 ||
+      dartBodyNode2->getParentBodyNode() == dartBodyNode1)
+    res = true;
 
   return res;
 }

@@ -54,13 +54,20 @@ void DARTHingeJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 {
-  return DARTTypes::ConvVec3(this->dartRevJoint->getWorldOrigin());
+  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
+
+  return DARTTypes::ConvVec3(worldOrigin);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
-  Eigen::Vector3d globalAxis = this->dartRevJoint->getWorldAxis();
+  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d axis = this->dartRevJoint->getAxis();
+  Eigen::Vector3d globalAxis = T.linear() * axis;
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match

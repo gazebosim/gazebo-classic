@@ -54,13 +54,20 @@ void DARTSliderJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
 {
-  return DARTTypes::ConvVec3(this->dartPrismaticJoint->getWorldOrigin());
+  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
+
+  return DARTTypes::ConvVec3(worldOrigin);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 {
-  Eigen::Vector3d globalAxis = this->dartPrismaticJoint->getWorldAxis();
+  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d axis = this->dartPrismaticJoint->getAxis();
+  Eigen::Vector3d globalAxis = T.linear() * axis;
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match

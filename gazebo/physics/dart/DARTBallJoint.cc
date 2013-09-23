@@ -52,5 +52,9 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 {
-  return DARTTypes::ConvVec3(this->dartBallJoint->getWorldOrigin());
+  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
+
+  return DARTTypes::ConvVec3(worldOrigin);
 }

@@ -102,8 +102,9 @@ void DARTLink::Init()
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
-  // Add dart body to dart skeleton.
-  this->GetDARTModel()->GetSkeleton()->addBodyNode(this->dartBodyNode, false);
+  // We don't add dart body node to the skeleton here because dart body node
+  // should be set its parent joint before it.
+  //this->GetDARTModel()->GetSkeleton()->addBodyNode(this->dartBodyNode);
 }
 
 //////////////////////////////////////////////////

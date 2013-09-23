@@ -71,18 +71,18 @@ void DARTModel::Init()
 
     if (dartBodyNode->getParentJoint() == NULL)
     {
-      // If this link has no parent joint, then we add 6-dof free joint.
+      // If this link has no parent joint, then we add 6-dof free joint to the
+      // link.
       dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
 
-      newFreeJoint->setParentBodyNode(NULL);
       newFreeJoint->setTransformFromParentBodyNode(
             DARTTypes::ConvPose(linkList[i]->GetWorldPose()));
-
-      newFreeJoint->setChildBodyNode(dartBodyNode);
       newFreeJoint->setTransformFromChildBodyNode(Eigen::Isometry3d::Identity());
 
-      this->GetSkeleton()->addJoint(newFreeJoint);
+      dartBodyNode->setParentJoint(newFreeJoint);
     }
+
+    dartSkeleton->addBodyNode(dartBodyNode);
   }
 
   // add skeleton to world
