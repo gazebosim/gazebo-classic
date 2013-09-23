@@ -94,7 +94,7 @@ void LaserVisual::Update()
 
   this->rayFan->SetPoint(0, offset.pos);
   for (size_t i = 0;
-       static_cast<int>(i) < this->laserMsg->scan().ranges_size(); i++)
+       static_cast<int>(i) < this->laserMsg->scan().ranges_size(); ++i)
   {
     r = this->laserMsg->scan().ranges(i);
     pt.x = 0 + r * cos(angle);
