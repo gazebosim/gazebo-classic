@@ -75,5 +75,4 @@ void SimbodyRayShape::SetPoints(const math::Vector3 &_posStart,
 {
   this->globalStartPos = _posStart;
   this->globalEndPos = _posEnd;
-
 }

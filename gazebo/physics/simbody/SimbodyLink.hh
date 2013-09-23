@@ -22,6 +22,7 @@
 #ifndef _SIMBODYLINK_HH_
 #define _SIMBODYLINK_HH_
 
+#include <vector>
 #include <Simbody.h>
 
 #include "gazebo/physics/simbody/simbody_inc.h"
