@@ -649,10 +649,10 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   // Tell all the cameras to render
   // event::Events::render();
 
+  event::Events::postRender();
+
   // Update the sensors, which will produce data messages.
   SensorContainer::Update(_force);
-
-  event::Events::postRender();
 }
 
 
