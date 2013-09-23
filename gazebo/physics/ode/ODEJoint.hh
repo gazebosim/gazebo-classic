@@ -174,9 +174,6 @@ namespace gazebo
       public: virtual void SetProvideFeedback(bool _enable);
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(int _index);
-
-      // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       // Documentation inherited.
