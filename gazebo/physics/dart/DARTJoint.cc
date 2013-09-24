@@ -82,7 +82,8 @@ void DARTJoint::Init()
   Eigen::Isometry3d dartTransfParentLink = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dartTransfChildLink = Eigen::Isometry3d::Identity();
 
-  if (theChildLink != NULL)
+  //if (theChildLink != NULL)
+  assert(theChildLink);
   {
     dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
@@ -113,6 +114,7 @@ void DARTJoint::Init()
 
   this->dartJoint->setTransformFromParentBodyNode(dartTransfParentLinkToJointLeft);
   this->dartJoint->setTransformFromChildBodyNode(dartTransfChildLinkToJointRight);
+  this->dartChildBodyNode = dartChildBody;
 
   //----------------------------------------------------------------------------
   // TODO: Currently, dampingCoefficient seems not to be initialized when
