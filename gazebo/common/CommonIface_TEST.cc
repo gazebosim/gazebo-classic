@@ -31,7 +31,7 @@ TEST(CommonIface_TEST, GetSHA1)
   // Do not forget to update 'precomputedSHA1' if you modify this vector
   std::vector<float> v;
   for (int i = 0; i < 100; ++i)
-    v.push_back(float(i));
+    v.push_back(i);
 
   // Compute the SHA1 of the vector
   std::string precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";
