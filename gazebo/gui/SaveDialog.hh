@@ -78,10 +78,10 @@ namespace gazebo
       private slots: void OnSave();
 
       /// \brief Editable line that holds the name.
-      private: QLineEdit* nameLineEdit;
+      private: QLineEdit *nameLineEdit;
 
       /// \brief Editable line that holds the save location.
-      private: QLineEdit* locationLineEdit;
+      private: QLineEdit *locationLineEdit;
 
       /// \brief Message displayed in the dialog.
       private: QLabel *messageLabel;
