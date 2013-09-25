@@ -19,7 +19,6 @@
 #define _COMMONIFACE_HH_
 
 #include <string>
-#include <boost/filesystem/path.hpp>
 #include <vector>
 
 namespace gazebo
