@@ -469,8 +469,16 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
+#ifdef HAVE_DART
+      // DART calculates all the pose, velocity, and acceleration
+      // in body frame so there could be neglectable numerical error
+      // for a rotated link when it is free-falling.
+      EXPECT_NEAR(vel1.x, 0, 2.2e-37);
+      EXPECT_NEAR(vel1.y, 0, 4.7e-38);
+#else
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
+#endif
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
@@ -1119,8 +1127,13 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     EXPECT_EQ(vel.x, 0.0);
 
+#ifdef HAVE_DART
+    EXPECT_NEAR(vel.y, -10.2009, 0.013);
+    EXPECT_NEAR(vel.z, -6.51755, 0.013);
+#else
     EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
     EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
+#endif
 
     EXPECT_EQ(pose.pos.x, 3.0);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
@@ -1136,6 +1149,13 @@ TEST_F(PhysicsTest, JointDampingTest)
 {
   JointDampingTest("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, JointDampingDART)
+{
+  JointDampingTest("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
@@ -1193,7 +1213,14 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.0101);  // sometimes -0.01, why?
+#ifdef HAVE_DART
+            // DART needs more tolerance until supports 'correction for
+            // penetration' feature.
+            // See: https://github.com/dartsim/dart/issues/100
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+#else
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+#endif
           }
         }
 
@@ -1214,8 +1241,16 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
           else
           {
+#ifdef HAVE_DART
+            // DART needs more tolerance until supports 'correction for
+            // penetration' feature.
+            // See: https://github.com/dartsim/dart/issues/100
+            EXPECT_LT(fabs(vel.z), 0.015);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+#else
             EXPECT_LT(fabs(vel.z), 3e-5);
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+#endif
           }
         }
 
@@ -1237,7 +1272,14 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.011);
+#ifdef HAVE_DART
+            // DART needs more tolerance until supports 'correction for
+            // penetration' feature.
+            // See: https://github.com/dartsim/dart/issues/100
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0041);
+#else
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
+#endif
           }
         }
       }
@@ -1251,6 +1293,13 @@ TEST_F(PhysicsTest, DropStuff)
 {
   DropStuff("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, DropStuffDART)
+{
+  DropStuff("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
 {
@@ -1301,7 +1350,11 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
           if (i == 0)
             box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
           EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
+#ifdef HAVE_DART
+          EXPECT_LT(fabs(vel.x - v), 0.00050);
+#else
           EXPECT_LT(fabs(vel.x - v), 0.00001);
+#endif
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
@@ -1323,7 +1376,11 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
-            EXPECT_LT(fabs(vel.x - v), 0.00001);
+#ifdef HAVE_DART
+          EXPECT_LT(fabs(vel.x - v), 0.00050);
+#else
+          EXPECT_LT(fabs(vel.x - v), 0.00001);
+#endif
           }
         }
       }
@@ -1342,6 +1399,13 @@ TEST_F(PhysicsTest, CollisionTest)
 {
   CollisionTest("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, CollisionTestDART)
+{
+  CollisionTest("dart");
+}
+#endif // HAVE_DART
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
