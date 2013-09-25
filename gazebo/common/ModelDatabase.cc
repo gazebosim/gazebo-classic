@@ -137,6 +137,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
   if (uriSeparator == std::string::npos)
     return false;
 
+  uri = uri.substr(0, uri.find("/", uriSeparator+3));
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
@@ -316,6 +317,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
       {
         gzmsg << "Waiting for model database update to complete...\n";
         boost::mutex::scoped_lock lock2(this->updateMutex);
+        gzmsg << "Model database update completed\n";
       }
     }
 
@@ -423,9 +425,10 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
       endIndex - startIndex;
 
-    modelName = modelName.substr(startIndex, modelNameLen);
     if (endIndex != std::string::npos)
-      suffix = _uri.substr(endIndex, std::string::npos);
+      suffix = modelName.substr(endIndex, std::string::npos);
+
+    modelName = modelName.substr(startIndex, modelNameLen);
 
     // Store downloaded .tar.gz and intermediate .tar files in temp location
     boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();

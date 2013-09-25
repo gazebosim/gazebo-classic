@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -186,6 +187,9 @@ bool gui::run(int _argc, char **_argv)
   // Initialize the informational logger. This will log warnings, and errors.
   gazebo::common::Console::Instance()->Init("gzclient.log");
 
+  // Make sure the model database has started
+  gazebo::common::ModelDatabase::Instance()->Start();
+
   if (!parse_args(_argc, _argv))
     return false;
 
@@ -210,6 +214,9 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  // Cleanup model database.
+  common::ModelDatabase::Instance()->Fini();
+
   gazebo::stop();
   g_active_camera.reset();
   g_app->quit();
