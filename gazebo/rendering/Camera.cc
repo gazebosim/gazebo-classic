@@ -794,6 +794,12 @@ void Camera::EnableSaveFrame(bool _enable)
 }
 
 //////////////////////////////////////////////////
+bool Camera::GetCaptureData() const
+{
+  return this->captureData;
+}
+
+//////////////////////////////////////////////////
 void Camera::SetSaveFramePathname(const std::string &_pathname)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("save");
