@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _IMPORT_DIALOG_HH_
-#define _IMPORT_DIALOG_HH_
+#ifndef _MODEL_IMPORT_DIALOG_HH_
+#define _MODEL_IMPORT_DIALOG_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"
@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class ImportDialog ImportDialog.hh
+    /// \class ImportDialog gui/ImportDialog.hh
     /// \brief Dialog for saving to file.
     class ImportDialog : public QDialog
     {
@@ -78,10 +78,10 @@ namespace gazebo
       private slots: void onImport();
 
       /// \brief Editable line that holds the name.
-      private: QLineEdit* nameLineEdit;
+      private: QLineEdit *nameLineEdit;
 
       /// \brief Editable line that holds the import location.
-      private: QLineEdit* pathLineEdit;
+      private: QLineEdit *pathLineEdit;
 
       /// \brief Message displayed in the dialog.
       private: QLabel *messageLabel;

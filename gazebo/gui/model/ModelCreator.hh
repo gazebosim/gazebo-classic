@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ namespace gazebo
         PART_SPHERE,
         /// \brief Cylinder
         PART_CYLINDER,
-        /// \brief Cylinder
+        /// \brief Custom
         PART_CUSTOM
       };
 
