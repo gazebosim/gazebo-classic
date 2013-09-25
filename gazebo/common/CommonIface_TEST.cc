@@ -28,16 +28,14 @@ using namespace gazebo;
 /// \brief Test CommonIface::GetSHA1
 TEST(CommonIface_TEST, GetSHA1)
 {
-  // Do not forget to update 'precomputedSHA1' if you modify this text
-  std::string s;
-  s = "Marty McFly: Wait a minute, Doc. Ah... Are you telling me that you"
-      " built a time machine... out of a DeLorean?\n"
-      "Dr. Emmett Brown: The way I see it, if you're gonna build a time"
-      " machine into a car, why not do it with some style?";
+  // Do not forget to update 'precomputedSHA1' if you modify this vector
+  std::vector<float> v;
+  for (int i = 0; i < 100; ++i)
+    v.push_back(float(i));
 
-  // Compute the SHA1 of the file and compare it with the precomputed SHA1
-  std::string precomputedSHA1 = "a370ddc4d61d936b2bb40f98bae061dc15fd8923";
-  std::string computedSHA1 = common::get_sha1(s.data(), s.size());
+  // Compute the SHA1 of the vector
+  std::string precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";
+  std::string computedSHA1 = common::get_sha1(v);
   EXPECT_EQ(precomputedSHA1, computedSHA1);
 }
 

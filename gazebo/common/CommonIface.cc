@@ -84,13 +84,13 @@ std::string common::find_file_path(const std::string &_file)
 }
 
 //////////////////////////////////////////////////
-std::string common::get_sha1(void const *_buffer, std::size_t _byteCount)
+std::string common::get_sha1(const std::vector<float> &_buffer)
 {
   boost::uuids::detail::sha1 sha1;
   unsigned int hash[5];
   std::stringstream stream;
 
-  sha1.process_bytes(_buffer, _byteCount);
+  sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
   sha1.get_digest(hash);
 
   stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;

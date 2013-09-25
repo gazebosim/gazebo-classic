@@ -55,8 +55,7 @@ namespace gazebo
     /// \param[in] _buffer Input sequence of bytes.
     /// \param[in] _byteCount Size of the input sequence in bytes
     /// \return The string representation (40 character) of the SHA1 hash.
-    std::string get_sha1(void const *_buffer, std::size_t _byteCount);
-
+    std::string get_sha1(const std::vector<float> &_buffer);
     /// \}
   }
 }
