@@ -38,30 +38,33 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
-      &LaserVisual::OnScan, this);
-
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->laserScanSub = this->node->Subscribe(_topicName,
+      &LaserVisual::OnScan, this);
 }
 
 /////////////////////////////////////////////////
 LaserVisual::~LaserVisual()
 {
-  delete this->rayFan;
-  this->rayFan = NULL;
+  if (this->rayFan)
+  {
+    this->DeleteDynamicLine(this->rayFan);
+    this->rayFan = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   // Skip the update if the user is moving the laser.
-  if (this->GetScene()->GetSelectedVisual() &&
+  if (!this->rayFan || (this->GetScene()->GetSelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName())
+      this->GetScene()->GetSelectedVisual()->GetName()))
   {
     return;
   }

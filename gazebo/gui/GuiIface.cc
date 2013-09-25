@@ -137,6 +137,9 @@ namespace gazebo
     /////////////////////////////////////////////////
     void fini()
     {
+      // Cleanup model database.
+      common::ModelDatabase::Instance()->Fini();
+
       gui::clear_active_camera();
       rendering::fini();
       fflush(stdout);
@@ -214,9 +217,6 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  // Cleanup model database.
-  common::ModelDatabase::Instance()->Fini();
-
   gazebo::stop();
   g_active_camera.reset();
   g_app->quit();

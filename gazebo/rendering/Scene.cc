@@ -1766,7 +1766,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       LaserVisualPtr laserVis(new LaserVisual(
             rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
+      this->visuals[laserVis->GetName()] = laserVis;
     }
   }
   else if ((_msg->type() == "sonar") && _msg->visualize()
@@ -1782,7 +1782,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       SonarVisualPtr sonarVis(new SonarVisual(
             sonarVisualName+"_GUIONLY_sonar_vis", parentVis, _msg->topic()));
       sonarVis->Load();
-      this->visuals[sonarVisualName+"_sonar_vis"] = sonarVis;
+      this->visuals[sonarVis->GetName()] = sonarVis;
     }
   }
   else if ((_msg->type() == "force_torque") && _msg->visualize()
@@ -1806,7 +1806,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
             wrenchVisualName+"_GUIONLY_wrench_vis", parentVis,
             _msg->topic()));
       wrenchVis->Load(jointMsg);
-      this->visuals[wrenchVisualName+"_wrench_vis"] = wrenchVis;
+      this->visuals[wrenchVis->GetName()] = wrenchVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
