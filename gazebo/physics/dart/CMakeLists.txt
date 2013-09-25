@@ -65,7 +65,7 @@ target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp)
 gz_install_library(gazebo_physics_dart)
 
 # unit tests
-set (gtest_sources
-  DARTJoint_TEST.cc
-)
-gz_build_tests(${gtest_sources})
+#set (gtest_sources
+#  DARTJoint_TEST.cc
+#)
+#gz_build_tests(${gtest_sources})
