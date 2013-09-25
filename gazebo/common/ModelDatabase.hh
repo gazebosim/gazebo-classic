@@ -94,12 +94,6 @@ namespace gazebo
       /// \return The database config file from the model database.
       public: std::string GetDBConfig(const std::string &_uri);
 
-      /// \brief Deprecated.
-      /// \sa ModelDatabase::GetModelConfig
-      /// \sa ModelDatabase::GetDBConfig
-      public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the local path to a model.
       ///
       /// Get the path to a model based on a URI. If the model is on

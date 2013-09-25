@@ -1,4 +1,3 @@
-
 ################################################################################
 #APPEND_TO_CACHED_STRING(_string _cacheDesc [items...])
 # Appends items to a cached list.
@@ -156,24 +155,6 @@ macro (gz_setup_apple)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
-#################################################
-macro (gz_issue_775 _name)
-  # Deprecated header files
-  # Install until next gazebo version on case-sensitive filesystems
-  if (FILESYSTEM_CASE_SENSITIVE)
-    if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
-      message(WARNING "Installing deprecated ${_name}.hh. This should be removed after Gazebo 1.9")
-    endif()
-    set(generated_file "${CMAKE_CURRENT_BINARY_DIR}/${_name}.hh")
-    execute_process(
-      COMMAND bash ${PROJECT_SOURCE_DIR}/tools/issue_775_generator.bash ${_name}
-      OUTPUT_FILE ${generated_file}
-    )
-    string(TOLOWER ${_name} nameLower)
-    gz_install_includes(${nameLower} ${generated_file})
-  endif()
-endmacro()
-
 # This should be migrated to more fine control solution based on set_property APPEND
 # directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
@@ -199,3 +180,17 @@ endmacro()
 if (ENABLE_TESTS_COMPILATION)
   include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
 endif()
+
+#################################################
+# Macro to setup supported compiler warnings
+# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
+include(CheckCXXCompilerFlag)
+
+macro(filter_valid_compiler_warnings) 
+  foreach(flag ${ARGN})
+    CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
+    if(${R${flag}})
+      set(WARNING_CXX_FLAGS "${WARNING_CXX_FLAGS} ${flag}")
+    endif()
+  endforeach()
+endmacro()
