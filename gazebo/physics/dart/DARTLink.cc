@@ -287,6 +287,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
   return DARTTypes::ConvVec3(linVel);
 }
 
+//////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   const Eigen::Vector3d& linVel
