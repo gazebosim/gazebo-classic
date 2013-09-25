@@ -31,7 +31,7 @@ namespace gazebo
   {
     class JointMaker;
 
-    /// \class JointInspector JointInspector.hh gui/JointInspector.hh
+    /// \class JointInspector JointInspector.hh
     /// \brief A class to inspect and modify joints.
     class JointInspector : public QDialog
     {

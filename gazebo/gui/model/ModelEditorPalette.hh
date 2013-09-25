@@ -42,7 +42,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class ModelEditorPalette ModelEditorPalette.hh gui/gui.hh
+    /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
     class ModelEditorPalette : public QWidget
     {

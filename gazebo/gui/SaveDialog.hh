@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class SaveDialog SaveDialog.hh gui/SaveDialog.hh
+    /// \class SaveDialog SaveDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
     class SaveDialog : public QDialog
     {
