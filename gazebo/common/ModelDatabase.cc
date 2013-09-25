@@ -317,7 +317,6 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
       {
         gzmsg << "Waiting for model database update to complete...\n";
         boost::mutex::scoped_lock lock2(this->updateMutex);
-        gzmsg << "Model database update completed\n";
       }
     }
 
