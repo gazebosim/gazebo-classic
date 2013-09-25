@@ -28,6 +28,8 @@ TEST(issue_846_typo_in_camera, CaptureData)
   EXPECT_FALSE(camera->GetCaptureData());
   camera->EnableSaveFrame(true);
   EXPECT_TRUE(camera->GetCaptureData());
+  camera->EnableSaveFrame(false);
+  EXPECT_FALSE(camera->GetCaptureData());
 }
 
 /////////////////////////////////////////////////
