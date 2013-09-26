@@ -20,11 +20,37 @@
 
 #include <string>
 #include <vector>
+#include <boost/uuid/sha1.hpp>
+#include <boost/variant.hpp>
+#include <iomanip>
+#include <sstream>
+
+/*template <typename T>
+struct HashableType
+{
+  typedef boost::variant<std::string, std::vector<T> > Type;
+};*/
+
+class Sha1:
+  public boost::static_visitor<double>
+{
+  public:
+    template<class T>
+    double operator()(const T &_v) const
+    {
+      typename T::value_type t = 0;
+
+      return t;
+    }
+};
 
 namespace gazebo
 {
   namespace common
   {
+    typedef boost::variant<int, float, unsigned int, bool> BasicType;
+    typedef boost::variant<std::string, std::vector<BasicType> > T2;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -54,8 +80,15 @@ namespace gazebo
     /// \param[in] _buffer Input sequence of bytes.
     /// \param[in] _byteCount Size of the input sequence in bytes
     /// \return The string representation (40 character) of the SHA1 hash.
-    std::string get_sha1(const std::vector<float> &_buffer);
+    //template<typename T>
+    std::string get_sha1(const T2 &_buffer);
     /// \}
   }
+
+  ///////////////////////////////////////////////
+  // Implementation of get_sha1
+  //template<typename T>
+  
+
 }
 #endif
