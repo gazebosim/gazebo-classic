@@ -280,7 +280,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       x0 = modelPos[name].x;
       // issue \#848: failure with bullet 2.81
       // make this if statement unconditional when \#848 is resolved
-      if (!(name == "link_offset_box" && _physicsEngine == "bullet"))
+      if (!(name == "link_offset_box" && _physicsEngine == "bullet"
+          && LIBBULLET_VERSION < 2.82))
       {
         EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
         EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);

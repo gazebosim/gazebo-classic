@@ -142,7 +142,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   world->StepWorld(steps);
 
   // Issue #848
-  if (_physicsEngine == "bullet")
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)
     EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, 1e-1);
   else
     EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
