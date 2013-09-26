@@ -265,6 +265,10 @@ namespace gazebo
       /// \param[in] _enable Set to True to enable saving of frames
       public: void EnableSaveFrame(bool _enable);
 
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      public: bool GetCaptureData() const;
+
       /// \brief Set the save frame pathname
       /// \param[in] _pathname Directory in which to store saved image frames
       public: void SetSaveFramePathname(const std::string &_pathname);
