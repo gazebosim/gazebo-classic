@@ -253,7 +253,7 @@ bool Heightmap::PrepareTerrainPaging(
   bool updateHash = true;
 
   // Compute the original heightmap's image.
-  heightmapHash = common::get_sha1(this->heights);
+  heightmapHash = common::get_sha1<float>(this->heights);
 
   // Check if the terrain hash exists
   terrainHashFullPath = _terrainDirPath / this->hashFilename;

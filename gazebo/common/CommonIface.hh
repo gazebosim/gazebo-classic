@@ -20,6 +20,9 @@
 
 #include <string>
 #include <vector>
+#include <boost/uuid/sha1.hpp>
+#include <iomanip>
+#include <sstream>
 
 namespace gazebo
 {
@@ -54,8 +57,31 @@ namespace gazebo
     /// \param[in] _buffer Input sequence of bytes.
     /// \param[in] _byteCount Size of the input sequence in bytes
     /// \return The string representation (40 character) of the SHA1 hash.
-    std::string get_sha1(const std::vector<float> &_buffer);
+    template<typename T>
+    std::string get_sha1(const std::vector<T> &_buffer);
     /// \}
+  }
+
+  ///////////////////////////////////////////////
+  // Implementation of get_sha1
+  template<typename T>
+  std::string common::get_sha1(const std::vector<T> &_buffer)
+  {
+    boost::uuids::detail::sha1 sha1;
+    unsigned int hash[5];
+    std::stringstream stream;
+
+    sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+    sha1.get_digest(hash);
+
+    stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
+
+    for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
+    {
+      stream << hash[i];
+    }
+
+    return stream.str();
   }
 }
 #endif
