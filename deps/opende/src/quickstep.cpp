@@ -1870,7 +1870,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
-              const dReal max_moi_ratio = 100.0;
+              const dReal max_moi_ratio = 1000.0;
               bool modify_inertia = true;
               dReal moi_S1_new, moi_S2_new;
               if (moi_S1 > max_moi_ratio * moi_S2)
@@ -1896,12 +1896,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 // Modify MOI by adding delta scalar MOI in tensor form.
                 for (int si = 0; si < 12; ++si)
                 {
-                  if (si % 4 == 3)
+                  if (si % 4 == 3) //  unused term
                   {
-                    // MOI_ptr1[si] = 0;
-                    // MOI_ptr2[si] = 0;
+                    MOI_ptr1[si] = 0;
+                    MOI_ptr2[si] = 0;
                   }
-                  else if (si / 4 == si % 4)
+                  else if (si / 4 == si % 4)  // diagonal term
                   {
                     MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
                     MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
@@ -1968,6 +1968,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                   MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
                   MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
                   MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+
                 printf("--------------------------\n");
                 printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
                   invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
@@ -1981,6 +1982,21 @@ void dxQuickStepper (dxWorldProcessContext *context,
                   invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
                 printf("--------------------------\n");
 #endif
+
+                // check diagonally-dominant-ness
+                if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
+                  printf("new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
+                if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
+                  printf("new MOI1 row 2 d[%f] < o[%f, %f]\n", MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
+                if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
+                  printf("new MOI1 row 3 d[%f] < o[%f, %f]\n", MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
+
+                if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
+                  printf("new MOI2 row 1 d[%f] < o[%f, %f]\n", MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
+                if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
+                  printf("new MOI2 row 2 d[%f] < o[%f, %f]\n", MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
+                if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
+                  printf("new MOI2 row 3 d[%f] < o[%f, %f]\n", MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
               }
             }
           }
