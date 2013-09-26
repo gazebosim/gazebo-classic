@@ -1983,6 +1983,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 printf("--------------------------\n");
 #endif
 
+#ifdef DEBUG_INERTIA_PROPAGATION
                 // check diagonally-dominant-ness
                 if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
                   printf("new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
@@ -1997,6 +1998,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                   printf("new MOI2 row 2 d[%f] < o[%f, %f]\n", MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
                 if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
                   printf("new MOI2 row 3 d[%f] < o[%f, %f]\n", MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
+#endif
               }
             }
           }
