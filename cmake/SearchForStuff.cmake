@@ -130,6 +130,7 @@ if (PKG_CONFIG_FOUND)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
   else()
+    BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
     set (HAVE_SIMBODY FALSE)
   endif()
   
