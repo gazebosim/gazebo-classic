@@ -35,6 +35,8 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(_name, _vis)
 {
+  this->receivedMsg = false;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
@@ -46,6 +48,9 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->connection = event::Events::ConnectPreRender(
+        boost::bind(&LaserVisual::Update, this));
 }
 
 /////////////////////////////////////////////////
@@ -58,6 +63,16 @@ LaserVisual::~LaserVisual()
 /////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->laserMsg = _msg;
+  this->receivedMsg = true;
+}
+
+/////////////////////////////////////////////////
+void LaserVisual::Update()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Skip the update if the user is moving the laser.
   if (this->GetScene()->GetSelectedVisual() &&
       this->GetRootVisual()->GetName() ==
@@ -66,16 +81,22 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
     return;
   }
 
-  double angle = _msg->scan().angle_min();
+  if (!this->laserMsg || !this->receivedMsg)
+    return;
+
+  this->receivedMsg = false;
+
+  double angle = this->laserMsg->scan().angle_min();
   double r;
   math::Vector3 pt;
-  math::Pose offset = msgs::Convert(_msg->scan().world_pose()) -
+  math::Pose offset = msgs::Convert(this->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
 
   this->rayFan->SetPoint(0, offset.pos);
-  for (size_t i = 0; static_cast<int>(i) < _msg->scan().ranges_size(); i++)
+  for (size_t i = 0;
+       static_cast<int>(i) < this->laserMsg->scan().ranges_size(); ++i)
   {
-    r = _msg->scan().ranges(i);
+    r = this->laserMsg->scan().ranges(i);
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
@@ -86,7 +107,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
     else
       this->rayFan->SetPoint(i+1, pt);
 
-    angle += _msg->scan().angle_step();
+    angle += this->laserMsg->scan().angle_step();
   }
 }
 
