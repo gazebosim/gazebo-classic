@@ -40,3 +40,5 @@ gz_install_executable(gzstats)
 add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
+
+install (PROGRAMS gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
