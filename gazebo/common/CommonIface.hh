@@ -34,23 +34,26 @@ namespace gazebo
     /// \brief Load the common library.
     void load();
 
-    /// \brief add path prefix to common::SystemPaths
+    /// \brief add path sufix to common::SystemPaths
+    /// \param[in] _suffix The suffix to add.
     void add_search_path_suffix(const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
+    /// \return The path containing the file.
     std::string find_file(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
+    /// \return The path containing the file.
     std::string find_file(const std::string &_file,
                           bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
-    /// \param[in] _file the file name to look for
-    /// \return The path containing the file
+    /// \param[in] _file the file name to look for.
+    /// \return The path containing the file.
     std::string find_file_path(const std::string &_file);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
