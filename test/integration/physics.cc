@@ -475,8 +475,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_EQ(vel1.x, 0);
-      EXPECT_EQ(vel1.y, 0);
+      EXPECT_DOUBLE_EQ(vel1.x, 0);
+      EXPECT_DOUBLE_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
