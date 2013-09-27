@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: SimbodyCollision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
@@ -49,12 +45,10 @@ void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyCollision::OnPoseChange()
 {
-  /*
-  math::Pose pose = this->GetRelativePose();
-  SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
+  // math::Pose pose = this->GetRelativePose();
+  // SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
 
-  bbody->SetCollisionRelativePose(this, pose);
-  */
+  // bbody->SetCollisionRelativePose(this, pose);
 }
 
 //////////////////////////////////////////////////
@@ -66,13 +60,6 @@ void SimbodyCollision::SetCategoryBits(unsigned int /*_bits*/)
 void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 {
 }
-
-//////////////////////////////////////////////////
-/*Mass SimbodyCollision::GetLinkMassMatrix()
-{
-  Mass result;
-  return result;
-}*/
 
 //////////////////////////////////////////////////
 math::Box SimbodyCollision::GetBoundingBox() const

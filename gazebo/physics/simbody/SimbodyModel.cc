@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
@@ -77,7 +73,8 @@ void SimbodyModel::Init()
     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
       this->GetWorld()->GetPhysicsEngine());
   if (simbodyPhysics)
-    simbodyPhysics->InitModel(this);
+    simbodyPhysics->InitModel(
+        boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
@@ -107,18 +104,16 @@ void SimbodyModel::Init()
   }
 }
 
-/*
 //////////////////////////////////////////////////
-void SimbodyModel::FillMsg(msgs::Model &_msg)
-{
-  // rebuild simbody state
-  // this needs to happen before this->joints are used
-  physics::SimbodyPhysicsPtr simbodyPhysics =
-    boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-  if (simbodyPhysics)
-    simbodyPhysics->InitModel(this);
-
-  Model::FillMsg(_msg);
-}
-*/
+// void SimbodyModel::FillMsg(msgs::Model &_msg)
+// {
+//   // rebuild simbody state
+//   // this needs to happen before this->joints are used
+//   physics::SimbodyPhysicsPtr simbodyPhysics =
+//     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
+//       this->GetWorld()->GetPhysicsEngine());
+//   if (simbodyPhysics)
+//     simbodyPhysics->InitModel(this);
+//
+//   Model::FillMsg(_msg);
+// }

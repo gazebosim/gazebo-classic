@@ -15,15 +15,14 @@
  *
 */
 
-#ifndef SIMBODY_INC_H_
-#define SIMBODY_INC_H_
+#ifndef _SIMBODY_INC_H_
+#define _SIMBODY_INC_H_
 
-// This disables warning messages for ODE
 #pragma GCC system_header
+#include <Simbody.h>
 // #include <SimTKcommon.h>
 // #include <SimTKsimbody.h>
 // #include <SimTKmath.h>
-// #include <Simbody.h>
 // using namespace SimTK;
 
 #endif

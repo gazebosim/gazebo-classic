@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _SIMBODYMULTIRAYSHAPE_HH_
-#define _SIMBODYMULTIRAYSHAPE_HH_
+
+#ifndef _SIMBODY_MULTIRAYSHAPE_HH_
+#define _SIMBODY_MULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 
@@ -36,13 +37,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyMultiRayShape();
 
-      /// \brief Update the rays
+      // Documentation inherited.
       public: virtual void UpdateRays();
 
-      /// \brief Add a ray to the collision
-      protected: void AddRay(const math::Vector3 &start,
-                             const math::Vector3 &end);
+      // Documentation inherited.
+      protected: virtual void AddRay(const math::Vector3 &_start,
+                             const math::Vector3 &_end);
 
+      /// \brief Pointer to the physics engine.
       private: SimbodyPhysicsPtr physicsEngine;
     };
     /// \}

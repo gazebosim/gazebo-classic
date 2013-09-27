@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Box shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
 #ifndef _SIMBODY_BOXSHAPE_HH_
 #define _SIMBODY_BOXSHAPE_HH_
@@ -42,7 +38,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyBoxShape() {}
 
-      /// \brief Set the size of the box
+      // Documentation inherited
       public: void SetSize(const math::Vector3 &_size)
               {
                 if (_size.x < 0 || _size.y < 0 || _size.z < 0)

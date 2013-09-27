@@ -14,20 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Simbody Link class
- * Author: Nate Koenig
- * Date: 15 May 2009
- */
 
-#ifndef _SIMBODYLINK_HH_
-#define _SIMBODYLINK_HH_
+#ifndef _SIMBODY_LINK_HH_
+#define _SIMBODY_LINK_HH_
 
 #include <vector>
-#include <Simbody.h>
 
-#include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/Link.hh"
+
+#include "gazebo/physics/simbody/simbody_inc.h"
 
 namespace gazebo
 {
@@ -47,112 +43,100 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyLink();
 
-      /// \brief Load the body based on an common::XMLConfig node
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _ptr);
 
-      /// \brief Initialize the body
+      // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Finalize the body
+      // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Called when the pose of the entity (or one of its parents) has
-      /// changed
+      // Documentation inherited.
       public: virtual void OnPoseChange();
 
-      /// \brief Set whether this body is enabled
+      // Documentation inherited.
       public: virtual void SetEnabled(bool enable) const;
 
-      /// \brief Get whether this body is enabled in the physics engine
-      public: virtual bool GetEnabled() const {return true;}
+      // Documentation inherited.
+      public: virtual bool GetEnabled() const;
 
-      /// \brief Set the linear velocity of the body
-      public: virtual void SetLinearVel(const math::Vector3 &vel);
+      // Documentation inherited.
+      public: virtual void SetLinearVel(const math::Vector3 &_vel);
 
-      /// \brief Set the angular velocity of the body
-      public: virtual void SetAngularVel(const math::Vector3 &vel);
+      // Documentation inherited.
+      public: virtual void SetAngularVel(const math::Vector3 &_vel);
 
-      /// \brief Set the force applied to the body
-      public: virtual void SetForce(const math::Vector3 &force);
+      // Documentation inherited.
+      public: virtual void SetForce(const math::Vector3 &_force);
 
-      /// \brief Set the torque applied to the body
-      public: virtual void SetTorque(const math::Vector3 &force);
+      // Documentation inherited.
+      public: virtual void SetTorque(const math::Vector3 &_force);
 
-      /// \brief Get the linear velocity of the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldLinearVel(
         const math::Vector3& _vector3) const;
 
-      /// \brief Get the linear velocity of the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldLinearVel(
           const math::Vector3 &_offset,
           const math::Quaternion &_q) const;
 
-      /// \brief Get the linear velocity of the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
-      /// \brief Get the angular velocity of the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldAngularVel() const;
 
-      /// \brief Get the force applied to the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldForce() const;
 
-      /// \brief Get the torque applied to the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldTorque() const;
 
-      /// \brief Set whether gravity affects this body
-      public: virtual void SetGravityMode(bool mode);
+      // Documentation inherited.
+      public: virtual void SetGravityMode(bool _mode);
 
-      /// \brief Get the gravity mode
+      // Documentation inherited.
       public: virtual bool GetGravityMode() const;
 
-      /// \brief store gravity mode given link might not be around
-      public: bool gravityMode;
+      // Documentation inherited.
+      public: virtual void SetSelfCollide(bool _collide);
 
-      /// \brief Set whether this body will collide with others in the model
-      public: void SetSelfCollide(bool collide);
+      // Documentation inherited.
+      public: virtual void SetLinearDamping(double _damping);
 
-      /// \brief Set the linear damping factor
-      public: virtual void SetLinearDamping(double damping);
+      // Documentation inherited.
+      public: virtual void SetAngularDamping(double _damping);
 
-      /// \brief Set the angular damping factor
-      public: virtual void SetAngularDamping(double damping);
-
-      /// \brief Set the relative pose of a child collision.
-      /*public: void SetCollisionRelativePose(SimbodyCollision *collision,
-                                            const math::Pose &newPose);
-                                            */
-
-      /// \brief Add a force to the body
+      // Documentation inherited.
       public: virtual void AddForce(const math::Vector3 &_force);
 
-      /// \brief Add a force to the body, components are relative to the
-      ///        body's own frame of reference.
+      // Documentation inherited.
       public: virtual void AddRelativeForce(const math::Vector3 &_force);
 
-      /// \brief Add a force to the body using a global position
+      // Documentation inherited.
       public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
                                                    const math::Vector3 &_pos);
 
-      /// \brief Add a force to the body at position expressed to the body's
-      ///        own frame of reference.
+      // Documentation inherited.
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
 
-      /// \brief Add a torque to the body
+      // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
-      /// \brief Add a torque to the body, components are relative to the
-      ///        body's own frame of reference.
+      // Documentation inherited.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
-      /// \copydoc Link::SetAutoDisable(bool)
+      // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);
 
-      // Save current Simbody State
+      // Documentation inherited.
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
 
-      // Restore saved Simbody State
+      // Documentation inherited.
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       /// \brief If the inboard body of this link is ground, simply
@@ -162,9 +146,40 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static);
 
-      /// \biref Internal call to make link static if
+      /// \brief Convert Gazebo Inertia to Simbody MassProperties
+      /// Where Simbody MassProperties contains mass,
+      /// center of mass location, and unit inertia about body origin.
+      public: SimTK::MassProperties GetMassProperties() const;
+
+      public: SimTK::MassProperties GetEffectiveMassProps(
+        int _numFragments) const;
+
+      public: void SetDirtyPose(const math::Pose &_pose);
+
+      /// \brief Internal call to make link static if
       /// staticLinkDirty and staticLink are true.
       private: void ProcessSetLinkStatic();
+
+      /// \brief: Force this link to be a base body, where its inboard
+      /// body is the world with 6DOF.
+      public: bool mustBeBaseLink;
+
+      // Below to be filled in after everything is loaded
+      // Which MobilizedBody corresponds to the master instance of this link.
+      public: SimTK::MobilizedBody masterMobod;
+
+      // Keeps track if physics has been initialized
+      public: bool physicsInitialized;
+
+      // If this link got split into a master and slaves, these are the
+      // MobilizedBodies used to mobilize the slaves.
+      public: std::vector<SimTK::MobilizedBody> slaveMobods;
+
+      // And these are the Weld constraints used to attach slaves to master.
+      public: std::vector<SimTK::Constraint::Weld> slaveWelds;
+
+      /// \brief store gravity mode given link might not be around
+      private: bool gravityMode;
 
       /// \biref Trigger setting of link according to staticLink.
       private: bool staticLinkDirty;
@@ -183,35 +198,6 @@ namespace gazebo
 
       /// \brief keep a pointer to the simbody physics engine for convenience
       private: SimbodyPhysicsPtr simbodyPhysics;
-
-      /// \brief: Force this link to be a base body, where its inboard
-      /// body is the world with 6DOF.
-      public: bool mustBeBaseLink;
-
-      // Below to be filled in after everything is loaded
-      // Which MobilizedBody corresponds to the master instance of this link.
-      public: SimTK::MobilizedBody                   masterMobod;
-
-      // Keeps track if physics has been initialized
-      public: bool physicsInitialized;
-
-      // If this link got split into a master and slaves, these are the
-      // MobilizedBodies used to mobilize the slaves.
-      public: std::vector<SimTK::MobilizedBody>      slaveMobods;
-
-      // And these are the Weld constraints used to attach slaves to master.
-      public: std::vector<SimTK::Constraint::Weld>   slaveWelds;
-
-      // Convert Gazebo Inertia to Simbody MassProperties
-      // Where Simbody MassProperties contains mass,
-      // center of mass location, and unit inertia about body origin.
-      public: SimTK::MassProperties GetMassProperties() const;
-      public: SimTK::MassProperties GetEffectiveMassProps(
-        int _numFragments) const;
-      public: void SetDirtyPose(math::Pose _pose)
-              {
-                this->dirtyPose = _pose;
-              }
     };
     /// \}
   }

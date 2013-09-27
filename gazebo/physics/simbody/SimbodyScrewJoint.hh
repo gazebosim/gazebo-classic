@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
 
-#ifndef _SIMBODYSCREWJOINT_HH_
-#define _SIMBODYSCREWJOINT_HH_
+#ifndef _SIMBODY_SCREWJOINT_HH_
+#define _SIMBODY_SCREWJOINT_HH_
 
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
@@ -37,64 +33,63 @@ namespace gazebo
     class SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodyScrewJoint(SimTK::MultibodySystem *world, BasePtr _parent);
+      /// \param[in] _world Pointer to the Simbody world.
+      /// \param[in] _parent Parent of the screw joint.
+      public: SimbodyScrewJoint(SimTK::MultibodySystem *_world,
+                  BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyScrewJoint();
 
-      /// \brief Load the SimbodyScrewJoint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set joint damping, not yet implemented
+      // Documentation inherited.
       public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Set the axis of motion
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
+      // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \copydoc ScrewJoint::SetThreadPitch
+      // Documentation inherited.
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
-      /// \copydoc ScrewJoint::GetThreadPitch
-      public: virtual double GetThreadPitch(unsigned int /*_index*/)
-              {
-                gzerr << "Not implemented in Simbody\n";
-                return 0;
-              }
+      // Documentation inherited.
+      public: virtual double GetThreadPitch(unsigned int /*_index*/);
 
-      /// \brief Set the high stop of an axis(index).
+      // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
-      /// \brief Set the low stop of an axis(index).
+      // Documentation inherited.
       public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the high stop of an axis(index).
+      // Documentation inherited.
       public: virtual math::Angle GetHighStop(int _index);
 
-      /// \brief Get the low stop of an axis(index).
+      // Documentation inherited.
       public: virtual math::Angle GetLowStop(int _index);
 
-      /// \brief Get the rate of change
+      // Documentation inherited.
       public: virtual double GetVelocity(int _index) const;
 
-       /// \brief Set the velocity of an axis(index).
+      // Documentation inherited.
       public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Get the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual double GetMaxForce(int _index);
 
-      /// \brief Get the axis of rotation
+      // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Get the angle of rotation
+      // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Set the screw force
+      // Documentation inherited.
       protected: virtual void SetForceImpl(int _index, double _force);
     };
     /// \}

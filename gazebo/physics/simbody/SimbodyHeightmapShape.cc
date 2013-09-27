@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collisionetry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
 #include "gazebo/common/Exception.hh"
 

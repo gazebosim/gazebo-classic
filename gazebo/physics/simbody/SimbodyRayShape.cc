@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"

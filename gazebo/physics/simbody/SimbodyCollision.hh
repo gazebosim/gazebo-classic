@@ -14,30 +14,19 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifndef _SIMBODY_COLLISION_HH_
 #define _SIMBODY_COLLISION_HH_
 
 #include <string>
 
-/*
-
-#include "common/Param.hh"
-#include "Entity.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
-#include "physics/Collision.hh"
-*/
-
-#include <SimTKmath.h>
-// using namespace SimTK;
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+
+namespace SimTK
+{
+ class ContactGeometry;
+}
 
 namespace gazebo
 {
@@ -56,29 +45,31 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyCollision();
 
-      /// \brief Load the collision
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _ptr);
 
-      /// \brief On pose change
+      // Documentation inherited
       public: virtual void OnPoseChange();
 
-      /// \brief Set the category bits, used during collision detection
-      /// \param bits The bits
-      public: virtual void SetCategoryBits(unsigned int bits);
+      // Documentation inherited
+      public: virtual void SetCategoryBits(unsigned int _bits);
 
-      /// \brief Set the collide bits, used during collision detection
-      /// \param bits The bits
-      public: virtual void SetCollideBits(unsigned int bits);
+      // Documentation inherited
+      public: virtual void SetCollideBits(unsigned int _bits);
 
-      /// \brief Get the bounding box, defined by the physics engine
+      // Documentation inherited
       public: virtual math::Box GetBoundingBox() const;
 
-      /// \brief Set the collision shape
-      public: void SetCollisionShape(SimTK::ContactGeometry *shape);
+      /// \brief Set the collision shape.
+      /// \param[in] _shape SimTK geometry to use as the collision
+      /// SimTK geometry to use as the collision shape.
+      public: void SetCollisionShape(SimTK::ContactGeometry *_shape);
 
-      /// \brief Get the simbody collision shape
+      /// \brief Get the simbody collision shape.
+      /// \return SimTK geometry used as the collision shape.
       public: SimTK::ContactGeometry *GetCollisionShape() const;
 
+      /// \brief The SimTK collision geometry.
       private: SimTK::ContactGeometry *collisionShape;
     };
     /// \}

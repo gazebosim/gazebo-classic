@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
-#ifndef _SIMBODYHINGEJOINT_HH_
-#define _SIMBODYHINGEJOINT_HH_
+#ifndef _SIMBODY_HINGEJOINT_HH_
+#define _SIMBODY_HINGEJOINT_HH_
 
 #include <vector>
 
@@ -47,10 +43,10 @@ namespace gazebo
       /// Destructor
       public: virtual ~SimbodyHingeJoint();
 
-      /// \brief Load the SimbodyHingeJoint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set joint damping, not yet implemented
+      // Documentation inherited.
       public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
@@ -83,14 +79,14 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(int _index) const;
-
       /// \brief save simbody state for spawning
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
 
       /// \brief restore  simbody state for spawning
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
+
+      // Documentation inherited.
+      protected: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited.
       protected: void SetForceImpl(int _index, double _torque);

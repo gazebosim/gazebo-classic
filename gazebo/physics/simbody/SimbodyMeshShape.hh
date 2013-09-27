@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh collisionetry
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
 
-#ifndef _SIMBODYMESHSHAPE_HH_
-#define _SIMBODYMESHSHAPE_HH_
+#ifndef _SIMBODY_MESHSHAPE_HH_
+#define _SIMBODY_MESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
 
@@ -41,12 +37,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyMeshShape();
 
-      /// \brief Load the trimesh
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited
       protected: virtual void Init();
     };
-
     /// \}
   }
 }

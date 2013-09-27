@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base Simbody joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 15 May 2009
- */
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -98,11 +94,11 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   if (_sdf->GetElement("child")->HasElement("pose"))
     childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
 
-  this->X_CB = physics::SimbodyPhysics::Pose2Transform(childPose);
+  this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
   math::Pose parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
-    this->X_PA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
+    this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
   {
     SimTK::Transform X_MC, X_MP;
@@ -132,7 +128,9 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;
-    this->X_PA = X_PC*this->X_CB;  // i.e., A spatially coincident with B
+
+    // i.e., A spatially coincident with B
+    this->xPA = X_PC*this->xCB;
   }
 }
 
@@ -252,7 +250,7 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void SimbodyJoint::SetAxis(int _index, const math::Vector3 &/*_axis*/)
 {
   math::Pose parentModelPose;
   if (this->parentLink)
@@ -338,4 +336,59 @@ void SimbodyJoint::SaveSimbodyState(const SimTK::State &/*_state*/)
 void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 {
   // Not implemented
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetAnchor(int /*_index*/,
+    const gazebo::math::Vector3 & /*_anchor*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetDamping(int /*_index*/, const double /*_damping*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyJoint::GetAnchor(int /*_index*/) const
+{
+  gzdbg << "Not implement in Simbody\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+{
+  gzdbg << "Not implement in Simbody\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+{
+  gzdbg << "Not implement in Simbody\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetAttribute(Attribute, int /*_index*/, double /*_value*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
+    const boost::any &/*_value*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+}
+
+//////////////////////////////////////////////////
+double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
+    unsigned int /*_index*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+  return 0;
 }

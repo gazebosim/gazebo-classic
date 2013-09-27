@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
 
-#ifndef _SIMBODYRAYGEOM_HH_
-#define _SIMBODYRAYGEOM_HH_
+#ifndef _SIMBODY_RAY_SHAPE_HH_
+#define _SIMBODY_RAY_SHAPE_HH_
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
@@ -36,28 +32,28 @@ namespace gazebo
     /// \brief Ray shape for simbody
     class SimbodyRayShape : public RayShape
     {
+      /// \brief Constructor.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
       public: SimbodyRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
-      /// \param body Link the ray is attached to
+      /// \param[in] _collision Collision the ray is attached to.
       public: SimbodyRayShape(CollisionPtr _collision);
 
       /// \brief Destructor
       public: virtual ~SimbodyRayShape();
 
-      /// \brief Update the ray collision
+      // Documentation inherited
       public: virtual void Update();
 
-      /// \brief Get the nearest intersection
+      // Documentation inherited
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
-      /// \brief Set the ray based on starting and ending points relative to
-      ///        the body
-      /// \param posStart Start position, relative the body
-      /// \param posEnd End position, relative to the body
-      public: void SetPoints(const math::Vector3 &_posStart,
-                             const math::Vector3 &_posEnd);
+      // Documentation inherited
+      public: virtual void SetPoints(const math::Vector3 &_posStart,
+                                     const math::Vector3 &_posEnd);
 
+      /// \brief Pointer to the physics engine.
       private: SimbodyPhysicsPtr physicsEngine;
     };
     /// \}

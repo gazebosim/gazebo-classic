@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A simbody slider or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"

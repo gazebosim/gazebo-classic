@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Cylinder shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
 #ifndef _SIMBODY_CYLINDERSHAPE_HH_
 #define _SIMBODY_CYLINDERSHAPE_HH_
@@ -43,9 +39,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyCylinderShape() {}
 
-      /// \brief Set the size of the cylinder
-      /// \param[in] _radius Cylinder radius
-      /// \param[in] _length Cylinder length
+      // Documentation inherited
       public: void SetSize(double _radius, double _length)
               {
                 if (_radius < 0)

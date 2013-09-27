@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collision
- * Author: Nate Koenig
- * Date: 8 May 2003
- */
 
-#ifndef _SIMBODYHEIGHTMAPGEOM_HH_
-#define _SIMBODYHEIGHTMAPGEOM_HH_
+#ifndef _SIMBODY_HEIGHTMAPGEOM_HH_
+#define _SIMBODY_HEIGHTMAPGEOM_HH_
+
 #include <string>
 
 #include "gazebo/physics/HeightmapShape.hh"
@@ -35,16 +32,16 @@ namespace gazebo
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
-    /// \brief Height map collision
+    /// \brief Height map collision.
     class SimbodyHeightmapShape : public HeightmapShape
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: SimbodyHeightmapShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~SimbodyHeightmapShape();
 
-      /// \brief Load the heightmap
+      // Documentation inherited.
       public: virtual void Init();
     };
     /// \}

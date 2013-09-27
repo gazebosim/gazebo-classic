@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A simbody screw or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -142,4 +138,11 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(int /*_index*/) const
 {
   gzerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
   return math::Angle();
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+{
+  gzerr << "Not implemented in Simbody\n";
+  return 0;
 }

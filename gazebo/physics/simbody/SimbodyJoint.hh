@@ -14,18 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: The base Simbody joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
-#ifndef _SIMBODYJOINT_HH_
-#define _SIMBODYJOINT_HH_
+#ifndef _SIMBODY_JOINT_HH_
+#define _SIMBODY_JOINT_HH_
 
 #include <boost/any.hpp>
 #include <string>
-
-#include <Simbody.h>
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/Joint.hh"
@@ -47,77 +41,57 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SimbodyJoint();
 
-      /// \brief Load a SimbodyJoint
-      public: void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Reset the joint
+      // Documentation inherited.
       public: virtual void Reset();
 
-      /// \brief Get the body to which the joint is attached
-      ///        according the _index
-      public: LinkPtr GetJointLink(int _index) const;
+      // Documentation inherited.
+      public: virtual LinkPtr GetJointLink(int _index) const;
 
-      /// \brief Determines of the two bodies are connected by a joint
-      public: bool AreConnected(LinkPtr _one, LinkPtr _two) const;
+      // Documentation inherited.
+      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
-      /// \brief Detach this joint from all bodies
+      // Documentation inherited.
       public: virtual void Detach();
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int /*index*/,
-                                      const gazebo::math::Vector3 & /*anchor*/)
-              {gzdbg << "Not implement in Simbody\n";}
+      // Documentation inherited.
+      public: virtual void SetAnchor(int _index,
+                  const gazebo::math::Vector3 &_anchor);
 
-      /// \brief Set the joint damping
-      public: virtual void SetDamping(int /*index*/,
-                                      const double /*damping*/)
-              {gzdbg << "Not implement in Simbody\n";}
+      // Documentation inherited.
+      public: virtual void SetDamping(int /*index*/, const double /*damping*/);
 
-      /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int /*_index*/) const
-              {gzdbg << "Not implement in Simbody\n";
-               return math::Vector3();}
+      // Documentation inherited.
+      public: virtual math::Vector3 GetAnchor(int /*_index*/) const;
 
-      /// \brief Get the force the joint applies to the first body
-      /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkForce(unsigned int /*_index*/) const
-              {gzdbg << "Not implement in Simbody\n";
-               return math::Vector3();}
+      // Documentation inherited.
+      public: virtual math::Vector3 GetLinkForce(
+                  unsigned int /*_index*/) const;
 
-      /// \brief Get the torque the joint applies to the first body
-      /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkTorque(unsigned int /*_index*/) const
-              {gzdbg << "Not implement in Simbody\n";
-               return math::Vector3();}
+      // Documentation inherited.
+      public: virtual math::Vector3 GetLinkTorque(
+                  unsigned int /*_index*/) const;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int /*_index*/,
-                                        double /*_value*/)
-              {gzdbg << "Not implement in Simbody\n";}
+                                        double /*_value*/);
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &/*_key*/,
                                         int /*_index*/,
-                                        const boost::any &/*_value*/)
-              {gzdbg << "Not implement in Simbody\n";}
+                                        const boost::any &/*_value*/);
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &/*_key*/,
-                                                unsigned int /*_index*/)
-              {
-                gzdbg << "Not implement in Simbody\n";
-                return 0;
-              }
-
+                                                unsigned int /*_index*/);
 
       // Save current Simbody State
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
 
       // Restore saved Simbody State
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
-
-      /// \brief Simbody Multibody System
-      protected: SimTK::MultibodySystem *world;
 
       // Documentation inherited.
       public: virtual void SetForce(int _index, double _force);
@@ -126,7 +100,7 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
@@ -148,13 +122,21 @@ namespace gazebo
       /// \param[in] _force Force value.
       private: void SaveForce(int _index, double _force);
 
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
       // Simbody specific variables
       public: bool mustBreakLoopHere;
 
       // Normally A=F, B=M. But if reversed, then B=F, A=M.
-      public: SimTK::Transform    X_PA;  // parent body frame to mobilizer frame
-      public: SimTK::Transform    X_CB;  // child body frame to mobilizer frame
-      public: SimTK::Transform defX_AB;  // default mobilizer pose
+      // parent body frame to mobilizer frame
+      public: SimTK::Transform xPA;
+
+      // child body frame to mobilizer frame
+      public: SimTK::Transform xCB;
+
+      // default mobilizer pose
+      public: SimTK::Transform defxAB;
 
       // Members below here are set when we build the Simbody model.
 
@@ -186,8 +168,8 @@ namespace gazebo
       // Keeps track if physics has been initialized
       public: bool physicsInitialized;
 
-      // Documentation inherited.
-      public: virtual void CacheForceTorque();
+      /// \brief Simbody Multibody System
+      protected: SimTK::MultibodySystem *world;
 
       /// \brief keep a pointer to the simbody physics engine for convenience
       protected: SimbodyPhysicsPtr simbodyPhysics;

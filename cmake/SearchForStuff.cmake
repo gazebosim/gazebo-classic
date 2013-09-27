@@ -131,9 +131,10 @@ if (PKG_CONFIG_FOUND)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
   else()
+    BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
     set (HAVE_SIMBODY FALSE)
   endif()
-  
+
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
@@ -304,8 +305,10 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(BULLET bullet>=2.81)
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
+    add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )
   else()
     set (HAVE_BULLET FALSE)
+    add_definitions( -DLIBBULLET_VERSION=0.0 )
   endif()
 
 else (PKG_CONFIG_FOUND)

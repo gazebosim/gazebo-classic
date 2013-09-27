@@ -14,10 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: A SimbodyHingeJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
