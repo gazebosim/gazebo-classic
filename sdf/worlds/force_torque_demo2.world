@@ -13,7 +13,7 @@
       <background>0.500000 0.500000 0.500000 1.000000</background>
       <shadows>0</shadows>
     </scene>
-    <physics type="simbody">
+    <physics type="ode">
       <gravity>0.000000 0.000000 -9.810000</gravity>
       <simbody>
         <accuracy>0.001</accuracy>
