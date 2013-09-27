@@ -27,6 +27,7 @@ set(tests
   contact_sensor.cc
   factory.cc
   file_handling.cc
+  gripper.cc
   imu.cc
   laser.cc
   nondefault_world.cc

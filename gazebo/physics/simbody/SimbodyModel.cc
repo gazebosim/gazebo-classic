@@ -61,10 +61,9 @@ void SimbodyModel::Init()
       boost::static_pointer_cast<SimbodyModel>(*iter)->Init();
   }
 
-  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
-       iter != this->grippers.end(); ++iter)
+  for (unsigned int i = 0; i < this->GetGripperCount(); ++i)
   {
-    (*iter)->Init();
+    this->GetGripper(i)->Init();
   }
 
   // rebuild simbody state
@@ -77,8 +76,9 @@ void SimbodyModel::Init()
         boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Initialize the joints last.
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  Joint_V myJoints = this->GetJoints();
+  for (Joint_V::iterator iter = myJoints.begin();
+       iter != myJoints.end(); ++iter)
   {
     try
     {
@@ -92,8 +92,8 @@ void SimbodyModel::Init()
   }
 
   // Initialize the joints messages for visualizer
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (Joint_V::iterator iter = myJoints.begin();
+       iter != myJoints.end(); ++iter)
   {
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
