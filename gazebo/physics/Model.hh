@@ -334,6 +334,9 @@ namespace gazebo
       /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
 
+      /// \brief Publisher for joint info.
+      protected: transport::PublisherPtr jointPub;
+
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
 
@@ -348,9 +351,6 @@ namespace gazebo
 
       /// \brief All the model plugins.
       private: std::vector<ModelPluginPtr> plugins;
-
-      /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
 
       /// \brief The joint animations.
       private: std::map<std::string, common::NumericAnimationPtr>
