@@ -24,8 +24,8 @@
  *  should refine the test to be more specific in the future.
 */
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/CartTestPlugin.hh"
 
 using namespace gazebo;
@@ -57,58 +57,58 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
 
   // get all joints
   this->joints[0] = _model->GetJoint(
-    _sdf->GetElement("steer")->GetValueString());
+    _sdf->GetElement("steer")->Get<std::string>());
   this->jointPIDs[0] = common::PID(
-    _sdf->GetElement("steer_pid")->GetValueVector3().x,
-    _sdf->GetElement("steer_pid")->GetValueVector3().y,
-    _sdf->GetElement("steer_pid")->GetValueVector3().z,
-    _sdf->GetElement("steer_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("steer_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("steer_pid")->Get<math::Vector3>().z,
+    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[0] =
-    _sdf->GetElement("steer_pos")->GetValueDouble();
+    _sdf->GetElement("steer_pos")->Get<double>();
   this->jointVelocities[0] =
-    _sdf->GetElement("steer_vel")->GetValueDouble();
+    _sdf->GetElement("steer_vel")->Get<double>();
   this->jointMaxEfforts[0] =
-    _sdf->GetElement("steer_eff")->GetValueDouble();
+    _sdf->GetElement("steer_eff")->Get<double>();
 
   this->joints[1] = _model->GetJoint(
-    _sdf->GetElement("right")->GetValueString());
+    _sdf->GetElement("right")->Get<std::string>());
   this->jointPIDs[1] = common::PID(
-    _sdf->GetElement("right_pid")->GetValueVector3().x,
-    _sdf->GetElement("right_pid")->GetValueVector3().y,
-    _sdf->GetElement("right_pid")->GetValueVector3().z,
-    _sdf->GetElement("right_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("right_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("right_pid")->Get<math::Vector3>().z,
+    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[1] =
-    _sdf->GetElement("right_pos")->GetValueDouble();
+    _sdf->GetElement("right_pos")->Get<double>();
   this->jointVelocities[1] =
-    _sdf->GetElement("right_vel")->GetValueDouble();
+    _sdf->GetElement("right_vel")->Get<double>();
   this->jointMaxEfforts[1] =
-    _sdf->GetElement("right_eff")->GetValueDouble();
+    _sdf->GetElement("right_eff")->Get<double>();
 
   this->joints[2] = _model->GetJoint(
-    _sdf->GetElement("left")->GetValueString());
+    _sdf->GetElement("left")->Get<std::string>());
   this->jointPIDs[2] = common::PID(
-    _sdf->GetElement("left_pid")->GetValueVector3().x,
-    _sdf->GetElement("left_pid")->GetValueVector3().y,
-    _sdf->GetElement("left_pid")->GetValueVector3().z,
-    _sdf->GetElement("left_ilim")->GetValueVector2d().y,
-    _sdf->GetElement("left_ilim")->GetValueVector2d().x);
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().x,
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().y,
+    _sdf->GetElement("left_pid")->Get<math::Vector3>().z,
+    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().y,
+    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().x);
   this->jointPositions[2] =
-    _sdf->GetElement("left_pos")->GetValueDouble();
+    _sdf->GetElement("left_pos")->Get<double>();
   this->jointVelocities[2] =
-    _sdf->GetElement("left_vel")->GetValueDouble();
+    _sdf->GetElement("left_vel")->Get<double>();
   this->jointMaxEfforts[2] =
-    _sdf->GetElement("left_eff")->GetValueDouble();
+    _sdf->GetElement("left_eff")->Get<double>();
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&CartTestPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
 void CartTestPlugin::Init()
 {
-  // physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+  // physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
   //   this->joints[0]->GetChild());
 }
 

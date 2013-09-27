@@ -17,7 +17,7 @@
 #include <boost/bind.hpp>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 #include "msgs/custom.pb.h"
 
@@ -32,7 +32,7 @@ namespace gazebo
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateStart(
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&CustomMessages::OnUpdate, this));
     }
 

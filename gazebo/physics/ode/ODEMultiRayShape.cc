@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODERayShape.hh"
-#include "physics/ode/ODEMultiRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODERayShape.hh"
+#include "gazebo/physics/ode/ODEMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -46,9 +46,9 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
 
   // These three lines may be unessecary
   ODELinkPtr pLink =
-    boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
+    boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId(this->raySpaceId);
-  boost::shared_static_cast<ODECollision>(this->collisionParent)->SetSpaceId(
+  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
       this->raySpaceId);
 }
 
@@ -65,7 +65,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
-  ODEPhysicsPtr ode = boost::shared_dynamic_cast<ODEPhysics>(
+  ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
@@ -87,9 +87,6 @@ void ODEMultiRayShape::UpdateRays()
 void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODECollision *collision1, *collision2 = NULL;
-  ODECollision *rayCollision = NULL;
-  ODECollision *hitCollision = NULL;
   ODEMultiRayShape *self = NULL;
 
   self = static_cast<ODEMultiRayShape*>(_data);
@@ -107,8 +104,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    collision1 = NULL;
-    collision2 = NULL;
+    ODECollision *collision1 = NULL;
+    ODECollision *collision2 = NULL;
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
@@ -131,8 +128,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     assert(collision1 && collision2);
 
-    rayCollision = NULL;
-    hitCollision = NULL;
+    ODECollision *rayCollision = NULL;
+    ODECollision *hitCollision = NULL;
 
     // Figure out which one is a ray; note that this assumes
     // that the ODE dRayClass is used *soley* by the RayCollision.
@@ -159,7 +156,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
       if (n > 0)
       {
-        RayShapePtr shape = boost::shared_static_cast<RayShape>(
+        RayShapePtr shape = boost::static_pointer_cast<RayShape>(
             rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {

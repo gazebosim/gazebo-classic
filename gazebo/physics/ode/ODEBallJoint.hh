@@ -51,9 +51,6 @@ namespace gazebo
               {return math::Vector3();}
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
 
       // Documentation inherited
@@ -68,6 +65,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int /*index*/) const
               {return math::Angle(0);}
+
+      // Documentation inherited.
+      protected: void SetForceImpl(int _index, double _torque);
     };
   }
 }

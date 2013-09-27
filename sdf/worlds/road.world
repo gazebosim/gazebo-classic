@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
     <scene>
       <grid>false</grid>
     </scene>
     <!-- A global light source -->
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <!-- Invisible ground plane -->
     <model name="ground">
       <link name="body">

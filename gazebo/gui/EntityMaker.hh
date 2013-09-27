@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef ENTITYMAKER_HH
-#define ENTITYMAKER_HH
+#ifndef _ENTITYMAKER_HH_
+#define _ENTITYMAKER_HH_
 
-#include "rendering/RenderTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "math/Vector3.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

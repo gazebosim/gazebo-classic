@@ -15,10 +15,10 @@
  *
  */
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/ModelEditWidget.hh"
+#include "gazebo/gui/ModelEditWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

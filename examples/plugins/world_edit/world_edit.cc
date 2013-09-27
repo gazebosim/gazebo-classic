@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 /// \example examples/plugins/world_edit.cc
 /// This example creates a WorldPlugin, initializes the Transport system by

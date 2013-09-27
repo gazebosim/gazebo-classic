@@ -49,6 +49,10 @@ namespace gazebo
       /// \param[in] _size Size of each side of the box.
       public: virtual void SetSize(const math::Vector3 &_size);
 
+      /// \brief Set the scale of the box.
+      /// \param[in] _scale Scale of the box.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.
       public: math::Vector3 GetSize() const;

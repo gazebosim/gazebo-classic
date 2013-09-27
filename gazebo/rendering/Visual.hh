@@ -28,6 +28,8 @@
 #include <list>
 #include <vector>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
@@ -36,7 +38,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -155,10 +156,15 @@ namespace gazebo
 
       /// \brief Attach a mesh to this visual by name.
       /// \param[in] _meshName Name of the mesh.
+      /// \param[in] _subMesh Name of the submesh. Empty string to use all
+      /// submeshes.
+      /// \param[in] _centerSubmesh True to center a submesh.
       /// \param[in] _objName Name of the attached Object to put the mesh
       /// onto.
       public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
-                                              const std::string &_objName="");
+                  const std::string &_subMesh="",
+                  bool _centerSubmesh = false,
+                  const std::string &_objName="");
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
@@ -190,6 +196,10 @@ namespace gazebo
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
+
+      /// \brief Enable or disable wireframe for this visual.
+      /// \param[in] _show True to enable wireframe for this visual.
+      public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -325,11 +335,19 @@ namespace gazebo
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _meshName Name of the mesh to insert.
-      public: void InsertMesh(const std::string &_meshName);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
+      public: void InsertMesh(const std::string &_meshName,
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _mesh Pointer to the mesh to insert.
-      public: static void InsertMesh(const common::Mesh *_mesh);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
+      public: static void InsertMesh(const common::Mesh *_mesh,
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.
@@ -375,14 +393,14 @@ namespace gazebo
       /// \param[in] _flags The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: void SetVisibilityFlags(uint32_t _flags);
 
       /// \brief Get visibility flags for this visual and all children.
       /// \return The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: uint32_t GetVisibilityFlags();
 
       /// \brief Display the bounding box visual.
@@ -429,6 +447,12 @@ namespace gazebo
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
 
+      /// \brief Get the id associated with this visual
+      public: uint32_t GetId() const;
+
+      /// \brief Set the id associated with this visual
+      public: void SetId(uint32_t _id);
+
       /// \brief Load all plugins
       ///
       /// Load all plugins specified in the SDF for the model.
@@ -448,6 +472,11 @@ namespace gazebo
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
 
+      /// \brief Get the name of the sub mesh set in the visual's SDF.
+      /// \return Name of the submesh. Empty string if no submesh is
+      /// specified.
+      public: std::string GetSubMeshName() const;
+
       /// \brief Clear parents.
       public: void ClearParent();
 
@@ -459,6 +488,11 @@ namespace gazebo
 
       /// \brief Parent visual.
       protected: VisualPtr parent;
+
+      /// \brief Return true if the submesh should be centered.
+      /// \return True if the submesh should be centered when it's inserted
+      /// into OGRE.
+      private: bool GetCenterSubMesh() const;
 
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
@@ -496,7 +530,7 @@ namespace gazebo
       /// \brief Connection for the pre render event.
       private: event::ConnectionPtr preRenderConnection;
 
-      /// \brief List of all the lines created
+      /// \brief List of all the lines created.
       private: std::list<DynamicLines*> lines;
 
       /// \brief Lines and their vertices connected to this visual.
@@ -517,7 +551,7 @@ namespace gazebo
       /// \brief Callback for the animation complete event.
       private: boost::function<void()> onAnimationComplete;
 
-      /// \brief True to use RT shader system
+      /// \brief True to use RT shader system.
       private: bool useRTShader;
 
       /// \brief True if initialized.
@@ -525,6 +559,15 @@ namespace gazebo
 
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
+
+      /// \brief Unique id of this visual.
+      private: uint32_t id;
+
+      /// \brief Counter used to create unique ids.
+      private: static uint32_t visualIdCount;
+
+      /// \brief Scale of visual.
+      private: math::Vector3 scale;
     };
     /// \}
   }

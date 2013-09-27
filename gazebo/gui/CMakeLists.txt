@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -12,43 +13,43 @@ include_directories(
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(model_editor)
+add_subdirectory(building)
+add_subdirectory(terrain)
+add_subdirectory(viewers)
 
 set (sources
-  ../gazebo.cc
   Actions.cc
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
+  Editor.cc
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
-  Gui.cc
+  GuiIface.cc
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
+  KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
+  MouseEventHandler.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
   TopicSelector.cc
-  viewers/ImageView.cc
-  viewers/ImagesView.cc
-  viewers/LaserView.cc
-  viewers/TopicView.cc
-  viewers/TextView.cc
-  viewers/ViewFactory.cc
 )
 
 set (qt_headers
   Actions.hh
   DataLogger.hh
+  Editor.hh
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
@@ -60,11 +61,6 @@ set (qt_headers
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
-  viewers/ImageView.hh
-  viewers/ImagesView.hh
-  viewers/LaserView.hh
-  viewers/TextView.hh
-  viewers/TopicView.hh
 )
 
 set (headers
@@ -73,13 +69,15 @@ set (headers
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
-  Gui.hh
+  GuiIface.hh
   GuiEvents.hh
+  KeyEventHandler.hh
   LightMaker.hh
+  ModelManipulator.hh
   MeshMaker.hh
+  MouseEventHandler.hh
   ModelMaker.hh
   SphereMaker.hh
-  viewers/ViewFactory.hh
 )
 
 #if (HAVE_QWT)
@@ -95,8 +93,8 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
+  MainWindow_TEST.cc
   TimePanel_TEST.cc
-  viewers/ImagesView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests
@@ -113,34 +111,49 @@ gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_msgs)
 
-target_link_libraries(gazebo_gui gazebo_common
-                                 gazebo_transport
-                                 gazebo_sdf_interface
-                                 gazebo_rendering
-                                 gazebo_sensors
-                                 gazebo_msgs
-                                 gazebo_model_editor
-                                 gzqtpropertybrowser
-                                 ${QT_LIBRARIES}
-                                 ${ogre_libraries}
-                                 ${Boost_LIBRARIES}
-                                 pthread)
+target_link_libraries(gazebo_gui
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
-target_link_libraries(gzclient  gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_rendering
-                                gazebo_sensors
-                                gazebo_msgs
-                                gazebo_model_editor
-                                gzqtpropertybrowser
-                                ${QT_LIBRARIES}
-                                ${ogre_libraries}
-                                ${Boost_LIBRARIES}
-                                pthread)
+target_link_libraries(gzclient
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
 add_definitions(${QT_DEFINITIONS})
 
+set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(gui_headers
+    "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
+endforeach()
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
+
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${headers})
+gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)

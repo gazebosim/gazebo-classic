@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
@@ -47,8 +49,12 @@ SelectionBuffer::~SelectionBuffer()
 /////////////////////////////////////////////////
 void SelectionBuffer::Update()
 {
+  if (!this->renderTexture)
+    return;
+
   this->UpdateBufferSize();
   this->materialSwitchListener->Reset();
+
   // FIXME: added try-catch block to prevent crash in deferred rendering mode.
   // RTT does not like VPL.material as it references a texture in the compositor
   // pipeline. A possible workaround is to add the deferred rendering
@@ -82,11 +88,20 @@ void SelectionBuffer::CreateRTTBuffer()
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
-  this->texture = Ogre::TextureManager::getSingleton().createManual(
+  try
+  {
+    this->texture = Ogre::TextureManager::getSingleton().createManual(
         "SelectionPassTex",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Ogre::TEX_TYPE_2D, width, height, 0, Ogre::PF_R8G8B8,
         Ogre::TU_RENDERTARGET);
+  }
+  catch(...)
+  {
+    this->renderTexture = NULL;
+    gzerr << "Unable to create selection buffer.\n";
+    return;
+  }
 
   this->renderTexture = this->texture->getBuffer()->getRenderTarget();
   this->renderTexture->setAutoUpdated(false);
@@ -97,7 +112,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->renderTexture->addListener(this->selectionTargetListener);
   this->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->renderTexture->getViewport(0)->setVisibilityMask(
-      ~GZ_VISIBILITY_NOT_SELECTABLE);
+      GZ_VISIBILITY_SELECTABLE);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 
@@ -110,6 +125,9 @@ void SelectionBuffer::CreateRTTBuffer()
 /////////////////////////////////////////////////
 void SelectionBuffer::UpdateBufferSize()
 {
+  if (!this->renderTexture)
+    return;
+
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
@@ -124,6 +142,9 @@ void SelectionBuffer::UpdateBufferSize()
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
+  if (!this->renderTexture)
+    return NULL;
+
   if (_x < 0 || _y < 0
       || _x >= static_cast<int>(this->renderTarget->getWidth())
       || _y >= static_cast<int>(this->renderTarget->getHeight()))

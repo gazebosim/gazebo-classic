@@ -25,33 +25,656 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
+#include <sdf/sdf.hh>
+
 #include <gazebo/gazebo.hh>
-
-#include <gazebo/sdf/sdf.hh>
-
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/WorldState.hh>
 #include <gazebo/common/Time.hh>
+#include <gazebo/util/util.hh>
 #include <gazebo/gazebo_config.h>
 
 namespace po = boost::program_options;
 
 sdf::ElementPtr g_stateSdf;
 
+/// \brief Base class for all filters.
+class FilterBase
+{
+  /// \brief Constructor
+  /// \param[in] _xmlOutput True if the output should be in XML format.
+  /// \param[in[ _stamp Type of stamp to apply.
+  public: FilterBase(bool _xmlOutput, const std::string &_stamp)
+          : xmlOutput(_xmlOutput), stamp(_stamp)
+  {
+  }
+
+  /// \brief Output a line of data.
+  /// \param[in] _stream The output stream.
+  /// \param[in] _state Current state.
+  public: std::ostringstream &Out(std::ostringstream &_stream,
+              const gazebo::physics::State &_state)
+          {
+            if (!this->xmlOutput && !this->stamp.empty())
+            {
+              if (this->stamp == "sim")
+                _stream << _state.GetSimTime().Double() << " ";
+              else if (this->stamp == "real")
+                _stream << _state.GetRealTime().Double() << " ";
+              else if (this->stamp == "wall")
+                _stream << _state.GetWallTime().Double() << " ";
+            }
+
+            return _stream;
+          }
+
+  /// \brief Filter a pose.
+  /// \param[in] _pose The pose to filter.
+  /// \param[in] _xmlName Name of the xml tag.
+  /// \param[in] _filter The filter string [x,y,z,r,p,a].
+  /// \param[in] _state Current state.
+  public: std::string FilterPose(const gazebo::math::Pose &_pose,
+              const std::string &_xmlName,
+              std::string _filter,
+              const gazebo::physics::State &_state)
+          {
+            std::ostringstream result;
+            std::string xmlPrefix, xmlSuffix;
+
+            // Remove brackets, if they exist
+            boost::erase_all(_filter, "[");
+            boost::erase_all(_filter, "]");
+
+            // Output XML tags if required.
+            if (this->xmlOutput)
+            {
+              xmlPrefix = std::string("<") + _xmlName + ">";
+              xmlSuffix = std::string("</") + _xmlName + ">";
+            }
+
+            // Get the euler angles.
+            gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+
+            // If the filter is empty, then output the whole pose.
+            if (!_filter.empty())
+            {
+              // Get the list of pose elements from the filter
+              std::list<std::string> elements;
+              boost::split(elements, _filter, boost::is_any_of(","));
+              if (elements.empty() && !_filter.empty())
+                elements.push_back(_filter);
+
+              // Iterate over the list of pose elements.
+              for (std::list<std::string>::iterator elemIter =
+                  elements.begin(); elemIter != elements.end();
+                  ++elemIter)
+              {
+                switch ((*elemIter)[0])
+                {
+                  case 'X':
+                  case 'x':
+                    this->Out(result, _state) << std::fixed
+                      << _pose.pos.x << " ";
+                    break;
+                  case 'Y':
+                  case 'y':
+                    this->Out(result, _state) << std::fixed
+                      << _pose.pos.y << " ";
+                    break;
+                  case 'Z':
+                  case 'z':
+                    this->Out(result, _state) << std::fixed
+                      << _pose.pos.z << " ";
+                    break;
+                  case 'R':
+                  case 'r':
+                    this->Out(result, _state) << std::fixed << rpy.x << " ";
+                    break;
+                  case 'P':
+                  case 'p':
+                    this->Out(result, _state) << std::fixed << rpy.y << " ";
+                    break;
+                  case 'A':
+                  case 'a':
+                    this->Out(result, _state) << std::fixed << rpy.z << " ";
+                    break;
+                  default:
+                    gzerr << "Invalid pose value[" << *elemIter << "]\n";
+                    break;
+                }
+              }
+              result << std::endl;
+            }
+            else
+            {
+              // No filter, so output the whole pose.
+              if (!xmlPrefix.empty())
+              {
+                result << std::fixed << xmlPrefix << _pose
+                  << xmlSuffix << std::endl;
+              }
+              else
+                this->Out(result, _state) << _pose << std::endl;
+            }
+
+            return result.str();
+          }
+
+  /// \brief True if XML output is requested.
+  protected: bool xmlOutput;
+
+  /// \brief Time stamp type
+  protected: std::string stamp;
+};
+
+/// \brief Filter for joint state.
+class JointFilter : public FilterBase
+{
+  /// \brief Constructor.
+  /// \param[in] _xmlOutput True if the output should be in XML format.
+  public: JointFilter(bool _xmlOutput, const std::string &_stamp)
+          : FilterBase(_xmlOutput, _stamp)
+          {
+          }
+
+  /// \brief Initialize the filter.
+  /// \param[in] _filter The command line filter string.
+  public: void Init(const std::string &_filter)
+          {
+            this->parts.clear();
+
+            if (!_filter.empty())
+            {
+              boost::split(this->parts, _filter, boost::is_any_of("."));
+
+              if (!this->parts.size())
+                this->parts.push_back(_filter);
+            }
+          }
+
+  /// \brief Filter joint parts (angle)
+  /// \param[in] _state Link state to filter.
+  /// \param[in] _partIter Iterator to the filtered string parts.
+  public: std::string FilterParts(gazebo::physics::JointState &_state,
+              std::list<std::string>::iterator _partIter)
+          {
+            std::ostringstream result;
+            std::string part = *_partIter;
+
+            // Remove brackets, if they exist
+            boost::erase_all(part, "[");
+            boost::erase_all(part, "]");
+
+            // If the filter is empty, then output all the angles.
+            if (!part.empty())
+            {
+              // Get the list of axis elements from the filter
+              std::list<std::string> elements;
+              boost::split(elements, part, boost::is_any_of(","));
+              if (elements.empty() && !part.empty())
+                elements.push_back(part);
+
+              // Iterate over the list of axis elements.
+              for (std::list<std::string>::iterator elemIter =
+                  elements.begin(); elemIter != elements.end();
+                  ++elemIter)
+              {
+                try
+                {
+                  unsigned int axis =
+                    boost::lexical_cast<unsigned int>(*elemIter);
+
+                  if (axis >= _state.GetAngleCount())
+                    continue;
+
+                  gazebo::math::Angle angle = _state.GetAngle(axis);
+
+                  if (this->xmlOutput)
+                  {
+                    result << "<angle axis='" << *elemIter << "'>"
+                      << std::fixed << angle << "</angle>\n";
+                  }
+                  else
+                    this->Out(result, _state) << std::fixed << angle << " ";
+                }
+                catch(...)
+                {
+                  gzerr << "Inavlid axis value[" << *elemIter << "]\n";
+                }
+              }
+            }
+
+            return result.str();
+          }
+
+  /// \brief Filter the joints in a Model state, and output the result
+  /// as a string.
+  /// \param[in] _state The model state to filter.
+  /// \return Filtered string.
+  public: std::string Filter(gazebo::physics::ModelState &_state)
+          {
+            std::ostringstream result;
+
+            gazebo::physics::JointState_M states;
+            std::list<std::string>::iterator partIter;
+
+            /// Get an iterator to the list of the command line parts.
+            partIter = this->parts.begin();
+
+            // The first element in the filter must be a link name or a star.
+            std::string regexStr = *partIter;
+            boost::replace_all(regexStr, "*", ".*");
+            boost::regex regex(regexStr);
+            states = _state.GetJointStates(regex);
+
+            ++partIter;
+
+            // Filter all the link states that were found.
+            for (gazebo::physics::JointState_M::iterator iter =
+                states.begin(); iter != states.end(); ++iter)
+            {
+              // Filter the elements of the joint (angle).
+              // If no filter parts were specified,
+              // then output the whole joint state.
+              if (partIter != this->parts.end())
+              {
+                if (this->xmlOutput)
+                  result << "<joint name='" << iter->first << "'>\n";
+
+                result << this->FilterParts(iter->second, partIter);
+
+                if (this->xmlOutput)
+                  result << "</joint>\n";
+              }
+              else
+              {
+                if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
+                  result << std::fixed << iter->second.GetAngle(0);
+                else
+                  result << std::fixed << iter->second;
+              }
+            }
+
+            return result.str();
+          }
+
+  /// \brief The list of filter strings.
+  public: std::list<std::string> parts;
+};
+
+/// \brief Filter for link state.
+class LinkFilter : public FilterBase
+{
+  /// \brief Constructor.
+  /// \param[in] _xmlOutput True if the output should be in XML format.
+  public: LinkFilter(bool _xmlOutput, const std::string &_stamp)
+          : FilterBase(_xmlOutput, _stamp)
+          {
+          }
+
+  /// \brief Initialize the filter.
+  /// \param[in] _filter The command line filter string.
+  public: void Init(const std::string &_filter)
+          {
+            this->parts.clear();
+
+            if (!_filter.empty())
+            {
+              boost::split(this->parts, _filter, boost::is_any_of("."));
+
+              if (!this->parts.size())
+                this->parts.push_back(_filter);
+            }
+          }
+
+  /// \brief Filter link parts (pose, velocity, acceleration, wrench)
+  /// \param[in] _state Link state to filter.
+  /// \param[in] _partIter Iterator to the filtered string parts.
+  public: std::string FilterParts(gazebo::physics::LinkState &_state,
+              std::list<std::string>::iterator _partIter)
+          {
+            std::ostringstream result;
+
+            std::string part = *_partIter;
+            std::string elemParts;
+
+            ++_partIter;
+            if (_partIter != this->parts.end())
+              elemParts = *_partIter;
+
+            if (part == "pose")
+              result << this->FilterPose(_state.GetPose(), part, elemParts,
+                  _state);
+            else if (part == "acceleration")
+              result << this->FilterPose(_state.GetAcceleration(), part,
+                  elemParts, _state);
+            else if (part == "velocity")
+              result << this->FilterPose(_state.GetVelocity(), part, elemParts,
+                  _state);
+            else if (part == "wrench")
+              result << this->FilterPose(_state.GetWrench(), part, elemParts,
+                  _state);
+
+            return result.str();
+          }
+
+  /// \brief Filter the links in a Model state, and output the result
+  /// as a string.
+  /// \param[in] _state The model state to filter.
+  /// \return Filtered string.
+  public: std::string Filter(gazebo::physics::ModelState &_state)
+          {
+            std::ostringstream result;
+
+            gazebo::physics::LinkState_M states;
+            std::list<std::string>::iterator partIter;
+
+            /// Get an iterator to the list of the command line parts.
+            partIter = this->parts.begin();
+
+            // The first element in the filter must be a link name or a star.
+            if (*partIter != "*")
+            {
+              std::string regexStr = *partIter;
+              boost::replace_all(regexStr, "*", ".*");
+              boost::regex regex(regexStr);
+              states = _state.GetLinkStates(regex);
+            }
+            else
+              states = _state.GetLinkStates();
+
+            ++partIter;
+
+            // Filter all the link states that were found.
+            for (gazebo::physics::LinkState_M::iterator iter =
+                states.begin(); iter != states.end(); ++iter)
+            {
+              // Filter the elements of the link (pose, velocity,
+              // acceleration, wrench). If no filter parts were specified,
+              // then output the while link state.
+              if (partIter != this->parts.end())
+              {
+                if (this->xmlOutput)
+                  result << "<link name='" << iter->second.GetName() << "'>\n";
+
+                result << this->FilterParts(iter->second, partIter);
+
+                if (this->xmlOutput)
+                  result << "</link>\n";
+              }
+              else
+                result << std::fixed << iter->second << std::endl;
+            }
+
+            return result.str();
+          }
+
+  /// \brief The list of filter strings.
+  public: std::list<std::string> parts;
+};
+
+/// \brief Filter for model state.
+class ModelFilter : public FilterBase
+{
+  /// \brief Constructor.
+  /// \param[in] _xmlOutput True if the output should be in XML format.
+  public: ModelFilter(bool _xmlOutput, const std::string &_stamp)
+          : FilterBase(_xmlOutput, _stamp)
+          {
+            this->linkFilter = NULL;
+            this->jointFilter = NULL;
+          }
+
+  /// \brief Destructor.
+  public: virtual ~ModelFilter()
+          {
+            delete this->linkFilter;
+            delete this->jointFilter;
+          }
+
+  /// \brief Initialize the filter.
+  /// \param[in] _filter The command line filter string.
+  public: void Init(const std::string &_filter)
+          {
+            this->linkFilter = NULL;
+            this->jointFilter = NULL;
+            this->parts.clear();
+
+            if (_filter.empty())
+              return;
+
+            std::list<std::string> mainParts;
+            boost::split(mainParts, _filter, boost::is_any_of("/"));
+
+            // Create the model filter
+            if (!mainParts.empty())
+            {
+              boost::split(this->parts, mainParts.front(),
+                  boost::is_any_of("."));
+              if (this->parts.size() == 0 && !mainParts.front().empty())
+                this->parts.push_back(mainParts.front());
+            }
+
+            if (mainParts.empty())
+              return;
+
+            mainParts.pop_front();
+
+            // Create the link filter
+            if (!mainParts.empty() && !mainParts.front().empty())
+            {
+              this->linkFilter = new LinkFilter(this->xmlOutput, this->stamp);
+              this->linkFilter->Init(mainParts.front());
+            }
+
+            if (mainParts.empty())
+              return;
+
+            mainParts.pop_front();
+
+            // Create the joint filter
+            if (!mainParts.empty())
+            {
+              this->jointFilter = new JointFilter(this->xmlOutput,
+                  this->stamp);
+              this->jointFilter->Init(mainParts.front());
+            }
+          }
+
+  /// \brief Filter model parts (pose)
+  /// \param[in] _state Model state to filter.
+  /// \param[in] _partIter Iterator to the filtered string parts.
+  public: std::string FilterParts(gazebo::physics::ModelState &_state,
+              std::list<std::string>::iterator _partIter)
+          {
+            std::ostringstream result;
+
+            // Currently a model can only have a pose.
+            if (*_partIter == "pose")
+            {
+              // Get the model state pose
+              gazebo::math::Pose pose = _state.GetPose();
+              ++_partIter;
+
+              // Get the elements to filter pose by.
+              std::string elemParts;
+              if (_partIter != this->parts.end())
+                elemParts = *_partIter;
+
+              // Output the filtered pose.
+              result << this->FilterPose(pose, "pose", elemParts, _state);
+            }
+            else
+              gzerr << "Invalid model state component["
+                << *_partIter << "]\n";
+
+            return result.str();
+          }
+
+  /// \brief Filter the models in a World state, and output the result
+  /// as a string.
+  /// \param[in] _state The World state to filter.
+  /// \return Filtered string.
+  public: std::string Filter(gazebo::physics::WorldState &_state)
+          {
+            std::ostringstream result;
+
+            gazebo::physics::ModelState_M states;
+            std::list<std::string>::iterator partIter = this->parts.begin();
+
+            // The first element in the filter must be a model name or a star.
+            if (partIter != this->parts.end() && !this->parts.empty() &&
+                !(*partIter).empty() && (*partIter) != "*")
+            {
+              std::string regexStr = *partIter;
+              boost::replace_all(regexStr, "*", ".*");
+              boost::regex regex(regexStr);
+              states = _state.GetModelStates(regex);
+            }
+            else
+              states = _state.GetModelStates();
+
+            ++partIter;
+
+            // Filter all the model states that were found.
+            for (gazebo::physics::ModelState_M::iterator iter =
+                states.begin(); iter != states.end(); ++iter)
+            {
+              // If no link filter, and no model parts, then output the
+              // whole model state.
+              if (!this->linkFilter && !this->jointFilter &&
+                  partIter == this->parts.end())
+                result << std::fixed << iter->second;
+              else
+              {
+                if (this->xmlOutput)
+                  result << "<model name='" << iter->second.GetName() << "'>\n";
+
+                // Filter the pose of the model.
+                if (partIter != this->parts.end())
+                  result << this->FilterParts(iter->second, partIter);
+
+                // Apply link filtering, if a link filter exists.
+                if (this->linkFilter)
+                  result << this->linkFilter->Filter(iter->second);
+
+                // Apply link filtering, if a link filter exists.
+                if (this->jointFilter)
+                  result << this->jointFilter->Filter(iter->second);
+
+                if (this->xmlOutput)
+                  result << "</model>\n";
+              }
+            }
+
+            return result.str();
+          }
+
+  /// \brief The list of model parts to filter.
+  public: std::list<std::string> parts;
+
+  /// \brief Pointer to the link filter.
+  public: LinkFilter *linkFilter;
+
+  /// \brief Pointer to the joint filter.
+  public: JointFilter *jointFilter;
+};
+
+/// \brief Filter interface for an entire state.
+class StateFilter : public FilterBase
+{
+  /// \brief Constructor
+  /// \param[in] _xmlOutput True to format output as XML
+  public: StateFilter(bool _xmlOutput, const std::string &_stamp,
+              double _hz = 0)
+          : FilterBase(_xmlOutput, _stamp), filter(_xmlOutput, _stamp),
+          hz(_hz)
+          {}
+
+  /// \brief Initialize the filter with a set of parameters.
+  /// \param[_in] _filter The filter parameters
+  public: void Init(const std::string &_filter)
+          {
+            this->filter.Init(_filter);
+          }
+
+  /// \brief Perform filtering
+  /// \param[in] _stateString The string to filter.
+  public: std::string Filter(const std::string &_stateString)
+          {
+            gazebo::physics::WorldState state;
+
+            // Read and parse the state information
+            g_stateSdf->ClearElements();
+            sdf::readString(_stateString, g_stateSdf);
+            state.Load(g_stateSdf);
+
+            std::ostringstream result;
+
+            if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
+            {
+              if ((state.GetSimTime() - this->prevTime).Double() <
+                  1.0 / this->hz)
+              {
+                return result.str();
+              }
+            }
+
+            if (this->xmlOutput)
+            {
+              result << "<sdf version='" << SDF_VERSION << "'>\n"
+                << "<state world_name='" << state.GetName() << "'>\n"
+                << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
+                << "<real_time>" << state.GetRealTime() << "</real_time>\n"
+                << "<wall_time>" << state.GetWallTime() << "</wall_time>\n";
+            }
+
+            result << this->filter.Filter(state);
+
+            if (this->xmlOutput)
+              result << "</sdf></state>\n";
+
+            this->prevTime = state.GetSimTime();
+            return result.str();
+          }
+
+  /// \brief Filter for a model.
+  private: ModelFilter filter;
+
+  /// \brief Rate at which to output states.
+  private: double hz;
+
+  /// \brief Previous time a state was output.
+  private: gazebo::common::Time prevTime;
+};
+
+
 /////////////////////////////////////////////////
 /// \brief Print general help
-void help()
+void help(po::options_description &_options)
 {
-  std::cerr << "Help:\n";
-  std::cerr << "This tool introspects Gazebo log files.\n\n";
-  std::cerr << "Usage: gzlog [command] <options> [log file]\n\n";
+  std::cerr << "gzlog -- Tool to instrospect Gazebo log files\n\n";
+
+  std::cerr << "`gzlog` [command] <options> [log file]\n\n";
+
+  std::cerr << "Introspect Gazebo log files through different commands.\n\n";
 
   std::cerr << "Commands:\n"
             << "  help\t Output this help message.\n"
             << "  info\t Display statistical information about a log file.\n"
             << "  echo\t Output the contents of a log file to screen.\n"
             << "  step\t Step through the contents of a log file.\n";
-
+            // << "  start\t Start recording a log file on an active Gazebo "
+            // << "server.\n"
+            // << "  stop\t Stop recording a log file on an active Gazebo "
+            // << "server.\n";
   std::cerr << "\n";
+
+  std::cerr << _options << "\n";
+
+  std::cerr << "See also:\n"
+    << "Example and more information can be found at: "
+    << "http://gazebosim.org/wiki/Tools#Data_Log_Tool\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -84,7 +707,7 @@ bool load_log_from_file(const std::string &_filename)
 
   try
   {
-    gazebo::common::LogPlay::Instance()->Open(_filename);
+    gazebo::util::LogPlay::Instance()->Open(_filename);
   }
   catch(gazebo::common::Exception &_e)
   {
@@ -133,11 +756,11 @@ std::string get_file_size_str(const std::string &_filename)
 /// \bried Output information about a log file.
 void info(const std::string &_filename)
 {
-  gazebo::common::LogPlay *play = gazebo::common::LogPlay::Instance();
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
   // Get the SDF world description from the log file
   std::string sdfString;
-  gazebo::common::LogPlay::Instance()->Step(sdfString);
+  gazebo::util::LogPlay::Instance()->Step(sdfString);
 
   // Parse the first SDF world description
   sdf::ElementPtr sdf(new sdf::Element);
@@ -146,7 +769,7 @@ void info(const std::string &_filename)
 
   gazebo::physics::WorldState state;
 
-  unsigned int modelCount = 0;
+  // unsigned int modelCount = 0;
 
   gazebo::common::Time endTime(0, 0);
   gazebo::common::Time startTime(0, 0);
@@ -168,7 +791,7 @@ void info(const std::string &_filename)
         // Count all the model elements.
         while (modelElem)
         {
-          modelCount++;
+          // modelCount++;
           modelElem = modelElem->GetNextElement("model");
         }
       }
@@ -206,189 +829,152 @@ void info(const std::string &_filename)
 
   // Compute the duration
   gazebo::common::Time deltaTime = endTime - startTime;
-  int hours = deltaTime.sec / 3600;
-  int minutes = (deltaTime.sec - hours * 3600) / 60;
-  int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
+  // int hours = deltaTime.sec / 3600;
+  // int minutes = (deltaTime.sec - hours * 3600) / 60;
+  // int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
 
   // Output info
   std::cout
     << "Log Version:    " << play->GetLogVersion() << "\n"
     << "Gazebo Version: " << play->GetGazeboVersion() << "\n"
     << "Random Seed:    " << play->GetRandSeed() << "\n"
-    << "Start:          " << boost::posix_time::from_time_t(startTime.sec)
-    << "." << startTime.nsec << "\n"
-    << "End:            " << boost::posix_time::from_time_t(endTime.sec)
-    << "." << endTime.nsec << "\n"
-    << "Duration:       " << std::setfill('0') << std::setw(2) << hours << ":"
-                          << std::setfill('0') << std::setw(2) << minutes << ":"
-                          << std::setfill('0') << std::setw(2) << seconds << "."
-                          << deltaTime.nsec << "\n"
-    << "Steps:          " << play->GetChunkCount() << "\n"
+    // << "Start:          " << boost::posix_time::from_time_t(startTime.sec)
+    // << "." << startTime.nsec << "\n"
+    // << "End:            " << boost::posix_time::from_time_t(endTime.sec)
+    // << "." << endTime.nsec << "\n"
+    // << "Duration:       " << std::setfill('0') << std::setw(2)
+    // << hours << ":"
+    //                       << std::setfill('0')
+    //                       << std::setw(2) << minutes << ":"
+    //                       << std::setfill('0') << std::setw(2)
+    //                       << seconds << "."
+    //                       << deltaTime.nsec << "\n"
+    // << "Steps:          " << play->GetChunkCount() << "\n"
     << "Size:           " << get_file_size_str(_filename) << "\n"
     << "Encoding:       " << play->GetEncoding() << "\n"
-    << "Model Count:    " << modelCount << "\n"
+    // << "Model Count:    " << modelCount << "\n"
     << "\n";
-}
-
-/////////////////////////////////////////////////
-/// \brief Filter a state string.
-/// \param[in] _stateString State string data.
-/// \param[in] _filter Filter argument.
-std::string filter_state(const std::string &_stateString,
-                         std::string _filter)
-{
-  std::ostringstream result;
-  gazebo::physics::WorldState state;
-  std::vector<std::string> names;
-
-  // Read and parse the state information
-  g_stateSdf->ClearElements();
-  sdf::readString(_stateString, g_stateSdf);
-  state.Load(g_stateSdf);
-
-  // Split the filter on "::"
-  boost::split_regex(names, _filter, boost::regex("::"));
-  std::vector<std::string>::iterator iter = names.begin();
-
-  // Continue if the filter is valid. Otherwise output the raw state data.
-  if (iter != names.end() && !(*iter).empty())
-  {
-    // The first element in the filter must be a model name.
-    gazebo::physics::ModelState modelState = state.GetModelState(*(iter++));
-
-    // Continue if there is more to the filter and the current filter
-    // item valid. Otheriwise, use all of the model state data.
-    if (iter != names.end() && !(*iter).empty())
-    {
-      // Check to see if the next element in the filter is a link.
-      if (modelState.HasLinkState(*iter))
-      {
-        gazebo::physics::LinkState linkState;
-
-        // Get the link.
-        linkState = modelState.GetLinkState(*(iter++));
-
-        // Continue if the next element in the filter is valid. Otherwise
-        // use all of the link's data.
-        if (iter != names.end() && !(*iter).empty())
-        {
-          // Each data value in a link starts with a unique character, so we
-          // allow the user to use just the first character in the filter.
-          switch ((*iter)[0])
-          {
-            default:
-            case 'p':
-              result << linkState.GetPose();
-              break;
-            case 'v':
-              result << linkState.GetVelocity();
-              break;
-            case 'a':
-              result << linkState.GetAcceleration();
-              break;
-            case 'w':
-              result << linkState.GetAcceleration();
-              break;
-          }
-        }
-        else
-          result << linkState;
-      }
-      // Otherwise check to see if the next element in the filter is a joint.
-      else if (modelState.HasJointState(*iter))
-      {
-        gazebo::physics::JointState jointState;
-
-        // Get the joint.
-        jointState = modelState.GetJointState(*(iter++));
-
-        // Continue if there is more to the filter, and the filter element
-        // is valid. Otherwise use all of the joint's data.
-        if (iter != names.end() && !(*iter).empty())
-        {
-          // Try to get the index of the axis for output
-          try
-          {
-            int index = boost::lexical_cast<int>(*iter);
-            result << jointState.GetAngle(index);
-          }
-          catch(boost::bad_lexical_cast &_e)
-          {
-            gzerr << "Invalid joint angle index[" << *iter << "]\n";
-          }
-        }
-        else
-          result << jointState;
-      }
-      // Otherwise don't use any data.
-      else
-      {
-        // Don't output an error here. A link or joint will not get logged
-        // if there was no change in it's state values.
-      }
-    }
-    else
-      result << modelState;
-  }
-  else
-    result << g_stateSdf;
-
-  return result.str();
 }
 
 /////////////////////////////////////////////////
 /// \brief Dump the contents of a log file to screen
 /// \param[in] _filter Filter string
-void echo(const std::string _filter)
+void echo(const std::string &_filter, bool _raw, const std::string &_stamp,
+    double _hz)
 {
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
   std::string stateString;
 
-  for (unsigned int i = 0;
-       i < gazebo::common::LogPlay::Instance()->GetChunkCount(); ++i)
-  {
-    // Get and output the state string
-    gazebo::common::LogPlay::Instance()->Step(stateString);
+  // Output the header
+  if (!_raw)
+    std::cout << play->GetHeader() << std::endl;
 
-    if (!_filter.empty() && i > 0)
-      stateString = filter_state(stateString, _filter);
-    else if (!_filter.empty())
+  StateFilter filter(!_raw, _stamp, _hz);
+  filter.Init(_filter);
+
+  unsigned int i = 0;
+  while (play->Step(stateString))
+  {
+    if (i > 0)
+      stateString = filter.Filter(stateString);
+    else if (i == 0 && _raw)
       stateString.clear();
 
     if (!stateString.empty())
-      std::cout << stateString << "\n";
+    {
+      if (!_raw)
+        std::cout << "<chunk encoding='txt'><![CDATA[\n";
+
+      std::cout << stateString;
+
+      if (!_raw)
+        std::cout << "]]></chunk>\n";
+    }
+
+    ++i;
   }
+
+  if (!_raw)
+    std::cout << "</gazebo_log>\n";
 }
 
 /////////////////////////////////////////////////
 /// \brief Step through a log file.
 /// \param[in] _filter Filter string
-void step(const std::string &_filter)
+void step(const std::string &_filter, bool _raw, const std::string &_stamp,
+    double _hz)
 {
   std::string stateString;
-  gazebo::common::LogPlay *play = gazebo::common::LogPlay::Instance();
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+
+  if (!_raw)
+    std::cout << play->GetHeader() << std::endl;
 
   char c = '\0';
 
-  for (unsigned int i = 0; i < play->GetChunkCount() && c != 'q'; ++i)
-  {
-    // Get and output the state string
-    play->Step(stateString);
+  StateFilter filter(!_raw, _stamp, _hz);
+  filter.Init(_filter);
 
-    if (!_filter.empty() && i > 0)
-      stateString = filter_state(stateString, _filter);
-    else if (!_filter.empty())
+  unsigned int i = 0;
+  while (play->Step(stateString) && c != 'q')
+  {
+    if (i > 0)
+      stateString = filter.Filter(stateString);
+    else if (i == 0 && _raw)
       stateString.clear();
 
-    std::cout << stateString << "\n";
+    // Only wait for user input if there is some state to output.
+    if (!stateString.empty())
+    {
+      if (!_raw)
+        std::cout << "<chunk encoding='txt'><![CDATA[\n";
+      std::cout << stateString;
 
-    std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
+      if (!_raw)
+        std::cout << "]]></chunk>\n";
 
-    c = '\0';
+      std::cout << "\n--- Press space to continue, 'q' to quit ---\n";
 
-    // Wait for a space or 'q' key press
-    while (c != ' ' && c != 'q')
-      c = get_ch();
+      c = '\0';
+
+      // Wait for a space or 'q' key press
+      while (c != ' ' && c != 'q')
+        c = get_ch();
+    }
+    ++i;
   }
+
+  if (!_raw)
+    std::cout << "</gazebo_log>\n";
+}
+
+/////////////////////////////////////////////////
+/// \brief Start or stop logging
+/// \param[in] _start True to start logging
+void record(bool _start)
+{
+  if (!gazebo::transport::init())
+    return;
+
+  gazebo::transport::run();
+
+  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node->Init();
+
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::LogControl>("~/log/control");
+
+  if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
+  {
+    gzerr << "Unable to create a connection to topic ~/log/control.\n";
+    return;
+  }
+
+  gazebo::msgs::LogControl msg;
+  _start ? msg.set_start(true) : msg.set_stop(true);
+  pub->Publish<gazebo::msgs::LogControl>(msg, true);
+
+  gazebo::transport::fini();
 }
 
 /////////////////////////////////////////////////
@@ -403,6 +989,11 @@ int main(int argc, char **argv)
   po::options_description visibleOptions("Options");
   visibleOptions.add_options()
     ("help,h", "Output this help message.")
+    ("raw,r", "Output the data from echo and step without XML formatting.")
+    ("stamp,s", po::value<std::string>(), "Add a timestamp to each line of "
+     "output. Valid values are (sim,real,wall)")
+    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
+     "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only for the echo and step commands");
@@ -446,32 +1037,45 @@ int main(int argc, char **argv)
   // Output help when appropriate
   if (command.empty() || command == "help" || vm.count("help"))
   {
-    help();
-    std::cerr << visibleOptions << "\n";
-
+    help(visibleOptions);
     return 0;
   }
 
-  // Load the log file
-  if (vm.count("file"))
-    filename = vm["file"].as<std::string>();
-  else
+  if (command != "start" && command != "stop")
   {
-    gzerr << "No log file specified\n";
-    return -1;
+    // Load the log file
+    if (vm.count("file"))
+      filename = vm["file"].as<std::string>();
+    else
+    {
+      gzerr << "No log file specified\n";
+      return -1;
+    }
+
+    // Load log file from string
+    if (!load_log_from_file(filename))
+      return -1;
   }
 
-  // Load log file from string
-  if (!load_log_from_file(filename))
-    return -1;
+  std::string stamp;
+  if (vm.count("stamp"))
+    stamp = vm["stamp"].as<std::string>();
+
+  double hz = 0;
+  if (vm.count("hz"))
+    hz = vm["hz"].as<double>();
 
   // Process the command
   if (command == "info")
     info(filename);
   else if (command == "echo")
-    echo(filter);
+    echo(filter, vm.count("raw"), stamp, hz);
   else if (command == "step")
-    step(filter);
+    step(filter, vm.count("raw"), stamp, hz);
+  else if (command == "start")
+    record(true);
+  else if (command == "stop")
+    record(false);
 
   return 0;
 }

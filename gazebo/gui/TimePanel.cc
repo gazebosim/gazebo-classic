@@ -16,11 +16,11 @@
  */
 #include <sstream>
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Actions.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/TimePanel.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TimePanel.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -137,7 +137,6 @@ TimePanel::~TimePanel()
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  std::ostringstream stream;
 
   this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (this->simTimes.size() > 20)
@@ -147,60 +146,58 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
 
-  if (_msg->paused() && (g_pauseAct && !g_pauseAct->isChecked()))
+  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
   {
-    g_pauseAct->setChecked(true);
-    g_playAct->setChecked(false);
+    g_playAct->setVisible(true);
+    g_pauseAct->setVisible(false);
   }
-  else if (!_msg->paused() && (g_playAct && !g_playAct->isChecked()))
+  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
   {
-    g_pauseAct->setChecked(false);
-    g_playAct->setChecked(true);
+    g_pauseAct->setVisible(true);
+    g_playAct->setVisible(false);
   }
 
   // Set simulation time
-  {
-    stream.str("");
-
-    double simDbl = msgs::Convert(_msg->sim_time()).Double();
-    if (simDbl > 31536000)
-      stream << std::fixed << std::setprecision(2) << simDbl/31536000 << " dys";
-    else if (simDbl > 86400)
-      stream << std::fixed << std::setprecision(2) << simDbl/86400 << " dys";
-    else if (simDbl > 3600)
-      stream << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
-    else if (simDbl > 999)
-      stream << std::fixed << std::setprecision(2) << simDbl/60 << " min";
-    else
-      stream << std::fixed << std::setprecision(2) << simDbl << " sec";
-
-    this->SetSimTime(QString::fromStdString(stream.str()));
-  }
+  this->SetSimTime(QString::fromStdString(FormatTime(_msg->sim_time())));
 
   // Set real time
-  {
-    stream.str("");
-
-    double realDbl = msgs::Convert(_msg->real_time()).Double();
-    if (realDbl > 31536000)
-      stream << std::fixed << std::setprecision(2)
-             << realDbl/31536000 << " dys";
-    else if (realDbl > 86400)
-      stream << std::fixed << std::setprecision(2) << realDbl/86400 << " dys";
-    else if (realDbl > 3600)
-      stream << std::fixed << std::setprecision(2) << realDbl/3600 << " hrs";
-    else if (realDbl > 999)
-      stream << std::fixed << std::setprecision(2) << realDbl/60 << " min";
-    else
-      stream << std::fixed << std::setprecision(2) << realDbl << " sec";
-
-    this->SetRealTime(QString::fromStdString(stream.str()));
-  }
+  this->SetRealTime(QString::fromStdString(FormatTime(_msg->real_time())));
 
   // Set the iterations
   this->SetIterations(QString::fromStdString(
         boost::lexical_cast<std::string>(_msg->iterations())));
 }
+
+/////////////////////////////////////////////////
+std::string TimePanel::FormatTime(const msgs::Time &_msg)
+{
+  std::ostringstream stream;
+  unsigned int day, hour, min, sec, msec;
+
+  stream.str("");
+
+  sec = _msg.sec();
+
+  day = sec / 86400;
+  sec -= day * 86400;
+
+  hour = sec / 3600;
+  sec -= hour * 3600;
+
+  min = sec / 60;
+  sec -= min * 60;
+
+  msec = rint(_msg.nsec() * 1e-6);
+
+  stream << std::setw(2) << std::setfill('0') << day << " ";
+  stream << std::setw(2) << std::setfill('0') << hour << ":";
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec << ".";
+  stream << std::setw(3) << std::setfill('0') << msec;
+
+  return stream.str();
+}
+
 
 /////////////////////////////////////////////////
 void TimePanel::Update()

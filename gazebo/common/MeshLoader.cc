@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/MeshLoader.hh"
+#include "gazebo/common/MeshLoader.hh"
 
 using namespace gazebo;
 using namespace common;

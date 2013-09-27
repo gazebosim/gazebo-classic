@@ -35,6 +35,17 @@ namespace gazebo
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
+      /// \brief internal variables used for cfm damping
+      public:  enum CFMMode
+      {
+        /// \brief cfm damping not active
+        NONE           = 0x00000000,
+        /// \brief cfm damping active, joints within limits
+        DAMPING_ACTIVE = 0x00000001,
+        /// \brief cfm damping not active, enforcing joints limits
+        JOINT_LIMIT    = 0x00000002
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
       public: ODEJoint(BasePtr _parent);
@@ -70,6 +81,9 @@ namespace gazebo
       /// \param[in] _value Value to set.
       public: virtual void SetParam(int _parameter, double _value);
 
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
+
       // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
@@ -96,6 +110,33 @@ namespace gazebo
       /// \return Pointer to the joint feedback.
       public: dJointFeedback *GetFeedback();
 
+      /// \brief simulating damping with CFM and meddling with Joint limits
+      public: void CFMDamping();
+
+      /// \brief Get access to stopCFM
+      /// \return Returns joint's cfm for end stops
+      public: double GetStopCFM()
+      {
+        return this->stopCFM;
+      }
+
+      /// \brief Get access to stopERP
+      /// \return Returns joint's erp for end stops
+      public: double GetStopERP()
+      {
+        return this->stopERP;
+      }
+
+      /// \brief internal variable to keep track of cfm damping internals
+      private: int cfmDampingState[3];
+
+      /// \brief current cfm damping for stability reasons
+      private: double dStable[3];
+
+      /// \brief internal variable to keep track if ConnectJointUpdate
+      /// has been called on a damping method
+      private: bool dampingInitialized;
+
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
@@ -119,8 +160,46 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual void SetProvideFeedback(bool _enable);
+
+      // Documentation inherited.
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual void SetForce(int _index, double _force);
+
+      // Documentation inherited.
+      public: virtual double GetForce(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual void ApplyDamping();
+
+      // Documentation inherited.
+      /// \brief Set the force applied to this physics::Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.
+      /// Force is additive (multiple calls
+      /// to SetForceImpl to the same joint in the same time
+      /// step will accumulate forces on that Joint).
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _force Force value.
+      protected: virtual void SetForceImpl(int _index, double _force) = 0;
+
+      /// \brief Save external forces applied to this Joint.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _force Force value.
+      private: void SaveForce(int _index, double _force);
 
       /// \brief This is our ODE ID
       protected: dJointID jointId;
@@ -128,14 +207,22 @@ namespace gazebo
       /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
 
-      /// \brief Provide Feedback data for contact forces
-      private: bool provideFeedback;
+      /// \brief CFM for joint's limit constraint
+      private: double stopCFM;
 
-      // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(int _index);
+      /// \brief ERP for joint's limit constraint
+      private: double stopERP;
 
-      // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      /// \brief Save force applied by user
+      /// This plus the joint feedback (joint contstraint forces) is the
+      /// equivalent of simulated force torque sensor reading
+      /// Allocate a 2 vector in case hinge2 joint is used.
+      /// This is used by ODE to store external force applied by the user.
+      private: double forceApplied[MAX_JOINT_AXIS];
+
+      /// \brief Save time at which force is applied by user
+      /// This will let us know if it's time to clean up forceApplied.
+      private: common::Time forceAppliedTime;
     };
   }
 }

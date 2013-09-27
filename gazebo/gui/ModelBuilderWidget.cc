@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-#include "rendering/Rendering.hh"
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "physics/World.hh"
-#include "physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/GLWidget.hh"
-#include "gui/ModelBuilderWidget.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/ModelBuilderWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

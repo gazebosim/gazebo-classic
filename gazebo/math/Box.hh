@@ -18,7 +18,7 @@
 #define _BOX_HH_
 
 #include <iostream>
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

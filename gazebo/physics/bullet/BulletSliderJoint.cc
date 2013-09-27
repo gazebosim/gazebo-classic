@@ -23,6 +23,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -57,9 +58,9 @@ void BulletSliderJoint::Init()
   SliderJoint<BulletJoint>::Init();
 
   BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
+    boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+    boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = this->initialWorldAxis;
@@ -161,8 +162,8 @@ void BulletSliderJoint::Init()
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->GetValueDouble("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->GetValueDouble("upper"));
+  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
+  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
 
   this->constraint = this->bulletSlider;
 
@@ -172,6 +173,9 @@ void BulletSliderJoint::Init()
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -199,7 +203,15 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    this->initialWorldAxis = _axis;
+
+    /// \TODO: currently we assume joint axis is specified in model frame,
+    /// this is incorrect, and should be corrected to be
+    /// joint frame which is specified in child link frame.
+    if (this->parentLink)
+      this->initialWorldAxis =
+        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+    else
+      this->initialWorldAxis = _axis;
   }
   else
   {
@@ -215,29 +227,8 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForce(int _index, double _effort)
+void BulletSliderJoint::SetForceImpl(int /*_index*/, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling BulletSliderJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
-       this->effortLimit[_index]);
-
   if (this->bulletSlider && this->constraint)
   {
     // x-axis of constraint frame

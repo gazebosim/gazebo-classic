@@ -99,3 +99,21 @@ State State::operator-(const State &_state) const
   return State(this->name, this->realTime - _state.realTime,
                this->simTime - _state.simTime);
 }
+
+/////////////////////////////////////////////////
+void State::SetWallTime(const common::Time &_time)
+{
+  this->wallTime = _time;
+}
+
+/////////////////////////////////////////////////
+void State::SetRealTime(const common::Time &_time)
+{
+  this->realTime = _time;
+}
+
+/////////////////////////////////////////////////
+void State::SetSimTime(const common::Time &_time)
+{
+  this->simTime = _time;
+}

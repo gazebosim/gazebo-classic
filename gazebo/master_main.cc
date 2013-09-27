@@ -18,7 +18,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Exception.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/Master.hh"
 #include "gazebo/gazebo_config.h"
 

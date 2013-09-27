@@ -16,8 +16,8 @@
 */
 
 #include <gtest/gtest.h>
-#include "msgs/msgs.hh"
-#include "common/Exception.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 
@@ -782,4 +782,40 @@ TEST(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
          </scene>\
       </gazebo>", sdf);
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
+}
+
+/////////////////////////////////////////////////
+TEST(MsgsTest, MeshFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("geometry.sdf", sdf);
+  sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+           <geometry>\
+             <mesh>\
+               <uri>test/mesh.dae</uri>\
+               <scale>1 2 3</scale>\
+               <submesh>\
+                 <name>test_name</name>\
+                 <center>true</center>\
+               </submesh>\
+             </mesh>\
+           </geometry>\
+         </visual>\
+      </sdf>", sdf);
+
+  msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
+  EXPECT_TRUE(msg.has_filename());
+  EXPECT_STREQ("test/mesh.dae", msg.filename().c_str());
+
+  EXPECT_TRUE(msg.has_scale());
+  EXPECT_DOUBLE_EQ(msg.scale().x(), 1.0);
+  EXPECT_DOUBLE_EQ(msg.scale().y(), 2.0);
+  EXPECT_DOUBLE_EQ(msg.scale().z(), 3.0);
+
+  EXPECT_TRUE(msg.has_submesh());
+  EXPECT_STREQ("test_name", msg.submesh().c_str());
+
+  EXPECT_TRUE(msg.has_center_submesh());
+  EXPECT_TRUE(msg.center_submesh());
 }

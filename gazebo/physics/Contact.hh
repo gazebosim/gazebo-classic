@@ -27,6 +27,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
@@ -42,6 +43,7 @@ namespace gazebo
 {
   namespace physics
   {
+    class Collision;
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -81,11 +83,11 @@ namespace gazebo
       /// \brief Reset to default values.
       public: void Reset();
 
-      /// \brief Name of the first collision object
-      public: std::string collision1;
+      /// \brief Pointer to the first collision object
+      public: Collision *collision1;
 
-      /// \brief Name of the second collision object
-      public: std::string collision2;
+      /// \brief Pointer to the second collision object
+      public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
       /// All forces and torques are relative to the center of mass of the
@@ -104,8 +106,11 @@ namespace gazebo
       /// \brief Length of all the arrays.
       public: int count;
 
-      /// \brief Time at which the contact occured.
+      /// \brief Time at which the contact occurred.
       public: common::Time time;
+
+      /// \brief World in which the contact occurred
+      public: WorldPtr world;
     };
     /// \}
   }

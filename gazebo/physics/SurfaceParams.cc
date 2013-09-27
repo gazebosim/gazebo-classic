@@ -20,13 +20,20 @@
  */
 
 #include <float.h>
-#include "physics/SurfaceParams.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
+  : bounce(0), bounceThreshold(100000),
+    kp(1000000000000), kd(1), cfm(0), erp(0.2),
+    maxVel(0.01), minDepth(0),
+    mu1(1), mu2(1), slip1(0), slip2(0),
+    collideWithoutContact(false),
+    collideWithoutContactBitmask(1)
 {
 }
 
@@ -38,40 +45,50 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
   {
     sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
-    this->bounceThreshold = bounceElem->GetValueDouble("threshold");
+    GZ_ASSERT(bounceElem, "Surface sdf member is NULL");
+    this->bounce = bounceElem->Get<double>("restitution_coefficient");
+    this->bounceThreshold = bounceElem->Get<double>("threshold");
   }
 
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
+    GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
     {
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      this->mu1 = frictionOdeElem->GetValueDouble("mu");
-      this->mu2 = frictionOdeElem->GetValueDouble("mu2");
+      GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
+      this->mu1 = frictionOdeElem->Get<double>("mu");
+      this->mu2 = frictionOdeElem->Get<double>("mu2");
 
       if (this->mu1 < 0)
         this->mu1 = FLT_MAX;
       if (this->mu2 < 0)
         this->mu2 = FLT_MAX;
 
-      this->slip1 = frictionOdeElem->GetValueDouble("slip1");
-      this->slip2 = frictionOdeElem->GetValueDouble("slip2");
-      this->fdir1 = frictionOdeElem->GetValueVector3("fdir1");
+      this->slip1 = frictionOdeElem->Get<double>("slip1");
+      this->slip2 = frictionOdeElem->Get<double>("slip2");
+      this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
     }
   }
 
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+    GZ_ASSERT(contactElem, "Surface sdf member is NULL");
     {
+      this->collideWithoutContact =
+        contactElem->Get<bool>("collide_without_contact");
+      this->collideWithoutContactBitmask =
+          contactElem->Get<unsigned int>("collide_without_contact_bitmask");
       sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-      this->kp = contactOdeElem->GetValueDouble("kp");
-      this->kd = contactOdeElem->GetValueDouble("kd");
-      this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
-      this->erp = contactOdeElem->GetValueDouble("soft_erp");
-      this->maxVel = contactOdeElem->GetValueDouble("max_vel");
-      this->minDepth = contactOdeElem->GetValueDouble("min_depth");
+      GZ_ASSERT(contactOdeElem, "Surface sdf member is NULL");
+      this->kp = contactOdeElem->Get<double>("kp");
+      this->kd = contactOdeElem->Get<double>("kd");
+      this->cfm = contactOdeElem->Get<double>("soft_cfm");
+      this->erp = contactOdeElem->Get<double>("soft_erp");
+      this->maxVel = contactOdeElem->Get<double>("max_vel");
+      this->minDepth = contactOdeElem->Get<double>("min_depth");
     }
   }
 }
@@ -94,6 +111,8 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.set_kd(this->kd);
   _msg.set_max_vel(this->maxVel);
   _msg.set_min_depth(this->minDepth);
+  _msg.set_collide_without_contact(this->collideWithoutContact);
+  _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
 }
 
 
@@ -134,6 +153,8 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->maxVel = _msg.max_vel();
   if (_msg.has_min_depth())
     this->minDepth = _msg.min_depth();
+  if (_msg.has_collide_without_contact())
+    this->collideWithoutContact = _msg.collide_without_contact();
+  if (_msg.has_collide_without_contact_bitmask())
+    this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
 }
-
-

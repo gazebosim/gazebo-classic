@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -71,7 +71,7 @@ void ImagesView::UpdateImpl()
       (*labelIter)->hide();
       this->frameLayout->removeWidget(*labelIter);
       delete *labelIter;
-      this->imageLabels.erase(labelIter);
+      labelIter = this->imageLabels.erase(labelIter);
     }
 
     // Clear the lists
@@ -88,7 +88,7 @@ void ImagesView::UpdateImpl()
   }
 
   // Update the images if there are sizes
-  if (this->images.size() > 0)
+  if (!this->images.empty())
   {
     // Update the image output
     for (; labelIter != this->imageLabels.end(); ++labelIter, ++imageIter)

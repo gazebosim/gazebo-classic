@@ -35,8 +35,8 @@
 #include <string>
 #include <list>
 
-#include "common/CommonTypes.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
 {

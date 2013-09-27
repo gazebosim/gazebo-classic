@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
 
 #include <string>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-
-#include "common/Image.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/rendering/Scene.hh"
 
 namespace Ogre
 {
@@ -43,6 +43,42 @@ namespace gazebo
 {
   namespace rendering
   {
+    class GzTerrainMatGen;
+
+    /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
+    /// \brief Pretends to provide procedural page content to avoid page loading
+    class DummyPageProvider : public Ogre::PageProvider
+    {
+      /// \brief Give a provider the opportunity to prepare page content
+      /// procedurally. The parameters are not used.
+      public: bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to load page content
+      /// procedurally. The parameters are not used.
+      public: bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to unload page content
+      /// procedurally. The parameters are not used.
+      public: bool unloadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to unprepare page content
+      /// procedurally. The parameters are not used.
+      public:
+          bool unprepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+    };
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -71,9 +107,100 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Flatten the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Smooth the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Raise the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Lower the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
+                         double _outsideRadius, double _insideRadius,
+                         double _weight = 0.1);
+
+      /// \brief Get the average height around a point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+
+      /// \brief Set the heightmap to render in wireframe mode.
+      /// \param[in] _show True to render wireframe, false to render solid.
+      public: void SetWireframe(bool _show);
+
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *GetOgreTerrain() const;
+
+      /// \brief Get the heightmap as an image
+      /// \return An image that contains the terrain data.
+      public: common::Image GetImage() const;
+
+      /// \brief Calculate a mouse ray hit on the terrain.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \return The result of the mouse ray hit.
+      public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
+                  math::Vector2i _mousePos);
+
+      /// \brief Split a terrain into subterrains
+      /// \param[in] _heightmap Source vector of floats with the heights.
+      /// \param[in] _n Number of subterrains.
+      /// \param[out] _v Destination vector with the subterrains.
+      public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
+                  std::vector<std::vector<float> > &_v);
+
+      /// \brief Modify the height at a specific point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \param[in] _op Type of operation to perform.
+      private: void ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
+                   double _insideRadius, double _weight,
+                   const std::string &_op);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
@@ -91,6 +218,25 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
+      /// \brief Number of pieces in which a terrain is subdivided for paging.
+      public: static const unsigned int NumTerrainSubdivisions;
+
+      /// \brief Path for the terrain pages generated on disk.
+      private: boost::filesystem::path pagingPath;
+
+      /// \brief The terrain pages are loaded if the distance from the camera is
+      /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
+      /// LoadRadiusFactor is a multiplier applied to the terrain size to create
+      /// a load radius that depends on the terrain size.
+      private: static const double LoadRadiusFactor;
+
+      /// \brief The terrain pages are held in memory but not loaded if they
+      /// are not ready when the camera is within holdRadius distance. See
+      /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
+      /// multiplier applied to the terrain size to create a hold radius that
+      /// depends on the terrain size.
+      private: static const double HoldRadiusFactor;
+
       /// \brief The scene.
       private: ScenePtr scene;
 
@@ -100,11 +246,8 @@ namespace gazebo
       /// \brief Size of the terrain.
       private: math::Vector3 terrainSize;
 
-      /// \brief Size of the image.
-      private: unsigned int imageSize;
-
-      /// \brief Max pixel value.
-      private: double maxPixel;
+      /// \brief Size of the heightmap data.
+      private: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
       private: math::Vector3 terrainOrigin;
@@ -132,6 +275,34 @@ namespace gazebo
 
       /// \brief Material blend fade distances.
       private: std::vector<double> blendFade;
+
+      /// \brief The raw height values received from physics.
+      private: std::vector<float> heights;
+
+      /// \brief Pointer to the terrain material generator.
+      private: GzTerrainMatGen *gzMatGen;
+
+      /// \brief A page provider is needed to use the paging system.
+      private: DummyPageProvider dummyPageProvider;
+
+      /// \brief Central registration point for extension classes,
+      /// such as the PageStrategy, PageContentFactory.
+      private: Ogre::PageManager *pageManager;
+
+      /// \brief Type of paging applied
+      private: Ogre::TerrainPaging *terrainPaging;
+
+      /// \brief Collection of world content
+      private: Ogre::PagedWorld *world;
+
+      /// \brief Collection of terrains. Every terrain might be paged.
+      private: std::vector<std::vector<float> > subTerrains;
+
+      /// \brief Used to iterate over all the terrains
+      private: int terrainIdx;
+
+      /// \brief Flag that enables/disables the terrain paging
+      private: bool useTerrainPaging;
     };
     /// \}
 

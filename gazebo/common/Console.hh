@@ -77,9 +77,17 @@ namespace gazebo
       /// \brief Load the message parameters
       public: void Init(const std::string &_logFilename);
 
+      /// \brief Return true if Init has been called.
+      /// \return True is initialized.
+      public: bool IsInitialized() const;
+
       /// \brief Set quiet output
       /// \param[in] q True to prevent warning
       public: void SetQuiet(bool _q);
+
+      /// \brief Get whether quiet output is set
+      /// \return True to if quiet output is set
+      public: bool GetQuiet() const;
 
       /// \brief Use this to output a colored message to the terminal
       /// \param[in] _lbl Text label
@@ -121,6 +129,9 @@ namespace gazebo
 
       /// \brief Stream for a log file.
       private: std::ofstream *logStream;
+
+      /// \brief True to silence msg output.
+      private: bool quiet;
 
       /// \brief This is a singleton
       private: friend class SingletonT<Console>;

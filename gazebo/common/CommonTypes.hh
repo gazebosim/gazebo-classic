@@ -34,13 +34,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GNUC__)
-#define GAZEBO_DEPRECATED __attribute__((deprecated))
+#define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
 #define GAZEBO_FORCEINLINE __attribute__((always_inline))
 #elif defined(MSVC)
-#define GAZEBO_DEPRECATED
+#define GAZEBO_DEPRECATED(version) ()
 #define GAZEBO_FORCEINLINE __forceinline
 #else
-#define GAZEBO_DEPRECATED
+#define GAZEBO_DEPRECATED(version) ()
 #define GAZEBO_FORCEINLINE
 #endif
 
@@ -90,15 +90,20 @@ namespace gazebo
     class DiagnosticTimer;
     class Image;
     class Mesh;
+    class SubMesh;
     class MouseEvent;
     class NumericAnimation;
     class Param;
     class PoseAnimation;
     class SkeletonAnimation;
+    class SphericalCoordinates;
     class Time;
 
     template <typename T>
     class ParamT;
+
+    /// \brief Speed of light.
+    static const double SpeedOfLight = 299792458;
 
     /// \def Param_V
     /// \brief std::vector of Param*
@@ -123,6 +128,10 @@ namespace gazebo
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class
     typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+
+    /// \def  SphericalCoordinatesPtr
+    /// \brief Boost shared pointer to a SphericalCoordinates object
+    typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
   }
 
   namespace event

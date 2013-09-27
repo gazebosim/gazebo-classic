@@ -15,7 +15,7 @@
  *
 */
 #include "plugins/GpuRayPlugin.hh"
-#include "sensors/GpuRaySensor.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)
@@ -30,7 +30,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::GpuRaySensor>(_sensor);
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(_sensor);
 
   if (!this->parentSensor)
   {

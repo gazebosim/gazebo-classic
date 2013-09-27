@@ -16,7 +16,12 @@
 */
 
 #include <sys/stat.h>
-#include "sdf/sdf.hh"
+
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 std::vector<std::string> params;
 
@@ -25,17 +30,25 @@ using namespace sdf;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cout << "This tool provides information about SDF files.\n\n";
-  std::cout << "gzsdf <command>\n\n";
-  std::cout << "Commands:\n";
-  std::cout << "    describe [SDF version]     Print the SDF format.\n";
-  std::cout << "    convert [file]             "
-            << "In place conversion to the latest format.\n";
-  std::cout << "    doc [SDF version]          Print HTML SDF.\n";
-  std::cout << "    check [file] [SDF version] Check the SDF format for the";
-  std::cout << " given file.\n";
-  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
-  std::cout << " debugging and as a conversion tool.\n\n";
+  std::cerr << "gzsdf -- Tool to provide information about SDF files.\n\n";
+  std::cerr << "`gzsdf` <command>\n\n";
+  std::cerr << "This tool provides information about SDF files.\n\n";
+  std::cerr << "Commands:\n";
+  std::cerr << "    describe <SDF version>     Print the SDF format.\n";
+  std::cerr << "    convert <file>             "
+    << "In place conversion to the latest format.\n";
+  std::cerr << "    doc <SDF version>          Print HTML SDF.\n";
+  std::cerr << "    check <file> <SDF version> Check the SDF format for the";
+  std::cerr << " given file.\n";
+  std::cerr << "    print <SDF version>         Prints SDF, useful for ";
+  std::cerr << " debugging and as a conversion tool.\n\n";
+
+  std::cerr << "See also:\n"
+    << "Example and more information about gazebo gzsdf and other command"
+    << "line tools can be found at: "
+    << "http://gazebosim.org/user_guide/started__commandlinetools.html\n\n"
+    << "For more information about the SDF format please read: "
+    << "http://gazebosim.org/sdf.html\n";
 }
 
 /////////////////////////////////////////////////
@@ -50,6 +63,17 @@ int main(int argc, char** argv)
 {
   bool success = false;
 
+  try
+  {
+    // Initialize the informational logger. This will log warnings and errors.
+    gazebo::common::Console::Instance()->Init("gzsdf.log");
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+    std::cerr << "Error initializing log file" << std::endl;
+  }
+
   // Get parameters from command line
   for (int i = 1; i < argc; i++)
   {
@@ -58,11 +82,15 @@ int main(int argc, char** argv)
     params.push_back(p);
   }
 
-  if (params.empty() || params[0] == "help" || params[0] == "h")
+  if (params.empty() || params[0] == "help" || params[0] == "-h")
   {
     help();
     return 0;
   }
+
+  // We must set the findFile callback here so that gzsdf check/print
+  // can find resource files when parsing the sdf in readFile().
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {
@@ -128,7 +156,16 @@ int main(int argc, char** argv)
       if (sdf::Converter::Convert(&xmlDoc, SDF::version, true))
       {
         success = true;
-        xmlDoc.SaveFile(params[1]);
+
+        // Create an XML printer to control formatting
+        TiXmlPrinter printer;
+        printer.SetIndent("  ");
+        xmlDoc.Accept(&printer);
+
+        // Output the XML
+        std::ofstream stream(params[1].c_str(), std::ios_base::out);
+        stream << printer.Str();
+        stream.close();
       }
     }
     else

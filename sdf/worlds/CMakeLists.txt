@@ -8,18 +8,22 @@ set (files
   depth_camera.world
   empty.world
   force_torque_demo.world
+  force_torque_demo2.world
   joints.world
   heightmap.world
   lights.world
   model_nesting.world
   pioneer2dx.world
+  openal.world
   trimesh_test.world
   cart_test.world
   double_pendulums.world
+  mud.world
   plugin.world
   pr2.world
   presentation.world
   projector.world
+  ray_cpu.world
   rubble.world
   shapes.world
   weshare2012.world

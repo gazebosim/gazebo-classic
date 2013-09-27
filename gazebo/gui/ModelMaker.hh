@@ -19,9 +19,9 @@
 
 #include <list>
 #include <string>
+#include <sdf/sdf.hh>
 
-#include "sdf/sdf.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {
@@ -37,7 +37,7 @@ namespace gazebo
       public: ModelMaker();
       public: virtual ~ModelMaker();
 
-      public: bool InitFromModel(const std::string &_modelName);
+      // public: bool InitFromModel(const std::string &_modelName);
       public: bool InitFromSDFString(const std::string &_data);
       public: bool InitFromFile(const std::string &_filename);
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -109,6 +109,7 @@ void TextView::OnText(const std::string &_msg)
 {
   if (this->paused)
     return;
+
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Update the Hz and Bandwidth info.

@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -158,7 +158,7 @@ Quaternion Quaternion::GetExp() const
 void Quaternion::Invert()
 {
   this->Normalize();
-  this->w = this->w;
+  // this->w = this->w;
   this->x = -this->x;
   this->y = -this->y;
   this->z = -this->z;

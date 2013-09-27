@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "rendering/Camera.hh"
-#include "rendering/ViewController.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/ViewController.hh"
 
 using namespace gazebo;
 using namespace rendering;

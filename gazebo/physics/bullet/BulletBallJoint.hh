@@ -22,9 +22,9 @@
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
-#include "physics/BallJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/BallJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btPoint2PointConstraint;
 
@@ -45,17 +45,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletBallJoint();
 
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
+
       /// \brief Get joint's anchor point
       public: math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Set joint's anchor point
-      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
-
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int /*_index*/) const
@@ -79,14 +76,14 @@ namespace gazebo
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int _index) const;
+      // Documentation inherited.
+      public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Get the axis of rotation
+      // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      // Documentation inherited.
+      protected: void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to Bullet ball constraint
       private: btPoint2PointConstraint *bulletBall;

@@ -1,7 +1,4 @@
 <?xml version="1.0" ?>
-<!-- this was initially generated from ragdoll.urdf,
-     but have sence been updated to turn off gravity for certain links
-     and various tweaks -->
 <gazebo version="1.2">
     <model name="ragdoll">
         <pose>0.000000 0.000000 1.4 0.000000 -0.000000 0.000000</pose>

@@ -19,11 +19,12 @@
  * Date: 21 May 2003
  */
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -47,7 +48,10 @@ ODEUniversalJoint::~ODEUniversalJoint()
 math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
-  dJointGetUniversalAnchor(this->jointId, result);
+  if (this->jointId)
+    dJointGetUniversalAnchor(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -58,7 +62,10 @@ void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  if (this->jointId)
+    dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -66,10 +73,15 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 {
   dVector3 result;
 
-  if (_index == 0)
-    dJointGetUniversalAxis1(this->jointId, result);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      dJointGetUniversalAxis1(this->jointId, result);
+    else
+      dJointGetUniversalAxis2(this->jointId, result);
+  }
   else
-    dJointGetUniversalAxis2(this->jointId, result);
+    gzerr << "ODE Joint ID is invalid\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -80,20 +92,26 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  if (_index == 0)
-    dJointSetUniversalAxis1(this->jointId, _axis.x, _axis.y, _axis.z);
-  else
-    dJointSetUniversalAxis2(this->jointId, _axis.x, _axis.y, _axis.z);
-}
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
 
-//////////////////////////////////////////////////
-void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, _damping);
-  this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&Joint::ApplyDamping, this));
+  if (this->jointId)
+  {
+    if (_index == 0)
+      dJointSetUniversalAxis1(this->jointId,
+        globalAxis.x, globalAxis.y, globalAxis.z);
+    else
+      dJointSetUniversalAxis2(this->jointId,
+        globalAxis.x, globalAxis.y, globalAxis.z);
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -108,6 +126,8 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
     else
       result = dJointGetUniversalAngle2(this->jointId);
   }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -115,12 +135,17 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 //////////////////////////////////////////////////
 double ODEUniversalJoint::GetVelocity(int _index) const
 {
-  double result;
+  double result = 0;
 
-  if (_index == 0)
-    result = dJointGetUniversalAngle1Rate(this->jointId);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      result = dJointGetUniversalAngle1Rate(this->jointId);
+    else
+      result = dJointGetUniversalAngle2Rate(this->jointId);
+  }
   else
-    result = dJointGetUniversalAngle2Rate(this->jointId);
+    gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -135,37 +160,17 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetForce(int _index, double _effort)
+void ODEUniversalJoint::SetForceImpl(int _index, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  if (this->jointId)
   {
-    gzerr << "Calling ODEUniversalJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
+    if (_index == 0)
+      dJointAddUniversalTorques(this->jointId, _effort, 0);
+    else
+      dJointAddUniversalTorques(this->jointId, 0, _effort);
   }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0.0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
-      this->effortLimit[_index]);
-
-  ODEJoint::SetForce(_index, _effort);
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
-
-  if (_index == 0)
-    dJointAddUniversalTorques(this->jointId, _effort, 0);
   else
-    dJointAddUniversalTorques(this->jointId, 0, _effort);
+    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -190,12 +195,9 @@ double ODEUniversalJoint::GetMaxForce(int _index)
 void ODEUniversalJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
-  dJointSetUniversalParam(this->jointId, _parameter, _value);
+
+  if (this->jointId)
+    dJointSetUniversalParam(this->jointId, _parameter, _value);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
 }
-
-
-
-
-
-
-

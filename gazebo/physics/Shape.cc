@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -29,6 +29,8 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -36,4 +38,10 @@ Shape::~Shape()
 {
   if (this->collisionParent)
     this->collisionParent->SetShape(ShapePtr());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Shape::GetScale() const
+{
+  return this->scale;
 }

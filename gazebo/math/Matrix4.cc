@@ -16,10 +16,10 @@
 */
 #include <string.h>
 
-#include "math/Helpers.hh"
-#include "math/Matrix4.hh"
-#include "math/Quaternion.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;

@@ -41,7 +41,7 @@ void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
       this->model->GetName() + "/pose_trajectory",
       &ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg, this);
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&ModelTrajectoryTestPlugin::OnUpdate, this));
 }
 

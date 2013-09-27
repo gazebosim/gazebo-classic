@@ -53,9 +53,6 @@ namespace gazebo
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       // Documentation inherited.
@@ -77,12 +74,12 @@ namespace gazebo
       public: virtual double GetMaxForce(int index);
 
       // Documentation inherited.
-      public: virtual void SetForce(int _index, double _effort);
-
-      // Documentation inherited.
       public: virtual double GetParam(int parameter) const;
 
       public: virtual void SetParam(int parameter, double value);
+
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _effort);
     };
   }
 }

@@ -60,6 +60,41 @@ namespace gazebo
     /// \brief ODE physics engine.
     class ODEPhysics : public PhysicsEngine
     {
+      /// \enum ODEParam
+      /// \brief ODE Physics parameter types.
+      public: enum ODEParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations
+        SOR_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        PGS_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Max correcting velocity
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
       public: ODEPhysics(WorldPtr _world);
@@ -91,12 +126,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual std::string GetType() const
                       { return "ode"; }
-
-      // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -170,6 +199,24 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
 
+      /// \brief Set a parameter of the bullet physics engine
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \param[in] _value The value to set to
+      public: virtual void SetParam(ODEParam _param,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(ODEParam _param) const;
+
       /// \brief Return the world space id.
       /// \return The space id for the world.
       public: dSpaceID GetSpaceId() const;
@@ -242,9 +289,6 @@ namespace gazebo
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
 
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
-
       /// \brief The type of the solver.
       private: std::string stepType;
 
@@ -278,6 +322,9 @@ namespace gazebo
 
       /// \brief Indices used during creation of contact joints.
       private: int indices[MAX_CONTACT_JOINTS];
+
+      /// \brief Maximum number of contact points per collision pair.
+      private: int maxContacts;
     };
   }
 }

@@ -120,6 +120,14 @@ TEST(TimeTest, Time)
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
   EXPECT_TRUE(time == common::Time(0, 500000499));
+
+  double sec = 1.0 + 1e-9;
+  double msec = sec * 1e3;
+  double usec = sec * 1e6;
+  double nsec = sec * 1e9;
+  EXPECT_DOUBLE_EQ(nsec, common::Time::SecToNano(sec));
+  EXPECT_DOUBLE_EQ(nsec, common::Time::MilToNano(msec));
+  EXPECT_DOUBLE_EQ(nsec, common::Time::MicToNano(usec));
 }
 
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Hammer -->
+    <include>
+      <name>active_hammer</name>
+      <uri>model://hammer</uri>
+      <pose>0 -8 2  0 0 0</pose>
+      <static>false</static>
+    </include>
+
+    <!-- Static hammer -->
+    <include>
+      <name>static_hammer</name>
+      <uri>model://hammer</uri>
+      <pose>4 -8 2  0 0 0</pose>
+      <static>true</static>
+    </include>
+
+    <!-- Cordless drill -->
+    <include>
+      <name>active_drill</name>
+      <uri>model://cordless_drill</uri>
+      <pose>0 -4 2  0 0 0</pose>
+      <static>false</static>
+    </include>
+
+    <!-- Static cordless drill -->
+    <include>
+      <name>static_drill</name>
+      <uri>model://cordless_drill</uri>
+      <pose>4 -4 2  0 0 0</pose>
+      <static>true</static>
+    </include>
+
+    <!-- Double pendulum -->
+    <include>
+      <name>active_pendulum</name>
+      <uri>model://double_pendulum_with_base</uri>
+    </include>
+
+    <!-- Static double pendulum -->
+    <include>
+      <name>static_pendulum</name>
+      <uri>model://double_pendulum_with_base</uri>
+      <pose>4 0 0  0 0 0</pose>
+      <static>true</static>
+    </include>
+
+    <!-- PR2 -->
+    <include>
+      <name>active_pr2</name>
+      <uri>model://pr2</uri>
+      <pose>0 8 0  0 0 0</pose>
+    </include>
+
+    <!-- Static PR2 -->
+    <include>
+      <uri>model://pr2</uri>
+      <pose>4 8 0  0 0 0</pose>
+      <static>true</static>
+    </include>
+  </world>
+</sdf>

@@ -16,7 +16,7 @@
 */
 #include <inttypes.h>
 #include "Assert.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
 /*
  * When using the flag BOOST_ENABLE_ASSERT_HANDLER, the boost functions

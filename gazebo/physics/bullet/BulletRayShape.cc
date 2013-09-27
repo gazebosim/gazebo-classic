@@ -38,7 +38,7 @@ BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
   this->SetName("Bullet Ray Shape");
 
   this->physicsEngine =
-    boost::shared_static_cast<BulletPhysics>(_physicsEngine);
+    boost::static_pointer_cast<BulletPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -46,7 +46,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
   this->SetName("Bullet Ray Shape");
-  this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
+  this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
@@ -61,7 +61,7 @@ void BulletRayShape::Update()
   if (this->collisionParent)
   {
     BulletCollisionPtr collision =
-        boost::shared_static_cast<BulletCollision>(this->collisionParent);
+        boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
@@ -106,7 +106,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   if (this->collisionParent)
   {
     BulletCollisionPtr collision =
-        boost::shared_static_cast<BulletCollision>(this->collisionParent);
+        boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");

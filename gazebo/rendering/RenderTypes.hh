@@ -31,9 +31,9 @@
 /// \brief Render GUI visuals mask.
 #define GZ_VISIBILITY_GUI             0x00000001
 
-/// \def GZ_VISIBILITY_NOT_SELECTABLE
-/// \brief Render visuals that are not selectable mask.
-#define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
+/// \def GZ_VISIBILITY_SELECTABLE
+/// \brief Render visuals that are selectable mask.
+#define GZ_VISIBILITY_SELECTABLE      0x00000002
 
 namespace gazebo
 {
@@ -48,6 +48,8 @@ namespace gazebo
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class SonarVisual;
+    class WrenchVisual;
     class CameraVisual;
     class JointVisual;
     class AxisVisual;
@@ -56,6 +58,8 @@ namespace gazebo
     class COMVisual;
     class RFIDVisual;
     class RFIDTagVisual;
+    class WindowManager;
+    class SelectionObj;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -93,6 +97,14 @@ namespace gazebo
     /// \brief Shared pointer to LaserVisual
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
 
+    /// \def SonarVisualPtr
+    /// \brief Shared pointer to SonarVisual
+    typedef boost::shared_ptr<SonarVisual> SonarVisualPtr;
+
+    /// \def WrenchVisualPtr
+    /// \brief Shared pointer to WrenchVisual
+    typedef boost::shared_ptr<WrenchVisual> WrenchVisualPtr;
+
     /// \def CameraVisualPtr
     /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
@@ -124,6 +136,14 @@ namespace gazebo
     /// \def RFIDTagVisual
     /// \brief Shared pointer to RFIDTagVisual
     typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+
+    /// \def WindowManager
+    /// \brief Shared pointer to WindowManager
+    typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
+
+    /// \def ContactVisualPtr
+    /// \brief Shared pointer to SelectionObj
+    typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

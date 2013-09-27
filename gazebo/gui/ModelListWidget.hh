@@ -21,12 +21,12 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "gui/qt.h"
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -233,6 +233,9 @@ namespace gazebo
       private: std::deque<std::string> fillTypes;
 
       private: msgs::Light::LightType lightType;
+
+      /// \brief Type of physics engine.
+      private: msgs::Physics_Type physicsType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

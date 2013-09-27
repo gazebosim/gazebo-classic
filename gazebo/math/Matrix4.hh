@@ -20,8 +20,8 @@
 #include <assert.h>
 #include <iostream>
 
-#include "math/Vector3.hh"
-#include "math/Matrix3.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
 
 namespace gazebo
 {

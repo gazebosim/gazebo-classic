@@ -27,6 +27,7 @@
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 
@@ -57,6 +58,10 @@ namespace gazebo
       /// \brief Initialize the heightmap.
       public: virtual void Init();
 
+      /// \brief Set the scale of the heightmap shape.
+      /// \param[in] _scale Scale to set the heightmap shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
       public: std::string GetURI() const;
@@ -79,7 +84,7 @@ namespace gazebo
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \return The height at a the specified location.
-      public: float GetHeight(int _x, int _y);
+      public: float GetHeight(int _x, int _y) const;
 
       /// \brief Fill a geometry message with this shape's data.
       /// \param[in] _msg Message to fill.
@@ -101,8 +106,17 @@ namespace gazebo
       /// \return Amount of subsampling.
       public: int GetSubSampling() const;
 
+      /// \brief Return an image representation of the heightmap.
+      /// \return Image where white pixels represents the highest locations,
+      /// and black pixels the lowest.
+      public: common::Image GetImage() const;
+
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();
+
+      /// \brief Handle request messages.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Lookup table of heights.
       protected: std::vector<float> heights;
@@ -113,11 +127,20 @@ namespace gazebo
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;
 
-      /// \brief Scaling factor.
-      protected: math::Vector3 scale;
+      /// \brief True to flip the heights along the y direction.
+      protected: bool flipY;
 
-      /// \brief Level of subsampling.
+      /// \brief The amount of subsampling. Default is 2.
       protected: int subSampling;
+
+      /// \brief Transportation node.
+      private: transport::NodePtr node;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
     };
     /// \}
   }

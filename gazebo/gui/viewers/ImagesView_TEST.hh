@@ -41,5 +41,4 @@ class ImagesView_TEST : public QTestFixture
   private: void SetTopic(gazebo::gui::ImagesView *_view,
                          const std::string &_topicName, int _count);
 };
-
 #endif

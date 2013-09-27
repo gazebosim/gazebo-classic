@@ -17,11 +17,11 @@
 
 #include <sstream>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -113,8 +113,7 @@ void Grid::Init()
 {
   this->manualObject =
     this->scene->GetManager()->createManualObject(this->name);
-  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI |
-                                         GZ_VISIBILITY_NOT_SELECTABLE);
+  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->manualObject->setDynamic(false);
   // this->manualObject->setRenderQueueGroup(

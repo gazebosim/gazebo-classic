@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
@@ -62,7 +62,7 @@ TEST_F(RaySensor_TEST, CreateLaser)
 
   // Create the Ray sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName, std::string("default::ground_plane::link::laser"));
@@ -71,7 +71,7 @@ TEST_F(RaySensor_TEST, CreateLaser)
   mgr->Update();
 
   // Get a pointer to the Ray sensor
-  sensors::RaySensorPtr sensor = boost::shared_dynamic_cast<sensors::RaySensor>
+  sensors::RaySensorPtr sensor = boost::dynamic_pointer_cast<sensors::RaySensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

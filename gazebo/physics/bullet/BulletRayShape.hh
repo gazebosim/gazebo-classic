@@ -23,7 +23,7 @@
 #define _BULLETRAYGEOM_HH_
 
 #include <string>
-#include "physics/RayShape.hh"
+#include "gazebo/physics/RayShape.hh"
 
 namespace gazebo
 {

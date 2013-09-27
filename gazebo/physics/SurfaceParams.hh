@@ -22,8 +22,9 @@
 #ifndef _SURFACEPARAMS_HH_
 #define _SURFACEPARAMS_HH_
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -132,6 +133,13 @@ namespace gazebo
       ///        to the contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: math::Vector3 fdir1;
+
+      /// \brief Allow collision checking without generating a contact joint.
+      public: bool collideWithoutContact;
+
+      /// \brief Custom collision filtering used when collideWithoutContact is
+      /// true.
+      public: unsigned int collideWithoutContactBitmask;
     };
     /// \}
   }

@@ -22,6 +22,7 @@
 using namespace gazebo;
 using namespace transport;
 
+extern void dummy_callback_fn(uint32_t);
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
@@ -62,8 +63,8 @@ void Publication::AddSubscription(const NodePtr &_node)
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
          ++pubIter)
     {
-      if (!(*pubIter)->GetPrevMsg().empty())
-        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsg());
+      if ((*pubIter)->GetPrevMsgPtr())
+        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsgPtr());
     }
   }
 }
@@ -86,8 +87,8 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
       for (pubIter = this->publishers.begin();
            pubIter != this->publishers.end(); ++pubIter)
       {
-        if (!(*pubIter)->GetPrevMsg().empty())
-          _callback->HandleData((*pubIter)->GetPrevMsg());
+        if ((*pubIter)->GetPrevMsgPtr())
+          _callback->HandleMessage((*pubIter)->GetPrevMsgPtr());
       }
     }
   }
@@ -178,7 +179,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  if (this->nodes.empty() && this->callbacks.empty())
   {
     this->transports.clear();
   }
@@ -202,7 +203,7 @@ void Publication::RemoveSubscription(const std::string &_host,
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+    subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
     std::string host = subptr->GetConnection()->GetRemoteAddress();
     if (!subptr || !subptr->GetConnection()->IsOpen() ||
         ((host.empty() || host == _host) &&
@@ -216,14 +217,14 @@ void Publication::RemoveSubscription(const std::string &_host,
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  if (this->nodes.empty() && this->callbacks.empty())
   {
     this->transports.clear();
   }
 }
 
 //////////////////////////////////////////////////
-void Publication::LocalPublish(const std::string &data)
+void Publication::LocalPublish(const std::string &_data)
 {
   std::list<NodePtr>::iterator iter, endIter;
 
@@ -234,7 +235,7 @@ void Publication::LocalPublish(const std::string &data)
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleData(this->topic, _data))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -254,7 +255,8 @@ void Publication::LocalPublish(const std::string &data)
     {
       if ((*cbIter)->IsLocal())
       {
-        if ((*cbIter)->HandleData(data))
+        if ((*cbIter)->HandleData(_data,
+              boost::bind(&dummy_callback_fn, _1), 0))
           ++cbIter;
         else
           cbIter = this->callbacks.erase(cbIter);
@@ -266,12 +268,9 @@ void Publication::LocalPublish(const std::string &data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(const google::protobuf::Message &_msg,
-                          const boost::function<void()> &_cb)
+void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+    uint32_t _id)
 {
-  std::string data;
-  _msg.SerializeToString(&data);
-
   std::list<NodePtr>::iterator iter, endIter;
 
   {
@@ -281,7 +280,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
     endIter = this->nodes.end();
     while (iter != endIter)
     {
-      if ((*iter)->HandleData(this->topic, data))
+      if ((*iter)->HandleMessage(this->topic, _msg))
         ++iter;
       else
         this->nodes.erase(iter++);
@@ -295,20 +294,30 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   {
     boost::mutex::scoped_lock lock(this->callbackMutex);
-    std::list<CallbackHelperPtr>::iterator cbIter;
-    cbIter = this->callbacks.begin();
 
-    while (cbIter != this->callbacks.end())
+    if (!this->callbacks.empty())
     {
-      if ((*cbIter)->HandleData(data))
-        ++cbIter;
-      else
-        this->callbacks.erase(cbIter++);
+      std::string data;
+      _msg->SerializeToString(&data);
+      std::list<CallbackHelperPtr>::iterator cbIter;
+      cbIter = this->callbacks.begin();
+
+      while (cbIter != this->callbacks.end())
+      {
+        if ((*cbIter)->HandleData(data, _cb, _id))
+          ++cbIter;
+        else
+          this->callbacks.erase(cbIter++);
+      }
+
+      if (this->callbacks.empty() && !_cb.empty())
+        _cb(_id);
+    }
+    else if (!_cb.empty())
+    {
+      _cb(_id);
     }
   }
-
-  if (_cb)
-    (_cb)();
 }
 
 //////////////////////////////////////////////////
@@ -415,7 +424,7 @@ void Publication::RemoveNodes()
       iter = this->callbacks.begin();
       while (iter != this->callbacks.end())
       {
-        subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+        subptr = boost::dynamic_pointer_cast<SubscriptionTransport>(*iter);
         if (!subptr || !subptr->GetConnection()->IsOpen() ||
             (subptr->GetConnection()->GetRemoteAddress() == (*cbIter).first &&
              subptr->GetConnection()->GetRemotePort() == (*cbIter).second))
@@ -435,7 +444,7 @@ void Publication::RemoveNodes()
   {
     boost::mutex::scoped_lock lock(this->nodeMutex);
     // If no more subscribers, then disconnect from all publishers
-    if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+    if (this->nodes.empty() && this->callbacks.empty())
     {
       this->transports.clear();
     }

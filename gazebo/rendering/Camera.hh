@@ -28,18 +28,19 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -62,6 +63,7 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
+    class GaussianNoiseCompositorListener;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -123,10 +125,6 @@ namespace gazebo
       ///
       /// This function is called before the camera is destructed
       public: virtual void Fini();
-
-      /// Deprecated.
-      /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED;
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
@@ -267,6 +265,10 @@ namespace gazebo
       /// \param[in] _enable Set to True to enable saving of frames
       public: void EnableSaveFrame(bool _enable);
 
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      public: bool GetCaptureData() const;
+
       /// \brief Set the save frame pathname
       /// \param[in] _pathname Directory in which to store saved image frames
       public: void SetSaveFramePathname(const std::string &_pathname);
@@ -365,6 +367,9 @@ namespace gazebo
       /// \param[in] _value Set to true to capture data into a memory buffer.
       public: void SetCaptureData(bool _value);
 
+      /// \brief Capture data once and save to disk
+      public: void SetCaptureDataOnce();
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -398,6 +403,18 @@ namespace gazebo
                   bool _inheritOrientation,
                   double _minDist = 0.0, double _maxDist = 0.0);
 
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      public: void AttachToVisual(uint32_t _id,
+                  bool _inheritOrientation,
+                  double _minDist = 0.0, double _maxDist = 0.0);
+
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
       public: void TrackVisual(const std::string &_visualName);
@@ -410,7 +427,7 @@ namespace gazebo
       /// \return Direction the camera is facing
       public: math::Vector3 GetDirection() const;
 
-      /// \brief Connect a to the new image signal
+      /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.
@@ -474,8 +491,15 @@ namespace gazebo
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
 
+      /// \brief Get the path to saved screenshots.
+      /// \return Path to saved screenshots.
+      public: std::string GetScreenshotPath() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
+
+      /// \brief Read image data from pixel buffer
+      protected: void ReadPixelBuffer();
 
       /// \brief Implementation of the Camera::TrackVisual call
       /// \param[in] _visualName Name of the visual to track
@@ -497,6 +521,19 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
+                     bool _inheritOrientation,
+                     double _minDist = 0, double _maxDist = 0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      /// \return True on success
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 
@@ -579,6 +616,9 @@ namespace gazebo
       /// \brief Number of saved frames.
       protected: unsigned int saveCount;
 
+      /// \brief Path to saved screenshots.
+      protected: std::string screenshotPath;
+
       /// \brief Format for saving images.
       protected: int imageFormat;
 
@@ -596,6 +636,9 @@ namespace gazebo
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
+
+      /// \brief True to capture a frame once and save to disk.
+      protected: bool captureDataOnce;
 
       /// \brief True if new data is available.
       protected: bool newData;
@@ -653,11 +696,49 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       private: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Gaussian noise compositor
+      private: Ogre::CompositorInstance *gaussianNoiseInstance;
+
+      /// \brief Gaussian noise compositor listener
+      private: boost::shared_ptr<GaussianNoiseCompositorListener>
+        gaussianNoiseCompositorListener;
+
       /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Position PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
+      private: common::PID trackVisualYawPID;
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other
+      /// noise parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
+      /// distibution from which we sample
+      private: double noiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
+      /// devation of the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }

@@ -17,8 +17,8 @@
 #ifndef _PLANE_HH_
 #define _PLANE_HH_
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {

@@ -32,16 +32,13 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->world = _world;
 
-  math::Vector3 bottomRight = _sdf->GetValueVector3("bottom_right");
-  math::Vector3 topLeft = _sdf->GetValueVector3("top_left");
-  math::Vector3 minSize = _sdf->GetValueVector3("min_size");
-  math::Vector3 maxSize = _sdf->GetValueVector3("max_size");
-  double minMass = _sdf->GetValueDouble("min_mass");
-  double maxMass = _sdf->GetValueDouble("max_mass");
-  unsigned int count = _sdf->GetValueUInt("count");
-
-  std::vector<CompoundObj> objects;
-  std::vector<CompoundObj>::iterator iter;
+  math::Vector3 bottomRight = _sdf->Get<math::Vector3>("bottom_right");
+  math::Vector3 topLeft = _sdf->Get<math::Vector3>("top_left");
+  math::Vector3 minSize = _sdf->Get<math::Vector3>("min_size");
+  math::Vector3 maxSize = _sdf->Get<math::Vector3>("max_size");
+  double minMass = _sdf->Get<double>("min_mass");
+  double maxMass = _sdf->Get<double>("max_mass");
+  unsigned int count = _sdf->Get<unsigned int>("count");
 
   for (unsigned int i = 0; i < count; ++i)
   {
@@ -108,7 +105,9 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     // Disable compound objects for now.
     // bool merged = false;
-    /*for (iter = objects.begin(); iter != objects.end(); ++iter)
+    /* std::vector<CompoundObj> objects;
+       std::vector<CompoundObj>::iterator iter;
+       for (iter = objects.begin(); iter != objects.end(); ++iter)
     {
       bool x = fabs(obj.pos.x - (*iter).pos.x) <=
         (*iter).size.x * 0.5 + obj.size.x * 0.5;
@@ -183,11 +182,11 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
 {
   std::ostringstream newModelStr;
 
-  float w = _size.y;
-  float h = _size.z;
-  float d = _size.x;
+  float sx = _size.x;
+  float sy = _size.y;
+  float sz = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pose << "</pose>"
     "<link name='link'>"
@@ -197,9 +196,9 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
       "</velocity_decay>"
       "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-        "<ixx>" << (1.0/12.0) * _mass * (h*h + d*d) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * _mass * (w*w + d*d) << "</iyy>"
-        "<izz>" << (1.0/12.0) * _mass * (w*w + h*h) << "</izz>"
+        "<ixx>" << (1.0/12.0) * _mass * (sy*sy + sz*sz) << "</ixx>"
+        "<iyy>" << (1.0/12.0) * _mass * (sz*sz + sx*sx) << "</iyy>"
+        "<izz>" << (1.0/12.0) * _mass * (sx*sx + sy*sy) << "</izz>"
         "<ixy>" << 0.0 << "</ixy>"
         "<ixz>" << 0.0 << "</ixz>"
         "<iyz>" << 0.0 << "</iyz>"
@@ -228,10 +227,11 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 {
   std::ostringstream newModelStr;
 
-  float w = _size.y;
-  float h = _size.z;
-  float d = _size.x;
-  newModelStr << "<sdf version='1.3'>"
+  float sx = _size.x;
+  float sy = _size.y;
+  float sz = _size.z;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<allow_auto_disable>true</allow_auto_disable>"
     "<pose>" << _pose << "</pose>"
@@ -242,9 +242,9 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
       "</velocity_decay>"
       "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-        "<ixx>" << (1.0/12.0) * _mass * (h*h + d*d) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * _mass * (w*w + d*d) << "</iyy>"
-        "<izz>" << (1.0/12.0) * _mass * (w*w + h*h) << "</izz>"
+        "<ixx>" << (1.0/12.0) * _mass * (sy*sy + sz*sz) << "</ixx>"
+        "<iyy>" << (1.0/12.0) * _mass * (sz*sz + sx*sx) << "</iyy>"
+        "<izz>" << (1.0/12.0) * _mass * (sx*sx + sy*sy) << "</izz>"
         "<ixy>" << 0.0 << "</ixy>"
         "<ixz>" << 0.0 << "</ixz>"
         "<iyz>" << 0.0 << "</iyz>"
@@ -276,7 +276,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
   float r = _size.x * 0.5;
   float h = _size.z;
 
-  newModelStr << "<sdf version='1.3'>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"
@@ -288,7 +288,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
         "<inertia>"
           "<ixx>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</ixx>"
           "<iyy>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</iyy>"
-          "<izz>" << (1.0/12.0) * _mass * r * r << "</izz>"
+          "<izz>" << (1.0/2.0)  * _mass * r * r << "</izz>"
           "<ixy>" << 0.0 << "</ixy>"
           "<ixz>" << 0.0 << "</ixz>"
           "<iyz>" << 0.0 << "</iyz>"

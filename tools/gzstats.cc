@@ -19,14 +19,14 @@
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
 
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 namespace po = boost::program_options;
 using namespace gazebo;
@@ -41,7 +41,6 @@ bool g_plot;
 /////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
-  static bool first = true;
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
@@ -86,6 +85,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
 
   if (g_plot)
   {
+    static bool first = true;
     if (first)
     {
       printf("# real-time factor (percent), simtime (sec), realtime (sec), "
@@ -112,20 +112,18 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::string worldName = "default";
-
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add_options()
-    ("help,h", "print help message")
-    ("plot,p", "output comma-separated values, useful for processing and "
-               "plotting")
-    ("world-name,w", po::value<std::string>(), "the Gazebo world to monitor");
+    ("help,h", "Print help message.")
+    ("plot,p", "Output comma-separated values, useful for processing and "
+               "plotting.")
+    ("world-name,w", po::value<std::string>(), "The Gazebo world to monitor.");
   po::variables_map vm;
 
   try
@@ -143,12 +141,24 @@ int main(int argc, char **argv)
 
   if (vm.count("help"))
   {
-    std::cerr << "This tool displays statistics about a running Gazebo world.\n"
-              << "Usage: gzstats [options]\n"
-              << desc << std::endl;
+    std::cerr << "gzstats -- This tool displays statistics about a "
+      "running Gazebo world\n\n";
+
+    std::cerr << "`gzstats` [options]\n\n";
+
+    std::cerr << "This tool displays statistics about a running "
+      "Gazebo world.\n\n";
+
+    std::cerr << desc << "\n";
+
+    std::cerr << "See also:\n"
+      << "Examples and more information can be found at: "
+      << "http://gazebosim.org/wiki/Tools#World_Statistics\n";
+
     return 1;
   }
 
+  std::string worldName;
   if (vm.count("world-name"))
   {
     worldName = vm["world-name"].as<std::string>();
@@ -159,19 +169,20 @@ int main(int argc, char **argv)
     g_plot = true;
   }
 
-  transport::init();
+  if (transport::init())
+  {
+    transport::NodePtr node(new transport::Node());
 
-  transport::NodePtr node(new transport::Node());
+    node->Init(worldName);
 
-  node->Init(worldName);
+    std::string topic = "~/world_stats";
 
-  std::string topic = "~/world_stats";
+    transport::SubscriberPtr sub = node->Subscribe(topic, cb);
+    transport::run();
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, cb);
-  transport::run();
-
-  boost::mutex::scoped_lock lock(mutex);
-  condition.wait(lock);
+    boost::mutex::scoped_lock lock(mutex);
+    condition.wait(lock);
+  }
 
   transport::fini();
 

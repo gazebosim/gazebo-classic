@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 class QLineEdit;
 class QLabel;
@@ -49,17 +49,42 @@ namespace gazebo
       /// param[in] _show True to show the editor widget, false to hide it.
       public: void ShowEditor(bool _show);
 
+      /// \brief Display an overlay message
+      /// \param[in] _msg Message to be displayed
+      /// \param [in] _duration Duration in milliseconds
+      public: void DisplayOverlayMsg(const std::string &_msg,
+          int _duration = -1);
+
+      /// \brief Get the overlay message being displayed
+      /// \return Message displayed in the render window
+      public: std::string GetOverlayMsg() const;
+
+      /// \brief Qt call back when the step value in the spinbox changed
+      private slots: void OnStepValueChanged(int _value);
+
       private slots: virtual void update();
+
+      /// \brief Qt callback to clear overlay message if a duration is
+      /// specified
+      private slots: void OnClearOverlayMsg();
 
       private: void OnFullScreen(bool &_value);
 
-      private: QHBoxLayout *bottomBarLayout;
+      /// \brief Handle follow model user event.
+      /// \param[in] _modelName Name of the model that is being followed.
+      private: void OnFollow(const std::string &_modelName);
+
+      /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
-      // \brief Building editor widget for creating a building model
+      /// \brief Building editor widget for creating a building model
       private: BuildingEditorWidget *buildingEditorWidget;
 
+      /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
+
+      /// \brief All event connections.
+      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Bottom frame that holds the play/pause widgets
       private: QFrame *bottomFrame;
@@ -78,11 +103,8 @@ namespace gazebo
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
-      /// \brief An overlay label on the 3D render widget (currently used for
-      // to show that building model is view only
-      private: QLabel *viewOnlyLabel;
-
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \brief An overlay label on the 3D render widget
+      private: QLabel *msgOverlayLabel;
 
       private: bool clear;
       private: std::string clearName;
@@ -90,6 +112,12 @@ namespace gazebo
       private: bool create;
       private: std::string createName;
       private: QTimer *timer;
+
+      /// \brief Base overlay message;
+      private: std::string baseOverlayMsg;
+
+      /// \brief Tool button that holds the step widget
+      private: QToolButton *stepButton;
     };
   }
 }

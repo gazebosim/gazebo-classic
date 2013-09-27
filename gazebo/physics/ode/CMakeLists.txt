@@ -1,8 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
-link_directories(  
-  ${CCD_LIBRARY_DIRS} 
+
+link_directories(
+  ${CCD_LIBRARY_DIRS}
 )
 
 
@@ -15,7 +16,7 @@ set (sources ODEPhysics.cc
              ODEHinge2Joint.cc
              ODEUniversalJoint.cc
              ODEBallJoint.cc
-             ODETrimeshShape.cc
+             ODEMeshShape.cc
              ODERayShape.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
@@ -33,7 +34,7 @@ SET (headers
   ODEHinge2Joint.hh
   ODEUniversalJoint.hh
   ODEBallJoint.hh
-  ODETrimeshShape.hh
+  ODEMeshShape.hh
   ODERayShape.hh
   ODEMultiRayShape.hh
   ODEHeightmapShape.hh
@@ -45,8 +46,19 @@ SET (headers
   ODEScrewJoint.hh
 )
 
+set (gtest_sources
+  ODEPhysics_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
 gz_add_library(gazebo_physics_ode ${sources})
-target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+target_link_libraries(gazebo_physics_ode
+  gazebo_ode
+  gazebo_opcode
+  gazebo_math
+  gazebo_common
+  ${TBB_LIBRARIES}
+)
 
 gz_install_library(gazebo_physics_ode)
 

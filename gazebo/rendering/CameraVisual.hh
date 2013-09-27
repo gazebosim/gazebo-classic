@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {

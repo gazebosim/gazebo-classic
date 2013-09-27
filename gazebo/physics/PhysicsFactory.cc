@@ -20,11 +20,11 @@
  * Date: 21 May 2009
  */
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/PhysicsFactory.hh"
-#include "common/Console.hh"
-#include "gazebo_config.h"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
 
@@ -72,7 +72,7 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
 }
 
 //////////////////////////////////////////////////
-bool PhysicsFactory::IsRegistered(const std::string _name)
+bool PhysicsFactory::IsRegistered(const std::string &_name)
 {
   return (engines.count(_name) > 0);
 }

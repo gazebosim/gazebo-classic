@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/CallbackHelper.hh"
+#include "gazebo/transport/CallbackHelper.hh"
 
 namespace gazebo
 {
