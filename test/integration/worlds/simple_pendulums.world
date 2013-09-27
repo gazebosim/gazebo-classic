@@ -28,9 +28,6 @@
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <simbody>
-          <dt>0.001</dt>
-      </simbody>
     </physics>
     <model name="model_1">
       <pose>0.0 0.0 10.1 1.57079633 0.0 0.0</pose>
