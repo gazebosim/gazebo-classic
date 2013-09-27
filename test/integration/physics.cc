@@ -278,8 +278,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      // issue \#848: failure with bullet 2.81
+      // make this if statement unconditional when \#848 is resolved
+      if (!(name == "link_offset_box" && _physicsEngine == "bullet"
+          && LIBBULLET_VERSION < 2.82))
+      {
+        EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
+        EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      }
 
       // debug
       // if (physics->GetType()  == "bullet")
@@ -1581,11 +1587,11 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   math::Vector3 vel;
 
   physics::Link_V links = model->GetLinks();
-  unsigned int linkCount = 2;
-  EXPECT_EQ(links.size(), linkCount);
+  EXPECT_EQ(links.size(), 2u);
   for (physics::Link_V::const_iterator iter = links.begin();
       iter != links.end(); ++iter)
   {
+    std::cout << "LinkName[" << (*iter)->GetScopedName() << "]\n";
     // Links should not repel each other hence expecting zero x, y vel
     vel = (*iter)->GetWorldLinearVel();
     EXPECT_EQ(vel.x, 0);

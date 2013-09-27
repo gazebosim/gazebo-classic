@@ -272,10 +272,7 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
   if (_x < 0 || _y < 0)
-  {
-    printf("Less than zero\n\n");
     return 0.0;
-  }
 
   return this->heights[_y * this->vertSize + _x];
 }
