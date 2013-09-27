@@ -126,6 +126,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
