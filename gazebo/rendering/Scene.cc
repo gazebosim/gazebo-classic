@@ -320,8 +320,6 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
-
-  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -659,6 +657,12 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetVisualCount() const
+{
+  return this->visuals.size();
 }
 
 //////////////////////////////////////////////////
@@ -1335,19 +1339,22 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 /////////////////////////////////////////////////
 bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
-  for (int i = 0; i < _msg->model_size(); i++)
   {
-    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->model(i).id());
-    if (iter != this->poseMsgs.end())
-      iter->second.CopyFrom(_msg->model(i).pose());
-    else
-      this->poseMsgs.insert(
-          std::make_pair(_msg->model(i).id(), _msg->model(i).pose()));
+    boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
+    for (int i = 0; i < _msg->model_size(); i++)
+    {
+      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg->model(i).id());
+      if (iter != this->poseMsgs.end())
+        iter->second.CopyFrom(_msg->model(i).pose());
+      else
+        this->poseMsgs.insert(
+            std::make_pair(_msg->model(i).id(), _msg->model(i).pose()));
 
-    this->poseMsgs[_msg->model(i).id()].set_name(_msg->model(i).name());
-    this->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
+      this->poseMsgs[_msg->model(i).id()].set_name(_msg->model(i).name());
+      this->poseMsgs[_msg->model(i).id()].set_id(_msg->model(i).id());
 
-    this->ProcessModelMsg(_msg->model(i));
+      this->ProcessModelMsg(_msg->model(i));
+    }
   }
 
   for (int i = 0; i < _msg->light_size(); i++)
@@ -1453,15 +1460,18 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     linkName = modelName + _msg.link(j).name();
 
-    PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
-    if (iter != this->poseMsgs.end())
-      iter->second.CopyFrom(_msg.link(j).pose());
-    else
-      this->poseMsgs.insert(
-          std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
+    {
+      boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
+      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
+      if (iter != this->poseMsgs.end())
+        iter->second.CopyFrom(_msg.link(j).pose());
+      else
+        this->poseMsgs.insert(
+            std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
 
-    this->poseMsgs[_msg.link(j).id()].set_name(linkName);
-    this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+      this->poseMsgs[_msg.link(j).id()].set_name(linkName);
+      this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+    }
 
     if (_msg.link(j).has_inertial())
     {
@@ -1613,7 +1623,10 @@ void Scene::PreRender()
   for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
   {
     if (this->ProcessSceneMsg(*sIter))
+    {
+      this->initialized = true;
       sceneMsgsCopy.erase(sIter++);
+    }
     else
       ++sIter;
   }
@@ -1707,7 +1720,7 @@ void Scene::PreRender()
   }
 
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
@@ -1994,8 +2007,6 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
             _msg->name() + "_JOINT_VISUAL__", childVis));
     jointVis->Load(_msg);
     jointVis->SetVisible(this->showJoints);
-    jointVis->GetSceneNode()->_setDerivedOrientation(
-        Ogre::Quaternion(1, 0, 0, 0));
     if (_msg->has_id())
       jointVis->SetId(_msg->id());
 
@@ -2342,8 +2353,7 @@ common::Time Scene::GetSimTime() const
 /////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-
+  boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
   this->sceneSimTimePosesReceived =
     common::Time(_msg->time().sec(), _msg->time().nsec());
 

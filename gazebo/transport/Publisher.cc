@@ -30,17 +30,6 @@ uint32_t Publisher::idCounter = 0;
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool /*_latch*/)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
-{
-  this->queueLimitWarned = false;
-  this->updatePeriod = 0;
-  this->pubId = 0;
-  this->id = ++idCounter;
-}
-
-//////////////////////////////////////////////////
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, double _hzRate)
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)

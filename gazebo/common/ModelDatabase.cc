@@ -183,12 +183,6 @@ std::string ModelDatabase::GetModelConfig(const std::string &_uri)
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest(const std::string &_uri)
-{
-  return this->GetModelConfig(_uri);
-}
-
-/////////////////////////////////////////////////
 std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
 {
   std::string xmlString;
@@ -546,17 +540,13 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
 {
   boost::filesystem::path manifestPath = _path;
 
-  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-  // exist, try to get the deprecated version.
+  // Get the GZ_MODEL_MANIFEST_FILENAME.
   if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << _path << "\n";
-
-    manifestPath /= "manifest.xml";
   }
 
   TiXmlDocument xmlDoc;
@@ -603,17 +593,13 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
 
   boost::filesystem::path manifestPath = path;
 
-  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-  // exist, try to get the deprecated version.
+  // Get the GZ_MODEL_MANIFEST_FILENAME.
   if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << manifestPath << "\n";
-
-    manifestPath /= "manifest.xml";
   }
 
   TiXmlDocument xmlDoc;

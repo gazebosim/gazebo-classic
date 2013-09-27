@@ -24,6 +24,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -434,6 +435,10 @@ namespace gazebo
       /// \return The current simulation time in Scene
       public: common::Time GetSimTime() const;
 
+      /// \brief Get the number of visuals.
+      /// \return The number of visuals in the Scene.
+      public: uint32_t GetVisualCount() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
@@ -684,6 +689,9 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       private: boost::mutex *receiveMutex;
+
+      /// \brief Mutex to lock the pose message buffers.
+      private: boost::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       private: transport::NodePtr node;

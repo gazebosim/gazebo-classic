@@ -565,7 +565,7 @@ math::Quaternion Camera::GetWorldRotation() const
 
   // As far as I can tell, OGRE is broken. It makes a strong assumption
   // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinat frame is right-handed with +Y up, +X right, and +Z
+  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
   // This -1.0 multiplication is a hack to get back the correct orientation.
   sRot.x *= -1.0;
@@ -615,7 +615,7 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 
   // As far as I can tell, OGRE is broken. It makes a strong assumption
   // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinat frame is right-handed with +Y up, +X right, and +Z
+  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
   // The -1.0 to Roll is a hack to set the correct orientation.
   s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
@@ -847,11 +847,17 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-void Camera::EnableSaveFrame(bool enable)
+void Camera::EnableSaveFrame(bool _enable)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("save");
-  elem->GetAttribute("enabled")->Set(enable);
-  this->captureData = true;
+  elem->GetAttribute("enabled")->Set(_enable);
+  this->captureData = _enable;
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetCaptureData() const
+{
+  return this->captureData;
 }
 
 //////////////////////////////////////////////////
@@ -1266,6 +1272,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+
   this->initialized = true;
 }
 
@@ -1324,7 +1331,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
-    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
+        ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
@@ -1720,12 +1728,6 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
-}
-
-//////////////////////////////////////////////////
-bool Camera::IsInitialized() const
-{
-  return this->GetInitialized();
 }
 
 //////////////////////////////////////////////////

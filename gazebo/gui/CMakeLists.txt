@@ -158,6 +158,3 @@ gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)
-
-# Deprecated Gui.hh
-gz_issue_775("Gui")

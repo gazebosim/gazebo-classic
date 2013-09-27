@@ -52,7 +52,6 @@ Collision::Collision(LinkPtr _link)
 
   this->link = _link;
 
-  this->contactsEnabled = false;
   this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
@@ -200,26 +199,19 @@ void Collision::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool _enable)
+void Collision::SetContactsEnabled(bool /*_enable*/)
 {
-  this->contactsEnabled = _enable;
 }
 
 //////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
-  return this->contact.ConnectionCount() > 0 || this->contactsEnabled;
+  return false;
 }
 
 //////////////////////////////////////////////////
-void Collision::AddContact(const Contact &_contact)
+void Collision::AddContact(const Contact & /*_contact*/)
 {
-  if (!this->GetContactsEnabled() ||
-      this->HasType(Base::RAY_SHAPE) ||
-      this->HasType(Base::PLANE_SHAPE))
-    return;
-
-  this->contact(this->GetScopedName(), _contact);
 }
 
 //////////////////////////////////////////////////

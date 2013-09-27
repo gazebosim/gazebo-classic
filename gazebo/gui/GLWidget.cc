@@ -828,7 +828,8 @@ void GLWidget::Paste(const std::string &_object)
     if (this->entityMaker)
       this->entityMaker->Stop();
 
-    this->modelMaker.InitFromModel(_object);
+    // \todo Put this back in when pasting is enabled again
+    // this->modelMaker.InitFromModel(_object);
     this->entityMaker = &this->modelMaker;
     this->entityMaker->Start(this->userCamera);
     gui::Events::manipMode("make_entity");

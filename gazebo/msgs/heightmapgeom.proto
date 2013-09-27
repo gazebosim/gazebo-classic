@@ -32,6 +32,7 @@ message HeightmapGeom
 
   repeated Texture texture = 7; // List of textures
   repeated Blend blend     = 8; // How to blend the textures
+  optional bool use_terrain_paging = 9; // Enable terrain paging in rendering
 }
 
 

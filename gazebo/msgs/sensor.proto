@@ -13,7 +13,7 @@ import "contactsensor.proto";
 message Sensor
 {
   required string name             = 1;
-  required uint32 id               = 2;
+  optional uint32 id               = 2;
   required string parent           = 3;
   required uint32 parent_id        = 4;
   required string type             = 5;

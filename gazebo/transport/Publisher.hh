@@ -40,10 +40,6 @@ namespace gazebo
     /// \brief A publisher of messages on a topic
     class Publisher
     {
-      /// Deprecated
-      public: Publisher(const std::string &_topic, const std::string &_msgType,
-                  unsigned int _limit, bool _latch) GAZEBO_DEPRECATED(1.5);
-
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
       /// \param[in] _msgType Type of the message to be published
@@ -70,11 +66,6 @@ namespace gazebo
       /// value to wait forever.
       /// \return True if a connection was established.
       public: bool WaitForConnection(const common::Time &_timeout) const;
-
-      /// \brief DEPRECATED in version 1.6
-      /// \sa SetPublication
-      public: void SetPublication(PublicationPtr &_publication, int _i)
-              GAZEBO_DEPRECATED(1.5);
 
       /// \brief Set the publication object for a particular publication
       /// \param[in] _publication Pointer to the publication object to be set
@@ -116,8 +107,13 @@ namespace gazebo
       /// this publisher.
       public: void SetNode(NodePtr _node);
 
-      /// Deprecated
-      public: bool GetLatching() const GAZEBO_DEPRECATED(1.5);
+      /// \brief Get the previously published message
+      /// \return The previously published message, if any
+      public: std::string GetPrevMsg() const;
+
+      /// \brief Get the previously published message
+      /// \return The previously published message, if any
+      public: MessagePtr GetPrevMsgPtr() const;
 
       /// \brief Finalize the publisher.
       public: void Fini();

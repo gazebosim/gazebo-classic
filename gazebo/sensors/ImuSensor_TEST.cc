@@ -141,7 +141,11 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->Step(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  // Issue #848
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, 1e-1);
+  else
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, TOL);
 }

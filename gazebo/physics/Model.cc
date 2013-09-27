@@ -184,7 +184,15 @@ void Model::Init()
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    (*iter)->Init();
+    try
+    {
+      (*iter)->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Init joint failed" << std::endl;
+      return;
+    }
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
     // can be included in the message.
@@ -306,7 +314,7 @@ void Model::RemoveChild(EntityPtr _child)
   Entity::RemoveChild(_child->GetId());
 
   for (Link_V::iterator liter = this->links.begin();
-       liter!= this->links.end(); ++liter)
+       liter != this->links.end(); ++liter)
   {
     (*liter)->SetEnabled(true);
   }
@@ -524,7 +532,7 @@ math::Box Model::GetBoundingBox() const
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
   for (Link_V::const_iterator iter = this->links.begin();
-      iter!= this->links.end(); ++iter)
+       iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -752,7 +760,7 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 void Model::SetGravityMode(const bool &_v)
 {
   for (Link_V::iterator liter = this->links.begin();
-      liter!= this->links.end(); ++liter)
+      liter != this->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -765,7 +773,7 @@ void Model::SetGravityMode(const bool &_v)
 void Model::SetCollideMode(const std::string &_m)
 {
   for (Link_V::iterator liter = this->links.begin();
-      liter!= this->links.end(); ++liter)
+      liter != this->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -778,7 +786,7 @@ void Model::SetCollideMode(const std::string &_m)
 void Model::SetLaserRetro(const float _retro)
 {
   for (Link_V::iterator liter = this->links.begin();
-      liter!= this->links.end(); ++liter)
+      liter != this->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -943,7 +951,7 @@ void Model::SetScale(const math::Vector3 &_scale)
   this->scale = _scale;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -956,7 +964,7 @@ void Model::SetScale(const math::Vector3 &_scale)
 void Model::SetEnabled(bool _enabled)
 {
   for (Link_V::iterator liter = this->links.begin();
-      liter!= this->links.end(); ++liter)
+      liter != this->links.end(); ++liter)
   {
     if (*liter)
       (*liter)->SetEnabled(_enabled);
@@ -992,7 +1000,7 @@ void Model::SetAutoDisable(bool _auto)
     return;
 
   for (Link_V::iterator liter = this->links.begin();
-      liter!= this->links.end(); ++liter)
+      liter != this->links.end(); ++liter)
   {
     if (*liter)
     {

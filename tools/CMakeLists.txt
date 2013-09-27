@@ -11,6 +11,10 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 set (test_sources 
   gz_log_TEST.cc 
   gz_TEST.cc
@@ -38,7 +42,7 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
+if (${GAZEBO_VERSION} VERSION_GREATER 1.10)
   message (WARNING
     "Installing deprecated manpages. This should be removed after Gazebo 1.9")
   manpage(gzfactory 1)
@@ -56,22 +60,5 @@ gz_install_executable(gz)
 
 roffman(gz 1)
 
-# find_program(GZIP gzip)
-# # Create man page for gz
-# add_custom_command(
-#   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz
-#   COMMAND ${GZIP} -c ${CMAKE_CURRENT_SOURCE_DIR}/gz.1.roff
-#   > ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz
-# )
-# set(MANPAGE_TARGET "man-gz")
-# add_custom_target(${MANPAGE_TARGET} DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz)
-# add_dependencies(man ${MANPAGE_TARGET})
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gz.1.gz DESTINATION share/man/man1)
-# 
-
 install (PROGRAMS gzmodel_create gzmodel_create.sh
   DESTINATION ${BIN_INSTALL_DIR})
-
-if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
-  message (WARNING "Installing deprecated gzmodel_create.sh. This should be removed after Gazebo 1.9")
-endif()

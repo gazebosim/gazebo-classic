@@ -160,20 +160,6 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
-ModelState WorldState::GetModelState(unsigned int _index) const
-{
-  if (_index < this->modelStates.size())
-  {
-    ModelState_M::const_iterator iter = this->modelStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Invalid model state index\n");
-  return ModelState();
-}
-
-/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   // Search for the model name

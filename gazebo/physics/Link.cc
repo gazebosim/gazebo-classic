@@ -155,8 +155,8 @@ void Link::Load(sdf::ElementPtr _sdf)
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
         std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-            this->GetScopedName(), this->GetId());
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
@@ -458,6 +458,18 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+}
+
+/////////////////////////////////////////////////
+Joint_V Link::GetParentJoints() const
+{
+  return this->parentJoints;
+}
+
+/////////////////////////////////////////////////
+Joint_V Link::GetChildJoints() const
+{
+  return this->childJoints;
 }
 
 /////////////////////////////////////////////////

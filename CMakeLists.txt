@@ -120,7 +120,7 @@ set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 
-set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
+set (MIN_OGRE_VERSION 1.7.4 CACHE INTERNAL "Ogre version requirement" FORCE)
 set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
@@ -128,19 +128,6 @@ set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requireme
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
-
-#####################################
-# Build type cflags
-set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic" CACHE INTERNAL "General C Flags")
-
-
-#####################################
-# Build type link flags
-set (CMAKE_LINK_FLAGS_RELEASE " " CACHE INTERNAL "Link flags fro release" FORCE)
-set (CMAKE_LINK_FLAGS_RELWITHDEBINFO " " CACHE INTERNAL "Link flags for release with debug support" FORCE)
-set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FORCE)
-set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
 #####################################
 # Check for low memory version to use in some tests
@@ -172,54 +159,8 @@ set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
 
 
-if (SSE2_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2")
-  if (NOT APPLE)
-    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mfpmath=sse")
-  endif()
-endif()
-if (SSE3_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse3")
-endif()
-if (SSSE3_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mssse3")
-endif()
-
-if (ENABLE_SSE4)
-  message(STATUS "\nSSE4 will be enabled if system supports it.\n")
-  if (SSE4_1_FOUND)
-    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.1")
-  endif()
-  if (SSE4_2_FOUND)
-    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.2")
-  endif()
-else()
-  message(STATUS "\nSSE4 disabled.\n")
-endif()
-
 # Check for DRI capable Display
 include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
-
-set (CMAKE_C_FLAGS_RELEASE "")
-if (NOT APPLE)
-  # -s doesn't work with default osx compiler clang, alternative:
-  # http://stackoverflow.com/questions/6085491/gcc-vs-clang-symbol-strippingu
-  set (CMAKE_C_FLAGS_RELEASE "-s")
-endif()
-set (CMAKE_C_FLAGS_RELEASE " ${CMAKE_C_FLAGS_RELEASE} -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
-set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-
-set (CMAKE_C_FLAGS_RELWITHDEBINFO " -g -O2 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release with debug support" FORCE)
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_C_FLAGS_RELWITHDEBINFO})
-
-set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
-set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-
-set (CMAKE_C_FLAGS_PROFILE " -fno-omit-frame-pointer -g -pg ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
-set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
-
-set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
-set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
 
 #####################################
 MESSAGE(STATUS "Checking gazebo build type")
@@ -231,14 +172,6 @@ endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with 
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
-
-#####################################
-# Set all the global build flags
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
-set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 
 set (BUILD_TYPE_PROFILE FALSE)
 set (BUILD_TYPE_RELEASE FALSE)
@@ -257,11 +190,30 @@ else()
   build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
 endif()
 
-# TODO: remove this check when transtition period ends
-# Check if build type was sent in old uppercase format
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE_UPPERCASE}")
-    build_warning("CMAKE_BUILD_TYPE was specified in uppercase. This will stop to be supported soon. Valid types: Debug Release RelWithDebInfo Profile Check")
-endif ()
+#####################################
+# Handle CFlags
+unset (CMAKE_C_FLAGS_ALL CACHE)
+unset (CMAKE_CXX_FLAGS CACHE)
+
+# USE_HOST_CFLAGS (default TRUE)
+# Will check building host machine for proper cflags 
+if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
+  message(STATUS "Enable host CFlags")
+  include (${gazebo_cmake_dir}/HostCFlags.cmake)
+endif()
+
+# USE_UPSTREAM_CFLAGS (default TRUE)
+# Will use predefined gazebo developers cflags
+if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
+  message(STATUS "Enable upstream CFlags")
+  include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
+endif()
+
+# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+filter_valid_compiler_warnings(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
+                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow 
+			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS}")
 
 #################################################
 # OS Specific initialization
@@ -320,7 +272,11 @@ else (build_errors)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
-  message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
+  if (DEFINED CMAKE_CXX_FLAGS)
+    message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
+  else()
+    message (STATUS "Use default CFlags")
+  endif()
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
