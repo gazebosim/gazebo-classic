@@ -292,11 +292,6 @@ namespace gazebo
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
 
-      /// \brief Get a handle to the Controller for the joints in this model.
-      /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController()
-        { return this->jointController; }
-
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -320,6 +315,19 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
+      /// \brief Get a handle to the Controller for the joints in this model.
+      /// \return A handle to the Controller for the joints in this model.
+      public: JointControllerPtr GetJointController();
+
+      /// \brief Get a gripper based on an index.
+      /// \return A pointer to a Gripper. Null if the _index is invalid.
+      public: GripperPtr GetGripper(size_t _index) const;
+
+      /// \brief Get the number of grippers in this model.
+      /// \return Size of this->grippers array.
+      /// \sa Model::GetGripper()
+      public: size_t GetGripperCount() const;
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -330,19 +338,19 @@ namespace gazebo
       private: LinkPtr canonicalLink;
 
       /// \brief All the joints in the model.
-      protected: Joint_V joints;
+      private: Joint_V joints;
 
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
 
       /// \brief All the grippers in the model.
-      protected: std::vector<Gripper*> grippers;
+      private: std::vector<GripperPtr> grippers;
 
       /// \brief All the model plugins.
       private: std::vector<ModelPluginPtr> plugins;
 
       /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
+      private: transport::PublisherPtr jointPub;
 
       /// \brief The joint animations.
       private: std::map<std::string, common::NumericAnimationPtr>
