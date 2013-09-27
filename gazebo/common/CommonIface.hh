@@ -21,36 +21,13 @@
 #include <string>
 #include <vector>
 #include <boost/uuid/sha1.hpp>
-#include <boost/variant.hpp>
 #include <iomanip>
 #include <sstream>
-
-/*template <typename T>
-struct HashableType
-{
-  typedef boost::variant<std::string, std::vector<T> > Type;
-};*/
-
-class Sha1:
-  public boost::static_visitor<double>
-{
-  public:
-    template<class T>
-    double operator()(const T &_v) const
-    {
-      typename T::value_type t = 0;
-
-      return t;
-    }
-};
 
 namespace gazebo
 {
   namespace common
   {
-    typedef boost::variant<int, float, unsigned int, bool> BasicType;
-    typedef boost::variant<std::string, std::vector<BasicType> > T2;
-
     /// \addtogroup gazebo_common
     /// \{
 
@@ -77,18 +54,42 @@ namespace gazebo
     std::string find_file_path(const std::string &_file);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
-    /// \param[in] _buffer Input sequence of bytes.
-    /// \param[in] _byteCount Size of the input sequence in bytes
+    /// \param[in] _buffer Input sequence. The permitted data types for this
+    /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
-    //template<typename T>
-    std::string get_sha1(const T2 &_buffer);
+    template<typename T>
+    std::string get_sha1(const T &_buffer);
+
     /// \}
   }
 
   ///////////////////////////////////////////////
   // Implementation of get_sha1
-  //template<typename T>
-  
+  template<typename T>
+  std::string common::get_sha1(const T &_buffer)
+  {
+    boost::uuids::detail::sha1 sha1;
+    unsigned int hash[5];
+    std::stringstream stream;
 
+    if (_buffer.size() == 0)
+    {
+      sha1.process_bytes(NULL, 0);
+    }
+    else
+    {
+      sha1.process_bytes(&(_buffer[0]), _buffer.size() * sizeof(_buffer[0]));
+    }
+
+    sha1.get_digest(hash);
+    stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
+
+    for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
+    {
+      stream << hash[i];
+    }
+
+    return stream.str();
+  }
 }
 #endif

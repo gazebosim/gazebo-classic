@@ -79,24 +79,3 @@ std::string common::find_file_path(const std::string &_file)
     return filepath.substr(0, index);
   }
 }
-
-std::string common::get_sha1(const T2 &_buffer)
-  {
-    /*boost::uuids::detail::sha1 sha1;
-    unsigned int hash[5];
-    std::stringstream stream;
-
-    sha1.process_bytes(&(_buffer.at(0)), _buffer.size() * sizeof(_buffer.at(0)));
-    sha1.get_digest(hash);
-
-    stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
-
-    for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
-    {
-      stream << hash[i];
-    }
-
-    return stream.str();*/
-
-    //return boost::apply_visitor( Sha1(), _buffer);
-  }

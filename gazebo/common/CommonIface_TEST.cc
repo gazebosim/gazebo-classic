@@ -16,9 +16,7 @@
 */
 
 #include <stdlib.h>
-#include <fstream>
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/common/CommonIface.hh"
 
@@ -28,15 +26,34 @@ using namespace gazebo;
 /// \brief Test CommonIface::GetSHA1
 TEST(CommonIface_TEST, GetSHA1)
 {
-  // Do not forget to update 'precomputedSHA1' if you modify this vector
+  // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
+  std::string precomputedSHA1;
+  std::string computedSHA1;
+  std::string s;
+
+  // Compute the SHA1 of the vector
   std::vector<float> v;
   for (int i = 0; i < 100; ++i)
     v.push_back(i);
 
-  // Compute the SHA1 of the vector
-  std::string precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";
-  //std::string computedSHA1 = common::get_sha1(v);
-  //EXPECT_EQ(precomputedSHA1, computedSHA1);
+  computedSHA1 = common::get_sha1<std::vector<float> >(v);
+  precomputedSHA1 = "913283ec8502ba1423d38a7ea62cb8e492e87b23";
+  EXPECT_EQ(precomputedSHA1, computedSHA1);
+
+  // Compute the SHA1 of a string
+  s = "Marty McFly: Wait a minute, Doc. Ah... Are you telling me that you"
+      " built a time machine... out of a DeLorean?\n"
+      "Dr. Emmett Brown: The way I see it, if you're gonna build a time"
+      " machine into a car, why not do it with some style?";
+  computedSHA1 = common::get_sha1<std::string>(s);
+  precomputedSHA1 = "a370ddc4d61d936b2bb40f98bae061dc15fd8923";
+  EXPECT_EQ(precomputedSHA1, computedSHA1);
+
+  // Compute the SHA1 of an empty string
+  s = "";
+  computedSHA1 = common::get_sha1<std::string>(s);
+  precomputedSHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+  EXPECT_EQ(precomputedSHA1, computedSHA1);
 }
 
 /////////////////////////////////////////////////
