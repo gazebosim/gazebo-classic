@@ -52,7 +52,7 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 
   // Create the IMU sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName, std::string("default::ground_plane::link::imu"));
@@ -148,7 +148,11 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  // Issue #848
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, 1e-1);
+  else
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, TOL);
 }

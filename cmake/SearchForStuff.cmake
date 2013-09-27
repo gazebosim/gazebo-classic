@@ -128,8 +128,10 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(BULLET bullet>=2.81)
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
+    add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )
   else()
     set (HAVE_BULLET FALSE)
+    add_definitions( -DLIBBULLET_VERSION=0.0 )
   endif()
 
   #################################################
