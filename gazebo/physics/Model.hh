@@ -350,7 +350,7 @@ namespace gazebo
       private: std::vector<ModelPluginPtr> plugins;
 
       /// \brief Publisher for joint info.
-      private: transport::PublisherPtr jointPub;
+      protected: transport::PublisherPtr jointPub;
 
       /// \brief The joint animations.
       private: std::map<std::string, common::NumericAnimationPtr>
