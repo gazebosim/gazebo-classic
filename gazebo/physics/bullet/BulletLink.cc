@@ -598,7 +598,7 @@ void BulletLink::SetAutoDisable(bool /*_disable*/)
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinkStatic(bool _static)
+void BulletLink::SetLinkStatic(bool /*_static*/)
 {
-  gzlog << "To be implemneted\n";
+  gzlog << "To be implemented\n";
 }
