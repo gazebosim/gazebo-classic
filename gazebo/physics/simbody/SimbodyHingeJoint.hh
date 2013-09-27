@@ -89,7 +89,7 @@ namespace gazebo
       protected: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited.
-      protected: void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief save simbody state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;
