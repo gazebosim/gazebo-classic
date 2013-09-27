@@ -37,9 +37,10 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
 {
   this->mustBeBaseLink = false;
   this->physicsInitialized = false;
-  this->simbodyPhysics.reset();
+  this->gravityMode = false;
   this->staticLinkDirty = false;
   this->staticLink = false;
+  this->simbodyPhysics.reset();
 }
 
 //////////////////////////////////////////////////
