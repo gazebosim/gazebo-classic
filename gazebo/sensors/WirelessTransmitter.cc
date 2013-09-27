@@ -149,6 +149,13 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   math::Vector3 end = _receiver.pos;
   math::Vector3 start = this->referencePose.pos;
 
+  // Avoid computing the intersection of coincident points
+  // This prevents an assertion in bullet (issue #849)
+  if (start == end)
+  {
+    end.z += 0.00001;
+  }
+
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->
       GetPhysicsUpdateMutex()));
