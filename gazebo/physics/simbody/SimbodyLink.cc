@@ -112,7 +112,8 @@ void SimbodyLink::SetGravityMode(bool _mode)
   }
   else
   {
-    gzdbg << "SetGravityMode, but physics not initialized, caching\n";
+    gzlog << "SetGravityMode [" << _mode
+          << "], but physics not initialized, caching\n";
   }
 }
 
@@ -126,8 +127,8 @@ bool SimbodyLink::GetGravityMode() const
   }
   else
   {
-    gzdbg << "GetGravityMode, but physics not initialized, returning"
-          << " cached value\n";
+    gzlog << "GetGravityMode [" << this->gravityMode
+          << "], but physics not initialized, returning cached value\n";
     return this->gravityMode;
   }
 }
@@ -436,7 +437,8 @@ void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 /////////////////////////////////////////////////
 SimTK::MassProperties SimbodyLink::GetMassProperties() const
 {
-  gzdbg << "SimbodyLink::GetMassProperties for [" << this->GetName() << "]\n";
+  gzlog << "SimbodyLink::GetMassProperties for ["
+        << this->GetScopedName() << "]\n";
 
   if (!this->IsStatic())
   {

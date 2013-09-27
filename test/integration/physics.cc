@@ -964,13 +964,13 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
 
-          gzdbg << "model " << *modelIter
-                << "  i " << i
-                << "  oldVel " << oldVel
-                << "  newVel " << newVel
-                << "  upper joint v "
-                << model->GetJoint("upper_joint")->GetVelocity(0)
-                << " joint " << joint->GetName() <<  "\n";
+          // gzdbg << "model " << *modelIter
+          //       << "  i " << i
+          //       << "  oldVel " << oldVel
+          //       << "  newVel " << newVel
+          //       << "  upper joint v "
+          //       << model->GetJoint("upper_joint")->GetVelocity(0)
+          //       << " joint " << joint->GetName() <<  "\n";
 
           // Expect increasing velocities
           EXPECT_GT(newVel, oldVel);
@@ -1000,13 +1000,13 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
 
-          gzdbg << "model " << *modelIter
-                << "  i " << i
-                << "  oldVel " << oldVel
-                << "  newVel " << newVel
-                << "  upper joint v "
-                << model->GetJoint("upper_joint")->GetVelocity(0)
-                << " joint " << joint->GetName() <<  "\n";
+          // gzdbg << "model " << *modelIter
+          //       << "  i " << i
+          //       << "  oldVel " << oldVel
+          //       << "  newVel " << newVel
+          //       << "  upper joint v "
+          //       << model->GetJoint("upper_joint")->GetVelocity(0)
+          //       << " joint " << joint->GetName() <<  "\n";
 
           // Expect decreasing velocities
           EXPECT_LT(newVel, oldVel);
@@ -1324,12 +1324,12 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
 
-          gzdbg << "box time [" << t
-               << "] sim x [" << pose.pos.x
-               << "] ideal x [" << x
-               << "] sim vx [" << vel.x
-               << "] ideal vx [" << v
-               << "]\n";
+          // gzdbg << "box time [" << t
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
 
           if (i == 0)
             box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
@@ -1351,12 +1351,12 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
           math::Pose pose = sphere_model->GetWorldPose();
-          gzdbg << "sphere time [" << world->GetSimTime().Double()
-               << "] sim x [" << pose.pos.x
-               << "] ideal x [" << x
-               << "] sim vx [" << vel.x
-               << "] ideal vx [" << v
-               << "]\n";
+          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
           if (t > 1.000 && t < 1.01)
           {
             // collision transition, do nothing
