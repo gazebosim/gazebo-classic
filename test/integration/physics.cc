@@ -1386,8 +1386,10 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 
       // integrate here to see when the collision should happen
       double vold = v;
-      if (i == 0) v = vold + dt* (f / m);
-      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      if (i == 0)
+        v = vold + dt* (f / m);
+      else if (t >= 1.0)
+        v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
       x = x + dt * (v + vold) / 2.0;
     }
   }
