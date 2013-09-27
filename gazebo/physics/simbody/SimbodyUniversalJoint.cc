@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -53,7 +49,7 @@ void SimbodyUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -65,7 +61,7 @@ math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
+void SimbodyUniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }
@@ -77,11 +73,6 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetAngle(int /*_index*/) const
-{
-  return math::Angle();
-}
 
 //////////////////////////////////////////////////
 double SimbodyUniversalJoint::GetVelocity(int /*_index*/) const

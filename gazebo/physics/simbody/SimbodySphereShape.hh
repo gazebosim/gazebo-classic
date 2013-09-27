@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere collisionetry
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
 
-#ifndef _SIMBODY_SPHERESHAPE_HH_
-#define _SIMBODY_SPHERESHAPE_HH_
+#ifndef _SIMBODY_SPHERE_SHAPE_HH_
+#define _SIMBODY_SPHERE_SHAPE_HH_
 
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
@@ -37,14 +32,14 @@ namespace gazebo
     class SimbodySphereShape : public SphereShape
     {
       /// \brief Constructor
+      /// \param[in] _parent Collision parent pointer
       public: SimbodySphereShape(CollisionPtr _parent) : SphereShape(_parent) {}
 
       /// \brief Destructor
       public: virtual ~SimbodySphereShape() {}
 
-      /// \brief Set the radius
-      /// \param[in] _radius Sphere radius
-      public: void SetRadius(double _radius)
+      // Documentation inherited.
+      public: virtual void SetRadius(double _radius)
               {
                 if (_radius < 0)
                 {

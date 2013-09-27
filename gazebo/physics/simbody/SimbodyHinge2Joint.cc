@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -67,13 +63,6 @@ math::Vector3 SimbodyHinge2Joint::GetAxis(int /*index*/) const
 {
   gzerr << "Not implemented";
   return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngle(int /*_index*/) const
-{
-  gzerr << "Not implemented";
-  return math::Angle();
 }
 
 //////////////////////////////////////////////////

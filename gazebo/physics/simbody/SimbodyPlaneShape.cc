@@ -15,39 +15,39 @@
  *
 */
 
-#include "gazebo/common/Mesh.hh"
-
+#include "gazebo/physics/simbody/SimbodyPlaneShape.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyMeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////
-SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
-  : MeshShape(_parent)
+/////////////////////////////////////////////////
+SimbodyPlaneShape::SimbodyPlaneShape(CollisionPtr _parent)
+  : PlaneShape(_parent)
 {
 }
 
-
-//////////////////////////////////////////////////
-SimbodyMeshShape::~SimbodyMeshShape()
+/////////////////////////////////////////////////
+SimbodyPlaneShape::~SimbodyPlaneShape()
 {
 }
 
-//////////////////////////////////////////////////
-void SimbodyMeshShape::Load(sdf::ElementPtr _sdf)
+/////////////////////////////////////////////////
+void SimbodyPlaneShape::SetAltitude(const math::Vector3 &_pos)
 {
-  MeshShape::Load(_sdf);
+  PlaneShape::SetAltitude(_pos);
 }
 
-//////////////////////////////////////////////////
-void SimbodyMeshShape::Init()
+/////////////////////////////////////////////////
+void SimbodyPlaneShape::CreatePlane()
 {
-  MeshShape::Init();
+  PlaneShape::CreatePlane();
+  SimbodyCollisionPtr bParent;
+  bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
+      this->collisionParent);
 
-  SimbodyCollisionPtr bParent =
-    boost::static_pointer_cast<SimbodyCollision>(this->collisionParent);
+  math::Vector3 n = this->GetNormal();
+
+  // set collision shape
 }

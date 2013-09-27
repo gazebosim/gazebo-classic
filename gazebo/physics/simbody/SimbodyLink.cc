@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -58,7 +57,7 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
     gzthrow("Not using the simbody physics engine");
 
   if (_sdf->HasElement("must_be_base_link"))
-    this->mustBeBaseLink = _sdf->GetValueBool("must_be_base_link");
+    this->mustBeBaseLink = _sdf->Get<bool>("must_be_base_link");
 
   Link::Load(_sdf);
 }
@@ -469,6 +468,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
   }
 }
 
+/////////////////////////////////////////////////
 // When a link is broken into several fragments (master and slaves), they
 // share the mass equally. Given the number of fragments, this returns the
 // appropriate mass properties to use for each fragment. Per Simbody's
@@ -484,3 +484,14 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
                           massProps.getUnitInertia());
 }
 
+/////////////////////////////////////////////////
+bool SimbodyLink::GetEnabled() const
+{
+  return true;
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
+{
+  this->dirtyPose = _pose;
+}

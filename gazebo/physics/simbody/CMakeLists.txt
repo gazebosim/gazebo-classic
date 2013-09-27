@@ -12,23 +12,26 @@ link_directories(${Simbody_LIB_DIR})
 add_definitions(${Simbody_CFLAGS})
 
 set (sources
-  SimbodyPhysics.cc
-  SimbodyModel.cc
-  SimbodyLink.cc
-  SimbodyCollision.cc
-  SimbodyMeshShape.cc
-  SimbodyJoint.cc
-  SimbodyHingeJoint.cc
-  SimbodySliderJoint.cc
-  SimbodyUniversalJoint.cc
-  SimbodyBallJoint.cc
-  SimbodyHinge2Joint.cc
-  SimbodyScrewJoint.cc
-  SimbodyRayShape.cc
-  SimbodyMultiRayShape.cc
-  SimbodyHeightmapShape.cc)
+SimbodyBallJoint.cc
+SimbodyCollision.cc
+SimbodyHeightmapShape.cc
+SimbodyHinge2Joint.cc
+SimbodyHingeJoint.cc
+SimbodyJoint.cc
+SimbodyLink.cc
+SimbodyMeshShape.cc
+SimbodyModel.cc
+SimbodyMultiRayShape.cc
+SimbodyPhysics.cc
+SimbodyPlaneShape.cc
+SimbodyRayShape.cc
+SimbodyScrewJoint.cc
+SimbodySliderJoint.cc
+SimbodyUniversalJoint.cc
+)
 
 gz_add_library(gazebo_physics_simbody ${sources})
 target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
 
 gz_install_library(gazebo_physics_simbody)
+

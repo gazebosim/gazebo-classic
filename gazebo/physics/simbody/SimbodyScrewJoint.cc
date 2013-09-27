@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
-/* Desc: A simbody screw or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
  */
 
 #include "gazebo/common/Console.hh"
@@ -142,4 +138,11 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(int /*_index*/) const
 {
   gzerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
   return math::Angle();
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+{
+  gzerr << "Not implemented in Simbody\n";
+  return 0;
 }

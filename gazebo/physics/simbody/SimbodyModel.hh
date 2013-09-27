@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,11 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
-#ifndef SIMBODYMODEL_HH_
-#define SIMBODYMODEL_HH_
-
-#include <string>
-#include <map>
-#include <vector>
+#ifndef _SIMBODY_MODEL_HH_
+#define _SIMBODY_MODEL_HH_
 
 #include "gazebo/physics/Model.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -51,11 +38,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~SimbodyModel();
 
-      /// \brief Load the model.
-      /// \param[in] _sdf SDF parameters to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the model.
+      // Documentation inherited
       public: virtual void Init();
     };
     /// \}
