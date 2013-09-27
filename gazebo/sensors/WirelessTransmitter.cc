@@ -149,7 +149,8 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   math::Vector3 end = _receiver.pos;
   math::Vector3 start = this->referencePose.pos;
 
-  // Avoid to compute the intersection of two points that have the same values
+  // Avoid computing the intersection of coincident points
+  // This prevents an assertion in bullet (issue #849)
   if (start == end)
   {
     end.z += 0.00001;
