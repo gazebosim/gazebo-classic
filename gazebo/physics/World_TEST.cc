@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "test/ServerFixture.hh"
 
@@ -53,8 +53,10 @@ void World_TEST::GetEntityBelowPoint(const std::string &_physicsEngine)
     entity = world->GetEntityBelowPoint(pos);
     if (entity)
     {
+      gzdbg << "hit: " << entity->GetScopedName()
+            << ", expected: " << model->GetScopedName()
+            << std::endl;
       EXPECT_EQ(entity->GetParentModel(), model);
-      gzdbg << "hit: " << entity->GetScopedName() << '\n';
     }
     else
     {
@@ -67,8 +69,10 @@ void World_TEST::GetEntityBelowPoint(const std::string &_physicsEngine)
     entity = world->GetEntityBelowPoint(testPos);
     if (entity)
     {
+      gzdbg << "hit: " << entity->GetScopedName()
+            << ", expected: " << model->GetScopedName()
+            << std::endl;
       EXPECT_EQ(entity->GetParentModel(), model);
-      gzdbg << "hit: " << entity->GetScopedName() << '\n';
     }
     else
     {
@@ -82,8 +86,10 @@ void World_TEST::GetEntityBelowPoint(const std::string &_physicsEngine)
   entity = world->GetEntityBelowPoint(pos);
   if (entity)
   {
+    gzdbg << "hit: " << entity->GetScopedName()
+          << ", expected: " << model->GetScopedName()
+          << std::endl;
     EXPECT_EQ(entity->GetParentModel()->GetName(), "ground_plane");
-    gzdbg << "hit: " << entity->GetScopedName() << '\n';
   }
   else
   {
