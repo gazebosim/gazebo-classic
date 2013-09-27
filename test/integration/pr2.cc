@@ -28,6 +28,13 @@ class PR2Test : public ServerFixture,
 
 void PR2Test::Load(std::string _physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since simbody does not supported screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
   boost::filesystem::create_directories("/tmp/gazebo_test");
