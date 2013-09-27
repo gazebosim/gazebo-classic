@@ -232,22 +232,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
 }
 
 //////////////////////////////////////////////////
-void Publisher::SetPublication(PublicationPtr &_publication, int _i)
-{
-  if (_i == 0)
-    this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr _publication)
 {
   this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
-bool Publisher::GetLatching() const
-{
-  return false;
 }
 
 //////////////////////////////////////////////////
