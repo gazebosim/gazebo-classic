@@ -457,7 +457,10 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
 {
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #859.\n";
     return;
+  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
