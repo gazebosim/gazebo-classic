@@ -298,6 +298,7 @@ void Heightmap::Load()
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
   boost::filesystem::path terrainDirPath;
+  boost::filesystem::path prefix;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
 
@@ -344,6 +345,11 @@ void Heightmap::Load()
   if (this->useTerrainPaging)
   {
     nTerrains = this->numTerrainSubdivisions;
+    prefix = terrainDirPath / "gazebo_terrain_cache";
+  }
+  else
+  {
+    prefix = terrainDirPath / "gazebo_terrain_nocache";
   }
 
   // Create terrain group, which holds all the individual terrain instances.
@@ -358,7 +364,6 @@ void Heightmap::Load()
       1 + ((this->dataSize - 1) / sqrt(nTerrains)),
       this->terrainSize.x / (sqrt(nTerrains)));
 
-  boost::filesystem::path prefix = terrainDirPath / "gazebo_terrain";
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
