@@ -130,7 +130,6 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
     rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
     this->physicsEngine->GetDynamicsWorld()->rayTest(
         start, end, rayCallback);
-
     if (rayCallback.hasHit())
     {
       math::Vector3 result(rayCallback.m_hitPointWorld.getX(),

@@ -86,12 +86,6 @@ set (headers
   World.hh
   WorldState.hh)
 
-set (gtest_sources
-  World_TEST.cc
-)
-
-gz_build_tests(${gtest_sources})
-
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers
@@ -122,5 +116,7 @@ set (gtest_sources
   Inertial_TEST.cc
   Joint_TEST.cc
   PhysicsEngine_TEST.cc
-  SphereShape_TEST.cc)
+  SphereShape_TEST.cc
+  World_TEST.cc
+)
 gz_build_tests(${gtest_sources})
