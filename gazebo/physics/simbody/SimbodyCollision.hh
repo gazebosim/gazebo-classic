@@ -25,7 +25,7 @@
 
 namespace SimTK
 {
- class ContactGeometry;
+  class ContactGeometry;
 }
 
 namespace gazebo

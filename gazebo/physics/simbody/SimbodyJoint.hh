@@ -61,31 +61,27 @@ namespace gazebo
                   const gazebo::math::Vector3 &_anchor);
 
       // Documentation inherited.
-      public: virtual void SetDamping(int /*index*/, const double /*damping*/);
+      public: virtual void SetDamping(int _index, const double _damping);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(int /*_index*/) const;
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(
-                  unsigned int /*_index*/) const;
+      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(
-                  unsigned int /*_index*/) const;
+      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, int /*_index*/,
-                                        double /*_value*/);
+      public: virtual void SetAttribute(Attribute, int _index, double _value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &/*_key*/,
-                                        int /*_index*/,
-                                        const boost::any &/*_value*/);
+      public: virtual void SetAttribute(const std::string &_key,
+                                        int _index, const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &/*_key*/,
-                                                unsigned int /*_index*/);
+      public: virtual double GetAttribute(const std::string &_key,
+                  unsigned int _index);
 
       // Save current Simbody State
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
