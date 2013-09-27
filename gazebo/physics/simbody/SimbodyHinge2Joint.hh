@@ -98,7 +98,7 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       /// \brief Set the torque
-      protected: void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(int _index, double _torque);
     };
 
   /// \}
