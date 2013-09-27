@@ -736,7 +736,7 @@ void ODELink::SetAutoDisable(bool _disable)
 }
 
 //////////////////////////////////////////////////
-void ODELink::SetLinkStatic(bool _static)
+void ODELink::SetLinkStatic(bool /*_static*/)
 {
-  gzlog << "To be implemneted\n";
+  gzlog << "To be implemented\n";
 }
