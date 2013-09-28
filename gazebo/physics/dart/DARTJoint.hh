@@ -72,6 +72,13 @@ namespace gazebo
         gzerr << "DART does not support joint attach\n";
       }
 
+      /// \brief Set the anchor point
+      public: virtual void SetAnchor(int /*index*/,
+                                     const gazebo::math::Vector3 & /*anchor*/)
+      {
+        // nothing to do here for DART.
+      }
+
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
 

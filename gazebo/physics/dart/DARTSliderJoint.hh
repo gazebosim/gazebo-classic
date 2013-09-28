@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DARTSliderJoint();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
@@ -43,13 +43,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetAnchor(int /*_index*/,
-                                     const math::Vector3& /*_anchor*/)
-      {
-        // nothing to do here for DART.
-      }
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
@@ -61,29 +54,21 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int /*_index*/, double /*_vel*/)
-      {
-        // TODO: Do nothing because DART accept only torques (forces) of joint
-        // as input.
-        gzwarn << "Not implemented DARTSliderJoint::SetVelocity().\n";
-      }
+      public: virtual void SetVelocity(int /*_index*/, double /*_vel*/);
 
       // Documentation inherited
       public: virtual double GetVelocity(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _torque);
+      public: virtual void SetMaxForce(int _index, double _force);
 
       // Documentation inherited
       public: virtual double GetMaxForce(int _index);
 
-      // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
-
       // Documentation inherited.
       protected: virtual void SetForceImpl(int _index, double _effort);
 
-      /// \brief
+      /// \brief Prismatic joint of DART
       protected: dart::dynamics::PrismaticJoint* dartPrismaticJoint;
     };
   }

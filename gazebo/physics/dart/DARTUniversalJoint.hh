@@ -35,14 +35,14 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~DARTUniversalJoint();
 
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
+
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
@@ -57,19 +57,19 @@ namespace gazebo
       public: virtual double GetVelocity(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(int _index, double _vel);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(int _index, double _force);
 
       // Documentation inherited
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
+      protected: virtual void SetForceImpl(int _index, double _effort);
+
+      /// \brief Universal joint of DART
+      protected: dart::dynamics::UniversalJoint* dartUniveralJoint;
     };
   }
 }

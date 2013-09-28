@@ -29,7 +29,7 @@ set (sources
 )
 
 SET (headers
-    DART_inc.h
+    dart_inc.h
     DARTPhysics.hh
     DARTCollision.hh
     DARTLink.hh
@@ -57,7 +57,7 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_dart ${sources})
+gz_add_library(gazebo_physics_dart ${headers} ${sources})
 
 # these flags should probably go into dart.pc
 #target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp)

@@ -35,6 +35,8 @@ DARTBallJoint::DARTBallJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
+  delete dartBallJoint;
+  this->dartJoint = NULL;
 }
 
 //////////////////////////////////////////////////

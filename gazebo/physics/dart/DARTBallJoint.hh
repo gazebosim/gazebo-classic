@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTBallJoint();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
@@ -43,13 +43,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetAnchor(int /*_index*/,
-                                     const math::Vector3& /*_anchor*/)
-      {
-        // nothing to do here for DART.
-      }
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int /*_index*/) const

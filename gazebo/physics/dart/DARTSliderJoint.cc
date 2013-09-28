@@ -37,6 +37,8 @@ DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
+  delete dartPrismaticJoint;
+  this->dartJoint = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -62,12 +64,21 @@ math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 DARTSliderJoint::GetGlobalAxis(int _index) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
-  Eigen::Vector3d axis = this->dartPrismaticJoint->getAxis();
-  Eigen::Vector3d globalAxis = T.linear() * axis;
+  Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  if (_index == 0)
+  {
+    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                          this->dartJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dartPrismaticJoint->getAxis();
+    globalAxis = T.linear() * axis;
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
@@ -75,74 +86,94 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
+  if (_index == 0)
+  {
+    //----------------------------------------------------------------------------
+    // TODO: Issue #494
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
+    Eigen::Isometry3d dartTransfJointLeftToParentLink
+        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+    dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
+    //----------------------------------------------------------------------------
 
-  //----------------------------------------------------------------------------
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = this->dartPrismaticJoint->getTransformFromParentBodyNode().inverse();
-  dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
-  //----------------------------------------------------------------------------
-
-  this->dartPrismaticJoint->setAxis(dartVec3);
+    this->dartPrismaticJoint->setAxis(dartVec3);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTSliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle DARTSliderJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-  assert(this->dartJoint);
-  assert(this->dartJoint->getNumGenCoords() == 1);
-
-  // Hinge joint has only one dof.
-  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
-  result.SetFromRadian(radianAngle);
+  if (_index == 0)
+  {
+    double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+    result.SetFromRadian(radianAngle);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-double DARTSliderJoint::GetVelocity(int /*index*/) const
+void DARTSliderJoint::SetVelocity(int _index, double _vel)
 {
-  return this->dartJoint->getGenCoord(0)->get_dq();
-}
-
-//////////////////////////////////////////////////
-void DARTSliderJoint::SetForce(int /*index*/, double _force)
-{
-  this->dartJoint->getGenCoord(0)->set_tauMax(_force);
-}
-
-//////////////////////////////////////////////////
-double DARTSliderJoint::GetMaxForce(int /*_index*/)
-{
-  return this->dartJoint->getGenCoord(0)->get_tauMax();
-}
-
-//////////////////////////////////////////////////
-void DARTSliderJoint::SetMaxForce(int _index, double _torque)
-{
-  DARTJoint::SetForce(_index, _torque);
-
-  this->dartJoint->getGenCoord(0)->set_tau(_torque);
-}
-
-//////////////////////////////////////////////////
-void DARTSliderJoint::SetForceImpl(int /*_index*/, double _effort)
-{
-  if (this->dartJoint)
-  {
-    this->dartJoint->getGenCoord(0)->set_tau(_effort);
-  }
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_dq(_vel);
   else
-  {
-    gzerr << "DART revolute joint is invalid\n";
-  }
+    gzerr << "Invalid index[" << _index << "]\n";
 }
 
+//////////////////////////////////////////////////
+double DARTSliderJoint::GetVelocity(int _index) const
+{
+  double result = 0.0;
 
+  if (_index == 0)
+    result = this->dartJoint->getGenCoord(0)->get_dq();
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTSliderJoint::SetMaxForce(int _index, double _force)
+{
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_tauMax(_force);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+}
+
+//////////////////////////////////////////////////
+double DARTSliderJoint::GetMaxForce(int _index)
+{
+  double result = 0.0;
+
+  if (_index == 0)
+    result = this->dartJoint->getGenCoord(0)->get_tauMax();
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTSliderJoint::SetForceImpl(int _index, double _effort)
+{
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+}

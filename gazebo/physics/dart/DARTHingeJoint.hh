@@ -35,10 +35,10 @@ namespace gazebo
       /// \param[in] _parent Parent of the Joint
       public: DARTHingeJoint(BasePtr _parent);
 
-      /// \brief Destructor.
+      /// \brief Destructor
       public: virtual ~DARTHingeJoint();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
@@ -46,13 +46,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetAnchor(int /*_index*/,
-                                     const math::Vector3& /*_anchor*/)
-      {
-        // nothing to do here for DART.
-      }
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
@@ -64,12 +57,7 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int /*_index*/, double /*_vel*/)
-      {
-        // TODO: Do nothing because DART accept only torques (forces) of joint
-        // as input.
-        gzwarn << "Not implemented DARTHingeJoint::SetVelocity().\n";
-      }
+      public: virtual void SetVelocity(int /*_index*/, double /*_vel*/);
 
       // Documentation inherited
       public: virtual double GetVelocity(int _index) const;
@@ -81,13 +69,10 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
-
-      // Documentation inherited.
       protected: virtual void SetForceImpl(int _index, double _effort);
 
-      /// \brief
-      protected: dart::dynamics::RevoluteJoint* dartRevJoint;
+      /// \brief Revolute joint of DART
+      protected: dart::dynamics::RevoluteJoint* dartRevoluteJoint;
     };
   }
 }

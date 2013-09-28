@@ -35,20 +35,23 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTScrewJoint();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int index, const math::Vector3 &_axis);
-
-      // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch(unsigned int _index);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
@@ -57,22 +60,19 @@ namespace gazebo
       public: virtual double GetVelocity(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(int _index, double _vel);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _force);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(int _index, double _force);
 
       // Documentation inherited
       public: virtual double GetMaxForce(int _index);
 
-      // Documentation inherited
-      public: virtual double GetParam(int _parameter) const;
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _effort);
 
-      // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
+      /// \brief Universal joint of DART
+      protected: dart::dynamics::ScrewJoint* dartScrewJoint;
     };
   }
 }

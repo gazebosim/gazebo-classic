@@ -249,20 +249,18 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
-//  if (_type == "prismatic")
-//    joint.reset(new DARTSliderJoint(_parent));
-//  else if (_type == "screw")
-//    joint.reset(new DARTScrewJoint(_parent));
-//  else if (_type == "revolute")
-//    joint.reset(new DARTHingeJoint(_parent));
-//  else if (_type == "revolute2")
-//    joint.reset(new DARTHinge2Joint(_parent));
-//  else if (_type == "ball")
-//    joint.reset(new DARTBallJoint(_parent));
-//  else if (_type == "universal")
-//    joint.reset(new DARTUniversalJoint(_parent));
-  if (_type == "revolute")
+  if (_type == "prismatic")
+    joint.reset(new DARTSliderJoint(_parent));
+  else if (_type == "screw")
+    joint.reset(new DARTScrewJoint(_parent));
+  else if (_type == "revolute")
     joint.reset(new DARTHingeJoint(_parent));
+  else if (_type == "revolute2")
+    joint.reset(new DARTHinge2Joint(_parent));
+  else if (_type == "ball")
+    joint.reset(new DARTBallJoint(_parent));
+  else if (_type == "universal")
+    joint.reset(new DARTUniversalJoint(_parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

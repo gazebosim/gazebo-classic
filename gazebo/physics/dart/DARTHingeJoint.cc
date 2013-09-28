@@ -29,14 +29,16 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
   : HingeJoint<DARTJoint>(_parent),
-    dartRevJoint(new dart::dynamics::RevoluteJoint())
+    dartRevoluteJoint(new dart::dynamics::RevoluteJoint())
 {
-  this->dartJoint = this->dartRevJoint;
+  this->dartJoint = this->dartRevoluteJoint;
 }
 
 //////////////////////////////////////////////////
 DARTHingeJoint::~DARTHingeJoint()
 {
+  delete dartRevoluteJoint;
+  this->dartJoint = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -62,12 +64,21 @@ math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
-  Eigen::Vector3d axis = this->dartRevJoint->getAxis();
-  Eigen::Vector3d globalAxis = T.linear() * axis;
+  Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  if (_index == 0)
+  {
+    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
+                          this->dartJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dartRevoluteJoint->getAxis();
+    globalAxis = T.linear() * axis;
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
@@ -75,71 +86,94 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetAxis(int /*index*/, const math::Vector3& _axis)
+void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
 {
-  Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+  if (_index == 0)
+  {
+    //--------------------------------------------------------------------------
+    // TODO: Issue #494
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+    Eigen::Isometry3d dartTransfJointLeftToParentLink
+        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+    dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
+    //--------------------------------------------------------------------------
 
-  //----------------------------------------------------------------------------
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
-  Eigen::Isometry3d dartTransfJointLeftToParentLink
-      = this->dartRevJoint->getTransformFromParentBodyNode().inverse();
-  dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
-  //----------------------------------------------------------------------------
-
-  this->dartRevJoint->setAxis(dartAxis);
+    this->dartRevoluteJoint->setAxis(dartAxis);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHingeJoint::GetAngleImpl(int /*index*/) const
+math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-  assert(this->dartJoint);
-  assert(this->dartJoint->getNumGenCoords() == 1);
-
-  // Hinge joint has only one dof.
-  double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
-  result.SetFromRadian(radianAngle);
+  if (_index == 0)
+  {
+    double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+    result.SetFromRadian(radianAngle);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-double DARTHingeJoint::GetVelocity(int /*index*/) const
+void DARTHingeJoint::SetVelocity(int _index, double _vel)
 {
-  return this->dartJoint->getGenCoord(0)->get_dq();
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetMaxForce(int /*index*/, double _force)
-{
-  this->dartJoint->getGenCoord(0)->set_tauMax(_force);
-}
-
-//////////////////////////////////////////////////
-double DARTHingeJoint::GetMaxForce(int /*index*/)
-{
-  return this->dartJoint->getGenCoord(0)->get_tauMax();
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetForce(int _index, double _torque)
-{
-  DARTJoint::SetForce(_index, _torque);
-
-  this->dartJoint->getGenCoord(0)->set_tau(_torque);
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetForceImpl(int /*_index*/, double _effort)
-{
-  if (this->dartRevJoint)
-  {
-    this->dartJoint->getGenCoord(0)->set_tau(_effort);
-  }
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_dq(_vel);
   else
-  {
-    gzerr << "DART revolute joint is invalid\n";
-  }
+    gzerr << "Invalid index[" << _index << "]\n";
+}
+
+//////////////////////////////////////////////////
+double DARTHingeJoint::GetVelocity(int _index) const
+{
+  double result = 0.0;
+
+  if (_index == 0)
+    result = this->dartJoint->getGenCoord(0)->get_dq();
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTHingeJoint::SetMaxForce(int _index, double _force)
+{
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_tauMax(_force);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+}
+
+//////////////////////////////////////////////////
+double DARTHingeJoint::GetMaxForce(int _index)
+{
+  double result = 0.0;
+
+  if (_index == 0)
+    result = this->dartJoint->getGenCoord(0)->get_tauMax();
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTHingeJoint::SetForceImpl(int _index, double _effort)
+{
+  if (_index == 0)
+    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
