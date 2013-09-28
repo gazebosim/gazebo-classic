@@ -928,13 +928,19 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       joint = model->GetJoint("upper_joint");
       if (joint)
       {
+        if (_physicsEngine == "simbody" ||
+            _physicsEngine == "dart")
+        {
+          gzerr << "Skipping joint detachment per #862" << std::endl;
+          continue;
+        }
         // Detach upper_joint.
-        // joint->Detach();
+        joint->Detach();
         // Simbody and DART will not easily detach joints,
-        // freeze joint limit instead
-        math::Angle curAngle = joint->GetAngle(0u);
-        joint->SetLowStop(0, curAngle);
-        joint->SetHighStop(0, curAngle);
+        // consider freezing joint limit instead
+        // math::Angle curAngle = joint->GetAngle(0u);
+        // joint->SetLowStop(0, curAngle);
+        // joint->SetHighStop(0, curAngle);
       }
       else
       {
