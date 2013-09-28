@@ -134,7 +134,10 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 {
   // static models not fully working in simbody yet
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #860.\n";
     return;
+  }
 
   Load("worlds/empty.world", true, _physicsEngine);
 
@@ -216,7 +219,10 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 {
   // static models not fully working in simbody yet
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #860.\n";
     return;
+  }
 
   Load("worlds/empty.world", true, _physicsEngine);
 

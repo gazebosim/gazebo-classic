@@ -456,9 +456,10 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
                                  const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody")  // &&
+  //    _jointType != "revolute" && _jointType != "prismatic")
   {
-    gzerr << "Aborting test for Simbody, see issue #859.\n";
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
   }
 
@@ -493,8 +494,11 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
                                       const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody" && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issue #859.\n";
     return;
+  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -540,8 +544,11 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
                                            const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody")  // && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
+  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -794,9 +801,19 @@ TEST_F(Joint_TEST, JointTorqueTestBullet)
 
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
+  /// \TODO: Disable for now until functionality is implemented
+  /// bullet collision parameters needs tweaking
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #590.\n";
+    return;
+  }
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #862.\n";
     return;
+  }
 
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
@@ -896,27 +913,10 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, JointCreationDestructionTestODE)
+TEST_P(Joint_TEST, JointCreationDestructionTest)
 {
-  JointCreationDestructionTest("ode");
+  JointCreationDestructionTest(this->physicsEngine);
 }
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
-{
-  JointCreationDestructionTest("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
-{
-  /// \TODO: Disable for now until functionality is implemented
-  // JointCreationDestructionTest("bullet");
-  gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
-}
-#endif  // HAVE_BULLET
 
 TEST_F(Joint_TEST, joint_SDF14)
 {
@@ -958,6 +958,10 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("")));
 
 int main(int argc, char **argv)
 {
