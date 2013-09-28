@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
