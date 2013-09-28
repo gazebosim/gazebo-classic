@@ -644,14 +644,17 @@ void SimbodyPhysics::CreateMultibodyGraph(
     SimbodyJointPtr simbodyJoint =
       boost::dynamic_pointer_cast<SimbodyJoint>(*ji);
     if (simbodyJoint)
-      if ((*ji)->GetParent())
+      if ((*ji)->GetParent() && (*ji)->GetChild())
         _mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
            (*ji)->GetParent()->GetName(), (*ji)->GetChild()->GetName(),
                             simbodyJoint->mustBreakLoopHere, (*ji).get());
-      else
+      else if ((*ji)->GetChild())
         _mbgraph.addJoint((*ji)->GetName(), GetTypeString((*ji)->GetType()),
            "world", (*ji)->GetChild()->GetName(),
                             simbodyJoint->mustBreakLoopHere, (*ji).get());
+      else
+        gzerr << "simbodyJoint [" << (*ji)->GetName()
+              << "] does not have a valid child link, which is required\n";
     else
       gzerr << "simbodyJoint [" << (*ji)->GetName()
             << "]is not a SimbodyJointPtr\n";

@@ -456,9 +456,10 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
                                  const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody")  // &&
+  //    _jointType != "revolute" && _jointType != "prismatic")
   {
-    gzerr << "Aborting test for Simbody, see issue #859.\n";
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
   }
 
@@ -493,8 +494,11 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
                                       const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody" && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issue #859.\n";
     return;
+  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -540,8 +544,11 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
                                            const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody")  // && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
+  }
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
