@@ -121,47 +121,54 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void CacheForceTorque();
 
-      // Simbody specific variables
+      /// \brief Force Simbody to break a loop by using a weld constraint.
+      /// This flag is needed by SimbodyPhysics::MultibodyGraphMaker, so kept
+      /// public.
       public: bool mustBreakLoopHere;
 
-      // Normally A=F, B=M. But if reversed, then B=F, A=M.
-      // parent body frame to mobilizer frame
+      /// \brief Normally A=F, B=M. But if reversed, then B=F, A=M.
+      /// parent body frame to mobilizer frame
       public: SimTK::Transform xPA;
 
-      // child body frame to mobilizer frame
+      /// \brief child body frame to mobilizer frame
       public: SimTK::Transform xCB;
 
-      // default mobilizer pose
+      /// \brief default mobilizer pose
       public: SimTK::Transform defxAB;
 
-      // Members below here are set when we build the Simbody model.
-
-      // How this joint was modeled in the Simbody System. We used either a
-      // mobilizer or a constraint, but not both. The type of either one is the
-      // same as the joint type above.
-
-      /// \brief: for enforcing joint damping forces
+      /// \brief: for enforcing joint damping forces.
+      /// Set when we build the Simbody model.
       /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
       public: SimTK::Force::MobilityLinearDamper damper;
 
       /// \brief: for enforcing joint stops
+      /// Set when we build the Simbody model.
       /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
       public: SimTK::Force::MobilityLinearStop limitForce;
 
-      // isValid() if we used a mobilizer
+      /// \brief Use isValid() if we used a mobilizer
+      /// Set when we build the Simbody model.
+      /// How this joint was modeled in the Simbody System. We used either a
+      /// mobilizer or a constraint, but not both. The type of either one is
+      /// the same as the joint type above.
       public: SimTK::MobilizedBody mobod;
 
       /// \brief: if mobilizer, did it reverse parent&child?
+      /// Set when we build the Simbody model.
       public: bool isReversed;
 
-      /// \brief: isValid() if we used a constraint
+      /// \brief: isValid() if we used a constraint to model this joint.
+      /// Set when we build the Simbody model.
+      /// How this joint was modeled in the Simbody System. We used either a
+      /// mobilizer or a constraint, but not both. The type of either one is the
+      /// same as the joint type above.
       public: SimTK::Constraint constraint;
 
-      // Keeps track if physics has been initialized
+      // Keeps track if simbody physics has been initialized
       public: bool physicsInitialized;
 
       /// \brief Simbody Multibody System
