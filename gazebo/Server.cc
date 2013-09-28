@@ -105,6 +105,7 @@ bool Server::ParseArgs(int argc, char **argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
+    ("minimal_comms", "Reduce the messages output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -148,6 +149,11 @@ bool Server::ParseArgs(int argc, char **argv)
     gazebo::common::Console::Instance()->SetQuiet(true);
   else
     gazebo::print_version();
+
+  if (this->vm.count("minimal_comms"))
+    gazebo::transport::setMinimalComms(true);
+  else
+    gazebo::transport::setMinimalComms(false);
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))

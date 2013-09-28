@@ -24,6 +24,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -229,8 +230,15 @@ namespace gazebo
       /// \return Pointer to the Light or NULL if index was invalid.
       public: LightPtr GetLight(uint32_t _index) const;
 
-      /// \brief Get a visual by name
+      /// \brief Get a visual by name.
+      /// \param[in] _name Name of the visual to retrieve.
+      /// \return Pointer to the visual, NULL if not found.
       public: VisualPtr GetVisual(const std::string &_name) const;
+
+      /// \brief Get a visual by id.
+      /// \param[in] _id ID of the visual to retrieve.
+      /// \return Pointer to the visual, NULL if not found.
+      public: VisualPtr GetVisual(uint32_t _id) const;
 
       /// \brief Select a visual by name.
       /// \param[in] _name Name of the visual to select.
@@ -369,12 +377,9 @@ namespace gazebo
       /// \brief Clear rendering::Scene
       public: void Clear();
 
-      /// \brief Clone a visual.
-      /// \param[in] _visualName Name of the visual to clone.
-      /// \param[in] _newName New name of the visual.
-      /// \return Pointer to the cloned visual.
+      /// \brief Deprecated.
       public: VisualPtr CloneVisual(const std::string &_visualName,
-                                    const std::string &_newName);
+                  const std::string &_newName) GAZEBO_DEPRECATED(1.10);
 
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if
@@ -616,10 +621,10 @@ namespace gazebo
 
       /// \def PoseMsgs_L.
       /// \brief List of messages.
-      typedef std::list<msgs::Pose> PoseMsgs_L;
+      typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
 
       /// \brief List of pose message to process.
-      private: PoseMsgs_L poseMsgs;
+      private: PoseMsgs_M poseMsgs;
 
       /// \def SceneMsgs_L
       /// \brief List of scene messages.
@@ -663,7 +668,7 @@ namespace gazebo
 
       /// \def Visual_M
       /// \brief Map of visuals and their names.
-      typedef std::map<std::string, VisualPtr> Visual_M;
+      typedef std::map<uint32_t, VisualPtr> Visual_M;
 
       /// \brief Map of all the visuals in this scene.
       private: Visual_M visuals;
@@ -687,6 +692,9 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       private: boost::mutex *receiveMutex;
+
+      /// \brief Mutex to lock the pose message buffers.
+      private: boost::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       private: transport::NodePtr node;
@@ -795,6 +803,9 @@ namespace gazebo
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
       private: common::Time sceneSimTimePosesApplied;
+
+      /// \brief Keeps track of the visual ID for contact visualization.
+      private: uint32_t contactVisId;
 
       /// \def JointMsgs_M
       /// \brief Map of joint names to joint messages.
