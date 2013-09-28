@@ -37,6 +37,7 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class Gripper;
     class Joint;
     class JointController;
     class Contact;
@@ -145,6 +146,10 @@ namespace gazebo
     /// \def MeshShapePtr
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
+
+    /// \def GripperPtr
+    /// \brief Boost shared pointer to a Gripper object
+    typedef boost::shared_ptr<Gripper> GripperPtr;
 
     /// \def Base_V
     /// \brief Vector of BasePtr
