@@ -247,7 +247,6 @@ void SimbodyPhysics::Reset()
 //////////////////////////////////////////////////
 void SimbodyPhysics::Init()
 {
-  gzlog << "SimbodyPhysics::Init\n";
   this->simbodyPhysicsInitialized = true;
 }
 
