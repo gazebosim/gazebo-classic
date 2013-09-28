@@ -589,13 +589,6 @@ void SimbodyPhysics::DebugPrint() const
 }
 
 //////////////////////////////////////////////////
-//==============================================================================
-//                          CREATE MULTIBODY GRAPH
-//==============================================================================
-// Define Gazebo joint types, then use links and joints in the given model
-// to construct a reasonable spanning-tree-plus-constraints multibody graph
-// to represent that model. An exception will be thrown if this fails.
-// Note that this step is not Simbody dependent.
 void SimbodyPhysics::CreateMultibodyGraph(
   SimTK::MultibodyGraphMaker &_mbgraph, const physics::ModelPtr _model)
 {
@@ -665,17 +658,6 @@ void SimbodyPhysics::CreateMultibodyGraph(
 }
 
 //////////////////////////////////////////////////
-//==============================================================================
-//                            BUILD SIMBODY SYSTEM
-//==============================================================================
-// Given a desired multibody graph, gravity, and the Gazebo model that was
-// used to generate the graph, create a Simbody System for it. There are many
-// limitations here, especially in the handling of contact. Any Gazebo features
-// that we haven't modeled are just ignored.
-// The GazeboModel is updated so that its links and joints have references to
-// their corresponding Simbody elements.
-// We set up some visualization here so we can see what's happening but this
-// would not be needed in Gazebo since it does its own visualization.
 void SimbodyPhysics::InitSimbodySystem()
 {
   // Set stiction max slip velocity to make it less stiff.
