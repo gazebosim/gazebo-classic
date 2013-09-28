@@ -29,6 +29,7 @@ using namespace physics;
 SimbodyHeightmapShape::SimbodyHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
+  gzerr << "SimbodyHeightmapShape not implemented yet.\n";
 }
 
 //////////////////////////////////////////////////
