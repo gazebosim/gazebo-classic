@@ -134,34 +134,34 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, ForceTorque1ODE)
-{
-  ForceTorque1("ode");
-}
+//TEST_F(Joint_TEST, ForceTorque1ODE)
+//{
+//  ForceTorque1("ode");
+//}
 
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque1Simbody)
-{
-  ForceTorque1("simbody");
-}
-#endif  // HAVE_SIMBODY
+//#ifdef HAVE_SIMBODY
+//TEST_F(Joint_TEST, ForceTorque1Simbody)
+//{
+//  ForceTorque1("simbody");
+//}
+//#endif  // HAVE_SIMBODY
 
-#ifdef HAVE_BULLET
+//#ifdef HAVE_BULLET
 
-/// bullet collision parameters needs tweaking?
-TEST_F(Joint_TEST, ForceTorque1Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque1("bullet");
-}
-#endif  // HAVE_BULLET
+///// bullet collision parameters needs tweaking?
+//TEST_F(Joint_TEST, ForceTorque1Bullet)
+//{
+//  // uncomment when bullet 2.82 is released
+//  // ForceTorque1("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, ForceTorque1DART)
-{
-  ForceTorque1("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, ForceTorque1DART)
+//{
+//  ForceTorque1("dart");
+//}
+//#endif  // HAVE_DART
 
 void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 {
@@ -299,34 +299,34 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   gzdbg << "t after 20 steps : " << t << "\n";
 }
 
-TEST_F(Joint_TEST, ForceTorque2ODE)
-{
-  ForceTorque2("ode");
-}
+//TEST_F(Joint_TEST, ForceTorque2ODE)
+//{
+//  ForceTorque2("ode");
+//}
 
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque2Simbody)
-{
-  ForceTorque2("simbody");
-}
-#endif  // HAVE_SIMBODY
+//#ifdef HAVE_SIMBODY
+//TEST_F(Joint_TEST, ForceTorque2Simbody)
+//{
+//  ForceTorque2("simbody");
+//}
+//#endif  // HAVE_SIMBODY
 
-#ifdef HAVE_BULLET
+//#ifdef HAVE_BULLET
 
-/// bullet collision parameters needs tweaking?
-TEST_F(Joint_TEST, ForceTorque2Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque2("bullet");
-}
-#endif  // HAVE_BULLET
+///// bullet collision parameters needs tweaking?
+//TEST_F(Joint_TEST, ForceTorque2Bullet)
+//{
+//  // uncomment when bullet 2.82 is released
+//  // ForceTorque2("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, ForceTorque2DART)
-{
-  ForceTorque2("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, ForceTorque2DART)
+//{
+//  ForceTorque2("dart");
+//}
+//#endif  // HAVE_DART
 
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
@@ -442,33 +442,33 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   }
 }
 
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)
-{
-  GetForceTorqueWithAppliedForce("ode");
-}
+//TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)
+//{
+//  GetForceTorqueWithAppliedForce("ode");
+//}
 
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbody)
-{
-  GetForceTorqueWithAppliedForce("simbody");
-}
-#endif  // HAVE_SIMBODY
+//#ifdef HAVE_SIMBODY
+//TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbody)
+//{
+//  GetForceTorqueWithAppliedForce("simbody");
+//}
+//#endif  // HAVE_SIMBODY
 
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
-{
-  // uncomment when bullet 2.82 is released
-  // GetForceTorqueWithAppliedForce("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+///// bullet collision parameters needs tweaking
+//TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
+//{
+//  // uncomment when bullet 2.82 is released
+//  // GetForceTorqueWithAppliedForce("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceDART)
-{
-  GetForceTorqueWithAppliedForce("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceDART)
+//{
+//  GetForceTorqueWithAppliedForce("dart");
+//}
+//#endif  // HAVE_DART
 
 // Fixture for testing all joint types.
 class Joint_TEST_All : public Joint_TEST {};
@@ -594,42 +594,42 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
   }
 }
 
-TEST_P(Joint_TEST_All, SpawnJointTypes)
-{
-#ifdef HAVE_DART
-  if (this->physicsEngine == "dart")
-    gzerr << "SpawnJointTypesDART fails because dynamic joint creating/removing "
-          << "is not yet working\n";
-  else
-    SpawnJointTypes(this->physicsEngine, this->jointType);
-#else
-  SpawnJointTypes(this->physicsEngine, this->jointType);
-#endif
-}
+//TEST_P(Joint_TEST_All, SpawnJointTypes)
+//{
+//#ifdef HAVE_DART
+//  if (this->physicsEngine == "dart")
+//    gzerr << "SpawnJointTypesDART fails because dynamic joint creating/removing "
+//          << "is not yet working\n";
+//  else
+//    SpawnJointTypes(this->physicsEngine, this->jointType);
+//#else
+//  SpawnJointTypes(this->physicsEngine, this->jointType);
+//#endif
+//}
 
-TEST_P(Joint_TEST_Rotational, SpawnJointRotational)
-{
-#ifdef HAVE_DART
-  if (this->physicsEngine == "dart")
-    gzerr << "SpawnJointRotationalDART fails because dynamic joint creating/removing "
-          << "is not yet working\n";
-  else
-    SpawnJointRotational(this->physicsEngine, this->jointType);
-#else
-  SpawnJointRotational(this->physicsEngine, this->jointType);
-#endif
-}
+//TEST_P(Joint_TEST_Rotational, SpawnJointRotational)
+//{
+//#ifdef HAVE_DART
+//  if (this->physicsEngine == "dart")
+//    gzerr << "SpawnJointRotationalDART fails because dynamic joint creating/removing "
+//          << "is not yet working\n";
+//  else
+//    SpawnJointRotational(this->physicsEngine, this->jointType);
+//#else
+//  SpawnJointRotational(this->physicsEngine, this->jointType);
+//#endif
+//}
 
 TEST_P(Joint_TEST_RotationalWorld, SpawnJointRotationalWorld)
 {
 #ifdef HAVE_DART
-  if (this->physicsEngine == "dart")
-    gzerr << "SpawnJointRotationalWorldDART fails because dynamic joint creating/removing "
-          << "is not yet working\n";
-  else
+//  if (this->physicsEngine == "dart")
+//    gzerr << "SpawnJointRotationalWorldDART fails because dynamic joint creating/removing "
+//          << "is not yet working\n";
+//  else
     SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
 #else
-  SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
+  //SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
 #endif
 }
 
@@ -804,36 +804,36 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, JointTorqueTestODE)
-{
-  JointTorqueTest("ode");
-}
+//TEST_F(Joint_TEST, JointTorqueTestODE)
+//{
+//  JointTorqueTest("ode");
+//}
 
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, JointTorqueTestSimbody)
-{
-  JointTorqueTest("simbody");
-}
-#endif  // HAVE_SIMBODY
+//#ifdef HAVE_SIMBODY
+//TEST_F(Joint_TEST, JointTorqueTestSimbody)
+//{
+//  JointTorqueTest("simbody");
+//}
+//#endif  // HAVE_SIMBODY
 
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, JointTorqueTestBullet)
-{
-  gzerr << "JointTorqueTestBullet fails because dynamic joint manipulation "
-        << "is not yet working\n";
-  // JointTorqueTest("bullet");
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+///// bullet collision parameters needs tweaking
+//TEST_F(Joint_TEST, JointTorqueTestBullet)
+//{
+//  gzerr << "JointTorqueTestBullet fails because dynamic joint manipulation "
+//        << "is not yet working\n";
+//  // JointTorqueTest("bullet");
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, JointTorqueTestDART)
-{
-  gzerr << "JointTorqueTestDART fails because dynamic joint creating/removing "
-        << "is not yet working\n";
-  // JointTorqueTest("dart");
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, JointTorqueTestDART)
+//{
+//  gzerr << "JointTorqueTestDART fails because dynamic joint creating/removing "
+//        << "is not yet working\n";
+//  // JointTorqueTest("dart");
+//}
+//#endif  // HAVE_DART
 
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
@@ -935,77 +935,77 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, JointCreationDestructionTestODE)
-{
-  JointCreationDestructionTest("ode");
-}
+//TEST_F(Joint_TEST, JointCreationDestructionTestODE)
+//{
+//  JointCreationDestructionTest("ode");
+//}
 
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
-{
-  JointCreationDestructionTest("simbody");
-}
-#endif  // HAVE_SIMBODY
+//#ifdef HAVE_SIMBODY
+//TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
+//{
+//  JointCreationDestructionTest("simbody");
+//}
+//#endif  // HAVE_SIMBODY
 
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
-{
-  /// \TODO: Disable for now until functionality is implemented
-  // JointCreationDestructionTest("bullet");
-  gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
-}
-#endif  // HAVE_BULLET
+//#ifdef HAVE_BULLET
+///// bullet collision parameters needs tweaking
+//TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
+//{
+//  /// \TODO: Disable for now until functionality is implemented
+//  // JointCreationDestructionTest("bullet");
+//  gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
+//}
+//#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, JointCreationDestructionTestDART)
-{
-  /// \TODO: Disable for now until functionality is implemented
-  // JointCreationDestructionTest("dart");
-  gzwarn << "JointCreationDestructionTest is disabled for DART\n";
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, JointCreationDestructionTestDART)
+//{
+//  /// \TODO: Disable for now until functionality is implemented
+//  // JointCreationDestructionTest("dart");
+//  gzwarn << "JointCreationDestructionTest is disabled for DART\n";
+//}
+//#endif  // HAVE_DART
 
-TEST_F(Joint_TEST, joint_SDF14)
-{
-  Load("worlds/SDF_1_4.world");
+//TEST_F(Joint_TEST, joint_SDF14)
+//{
+//  Load("worlds/SDF_1_4.world");
 
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+//  physics::WorldPtr world = physics::get_world("default");
+//  ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+//  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+//  ASSERT_TRUE(physics != NULL);
 
-  int i = 0;
-  while (!this->HasEntity("joint14_model") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
+//  int i = 0;
+//  while (!this->HasEntity("joint14_model") && i < 20)
+//  {
+//    common::Time::MSleep(100);
+//    ++i;
+//  }
 
-  if (i > 20)
-    gzthrow("Unable to get joint14_model");
+//  if (i > 20)
+//    gzthrow("Unable to get joint14_model");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
-  physics::ModelPtr model = world->GetModel("joint14_model");
-  EXPECT_TRUE(model);
-  physics::LinkPtr link1 = model->GetLink("body1");
-  EXPECT_TRUE(link1);
-  physics::LinkPtr link2 = model->GetLink("body2");
-  EXPECT_TRUE(link2);
+//  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+//  EXPECT_TRUE(physicsEngine);
+//  physics::ModelPtr model = world->GetModel("joint14_model");
+//  EXPECT_TRUE(model);
+//  physics::LinkPtr link1 = model->GetLink("body1");
+//  EXPECT_TRUE(link1);
+//  physics::LinkPtr link2 = model->GetLink("body2");
+//  EXPECT_TRUE(link2);
 
-  EXPECT_EQ(model->GetJointCount(), 1u);
-  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-  EXPECT_TRUE(joint);
+//  EXPECT_EQ(model->GetJointCount(), 1u);
+//  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
+//  EXPECT_TRUE(joint);
 
-  physics::LinkPtr parent = joint->GetParent();
-  EXPECT_TRUE(parent);
-  physics::LinkPtr child = joint->GetChild();
-  EXPECT_TRUE(child);
-  EXPECT_EQ(parent->GetName(), "body2");
-  EXPECT_EQ(child->GetName(), "body1");
-}
+//  physics::LinkPtr parent = joint->GetParent();
+//  EXPECT_TRUE(parent);
+//  physics::LinkPtr child = joint->GetChild();
+//  EXPECT_TRUE(child);
+//  EXPECT_EQ(parent->GetName(), "body2");
+//  EXPECT_EQ(child->GetName(), "body1");
+//}
 
 int main(int argc, char **argv)
 {
