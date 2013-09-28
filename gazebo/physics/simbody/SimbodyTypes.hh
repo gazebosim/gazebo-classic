@@ -31,10 +31,24 @@ namespace gazebo
     class SimbodyPhysics;
     class SimbodyRayShape;
 
+    /// \def SimbodyPhysicsPtr
+    /// \brief Boost shared point to SimbodyPhysics
     typedef boost::shared_ptr<SimbodyPhysics> SimbodyPhysicsPtr;
+
+    /// \def SimbodyCollisionPtr
+    /// \brief Boost shared point to SimbodyCollision
     typedef boost::shared_ptr<SimbodyCollision> SimbodyCollisionPtr;
+
+    /// \def SimbodyLinkPtr
+    /// \brief Boost shared point to SimbodyLink
     typedef boost::shared_ptr<SimbodyLink> SimbodyLinkPtr;
+
+    /// \def SimbodyModelPtr
+    /// \brief Boost shared point to SimbodyModel
     typedef boost::shared_ptr<SimbodyModel> SimbodyModelPtr;
+
+    /// \def SimbodyRayShapePtr
+    /// \brief Boost shared point to SimbodyRayShape
     typedef boost::shared_ptr<SimbodyRayShape> SimbodyRayShapePtr;
   }
 }
