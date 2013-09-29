@@ -295,17 +295,17 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 }
 
 
-/////////////////////////////////////////////////
-TEST_P(PhysicsMsgsTest, SetGravity)
-{
-  SetGravity(GetParam());
-}
+///////////////////////////////////////////////////
+//TEST_P(PhysicsMsgsTest, SetGravity)
+//{
+//  SetGravity(GetParam());
+//}
 
-/////////////////////////////////////////////////
-TEST_P(PhysicsMsgsTest, MoveTool)
-{
-  MoveTool(GetParam());
-}
+///////////////////////////////////////////////////
+//TEST_P(PhysicsMsgsTest, MoveTool)
+//{
+//  MoveTool(GetParam());
+//}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SimpleShapeResize)

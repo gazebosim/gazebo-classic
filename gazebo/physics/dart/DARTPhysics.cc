@@ -184,10 +184,9 @@ ModelPtr DARTPhysics::CreateModel(BasePtr _parent)
 LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
-	gzthrow("Link must have a parent\n");
+    gzthrow("Link must have a parent\n");
 
   DARTLinkPtr link(new DARTLink(_parent));
-
   link->SetWorld(_parent->GetWorld());
 
   return link;
@@ -195,16 +194,12 @@ LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 
 //////////////////////////////////////////////////
 CollisionPtr DARTPhysics::CreateCollision(const std::string &_type,
-                                            LinkPtr _body)
+                                          LinkPtr _body)
 {
   DARTCollisionPtr collision(new DARTCollision(_body));
-  
   ShapePtr shape = this->CreateShape(_type, collision);
-  
   collision->SetShape(shape);
-  
   shape->SetWorld(_body->GetWorld());
-  
   return collision;
 }
 
@@ -213,7 +208,6 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
                                     CollisionPtr _collision)
 {
   ShapePtr shape;
-  
   DARTCollisionPtr collision =
     boost::shared_dynamic_cast<DARTCollision>(_collision);
 
@@ -420,4 +414,10 @@ void DARTPhysics::SetMaxStepSize(double _stepSize)
 
   this->dartWorld->setTimeStep(_stepSize);
 }
+
+void DARTPhysics::InitDARTWorld()
+{
+  dartWorld->init();
+}
+
 

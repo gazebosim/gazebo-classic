@@ -18,6 +18,8 @@
 #ifndef _DARTCYLINDERSHAPE_HH_
 #define _DARTCYLINDERSHAPE_HH_
 
+#include "gazebo/common/Console.hh"
+
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
@@ -37,17 +39,54 @@ namespace gazebo
       public: virtual ~DARTCylinderShape() {}
 
       // Documentation inerited.
-      public: void SetSize(double /*_radius*/, double /*_length*/)
+      public: void SetSize(double _radius, double _length)
       {
-//         CylinderShape::SetSize(_radius, _length);
-//         DARTCollisionPtr oParent;
-//         oParent =
-//           boost::shared_dynamic_cast<DARTCollision>(this->collisionParent);
-// 
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
-//         else
-//           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
+        if (_radius < 0)
+        {
+          gzerr << "Cylinder shape does not support negative radius\n";
+          return;
+        }
+        if (_length < 0)
+        {
+          gzerr << "Cylinder shape does not support negative length\n";
+          return;
+        }
+        if (math::equal(_radius, 0.0))
+        {
+          // Warn user, but still create shape with very small value
+          // otherwise later resize operations using setLocalScaling
+          // will not be possible
+          gzwarn << "Setting cylinder shape's radius to zero \n";
+          _radius = 1e-4;
+        }
+        if (math::equal(_length, 0.0))
+        {
+          gzwarn << "Setting cylinder shape's length to zero \n";
+          _length = 1e-4;
+        }
+
+        CylinderShape::SetSize(_radius, _length);
+
+        DARTCollisionPtr dartCollisionParent =
+            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+
+        if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+        {
+          dart::dynamics::BodyNode* dtBodyNode =
+              dartCollisionParent->GetDARTBodyNode();
+          dart::dynamics::CylinderShape* dtCylinderShape =
+              new dart::dynamics::CylinderShape(_radius, _length);
+          dtBodyNode->addCollisionShape(dtCylinderShape);
+          dartCollisionParent->SetDARTCollisionShape(dtCylinderShape);
+        }
+        else
+        {
+          dart::dynamics::CylinderShape* dtCylinderShape =
+              dynamic_cast<dart::dynamics::CylinderShape*>(
+                dartCollisionParent->GetDARTCollisionShape());
+          dtCylinderShape->setRadius(_radius);
+          dtCylinderShape->setHeight(_length);
+        }
       }
     };
   }

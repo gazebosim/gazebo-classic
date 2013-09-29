@@ -36,6 +36,9 @@ DARTJoint::DARTJoint(BasePtr _parent)
     dartJoint(NULL),
     dartChildBodyNode(NULL)
 {
+  this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
+                              this->GetWorld()->GetPhysicsEngine());
+
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
 }
@@ -195,22 +198,41 @@ LinkPtr DARTJoint::GetJointLink(int _index) const
 //////////////////////////////////////////////////
 bool DARTJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  bool res = false;
+  if (_one.get() == NULL && _two.get() == NULL)
+    return false;
 
-  DARTLinkPtr dartLink1 = boost::shared_dynamic_cast<DARTLink>(_one);
-  DARTLinkPtr dartLink2 = boost::shared_dynamic_cast<DARTLink>(_two);
+  if ((this->childLink.get() == _one.get() &&
+       this->parentLink.get() == _two.get()) ||
+      (this->childLink.get() == _two.get() &&
+       this->parentLink.get() == _one.get()))
+    return true;
 
-  dart::dynamics::BodyNode* dartBodyNode1 = dartLink1->getDARTBodyNode();
-  dart::dynamics::BodyNode* dartBodyNode2 = dartLink2->getDARTBodyNode();
+  return false;
+}
 
-  if (dartLink1 == NULL || dartLink2 == NULL)
-    gzthrow("DARTJoint requires DART bodies\n");
+//////////////////////////////////////////////////
+void DARTJoint::Attach(LinkPtr _parent, LinkPtr _child)
+{
+  Joint::Attach(_parent, _child);
 
-  if (dartBodyNode1->getParentBodyNode() == dartBodyNode2 ||
-      dartBodyNode2->getParentBodyNode() == dartBodyNode1)
-    res = true;
+  if (this->AreConnected(_parent, _child))
+    return;
 
-  return res;
+  gzerr << "DART does not support joint attaching.\n";
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::Detach()
+{
+  if (!this->AreConnected(this->parentLink, this->childLink))
+    return;
+
+  this->childLink.reset();
+  this->parentLink.reset();
+
+  gzerr << "DART does not support joint dettaching.\n";
+
+  Joint::Detach();
 }
 
 //////////////////////////////////////////////////

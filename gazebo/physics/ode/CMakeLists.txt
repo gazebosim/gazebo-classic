@@ -51,7 +51,7 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_ode ${sources})
+gz_add_library(gazebo_physics_ode ${headers} ${sources})
 target_link_libraries(gazebo_physics_ode
   gazebo_ode
   gazebo_opcode

@@ -56,21 +56,10 @@ namespace gazebo
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
       // Documentation inherited.
-      public: virtual void Attach(LinkPtr _parent, LinkPtr _child)
-      {
-        Joint::Attach(_parent, _child);
-
-        gzerr << "DART does not support joint attach\n";
-      }
+      public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
       // Documentation inherited.
-      public: virtual void Detach()
-      {
-        this->childLink.reset();
-        this->parentLink.reset();
-
-        gzerr << "DART does not support joint attach\n";
-      }
+      public: virtual void Detach();
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int /*index*/,
@@ -157,6 +146,9 @@ namespace gazebo
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
+
+      /// \brief DARTPhysics engine pointer
+      protected: DARTPhysicsPtr dartPhysicsEngine;
 
       /// \brief DART joint pointer
       protected: dart::dynamics::Joint* dartJoint;

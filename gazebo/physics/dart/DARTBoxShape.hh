@@ -17,6 +17,8 @@
 #ifndef _DARTBOXSHAPE_HH_
 #define _DARTBOXSHAPE_HH_
 
+#include "gazebo/common/Console.hh"
+
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -42,19 +44,54 @@ namespace gazebo
       public: virtual ~DARTBoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &/*_size*/)
+      public: virtual void SetSize(const math::Vector3 &_size)
       {
-//         BoxShape::SetSize(_size);
-// 
-//         DARTCollisionPtr oParent;
-//         oParent = boost::shared_dynamic_cast<DARTCollision>(
-//             this->collisionParent);
-// 
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
-//         else
-//           dGeomBoxSetLengths(oParent->GetCollisionId(),
-//                              _size.x, _size.y, _size.z);
+        if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+        {
+          gzerr << "Box shape does not support negative size\n";
+          return;
+        }
+        math::Vector3 size = _size;
+        if (math::equal(size.x, 0.0))
+        {
+          // Warn user, but still create shape with very small value
+          // otherwise later resize operations using setLocalScaling
+          // will not be possible
+          gzwarn << "Setting box shape's x to zero \n";
+          size.x = 1e-4;
+        }
+        if (math::equal(size.y, 0.0))
+        {
+          gzwarn << "Setting box shape's y to zero \n";
+          size.y = 1e-4;
+        }
+        if (math::equal(size.z, 0.0))
+        {
+          gzwarn << "Setting box shape's z to zero \n";
+          size.z = 1e-4;
+        }
+
+        BoxShape::SetSize(size);
+
+        DARTCollisionPtr dartCollisionParent =
+            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+
+        if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+        {
+          dart::dynamics::BodyNode* dtBodyNode =
+              dartCollisionParent->GetDARTBodyNode();
+          dart::dynamics::BoxShape* dtBoxShape =
+              new dart::dynamics::BoxShape(DARTTypes::ConvVec3(size));
+          dtBodyNode->addCollisionShape(dtBoxShape);
+          dartCollisionParent->SetDARTCollisionShape(dtBoxShape);
+        }
+        else
+        {
+          dart::dynamics::BoxShape* dtBoxShape =
+              dynamic_cast<dart::dynamics::BoxShape*>(
+                dartCollisionParent->GetDARTCollisionShape());
+          dtBoxShape->setDim(DARTTypes::ConvVec3(size));
+        }
       }
     };
   }

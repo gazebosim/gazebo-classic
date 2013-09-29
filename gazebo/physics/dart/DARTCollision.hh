@@ -64,11 +64,23 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Box GetBoundingBox() const;
 
+      /// @brief Get DART body node.
+      public: dart::dynamics::BodyNode* GetDARTBodyNode() const;
+
+      /// @brief Set DART collision shape.
+      /// \param[in] _shape DART Collision shape
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetDARTCollisionShape(dart::dynamics::Shape* _shape,
+                                         bool _placeable = true);
+
+      /// @brief Get DART collision shape.
+      public: dart::dynamics::Shape* GetDARTCollisionShape() const;
+
       /// @brief DART body node associated with this collision.
-      public: dart::dynamics::BodyNode* dartBodyNode;
+      private: dart::dynamics::BodyNode* dtBodyNode;
 
       /// @brief DART collision shape associated with this collision.
-      public: dart::dynamics::Shape* dartCollShape;
+      private: dart::dynamics::Shape* dtCollisionShape;
     };
   }
 }

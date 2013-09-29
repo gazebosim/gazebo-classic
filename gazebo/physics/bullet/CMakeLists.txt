@@ -26,7 +26,7 @@ set (sources
 
 set (headers
   bullet_inc.h
-  bullet_math.h
+  bullet_math_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
@@ -56,7 +56,7 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_bullet ${sources})
+gz_add_library(gazebo_physics_bullet ${headers} ${sources})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
 

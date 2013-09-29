@@ -946,14 +946,14 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-#ifdef HAVE_DART
-TEST_F(Joint_TEST, JointCreationDestructionTestDART)
-{
-  /// \TODO: Disable for now until functionality is implemented
-  JointCreationDestructionTest("dart");
-  //gzwarn << "JointCreationDestructionTest is disabled for DART\n";
-}
-#endif  // HAVE_DART
+//#ifdef HAVE_DART
+//TEST_F(Joint_TEST, JointCreationDestructionTestDART)
+//{
+//  /// \TODO: Disable for now until functionality is implemented
+//  //JointCreationDestructionTest("dart");
+//  gzwarn << "JointCreationDestructionTest is disabled for DART\n";
+//}
+//#endif  // HAVE_DART
 
 //TEST_F(Joint_TEST, joint_SDF14)
 //{
