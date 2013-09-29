@@ -63,8 +63,11 @@ void DARTCollision::Init()
   Collision::Init();
 
   // Offset
-  math::Pose relativePose = this->GetRelativePose();
-  this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+  if (this->dtCollisionShape)
+  {
+    math::Pose relativePose = this->GetRelativePose();
+    this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+  }
 }
 
 //////////////////////////////////////////////////
