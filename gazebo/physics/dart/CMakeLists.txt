@@ -53,7 +53,7 @@ SET (headers
 )
 
 set (gtest_sources
-  #DARTPhysics_TEST.cc
+  DARTPhysics_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 
