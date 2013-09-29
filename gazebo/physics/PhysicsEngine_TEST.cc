@@ -64,6 +64,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::ODE;
   else if (_physicsEngine == "bullet")
     type = msgs::Physics::BULLET;
+  else if (_physicsEngine == "dart")
+    type = msgs::Physics::DART;
   else
     type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
@@ -103,6 +105,13 @@ TEST_F(PhysicsEngineTest, PhysicsEngineParamBullet)
   PhysicsEngineParam("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_DART
+TEST_F(PhysicsEngineTest, PhysicsEngineParamDART)
+{
+  PhysicsEngineParam("dart");
+}
+#endif  // HAVE_DART
 
 int main(int argc, char **argv)
 {
