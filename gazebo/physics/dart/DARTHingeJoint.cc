@@ -29,16 +29,15 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
   : HingeJoint<DARTJoint>(_parent),
-    dartRevoluteJoint(new dart::dynamics::RevoluteJoint())
+    dtRevoluteJoint(new dart::dynamics::RevoluteJoint())
 {
-  this->dartJoint = this->dartRevoluteJoint;
+  this->dtJoint = this->dtRevoluteJoint;
 }
 
 //////////////////////////////////////////////////
 DARTHingeJoint::~DARTHingeJoint()
 {
-  delete dartRevoluteJoint;
-  this->dartJoint = NULL;
+  delete dtRevoluteJoint;
 }
 
 //////////////////////////////////////////////////
@@ -56,8 +55,8 @@ void DARTHingeJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -70,9 +69,9 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                          this->dartJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = this->dartRevoluteJoint->getAxis();
+    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dtRevoluteJoint->getAxis();
     globalAxis = T.linear() * axis;
   }
   else
@@ -95,11 +94,11 @@ void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
     //--------------------------------------------------------------------------
 
-    this->dartRevoluteJoint->setAxis(dartAxis);
+    this->dtRevoluteJoint->setAxis(dartAxis);
   }
   else
   {
@@ -114,7 +113,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
     result.SetFromRadian(radianAngle);
   }
   else
@@ -129,7 +128,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
 void DARTHingeJoint::SetVelocity(int _index, double _vel)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->set_dq(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -140,7 +139,7 @@ double DARTHingeJoint::GetVelocity(int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->get_dq();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -151,7 +150,7 @@ double DARTHingeJoint::GetVelocity(int _index) const
 void DARTHingeJoint::SetMaxForce(int _index, double _force)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -162,7 +161,7 @@ double DARTHingeJoint::GetMaxForce(int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->get_tauMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -173,7 +172,7 @@ double DARTHingeJoint::GetMaxForce(int _index)
 void DARTHingeJoint::SetForceImpl(int _index, double _effort)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->set_tau(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

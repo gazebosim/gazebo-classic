@@ -27,16 +27,15 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
     : Hinge2Joint<DARTJoint>(_parent),
-      dartUniveralJoint(new dart::dynamics::UniversalJoint())
+      dtUniveralJoint(new dart::dynamics::UniversalJoint())
 {
-  this->dartJoint = dartUniveralJoint;
+  this->dtJoint = dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
 DARTHinge2Joint::~DARTHinge2Joint()
 {
-  delete dartUniveralJoint;
-  this->dartJoint = NULL;
+  delete dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
@@ -54,8 +53,8 @@ void DARTHinge2Joint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTHinge2Joint::GetAnchor(int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -72,11 +71,11 @@ void DARTHinge2Joint::SetAxis(int _index, const math::Vector3& _axis)
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
     Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
     //----------------------------------------------------------------------------
 
-    this->dartUniveralJoint->setAxis1(dartAxis);
+    this->dtUniveralJoint->setAxis1(dartAxis);
   }
   else if (_index == 1)
   {
@@ -84,11 +83,11 @@ void DARTHinge2Joint::SetAxis(int _index, const math::Vector3& _axis)
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
     Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
     //----------------------------------------------------------------------------
 
-    this->dartUniveralJoint->setAxis2(dartAxis);
+    this->dtUniveralJoint->setAxis2(dartAxis);
   }
   else
   {
@@ -103,18 +102,18 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                          this->dartJoint->getLocalTransform().inverse() *
-                          this->dartJoint->getTransformFromParentBodyNode();
-    Eigen::Vector3d axis = this->dartUniveralJoint->getAxis1();
+    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                          this->dtJoint->getLocalTransform().inverse() *
+                          this->dtJoint->getTransformFromParentBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis1();
 
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
   {
-    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                          this->dartJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = this->dartUniveralJoint->getAxis2();
+    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis2();
 
     globalAxis = T.linear() * axis;
   }
@@ -135,12 +134,12 @@ math::Angle DARTHinge2Joint::GetAngleImpl(int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
     result.SetFromRadian(radianAngle);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dartJoint->getGenCoord(1)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(1)->get_q();
     result.SetFromRadian(radianAngle);
   }
   else
@@ -157,9 +156,9 @@ double DARTHinge2Joint::GetVelocity(int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->get_dq();
   else if (_index == 1)
-    result = this->dartJoint->getGenCoord(1)->get_dq();
+    result = this->dtJoint->getGenCoord(1)->get_dq();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -170,9 +169,9 @@ double DARTHinge2Joint::GetVelocity(int _index) const
 void DARTHinge2Joint::SetVelocity(int _index, double _vel)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->set_dq(_vel);
   else if (_index == 1)
-    this->dartJoint->getGenCoord(1)->set_dq(_vel);
+    this->dtJoint->getGenCoord(1)->set_dq(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -183,9 +182,9 @@ double DARTHinge2Joint::GetMaxForce(int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->get_tauMax();
   else if (_index == 1)
-    result = this->dartJoint->getGenCoord(1)->get_tauMax();
+    result = this->dtJoint->getGenCoord(1)->get_tauMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -196,9 +195,9 @@ double DARTHinge2Joint::GetMaxForce(int _index)
 void DARTHinge2Joint::SetMaxForce(int _index, double _force)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
   else if (_index == 1)
-    this->dartJoint->getGenCoord(1)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(1)->set_tauMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -207,9 +206,9 @@ void DARTHinge2Joint::SetMaxForce(int _index, double _force)
 void DARTHinge2Joint::SetForceImpl(int _index, double _effort)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->set_tau(_effort);
   else if (_index == 1)
-    this->dartJoint->getGenCoord(1)->set_tau(_effort);
+    this->dtJoint->getGenCoord(1)->set_tau(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

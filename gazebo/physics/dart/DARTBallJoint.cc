@@ -27,16 +27,15 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
   : BallJoint<DARTJoint>(_parent),
-    dartBallJoint(new dart::dynamics::BallJoint())
+    dtBallJoint(new dart::dynamics::BallJoint())
 {
-  this->dartJoint = this->dartBallJoint;
+  this->dtJoint = this->dtBallJoint;
 }
 
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete dartBallJoint;
-  this->dartJoint = NULL;
+  delete dtBallJoint;
 }
 
 //////////////////////////////////////////////////
@@ -54,8 +53,8 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);

@@ -27,23 +27,22 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTModel::DARTModel(BasePtr _parent)
-  : Model(_parent), dartSkeleton(NULL),
-    dartCanonicalJoint(NULL)
+  : Model(_parent), dtSkeleton(NULL)
 {
 }
 
 //////////////////////////////////////////////////
 DARTModel::~DARTModel()
 {
-  if (dartSkeleton)
-    delete dartSkeleton;
+  if (dtSkeleton)
+    delete dtSkeleton;
 }
 
 //////////////////////////////////////////////////
 void DARTModel::Load(sdf::ElementPtr _sdf)
 {
   // create skeletonDynamics of DART
-  this->dartSkeleton = new dart::dynamics::Skeleton();
+  this->dtSkeleton = new dart::dynamics::Skeleton();
 
   Model::Load(_sdf);
 
@@ -56,20 +55,20 @@ void DARTModel::Init()
 
   // Name
   std::string modelName = this->GetName();
-  this->dartSkeleton->setName(modelName.c_str());
+  this->dtSkeleton->setName(modelName.c_str());
 
   // Static
-  this->dartSkeleton->setImmobileState(this->IsStatic());
+  this->dtSkeleton->setImmobileState(this->IsStatic());
 
   // Check if this link is free floating body
   Link_V linkList = this->GetLinks();
 
   for (unsigned int i = 0; i < linkList.size(); ++i)
   {
-    dart::dynamics::BodyNode* dartBodyNode
+    dart::dynamics::BodyNode* dtBodyNode
         = boost::static_pointer_cast<DARTLink>(linkList[i])->getDARTBodyNode();
 
-    if (dartBodyNode->getParentJoint() == NULL)
+    if (dtBodyNode->getParentJoint() == NULL)
     {
       // If this link has no parent joint, then we add 6-dof free joint to the
       // link.
@@ -79,14 +78,14 @@ void DARTModel::Init()
             DARTTypes::ConvPose(linkList[i]->GetWorldPose()));
       newFreeJoint->setTransformFromChildBodyNode(Eigen::Isometry3d::Identity());
 
-      dartBodyNode->setParentJoint(newFreeJoint);
+      dtBodyNode->setParentJoint(newFreeJoint);
     }
 
-    dartSkeleton->addBodyNode(dartBodyNode);
+    dtSkeleton->addBodyNode(dtBodyNode);
   }
 
   // add skeleton to world
-  this->GetDARTWorld()->addSkeleton(dartSkeleton);
+  this->GetDARTWorld()->addSkeleton(dtSkeleton);
 }
 
 
@@ -102,6 +101,12 @@ void DARTModel::Fini()
 {
   Model::Fini();
   
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::Skeleton*DARTModel::GetDARTSkeleton()
+{
+  return dtSkeleton;
 }
 
 //////////////////////////////////////////////////

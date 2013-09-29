@@ -59,18 +59,7 @@ namespace gazebo
       // public: virtual void Reset();
 
       /// \brief
-      public: dart::dynamics::Skeleton* GetSkeleton()
-      { return dartSkeleton; }
-
-      /// \brief
-      public: void SetCanonicalJoint(dart::dynamics::Joint* _joint) {
-        dartCanonicalJoint = _joint;
-      }
-
-      /// \brief
-      public: dart::dynamics::Joint* GetCanonicalJoint(void) const {
-        return dartCanonicalJoint;
-      }
+      public: dart::dynamics::Skeleton* GetDARTSkeleton();
 
       /// \brief
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
@@ -79,18 +68,8 @@ namespace gazebo
       public: dart::simulation::World* GetDARTWorld(void) const;
 
       /// \brief
-      protected: dart::dynamics::Skeleton* dartSkeleton;
+      protected: dart::dynamics::Skeleton* dtSkeleton;
 
-      /// \brief Parent joint of the canonical link.
-      /// When the canonical link of this model is free floating link, this link
-      /// does not have the parent joint to the world. However, all DART's link
-      /// must have a parent joint. For free floating link, DART connect the
-      /// link with a 6dof joint to the world.
-      /// A) If the canonical link has its parent joint, then just store it in
-      /// this member variable.
-      /// B) If the canonical link does not have its parent joint, then create
-      /// 6dof joint and store the joint in this member variable.
-      protected: dart::dynamics::Joint* dartCanonicalJoint;
     };
     /// \}
   }

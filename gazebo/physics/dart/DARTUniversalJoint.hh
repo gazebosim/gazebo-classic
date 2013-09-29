@@ -69,7 +69,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Universal joint of DART
-      protected: dart::dynamics::UniversalJoint* dartUniveralJoint;
+      protected: dart::dynamics::UniversalJoint* dtUniveralJoint;
     };
   }
 }

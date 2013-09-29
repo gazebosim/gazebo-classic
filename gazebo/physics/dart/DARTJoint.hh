@@ -134,7 +134,7 @@ namespace gazebo
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief Get DART joint pointer.
-      public: dart::dynamics::Joint* getDARTJoint() { return dartJoint; }
+      public: dart::dynamics::Joint* getDARTJoint() { return dtJoint; }
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
@@ -151,10 +151,10 @@ namespace gazebo
       protected: DARTPhysicsPtr dartPhysicsEngine;
 
       /// \brief DART joint pointer
-      protected: dart::dynamics::Joint* dartJoint;
+      protected: dart::dynamics::Joint* dtJoint;
 
-      /// \brief DART joint pointer
-      protected: dart::dynamics::BodyNode* dartChildBodyNode;
+      /// \brief DART child body node pointer
+      protected: dart::dynamics::BodyNode* dtChildBodyNode;
     };
   }
 }

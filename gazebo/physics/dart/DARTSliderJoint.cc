@@ -29,16 +29,15 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
     : SliderJoint<DARTJoint>(_parent),
-      dartPrismaticJoint(new dart::dynamics::PrismaticJoint())
+      dtPrismaticJoint(new dart::dynamics::PrismaticJoint())
 {
-  this->dartJoint = this->dartPrismaticJoint;
+  this->dtJoint = this->dtPrismaticJoint;
 }
 
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
-  delete dartPrismaticJoint;
-  this->dartJoint = NULL;
+  delete dtPrismaticJoint;
 }
 
 //////////////////////////////////////////////////
@@ -56,8 +55,8 @@ void DARTSliderJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                        this->dartJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -70,9 +69,9 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dartChildBodyNode->getWorldTransform() *
-                          this->dartJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = this->dartPrismaticJoint->getAxis();
+    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dtPrismaticJoint->getAxis();
     globalAxis = T.linear() * axis;
   }
   else
@@ -95,11 +94,11 @@ void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dartJoint->getTransformFromParentBodyNode().inverse();
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
     //----------------------------------------------------------------------------
 
-    this->dartPrismaticJoint->setAxis(dartVec3);
+    this->dtPrismaticJoint->setAxis(dartVec3);
   }
   else
   {
@@ -114,7 +113,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dartJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
     result.SetFromRadian(radianAngle);
   }
   else
@@ -129,7 +128,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int _index) const
 void DARTSliderJoint::SetVelocity(int _index, double _vel)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->set_dq(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -140,7 +139,7 @@ double DARTSliderJoint::GetVelocity(int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->get_dq();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -151,7 +150,7 @@ double DARTSliderJoint::GetVelocity(int _index) const
 void DARTSliderJoint::SetMaxForce(int _index, double _force)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -162,7 +161,7 @@ double DARTSliderJoint::GetMaxForce(int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->get_tauMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -173,7 +172,7 @@ double DARTSliderJoint::GetMaxForce(int _index)
 void DARTSliderJoint::SetForceImpl(int _index, double _effort)
 {
   if (_index == 0)
-    this->dartJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->set_tau(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

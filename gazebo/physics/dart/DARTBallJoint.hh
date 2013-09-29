@@ -71,7 +71,7 @@ namespace gazebo
       }
 
       /// \brief
-      protected: dart::dynamics::BallJoint* dartBallJoint;
+      protected: dart::dynamics::BallJoint* dtBallJoint;
     };
   }
 }

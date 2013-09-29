@@ -72,7 +72,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Revolute joint of DART
-      protected: dart::dynamics::RevoluteJoint* dartRevoluteJoint;
+      protected: dart::dynamics::RevoluteJoint* dtRevoluteJoint;
     };
   }
 }

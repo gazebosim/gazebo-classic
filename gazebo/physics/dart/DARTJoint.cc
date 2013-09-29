@@ -33,8 +33,8 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
-    dartJoint(NULL),
-    dartChildBodyNode(NULL)
+    dtJoint(NULL),
+    dtChildBodyNode(NULL)
 {
   this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
@@ -48,8 +48,8 @@ DARTJoint::~DARTJoint()
 {
   this->Detach();
 
-  if (dartJoint)
-    delete dartJoint;
+  if (dtJoint)
+    delete dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -69,56 +69,48 @@ void DARTJoint::Init()
   // Name
   //----------------------------------------------------------------------------
   std::string jointName = this->GetName();
-  this->dartJoint->setName(jointName.c_str());
+  this->dtJoint->setName(jointName.c_str());
 
   //----------------------------------------------------------------------------
   // Parent and child link information
   //----------------------------------------------------------------------------
-  DARTLinkPtr theParentLink =
+  DARTLinkPtr dartParentLink =
     boost::static_pointer_cast<DARTLink>(this->parentLink);
-  DARTLinkPtr theChildLink =
+  DARTLinkPtr dartChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
-  dart::dynamics::BodyNode* dartParentBody = NULL;
-  dart::dynamics::BodyNode* dartChildBody = NULL;
-  Eigen::Isometry3d dartTransfParentLinkToJointLeft = Eigen::Isometry3d::Identity();
-  Eigen::Isometry3d dartTransfChildLinkToJointRight = Eigen::Isometry3d::Identity();
-  Eigen::Isometry3d dartTransfParentLink = Eigen::Isometry3d::Identity();
-  Eigen::Isometry3d dartTransfChildLink = Eigen::Isometry3d::Identity();
+  dart::dynamics::BodyNode* dtParentBodyNode = NULL;
+  Eigen::Isometry3d dtTransformParentLinkToJoint =
+      Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dtTransformChildLinkToJoint = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dtTransformParentBodyNode = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
   //if (theChildLink != NULL)
-  assert(theChildLink);
+  assert(dartChildLink.get() != NULL);
   {
-    dartChildBody = theChildLink->getDARTBodyNode();
-    assert(dartChildBody);
-
-    math::Pose poseChildLink = theChildLink->GetWorldPose();
-    dartTransfChildLink = DARTTypes::ConvPose(poseChildLink);
-
-    dartChildBody->setParentJoint(this->dartJoint);
+    dtTransformChildBodyNode =
+        DARTTypes::ConvPose(dartChildLink->GetWorldPose());
+    this->dtChildBodyNode = dartChildLink->getDARTBodyNode();
+    this->dtChildBodyNode->setParentJoint(this->dtJoint);
   }
-  dartTransfChildLinkToJointRight = DARTTypes::ConvPose(this->anchorPose);
+  dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
 
-  if (theParentLink != NULL)
+  if (dartParentLink.get() != NULL)
   {
-    dartParentBody = theParentLink->getDARTBodyNode();
-    assert(dartParentBody);
-
-    math::Pose poseParentLink = theParentLink->GetWorldPose();
-    dartTransfParentLink = DARTTypes::ConvPose(poseParentLink);
-
-    dartParentBody->addChildBodyNode(dartChildBody);
+    dtTransformParentBodyNode =
+        DARTTypes::ConvPose(dartParentLink->GetWorldPose());
+    dtParentBodyNode = dartParentLink->getDARTBodyNode();
+    dtParentBodyNode->addChildBodyNode(this->dtChildBodyNode);
   }
-  // TODO: If the joint is not home position, then we need to care about it
-  //       by multiply jointLocalTransformation.inverse() to the end of below
-  //       line.
-  dartTransfParentLinkToJointLeft = dartTransfParentLink.inverse()
-                                    * dartTransfChildLink
-                                    * dartTransfChildLinkToJointRight;
 
-  this->dartJoint->setTransformFromParentBodyNode(dartTransfParentLinkToJointLeft);
-  this->dartJoint->setTransformFromChildBodyNode(dartTransfChildLinkToJointRight);
-  this->dartChildBodyNode = dartChildBody;
+  dtTransformParentLinkToJoint = dtTransformParentBodyNode.inverse() *
+                                 dtTransformChildBodyNode *
+                                 dtTransformChildLinkToJoint;
+
+  // We assume that the joint angles are all zero.
+  this->dtJoint->setTransformFromParentBodyNode(dtTransformParentLinkToJoint);
+  this->dtJoint->setTransformFromChildBodyNode(dtTransformChildLinkToJoint);
 
   //----------------------------------------------------------------------------
   // TODO: Currently, dampingCoefficient seems not to be initialized when
@@ -256,7 +248,7 @@ void DARTJoint::SetDamping(int _index, double _damping)
 
   if (!parentStatic && !childStatic)
   {
-    this->dartJoint->setDampingCoefficient(_index, _damping);
+    this->dtJoint->setDampingCoefficient(_index, _damping);
   }
 }
 
@@ -268,7 +260,7 @@ void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
     case 0:
     case 1:
     case 2:
-      this->dartJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
+      this->dtJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -284,7 +276,7 @@ void DARTJoint::SetLowStop(int _index, const math::Angle& _angle)
   case 0:
   case 1:
   case 2:
-    this->dartJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
+    this->dtJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -299,7 +291,7 @@ math::Angle DARTJoint::GetHighStop(int _index)
   case 0:
   case 1:
   case 2:
-    return this->dartJoint->getGenCoord(_index)->get_qMax();
+    return this->dtJoint->getGenCoord(_index)->get_qMax();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -315,7 +307,7 @@ math::Angle DARTJoint::GetLowStop(int _index)
   case 0:
   case 1:
   case 2:
-    return this->dartJoint->getGenCoord(_index)->get_qMin();
+    return this->dtJoint->getGenCoord(_index)->get_qMin();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -328,7 +320,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;
 
-  if (!this->dartJoint)
+  if (!this->dtJoint)
   {
     gzerr << "DART joint is invalid\n";
     return result;
@@ -342,7 +334,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dartJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -351,7 +343,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dartJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
@@ -372,7 +364,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 {
   math::Vector3 result;
 
-  if (!this->dartJoint)
+  if (!this->dtJoint)
   {
     gzerr << "DART joint is invalid\n";
     return result;
@@ -386,7 +378,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dartJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -395,7 +387,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dartJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
@@ -504,7 +496,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dartJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -513,7 +505,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dartJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
@@ -560,7 +552,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dartJoint->getNumGenCoords();
+  angleCount = this->dtJoint->getNumGenCoords();
 
   return angleCount;
 }
