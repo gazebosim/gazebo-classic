@@ -74,39 +74,43 @@ void DARTCollision::Fini()
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCollision(bool _placeable)
-{
-  Collision::SetCollision(_placeable);
-
-  // Nothing to do in dart.
-}
-
-//////////////////////////////////////////////////
 void DARTCollision::OnPoseChange()
 {
   // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCategoryBits(unsigned int /*_bits*/)
+void DARTCollision::SetCategoryBits(unsigned int _bits)
 {
-  // Nothing to do in dart.
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCollideBits(unsigned int /*_bits*/)
+void DARTCollision::SetCollideBits(unsigned int _bits)
 {
-  // Nothing to do in dart.
+  this->collideBits = _bits;
+}
+
+//////////////////////////////////////////////////
+unsigned int DARTCollision::GetCategoryBits() const
+{
+  return this->categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int DARTCollision::GetCollideBits() const
+{
+  return this->collideBits;
 }
 
 //////////////////////////////////////////////////
 gazebo::math::Box DARTCollision::GetBoundingBox() const
 {
-  gazebo::math::Box box;
+  math::Box result;
 
-  gzwarn << "Not implemented!\n";
+  gzerr << "DART does not provide bounding box info.\n";
 
-  return box;
+  return result;
 }
 
 //////////////////////////////////////////////////

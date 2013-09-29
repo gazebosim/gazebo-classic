@@ -48,18 +48,22 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Set the encapsulated collsion object.
-      /// \param[in] _placeable True to make the object m.
-      public: virtual void SetCollision(bool _placeable);
-
       // Documentation inherited.
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
-      public: virtual void SetCategoryBits(unsigned int bits);
+      public: virtual void SetCategoryBits(unsigned int _bits);
 
       // Documentation inherited.
-      public: virtual void SetCollideBits(unsigned int bits);
+      public: virtual void SetCollideBits(unsigned int _bits);
+
+      /// \brief Get the category bits, used during collision detection
+      /// \return The bits
+      public: virtual unsigned int GetCategoryBits() const;
+
+      /// \brief Get the collide bits, used during collision detection
+      /// \return The bits
+      public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited.
       public: virtual math::Box GetBoundingBox() const;
@@ -81,6 +85,12 @@ namespace gazebo
 
       /// @brief DART collision shape associated with this collision.
       private: dart::dynamics::Shape* dtCollisionShape;
+
+      /// \brief Category bits for collision detection
+      private: unsigned int categoryBits;
+
+      /// \brief Collide bits for collision detection
+      private: unsigned int collideBits;
     };
   }
 }
