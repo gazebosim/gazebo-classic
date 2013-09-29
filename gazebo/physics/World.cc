@@ -319,9 +319,6 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
-  // Need to have set
-  // this->physicsEngine->simbodyPhysicsInitialized = true
-  // by here
 
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));

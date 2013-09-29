@@ -104,22 +104,38 @@ namespace gazebo
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
 
+      /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
+      /// \param[in] _q Gazeb's math::Quaternion object
+      /// \return Simbody's SimTK::Quaternion object
       public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q);
 
+      /// \brief Convert SimTK::Quaternion to gazebo::math::Quaternion
+      /// \param[in] _q Simbody's SimTK::Quaternion object
+      /// \return Gazeb's math::Quaternion object
       public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q);
 
+      /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
+      /// \param[in] _v Gazeb's math::Vector3 object
+      /// \return Simbody's SimTK::Vec3 object
       public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v);
 
+      /// \brief Convert SimTK::Vec3 to gazebo::math::Vector3
+      /// \param[in] _v Simbody's SimTK::Vec3 object
+      /// \return Gazeb's math::Vector3 object
       public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v);
 
       /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
       /// a Simbody Transform. The rotation angles are interpreted as a
       /// body-fixed sequence, meaning we rotation about x, then about
       /// the new y, then about the now twice-rotated z.
+      /// \param[in] _pose Gazeb's math::Pose object
+      /// \return Simbody's SimTK::Transform object
       public: static SimTK::Transform Pose2Transform(const math::Pose &_pose);
 
       /// \brief Convert a Simbody transform to a pose in x,y,z,
       /// thetax,thetay,thetaz format.
+      /// \param[in] _xAB Simbody's SimTK::Transform object
+      /// \return Gazeb's math::Pose object
       public: static math::Pose Transform2Pose(const SimTK::Transform &_xAB);
 
       /// \brief If the given element contains a <pose> element, return it as a
@@ -127,25 +143,55 @@ namespace gazebo
       /// is more than one <pose> element, only the first one is processed.
       public: static SimTK::Transform GetPose(sdf::ElementPtr _element);
 
+      /// \brief Convert Base::GetType() to string,
+      /// this is needed by the MultibodyGraphMaker.
+      /// \param[in] _type Joint type returned by Joint::GetType().
+      /// \return a hard-coded string needed by the MultibodyGraphMaker.
       public: static std::string GetTypeString(unsigned int _type);
 
+      /// \brief Convert Base::GetType() to string,
+      /// this is needed by the MultibodyGraphMaker.
+      /// \param[in] _type Joint type returned by Joint::GetType().
+      /// \return a hard-coded string needed by the MultibodyGraphMaker.
       public: static std::string GetTypeString(physics::Base::EntityType _type);
 
+      // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
+      // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      /// \brief Helper functions
+      /// \brief CREATE MULTIBODY GRAPH
+      /// Define Gazebo joint types, then use links and joints in the
+      /// given model to construct a reasonable spanning-tree-plus-constraints
+      /// multibody graph to represent that model. An exception will be
+      /// thrown if this fails.  Note that this step is not Simbody dependent.
+      /// \param[in] _mbgraph Create a MultibodyGraphMaker that is equivalent
+      /// of incoming physics::Model.
+      /// \param[in] _model Model loaded by Gazebo parsing SDF.
       private: void CreateMultibodyGraph(
         SimTK::MultibodyGraphMaker& _mbgraph, const physics::ModelPtr _model);
 
-      /// \brief Initialize an empty simbody system
+      /// \brief BUILD SIMBODY SYSTEM
+      /// Given a desired multibody graph, gravity, and the Gazebo model
+      /// that was used to generate the graph, create a Simbody System
+      /// for it. There are many limitations here, especially in the
+      /// handling of contact. Any Gazebo features that we haven't
+      /// modeled are just ignored.  The GazeboModel is updated so that
+      /// its links and joints have references to their corresponding
+      /// Simbody elements.  We set up some visualization here so we
+      /// can see what's happening but this would not be needed in Gazebo
+      /// since it does its own visualization.
       private: void InitSimbodySystem();
 
-      /// \brief Add Model to simbody system, and reinitialize state
+      /// \brief Add a static Model to simbody system, and reinitialize state
+      /// \param[in] _model the incoming static Gazebo physics::Model.
       private: void AddStaticModelToSimbodySystem(
                    const physics::ModelPtr _model);
 
+      /// \brief Read from MultibodydGraphMaker and construct a physics::Model.
+      /// \param[in] _mbgraph Contain MultibodyGraphMaker object.
+      /// \param[in] _model Pointer to gazebo model, not used at this time.
       private: void AddDynamicModelToSimbodySystem(
         const SimTK::MultibodyGraphMaker &_mbgraph,
         const physics::ModelPtr _model);

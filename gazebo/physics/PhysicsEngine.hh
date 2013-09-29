@@ -108,7 +108,7 @@ namespace gazebo
       public: virtual void UpdatePhysics() {}
 
       /// \brief Create a new model.
-      /// \param[in]
+      /// \param[in] _base Boost shared pointer to a new model.
       public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.

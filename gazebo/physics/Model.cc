@@ -190,12 +190,6 @@ void Model::Init()
       gzerr << "Init joint failed" << std::endl;
       return;
     }
-  }
-
-  // Initialize the joints messages for visualizer
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
-  {
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
     // can be included in the message.
@@ -636,7 +630,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   if (!joint)
   {
     gzerr << "Unable to create joint of type[" << stype << "]\n";
-    gzthrow("Unable to create joint of type[" + stype + "]\n");
+    // gzthrow("Unable to create joint of type[" + stype + "]\n");
+    return;
   }
 
   joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
