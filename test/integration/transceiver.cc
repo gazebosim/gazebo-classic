@@ -412,6 +412,12 @@ INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
 #endif  // HAVE_BULLET
 
 /////////////////////////////////////////////////
+#ifdef HAVE_DART
+INSTANTIATE_TEST_CASE_P(TestTransceiverDART, TransceiverTest,
+    ::testing::Values("dart"));
+#endif  // HAVE_DART
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
