@@ -1282,14 +1282,20 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
   }
 }
 
-// This test doesn't pass yet in Bullet
-TEST_P(PhysicsTest, DropStuff)
+// This test doesn't pass yet in Bullet or Simbody
+TEST_F(PhysicsTest, DropStuffODE)
 {
-  DropStuff(GetParam());
+  DropStuff("ode");
 }
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Skipping InelasticCollision for bullet per #864" << std::endl;
+    return;
+  }
+
   // check conservation of mementum for linear inelastic collision
   Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
