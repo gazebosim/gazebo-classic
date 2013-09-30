@@ -135,10 +135,13 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 
   // Make sure there is a URI separator
   if (uriSeparator == std::string::npos)
+  {
+    gzerr << "No URI separator \"://\" in [" << _modelURI << "]\n";
     return false;
+  }
 
-  uri = uri.substr(0, uri.find("/", uriSeparator+3));
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
+  uri = uri.substr(0, uri.find("/", ModelDatabase::GetURI().size()));
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
 
@@ -148,6 +151,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
     if (iter->first == uri)
       return true;
   }
+
   return false;
 }
 
