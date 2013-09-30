@@ -173,7 +173,7 @@ namespace gazebo
 
       /// \brief Return the ID of this entity. This id is unique.
       /// \return Integer ID.
-      public: unsigned int GetId() const;
+      public: uint32_t GetId() const;
 
       /// \brief Set whether the object should be "saved", when the user
       /// selects to save the world to xml
@@ -315,10 +315,7 @@ namespace gazebo
       private: bool saveable;
 
       /// \brief This entities ID.
-      private: unsigned int id;
-
-      /// \brief Used to automaticaly chose a unique ID on creation.
-      private: static unsigned int idCounter;
+      private: uint32_t id;
 
       /// \brief The type of this object.
       private: unsigned int type;

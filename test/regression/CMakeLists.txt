@@ -18,6 +18,7 @@ if(HAVE_BULLET)
 endif()
 
 set(tests
+  846_typo_in_camera.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
