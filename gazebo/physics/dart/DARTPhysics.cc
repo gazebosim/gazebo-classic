@@ -524,7 +524,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
 void DARTPhysics::InitDARTWorld()
 {
-  dtWorld->init();
+  //dtWorld->init();
 }
 
 
