@@ -96,6 +96,7 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
+  event::Events::DisconnectWorldUpdateEnd(this->staticLinkConnection);
   Link::Fini();
 }
 
