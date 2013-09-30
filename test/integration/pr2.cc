@@ -30,7 +30,7 @@ void PR2Test::Load(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test since simbody does not supported screw joints in PR2, "
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
     return;
   }
