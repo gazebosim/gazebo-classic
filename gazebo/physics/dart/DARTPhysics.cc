@@ -22,14 +22,15 @@
 
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/MapShape.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/Entity.hh"
-#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/SurfaceParams.hh"
-#include "gazebo/physics/Collision.hh"
-#include "gazebo/physics/MapShape.hh"
+#include "gazebo/physics/World.hh"
 
 #include "gazebo/physics/dart/DARTScrewJoint.hh"
 #include "gazebo/physics/dart/DARTHingeJoint.hh"
@@ -61,7 +62,7 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->dartWorld = new dart::simulation::World;
+  this->dtWorld = new dart::simulation::World;
 
   // TODO: Gazebo does not support design-time and runtime concept now.
   // Therefore, we basically set dart world as runtime and never change it.
@@ -72,7 +73,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 DARTPhysics::~DARTPhysics()
 {
-  delete this->dartWorld;
+  delete this->dtWorld;
 }
 
 //////////////////////////////////////////////////
@@ -82,7 +83,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 
   // Gravity
   math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
-  this->dartWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
   //double timeStep = this->sdf->GetValueDouble("time_step");
@@ -111,7 +112,7 @@ void DARTPhysics::Reset()
   {
     this->physicsUpdateMutex->lock();
 
-    this->dartWorld->reset();
+    this->dtWorld->reset();
 
     this->physicsUpdateMutex->unlock();
   }
@@ -125,6 +126,84 @@ void DARTPhysics::InitForThread()
 //////////////////////////////////////////////////
 void DARTPhysics::UpdateCollision()
 {
+  this->contactManager->ResetCount();
+
+  dart::constraint::ConstraintDynamics* dtConstraintDynamics =
+      this->dtWorld->getCollisionHandle();
+  dart::collision::CollisionDetector* dtCollisionChecker =
+      dtConstraintDynamics->getCollisionChecker();
+  int numContacts = dtCollisionChecker->getNumContacts();
+
+  for (int i = 0; i < numContacts; ++i)
+  {
+    const dart::collision::Contact& dtContact = dtCollisionChecker->getContact(i);
+    dart::dynamics::BodyNode* dtBodyNode1 =
+        dtContact.collisionNode1->getBodyNode();
+    dart::dynamics::BodyNode* dtBodyNode2 =
+        dtContact.collisionNode2->getBodyNode();
+
+    DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
+    DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
+
+    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
+    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
+
+    unsigned int colIndex = 0;
+    CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
+    CollisionPtr collisionPtr2 = dartLink2->GetCollision(colIndex);
+
+    // Add a new contact to the manager. This will return NULL if no one is
+    // listening for contact information.
+    Contact *contactFeedback = this->GetContactManager()->NewContact(
+                                 collisionPtr1.get(), collisionPtr2.get(),
+                                 this->world->GetSimTime());
+
+    if (!contactFeedback)
+      continue;
+
+    math::Pose body1Pose = dartLink1->GetWorldPose();
+    math::Pose body2Pose = dartLink2->GetWorldPose();
+    math::Vector3 localForce1;
+    math::Vector3 localForce2;
+    math::Vector3 localTorque1;
+    math::Vector3 localTorque2;
+
+    // calculate force in world frame
+    Eigen::Vector3d force = dtContact.force;
+
+    // calculate torque in world frame
+    Eigen::Vector3d torqueA =
+        (dtContact.point -
+         dtBodyNode1->getWorldTransform().translation()).cross(force);
+    Eigen::Vector3d torqueB =
+        (dtContact.point -
+         dtBodyNode1->getWorldTransform().translation()).cross(-force);
+
+    // Convert from world to link frame
+    localForce1 = body1Pose.rot.RotateVectorReverse(
+        DARTTypes::ConvVec3(force));
+    localForce2 = body2Pose.rot.RotateVectorReverse(
+        DARTTypes::ConvVec3(-force));
+    localTorque1 = body1Pose.rot.RotateVectorReverse(
+        DARTTypes::ConvVec3(torqueA));
+    localTorque2 = body2Pose.rot.RotateVectorReverse(
+        DARTTypes::ConvVec3(torqueB));
+
+    contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
+    contactFeedback->normals[0] = DARTTypes::ConvVec3(dtContact.normal);
+    contactFeedback->depths[0] = dtContact.penetrationDepth;
+    if (!dartLink1->IsStatic())
+    {
+      contactFeedback->wrench[0].body1Force = localForce1;
+      contactFeedback->wrench[0].body1Torque = localTorque1;
+    }
+    if (!dartLink1->IsStatic())
+    {
+      contactFeedback->wrench[0].body2Force = localForce2;
+      contactFeedback->wrench[0].body2Torque = localTorque2;
+    }
+    contactFeedback->count++;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +214,7 @@ void DARTPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
-  this->dartWorld->step();
+  this->dtWorld->step();
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
@@ -265,7 +344,7 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void DARTPhysics::SetGravity(const gazebo::math::Vector3& _gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  this->dartWorld->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+  this->dtWorld->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
 //////////////////////////////////////////////////
@@ -412,12 +491,40 @@ void DARTPhysics::SetMaxStepSize(double _stepSize)
 {
   PhysicsEngine::SetMaxStepSize(_stepSize);
 
-  this->dartWorld->setTimeStep(_stepSize);
+  this->dtWorld->setTimeStep(_stepSize);
+}
+
+DARTLinkPtr DARTPhysics::FindDARTLink(
+    const dart::dynamics::BodyNode* _dtBodyNode)
+{
+  DARTLinkPtr res;
+
+  const Model_V& models = this->world->GetModels();
+
+  for (Model_V::const_iterator itModel = models.begin();
+       itModel != models.end(); ++itModel)
+  {
+    const Link_V& links = (*itModel)->GetLinks();
+
+    for (Link_V::const_iterator itLink = links.begin();
+         itLink != links.end(); ++itLink)
+    {
+      DARTLinkPtr dartLink = boost::shared_dynamic_cast<DARTLink>(*itLink);
+
+      if (dartLink->getDARTBodyNode() == _dtBodyNode)
+      {
+        res = dartLink;
+        break;
+      }
+    }
+  }
+
+  return res;
 }
 
 void DARTPhysics::InitDARTWorld()
 {
-  dartWorld->init();
+  dtWorld->init();
 }
 
 

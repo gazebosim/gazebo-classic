@@ -146,15 +146,21 @@ namespace gazebo
       // Documentation inherited
       void virtual SetMaxStepSize(double _stepSize);
 
-      void InitDARTWorld();
-
-      void Attach(DARTJointPtr _joint, LinkPtr _parent, LinkPtr _child);
+      /// \brief
+      private: DARTLinkPtr FindDARTLink(
+          const dart::dynamics::BodyNode* _dtBodyNode);
 
       /// \brief
-      public: dart::simulation::World* GetDARTWorld() { return dartWorld; }
+      private: void InitDARTWorld();
+
+      /// \brief
+      public: void Attach(DARTJointPtr _joint, LinkPtr _parent, LinkPtr _child);
+
+      /// \brief
+      public: dart::simulation::World* GetDARTWorld() { return dtWorld; }
 
       /// \brief 
-      private: dart::simulation::World* dartWorld;
+      private: dart::simulation::World* dtWorld;
 
     };
 

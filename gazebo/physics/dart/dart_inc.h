@@ -7,6 +7,8 @@
 #include <dart/math/Helpers.h>
 #include <dart/math/Geometry.h>
 
+#include <dart/collision/CollisionDetector.h>
+
 #include <dart/integration/Integrator.h>
 #include <dart/integration/EulerIntegrator.h>
 #include <dart/integration/RK4Integrator.h>
