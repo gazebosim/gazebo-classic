@@ -573,6 +573,7 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
   this->sdf->GetElement("gravity")->Set(_gravity);
 
   {
+    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
     if (this->simbodyPhysicsInitialized)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
