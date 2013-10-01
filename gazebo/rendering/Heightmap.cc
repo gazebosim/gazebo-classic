@@ -406,8 +406,8 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->LoadRadiusFactor * this->terrainSize.x,
-        this->HoldRadiusFactor * this->terrainSize.x,
+        this->loadRadiusFactor * this->terrainSize.x,
+        this->holdRadiusFactor * this->terrainSize.x,
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
