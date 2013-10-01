@@ -405,6 +405,10 @@ namespace gazebo
       /// \brief Cache Joint Force Torque Values if necessary for physics engine
       public: virtual void CacheForceTorque() { }
 
+      /// \brief Get damping coefficient of this joint
+      /// \return viscous joint damping coefficient
+      public: double GetDampingCoefficient() const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -444,10 +448,6 @@ namespace gazebo
 
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
-
-      /// \brief Get damping coefficient of this joint
-      /// \return viscous joint damping coefficient
-      public: double GetDampingCoefficient() const;
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
