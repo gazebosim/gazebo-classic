@@ -129,7 +129,7 @@ void DARTPhysics::UpdateCollision()
   this->contactManager->ResetCount();
 
   dart::constraint::ConstraintDynamics* dtConstraintDynamics =
-      this->dtWorld->getCollisionHandle();
+      this->dtWorld->getConstraintHandler();
   dart::collision::CollisionDetector* dtCollisionChecker =
       dtConstraintDynamics->getCollisionChecker();
   int numContacts = dtCollisionChecker->getNumContacts();

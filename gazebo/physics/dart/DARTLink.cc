@@ -265,7 +265,7 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3& _offset) const
 {
   const Eigen::Vector3d& linVel =
-      this->dartBodyNode->getWorldVelocityAtPoint(
+      this->dartBodyNode->getWorldVelocity(
         DARTTypes::ConvVec3(_offset)).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
@@ -282,7 +282,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
   const Eigen::Vector3d& offset2 = R2.transpose() * R1 * offset1;
 
   const Eigen::Vector3d& linVel =
-      this->dartBodyNode->getWorldVelocityAtPoint(offset2).tail<3>();
+      this->dartBodyNode->getWorldVelocity(offset2).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -290,8 +290,9 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
+  const Eigen::Vector3d& worldCOM = this->dartBodyNode->getWorldCOM();
   const Eigen::Vector3d& linVel
-      = this->dartBodyNode->getWorldVelocityAtCOM().tail<3>();
+      = this->dartBodyNode->getWorldVelocity(worldCOM).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
 }

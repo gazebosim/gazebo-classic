@@ -58,7 +58,7 @@ void DARTModel::Init()
   this->dtSkeleton->setName(modelName.c_str());
 
   // Static
-  this->dtSkeleton->setImmobileState(this->IsStatic());
+  this->dtSkeleton->setMobile(!this->IsStatic());
 
   // Check if this link is free floating body
   Link_V linkList = this->GetLinks();
