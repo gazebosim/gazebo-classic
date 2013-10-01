@@ -546,6 +546,12 @@ double Joint::GetForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetDampingCoefficient() const
+{
+  return this->dampingCoefficient;
+}
+
+//////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
   gzerr << "Joint::ApplyDamping should be overloaded by physics engines.\n";
