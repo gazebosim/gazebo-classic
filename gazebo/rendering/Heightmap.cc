@@ -352,6 +352,8 @@ void Heightmap::Load()
     prefix = terrainDirPath / "gazebo_terrain_nocache";
   }
 
+  double sqrtN = sqrt(nTerrains);
+
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
   // Param 2: Alignment plane
@@ -361,16 +363,16 @@ void Heightmap::Load()
 
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      1 + ((this->dataSize - 1) / sqrt(nTerrains)),
-      this->terrainSize.x / (sqrt(nTerrains)));
+      1 + ((this->dataSize - 1) / sqrtN),
+      this->terrainSize.x / (sqrtN));
 
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(
-      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains),
-      -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains),
+      orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
+      orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -404,13 +406,13 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->loadRadiusFactor * this->terrainSize.x,
-        this->holdRadiusFactor * this->terrainSize.x,
-        0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
+        this->LoadRadiusFactor * this->terrainSize.x,
+        this->HoldRadiusFactor * this->terrainSize.x,
+        0, 0, sqrtN - 1, sqrtN - 1);
   }
 
-  for (int y = 0; y <= sqrt(nTerrains) - 1; ++y)
-    for (int x = 0; x <= sqrt(nTerrains) - 1; ++x)
+  for (int y = 0; y <= sqrtN - 1; ++y)
+    for (int x = 0; x <= sqrtN - 1; ++x)
       this->DefineTerrain(x, y);
 
   // Sync load since we want everything in place when we start
