@@ -254,6 +254,7 @@ void Heightmap::Load()
   {
     nTerrains = this->NumTerrainSubdivisions;
   }
+  double sqrtN = sqrt(nTerrains);
 
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
@@ -264,8 +265,8 @@ void Heightmap::Load()
 
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      1 + ((this->dataSize - 1) / sqrt(nTerrains)),
-      this->terrainSize.x / (sqrt(nTerrains)));
+      1 + ((this->dataSize - 1) / sqrtN),
+      this->terrainSize.x / (sqrtN));
 
   boost::filesystem::path prefix = this->pagingPath / "gazebo_terrain";
   this->terrainGroup->setFilenameConvention(
@@ -273,10 +274,8 @@ void Heightmap::Load()
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(
-      orig.x -0.5 * this->terrainSize.x +
-      0.5 * this->terrainSize.x / sqrt(nTerrains),
-      orig.y -0.5 * this->terrainSize.x +
-      0.5 * this->terrainSize.x / sqrt(nTerrains),
+      orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
+      orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -307,11 +306,11 @@ void Heightmap::Load()
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
         this->LoadRadiusFactor * this->terrainSize.x,
         this->HoldRadiusFactor * this->terrainSize.x,
-        0, 0, sqrt(nTerrains) - 1, sqrt(nTerrains) - 1);
+        0, 0, sqrtN - 1, sqrtN - 1);
   }
 
-  for (int y = 0; y <= sqrt(nTerrains) - 1; ++y)
-    for (int x = 0; x <= sqrt(nTerrains) - 1; ++x)
+  for (int y = 0; y <= sqrtN - 1; ++y)
+    for (int x = 0; x <= sqrtN - 1; ++x)
       this->DefineTerrain(x, y);
 
   // sync load since we want everything in place when we start
