@@ -189,7 +189,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   gzlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
-  EXPECT_NEAR(t, dt, dt*1e-2);
+  EXPECT_DOUBLE_EQ(t, dt);
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
@@ -255,6 +255,9 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
           << " / -750 -450 0"
           << "]\n";
 
+    gzlog << "joint angle1[" << std::setprecision(17) << joint_01->GetAngle(0)
+          << "] angle2[" << joint_12->GetAngle(0) << "]\n";
+
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
@@ -312,8 +315,6 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 //#endif  // HAVE_SIMBODY
 
 //#ifdef HAVE_BULLET
-
-///// bullet collision parameters needs tweaking?
 //TEST_F(Joint_TEST, ForceTorque2Bullet)
 //{
 //  // uncomment when bullet 2.82 is released
@@ -400,15 +401,15 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
       EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
 
-      // gzdbg << "joint_01 force torque : "
-      //       << "step [" << i
-      //       << "] GetForce [" << joint_01->GetForce(0u)
-      //       << "] command [" << effort1
-      //       << "] force1 [" << wrench_01.body1Force
-      //       << "] torque1 [" << wrench_01.body1Torque
-      //       << "] force2 [" << wrench_01.body2Force
-      //       << "] torque2 [" << wrench_01.body2Torque
-      //       << "]\n";
+      gzlog << "joint_01 force torque : "
+            << "step [" << i
+            << "] GetForce [" << joint_01->GetForce(0u)
+            << "] command [" << effort1
+            << "] force1 [" << wrench_01.body1Force
+            << "] torque1 [" << wrench_01.body1Torque
+            << "] force2 [" << wrench_01.body2Force
+            << "] torque2 [" << wrench_01.body2Torque
+            << "]\n";
     }
 
     // test joint_12 wrench
@@ -429,16 +430,19 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_12.body2Torque.y,    0.000, TOL_CONT);
       EXPECT_NEAR(wrench_12.body2Torque.z,   17.678, TOL_CONT);
 
-      // gzdbg << "joint_12 force torque : "
-      //       << "step [" << i
-      //       << "] GetForce [" << joint_12->GetForce(0u)
-      //       << "] command [" << effort2
-      //       << "] force1 [" << wrench_12.body1Force
-      //       << "] torque1 [" << wrench_12.body1Torque
-      //       << "] force2 [" << wrench_12.body2Force
-      //       << "] torque2 [" << wrench_12.body2Torque
-      //       << "]\n";
+      gzlog << "joint_12 force torque : "
+            << "step [" << i
+            << "] GetForce [" << joint_12->GetForce(0u)
+            << "] command [" << effort2
+            << "] force1 [" << wrench_12.body1Force
+            << "] torque1 [" << wrench_12.body1Torque
+            << "] force2 [" << wrench_12.body2Force
+            << "] torque2 [" << wrench_12.body2Torque
+            << "]\n";
     }
+    gzlog << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
+          << "] 2[" << joint_12->GetAngle(0)
+          << "]\n";
   }
 }
 
@@ -484,6 +488,14 @@ class Joint_TEST_RotationalWorld : public Joint_TEST {};
 void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
                                  const std::string &_jointType)
 {
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")  // &&
+  //    _jointType != "revolute" && _jointType != "prismatic")
+  {
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -520,6 +532,13 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
 void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
                                       const std::string &_jointType)
 {
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody" && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issue #859.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -563,6 +582,13 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
 void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
                                            const std::string &_jointType)
 {
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")  // && _jointType != "revolute")
+  {
+    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -651,6 +677,10 @@ INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_RotationalWorld,
 ////////////////////////////////////////////////////////////////////////
 void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 {
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")
+    return;
+
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
 
@@ -826,6 +856,20 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
+  /// \TODO: Disable for now until functionality is implemented
+  /// bullet collision parameters needs tweaking
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #590.\n";
+    return;
+  }
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
+
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
 
@@ -924,77 +968,55 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-//TEST_F(Joint_TEST, JointCreationDestructionTestODE)
-//{
-//  JointCreationDestructionTest("ode");
-//}
+TEST_P(Joint_TEST, JointCreationDestructionTest)
+{
+  JointCreationDestructionTest(this->physicsEngine);
+}
 
-//#ifdef HAVE_SIMBODY
-//TEST_F(Joint_TEST, JointCreationDestructionTestSimbody)
-//{
-//  JointCreationDestructionTest("simbody");
-//}
-//#endif  // HAVE_SIMBODY
+TEST_F(Joint_TEST, joint_SDF14)
+{
+  Load("worlds/SDF_1_4.world");
 
-//#ifdef HAVE_BULLET
-///// bullet collision parameters needs tweaking
-//TEST_F(Joint_TEST, JointCreationDestructionTestBullet)
-//{
-//  /// \TODO: Disable for now until functionality is implemented
-//  // JointCreationDestructionTest("bullet");
-//  gzwarn << "JointCreationDestructionTest is disabled for Bullet\n";
-//}
-//#endif  // HAVE_BULLET
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
 
-//#ifdef HAVE_DART
-//TEST_F(Joint_TEST, JointCreationDestructionTestDART)
-//{
-//  /// \TODO: Disable for now until functionality is implemented
-//  //JointCreationDestructionTest("dart");
-//  gzwarn << "JointCreationDestructionTest is disabled for DART\n";
-//}
-//#endif  // HAVE_DART
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
 
-//TEST_F(Joint_TEST, joint_SDF14)
-//{
-//  Load("worlds/SDF_1_4.world");
+  int i = 0;
+  while (!this->HasEntity("joint14_model") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
 
-//  physics::WorldPtr world = physics::get_world("default");
-//  ASSERT_TRUE(world != NULL);
+  if (i > 20)
+    gzthrow("Unable to get joint14_model");
 
-//  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-//  ASSERT_TRUE(physics != NULL);
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model = world->GetModel("joint14_model");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link1 = model->GetLink("body1");
+  EXPECT_TRUE(link1);
+  physics::LinkPtr link2 = model->GetLink("body2");
+  EXPECT_TRUE(link2);
 
-//  int i = 0;
-//  while (!this->HasEntity("joint14_model") && i < 20)
-//  {
-//    common::Time::MSleep(100);
-//    ++i;
-//  }
+  EXPECT_EQ(model->GetJointCount(), 1u);
+  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
+  EXPECT_TRUE(joint);
 
-//  if (i > 20)
-//    gzthrow("Unable to get joint14_model");
+  physics::LinkPtr parent = joint->GetParent();
+  EXPECT_TRUE(parent);
+  physics::LinkPtr child = joint->GetChild();
+  EXPECT_TRUE(child);
+  EXPECT_EQ(parent->GetName(), "body2");
+  EXPECT_EQ(child->GetName(), "body1");
+}
 
-//  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-//  EXPECT_TRUE(physicsEngine);
-//  physics::ModelPtr model = world->GetModel("joint14_model");
-//  EXPECT_TRUE(model);
-//  physics::LinkPtr link1 = model->GetLink("body1");
-//  EXPECT_TRUE(link1);
-//  physics::LinkPtr link2 = model->GetLink("body2");
-//  EXPECT_TRUE(link2);
-
-//  EXPECT_EQ(model->GetJointCount(), 1u);
-//  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-//  EXPECT_TRUE(joint);
-
-//  physics::LinkPtr parent = joint->GetParent();
-//  EXPECT_TRUE(parent);
-//  physics::LinkPtr child = joint->GetChild();
-//  EXPECT_TRUE(child);
-//  EXPECT_EQ(parent->GetName(), "body2");
-//  EXPECT_EQ(child->GetName(), "body1");
-//}
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("")));
 
 int main(int argc, char **argv)
 {

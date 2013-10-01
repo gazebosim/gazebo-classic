@@ -8,6 +8,10 @@ if (HAVE_DART)
   add_subdirectory(dart)
 endif()
 
+if (HAVE_SIMBODY)
+  add_subdirectory(simbody)
+endif()
+
 set (sources
   Actor.cc
   Base.cc
@@ -110,6 +114,10 @@ if (HAVE_BULLET)
 endif()
 if (HAVE_DART)
   target_link_libraries(gazebo_physics gazebo_physics_dart)
+endif()
+
+if (HAVE_SIMBODY)
+  target_link_libraries(gazebo_physics gazebo_physics_simbody)
 endif()
 
 gz_install_library(gazebo_physics)

@@ -53,6 +53,12 @@ TEST_P(ContactSensor, EmptyWorld)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -285,6 +291,12 @@ TEST_P(ContactSensor, StackTest)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");

@@ -137,6 +137,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetAutoDisable(bool _disable);
 
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
       // TODO: (in test)
       public: void updateDirtyPoseFromDARTTransformation();
 

@@ -461,3 +461,8 @@ void DARTLink::AddDARTChildJoint(DARTJointPtr _dartChildJoint)
   dartChildJoints.push_back(_dartChildJoint);
 }
 
+//////////////////////////////////////////////////
+void DARTLink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
+}

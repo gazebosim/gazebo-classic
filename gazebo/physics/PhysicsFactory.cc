@@ -28,6 +28,10 @@
 
 void RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+void RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
 #endif
@@ -46,6 +50,10 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
+
+#ifdef HAVE_SIMBODY
+  RegisterSimbodyPhysics();
+#endif
 
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();

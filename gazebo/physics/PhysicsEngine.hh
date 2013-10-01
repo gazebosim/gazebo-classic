@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \brief Return the type of the physics engine (ode|bullet|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 
@@ -108,7 +108,7 @@ namespace gazebo
       public: virtual void UpdatePhysics() {}
 
       /// \brief Create a new model.
-      /// \param[in]
+      /// \param[in] _base Boost shared pointer to a new model.
       public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.

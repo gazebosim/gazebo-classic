@@ -313,7 +313,7 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  // Initialize all the entities
+  // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
 
@@ -1158,7 +1158,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 //////////////////////////////////////////////////
 /*void World::ModelUpdateTBB()
 {
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
+  tbb::parallel_for (tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models));
 }*/
 

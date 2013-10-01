@@ -153,6 +153,13 @@ TEST_P(LaserTest, EmptyWorld)
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support ray sensor, "
+          << "Please see issue #867.\n";
+    return;
+  }
+
   // Test ray sensor with 3 boxes in the world.
   // First place 2 of 3 boxes within range and verify range values, one of them
   // being a static model to verify collision filtering is working,

@@ -27,6 +27,7 @@ using namespace gazebo;
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
+  public: void InelasticCollision(const std::string &_physicsEngine);
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
@@ -35,7 +36,6 @@ class PhysicsTest : public ServerFixture,
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
-  public: void CollisionTest(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -475,16 +475,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       world->StepWorld(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-#ifdef HAVE_DART
-      // DART calculates all the pose, velocity, and acceleration
-      // in body frame so there could be neglectable numerical error
-      // for a rotated link when it is free-falling.
-      EXPECT_NEAR(vel1.x, 0, 2.2e-37);
-      EXPECT_NEAR(vel1.y, 0, 4.7e-38);
-#else
-      EXPECT_EQ(vel1.x, 0);
-      EXPECT_EQ(vel1.y, 0);
-#endif
+      EXPECT_NEAR(vel1.x, 0, 1e-16);
+      EXPECT_NEAR(vel1.y, 0, 1e-16);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->StepWorld(steps - 1);
@@ -838,6 +830,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 
   // Reset the world, and impose joint limits
   world->Reset();
+
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -935,8 +928,19 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       joint = model->GetJoint("upper_joint");
       if (joint)
       {
+        if (_physicsEngine == "simbody" ||
+            _physicsEngine == "dart")
+        {
+          gzerr << "Skipping joint detachment per #862" << std::endl;
+          continue;
+        }
         // Detach upper_joint.
         joint->Detach();
+        // Simbody and DART will not easily detach joints,
+        // consider freezing joint limit instead
+        // math::Angle curAngle = joint->GetAngle(0u);
+        // joint->SetLowStop(0, curAngle);
+        // joint->SetHighStop(0, curAngle);
       }
       else
       {
@@ -955,6 +959,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         oldVel = joint->GetVelocity(0);
         // Apply positive torque to the lower_joint and step forward.
         force = 1;
+
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
@@ -964,6 +969,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           joint->SetForce(0, force);
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
+
+          // gzdbg << "model " << *modelIter
+          //       << "  i " << i
+          //       << "  oldVel " << oldVel
+          //       << "  newVel " << newVel
+          //       << "  upper joint v "
+          //       << model->GetJoint("upper_joint")->GetVelocity(0)
+          //       << " joint " << joint->GetName() <<  "\n";
+
           // Expect increasing velocities
           EXPECT_GT(newVel, oldVel);
           oldVel = newVel;
@@ -991,6 +1005,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           joint->SetForce(0, force);
           world->StepWorld(1);
           newVel = joint->GetVelocity(0);
+
+          // gzdbg << "model " << *modelIter
+          //       << "  i " << i
+          //       << "  oldVel " << oldVel
+          //       << "  newVel " << newVel
+          //       << "  upper joint v "
+          //       << model->GetJoint("upper_joint")->GetVelocity(0)
+          //       << " joint " << joint->GetName() <<  "\n";
+
           // Expect decreasing velocities
           EXPECT_LT(newVel, oldVel);
 
@@ -1141,19 +1164,18 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
     EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
 #endif
 
-    EXPECT_EQ(pose.pos.x, 3.0);
+    EXPECT_DOUBLE_EQ(pose.pos.x, 3.0);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
     EXPECT_NEAR(pose.pos.z, 10.099, PHYSICS_TOL);
     EXPECT_NEAR(pose.rot.GetAsEuler().x, 0.567334, PHYSICS_TOL);
-    EXPECT_EQ(pose.rot.GetAsEuler().y, 0.0);
-    EXPECT_EQ(pose.rot.GetAsEuler().z, 0.0);
+    EXPECT_DOUBLE_EQ(pose.rot.GetAsEuler().y, 0.0);
+    EXPECT_DOUBLE_EQ(pose.rot.GetAsEuler().z, 0.0);
   }
 }
 
-// This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, JointDampingTest)
+TEST_P(PhysicsTest, JointDampingTest)
 {
-  JointDampingTest("ode");
+  JointDampingTest(GetParam());
 }
 
 #ifdef HAVE_DART
@@ -1294,8 +1316,8 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
   }
 }
 
-// This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, DropStuff)
+// This test doesn't pass yet in Bullet or Simbody
+TEST_F(PhysicsTest, DropStuffODE)
 {
   DropStuff("ode");
 }
@@ -1307,8 +1329,14 @@ TEST_F(PhysicsTest, DropStuffDART)
 }
 #endif // HAVE_DART
 
-void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
+void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Skipping InelasticCollision for bullet per #864" << std::endl;
+    return;
+  }
+
   // check conservation of mementum for linear inelastic collision
   Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -1329,9 +1357,12 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
     double test_duration = 1.1;
     double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
+    physics::ModelPtr box_model = world->GetModel("box");
+    physics::LinkPtr box_link = box_model->GetLink("link");
     double f = 1000.0;
     double v = 0;
     double x = 0;
+    double m = box_link->GetInertial()->GetMass();
 
     int steps = test_duration/dt;
 
@@ -1341,11 +1372,11 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
 
       world->StepWorld(1);  // theoretical contact, but
       {
-        physics::ModelPtr box_model = world->GetModel("box");
         if (box_model)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
+
           // gzdbg << "box time [" << t
           //      << "] sim x [" << pose.pos.x
           //      << "] ideal x [" << x
@@ -1354,13 +1385,18 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
           //      << "]\n";
 
           if (i == 0)
-            box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
-          EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
-#ifdef HAVE_DART
-          EXPECT_LT(fabs(vel.x - v), 0.00050);
-#else
-          EXPECT_LT(fabs(vel.x - v), 0.00001);
-#endif
+            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+
+          if (t > 1.000 && t < 1.01)
+          {
+            // collision transition, do nothing
+          }
+          else
+          {
+            // collision happened
+            EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
+          }
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
@@ -1374,44 +1410,48 @@ void PhysicsTest::CollisionTest(const std::string &_physicsEngine)
           //      << "] sim vx [" << vel.x
           //      << "] ideal vx [" << v
           //      << "]\n";
-          if (t < 1.001)
+          if (t > 1.000 && t < 1.01)
           {
+            // collision transition, do nothing
+          }
+          else if (t <= 1.00)
+          {
+            // no collision
             EXPECT_EQ(pose.pos.x, 2);
             EXPECT_EQ(vel.x, 0);
           }
           else
           {
-            EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
-#ifdef HAVE_DART
-          EXPECT_LT(fabs(vel.x - v), 0.00050);
-#else
-          EXPECT_LT(fabs(vel.x - v), 0.00001);
-#endif
+            // collision happened
+            EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
           }
         }
       }
 
+/*
       // integrate here to see when the collision should happen
       double impulse = dt*f;
       if (i == 0) v = v + impulse;
       else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
       x = x + dt * v;
+*/
+
+      // integrate here to see when the collision should happen
+      double vold = v;
+      if (i == 0)
+        v = vold + dt* (f / m);
+      else if (t >= 1.0)
+        v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      x = x + dt * (v + vold) / 2.0;
     }
   }
 }
 
-// This test doesn't pass yet in Bullet
-TEST_F(PhysicsTest, CollisionTest)
+TEST_P(PhysicsTest, InelasticCollision)
 {
-  CollisionTest("ode");
+  InelasticCollision(GetParam());
 }
-
-#ifdef HAVE_DART
-TEST_F(PhysicsTest, CollisionTestDART)
-{
-  CollisionTest("dart");
-}
-#endif // HAVE_DART
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
