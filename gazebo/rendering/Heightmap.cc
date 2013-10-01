@@ -273,8 +273,10 @@ void Heightmap::Load()
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   math::Vector3 origin(
-      orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains),
-      orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrt(nTerrains),
+      orig.x -0.5 * this->terrainSize.x +
+      0.5 * this->terrainSize.x / sqrt(nTerrains),
+      orig.y -0.5 * this->terrainSize.x +
+      0.5 * this->terrainSize.x / sqrt(nTerrains),
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
