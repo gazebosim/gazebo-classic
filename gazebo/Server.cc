@@ -94,7 +94,7 @@ bool Server::ParseArgs(int argc, char **argv)
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet).")
+     "Specify a physics engine (ode|bullet|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),

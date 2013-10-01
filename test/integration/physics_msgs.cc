@@ -266,6 +266,14 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
 
+  // Issue #856, simbody doesn't support shape resizes.
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since simbody doesn't support shape resizes (#856)"
+          << std::endl;
+    return;
+  }
+
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be
   // underneath the initial pose.

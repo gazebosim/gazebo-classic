@@ -734,3 +734,9 @@ void ODELink::SetAutoDisable(bool _disable)
   else
     gzlog << "ODE model has joints, unable to SetAutoDisable" << std::endl;
 }
+
+//////////////////////////////////////////////////
+void ODELink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
+}

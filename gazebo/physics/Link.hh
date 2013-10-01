@@ -133,7 +133,7 @@ namespace gazebo
       /// \brief Get Self-Collision Flag, if this is true, this body will
       /// collide with other bodies even if they share the same parent.
       /// \return True if self collision is enabled.
-      public: bool GetSelfCollide();
+      public: bool GetSelfCollide() const;
 
       /// \brief Set the laser retro reflectiveness.
       /// \param[in] _retro Retro value for all child collisions.
@@ -446,6 +446,11 @@ namespace gazebo
       /// \brief Remove a collision from the link.
       /// \param[int] _name Name of the collision to remove.
       public: void RemoveCollision(const std::string &_name);
+
+      /// \brief Freeze link to ground (inertial frame).
+      /// \param[in] _static if true, freeze link to ground.  Otherwise
+      /// unfreeze link.
+      public: virtual void SetLinkStatic(bool _static) = 0;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
