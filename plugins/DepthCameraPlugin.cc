@@ -82,7 +82,7 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
   }
 
   int index =  ((_height * 0.5) * _width) + _width * 0.5;
-  printf("W[%d] H[%d] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n",
+  printf("W[%u] H[%u] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n",
       width, height, index, _image[index], min, max);
 
   /*rendering::Camera::SaveFrame(_image, this->width,

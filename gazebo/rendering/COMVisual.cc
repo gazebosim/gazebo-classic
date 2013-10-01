@@ -46,7 +46,7 @@ COMVisual::~COMVisual()
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->GetValuePose("origin");
+  math::Pose pose = _elem->Get<math::Pose>("origin");
   this->Load(pose);
 }
 

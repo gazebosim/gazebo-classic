@@ -87,8 +87,8 @@ void ODELink::Init()
   }
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -201,12 +201,6 @@ void ODELink::Fini()
   this->linkId = NULL;
 
   this->odePhysics.reset();
-}
-
-//////////////////////////////////////////////////
-void ODELink::Update()
-{
-  Link::Update();
 }
 
 //////////////////////////////////////////////////
@@ -739,4 +733,10 @@ void ODELink::SetAutoDisable(bool _disable)
           << " does not exist, unable to SetAutoDisable" << std::endl;
   else
     gzlog << "ODE model has joints, unable to SetAutoDisable" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void ODELink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
 }

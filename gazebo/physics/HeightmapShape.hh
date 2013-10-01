@@ -58,6 +58,10 @@ namespace gazebo
       /// \brief Initialize the heightmap.
       public: virtual void Init();
 
+      /// \brief Set the scale of the heightmap shape.
+      /// \param[in] _scale Scale to set the heightmap shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
       public: std::string GetURI() const;
@@ -122,9 +126,6 @@ namespace gazebo
 
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;
-
-      /// \brief Scaling factor.
-      protected: math::Vector3 scale;
 
       /// \brief True to flip the heights along the y direction.
       protected: bool flipY;

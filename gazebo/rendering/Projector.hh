@@ -25,11 +25,11 @@
 #include <string>
 #include <map>
 #include <list>
+#include <sdf/sdf.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 

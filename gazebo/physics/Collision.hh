@@ -113,18 +113,22 @@ namespace gazebo
       /// \return The collision shape.
       public: ShapePtr GetShape() const;
 
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const math::Vector3 &_scale);
+
       /// \brief Turn contact recording on or off.
       /// \param[in] _enable True to enable collision contacts.
-      public: void SetContactsEnabled(bool _enable);
+      public: void SetContactsEnabled(bool _enable) GAZEBO_DEPRECATED(1.10);
 
       /// \brief Return true of contacts are on.
       /// \return True of contact are on.
-      public: bool GetContactsEnabled() const;
+      public: bool GetContactsEnabled() const GAZEBO_DEPRECATED(1.10);
 
       /// \brief Add an occurance of a contact to this collision.
       /// \param[in] _contact The contact which was detected by a collision
       /// engine.
-      public: void AddContact(const Contact &_contact);
+      public: void AddContact(const Contact &_contact) GAZEBO_DEPRECATED(1.10);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
@@ -169,15 +173,6 @@ namespace gazebo
       /// \param[in] The collision state.
       public: void SetState(const CollisionState &_state);
 
-      /// Deprecated.
-      public: template<typename T>
-              event::ConnectionPtr ConnectContact(T _subscriber)
-              {return contact.Connect(_subscriber);}
-
-      /// Deprecated.
-      public: void DisconnectContact(event::ConnectionPtr &_conn)
-              {contact.Disconnect(_conn);}
-
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.
       public: void FillMsg(msgs::Collision &_msg);
@@ -214,24 +209,20 @@ namespace gazebo
       /// \brief Pointer to physics::Shape.
       protected: ShapePtr shape;
 
-      /// \brief True if contacts are enabled.
-      private: bool contactsEnabled;
-
-      /// \brief The contact event.
-      private: event::EventT<void (const std::string &,
-                                   const Contact &)> contact;
-
       /// \brief The surface parameters.
       private: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
 
-      /// \brief Collision state.
+      /// \brief Stores collision state information.
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
       private: int maxContacts;
+
+      /// \brief Unique id for collision visual.
+      private: uint32_t collisionVisualId;
     };
     /// \}
   }

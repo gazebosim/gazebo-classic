@@ -22,10 +22,13 @@
 #include <string.h>
 #include <math.h>
 
+#include "gazebo/math/gzmath.hh"
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/HeightmapShape.hh"
@@ -74,11 +77,11 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string filename = common::find_file(this->sdf->GetValueString("uri"));
+  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
   if (filename.empty())
   {
     gzthrow("Unable to find heightmap[" +
-            this->sdf->GetValueString("uri") + "]\n");
+            this->sdf->Get<std::string>("uri") + "]\n");
   }
 
   // Use the image to get the size of the heightmap
@@ -123,6 +126,15 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////
@@ -185,7 +197,6 @@ void HeightmapShape::FillHeightMap()
       px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       h2 = (px3 - ((px3 - px4) * dx));
 
-
       h = (h1 - ((h1 - h2) * dy)) * this->scale.z;
 
       // invert pixel definition so 1=ground, 0=full height,
@@ -208,19 +219,19 @@ void HeightmapShape::FillHeightMap()
 //////////////////////////////////////////////////
 std::string HeightmapShape::GetURI() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("size");
+  return this->sdf->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->GetValueVector3("pos");
+  return this->sdf->Get<math::Vector3>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -260,10 +271,7 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
   if (_x < 0 || _y < 0)
-  {
-    printf("Less than zero\n\n");
     return 0.0;
-  }
 
   return this->heights[_y * this->vertSize + _x];
 }

@@ -31,6 +31,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
@@ -42,7 +44,6 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -120,6 +121,10 @@ namespace gazebo
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
+
+      /// \brief Return the spherical coordinates converter.
+      /// \return Pointer to the spherical coordinates converter.
+      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -403,7 +408,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.
@@ -427,6 +432,11 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
+      /// \brief Remove a model from the cached list of models.
+      /// This does not delete the model.
+      /// \param[in] _name Name of the model to remove.
+      private: void RemoveModel(const std::string &_name);
+
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -449,6 +459,9 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
 
+      /// \brief Pointer the spherical coordinates data.
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
+
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
 
@@ -460,9 +473,6 @@ namespace gazebo
 
       /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
-
-      /// \brief Incoming message buffer.
-      private: std::vector<google::protobuf::Message> messages;
 
       /// \brief Name of the world.
       private: std::string name;
@@ -511,6 +521,9 @@ namespace gazebo
 
       /// \brief Publisher for pose messages.
       private: transport::PublisherPtr posePub;
+
+      /// \brief Publisher for local pose messages.
+      private: transport::PublisherPtr poseLocalPub;
 
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
@@ -676,6 +689,9 @@ namespace gazebo
 
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;
+
+      /// \brief A cached list of models. This is here for performance.
+      private: Model_V models;
     };
     /// \}
   }

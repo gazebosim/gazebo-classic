@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/gui/EntityMaker.hh"
 

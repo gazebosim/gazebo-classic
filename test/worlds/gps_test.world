@@ -1,0 +1,186 @@
+<sdf version="1.4">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane ->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!- -->
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>37.4</latitude_deg>
+      <longitude_deg>-122.1</longitude_deg>
+      <elevation>0.0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <model name="pendulum_x">
+      <pose>0 0 5.0  0 0 0</pose>
+      <joint name="pin" type="revolute">
+        <pose>-10 0 0  0 0 0</pose>
+        <parent>world</parent>
+        <child>link_x</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+      <link name="link_x">
+        <pose>10.0 0 0  0 0 0</pose>
+        <collision name="collision_box">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_box">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <sensor name="gps" type="gps">
+          <pose>0 0 0  0 0 0</pose>
+          <update_rate>10.0</update_rate>
+          <always_on>true</always_on>
+          <gps>
+            <position_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>0.5</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>1.0</precision>
+                </noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity_sensing>
+          </gps>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="pendulum_y">
+      <pose>0 0 3.0  0 0 0</pose>
+      <joint name="pin" type="revolute">
+        <pose>0 -8 0  0 0 0</pose>
+        <parent>world</parent>
+        <child>link_y</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+      <link name="link_y">
+        <pose>0 8.0 0  0 0 0</pose>
+        <collision name="collision_box">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_box">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <sensor name="gps" type="gps">
+          <pose>0 0 0  0 0 0</pose>
+          <update_rate>10.0</update_rate>
+          <always_on>true</always_on>
+          <gps>
+            <position_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>0.5</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>1.0</precision>
+                </noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity_sensing> 
+          </gps>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

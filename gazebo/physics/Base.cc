@@ -24,20 +24,19 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-unsigned int Base::idCounter = 0;
-
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->id = ++idCounter;
+  this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
 
@@ -68,19 +67,21 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
-  this->sdf->Reset();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  if (_sdf)
+    this->sdf = _sdf;
 
-  this->sdf = _sdf;
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
 
   if (this->sdf->HasAttribute("name"))
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
   else
     this->name.clear();
 
@@ -152,7 +153,7 @@ std::string Base::GetName() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Base::GetId() const
+uint32_t Base::GetId() const
 {
   return this->id;
 }

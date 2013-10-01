@@ -25,7 +25,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -125,6 +125,17 @@ void RayShape::SetLength(double _len)
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  /// TODO RayShape::SetScale not yet implemented.
 }
 
 //////////////////////////////////////////////////

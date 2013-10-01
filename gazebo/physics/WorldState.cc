@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
@@ -102,7 +103,7 @@ void WorldState::Load(const WorldPtr _world)
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name
-  this->name = _elem->GetValueString("world_name");
+  this->name = _elem->Get<std::string>("world_name");
 
   // Add the model states
   this->modelStates.clear();
@@ -113,15 +114,15 @@ void WorldState::Load(const sdf::ElementPtr _elem)
     while (childElem)
     {
       this->modelStates.insert(std::make_pair(
-            childElem->GetValueString("name"), ModelState(childElem)));
+            childElem->Get<std::string>("name"), ModelState(childElem)));
       childElem = childElem->GetNextElement("model");
     }
   }
 
   // Copy the name and time information
-  this->SetSimTime(_elem->GetValueTime("sim_time"));
-  this->SetWallTime(_elem->GetValueTime("wall_time"));
-  this->SetRealTime(_elem->GetValueTime("real_time"));
+  this->simTime = _elem->Get<common::Time>("sim_time");
+  this->wallTime = _elem->Get<common::Time>("wall_time");
+  this->realTime = _elem->Get<common::Time>("real_time");
 }
 
 /////////////////////////////////////////////////
@@ -156,20 +157,6 @@ ModelState_M WorldState::GetModelStates(const boost::regex &_regex) const
 unsigned int WorldState::GetModelStateCount() const
 {
   return this->modelStates.size();
-}
-
-/////////////////////////////////////////////////
-ModelState WorldState::GetModelState(unsigned int _index) const
-{
-  if (_index < this->modelStates.size())
-  {
-    ModelState_M::const_iterator iter = this->modelStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Invalid model state index\n");
-  return ModelState();
 }
 
 /////////////////////////////////////////////////

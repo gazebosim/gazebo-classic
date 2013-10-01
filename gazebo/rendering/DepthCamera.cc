@@ -23,7 +23,6 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
 
@@ -65,7 +64,7 @@ void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =
-    (_sdf->GetElement("depth_camera")->GetValueString("output")
+    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
 
@@ -146,7 +145,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->pcdViewport->setOverlaysEnabled(false);
     this->pcdViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     this->pcdMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());

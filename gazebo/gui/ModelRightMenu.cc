@@ -20,8 +20,10 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -30,6 +32,9 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelRightMenu::ModelRightMenu()
 {
+  KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
+        boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->requestSub = this->node->Subscribe("~/request",
@@ -38,6 +43,11 @@ ModelRightMenu::ModelRightMenu()
   this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
+
+  this->followAct = new QAction(tr("Follow"), this);
+  this->followAct->setStatusTip(tr("Follow the selection"));
+  connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -89,15 +99,24 @@ ModelRightMenu::ModelRightMenu()
   this->viewStates.push_back(state);
 
   // \todo Reimplement
-  // this->followAction = new QAction(tr("Follow"), this);
-  // this->followAction->setStatusTip(tr("Follow the selection"));
-  // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
-
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+}
+
+/////////////////////////////////////////////////
+bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    cam->TrackVisual("");
+    gui::Events::follow("");
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -113,6 +132,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 
   QMenu menu;
   menu.addAction(this->moveToAct);
+  menu.addAction(this->followAct);
   // menu.addAction(this->snapBelowAct);
 
   // Create the view menu
@@ -135,7 +155,6 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(g_deleteAct);
 
   // \todo Reimplement these features.
-  // menu.addAction(this->followAction);
   // menu.addAction(this->skeletonAction);
 
   menu.exec(_pt);
@@ -146,6 +165,14 @@ void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->MoveToVisual(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnFollow()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->TrackVisual(this->modelName);
+  gui::Events::follow(this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -264,11 +291,4 @@ void ViewState::Callback()
 //   }
 //
 //   this->requestPub->Publish(*this->requestMsg);
-// }
-
-/////////////////////////////////////////////////
-// void ModelRightMenu::OnFollow()
-// {
-//   rendering::UserCameraPtr cam = gui::get_active_camera();
-//   cam->TrackVisual(this->modelName);
 // }

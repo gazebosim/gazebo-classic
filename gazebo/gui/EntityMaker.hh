@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ENTITYMAKER_HH
-#define ENTITYMAKER_HH
+#ifndef _ENTITYMAKER_HH_
+#define _ENTITYMAKER_HH_
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"

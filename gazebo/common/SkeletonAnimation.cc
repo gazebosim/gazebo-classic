@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
 

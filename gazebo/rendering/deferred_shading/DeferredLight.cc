@@ -237,7 +237,7 @@ void DeferredLight::CreateCone(float _radius, float _height,
         Ogre::Vector3(-_radius, 0, -_radius),
         Ogre::Vector3(_radius, _height, _radius)));
 
-  this->radius = radius;
+  this->radius = _radius;
   this->ignoreWorld = false;
 }
 

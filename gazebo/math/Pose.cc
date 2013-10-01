@@ -139,6 +139,14 @@ Pose Pose::operator*(const Pose &pose)
 }
 
 //////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
+}
+
+//////////////////////////////////////////////////
 Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 {
   Quaternion tmp;

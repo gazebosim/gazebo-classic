@@ -95,7 +95,7 @@ void ContactVisual::Update()
       double depth = this->contactsMsg->contact(i).depth(j);
 
       math::Vector3 force = msgs::Convert(
-          this->contactsMsg->contact(i).wrench(j).body_1_force());
+          this->contactsMsg->contact(i).wrench(j).body_1_wrench().force());
 
       // Scaling factor for the normal line.
       // Eq in the family of Y = 1/(1+exp(-(x^2)))

@@ -78,11 +78,12 @@ void ContactPlugin::OnUpdate()
       std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
       std::cout << "   Normal force 1: "
                 << contacts.contact(i).normal(j).x() *
-                   contacts.contact(i).wrench(j).body_1_force().x() +
+                   contacts.contact(i).wrench(j).body_1_wrench().force().x() +
                    contacts.contact(i).normal(j).y() *
-                   contacts.contact(i).wrench(j).body_1_force().y() +
+                   contacts.contact(i).wrench(j).body_1_wrench().force().y() +
                    contacts.contact(i).normal(j).z() *
-                   contacts.contact(i).wrench(j).body_1_force().z() << "\n";
+                   contacts.contact(i).wrench(j).body_1_wrench().force().z()
+                   << "\n";
     }
   }*/
 }

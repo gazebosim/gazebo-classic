@@ -30,7 +30,7 @@
 
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
@@ -50,12 +50,6 @@ DepthCameraSensor::DepthCameraSensor()
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void DepthCameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -88,10 +82,10 @@ void DepthCameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
 
     if (!this->scene)
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
     this->camera = this->scene->CreateDepthCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -114,7 +108,7 @@ void DepthCameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
     this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
     this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";

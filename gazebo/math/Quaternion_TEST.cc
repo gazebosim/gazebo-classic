@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Helpers.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
@@ -131,8 +130,8 @@ TEST(QuaternionTest, Quaternion)
   q = q * 5.0;
   EXPECT_TRUE(q == math::Quaternion(7.67918, -1.184, 2.7592, 4.0149));
 
-  gzerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-  gzerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
+  std::cerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+  std::cerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
 
   EXPECT_TRUE(q.RotateVectorReverse(math::Vector3(1, 2, 3)) ==
       math::Vector3(-0.104115, 0.4975, 3.70697));
@@ -173,9 +172,10 @@ TEST(QuaternionTest, Quaternion)
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
-    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " forward turns [" << v << "] to [" << r1 << "]\n";
+    std::cout << " reverse turns [" << v << "] to [" << r2 << "]\n";
     EXPECT_TRUE(r1 == math::Vector3(-1, -2, 3));
     EXPECT_TRUE(r2 == math::Vector3(-1, -2, 3));
   }
@@ -187,12 +187,13 @@ TEST(QuaternionTest, Quaternion)
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
-    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
-    gzdbg << " x axis [" << q.GetXAxis() << "]\n";
-    gzdbg << " y axis [" << q.GetYAxis() << "]\n";
-    gzdbg << " z axis [" << q.GetZAxis() << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " forward turns [" << v << "] to [" << r1 << "]\n";
+    std::cout << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    std::cout << " x axis [" << q.GetXAxis() << "]\n";
+    std::cout << " y axis [" << q.GetYAxis() << "]\n";
+    std::cout << " z axis [" << q.GetZAxis() << "]\n";
     EXPECT_TRUE(r1 == math::Vector3(-2, 1, 3));
     EXPECT_TRUE(r2 == math::Vector3(2, -1, 3));
     EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0, -1, 0));
@@ -204,10 +205,11 @@ TEST(QuaternionTest, Quaternion)
     // now try a harder case (axis[1,2,3], rotation[0.3*pi])
     // verified with octave
     q.SetFromAxis(math::Vector3(1, 2, 3), 0.3*M_PI);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " x [" << q.GetInverse().GetXAxis() << "]\n";
-    gzdbg << " y [" << q.GetInverse().GetYAxis() << "]\n";
-    gzdbg << " z [" << q.GetInverse().GetZAxis() << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " x [" << q.GetInverse().GetXAxis() << "]\n";
+    std::cout << " y [" << q.GetInverse().GetYAxis() << "]\n";
+    std::cout << " z [" << q.GetInverse().GetZAxis() << "]\n";
     EXPECT_TRUE(q.GetInverse().GetXAxis() ==
                 math::Vector3(0.617229, -0.589769, 0.520770));
     EXPECT_TRUE(q.GetInverse().GetYAxis() ==

@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -25,12 +26,14 @@ set (sources
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
-  Gui.cc
+  GuiIface.cc
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
+  KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
@@ -66,9 +69,11 @@ set (headers
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
-  Gui.hh
+  GuiIface.hh
   GuiEvents.hh
+  KeyEventHandler.hh
   LightMaker.hh
+  ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
@@ -106,37 +111,39 @@ gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_msgs)
 
-target_link_libraries(gazebo_gui gazebo_common
-                                 gazebo_transport
-                                 gazebo_sdf_interface
-                                 gazebo_rendering
-                                 gazebo_sensors
-                                 gazebo_msgs
-                                 gazebo_gui_building
-                                 gazebo_gui_terrain
-                                 gazebo_gui_viewers
-                                 gzqtpropertybrowser
-                                 libgazebo
-                                 ${QT_LIBRARIES}
-                                 ${ogre_libraries}
-                                 ${Boost_LIBRARIES}
-                                 pthread)
+target_link_libraries(gazebo_gui
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
-target_link_libraries(gzclient  gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_rendering
-                                gazebo_sensors
-                                gazebo_msgs
-                                gazebo_gui_building
-                                gazebo_gui_terrain
-                                gazebo_gui_viewers
-                                gzqtpropertybrowser
-                                libgazebo
-                                ${QT_LIBRARIES}
-                                ${ogre_libraries}
-                                ${Boost_LIBRARIES}
-                                pthread)
+target_link_libraries(gzclient
+  gazebo_common
+  gazebo_transport
+  gazebo_rendering
+  gazebo_sensors
+  gazebo_msgs
+  gazebo_gui_building
+  gazebo_gui_terrain
+  gazebo_gui_viewers
+  gzqtpropertybrowser
+  libgazebo
+  ${QT_LIBRARIES}
+  ${ogre_libraries}
+  ${Boost_LIBRARIES}
+  pthread
+)
 
 add_definitions(${QT_DEFINITIONS})
 

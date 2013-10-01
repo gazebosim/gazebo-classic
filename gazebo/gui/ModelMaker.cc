@@ -31,7 +31,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelMaker.hh"
 
@@ -53,28 +53,31 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string &_modelName)
-{
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (this->modelVisual)
-  {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
-  }
-
-  this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
-
-  if (!this->modelVisual)
-  {
-    gzerr << "Unable to clone\n";
-    return false;
-  }
-
-  this->clone = true;
-
-  return true;
-}
+// bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
+// {
+//   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+//   if (this->modelVisual)
+//   {
+//     scene->RemoveVisual(this->modelVisual);
+//     this->modelVisual.reset();
+//     this->visuals.clear();
+//   }
+//
+//   // This function is currently not executed. Commenting out the following
+//   // line to prevent a compile warning.
+//   // this->modelVisual =
+//   // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
+//
+//   if (!this->modelVisual)
+//   {
+//     gzerr << "Unable to clone\n";
+//     return false;
+//   }
+//
+//   this->clone = true;
+//
+//   return true;
+// }
 
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)
@@ -148,10 +151,10 @@ bool ModelMaker::Init()
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->GetValuePose("pose");
+    modelPose = modelElem->Get<math::Pose>("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
-    modelElem->GetValueString("name");
+    modelElem->Get<std::string>("name");
 
   this->modelVisual.reset(new rendering::Visual(modelName,
                           scene->GetWorldVisual()));
@@ -171,9 +174,9 @@ bool ModelMaker::Init()
     {
       while (linkElem)
       {
-        std::string linkName = linkElem->GetValueString("name");
+        std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->GetValuePose("pose");
+          linkPose = linkElem->Get<math::Pose>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -192,7 +195,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->GetValuePose("pose");
+            visualPose = visualElem->Get<math::Pose>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -343,14 +346,14 @@ void ModelMaker::CreateTheEntity()
       isLight = true;
     }
 
-    std::string modelName = modelElem->GetValueString("name");
+    std::string modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
     int i = 0;
     while ((isModel && has_entity_name(modelName)) ||
         (isLight && scene->GetLight(modelName)))
     {
-      modelName = modelElem->GetValueString("name") + "_" +
+      modelName = modelElem->Get<std::string>("name") + "_" +
         boost::lexical_cast<std::string>(i++);
     }
 

@@ -18,9 +18,9 @@
 #include <iostream>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/transport/Transport.hh"
-#include "gazebo/sensors/Sensors.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/gazebo.hh"
@@ -41,7 +41,7 @@ void Load()
   gazebo::sensors::load();
   gazebo::sensors::init();
 
-  gazebo::rendering::create_scene("world_1", false);
+  gazebo::rendering::create_scene("world_1", false, true);
   gazebo::common::Time::MSleep(10);
 }
 
@@ -68,5 +68,3 @@ int main(int /*argc*/, char ** /*argv*/)
 
   return 0;
 }
-
-

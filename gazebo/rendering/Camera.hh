@@ -28,8 +28,10 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/math/Angle.hh"
@@ -39,7 +41,6 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -124,10 +125,6 @@ namespace gazebo
       ///
       /// This function is called before the camera is destructed
       public: virtual void Fini();
-
-      /// Deprecated.
-      /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
@@ -268,6 +265,10 @@ namespace gazebo
       /// \param[in] _enable Set to True to enable saving of frames
       public: void EnableSaveFrame(bool _enable);
 
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      public: bool GetCaptureData() const;
+
       /// \brief Set the save frame pathname
       /// \param[in] _pathname Directory in which to store saved image frames
       public: void SetSaveFramePathname(const std::string &_pathname);
@@ -402,6 +403,18 @@ namespace gazebo
                   bool _inheritOrientation,
                   double _minDist = 0.0, double _maxDist = 0.0);
 
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      public: void AttachToVisual(uint32_t _id,
+                  bool _inheritOrientation,
+                  double _minDist = 0.0, double _maxDist = 0.0);
+
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
       public: void TrackVisual(const std::string &_visualName);
@@ -508,6 +521,19 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
+                     bool _inheritOrientation,
+                     double _minDist = 0, double _maxDist = 0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      /// \return True on success
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 
@@ -682,6 +708,15 @@ namespace gazebo
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Position PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
+      private: common::PID trackVisualYawPID;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType

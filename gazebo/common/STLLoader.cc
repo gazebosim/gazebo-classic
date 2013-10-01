@@ -168,8 +168,12 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     }
   }
 
+  result = subMesh->GetVertexCount() > 0;
+
   if (result)
     _mesh->AddSubMesh(subMesh);
+  else
+    delete subMesh;
 
   return result;
 }

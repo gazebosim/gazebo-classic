@@ -22,10 +22,11 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -68,12 +69,6 @@ SensorManager::~SensorManager()
 }
 
 //////////////////////////////////////////////////
-void SensorManager::Run()
-{
-  this->RunThreads();
-}
-
-//////////////////////////////////////////////////
 void SensorManager::RunThreads()
 {
   // Start the non-image sensor containers. The first item in the
@@ -105,10 +100,9 @@ void SensorManager::Update(bool _force)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
-    Sensor_V::iterator iter;
 
     // in case things are spawn, sensors length changes
-    for (iter = this->initSensors.begin();
+    for (Sensor_V::iterator iter = this->initSensors.begin();
          iter != this->initSensors.end(); ++iter)
     {
       GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
@@ -122,22 +116,18 @@ void SensorManager::Update(bool _force)
     }
     this->initSensors.clear();
 
-    for (iter = this->removeSensors.begin();
+    for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
          iter != this->removeSensors.end(); ++iter)
     {
-      GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
-      GZ_ASSERT((*iter)->GetCategory() < 0 ||
-          (*iter)->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
-      GZ_ASSERT(this->sensorContainers[(*iter)->GetCategory()] != NULL,
-                "Sensor container is NULL");
+      GZ_ASSERT(!(*iter).empty(), "Remove sensor name is empty.");
+
       bool removed = false;
-      std::string scopedName = (*iter)->GetScopedName();
       for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
            iter2 != this->sensorContainers.end() && !removed; ++iter2)
       {
         GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
 
-        removed = (*iter2)->RemoveSensor(scopedName);
+        removed = (*iter2)->RemoveSensor(*iter);
       }
 
       if (!removed)
@@ -238,7 +228,20 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
-  std::string type = _elem->GetValueString("type");
+  SensorPtr parentSensor = sensors::get_sensor(_parentName);
+  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
+
+  return this->CreateSensor(_elem, _worldName, _parentName,
+      parentSensor->GetId());
+}
+
+//////////////////////////////////////////////////
+std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
+                                        const std::string &_worldName,
+                                        const std::string &_parentName,
+                                        uint32_t _parentId)
+{
+  std::string type = _elem->Get<std::string>("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
 
   if (!sensor)
@@ -248,7 +251,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   }
 
   // Must come before sensor->Load
-  sensor->SetParent(_parentName);
+  sensor->SetParent(_parentName, _parentId);
 
   // Load the sensor
   sensor->Load(_worldName, _elem);
@@ -355,7 +358,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
   {
     // Push it on the list, to be removed by the main sensor thread,
     // to ensure correct access to rendering resources.
-    this->removeSensors.push_back(sensor);
+    this->removeSensors.push_back(sensor->GetScopedName());
   }
 }
 
@@ -616,6 +619,9 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->ResetLastUpdateTime();
   }
+
+  // Tell the run loop that world time has been reset.
+  this->runCondition.notify_one();
 }
 
 //////////////////////////////////////////////////

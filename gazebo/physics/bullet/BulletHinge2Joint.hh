@@ -47,23 +47,17 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletHinge2Joint();
 
-      /// \brief Load the BulletHinge2Joint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Get anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set the first axis of rotation
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;
@@ -76,9 +70,6 @@ namespace gazebo
 
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
-
-      /// \brief Set the torque
-      public: void SetForce(int _index, double _torque);
 
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
@@ -103,6 +94,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the torque
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;

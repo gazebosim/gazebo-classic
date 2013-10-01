@@ -191,7 +191,8 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  _viewport->setMaterialScheme(_scene->GetName());
+  if (_viewport && _scene && _scene->GetInitialized())
+    _viewport->setMaterialScheme(_scene->GetName());
 #endif
 }
 

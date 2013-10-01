@@ -23,14 +23,14 @@
 #define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
-
-#include "gazebo/sdf/sdf.hh"
 
 #include "gazebo/rendering/Camera.hh"
 

@@ -24,9 +24,13 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
+
+#ifdef HAVE_SIMBODY
+void RegisterSimbodyPhysics();
+#endif
 
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
@@ -42,6 +46,10 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
+
+#ifdef HAVE_SIMBODY
+  RegisterSimbodyPhysics();
+#endif
 
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();

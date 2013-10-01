@@ -20,7 +20,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/BVHLoader.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Skeleton.hh"

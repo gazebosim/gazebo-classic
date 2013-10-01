@@ -83,17 +83,11 @@ namespace gazebo
       /// \brief Reset to default values.
       public: void Reset();
 
-      /// \brief Name of the first collision object
-      public: std::string collision1;
-
-      /// \brief Name of the second collision object
-      public: std::string collision2;
-
       /// \brief Pointer to the first collision object
-      public: Collision *collisionPtr1;
+      public: Collision *collision1;
 
       /// \brief Pointer to the second collision object
-      public: Collision *collisionPtr2;
+      public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
       /// All forces and torques are relative to the center of mass of the

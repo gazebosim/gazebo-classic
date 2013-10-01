@@ -25,6 +25,7 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -71,7 +72,7 @@ void BulletLink::Init()
   Link::Init();
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   btScalar mass = this->inertial->GetMass();
@@ -85,6 +86,19 @@ void BulletLink::Init()
   btVector3 fallInertia(0, 0, 0);
   math::Vector3 cogVec = this->inertial->GetCoG();
 
+  /// \todo FIXME:  Friction Parameters
+  /// Currently, gazebo uses btCompoundShape to store multiple
+  /// <collision> shapes in bullet.  Each child shape could have a
+  /// different mu1 and mu2.  This is not ideal as friction is set
+  /// per BulletLink::rigidLink (btRigidBody : btCollisionObject).
+  /// Right now, the friction coefficients for the last BulletCollision
+  /// processed in this link below is stored in hackMu1, hackMu2.
+  /// The average is stored in this->rigidLink.
+  /// Final friction coefficient is applied in ContactCallback
+  /// by taking the lower of the 2 colliding rigidLink's.
+  double hackMu1 = 0;
+  double hackMu2 = 0;
+
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
@@ -93,6 +107,12 @@ void BulletLink::Init()
       BulletCollisionPtr collision;
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
+
+      hackMu1 = collision->GetSurface()->mu1;
+      hackMu2 = collision->GetSurface()->mu2;
+      // gzerr << "link[" << this->GetName()
+      //       << "] mu[" << hackMu1
+      //       << "] mu2[" << hackMu2 << "]\n";
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
@@ -127,6 +147,11 @@ void BulletLink::Init()
   this->rigidLink->setUserPointer(this);
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+
+  /// \TODO: get friction from collision object
+  this->rigidLink->setAnisotropicFriction(btVector3(1, 1, 1),
+    btCollisionObject::CF_ANISOTROPIC_FRICTION);
+  this->rigidLink->setFriction(0.5*(hackMu1 + hackMu2));  // Hack
 
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
@@ -167,7 +192,7 @@ void BulletLink::Init()
     this->rigidLink->setDeactivationTime(1.0);
   }
 
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -180,12 +205,6 @@ void BulletLink::Fini()
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->removeRigidBody(this->rigidLink);
-}
-
-//////////////////////////////////////////////////
-void BulletLink::Update()
-{
-  Link::Update();
 }
 
 //////////////////////////////////////////////////
@@ -464,6 +483,25 @@ btRigidBody *BulletLink::GetBulletLink() const
 }
 
 //////////////////////////////////////////////////
+void BulletLink::ClearCollisionCache()
+{
+  if (!this->rigidLink)
+  {
+    gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
+          << " does not exist, unable to ClearCollisionCache" << std::endl;
+    return;
+  }
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+
+  bulletWorld->updateSingleAabb(this->rigidLink);
+  bulletWorld->getBroadphase()->getOverlappingPairCache()->
+      cleanProxyFromPairs(this->rigidLink->getBroadphaseHandle(),
+      bulletWorld->getDispatcher());
+}
+
+//////////////////////////////////////////////////
 void BulletLink::SetLinearDamping(double _damping)
 {
   if (!this->rigidLink)
@@ -557,4 +595,10 @@ void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 void BulletLink::SetAutoDisable(bool /*_disable*/)
 {
   gzlog << "BulletLink::SetAutoDisable not yet implemented." << std::endl;
+}
+
+//////////////////////////////////////////////////
+void BulletLink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
 }
