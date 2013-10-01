@@ -242,6 +242,9 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 void SimbodyPhysics::Reset()
 {
   this->integ->initialize(this->system.getDefaultState());
+
+  // restore potentially user run-time modified gravity
+  this->SetGravity(this->GetGravity());
 }
 
 //////////////////////////////////////////////////
