@@ -51,6 +51,11 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
   "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_tests(${tests})
 
+if (ENABLE_TESTS_COMPILATION)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+endif()
+
 set(display_tests
 )
 
