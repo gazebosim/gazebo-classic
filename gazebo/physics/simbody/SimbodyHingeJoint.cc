@@ -55,20 +55,6 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetDamping(int _index, double _damping)
-{
-  if (_index < static_cast<int>(this->GetAngleCount()))
-  {
-    this->dampingCoefficient = _damping;
-    this->damper.setDamping(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _damping);
-  }
-  else
-    gzerr << "SetDamping _index too large.\n";
-}
-
-//////////////////////////////////////////////////
 void SimbodyHingeJoint::SetVelocity(int _index, double _rate)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -76,7 +62,7 @@ void SimbodyHingeJoint::SetVelocity(int _index, double _rate)
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
   else
-    gzerr << "SetDamping _index too large.\n";
+    gzerr << "SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////

@@ -57,12 +57,6 @@ void SimbodyBallJoint::Init()
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////
-void SimbodyBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
 /////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {

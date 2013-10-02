@@ -176,6 +176,10 @@ namespace gazebo
       /// Deprecat by ApplyStiffnessDamping.
       public: virtual void ApplyDamping() GAZEBO_DEPRECATED(1.10);
 
+      /// \brief Callback to apply spring stiffness and viscous damping
+      /// effects to joint.
+      public: virtual void ApplyStiffnessDamping();
+
       /// \brief Set the joint spring stiffness.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
@@ -188,10 +192,6 @@ namespace gazebo
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
       public: double GetStiffness(int _index);
-
-      /// \brief Callback to apply spring stiffness and viscous damping
-      /// forces to joint.
-      public: virtual void ApplyStiffnessDamping();
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -480,10 +480,13 @@ namespace gazebo
       protected: LinkPtr anchorLink;
 
       /// \brief joint dampingCoefficient
-      protected: double dampingCoefficient;
+      protected: double dampingCoefficient[MAX_JOINT_AXIS];
 
       /// \brief joint stiffnessCoefficient
-      protected: double stiffnessCoefficient;
+      protected: double stiffnessCoefficient[MAX_JOINT_AXIS];
+
+      /// \brief joint spring reference (zero load) position
+      protected: double springReferencePosition[MAX_JOINT_AXIS];
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;

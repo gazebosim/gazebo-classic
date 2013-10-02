@@ -118,8 +118,12 @@ namespace gazebo
       /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
       public: void CFMDamping() GAZEBO_DEPRECATED(1.10);
 
-      /// \brief simulating damping with CFM and meddling with Joint limits
+      /// \brief simulate implicit spring and damper with CFM/ERP
+      /// and meddling with Joint limits.
       public: void ApplyImplicitStiffnessDamping();
+
+      /// \brief simulating a joint spring and damper explicitly.
+      public: void ApplyExplicitStiffnessDamping();
 
       /// \brief Get access to stopCFM
       /// \return Returns joint's cfm for end stops

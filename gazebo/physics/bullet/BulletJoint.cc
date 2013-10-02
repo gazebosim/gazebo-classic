@@ -365,17 +365,27 @@ void BulletJoint::SetupJointFeedback()
 //////////////////////////////////////////////////
 void BulletJoint::SetDamping(int _index, double _damping)
 {
-  this->SetStiffnessDamping(_index, this->stiffnessCoefficient, _damping);
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "BulletJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffnessDamping(int /*_index*/,
+void BulletJoint::SetStiffnessDamping(int _index,
   double _stiffness, double _damping)
 {
-  this->stiffnessCoefficient = _stiffness;
-  gzdbg << "Stiffness not implement in Bullet\n";
-
-  this->dampingCoefficient = _damping;
+  gzdbg << "Joint stiffness not implement in Bullet\n";
+  this->stiffnessCoefficient[_index] = _stiffness;
+  this->dampingCoefficient[_index] = _damping;
 
   // \TODO: implement on a per axis basis (requires additional sdf parameters)
 
@@ -444,12 +454,19 @@ double BulletJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void BulletJoint::ApplyStiffnessDamping()
 {
-  // Take absolute value of dampingCoefficient, since negative values of
-  // dampingCoefficient are used for adaptive damping to enforce stability.
-  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    // Take absolute value of dampingCoefficient, since negative values of
+    // dampingCoefficient are used for adaptive damping to enforce stability.
+    double dampingForce = -fabs(this->dampingCoefficient[i])
+      * this->GetVelocity(i);
 
-  // do not change forceApplied if setting internal damping forces
-  this->SetForceImpl(0, dampingForce);
+    double springForce = this->stiffnessCoefficient[i]
+      * (this->GetAngle(i).Radian() - this->springReferencePosition[i]);
 
-  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+    // do not change forceApplied if setting internal damping forces
+    this->SetForceImpl(i, dampingForce + springForce);
+
+    // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+  }
 }

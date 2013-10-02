@@ -60,9 +60,6 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited.
-      public: virtual void SetDamping(int _index, const double _damping);
-
-      // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       // Documentation inherited.

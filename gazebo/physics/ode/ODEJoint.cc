@@ -1136,7 +1136,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
   {
     double angle = this->GetAngle(i).Radian();
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
-    if (math::equal(this->dampingCoefficient, 0.0) ||
+    if (math::equal(this->dampingCoefficient[i], 0.0) ||
         angle + dAngle >= this->upperLimit[i].Radian() ||
         angle + dAngle <= this->lowerLimit[i].Radian())
     {
@@ -1153,23 +1153,28 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
     }
-    else if (!math::equal(this->dampingCoefficient, 0.0))
+    else if (!math::equal(this->dampingCoefficient[i], 0.0))
     {
       /// \TODO: hardcoded thresholds for now, make them params.
       static double vThreshold = 0.01;
       static double fThreshold = 1.0;
       double f = this->GetForce(i);
       double v = this->GetVelocity(i);
-      double curDamp = fabs(this->dampingCoefficient);
+      double curDamp = fabs(this->dampingCoefficient[i]);
 
       /// \TODO: This bit of code involving dStable might be too complicated,
       /// add some more comments or simplify it.
 
-      /// \TODO: increase damping if resulting acceleration
-      /// is outside of stability region.  simple limiter based on (f, v).
-      /// safeguard against unstable joint behavior
-      /// at low speed and high force scenarios
-      if (this->dampingCoefficient < 0 &&
+      /// EXPERIMENTAL: If user specified damping coefficient is negative,
+      /// apply adaptive damping.  What this means is that
+      /// if resulting acceleration is outside of stability region,
+      /// then increase damping using a limiter based on (f, v).
+      /// This approach safeguards dynamics against unstable joint behavior
+      /// at low speed (|v| < vThreshold) and
+      /// high force (|f| > fThreshold) scenarios.
+      /// Stability region is determined by:
+      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
+      if (this->dampingCoefficient[i] < 0 &&
           fabs(v) < vThreshold && fabs(f) > fThreshold)
       {
         // guess what the stable damping value might be based on v.
@@ -1210,46 +1215,60 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 //////////////////////////////////////////////////
 void ODEJoint::SetDamping(int _index, double _damping)
 {
-  this->SetStiffnessDamping(_index, this->stiffnessCoefficient, _damping);
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "ODEJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetStiffnessDamping(int /*_index*/,
+void ODEJoint::SetStiffnessDamping(int _index,
   double _stiffness, double _damping)
 {
-  this->stiffnessCoefficient = _stiffness;
-  gzdbg << "Stiffness not implement in Bullet\n";
+  this->stiffnessCoefficient[_index] = _stiffness;
+  this->dampingCoefficient[_index] = _damping;
 
-  this->dampingCoefficient = _damping;
-
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
-  // trigger an update in ImplicitDamping if this is called
+  /// reset state of implicit damping state machine.
   if (this->useImplicitDamping)
   {
-    if (this->GetAngleCount() > 2)
+    if (static_cast<unsigned int>(_index) < this->GetAngleCount())
     {
-       gzerr << "Incompatible joint type, GetAngleCount() = "
-             << this->GetAngleCount() << " > 2\n";
+      this->implicitDampingState[_index] = ODEJoint::NONE;
+    }
+    else
+    {
+       gzerr << "Incompatible joint type, index[" << _index
+             << "] is out of bounds (GetAngleCount() = "
+             << this->GetAngleCount() << ").\n";
        return;
     }
-    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-      this->implicitDampingState[i] = ODEJoint::NONE;
   }
 
-  /// \TODO:  this check might not be needed?  attaching an object to a static
-  /// body should not affect damping application.
+  /// \TODO:  The check for static parent or child below might not be needed,
+  /// but we need to test first.  In theory, attaching an object to a static
+  /// body should not affect spring/damper application.
   bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
   bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
 
   if (!this->dampingInitialized && !parentStatic && !childStatic)
   {
-    if (this->useImplicitDamping)
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyImplicitStiffnessDamping, this));
-    else
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+    this->applyDamping = physics::Joint::ConnectJointUpdate(
+      boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
     this->dampingInitialized = true;
+  }
+  else
+  {
+    gzwarn << "Damping for Joint[" << this->GetName()
+           << "] is not initialized because either parent[" << parentStatic
+           << "] or child[" << childStatic << "] is static.\n";
   }
 }
 
@@ -1321,12 +1340,28 @@ double ODEJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void ODEJoint::ApplyStiffnessDamping()
 {
-  // Take absolute value of dampingCoefficient, since negative values of
-  // dampingCoefficient are used for adaptive damping to enforce stability.
-  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
+  if (this->useImplicitDamping)
+    this->ApplyImplicitStiffnessDamping();
+  else
+    this->ApplyExplicitStiffnessDamping();
+}
 
-  // do not change forceApplied if setting internal damping forces
-  this->SetForceImpl(0, dampingForce);
+//////////////////////////////////////////////////
+void ODEJoint::ApplyExplicitStiffnessDamping()
+{
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    // Take absolute value of dampingCoefficient, since negative values of
+    // dampingCoefficient are used for adaptive damping to enforce stability.
+    double dampingForce = -fabs(this->dampingCoefficient[i])
+      * this->GetVelocity(i);
 
-  // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+    double springForce = this->stiffnessCoefficient[i]
+      * (this->GetAngle(i).Radian() - this->springReferencePosition[i]);
+
+    // do not change forceApplied if setting internal damping forces
+    this->SetForceImpl(i, dampingForce + springForce);
+
+    // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
+  }
 }

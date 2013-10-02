@@ -55,20 +55,6 @@ void SimbodySliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetDamping(int _index, double _damping)
-{
-  if (_index < static_cast<int>(this->GetAngleCount()))
-  {
-    this->dampingCoefficient = _damping;
-    this->damper.setDamping(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _damping);
-  }
-  else
-    gzerr << "SetDamping _index too large.\n";
-}
-
-//////////////////////////////////////////////////
 void SimbodySliderJoint::SetVelocity(int _index, double _rate)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -76,7 +62,7 @@ void SimbodySliderJoint::SetVelocity(int _index, double _rate)
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
   else
-    gzerr << "SetDamping _index too large.\n";
+    gzerr << "SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////

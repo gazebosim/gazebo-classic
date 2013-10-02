@@ -57,8 +57,12 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
-  this->dampingCoefficient = 0;
-  this->stiffnessCoefficient = 0;
+  this->dampingCoefficient[0] = 0;
+  this->stiffnessCoefficient[0] = 0;
+  this->dampingCoefficient[1] = 0;
+  this->stiffnessCoefficient[1] = 0;
+  this->springReferencePosition[0] = 0;
+  this->springReferencePosition[1] = 0;
   this->provideFeedback = false;
 
   if (!this->sdfJoint)
@@ -549,7 +553,9 @@ double Joint::GetForce(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 double Joint::GetDampingCoefficient() const
 {
-  return this->dampingCoefficient;
+  gzerr << "Joint::GetDampingCoefficient() is deprecated, please switch "
+        << "to Joint::GetDamping(index)\n";
+  return this->dampingCoefficient[0];
 }
 
 //////////////////////////////////////////////////
@@ -636,15 +642,33 @@ double Joint::GetInertiaRatio(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetDamping(int /*_index*/)
+double Joint::GetDamping(int _index)
 {
-  return this->dampingCoefficient;
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    return this->dampingCoefficient[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get damping coefficient.\n";
+    return 0;
+  }
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStiffness(int /*_index*/)
+double Joint::GetStiffness(int _index)
 {
-  return this->stiffnessCoefficient;
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    return this->stiffnessCoefficient[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get stiffness coefficient.\n";
+    return 0;
+  }
 }
 
 //////////////////////////////////////////////////

@@ -72,12 +72,6 @@ void SimbodyScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
 void SimbodyScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";
