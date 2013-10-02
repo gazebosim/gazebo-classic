@@ -135,9 +135,13 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 
   // Make sure there is a URI separator
   if (uriSeparator == std::string::npos)
+  {
+    gzerr << "No URI separator \"://\" in [" << _modelURI << "]\n";
     return false;
+  }
 
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
+  uri = uri.substr(0, uri.find("/", ModelDatabase::GetURI().size()));
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
 
@@ -147,6 +151,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
     if (iter->first == uri)
       return true;
   }
+
   return false;
 }
 
@@ -423,9 +428,10 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
       endIndex - startIndex;
 
-    modelName = modelName.substr(startIndex, modelNameLen);
     if (endIndex != std::string::npos)
-      suffix = _uri.substr(endIndex, std::string::npos);
+      suffix = modelName.substr(endIndex, std::string::npos);
+
+    modelName = modelName.substr(startIndex, modelNameLen);
 
     // Store downloaded .tar.gz and intermediate .tar files in temp location
     boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();
