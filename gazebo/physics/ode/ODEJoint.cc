@@ -42,12 +42,10 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->jointId = NULL;
   this->implicitDampingState[0] = ODEJoint::NONE;
   this->implicitDampingState[1] = ODEJoint::NONE;
-  this->implicitDampingState[2] = ODEJoint::NONE;
   this->dampingInitialized = false;
   this->feedback = NULL;
-  this->dStable[0] = 0;
-  this->dStable[1] = 0;
-  this->dStable[2] = 0;
+  this->currentDamping[0] = 0;
+  this->currentDamping[1] = 0;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
 }
@@ -1155,50 +1153,19 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     }
     else if (!math::equal(this->dampingCoefficient[i], 0.0))
     {
-      /// \TODO: hardcoded thresholds for now, make them params.
-      static double vThreshold = 0.01;
-      static double fThreshold = 1.0;
-      double f = this->GetForce(i);
-      double v = this->GetVelocity(i);
       double curDamp = fabs(this->dampingCoefficient[i]);
 
-      /// \TODO: This bit of code involving dStable might be too complicated,
-      /// add some more comments or simplify it.
-
-      /// EXPERIMENTAL: If user specified damping coefficient is negative,
-      /// apply adaptive damping.  What this means is that
-      /// if resulting acceleration is outside of stability region,
-      /// then increase damping using a limiter based on (f, v).
-      /// This approach safeguards dynamics against unstable joint behavior
-      /// at low speed (|v| < vThreshold) and
-      /// high force (|f| > fThreshold) scenarios.
-      /// Stability region is determined by:
-      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
-      if (this->dampingCoefficient[i] < 0 &&
-          fabs(v) < vThreshold && fabs(f) > fThreshold)
-      {
-        // guess what the stable damping value might be based on v.
-        double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
-
-        // debug
-        // gzerr << "joint [" << this->GetName()
-        //       << "] curDamp[" << curDamp
-        //       << "] f [" << f
-        //       << "] v [" << v
-        //       << "] f*v [" << f*v
-        //       << "] f/v [" << tmpDStable
-        //       << "] cur dStable[" << i << "] = [" << dStable[i] << "]\n";
-
-        // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
-        curDamp = std::max(curDamp, 0.5*tmpDStable);
-      }
+      /// \TODO: This bit of code involving adaptive damping
+      /// might be too complicated, add some more comments or simplify it.
+      if (this->dampingCoefficient[i] < 0)
+        curDamp = this->ApplyAdaptiveDamping(i, curDamp);
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
       if (this->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
-          !math::equal(curDamp, this->dStable[i]))
+          !math::equal(curDamp, this->currentDamping[i]))
       {
-        this->dStable[i] = curDamp;
+        this->currentDamping[i] = curDamp;
         // add additional constraint row by fake hitting joint limit
         // then, set erp and cfm to simulate viscous joint damping
         this->SetAttribute("stop_erp", i, 0.0);
@@ -1210,6 +1177,38 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::ApplyAdaptiveDamping(int _index, const double _damping)
+{
+  /// \TODO: hardcoded thresholds for now, make them params.
+  static double vThreshold = 0.01;
+  static double fThreshold = 1.0;
+
+  double f = this->GetForce(_index);
+  double v = this->GetVelocity(_index);
+
+  if (fabs(v) < vThreshold && fabs(f) > fThreshold)
+  {
+    // guess what the stable damping value might be based on v.
+    double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
+
+    // debug
+    // gzerr << "joint [" << this->GetName()
+    //       << "] damping[" << _damping
+    //       << "] f [" << f
+    //       << "] v [" << v
+    //       << "] f*v [" << f*v
+    //       << "] f/v [" << tmpDStable
+    //       << "] cur currentDamping[" << _index
+    //       << "] = [" << currentDamping[_index] << "]\n";
+
+    // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
+    return std::max(_damping, 0.5*tmpDStable);
+  }
+  else
+    return _damping;
 }
 
 //////////////////////////////////////////////////

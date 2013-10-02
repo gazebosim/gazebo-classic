@@ -139,11 +139,22 @@ namespace gazebo
         return this->stopERP;
       }
 
+      /// \brief EXPERIMENTAL: If specified damping coefficient is negative,
+      /// apply adaptive damping.  What this means is that
+      /// if resulting acceleration is outside of stability region,
+      /// then increase damping using a limiter based on (f, v).
+      /// This approach safeguards dynamics against unstable joint behavior
+      /// at low speed (|v| < vThreshold) and
+      /// high force (|f| > fThreshold) scenarios.
+      /// Stability region is determined by:
+      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
+      private: double ApplyAdaptiveDamping(int _index, const double _damping);
+
       /// \brief internal variable to keep track of implicit damping internals
-      private: int implicitDampingState[3];
+      private: int implicitDampingState[MAX_JOINT_AXIS];
 
       /// \brief save current implicit damping coefficient for stability reasons
-      private: double dStable[3];
+      private: double currentDamping[MAX_JOINT_AXIS];
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
