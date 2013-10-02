@@ -43,7 +43,7 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -65,7 +65,7 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   gzlog << "-------------------Test 1-------------------\n";
   for (unsigned int i = 0; i < 10; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_DOUBLE_EQ(wrench_01.body1Force.x,    0.0);
@@ -173,7 +173,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -198,12 +198,12 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   joint_01->SetAttribute("stop_erp", 0, 0.02);
   joint_12->SetAttribute("stop_erp", 0, 0.02);
   // wait for dynamics to stabilize
-  world->StepWorld(2000);
+  world->Step(2000);
   // check force torques in new system
   gzlog << "\n-------------------Test 2-------------------\n";
   for (unsigned int i = 0; i < 5; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
     // Dbg joint_01 force torque :
     //   force1 [600 -200 999.99999600000001 / 600 -1000 -200]
     //   torque1 [749.999819 82.840868 -450.00009699999998 / 750 450 0]
@@ -274,7 +274,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 
   // simulate a few steps
   int steps = 20;
-  world->StepWorld(steps);
+  world->Step(steps);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
   gzdbg << "t after 20 steps : " << t << "\n";
@@ -320,7 +320,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -354,7 +354,7 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
     joint_01->SetForce(0u, effort1);
     joint_12->SetForce(0u, effort2);
 
-    world->StepWorld(1);
+    world->Step(1);
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
 
@@ -507,9 +507,9 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);
-    world->StepWorld(10);
+    world->Step(10);
   }
-  world->StepWorld(50);
+  world->Step(50);
   math::Pose childPose = child->GetWorldPose();
   math::Pose parentPose = parent->GetWorldPose();
   EXPECT_TRUE(parentPose.pos != pos);
@@ -555,7 +555,7 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
     EXPECT_TRUE(link != NULL);
 
     math::Pose initialPose = link->GetWorldPose();
-    world->StepWorld(100);
+    world->Step(100);
     math::Pose afterPose = link->GetWorldPose();
     EXPECT_TRUE(initialPose.pos == afterPose.pos);
   }
