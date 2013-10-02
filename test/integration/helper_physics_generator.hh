@@ -25,9 +25,17 @@
 # define BULLET_SUPPORT , "bullet"
 #endif
 
+#define SIMBODY_SUPPORT
+
+#ifdef HAVE_SIMBODY
+# undef SIMBODY_SUPPORT
+# define SIMBODY_SUPPORT , "simbody"
+#endif
+
 /// \brief Helper macro to instantiate gtest for different physics engines
 #define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
   BULLET_SUPPORT \
+  SIMBODY_SUPPORT \
   )
 
 #endif
