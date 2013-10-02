@@ -158,6 +158,10 @@ namespace gazebo
       /// \param[in] _topic The topic to be unadvertised
       public: void Unadvertise(const std::string &_topic);
 
+      /// \brief Unadvertise a publisher
+      /// \param[in] _pub Publisher to unadvertise
+      public: void Unadvertise(PublisherPtr _pub);
+
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
       /// \param [in] _topic Name of the topic

@@ -45,12 +45,15 @@ namespace gazebo
 
     /// \brief Initialize the transport system
     /// \param[in] _master_host The hostname or IP of the master. Leave empty to
-    ///                    use pull address from the GAZEBO_MASTER_URI env var.
+    ///            use pull address from the GAZEBO_MASTER_URI env var.
     /// \param[in] _master_port The port  of the master. Leave empty to
-    ///                    use pull address from the GAZEBO_MASTER_URI env var.
+    ///            use pull address from the GAZEBO_MASTER_URI env var.
+    /// \param[in] _timeoutIterations Number of times to wait for
+    ///            a connection to master.
     /// \return true if initialization succeeded; false otherwise
     bool init(const std::string &_master_host ="",
-              unsigned int _master_port = 0);
+              unsigned int _master_port = 0,
+              uint32_t _timeoutIterations = 30);
 
     /// \brief Run the transport component. Creates a thread to handle
     /// message passing. This call will block until the master can
