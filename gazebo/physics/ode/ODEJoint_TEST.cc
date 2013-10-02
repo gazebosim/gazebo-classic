@@ -28,12 +28,12 @@ class ODEJoint_TEST : public ServerFixture
 
 ////////////////////////////////////////////////////////////////////////
 // Test multi-axis universal joints
-// with cfm damping
+// with implicit (cfm) damping
 ////////////////////////////////////////////////////////////////////////
-TEST_F(ODEJoint_TEST, CFMDamping)
+TEST_F(ODEJoint_TEST, ImplicitDamping)
 {
   // Load our force torque test world
-  Load("worlds/cfm_damping_test.world", true);
+  Load("worlds/implicit_damping_test.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
