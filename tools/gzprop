@@ -2,6 +2,8 @@
 
 require 'tmpdir'
 
+#################################################
+# Display help information
 def help
   puts "gzprop -- Create a model tarball for upload to thepropshop.org\n"
   puts "\n"
@@ -9,21 +11,28 @@ def help
   puts "\n"
   puts "Package an existing model directory into a tarball suitable"
   puts "for upload to thepropshop.org. A working instanstance of"
-  puts "Gazebo >1.11 is required.\n"
+  puts "Gazebo >2.0 is required.\n"
   puts "\n"
 end
 
+#################################################
+# Main
+
+# Make sure there are command line arguments.
 if ARGV.empty?
   help()
   abort("")
 end
 
+# Get the model directory
 modelDir = ARGV[0]
 
+# Make sure model directory exists
 if !Dir.exists?(modelDir)
   abort("Model directory[#{modelDir}] doesn't exist")
 end
 
+# Make sure there is a model.sdf file in the model directory
 if !File.exists?(File.join(modelDir,"model.sdf"))
   abort("Missing model.sdf in directory [#{modelDir}]")
 end
@@ -51,5 +60,6 @@ Dir.mktmpdir { |dir|
   `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
 }
 
+# Completion message
 puts "Propshop model created.\n"
 puts "Upload [#{modelName}.tar.gz] to thepropshop.org"
