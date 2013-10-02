@@ -150,6 +150,26 @@ namespace gazebo
       ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
       private: double ApplyAdaptiveDamping(int _index, const double _damping);
 
+      /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
+      /// \param[in] _dt time step size
+      /// \param[in] _kp spring stiffness
+      /// \param[in] _kd spring damping
+      /// \param[out] _cfm equivalent constraint force mixing
+      /// \param[out] _erp equivalent error reduction parameter
+      private: void KpKdToCFMERP(const double _dt,
+                                 const double _kp, const double _kd,
+                                 double &_cfm, double &_erp);
+
+      /// \brief Helper funciton to convert CFM and ERP to Kp and Kd
+      /// \param[in] _dt time step size
+      /// \param[in] _cfm constraint force mixing
+      /// \param[in] _erp error reduction parameter
+      /// \param[out] _kp equivalent spring stiffness
+      /// \param[out] _kd equivalent spring damping
+      private: void CFMERPToKpKd(const double _dt,
+                                 const double _cfm, const double _erp,
+                                 double &_kp, double &_kd);
+
       /// \brief internal variable to keep track of implicit damping internals
       private: int implicitDampingState[MAX_JOINT_AXIS];
 

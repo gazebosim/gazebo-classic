@@ -1212,6 +1212,26 @@ double ODEJoint::ApplyAdaptiveDamping(int _index, const double _damping)
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::KpKdToCFMERP(const double _dt,
+                           const double _kp, const double _kd,
+                           double &_cfm, double &_erp)
+{
+  /// \TODO: check for NaN cases
+  _erp = _dt * _kp / ( _dt * _kp + _kd );
+  _cfm = 1.0 / ( _dt * _kp + _kd );
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::CFMERPToKpKd(const double _dt,
+                           const double _cfm, const double _erp,
+                           double &_kp, double &_kd)
+{
+  /// \TODO: check for NaN cases
+  _kp = _erp / (_dt * _cfm);
+  _kd = (1.0 - _erp) / _cfm;
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::SetDamping(int _index, double _damping)
 {
   if (static_cast<unsigned int>(_index) < this->GetAngleCount())
