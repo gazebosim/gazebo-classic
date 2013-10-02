@@ -184,8 +184,9 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _stiffness Stiffness value for the axis.
+      /// \param[in] _reference Spring zero load reference position.
       public: virtual void SetStiffnessDamping(int _index,
-        double _stiffness, double _damping) = 0;
+        double _stiffness, double _damping, double _reference = 0) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -512,7 +513,7 @@ namespace gazebo
       protected: JointWrench wrench;
 
       /// \brief option to use implicit damping
-      protected: bool useImplicitDamping;
+      protected: bool useImplicitDamping GAZEBO_DEPRECATED(1.10);
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

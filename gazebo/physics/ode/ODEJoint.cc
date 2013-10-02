@@ -42,12 +42,15 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->jointId = NULL;
   this->implicitDampingState[0] = ODEJoint::NONE;
   this->implicitDampingState[1] = ODEJoint::NONE;
-  this->dampingInitialized = false;
+  this->stiffnessDampingInitialized = false;
   this->feedback = NULL;
-  this->currentDamping[0] = 0;
-  this->currentDamping[1] = 0;
+  this->currentKd[0] = 0;
+  this->currentKd[1] = 0;
+  this->currentKp[0] = 0;
+  this->currentKp[1] = 0;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->useImplicitSpringDamper = false;
 }
 
 //////////////////////////////////////////////////
@@ -73,12 +76,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     if (elem->HasElement("cfm_damping"))
     {
       gzwarn << "Deprecating sdf <cfm_damping>, "
-             << "replace with <implicit_damping> in sdf 1.5.\n";
-      this->useImplicitDamping = elem->Get<bool>("cfm_damping");
+             << "replace with <implicit_spring_damper> in sdf 1.5.\n";
+      this->useImplicitSpringDamper = elem->Get<bool>("cfm_damping");
     }
-    else if (elem->HasElement("implicit_damping"))
+    else if (elem->HasElement("implicit_spring_damper"))
     {
-      this->useImplicitDamping = elem->Get<bool>("implicit_damping");
+      this->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
@@ -1153,26 +1156,35 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     }
     else if (!math::equal(this->dampingCoefficient[i], 0.0))
     {
-      double curDamp = fabs(this->dampingCoefficient[i]);
+      double kd = fabs(this->dampingCoefficient[i]);
+      double kp = this->stiffnessCoefficient[i];
 
       /// \TODO: This bit of code involving adaptive damping
       /// might be too complicated, add some more comments or simplify it.
       if (this->dampingCoefficient[i] < 0)
-        curDamp = this->ApplyAdaptiveDamping(i, curDamp);
+        kd = this->ApplyAdaptiveDamping(i, kd);
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
       if (this->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
-          !math::equal(curDamp, this->currentDamping[i]))
+          !math::equal(kd, this->currentKd[i]) ||
+          !math::equal(kp, this->currentKp[i]))
       {
-        this->currentDamping[i] = curDamp;
+        // save kp, kd applied for efficiency
+        this->currentKd[i] = kd;
+        this->currentKp[i] = kp;
+
+        // convert kp, kd to cfm, erp
+        double erp, cfm;
+        this->KpKdToCFMERP(dt, kp, kd, cfm, erp);
+
         // add additional constraint row by fake hitting joint limit
         // then, set erp and cfm to simulate viscous joint damping
-        this->SetAttribute("stop_erp", i, 0.0);
-        this->SetAttribute("stop_cfm", i, 1.0 / curDamp);
-        this->SetAttribute("hi_stop", i, 0.0);
-        this->SetAttribute("lo_stop", i, 0.0);
-        this->SetAttribute("hi_stop", i, 0.0);
+        this->SetAttribute("stop_erp", i, erp);
+        this->SetAttribute("stop_cfm", i, cfm);
+        this->SetAttribute("hi_stop", i, this->springReferencePosition[i]);
+        this->SetAttribute("lo_stop", i, this->springReferencePosition[i]);
+        this->SetAttribute("hi_stop", i, this->springReferencePosition[i]);
         this->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
       }
     }
@@ -1201,8 +1213,8 @@ double ODEJoint::ApplyAdaptiveDamping(int _index, const double _damping)
     //       << "] v [" << v
     //       << "] f*v [" << f*v
     //       << "] f/v [" << tmpDStable
-    //       << "] cur currentDamping[" << _index
-    //       << "] = [" << currentDamping[_index] << "]\n";
+    //       << "] cur currentKd[" << _index
+    //       << "] = [" << currentKd[_index] << "]\n";
 
     // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
     return std::max(_damping, 0.5*tmpDStable);
@@ -1250,45 +1262,53 @@ void ODEJoint::SetDamping(int _index, double _damping)
 
 //////////////////////////////////////////////////
 void ODEJoint::SetStiffnessDamping(int _index,
-  double _stiffness, double _damping)
+  double _stiffness, double _damping, double _reference)
 {
-  this->stiffnessCoefficient[_index] = _stiffness;
-  this->dampingCoefficient[_index] = _damping;
-
-  /// reset state of implicit damping state machine.
-  if (this->useImplicitDamping)
+  if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dampingCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// reset state of implicit damping state machine.
+    if (this->useImplicitSpringDamper)
     {
-      this->implicitDampingState[_index] = ODEJoint::NONE;
+      if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+      {
+        this->implicitDampingState[_index] = ODEJoint::NONE;
+      }
+      else
+      {
+         gzerr << "Incompatible joint type, index[" << _index
+               << "] is out of bounds (GetAngleCount() = "
+               << this->GetAngleCount() << ").\n";
+         return;
+      }
+    }
+
+    /// \TODO:  The check for static parent or child below might not be needed,
+    /// but we need to test first.  In theory, attaching an object to a static
+    /// body should not affect spring/damper application.
+    bool parentStatic =
+      this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+      this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!this->stiffnessDampingInitialized && !parentStatic && !childStatic)
+    {
+      this->applyDamping = physics::Joint::ConnectJointUpdate(
+        boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+      this->stiffnessDampingInitialized = true;
     }
     else
     {
-       gzerr << "Incompatible joint type, index[" << _index
-             << "] is out of bounds (GetAngleCount() = "
-             << this->GetAngleCount() << ").\n";
-       return;
+      gzwarn << "Damping for Joint[" << this->GetName()
+             << "] is not initialized because either parent[" << parentStatic
+             << "] or child[" << childStatic << "] is static.\n";
     }
   }
-
-  /// \TODO:  The check for static parent or child below might not be needed,
-  /// but we need to test first.  In theory, attaching an object to a static
-  /// body should not affect spring/damper application.
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-  if (!this->dampingInitialized && !parentStatic && !childStatic)
-  {
-    this->applyDamping = physics::Joint::ConnectJointUpdate(
-      boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
-    this->dampingInitialized = true;
-  }
   else
-  {
-    gzwarn << "Damping for Joint[" << this->GetName()
-           << "] is not initialized because either parent[" << parentStatic
-           << "] or child[" << childStatic << "] is static.\n";
-  }
+    gzerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
@@ -1359,7 +1379,7 @@ double ODEJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void ODEJoint::ApplyStiffnessDamping()
 {
-  if (this->useImplicitDamping)
+  if (this->useImplicitSpringDamper)
     this->ApplyImplicitStiffnessDamping();
   else
     this->ApplyExplicitStiffnessDamping();

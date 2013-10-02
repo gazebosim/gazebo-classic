@@ -381,25 +381,30 @@ void BulletJoint::SetDamping(int _index, double _damping)
 
 //////////////////////////////////////////////////
 void BulletJoint::SetStiffnessDamping(int _index,
-  double _stiffness, double _damping)
+  double _stiffness, double _damping, double _reference)
 {
-  gzdbg << "Joint stiffness not implement in Bullet\n";
-  this->stiffnessCoefficient[_index] = _stiffness;
-  this->dampingCoefficient[_index] = _damping;
-
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
-
-  /// \TODO:  this check might not be needed?  attaching an object to a static
-  /// body should not affect damping application.
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-  if (!this->dampingInitialized && !parentStatic && !childStatic)
+  if (_index < static_cast<int>(this->GetAngleCount()))
   {
-    this->applyDamping = physics::Joint::ConnectJointUpdate(
-      boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
-    this->dampingInitialized = true;
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dampingCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// \TODO: this check might not be needed?  attaching an object to a static
+    /// body should not affect damping application.
+    bool parentStatic =
+      this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+      this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!this->dampingInitialized && !parentStatic && !childStatic)
+    {
+      this->applyDamping = physics::Joint::ConnectJointUpdate(
+        boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
+      this->dampingInitialized = true;
+    }
   }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////

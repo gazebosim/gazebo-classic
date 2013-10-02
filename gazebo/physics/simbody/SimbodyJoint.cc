@@ -380,12 +380,13 @@ void SimbodyJoint::SetDamping(int _index, const double _damping)
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetStiffnessDamping(int _index,
-  double _stiffness, double _damping)
+  double _stiffness, double _damping, double _reference)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dampingCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
 
     /// \TODO: address multi-axis joints
     this->damper.setDamping(

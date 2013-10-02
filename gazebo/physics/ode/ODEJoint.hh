@@ -86,7 +86,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(int _index,
-        double _stiffness, double _damping);
+        double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
@@ -173,12 +173,18 @@ namespace gazebo
       /// \brief internal variable to keep track of implicit damping internals
       private: int implicitDampingState[MAX_JOINT_AXIS];
 
-      /// \brief save current implicit damping coefficient for stability reasons
-      private: double currentDamping[MAX_JOINT_AXIS];
+      /// \brief save current implicit damping coefficient
+      private: double currentKd[MAX_JOINT_AXIS];
+
+      /// \brief save current implicit stiffness coefficient
+      private: double currentKp[MAX_JOINT_AXIS];
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
-      private: bool dampingInitialized;
+      private: bool stiffnessDampingInitialized;
+
+      /// \brief flag to use implicit joint stiffness damping if true.
+      private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
