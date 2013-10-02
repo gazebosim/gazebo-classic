@@ -425,6 +425,12 @@ void Camera::Update()
 
 
 //////////////////////////////////////////////////
+void Camera::Render()
+{
+  this->Render(false);
+}
+
+//////////////////////////////////////////////////
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
@@ -1228,12 +1234,12 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
       // This #if allows ogre to antialias offscreen rendering
-      , NULL, false, 4
+     Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
+#else
+     Ogre::TU_RENDERTARGET)).getPointer();
 #endif
-      )).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 

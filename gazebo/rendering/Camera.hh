@@ -104,11 +104,18 @@ namespace gazebo
       public: double GetRenderRate() const;
 
       /// \brief Render the camera.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
+      // and change Render(bool _force) to have a default value of false.
+      public: void Render();
+
+      /// \brief Render the camera.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images
-      public: void Render(bool _force = false);
+      public: void Render(bool _force);
 
       /// \brief Post render
       ///
