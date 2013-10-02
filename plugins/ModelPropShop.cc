@@ -160,7 +160,7 @@ void ModelPropShop::Update()
       math::Box bbox = vis->GetBoundingBox();
 
       // Compute model scaling.
-      double scaling = 1.0/ bbox.GetSize().GetMax();
+      double scaling = 1.0 / bbox.GetSize().GetMax();
 
       // Compute the model translation.
       math::Vector3 trans = bbox.GetCenter();
