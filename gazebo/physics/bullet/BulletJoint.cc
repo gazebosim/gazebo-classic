@@ -387,7 +387,7 @@ void BulletJoint::SetStiffnessDamping(int /*_index*/,
   if (!this->dampingInitialized && !parentStatic && !childStatic)
   {
     this->applyDamping = physics::Joint::ConnectJointUpdate(
-      boost::bind(&BulletJoint::ApplyDamping, this));
+      boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
     this->dampingInitialized = true;
   }
 }
@@ -442,7 +442,7 @@ double BulletJoint::GetForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::ApplyDamping()
+void BulletJoint::ApplyStiffnessDamping()
 {
   // Take absolute value of dampingCoefficient, since negative values of
   // dampingCoefficient are used for adaptive damping to enforce stability.

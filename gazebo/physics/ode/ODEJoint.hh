@@ -191,7 +191,7 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void ApplyDamping();
+      public: virtual void ApplyStiffnessDamping();
 
       // Documentation inherited.
       /// \brief Set the force applied to this physics::Joint.

@@ -555,7 +555,14 @@ double Joint::GetDampingCoefficient() const
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  gzerr << "Joint::ApplyDamping should be overloaded by physics engines.\n";
+  gzerr << "Joint::ApplyDamping deprecated by Joint::ApplyStiffnessDamping.\n";
+  this->ApplyStiffnessDamping();
+}
+
+//////////////////////////////////////////////////
+void Joint::ApplyStiffnessDamping()
+{
+  gzerr << "Joint::ApplyStiffnessDamping should be overloaded by physics engines.\n";
 }
 
 //////////////////////////////////////////////////

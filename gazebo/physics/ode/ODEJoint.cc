@@ -1248,7 +1248,7 @@ void ODEJoint::SetStiffnessDamping(int /*_index*/,
         boost::bind(&ODEJoint::ApplyImplicitStiffnessDamping, this));
     else
       this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyDamping, this));
+        boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
     this->dampingInitialized = true;
   }
 }
@@ -1319,7 +1319,7 @@ double ODEJoint::GetForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::ApplyDamping()
+void ODEJoint::ApplyStiffnessDamping()
 {
   // Take absolute value of dampingCoefficient, since negative values of
   // dampingCoefficient are used for adaptive damping to enforce stability.

@@ -137,7 +137,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual void ApplyDamping();
+      public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
