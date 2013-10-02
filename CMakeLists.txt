@@ -303,6 +303,7 @@ else (build_errors)
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(PKG_LIBRARIES
+    gazebo
     gazebo_ccd
     gazebo_common
     gazebo_gimpact
