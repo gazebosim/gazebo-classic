@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <string>
+
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/gazebo.hh"
 
@@ -27,7 +29,9 @@ namespace gazebo
     public: virtual ~ModelPropShop();
 
     /// \brief Load the plugin.
-    public: void Load(int /*_argc*/, char ** /*_argv*/);
+    /// \param[in] _argc Number of command line arguments.
+    /// \param[in] _argv Array of command line arguments.
+    public: void Load(int _argc, char **_argv);
 
     /// \brief Initialize the plugin.
     private: void Init();
@@ -53,8 +57,10 @@ namespace gazebo
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
 
+    /// \brief Pointer to the sdf document.
     private: boost::shared_ptr<sdf::SDF> sdf;
 
+    /// \brief Name of the model.
     private: std::string modelName;
 
     /// \brief Path in which to save the output images.

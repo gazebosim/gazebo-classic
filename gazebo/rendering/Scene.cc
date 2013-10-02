@@ -2883,7 +2883,7 @@ void Scene::SetSkyXMode(unsigned int _mode)
 /////////////////////////////////////////////////
 void Scene::RemoveProjectors()
 {
-  for(std::map<std::string, Projector *>::iterator iter =
+  for (std::map<std::string, Projector *>::iterator iter =
       this->projectors.begin(); iter != this->projectors.end(); ++iter)
   {
     delete iter->second;
