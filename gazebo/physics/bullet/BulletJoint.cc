@@ -383,6 +383,13 @@ void BulletJoint::SetDamping(int /*_index*/, double _damping)
 }
 
 //////////////////////////////////////////////////
+void BulletJoint::SetStiffness(int /*_index*/, double _stiffness)
+{
+  this->stiffnessCoefficient = _stiffness;
+  gzdbg << "Not implement in Bullet\n";
+}
+
+//////////////////////////////////////////////////
 void BulletJoint::SetForce(int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);

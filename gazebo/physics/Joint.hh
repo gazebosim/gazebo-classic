@@ -173,6 +173,9 @@ namespace gazebo
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();
 
+      /// \brief Callback to apply damping force to joint.
+      public: virtual void ApplyExplicitStiffnessDamping();
+
       /// \brief Set the joint spring stiffness.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
