@@ -346,14 +346,14 @@ void SimbodyJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetDamping(int /*_index*/, const double _damping)
+void SimbodyJoint::SetDamping(int _index, const double _damping)
 {
-  this->dampingCoefficient = _damping;
-  gzdbg << "Not implement in Simbody\n";
+  this->SetStiffnessDamping(_index, this->stiffnessCoefficient, _damping);
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetStiffness(int /*_index*/, const double _stiffness)
+void SimbodyJoint::SetStiffnessDamping(int /*_index*/,
+  double _stiffness, double _damping)
 {
   this->stiffnessCoefficient = _stiffness;
   gzdbg << "Not implement in Simbody\n";

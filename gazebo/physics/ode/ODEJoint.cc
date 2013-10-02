@@ -1208,8 +1208,18 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetDamping(int /*_index*/, double _damping)
+void ODEJoint::SetDamping(int _index, double _damping)
 {
+  this->SetStiffnessDamping(_index, this->stiffnessCoefficient, _damping);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetStiffnessDamping(int /*_index*/,
+  double _stiffness, double _damping)
+{
+  this->stiffnessCoefficient = _stiffness;
+  gzdbg << "Stiffness not implement in Bullet\n";
+
   this->dampingCoefficient = _damping;
 
   // \TODO: implement on a per axis basis (requires additional sdf parameters)

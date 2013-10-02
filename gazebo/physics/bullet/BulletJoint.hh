@@ -72,7 +72,8 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
-      public: virtual void SetStiffness(int _index, const double _stiffness);
+      public: virtual void SetStiffnessDamping(int _index,
+        double _stiffness, double _damping);
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const

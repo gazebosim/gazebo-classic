@@ -85,6 +85,10 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual void SetStiffnessDamping(int _index,
+        double _stiffness, double _damping);
+
+      // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
       // Documentation inherited.

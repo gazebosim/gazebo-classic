@@ -363,8 +363,18 @@ void BulletJoint::SetupJointFeedback()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetDamping(int /*_index*/, double _damping)
+void BulletJoint::SetDamping(int _index, double _damping)
 {
+  this->SetStiffnessDamping(_index, this->stiffnessCoefficient, _damping);
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetStiffnessDamping(int /*_index*/,
+  double _stiffness, double _damping)
+{
+  this->stiffnessCoefficient = _stiffness;
+  gzdbg << "Stiffness not implement in Bullet\n";
+
   this->dampingCoefficient = _damping;
 
   // \TODO: implement on a per axis basis (requires additional sdf parameters)
@@ -380,13 +390,6 @@ void BulletJoint::SetDamping(int /*_index*/, double _damping)
       boost::bind(&BulletJoint::ApplyDamping, this));
     this->dampingInitialized = true;
   }
-}
-
-//////////////////////////////////////////////////
-void BulletJoint::SetStiffness(int /*_index*/, double _stiffness)
-{
-  this->stiffnessCoefficient = _stiffness;
-  gzdbg << "Not implement in Bullet\n";
 }
 
 //////////////////////////////////////////////////
