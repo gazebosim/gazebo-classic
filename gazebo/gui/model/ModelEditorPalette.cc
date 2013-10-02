@@ -418,9 +418,9 @@ void ModelEditorPalette::OnDiscard()
       break;
     case QMessageBox::Cancel:
       // Do nothing
-    break;
+      break;
     default:
-    break;
+      break;
   }
 }
 
