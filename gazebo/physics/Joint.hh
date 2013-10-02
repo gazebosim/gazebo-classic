@@ -173,10 +173,8 @@ namespace gazebo
       public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
-      public: virtual void ApplyDamping();
-
-      /// \brief Callback to apply damping force to joint.
-      public: virtual void ApplyExplicitStiffnessDamping();
+      /// Deprecat by ApplyStiffnessDamping.
+      public: virtual void ApplyDamping() GAZEBO_DEPRECATED(1.10);
 
       /// \brief Set the joint spring stiffness.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
