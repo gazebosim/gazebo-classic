@@ -40,9 +40,9 @@ ODEJoint::ODEJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->jointId = NULL;
-  this->cfmDampingState[0] = ODEJoint::NONE;
-  this->cfmDampingState[1] = ODEJoint::NONE;
-  this->cfmDampingState[2] = ODEJoint::NONE;
+  this->implicitDampingState[0] = ODEJoint::NONE;
+  this->implicitDampingState[1] = ODEJoint::NONE;
+  this->implicitDampingState[2] = ODEJoint::NONE;
   this->dampingInitialized = false;
   this->feedback = NULL;
   this->dStable[0] = 0;
@@ -74,7 +74,13 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("cfm_damping"))
     {
-      this->useCFMDamping = elem->Get<bool>("cfm_damping");
+      gzwarn << "Deprecating sdf <cfm_damping>, "
+             << "replace with <implicit_damping> in sdf 1.5.\n";
+      this->useImplicitDamping = elem->Get<bool>("cfm_damping");
+    }
+    else if (elem->HasElement("implicit_damping"))
+    {
+      this->useImplicitDamping = elem->Get<bool>("implicit_damping");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
@@ -1111,6 +1117,12 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 void ODEJoint::CFMDamping()
 {
+  this->ApplyImplicitStiffnessDamping();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyImplicitStiffnessDamping()
+{
   // check if we are violating joint limits
   if (this->GetAngleCount() > 2)
   {
@@ -1128,9 +1140,9 @@ void ODEJoint::CFMDamping()
         angle + dAngle >= this->upperLimit[i].Radian() ||
         angle + dAngle <= this->lowerLimit[i].Radian())
     {
-      if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
+      if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
-        // we have hit the actual joint limit!
+        // We have hit the actual joint limit!
         // turn off simulated damping by recovering cfm and erp,
         // and recover joint limits
         this->SetAttribute("stop_erp", i, this->stopERP);
@@ -1138,7 +1150,7 @@ void ODEJoint::CFMDamping()
         this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
         this->SetAttribute("lo_stop", i, this->lowerLimit[i].Radian());
         this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
-        this->cfmDampingState[i] = ODEJoint::JOINT_LIMIT;
+        this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
     }
     else if (!math::equal(this->dampingCoefficient, 0.0))
@@ -1150,14 +1162,20 @@ void ODEJoint::CFMDamping()
       double v = this->GetVelocity(i);
       double curDamp = fabs(this->dampingCoefficient);
 
+      /// \TODO: This bit of code involving dStable might be too complicated,
+      /// add some more comments or simplify it.
+
       /// \TODO: increase damping if resulting acceleration
       /// is outside of stability region.  simple limiter based on (f, v).
-      // safeguard against unstable joint behavior
-      // at low speed and high force scenarios
+      /// safeguard against unstable joint behavior
+      /// at low speed and high force scenarios
       if (this->dampingCoefficient < 0 &&
           fabs(v) < vThreshold && fabs(f) > fThreshold)
       {
+        // guess what the stable damping value might be based on v.
         double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
+
+        // debug
         // gzerr << "joint [" << this->GetName()
         //       << "] curDamp[" << curDamp
         //       << "] f [" << f
@@ -1172,7 +1190,7 @@ void ODEJoint::CFMDamping()
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
-      if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
+      if (this->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
           !math::equal(curDamp, this->dStable[i]))
       {
         this->dStable[i] = curDamp;
@@ -1183,7 +1201,7 @@ void ODEJoint::CFMDamping()
         this->SetAttribute("hi_stop", i, 0.0);
         this->SetAttribute("lo_stop", i, 0.0);
         this->SetAttribute("hi_stop", i, 0.0);
-        this->cfmDampingState[i] = ODEJoint::DAMPING_ACTIVE;
+        this->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
       }
     }
   }
@@ -1195,8 +1213,8 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
   this->dampingCoefficient = _damping;
 
   // \TODO: implement on a per axis basis (requires additional sdf parameters)
-  // trigger an update in CFMDAmping if this is called
-  if (this->useCFMDamping)
+  // trigger an update in ImplicitDamping if this is called
+  if (this->useImplicitDamping)
   {
     if (this->GetAngleCount() > 2)
     {
@@ -1205,7 +1223,7 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
        return;
     }
     for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-      this->cfmDampingState[i] = ODEJoint::NONE;
+      this->implicitDampingState[i] = ODEJoint::NONE;
   }
 
   /// \TODO:  this check might not be needed?  attaching an object to a static
@@ -1215,9 +1233,9 @@ void ODEJoint::SetDamping(int /*_index*/, double _damping)
 
   if (!this->dampingInitialized && !parentStatic && !childStatic)
   {
-    if (this->useCFMDamping)
+    if (this->useImplicitDamping)
       this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::CFMDamping, this));
+        boost::bind(&ODEJoint::ApplyImplicitStiffnessDamping, this));
     else
       this->applyDamping = physics::Joint::ConnectJointUpdate(
         boost::bind(&ODEJoint::ApplyDamping, this));

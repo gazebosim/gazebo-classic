@@ -35,14 +35,14 @@ namespace gazebo
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
-      /// \brief internal variables used for cfm damping
+      /// \brief internal variables used for implicit damping
       public:  enum CFMMode
       {
-        /// \brief cfm damping not active
+        /// \brief implicit damping not active
         NONE           = 0x00000000,
-        /// \brief cfm damping active, joints within limits
+        /// \brief implicit damping active, joints within limits
         DAMPING_ACTIVE = 0x00000001,
-        /// \brief cfm damping not active, enforcing joints limits
+        /// \brief implicit damping not active, enforcing joints limits
         JOINT_LIMIT    = 0x00000002
       };
 
@@ -111,7 +111,11 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
 
       /// \brief simulating damping with CFM and meddling with Joint limits
-      public: void CFMDamping();
+      /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
+      public: void CFMDamping() GAZEBO_DEPRECATED(1.10);
+
+      /// \brief simulating damping with CFM and meddling with Joint limits
+      public: void ApplyImplicitStiffnessDamping();
 
       /// \brief Get access to stopCFM
       /// \return Returns joint's cfm for end stops
@@ -127,10 +131,10 @@ namespace gazebo
         return this->stopERP;
       }
 
-      /// \brief internal variable to keep track of cfm damping internals
-      private: int cfmDampingState[3];
+      /// \brief internal variable to keep track of implicit damping internals
+      private: int implicitDampingState[3];
 
-      /// \brief current cfm damping for stability reasons
+      /// \brief save current implicit damping coefficient for stability reasons
       private: double dStable[3];
 
       /// \brief internal variable to keep track if ConnectJointUpdate

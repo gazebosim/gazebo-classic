@@ -50,7 +50,7 @@ Joint::Joint(BasePtr _parent)
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
   this->velocityLimit[1] = -1;
-  this->useCFMDamping = false;
+  this->useImplicitDamping = false;
   this->lowerLimit[0] = -1e16;
   this->lowerLimit[1] = -1e16;
   this->upperLimit[0] =  1e16;
@@ -58,6 +58,7 @@ Joint::Joint(BasePtr _parent)
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
   this->dampingCoefficient = 0;
+  this->stiffnessCoefficient = 0;
   this->provideFeedback = false;
 
   if (!this->sdfJoint)
@@ -634,6 +635,12 @@ double Joint::GetDamping(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetStiffness(int /*_index*/)
+{
+  return this->stiffnessCoefficient;
+}
+
+//////////////////////////////////////////////////
 math::Angle Joint::GetLowerLimit(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
@@ -651,6 +658,80 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 
   gzwarn << "requesting upper limit of joint index out of bound\n";
   return math::Angle();
+}
+
+//////////////////////////////////////////////////
+void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "SetLowerLimit for index [" << _index
+          << "] out of bounds [" << this->GetAngleCount()
+          << "]\n";
+    return;
+  }
+
+  if (_index == 0)
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+    // store lower joint limits
+    this->lowerLimit[_index] = _limit;
+    limitElem->GetElement("lower")->Set(_limit.Radian());
+  }
+  else if (_index == 1)
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
+    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+    // store lower joint limits
+    this->lowerLimit[_index] = _limit;
+    limitElem->GetElement("lower")->Set(_limit.Radian());
+  }
+  else
+  {
+    gzwarn << "SetLowerLimit for joint [" << this->GetName()
+           << "] index [" << _index
+           << "] not supported\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "SetUpperLimit for index [" << _index
+          << "] out of bounds [" << this->GetAngleCount()
+          << "]\n";
+    return;
+  }
+
+  if (_index == 0)
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+    // store upper joint limits
+    this->upperLimit[_index] = _limit;
+    limitElem->GetElement("upper")->Set(_limit.Radian());
+  }
+  else if (_index == 1)
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
+    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+    // store upper joint limits
+    this->upperLimit[_index] = _limit;
+    limitElem->GetElement("upper")->Set(_limit.Radian());
+  }
+  else
+  {
+    gzwarn << "SetUpperLimit for joint [" << this->GetName()
+           << "] index [" << _index
+           << "] not supported\n";
+  }
 }
 
 //////////////////////////////////////////////////

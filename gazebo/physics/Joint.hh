@@ -173,6 +173,22 @@ namespace gazebo
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();
 
+      /// \brief Set the joint spring stiffness.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
+      /// \param[in] _stiffness Stiffness value for the axis.
+      public: virtual void SetStiffness(int _index, double _stiffness) = 0;
+
+      /// \brief Returns the current joint spring stiffness coefficient.
+      /// \param[in] _index Index of the axis to get, currently ignored, to be
+      ///                   implemented.
+      /// \return Joint spring stiffness coefficient for this joint.
+      public: double GetStiffness(int _index);
+
+      /// \brief Callback to apply spring stiffness and viscous damping
+      /// forces to joint.
+      public: virtual void ApplyStiffnessDamping();
+
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
       /// \return Connection pointer, which must be kept in scope.
@@ -389,7 +405,7 @@ namespace gazebo
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
-      /// \return Upper limit of the axis.
+      /// \return Lower limit of the axis.
       public: math::Angle GetLowerLimit(unsigned int _index) const;
 
       /// \brief:  get the joint lower limit
@@ -397,6 +413,18 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
       public: math::Angle GetUpperLimit(unsigned int _index) const;
+
+      /// \brief:  set the joint upper limit
+      /// (replaces SetLowStop and SetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _limit Lower limit of the axis.
+      public: void SetLowerLimit(unsigned int _index, math::Angle _limit);
+
+      /// \brief:  set the joint lower limit
+      /// (replacee GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _limit Upper limit of the axis.
+      public: void SetUpperLimit(unsigned int _index, math::Angle _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.
@@ -406,8 +434,9 @@ namespace gazebo
       public: virtual void CacheForceTorque() { }
 
       /// \brief Get damping coefficient of this joint
+      /// Depreated, use GetDamping(_index) instead.
       /// \return viscous joint damping coefficient
-      public: double GetDampingCoefficient() const;
+      public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(1.10);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -449,6 +478,9 @@ namespace gazebo
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
 
+      /// \brief joint stiffnessCoefficient
+      protected: double stiffnessCoefficient;
+
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
 
@@ -472,8 +504,8 @@ namespace gazebo
       /// clears them at the end of update step.
       protected: JointWrench wrench;
 
-      /// \brief option to use CFM damping
-      protected: bool useCFMDamping;
+      /// \brief option to use implicit damping
+      protected: bool useImplicitDamping;
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.
