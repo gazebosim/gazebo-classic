@@ -127,7 +127,7 @@ namespace gazebo
       /// \return Pointer to the window manager.
       public: WindowManagerPtr GetWindowManager() const;
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+#if OGRE_VERSION_MINOR >= 9
       /// \brief Get a pointer to the Ogre overlay system.
       /// \return Pointer to the OGRE overlay system.
       public: Ogre::OverlaySystem *GetOverlaySystem() const;
@@ -195,7 +195,7 @@ namespace gazebo
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+#if OGRE_VERSION_MINOR >= 9
       private: Ogre::OverlaySystem *overlaySystem;
 #endif
 
