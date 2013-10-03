@@ -51,6 +51,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
   this->useImplicitSpringDamper = false;
+  this->stopERP = 0.0;
+  this->stopCFM = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -1137,9 +1139,12 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
   {
     double angle = this->GetAngle(i).Radian();
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
-    if (math::equal(this->dampingCoefficient[i], 0.0) ||
-        angle + dAngle >= this->upperLimit[i].Radian() ||
-        angle + dAngle <= this->lowerLimit[i].Radian())
+    angle += dAngle;
+
+    if ((math::equal(this->dampingCoefficient[i], 0.0) &&
+         math::equal(this->stiffnessCoefficient[i], 0.0)) ||
+        angle >= this->upperLimit[i].Radian() ||
+        angle <= this->lowerLimit[i].Radian())
     {
       if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
@@ -1153,8 +1158,21 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
         this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
+      /* test to see if we can reduce jitter at joint limits
+      // apply spring damper explicitly if in joint limit
+      // this limits oscillations if spring is pushing joint
+      // into the limit.
+      {
+        double dampingForce = -fabs(this->dampingCoefficient[i])
+          * this->GetVelocity(i);
+        double springForce = this->stiffnessCoefficient[i]
+          * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+        this->SetForceImpl(i, dampingForce + springForce);
+      }
+      */
     }
-    else if (!math::equal(this->dampingCoefficient[i], 0.0))
+    else if (!math::equal(this->dampingCoefficient[i], 0.0) ||
+             !math::equal(this->stiffnessCoefficient[i], 0.0))
     {
       double kd = fabs(this->dampingCoefficient[i]);
       double kp = this->stiffnessCoefficient[i];
@@ -1396,7 +1414,7 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
-      * (this->GetAngle(i).Radian() - this->springReferencePosition[i]);
+      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);

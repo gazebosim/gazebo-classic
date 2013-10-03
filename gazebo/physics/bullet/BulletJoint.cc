@@ -467,7 +467,7 @@ void BulletJoint::ApplyStiffnessDamping()
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
-      * (this->GetAngle(i).Radian() - this->springReferencePosition[i]);
+      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);
