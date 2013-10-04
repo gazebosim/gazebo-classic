@@ -65,7 +65,7 @@ namespace gazebo
         PART_SPHERE,
         /// \brief Cylinder
         PART_CYLINDER,
-        /// \brief Cylinder
+        /// \brief Custom
         PART_CUSTOM
       };
 
