@@ -21,8 +21,8 @@
 
 namespace gazebo
 {
-  /// \brief This plugin will generate 4 pictures of a model: perspective,
-  /// top, left, front, back.
+  /// \brief This plugin will generate 5 pictures of a model: perspective,
+  /// top, front, side, back.
   class ModelPropShop : public SystemPlugin
   {
     /// \brief Destructor
