@@ -116,9 +116,9 @@
                 </axis>
                 <physics>
                     <ode>
-                        <!-- cfm_damping is being deprecated by implicit_damping -->
+                        <!-- cfm_damping is being deprecated by implicit_spring_damper -->
                         <cfm_damping>1</cfm_damping>
-                        <implicit_damping>1</implicit_damping>
+                        <implicit_spring_damper>1</implicit_spring_damper>
                     </ode>
                 </physics>
             </joint>
@@ -152,9 +152,9 @@
                 </axis2>
                 <physics>
                     <ode>
-                        <!-- cfm_damping is being deprecated by implicit_damping -->
+                        <!-- cfm_damping is being deprecated by implicit_spring_damper -->
                         <cfm_damping>1</cfm_damping>
-                        <implicit_damping>1</implicit_damping>
+                        <implicit_spring_damper>1</implicit_spring_damper>
                     </ode>
                 </physics>
             </joint>
