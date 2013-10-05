@@ -81,7 +81,14 @@ ConnectionManager::~ConnectionManager()
 
 //////////////////////////////////////////////////
 bool ConnectionManager::Init(const std::string &_masterHost,
-                             unsigned int master_port,
+    unsigned int _masterPort)
+{
+  return this->Init(_masterHost, _masterPort, 30);
+}
+
+//////////////////////////////////////////////////
+bool ConnectionManager::Init(const std::string &_masterHost,
+                             unsigned int _masterPort,
                              uint32_t _timeoutIterations)
 {
   this->stop = false;
@@ -97,7 +104,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   uint32_t timeoutCount = 0;
   uint32_t waitDurationMS = 1000;
 
-  while (!this->masterConn->Connect(_masterHost, master_port) &&
+  while (!this->masterConn->Connect(_masterHost, _masterPort) &&
       this->IsRunning() && timeoutCount < _timeoutIterations)
   {
     if (!common::Console::Instance()->GetQuiet())

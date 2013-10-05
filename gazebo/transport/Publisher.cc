@@ -183,7 +183,7 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->pubIds[*pubIter] = this->publication->Publish(*iter,
+      this->pubIds[*pubIter] = this->publication->Publish_(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
       if (this->pubIds[*pubIter] <= 0)
@@ -256,4 +256,27 @@ void Publisher::Fini()
   }
 
   this->node.reset();
+}
+
+//////////////////////////////////////////////////
+std::string Publisher::GetPrevMsg() const
+{
+  std::string result;
+  if (this->publication)
+  {
+    MessagePtr msg = this->publication->GetPrevMsg(this->id);
+    if (msg)
+      msg->SerializeToString(&result);
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+MessagePtr Publisher::GetPrevMsgPtr() const
+{
+  if (this->publication)
+    return this->publication->GetPrevMsg(this->id);
+  else
+    return MessagePtr();
 }

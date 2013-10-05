@@ -119,9 +119,9 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Implementation of Publish.
-      /// \param[in] _message Message to be published
+      /// \param[in] _message Message to be published.
       /// \param[in] _block Whether to block until the message is actually
-      /// written out
+      /// written out.
       private: void PublishImpl(const google::protobuf::Message &_message,
                                 bool _block);
 
@@ -166,7 +166,7 @@ namespace gazebo
       /// \brief Current id of the sent message.
       private: uint32_t pubId;
 
-      /// \brief Current publication ids
+      /// \brief Current publication ids.
       private: std::map<uint32_t, int> pubIds;
 
       /// \brief Unique ID for this publisher.

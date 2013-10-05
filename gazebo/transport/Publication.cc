@@ -46,7 +46,6 @@ void Publication::AddSubscription(const NodePtr &_node)
 
   {
     boost::mutex::scoped_lock lock(this->nodeMutex);
-
     endIter = this->nodes.end();
     iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
   }
@@ -60,6 +59,7 @@ void Publication::AddSubscription(const NodePtr &_node)
 
     boost::mutex::scoped_lock lock(this->callbackMutex);
 
+    // Send latched messages to the subscription.
     for (std::map<uint32_t, MessagePtr>::iterator pubIter =
         this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
     {
@@ -85,6 +85,7 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
     if (_callback->GetLatching())
     {
+      // Send latached messages to the subscription.
       for (std::map<uint32_t, MessagePtr>::iterator pubIter =
           this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
       {
@@ -277,7 +278,14 @@ void Publication::LocalPublish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-int Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+    uint32_t _id)
+{
+  this->Publish_(_msg, _cb, _id);
+}
+
+//////////////////////////////////////////////////
+int Publication::Publish_(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
     uint32_t _id)
 {
   int result = 0;
@@ -481,4 +489,13 @@ void Publication::RemoveNodes()
       this->transports.clear();
     }
   }
+}
+
+//////////////////////////////////////////////////
+MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
+{
+  if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
+    return this->prevMsgs[_pubId];
+  else
+    return MessagePtr();
 }

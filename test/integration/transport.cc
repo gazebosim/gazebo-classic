@@ -28,9 +28,33 @@ bool g_worldStatsMsg2 = false;
 bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
+bool g_stringMsg = false;
+bool g_stringMsg2 = false;
+bool g_stringMsg3 = false;
+bool g_stringMsg4 = false;
 
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
+  printf("1\n");
+  g_stringMsg = true;
+}
+
+void ReceiveStringMsg2(ConstGzStringPtr &/*_msg*/)
+{
+  printf("2\n");
+  g_stringMsg2 = true;
+}
+
+void ReceiveStringMsg3(ConstGzStringPtr &/*_msg*/)
+{
+  printf("3\n");
+  g_stringMsg3 = true;
+}
+
+void ReceiveStringMsg4(ConstGzStringPtr &/*_msg*/)
+{
+  printf("4\n");
+  g_stringMsg4 = true;
 }
 
 void ReceiveSceneMsg(ConstScenePtr &/*_msg*/)
@@ -53,7 +77,8 @@ void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
   g_worldStatsDebugMsg = true;
 }
 
-
+/*
+/////////////////////////////////////////////////
 TEST_F(TransportTest, Load)
 {
   for (unsigned int i = 0; i < 2; ++i)
@@ -63,6 +88,8 @@ TEST_F(TransportTest, Load)
   }
 }
 
+/////////////////////////////////////////////////
+// Standard pub/sub
 TEST_F(TransportTest, PubSub)
 {
   Load("worlds/empty.world");
@@ -93,6 +120,8 @@ TEST_F(TransportTest, PubSub)
   subs.clear();
 }
 
+/////////////////////////////////////////////////
+// Test error cases
 TEST_F(TransportTest, Errors)
 {
   Load("worlds/empty.world");
@@ -163,85 +192,240 @@ TEST_F(TransportTest, Errors)
   testNode.reset();
 }
 
-// This test creates a child process to test interprocess communication
-// TODO: This test needs to be fixed
-/*TEST_F(TransportTest, Processes)
+void SinglePub()
 {
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
+
+  msgs::GzString msg;
+  msg.set_data("Child process sending message.");
+  pub->Publish(msg);
+}
+
+
+
+/////////////////////////////////////////////////
+// This test creates a child process to test interprocess communication
+TEST_F(TransportTest, ThreadedSinglePubSub)
+{
+  g_stringMsg = false;
+
+  Load("worlds/empty.world");
+
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+  EXPECT_STREQ("gazebo.msgs.GzString",
+      node->GetMsgType("/gazebo/default/test").c_str());
+
+  boost::thread *thread = new boost::thread(boost::bind(&SinglePub));
+
+  for (int i = 0; i < 10 && !g_stringMsg; ++i)
+    common::Time::MSleep(100);
+
+  EXPECT_TRUE(g_stringMsg);
+
+  thread->join();
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, ThreadedMultiSubSinglePub)
+{
+  g_stringMsg = false;
+  g_stringMsg2 = false;
+
+  Load("worlds/empty.world");
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+  transport::SubscriberPtr sub2 =
+    node->Subscribe("~/test", &ReceiveStringMsg2, true);
+
+  EXPECT_STREQ("gazebo.msgs.GzString",
+      node->GetMsgType("/gazebo/default/test").c_str());
+
+  boost::thread *thread = new boost::thread(boost::bind(&SinglePub));
+
+  for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
+    common::Time::MSleep(100);
+
+  EXPECT_TRUE(g_stringMsg);
+
+  thread->join();
+}
+
+/////////////////////////////////////////////////
+void MultiPub()
+{
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
+  transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
+
+  msgs::GzString msg;
+  msg.set_data("Child process sending message.");
+  pub->Publish(msg);
+  pub2->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, ThreadedMultiPubSub)
+{
+  g_stringMsg = false;
+  g_stringMsg2 = false;
+
+  Load("worlds/empty.world");
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+  transport::SubscriberPtr sub2 =
+    node->Subscribe("~/test", &ReceiveStringMsg2, true);
+
+  EXPECT_STREQ("gazebo.msgs.GzString",
+      node->GetMsgType("/gazebo/default/test").c_str());
+
+  boost::thread *thread = new boost::thread(boost::bind(&MultiPub));
+
+  for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
+    common::Time::MSleep(100);
+
+  EXPECT_TRUE(g_stringMsg);
+
+  thread->join();
+}
+*/
+
+/////////////////////////////////////////////////
+void MultiPubSub()
+{
+  transport::NodePtr node(new transport::Node());
+  node->Init("default");
+
+  //transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
+  //transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
+
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/testO", &ReceiveStringMsg3, true);
+
+  //transport::SubscriberPtr sub2 =
+  //  node->Subscribe("~/testO", &ReceiveStringMsg4, true);
+
+  //EXPECT_STREQ("gazebo.msgs.GzString",
+  //    node->GetMsgType("/gazebo/default/testO").c_str());
+
+  //msgs::GzString msg;
+  //msg.set_data("Child process sending message.");
+  //pub->Publish(msg);
+  //pub2->Publish(msg);
+
+  for (int i = 0; i < 10 && !g_stringMsg3; ++i)// && !g_stringMsg4; ++i)
+    common::Time::MSleep(100);
+
+  EXPECT_TRUE(g_stringMsg3);
+  //EXPECT_TRUE(g_stringMsg4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
+{
+  g_stringMsg = false;
+  g_stringMsg2 = false;
+  g_stringMsg3 = false;
+  g_stringMsg4 = false;
+
+  Load("worlds/empty.world");
+
+  transport::NodePtr node(new transport::Node());
+  node->Init("default");
+
+  // transport::SubscriberPtr sub =
+  //   node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+  // transport::SubscriberPtr sub2 =
+  //   node->Subscribe("~/test", &ReceiveStringMsg2, true);
+
+
+  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/testO");
+  //transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/testO");
+  //pub->WaitForConnection();
+  //pub2->WaitForConnection();
+
+  // EXPECT_STREQ("gazebo.msgs.GzString",
+  //     node->GetMsgType("/gazebo/default/test").c_str());
+
+  msgs::GzString msg;
+  msg.set_data("Parent send message");
+  pub->Publish(msg);
+  //pub2->Publish(msg);
+
+  boost::thread *thread = new boost::thread(boost::bind(&MultiPubSub));
+
+  // for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
+  //   common::Time::MSleep(100);
+
+  // EXPECT_TRUE(g_stringMsg);
+  // EXPECT_TRUE(g_stringMsg2);
+
+  thread->join();
+}
+
+/////////////////////////////////////////////////
+// Test the case of a programe that sends a messages and then immediatly
+// stops.
+/*TEST_F(TransportTest, ImmediateEnd)
+{
+  g_stringMsg = false;
+
+  transport::init();
+  transport::run();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  // Subscribe to the 'test' topic
+  transport::SubscriberPtr sub =
+    node->Subscribe("~/test", &ReceiveStringMsg, true);
+
   pid_t pid = fork();
   if (pid == 0)
   {
-    common::Time::MSleep(1);
-    transport::init();
-    transport::run();
-
-    transport::NodePtr node(new transport::Node());
-    node->Init();
-
+    // Child process advertises on the 'test' topic
     transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
-
-    transport::SubscriberPtr sub =
-      node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg2);
-    transport::SubscriberPtr sub2 =
-      node->Subscribe("~/test", &ReceiveStringMsg, true);
-
-    transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
-
-    EXPECT_STREQ("gazebo.msgs.WorldStatistics",
-                 node->GetMsgType("/gazebo/default/world_stats").c_str());
-
     msgs::GzString msg;
-    msg.set_data("Waiting for message");
+
+    // Send a message
+    msg.set_data("Child process sent message.");
     pub->Publish(msg);
-    pub2->Publish(msg);
-
-    int i = 0;
-    while (!g_worldStatsMsg2 && i < 20)
-    {
-      common::Time::MSleep(100);
-      ++i;
-    }
-    EXPECT_LT(i, 20);
-
-    pub.reset();
-    sub.reset();
-    node.reset();
-    transport::fini();
-    common::Time::MSleep(5);
   }
-  else if (pid < 0)
-    printf("Fork failed\n");
   else
   {
-    Load("worlds/empty.world");
-
-    transport::NodePtr node(new transport::Node());
-    node->Init();
-
-    transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
-    transport::SubscriberPtr sub =
-      node->Subscribe("~/test", &ReceiveStringMsg, true);
-
-    transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
-    transport::SubscriberPtr sub2 =
-      node->Subscribe("~/test", &ReceiveStringMsg, true);
-
-    EXPECT_STREQ("gazebo.msgs.String",
-                 node->GetMsgType("/gazebo/default/test").c_str());
-
-    msgs::GzString msg;
-    msg.set_data("Waiting for message");
-    pub->Publish(msg);
-    pub2->Publish(msg);
-
-    for (int i = 0; i < 5; ++i)
+    // Prarent processe waits for the message to arrive
+    for (int i = 0; i < 10 && !g_stringMsg; ++i)
+    {
       common::Time::MSleep(100);
-
-    sub.reset();
-    sub2.reset();
-    kill(pid, SIGKILL);
+    }
+    EXPECT_TRUE(g_stringMsg);
   }
 }*/
 
+
+/////////////////////////////////////////////////
+// Main
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

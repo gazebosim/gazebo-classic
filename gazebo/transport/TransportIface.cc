@@ -76,6 +76,11 @@ bool transport::get_master_uri(std::string &_masterHost,
 
   return true;
 }
+/////////////////////////////////////////////////
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
+{
+  return init(_masterHost, _masterPort, 30);
+}
 
 /////////////////////////////////////////////////
 bool transport::init(const std::string &_masterHost, unsigned int _masterPort,

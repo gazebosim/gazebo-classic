@@ -47,6 +47,16 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
+      // \todo Deprecation: This function should be removed in Gazebo 3.0.
+      // Default the _timeoutIterations to 30 in the other Init function. 
+      /// \brief Initialize the connection manager. This will call
+      /// ConnectionManager::Init with  _timeoutIterations==30.
+      /// \param[in] _masterHost Host where the master is running
+      /// \param[in] _masterPort Port where the master is running
+      /// \return true if initialization succeeded, false otherwise
+      public: bool Init(const std::string &_masterHost,
+                        unsigned int _masterPort);
+
       /// \brief Initialize the connection manager
       /// \param[in] _masterHost Host where the master is running
       /// \param[in] _masterPort Port where the master is running
@@ -55,7 +65,7 @@ namespace gazebo
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
                         unsigned int _masterPort,
-                        uint32_t _timeoutIterations = 30);
+                        uint32_t _timeoutIterations);
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.

@@ -399,11 +399,14 @@ void TopicManager::Unadvertise(PublisherPtr _pub)
 {
   GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
 
-  PublicationPtr publication = this->FindPublication(_pub->GetTopic());
-  if (publication)
-    publication->RemovePublisher(_pub);
+  if (_pub)
+  {
+    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+    if (publication)
+      publication->RemovePublisher(_pub);
 
-  this->Unadvertise(_pub->GetTopic());
+    this->Unadvertise(_pub->GetTopic());
+  }
 }
 
 //////////////////////////////////////////////////
