@@ -452,6 +452,12 @@ namespace gazebo
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
 
+      /// \brief Get the id associated with this visual
+      public: uint32_t GetId() const;
+
+      /// \brief Set the id associated with this visual
+      public: void SetId(uint32_t _id);
+
       /// \brief Load all plugins
       ///
       /// Load all plugins specified in the SDF for the model.
@@ -529,7 +535,7 @@ namespace gazebo
       /// \brief Connection for the pre render event.
       private: event::ConnectionPtr preRenderConnection;
 
-      /// \brief List of all the lines created
+      /// \brief List of all the lines created.
       private: std::list<DynamicLines*> lines;
 
       /// \brief Lines and their vertices connected to this visual.
@@ -550,7 +556,7 @@ namespace gazebo
       /// \brief Callback for the animation complete event.
       private: boost::function<void()> onAnimationComplete;
 
-      /// \brief True to use RT shader system
+      /// \brief True to use RT shader system.
       private: bool useRTShader;
 
       /// \brief True if initialized.
@@ -558,6 +564,12 @@ namespace gazebo
 
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
+
+      /// \brief Unique id of this visual.
+      private: uint32_t id;
+
+      /// \brief Counter used to create unique ids.
+      private: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
       private: math::Vector3 scale;

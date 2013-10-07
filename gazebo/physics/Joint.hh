@@ -279,13 +279,28 @@ namespace gazebo
       /// \return The force applied to an axis.
       public: virtual double GetForce(unsigned int _index);
 
-      /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
+      /// \brief get internal force and torque values at a joint.
+      ///
+      ///   The force and torque values are returned in  a JointWrench
+      ///   data structure.  Where JointWrench.body1Force contains the
+      ///   force applied by the parent Link on the Joint specified in
+      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the force applied by the child Link on the Joint specified
+      ///   in the child Link frame.  Note that this sign convention
+      ///   is opposite of the reaction forces of the Joint on the Links.
+      ///
+      ///   FIXME TODO: change name of this function to something like:
+      ///     GetNegatedForceTorqueInLinkFrame
+      ///   and make GetForceTorque call return non-negated reaction forces
+      ///   in perspective Link frames.
+      ///
+      ///   Note that for ODE you must set
+      ///     <provide_feedback>true<provide_feedback>
+      ///   in the joint sdf to use this.
+      ///
+      /// \param[in] _index Not used right now
+      /// \return The force and torque at the joint, see above for details
+      /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).
@@ -390,6 +405,10 @@ namespace gazebo
       /// \brief Cache Joint Force Torque Values if necessary for physics engine
       public: virtual void CacheForceTorque() { }
 
+      /// \brief Get damping coefficient of this joint
+      /// \return viscous joint damping coefficient
+      public: double GetDampingCoefficient() const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -455,6 +474,10 @@ namespace gazebo
 
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief An SDF pointer that allows us to only read the joint.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfJoint;
 
       /// \brief Provide Feedback data for contact forces
       protected: bool provideFeedback;
