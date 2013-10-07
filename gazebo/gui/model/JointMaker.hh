@@ -69,8 +69,6 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      /// \param[in] _name Name of the joint visual
-      /// \param[in] _vis Pointer to the parent visual
       public: JointMaker();
 
       /// \brief Destructor

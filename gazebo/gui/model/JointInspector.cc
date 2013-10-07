@@ -249,8 +249,11 @@ void JointInspector::SetType(JointMaker::JointType _type)
   for (int i = 0; i < axisCount; ++i)
     this->axisGroupBoxes[i]->setVisible(true);
 
-  for (int i = axisCount; i < 2; ++i)
+  for (int i = axisCount;
+      i < static_cast<int>(this->axisGroupBoxes.size()); ++i)
+  {
     this->axisGroupBoxes[i]->setVisible(false);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -31,8 +31,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   this->active = false;
-  // Create the terrain editor tab
-  this->modelPalette = new ModelEditorPalette;
+  // Create the model editor tab
+  this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
 
   connect(g_editModelAct, SIGNAL(triggered(bool)), this, SLOT(OnEdit(bool)));

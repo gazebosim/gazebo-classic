@@ -217,7 +217,7 @@ namespace gazebo
 
       /// \brief Get whether or not the visual is visually highlighted. This is
       /// most often means that an object is selected by a user via the GUI.
-      /// \param[in] _highlighted True if the visual is highlighted.
+      /// \return True if the visual is highlighted.
       public: bool GetHighlighted() const;
 
       /// \brief Set the emissive value.

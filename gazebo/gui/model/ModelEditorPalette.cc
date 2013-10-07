@@ -293,6 +293,7 @@ void ModelEditorPalette::OnBox()
 void ModelEditorPalette::OnCustom()
 {
   ImportDialog importDialog;
+  importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
     this->modelCreator->AddCustom(importDialog.GetImportPath());
@@ -385,9 +386,11 @@ void ModelEditorPalette::OnStatic()
 void ModelEditorPalette::OnSave()
 {
   SaveDialog saveDialog;
+  saveDialog.deleteLater();
   saveDialog.SetTitle("Save Model");
   saveDialog.SetSaveName(this->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
+  saveDialog.SetFileExtension("sdf");
   if (saveDialog.exec() == QDialog::Accepted)
   {
     this->modelName = saveDialog.GetSaveName();
@@ -431,6 +434,7 @@ void ModelEditorPalette::OnDone()
   saveDialog.SetTitle("Save Model");
   saveDialog.SetSaveName(this->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
+  saveDialog.SetFileExtension("sdf");
   if (saveDialog.exec() == QDialog::Accepted)
   {
     this->modelName = saveDialog.GetSaveName();

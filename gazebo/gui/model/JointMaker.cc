@@ -260,6 +260,9 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     // first and JoinMaker would not receive it.
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
         boost::bind(&JointMaker::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
   }
 }
 
@@ -406,7 +409,8 @@ void JointMaker::CreateHotSpot()
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
   hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
 
-  hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   this->joints[hotSpotName] = joint;
@@ -533,19 +537,33 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
 int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
+  {
     return 0;
+  }
   else if (_type == JOINT_HINGE)
+  {
     return 1;
+  }
   else if (_type == JOINT_HINGE2)
+  {
     return 2;
+  }
   else if (_type == JOINT_SLIDER)
+  {
     return 1;
+  }
   else if (_type == JOINT_SCREW)
+  {
     return 1;
+  }
   else if (_type == JOINT_UNIVERSAL)
+  {
     return 2;
+  }
   else if (_type == JOINT_BALL)
+  {
     return 0;
+  }
 
   return 0;
 }

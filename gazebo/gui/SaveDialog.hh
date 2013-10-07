@@ -65,6 +65,10 @@ namespace gazebo
       /// \param[in] _title Title of dialog.
       public: void SetTitle(const std::string &_title);
 
+      /// \brief Set the file extension.
+      /// \param[in] _extension File extension.
+      public: void SetFileExtension(const std::string &_extension);
+
       /// \brief Qt event emitted showing the dialog
       protected: virtual void showEvent(QShowEvent *_event);
 
@@ -85,6 +89,9 @@ namespace gazebo
 
       /// \brief Message displayed in the dialog.
       private: QLabel *messageLabel;
+
+      /// \brief File extension.
+      private: std::string fileExtension;
     };
     /// \}
   }

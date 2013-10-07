@@ -479,7 +479,11 @@ void ModelCreator::AddPart(PartType _type)
         break;
       }
       default:
+      {
+        gzwarn << "Unknown part type '" << _type << "'. " <<
+            "Part not added" << std::endl;
         break;
+      }
     }
   }
 }
