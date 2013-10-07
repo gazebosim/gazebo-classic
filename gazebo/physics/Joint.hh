@@ -173,7 +173,7 @@ namespace gazebo
       public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
-      /// Deprecat by ApplyStiffnessDamping.
+      /// Deprecated by ApplyStiffnessDamping.
       public: virtual void ApplyDamping() GAZEBO_DEPRECATED(1.10);
 
       /// \brief Callback to apply spring stiffness and viscous damping
