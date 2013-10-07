@@ -12,10 +12,10 @@
 
     <physics type="ode">
         <gravity>0.000000 0.000000 0.00000</gravity>
+        <max_step_size>0.000100</max_step_size>
         <ode>
             <solver>
                 <type>quick</type>
-                <dt>0.000100</dt>
                 <iters>100</iters>
                 <precon_iters>0</precon_iters>
                 <sor>1.300000</sor>
@@ -27,7 +27,7 @@
                 <contact_surface_layer>0.000000</contact_surface_layer>
             </constraints>
         </ode>
-        <update_rate>0.000000</update_rate>
+        <real_time_update_rate>0.000000</real_time_update_rate>
     </physics>
 
     <model name="model_1">
