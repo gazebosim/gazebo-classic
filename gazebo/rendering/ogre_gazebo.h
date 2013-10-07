@@ -58,11 +58,11 @@
 #include <OGRE/Terrain/OgreTerrain.h>
 #include <OGRE/Terrain/OgreTerrainGroup.h>
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
 #endif
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 9
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
 #include <OGRE/Overlay/OgreOverlayManager.h>
 #include <OGRE/Overlay/OgreOverlayElement.h>
 #include <OGRE/Overlay/OgreOverlayContainer.h>
