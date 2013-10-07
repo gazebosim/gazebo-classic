@@ -164,7 +164,7 @@ namespace gazebo
       ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping)
-        GAZEBO_DEPRECATED(1.10) = 0;
+        GAZEBO_DEPRECATED(2.0) = 0;
 
       /// \brief Returns the current joint damping coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -174,7 +174,7 @@ namespace gazebo
 
       /// \brief Callback to apply damping force to joint.
       /// Deprecated by ApplyStiffnessDamping.
-      public: virtual void ApplyDamping() GAZEBO_DEPRECATED(1.10);
+      public: virtual void ApplyDamping() GAZEBO_DEPRECATED(2.0);
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
@@ -441,7 +441,7 @@ namespace gazebo
       /// \brief Get damping coefficient of this joint
       /// Depreated, use GetDamping(_index) instead.
       /// \return viscous joint damping coefficient
-      public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(1.10);
+      public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -513,7 +513,9 @@ namespace gazebo
       protected: JointWrench wrench;
 
       /// \brief option to use implicit damping
-      protected: bool useImplicitDamping GAZEBO_DEPRECATED(1.10);
+      /// Deprecated, pushing this flag into individual physics engine,
+      /// for example: ODEJoint::useImplicitSpringDamper.
+      protected: bool useImplicitDamping GAZEBO_DEPRECATED(2.0);
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

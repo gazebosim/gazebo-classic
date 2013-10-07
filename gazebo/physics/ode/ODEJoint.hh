@@ -116,7 +116,7 @@ namespace gazebo
 
       /// \brief simulating damping with CFM and meddling with Joint limits
       /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
-      public: void CFMDamping() GAZEBO_DEPRECATED(1.10);
+      public: void CFMDamping() GAZEBO_DEPRECATED(2.0);
 
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
