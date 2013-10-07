@@ -155,13 +155,6 @@ void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetDamping(int /*index*/, double _damping)
-{
-  this->dampingCoefficient = _damping;
-  gzlog << "damping not available for gearbox\n";
-}
-
-//////////////////////////////////////////////////
 math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
 {
   gzlog << "GetAngle not implemented for gearbox\n";
