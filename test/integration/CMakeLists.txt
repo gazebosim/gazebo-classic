@@ -27,6 +27,7 @@ set(tests
   contact_sensor.cc
   factory.cc
   file_handling.cc
+  gripper.cc
   imu.cc
   laser.cc
   nondefault_world.cc
@@ -49,6 +50,11 @@ endif()
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
   "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
 gz_build_tests(${tests})
+
+if (ENABLE_TESTS_COMPILATION)
+  # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+endif()
 
 set(display_tests
 )
@@ -73,7 +79,7 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_dri_tests(${dri_tests})
 
 
-if (VALID_DRI_DISPLAY)
+if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
 

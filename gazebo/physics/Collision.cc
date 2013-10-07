@@ -28,7 +28,7 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/ContactManager.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"
@@ -52,11 +52,12 @@ Collision::Collision(LinkPtr _link)
 
   this->link = _link;
 
-  this->contactsEnabled = false;
   this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
+
+  this->collisionVisualId = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -198,26 +199,19 @@ void Collision::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool _enable)
+void Collision::SetContactsEnabled(bool /*_enable*/)
 {
-  this->contactsEnabled = _enable;
 }
 
 //////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
-  return this->contact.ConnectionCount() > 0 || this->contactsEnabled;
+  return false;
 }
 
 //////////////////////////////////////////////////
-void Collision::AddContact(const Contact &_contact)
+void Collision::AddContact(const Contact & /*_contact*/)
 {
-  if (!this->GetContactsEnabled() ||
-      this->HasType(Base::RAY_SHAPE) ||
-      this->HasType(Base::PLANE_SHAPE))
-    return;
-
-  this->contact(this->GetScopedName(), _contact);
 }
 
 //////////////////////////////////////////////////
@@ -351,7 +345,11 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+
+  // Put in a unique ID because this is a special visual.
+  msg.set_id(this->collisionVisualId);
   msg.set_parent_name(this->parent->GetScopedName());
+  msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());

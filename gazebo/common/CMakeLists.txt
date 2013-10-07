@@ -91,7 +91,6 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
-  AudioDecoder_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   Console_TEST.cc
@@ -103,6 +102,12 @@ set (gtest_sources
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_FFMPEG)
+  set (gtest_sources ${gtest_sources}
+                     AudioDecoder_TEST.cc)
+endif()
+
 gz_build_tests(${gtest_sources})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
@@ -155,6 +160,3 @@ endif()
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
-
-# Deprecated Common.hh
-gz_issue_775("Common")

@@ -103,13 +103,14 @@ set (headers
 )
 
 set (gtest_sources
-  Heightmap_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
-  GpuLaser_TEST.cc)
+  GpuLaser_TEST.cc
+  Heightmap_TEST.cc
+)
 
 gz_build_dri_tests(${gtest_sources_dri})
 
@@ -146,6 +147,3 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
-
-# Deprecated Rendering.hh
-gz_issue_775("Rendering")

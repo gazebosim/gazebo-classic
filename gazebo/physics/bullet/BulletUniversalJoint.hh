@@ -69,9 +69,6 @@ namespace gazebo
       /// \brief Get the angular rate of axis 1
       public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int _index, double _torque);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
@@ -95,6 +92,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the torque of a joint.
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to bullet universal constraint
       private: btUniversalConstraint *bulletUniversal;

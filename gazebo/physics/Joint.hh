@@ -105,16 +105,6 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose);
 
-      /// \brief Set parent and child links of a physics::Joint and its
-      /// anchor offset position.
-      /// This funciton is deprecated, use
-      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
-      /// \param[in] _parent Parent link.
-      /// \param[in] _child Child link.
-      /// \param[in] _pos Joint Anchor offset from child link.
-      public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
-
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -266,71 +256,63 @@ namespace gazebo
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.  Force is additive (multiple calls
+      /// to SetForce to the same joint in the same time
+      /// step will accumulate forces on that Joint).
+      /// Forces are truncated by effortLimit before applied.
       /// \param[in] _index Index of the axis.
-      /// \param[in] _force Force value.
-      public: virtual void SetForce(int _index, double _force);
+      /// \param[in] _effort Force value.
+      public: virtual void SetForce(int _index, double _effort) = 0;
+
+      /// \brief check if the force against velocityLimit and effortLimit,
+      /// truncate if necessary.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _effort Force value.
+      /// \return truncated effort
+      public: double CheckAndTruncateForce(int _index, double _effort);
 
       /// \brief @todo: not yet implemented.
-      /// Get the forces applied at this Joint.
+      /// Get external forces applied at this Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
-      /// \param[in] _index Index of the axis.
-      /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief @todo: not yet implemented.
-      /// Get the forces applied at this Joint.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
       public: virtual double GetForce(unsigned int _index);
 
-      /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
-      public: virtual JointWrench GetForceTorque(int _index)
-        GAZEBO_DEPRECATED(1.5) = 0;
-
-      /// \brief get internal force and torque values at a joint
-      /// Note that you must set
-      ///   <provide_feedback>true<provide_feedback>
-      /// in the joint sdf to use this.
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
+      /// \brief get internal force and torque values at a joint.
+      ///
+      ///   The force and torque values are returned in  a JointWrench
+      ///   data structure.  Where JointWrench.body1Force contains the
+      ///   force applied by the parent Link on the Joint specified in
+      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the force applied by the child Link on the Joint specified
+      ///   in the child Link frame.  Note that this sign convention
+      ///   is opposite of the reaction forces of the Joint on the Links.
+      ///
+      ///   FIXME TODO: change name of this function to something like:
+      ///     GetNegatedForceTorqueInLinkFrame
+      ///   and make GetForceTorque call return non-negated reaction forces
+      ///   in perspective Link frames.
+      ///
+      ///   Note that for ODE you must set
+      ///     <provide_feedback>true<provide_feedback>
+      ///   in the joint sdf to use this.
+      ///
+      /// \param[in] _index Not used right now
+      /// \return The force and torque at the joint, see above for details
+      /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
       public: virtual void SetMaxForce(int _index, double _force) = 0;
 
       /// \brief Get the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
       public: virtual double GetMaxForce(int _index) = 0;
@@ -358,10 +340,7 @@ namespace gazebo
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const = 0;
@@ -369,10 +348,7 @@ namespace gazebo
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// Note that the unit of torque should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons-Meters.  If using
-      /// imperial units (sorry), then unit of force is lb-force-inches
-      /// not (lb-mass-inches), etc.
+      /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1)
       /// \return Torque applied to the link.
       public: virtual math::Vector3 GetLinkTorque(
@@ -426,6 +402,13 @@ namespace gazebo
       /// \param[in] _enable True to enable joint feedback.
       public: virtual void SetProvideFeedback(bool _enable);
 
+      /// \brief Cache Joint Force Torque Values if necessary for physics engine
+      public: virtual void CacheForceTorque() { }
+
+      /// \brief Get damping coefficient of this joint
+      /// \return viscous joint damping coefficient
+      public: double GetDampingCoefficient() const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -434,11 +417,6 @@ namespace gazebo
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
-
-      /// \brief Helper function to load a joint.
-      /// This function is deprecated, use LoadImpl(math::Pose &)
-      /// \param[in] _pos Position of the anchor.
-      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Computes inertiaRatio for this joint during Joint::Init
       /// The inertia ratio for each joint between [1, +inf] gives a sense
@@ -474,12 +452,6 @@ namespace gazebo
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
 
-      /// \brief Save force applied by user
-      /// This plus the joint feedback (joint contstraint forces) is the
-      /// equivalent of simulated force torque sensor reading
-      /// Allocate a 2 vector in case hinge2 joint is used.
-      protected: double forceApplied[MAX_JOINT_AXIS];
-
       /// \brief Store Joint effort limit as specified in SDF
       protected: double effortLimit[MAX_JOINT_AXIS];
 
@@ -496,8 +468,16 @@ namespace gazebo
       /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
 
+      /// \brief Cache Joint force torque values in case physics engine
+      /// clears them at the end of update step.
+      protected: JointWrench wrench;
+
       /// \brief option to use CFM damping
       protected: bool useCFMDamping;
+
+      /// \brief An SDF pointer that allows us to only read the joint.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfJoint;
 
       /// \brief Provide Feedback data for contact forces
       protected: bool provideFeedback;
