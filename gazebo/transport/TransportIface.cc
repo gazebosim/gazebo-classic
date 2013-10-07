@@ -78,7 +78,7 @@ bool transport::get_master_uri(std::string &_masterHost,
     catch(...)
     {
       gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
-        << "Using the default port number of 11345.\n"; 
+        << "Using the default port number of 11345.\n";
     }
   }
 

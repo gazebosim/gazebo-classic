@@ -48,7 +48,7 @@ namespace gazebo
       private: virtual ~ConnectionManager();
 
       // \todo Deprecation: This function should be removed in Gazebo 3.0.
-      // Default the _timeoutIterations to 30 in the other Init function. 
+      // Default the _timeoutIterations to 30 in the other Init function.
       /// \brief Initialize the connection manager. This will call
       /// ConnectionManager::Init with  _timeoutIterations==30.
       /// \param[in] _masterHost Host where the master is running
