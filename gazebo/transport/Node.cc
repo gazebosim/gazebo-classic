@@ -268,7 +268,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -286,7 +289,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleMessage(_msg);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }

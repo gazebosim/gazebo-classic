@@ -76,6 +76,11 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const;
 
+      /// \brief Set whether this callback is latching.
+      /// This function should only be used by the Transport library.
+      /// \param[in] _latch False to turn off latching.
+      public: void SetLatching(bool _latch);
+
       /// \brief Get the unique ID of this callback.
       /// \return The unique ID of this callback.
       public: unsigned int GetId() const;

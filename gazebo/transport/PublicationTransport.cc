@@ -96,6 +96,8 @@ void PublicationTransport::OnPublish(const std::string &_data)
     this->connection->AsyncRead(
         boost::bind(&PublicationTransport::OnPublish, this, _1));
 
+    std::cout << "PublicationTransport::OnPublish[" << _data << "]\n";
+
     if (!_data.empty())
     {
       if (this->callback)

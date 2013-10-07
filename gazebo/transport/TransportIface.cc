@@ -70,8 +70,16 @@ bool transport::get_master_uri(std::string &_masterHost,
   }
   else
   {
-    _masterPort = boost::lexical_cast<unsigned int>(
-        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    try
+    {
+      _masterPort = boost::lexical_cast<unsigned int>(
+          masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    }
+    catch(...)
+    {
+      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+        << "Using the default port number of 11345.\n"; 
+    }
   }
 
   return true;

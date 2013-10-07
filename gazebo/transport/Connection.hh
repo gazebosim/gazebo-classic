@@ -261,7 +261,6 @@ namespace gazebo
                   }
                   else
                   {
-                    gzerr << "Header is empty\n";
                     boost::get<0>(_handler)("");
                     // This code tries to read the header again. We should
                     // never get here.

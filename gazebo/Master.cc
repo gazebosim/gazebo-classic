@@ -121,8 +121,9 @@ void Master::OnRead(const unsigned int _connectionIndex,
   }
   else
   {
-    gzerr << "Master got empty data message from["
-          << conn->GetRemotePort() << "]\n";
+    gzlog << "Master got empty data message from["
+          << conn->GetRemotePort() << "]. This is most likely fine, since"
+          << "the remote side probably terminated.\n";
   }
 }
 
