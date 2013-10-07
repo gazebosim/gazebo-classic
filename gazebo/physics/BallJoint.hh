@@ -22,7 +22,7 @@
 #ifndef _BALLJOINT_HH_
 #define _BALLJOINT_HH_
 
-#include "Joint.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {

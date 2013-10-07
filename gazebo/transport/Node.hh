@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "transport/TransportTypes.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 namespace gazebo
 {
@@ -157,6 +157,7 @@ namespace gazebo
               decodedTopic, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);
 
         return publisher;

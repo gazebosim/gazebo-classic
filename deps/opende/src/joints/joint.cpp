@@ -52,6 +52,7 @@ dxJoint::dxJoint( dxWorld *w ) :
     node[1].body = 0;
     node[1].next = 0;
     dSetZero( lambda, 6 );
+    dSetZero( lambda_erp, 6 );
 
     addObjectToList( this, ( dObject ** ) &w->firstjoint );
 

@@ -103,7 +103,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   _dist = 0;
   _entity = "";
 
-  if (this->physicsEngine && this->collisionParent)
+  if (this->physicsEngine)
   {
     btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
         this->globalStartPos.z);

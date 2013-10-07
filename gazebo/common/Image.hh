@@ -28,8 +28,8 @@
 #include <FreeImage.h>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {

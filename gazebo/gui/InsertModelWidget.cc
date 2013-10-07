@@ -17,23 +17,23 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sdf/sdf.hh>
 
-#include "sdf/sdf.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/ModelDatabase.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
 
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/InsertModelWidget.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -101,7 +101,7 @@ void InsertModelWidget::Update()
 
   // If the model database has call the OnModels callback function, then
   // add all the models from the database.
-  if (this->modelBuffer.size() > 0)
+  if (!this->modelBuffer.empty())
   {
     std::string uri = common::ModelDatabase::Instance()->GetURI();
     this->modelDatabaseItem->setText(0,
@@ -178,7 +178,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   boost::filesystem::path dir(_path);
 
   // Create a top-level tree item for the path
-  if (matchList.size() == 0)
+  if (matchList.empty())
   {
     topItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0), QStringList(qpath));
@@ -193,8 +193,6 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
   // Remove current items.
   topItem->takeChildren();
-
-  std::list<boost::filesystem::path> resultSet;
 
   if (boost::filesystem::exists(dir) &&
       boost::filesystem::is_directory(dir))
@@ -217,17 +215,9 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
       if (!boost::filesystem::is_directory(fullPath))
       {
-        if (dIter->filename() == "manifest.xml")
+        if (dIter->filename() != "database.config")
         {
-          boost::filesystem::path tmpPath = boost::filesystem::path(_path) /
-            "database.config";
-          gzwarn << "manifest.xml for a model database is deprecated. "
-                 << "Please rename " << fullPath <<  " to "
-                 << tmpPath << "\n";
-        }
-        else if (dIter->filename() != "database.config")
-        {
-          gzwarn << "Invalid filename or directory[" << fullPath
+          gzlog << "Invalid filename or directory[" << fullPath
             << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
             << "files in a GAZEBO_MODEL_PATH because the file structure may"
             << " be modified by Gazebo.\n";
@@ -235,23 +225,18 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         continue;
       }
 
-      // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-      // exist, try to get the deprecated version.
+      // Get the GZ_MODEL_MANIFEST_FILENAME.
       if (boost::filesystem::exists(manifest / GZ_MODEL_MANIFEST_FILENAME))
         manifest /= GZ_MODEL_MANIFEST_FILENAME;
       else if (boost::filesystem::exists(manifest / "manifest.xml"))
       {
-        gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-          << "Please rename manifest.xml to "
-          << GZ_MODEL_MANIFEST_FILENAME << " for model "
+        gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
-
-        manifest /= "manifest.xml";
       }
 
       if (!boost::filesystem::exists(manifest) || manifest == fullPath)
       {
-        gzerr << "model.config file is missing in directory["
+        gzlog << "model.config file is missing in directory["
               << fullPath << "]\n";
         continue;
       }

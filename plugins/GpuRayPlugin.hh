@@ -15,15 +15,15 @@
  *
 */
 
-#ifndef __GAZEBO_GPU_LASER_PLUGIN_HH__
-#define __GAZEBO_GPU_LASER_PLUGIN_HH__
+#ifndef _GAZEBO_GPU_LASER_PLUGIN_HH_
+#define _GAZEBO_GPU_LASER_PLUGIN_HH_
 
 #include <string>
 
-#include "common/Plugin.hh"
-#include "sensors/CameraSensor.hh"
-#include "rendering/RenderTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

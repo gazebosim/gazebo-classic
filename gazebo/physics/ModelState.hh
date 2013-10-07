@@ -119,16 +119,6 @@ namespace gazebo
       /// expression.
       public: JointState_M GetJointStates(const boost::regex &_regex) const;
 
-      /// \brief Get a link state.
-      ///
-      /// Get a Link State based on an index, where index is in the range of
-      /// 0...ModelState::GetLinkStateCount
-      /// \param[in] _index Index of the LinkState
-      /// \return State of the Link.
-      /// \throws common::Exception When _index is out of range.
-      public: LinkState GetLinkState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
-
       /// \brief Get a link state by Link name
       ///
       /// Searches through all LinkStates. Returns the LinkState with the
@@ -219,8 +209,17 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::ModelState &_state)
       {
-        _out << "<model name='" << _state.GetName() << "'>"
-             << "<pose>" << _state.pose << "</pose>";
+        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        _out << std::fixed <<std::setprecision(3)
+          << "<model name='" << _state.GetName() << "'>"
+          << "<pose>"
+          << _state.pose.pos.x << " "
+          << _state.pose.pos.y << " "
+          << _state.pose.pos.z << " "
+          << q.x << " "
+          << q.y << " "
+          << q.z << " "
+          << "</pose>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
@@ -230,12 +229,12 @@ namespace gazebo
         }
 
         // Output the joint information
-        /*for (JointState_M::const_iterator iter =
-            _state.jointStates.begin(); iter != _state.jointStates.end();
-            ++iter)
-        {
-          _out << iter->second;
-        }*/
+        // for (JointState_M::const_iterator iter =
+        //     _state.jointStates.begin(); iter != _state.jointStates.end();
+        //     ++iter)
+        // {
+        //   _out << iter->second;
+        // }
 
         _out << "</model>";
 

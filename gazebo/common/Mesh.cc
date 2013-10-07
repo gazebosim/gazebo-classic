@@ -730,7 +730,7 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 //////////////////////////////////////////////////
 void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
 {
-  if (this->vertices.size() == 0 || this->indices.size() == 0)
+  if (this->vertices.empty() || this->indices.empty())
     gzerr << "No vertices or indices\n";
 
   std::vector< math::Vector3 >::const_iterator viter;

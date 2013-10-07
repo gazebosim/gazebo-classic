@@ -22,7 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -30,11 +30,11 @@
 
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -51,6 +51,11 @@
 #include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
+
+// avoid collision from Mac OS X's ConditionalMacros.h
+#ifdef __MACH__
+#undef TYPE_BOOL
+#endif
 
 using namespace gazebo;
 using namespace gui;
@@ -225,7 +230,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillTypes.size() > 0)
+  if (!this->fillTypes.empty())
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;
@@ -1963,7 +1968,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.x));
+  item->setValue(rpy.x);
 
   // Add Pitch value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
@@ -1975,7 +1980,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.y));
+  item->setValue(rpy.y);
 
   // Add Yaw value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
@@ -1987,7 +1992,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.z));
+  item->setValue(rpy.z);
 }
 
 /////////////////////////////////////////////////

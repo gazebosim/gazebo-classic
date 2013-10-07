@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#include "math/Vector2i.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
 #define TYPE_STRING "fps"
 

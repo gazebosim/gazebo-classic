@@ -10,9 +10,12 @@ import "vector3d.proto";
 
 message HeightmapGeom
 {
-  required Image  image      = 1; // The height data
+  optional Image  image      = 1; // The height data
   required Vector3d size     = 2; // Size in meters
   optional Vector3d origin   = 3; // Origin in world coordinate frame
+  repeated float heights   = 4;
+  optional int32 width = 5;
+  optional int32 height = 6;
 
   message Texture
   {
@@ -27,8 +30,9 @@ message HeightmapGeom
     required double fade_dist  = 2;
   }
 
-  repeated Texture texture = 4; // List of textures
-  repeated Blend blend     = 5; // How to blend the textures
+  repeated Texture texture = 7; // List of textures
+  repeated Blend blend     = 8; // How to blend the textures
+  optional bool use_terrain_paging = 9; // Enable terrain paging in rendering
 }
 
 

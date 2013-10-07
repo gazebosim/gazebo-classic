@@ -17,12 +17,12 @@
 #ifndef _SKELETONANIMATION_HH_
 #define _SKELETONANIMATION_HH_
 
-#include <math/Matrix4.hh>
-#include <math/Pose.hh>
-
 #include <map>
 #include <utility>
 #include <string>
+
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {

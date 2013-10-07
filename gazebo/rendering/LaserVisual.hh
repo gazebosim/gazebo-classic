@@ -24,9 +24,9 @@
 
 #include <string>
 
-#include "rendering/Visual.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -57,6 +57,9 @@ namespace gazebo
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);
 
+      /// \brief Update the Visual
+      private: void Update();
+
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;
 
@@ -65,6 +68,18 @@ namespace gazebo
 
       /// \brief Renders the laser data.
       private: DynamicLines *rayFan;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      /// \brief True if we have received a message.
+      private: bool receivedMsg;
+
+      /// \brief The current contact message.
+      private: boost::shared_ptr<msgs::LaserScanStamped const> laserMsg;
+
+      /// \brief Pre render connection.
+      private: event::ConnectionPtr connection;
     };
     /// \}
   }

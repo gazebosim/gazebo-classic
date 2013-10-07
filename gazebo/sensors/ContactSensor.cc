@@ -25,10 +25,12 @@
 
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ContactSensor.hh"
@@ -58,12 +60,12 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   // Create a publisher for the contact information.
   if (this->sdf->HasElement("contact") &&
       this->sdf->GetElement("contact")->HasElement("topic") &&
-      this->sdf->GetElement("contact")->GetValueString("topic")
+      this->sdf->GetElement("contact")->Get<std::string>("topic")
       != "__default_topic__")
   {
     // This will create a topic based on the name specified in SDF.
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-      this->sdf->GetElement("contact")->GetValueString("topic"));
+      this->sdf->GetElement("contact")->Get<std::string>("topic"), 100);
   }
   else
   {
@@ -73,7 +75,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     topicName += this->parentName + "/" + this->GetName();
     boost::replace_all(topicName, "::", "/");
 
-    this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName);
+    this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName, 100);
   }
 }
 
@@ -82,30 +84,40 @@ void ContactSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (!this->contactSub)
-  {
-    this->contactSub = this->node->Subscribe("~/physics/contacts",
-        &ContactSensor::OnContacts, this);
-  }
-
   std::string collisionName;
   std::string collisionScopedName;
 
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
+  std::string entityName =
+      this->world->GetEntity(this->parentName)->GetScopedName();
+
   // Get all the collision elements
   while (collisionElem)
   {
     // get collision name
-    collisionName = collisionElem->GetValueString();
-    collisionScopedName =
-      this->world->GetEntity(this->parentName)->GetScopedName();
+    collisionName = collisionElem->Get<std::string>();
+    collisionScopedName = entityName;
     collisionScopedName += "::" + collisionName;
 
     this->collisions.push_back(collisionScopedName);
 
     collisionElem = collisionElem->GetNextElement("collision");
+  }
+
+  if (!this->collisions.empty())
+  {
+    // request the contact manager to publish messages to a custom topic for
+    // this sensor
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    std::string topic = mgr->CreateFilter(entityName, this->collisions);
+    if (!this->contactSub)
+    {
+      this->contactSub = this->node->Subscribe(topic,
+          &ContactSensor::OnContacts, this);
+    }
   }
 }
 
@@ -123,7 +135,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
   std::string collision1;
 
   // Don't do anything if there is no new data to process.
-  if (this->incomingContacts.size() == 0)
+  if (this->incomingContacts.empty())
     return;
 
   // Clear the outgoing contact message.

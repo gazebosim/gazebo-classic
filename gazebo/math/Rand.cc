@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <ctime>
 
-#include "math/Rand.hh"
+#include "gazebo/math/Rand.hh"
 
 using namespace gazebo;
 using namespace math;

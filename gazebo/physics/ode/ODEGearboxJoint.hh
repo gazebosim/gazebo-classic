@@ -56,9 +56,6 @@ namespace gazebo
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited
       public: virtual void SetGearRatio(double _gearRatio);
 
       // Documentation inherited
@@ -77,16 +74,13 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _effort);
-
-      // Documentation inherited
       public: virtual double GetParam(int _parameter) const;
 
       // Documentation inherited
       public: virtual void SetParam(int _parameter, double _value);
 
       // Documentation inherited
-      protected: virtual void Init();
+      protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Set gearbox joint gear reference body
       /// \param[in] _body an ode body as the reference link for the gears.

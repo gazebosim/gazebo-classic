@@ -34,7 +34,7 @@ namespace gazebo
       this->node->Init(_parent->GetWorld()->GetName());
 
       std::string name = std::string("~/") + _parent->GetName() + "/" +
-                          _sdf->GetValueString("projector");
+                          _sdf->Get<std::string>("projector");
 
       // Create a publisher on the ~/physics topic
       this->projectorPub = node->Advertise<msgs::Projector>(name);

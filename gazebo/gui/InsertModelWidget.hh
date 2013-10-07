@@ -21,7 +21,7 @@
 #include <map>
 #include <boost/thread/mutex.hpp>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 class QTreeWidget;
 class QTreeWidgetItem;

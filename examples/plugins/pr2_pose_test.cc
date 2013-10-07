@@ -29,7 +29,7 @@ namespace gazebo
     public: void Load(physics::ModelPtr &/*_parent*/, sdf::ElementPtr &_sdf)
     {
       // Get then name of the parent model
-      std::string modelName = _sdf->GetParent()->GetValueString("name");
+      std::string modelName = _sdf->GetParent()->Get<std::string>("name");
 
       // Get the world name.
       std::string worldName = _sdf->GetWorldName();

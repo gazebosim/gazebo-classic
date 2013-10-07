@@ -24,9 +24,10 @@
 #include <string>
 #include <vector>
 
-#include "sdf/sdf.hh"
-#include "physics/State.hh"
-#include "physics/ModelState.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/physics/State.hh"
+#include "gazebo/physics/ModelState.hh"
 
 namespace gazebo
 {
@@ -92,10 +93,6 @@ namespace gazebo
       /// Returns the number of models in this instance.
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
-
-      /// Deprecated
-      public: ModelState GetModelState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
 
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.

@@ -20,7 +20,7 @@
 // This disables warning messages
 #pragma GCC system_header
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_CEGUI
 #include <CEGUI/CEGUI.h>

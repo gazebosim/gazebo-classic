@@ -249,6 +249,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
             this->currentMouseItem));
         this->drawMode = NONE;
         this->drawInProgress = false;
+        gui::editor::Events::createBuildingEditorItem(std::string());
       }
       break;
     case DOOR:
@@ -258,6 +259,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
             this->currentMouseItem));
         this->drawMode = NONE;
         this->drawInProgress = false;
+        gui::editor::Events::createBuildingEditorItem(std::string());
       }
       break;
     case STAIRS:
@@ -273,6 +275,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         }
         this->drawMode = NONE;
         this->drawInProgress = false;
+        gui::editor::Events::createBuildingEditorItem(std::string());
       }
     default:
       break;
@@ -454,6 +457,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     this->currentMouseItem = NULL;
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    gui::editor::Events::createBuildingEditorItem(std::string());
   }
   else if (_event->key() == Qt::Key_Escape)
   {
@@ -486,6 +490,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     this->drawInProgress = false;
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    gui::editor::Events::createBuildingEditorItem(std::string());
   }
   else
   {
@@ -721,6 +726,8 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->drawMode = DOOR;
   else if (_type == "stairs")
     this->drawMode = STAIRS;
+  else
+    this->drawMode = NONE;
 
   if (this->drawInProgress && this->currentMouseItem)
   {
@@ -769,6 +776,7 @@ void EditorView::OnDiscardModel()
   this->currentMouseItem = NULL;
   this->drawInProgress = false;
   this->drawMode = NONE;
+  gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
@@ -1043,5 +1051,6 @@ void EditorView::CancelDrawMode()
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    gui::editor::Events::createBuildingEditorItem(std::string());
   }
 }

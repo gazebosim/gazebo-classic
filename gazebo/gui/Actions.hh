@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -40,6 +40,7 @@ namespace gazebo
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
     extern QAction *g_editBuildingAct;
+    extern QAction *g_editTerrainAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -70,17 +71,13 @@ namespace gazebo
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+    extern QAction *g_scaleAct;
 
     extern QAction *g_topicVisAct;
 
     extern QAction *g_diagnosticsAct;
 
     extern QAction *g_viewWireframeAct;
-
-    extern QAction *g_buildingEditorSaveAct;
-    extern QAction *g_buildingEditorDiscardAct;
-    extern QAction *g_buildingEditorDoneAct;
-    extern QAction *g_buildingEditorExitAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

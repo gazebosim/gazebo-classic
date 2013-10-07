@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 #include "plugins/CameraPlugin.hh"
 
 namespace gazebo

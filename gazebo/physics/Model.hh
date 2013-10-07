@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -187,7 +188,7 @@ namespace gazebo
 
       /// \brief Fill a model message.
       /// \param[in] _msg Message to fill using this model's data.
-      public: void FillMsg(msgs::Model &_msg);
+      public: virtual void FillMsg(msgs::Model &_msg);
 
       /// \brief Update parameters from a model message.
       /// \param[in] _msg Message to process.
@@ -198,7 +199,7 @@ namespace gazebo
       /// \param[in] _jointName Name of the joint to set.
       /// \param[in] _position Position to set the joint to.
       public: void SetJointPosition(const std::string &_jointName,
-                                    double _position);
+                                    double _position, int _index = 0);
 
       /// \brief Set the positions of a set of joints.
       /// \sa JointController::SetJointPositions.
@@ -238,10 +239,13 @@ namespace gazebo
       /// \sa Model::AttachStaticModel.
       public: void DetachStaticModel(const std::string &_model);
 
-
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
       public: void SetState(const ModelState &_state);
+
+      /// \brief Set the scale of model.
+      /// \param[in] _scale Scale to set the model to.
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
@@ -288,6 +292,19 @@ namespace gazebo
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
 
+      /// \brief Get a handle to the Controller for the joints in this model.
+      /// \return A handle to the Controller for the joints in this model.
+      public: JointControllerPtr GetJointController();
+
+      /// \brief Get a gripper based on an index.
+      /// \return A pointer to a Gripper. Null if the _index is invalid.
+      public: GripperPtr GetGripper(size_t _index) const;
+
+      /// \brief Get the number of grippers in this model.
+      /// \return Size of this->grippers array.
+      /// \sa Model::GetGripper()
+      public: size_t GetGripperCount() const;
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -306,30 +323,34 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadGripper(sdf::ElementPtr _sdf);
 
-      /// \brief Get a handle to the Controller for the joints in this model.
-      /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController()
-        { return this->jointController; }
+      /// \brief Remove a link from the model's cached list of links.
+      /// This does not delete the link.
+      /// \param[in] _name Name of the link to remove.
+      private: void RemoveLink(const std::string &_name);
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
       /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief Publisher for joint info.
+      protected: transport::PublisherPtr jointPub;
+
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
 
       /// \brief All the joints in the model.
       private: Joint_V joints;
 
+      /// \brief Cached list of links. This is here for performance.
+      private: Link_V links;
+
       /// \brief All the grippers in the model.
-      private: std::vector<Gripper*> grippers;
+      private: std::vector<GripperPtr> grippers;
 
       /// \brief All the model plugins.
       private: std::vector<ModelPluginPtr> plugins;
-
-      /// \brief Publisher for joint info.
-      private: transport::PublisherPtr jointPub;
 
       /// \brief The joint animations.
       private: std::map<std::string, common::NumericAnimationPtr>
@@ -342,11 +363,12 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
-      private: boost::recursive_mutex *updateMutex;
+      private: mutable boost::recursive_mutex updateMutex;
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
 
+      /// \brief True if plugins have been loaded.
       private: bool pluginsLoaded;
     };
     /// \}

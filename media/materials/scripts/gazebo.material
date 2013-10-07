@@ -150,8 +150,8 @@ material Gazebo/White
 
 		pass light
 		{
-      diffuse 1 1 1 1
-      specular .1 .1 .1 128
+			diffuse 1 1 1 1
+      			specular .1 .1 .1 128
 		}
 	}
 }
@@ -163,9 +163,9 @@ material Gazebo/FlatBlack
 		pass
 		{
 			ambient 0.1 0.1 0.1
-      diffuse 0.1 0.1 0.1
-      specular 0.01 0.01 0.01 1.0 1.0
-    }
+      			diffuse 0.1 0.1 0.1
+      			specular 0.01 0.01 0.01 1.0 1.0
+    		}
 	}
 }
 
@@ -177,7 +177,7 @@ material Gazebo/Black
 		{
 			ambient 0 0 0 1
 			diffuse 0 0 0 1
-      specular 0.1 0.1 0.1 1 5.0
+      			specular 0.1 0.1 0.1 1 5.0
 		}
 	}
 }
@@ -190,8 +190,8 @@ material Gazebo/Red
 		pass ambient
 		{
 			ambient 1 0 0
-      diffuse 1 0 0
-      specular 0.1 0.1 0.1 1 1
+      			diffuse 1 0 0
+			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -203,8 +203,8 @@ material Gazebo/Green
 		pass ambient
 		{
 			ambient 0 1 0
-      diffuse 0 1 0
-      specular 0.1 0.1 0.1 1 1
+			diffuse 0 1 0
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -213,12 +213,12 @@ material Gazebo/Blue
 {
 	technique
 	{
-    pass ambient
-    {
+	    pass ambient
+	    {
 			ambient 0 0 1
-      diffuse 0 0 1
-      specular 0.1 0.1 0.1 1 1
-    }
+      			diffuse 0 0 1
+      			specular 0.1 0.1 0.1 1 1
+    	    }
 	}
 }
 
@@ -229,9 +229,9 @@ material Gazebo/Yellow
 		pass ambient
 		{
 			ambient 1 1 0 1
-      diffuse 1 1 0 1
-      specular 0 0 0 0 0
-    }
+      			diffuse 1 1 0 1
+			specular 0 0 0 0 0	
+		}			
 	}
 }
 
@@ -242,8 +242,8 @@ material Gazebo/Purple
 		pass ambient
 		{
 			ambient 1 0 1
-      diffuse 1 0 1
-      specular 0.1 0.1 0.1 1 1
+      			diffuse 1 0 1
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -255,12 +255,26 @@ material Gazebo/Turquoise
 		pass ambient
 		{
 			ambient 0 1 1
-      diffuse 0 1 1
-      specular 0.1 0.1 0.1 1 1
+			diffuse 0 1 1
+      			specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
 
+material Gazebo/Orange
+{
+	technique
+	{
+		pass ambient
+		{
+			lighting on
+
+                        ambient 1 0.5088 0.0468 1
+                        diffuse 1 0.5088 0.0468 1
+                        specular 0.5 0.5 0.5 128
+		}
+	}
+}
 
 material Gazebo/WhiteGlow : Gazebo/White
 {
@@ -383,6 +397,66 @@ material Gazebo/TurquoiseGlowOutline
 	}
 }
 
+material Gazebo/RedTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
+material Gazebo/BlueTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 0 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
+material Gazebo/GreenTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
 material Gazebo/RedTransparent
 {
 	technique
@@ -442,6 +516,27 @@ material Gazebo/BlueTransparent
       }
     }
 	}
+}
+
+material Gazebo/GreyTransparent
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 0.5 0.5 0.5 1
+      diffuse 0.5 0.5 0.5 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
 }
 
 material Gazebo/YellowTransparent
@@ -505,8 +600,6 @@ material Gazebo/LightOff
     }
   }
 }
-
-
 
 material Gazebo/BlueLaser
 {
@@ -867,4 +960,20 @@ material Gazebo/GaussianCameraNoise
       }
     }
   }
+}
+
+material Gazebo/PointCloud
+{
+   technique
+   {
+      pass
+      {
+         diffuse vertexcolour
+         specular vertexcolour
+         ambient vertexcolour
+         point_size 3
+         point_sprites off
+         point_size_attenuation off
+      }
+   }
 }

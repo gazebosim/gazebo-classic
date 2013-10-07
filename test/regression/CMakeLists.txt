@@ -1,6 +1,4 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo
-  ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
@@ -14,32 +12,14 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-# Disable the player test for now, until we figure out a better way to test them
-#if (INCLUDE_PLAYER)
-#  add_subdirectory(player)
-#endif()
-
 if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 
 set(tests
-  bandwidth.cc
-  contact_sensor.cc
-  factory.cc
-  file_handling.cc
-  imu.cc
-  laser.cc
-  nondefault_world.cc
-  physics.cc
-  pioneer2dx.cc
-  transport.cc
-  server_fixture.cc
-  speed.cc
-  #state_log.cc
-  surface_properties.cc
-  )
+  846_typo_in_camera.cc
+)
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
   "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
@@ -54,12 +34,6 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
-  camera_sensor.cc
-  gpu_laser.cc
-  heightmap.cc
-  pr2.cc
-  projector.cc
-  speed_pr2.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS

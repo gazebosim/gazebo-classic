@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "rendering/ViewController.hh"
+#include "gazebo/rendering/ViewController.hh"
 
 namespace gazebo
 {

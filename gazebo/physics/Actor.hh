@@ -21,10 +21,10 @@
 #include <map>
 #include <vector>
 
-#include "physics/Model.hh"
-#include "common/Time.hh"
-#include "common/Skeleton.hh"
-#include "common/Animation.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/Animation.hh"
 
 namespace gazebo
 {
@@ -228,6 +228,9 @@ namespace gazebo
 
       /// \brief Name of the visual
       protected: std::string visualName;
+
+      /// \brief ID for this visual
+      protected: uint32_t visualId;
 
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;

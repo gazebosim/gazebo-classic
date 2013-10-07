@@ -28,6 +28,8 @@
 #include <list>
 #include <vector>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
@@ -36,7 +38,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -392,14 +393,14 @@ namespace gazebo
       /// \param[in] _flags The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: void SetVisibilityFlags(uint32_t _flags);
 
       /// \brief Get visibility flags for this visual and all children.
       /// \return The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: uint32_t GetVisibilityFlags();
 
       /// \brief Display the bounding box visual.
@@ -445,6 +446,12 @@ namespace gazebo
       /// \brief Remove a running plugin
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
+
+      /// \brief Get the id associated with this visual
+      public: uint32_t GetId() const;
+
+      /// \brief Set the id associated with this visual
+      public: void SetId(uint32_t _id);
 
       /// \brief Load all plugins
       ///
@@ -523,7 +530,7 @@ namespace gazebo
       /// \brief Connection for the pre render event.
       private: event::ConnectionPtr preRenderConnection;
 
-      /// \brief List of all the lines created
+      /// \brief List of all the lines created.
       private: std::list<DynamicLines*> lines;
 
       /// \brief Lines and their vertices connected to this visual.
@@ -544,7 +551,7 @@ namespace gazebo
       /// \brief Callback for the animation complete event.
       private: boost::function<void()> onAnimationComplete;
 
-      /// \brief True to use RT shader system
+      /// \brief True to use RT shader system.
       private: bool useRTShader;
 
       /// \brief True if initialized.
@@ -552,6 +559,15 @@ namespace gazebo
 
       /// \brief A wire frame bounding box.
       private: WireBox *boundingBox;
+
+      /// \brief Unique id of this visual.
+      private: uint32_t id;
+
+      /// \brief Counter used to create unique ids.
+      private: static uint32_t visualIdCount;
+
+      /// \brief Scale of visual.
+      private: math::Vector3 scale;
     };
     /// \}
   }

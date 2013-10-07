@@ -16,7 +16,7 @@
 */
 
 
-#include "common/Plugin.hh"
+#include "gazebo/common/Plugin.hh"
 
 
 using namespace gazebo;

@@ -17,7 +17,7 @@
 #include <boost/bind.hpp>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 #include "msgs/custom.pb.h"
 

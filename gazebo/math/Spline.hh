@@ -21,8 +21,8 @@
 
 #include <vector>
 
-#include "math/Vector3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {

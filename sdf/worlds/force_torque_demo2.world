@@ -7,6 +7,7 @@
     <include>
       <uri>model://sun</uri>
     </include>
+
     <scene>
       <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
       <background>0.500000 0.500000 0.500000 1.000000</background>
@@ -14,10 +15,21 @@
     </scene>
     <physics type="ode">
       <gravity>0.000000 0.000000 -9.810000</gravity>
+      <simbody>
+        <accuracy>0.001</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>10</dissipation>
+          <static_friction>0.15</static_friction>
+          <dynamic_friction>0.1</dynamic_friction>
+          <viscous_friction>0.0</viscous_friction>
+        </contact>
+      </simbody>
       <ode>
         <solver>
           <type>quick</type>
-          <iters>250</iters>
+          <iters>1000</iters>
           <precon_iters>0</precon_iters>
           <sor>1.400000</sor>
         </solver>
@@ -31,9 +43,10 @@
       <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
+
     <!-- test contributed by jesper -->
     <model name="boxes">
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 0 1.57</pose>
       <link name="link1">
         <collision name="collision">
           <pose>0.5 0 0.5 0 0 0</pose>
@@ -42,6 +55,19 @@
               <size>1 1 1</size>
             </box>
           </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.01</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="visual">
           <pose>0.5 0 0.5 0 0 0</pose>
@@ -55,12 +81,12 @@
           <mass>100.0</mass>
           <pose>0.5 0 0.5 0 0 0</pose>
           <inertia>
-            <ixx>0.1</ixx>
-            <iyy>0.1</iyy>
-            <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixx>10.0</ixx>
+            <iyy>10.0</iyy>
+            <izz>10.0</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -86,12 +112,12 @@
           <mass>5.0</mass>
           <pose>0.5 0 0.5 0 0 0</pose>
           <inertia>
-            <ixx>0.1</ixx>
-            <iyy>0.1</iyy>
-            <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixx>1.0</ixx>
+            <iyy>1.0</iyy>
+            <izz>1.0</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
@@ -115,17 +141,41 @@
         </visual>
         <inertial>
           <mass>1.0</mass>
-          <pose>0.5 0 0.5 0 0 0</pose>
+          <pose>0.5 0.5 0.5 0 0 0</pose>
           <inertia>
             <ixx>0.1</ixx>
             <iyy>0.1</iyy>
             <izz>0.1</izz>
-            <ixy>0.1</ixy>
-            <ixz>0.1</ixz>
-            <iyz>0.1</iyz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
           </inertia>
         </inertial>
       </link>
+
+      <!-- simbody debug: pin base link to world
+      <joint name="joint0" type="revolute">
+        <physics>
+          <ode>
+            <provide_feedback>true</provide_feedback>
+            <cfm_damping>true</cfm_damping>
+          </ode>
+        </physics>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-1e-6</lower>
+            <upper>1e-6</upper>
+          </limit>
+          <dynamics>
+            <damping>100.000000</damping>
+          </dynamics>
+        </axis>
+        <parent>world</parent>
+        <child>link1</child>
+      </joint>
+     -->
+
       <joint name="joint1" type="revolute">
         <physics>
           <ode>
@@ -135,8 +185,13 @@
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
+          <!-- simbody debug: limit joint angle -->
+          <limit>
+            <lower>-1e6</lower>
+            <upper>1e6</upper>
+          </limit>
           <dynamics>
-            <damping>100.000000</damping>
+            <damping>30.000000</damping>
           </dynamics>
         </axis>
         <parent>link1</parent>
@@ -151,6 +206,11 @@
         </physics>
         <axis>
           <xyz>0 1 0</xyz>
+          <!-- simbody debug: limit joint angle -->
+          <limit>
+            <lower>-1e6</lower>
+            <upper>1e6</upper>
+          </limit>
           <dynamics>
             <damping>30.000000</damping>
           </dynamics>

@@ -31,7 +31,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
@@ -50,12 +50,6 @@ CameraSensor::CameraSensor()
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -78,7 +72,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -98,7 +93,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -109,7 +104,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -132,12 +127,19 @@ void CameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -145,9 +147,14 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
+
   if (this->camera)
-    this->camera->Fini();
+  {
+    this->scene->RemoveCamera(this->camera->GetName());
+  }
+
   this->camera.reset();
   this->scene.reset();
 }
@@ -159,12 +166,12 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastMeasurementTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
 
     if (this->imagePub->HasConnections())
     {
       msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
       msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
@@ -175,7 +182,9 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
       msg.mutable_image()->set_data(this->camera->GetImageData(),
           msg.image().width() * this->camera->GetImageDepth() *
           msg.image().height());
-      this->imagePub->Publish(msg);
+
+      if (this->imagePub && this->imagePub->HasConnections())
+        this->imagePub->Publish(msg);
     }
   }
 }
@@ -212,5 +221,6 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool CameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

@@ -101,6 +101,12 @@ namespace gazebo
 
     /// \brief Dynamically created joint for simulating mud forces.
     private: std::vector<physics::JointPtr> joints;
+
+    /// \brief Custom bitmask associated to collision surface of allowed links
+    private: unsigned int contactSurfaceBitmask;
+
+    /// \brief SDF for this plugin;
+    private: sdf::ElementPtr sdf;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

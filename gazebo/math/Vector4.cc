@@ -21,8 +21,8 @@
 
 #include <math.h>
 
-#include "math/Helpers.hh"
-#include "math/Vector4.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector4.hh"
 
 using namespace gazebo;
 using namespace math;

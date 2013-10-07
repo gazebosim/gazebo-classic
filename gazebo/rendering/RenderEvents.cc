@@ -15,7 +15,7 @@
  *
 */
 
-#include "rendering/RenderEvents.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 
 using namespace gazebo;
 using namespace rendering;

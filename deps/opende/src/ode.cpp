@@ -246,7 +246,7 @@ void dWorldCheck (dxWorld *w)
 dxBody::dxBody(dxWorld *w) :
     dObject(w)
 {
-    
+
 }
 
 
@@ -807,7 +807,7 @@ void dBodySetFiniteRotationMode (dBodyID b, int mode)
     if (!_dequal(b->finite_rot_axis[0], 0.0) ||
         !_dequal(b->finite_rot_axis[1], 0.0) ||
         !_dequal(b->finite_rot_axis[2], 0.0))
-    { 
+    {
       b->flags |= dxBodyFlagFiniteRotationAxis;
     }
   }
@@ -869,7 +869,7 @@ dJointID dBodyGetJoint (dBodyID b, int index)
 void dBodySetDynamic (dBodyID b)
 {
   dAASSERT (b);
-  
+
   dBodySetMass(b,&b->mass);
 }
 
@@ -877,7 +877,7 @@ void dBodySetKinematic (dBodyID b)
 {
   dAASSERT (b);
   dSetZero (b->invI,4*3);
-  b->invMass = 0; 
+  b->invMass = 0;
 }
 
 int dBodyIsKinematic (dBodyID b)
@@ -1208,11 +1208,11 @@ dxJoint* createJoint(dWorldID w, dJointGroupID group)
         group->num++;
     } else
         j = (dxJoint*) dAlloc(sizeof(T));
-    
+
     new(j) T(w);
     if (group)
         j->flags |= dJOINT_INGROUP;
-    
+
     return j;
 }
 
@@ -1379,7 +1379,7 @@ void dJointGroupEmpty (dJointGroupID group)
     // be at the start of those lists.
     // if any group joints have their world pointer set to 0, their world was
     // previously destroyed. no special handling is required for these joints.
-    
+
     dAASSERT (group);
     int i;
     dxJoint **jlist = (dxJoint**) ALLOCA (group->num * sizeof(dxJoint*));
@@ -1540,7 +1540,7 @@ void dJointSetDamping (dxJoint *joint, dReal damping)
 {
   dAASSERT (joint);
 
-  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider || 
+  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider ||
       joint->type() == dJointTypeScrew)
   {
     if (!_dequal(damping, 0.0))
@@ -1683,7 +1683,7 @@ dxWorld * dWorldCreate()
   w->dampingp.linear_scale = 0;
   w->dampingp.angular_scale = 0;
   w->dampingp.linear_threshold = REAL(0.01) * REAL(0.01);
-  w->dampingp.angular_threshold = REAL(0.01) * REAL(0.01);  
+  w->dampingp.angular_threshold = REAL(0.01) * REAL(0.01);
   w->max_angular_speed = dInfinity;
 
   w->threadpool = NULL; // new boost::threadpool::pool(0);
@@ -1888,7 +1888,7 @@ void dWorldCleanupWorkingMemory(dWorldID w)
   dUASSERT (w,"bad world argument");
 
   dxStepWorkingMemory *wmem = w->wmem;
-  
+
   if (wmem)
   {
     wmem->CleanupMemory();
@@ -1966,7 +1966,7 @@ int dWorldStep (dWorldID w, dReal stepsize)
   if (dxReallocateWorldProcessContext (w, stepsize, &dxEstimateStepMemoryRequirements))
   {
     dxProcessIslands (w, stepsize, &dInternalStepIsland);
-    
+
     result = true;
   }
 
@@ -1983,7 +1983,7 @@ int dWorldQuickStep (dWorldID w, dReal stepsize)
   if (dxReallocateWorldProcessContext (w, stepsize, &dxEstimateQuickStepMemoryRequirements))
   {
     dxProcessIslands (w, stepsize, &dxQuickStepper);
-    
+
     result = true;
   }
 
@@ -2485,13 +2485,13 @@ int dCheckConfiguration( const char* extension )
 			break;
 
 		terminator = where + ext_length;
-	
-		if ( (where == start || *(where - 1) == ' ') && 
+
+		if ( (where == start || *(where - 1) == ' ') &&
 			 (*terminator == ' ' || *terminator == '\0') )
 		{
 			return 1;
 		}
-		
+
 		start = terminator;
 	}
 

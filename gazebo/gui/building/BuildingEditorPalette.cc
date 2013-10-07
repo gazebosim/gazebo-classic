@@ -44,129 +44,60 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   underLineFont.setUnderline(true);
   underLineFont.setPointSize(14);
 
-  QGridLayout *floorPlanGridLayout = new QGridLayout;
+  // Add a wall button
+  QPushButton *addWallButton = new QPushButton(tr("Add Wall"), this);
+  addWallButton->setCheckable(true);
+  addWallButton->setChecked(false);
+  this->brushes.push_back(addWallButton);
+  connect(addWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
-  QLabel *floorPlanLabel = new QLabel(tr("Floor Plan"));
-  floorPlanLabel->setFont(underLineFont);
-
-  QLabel *drawWallsLabel = new QLabel;
-  drawWallsLabel->setText("Draw Walls");
-  QPushButton *addDrawWallButton = new QPushButton;
-  addDrawWallButton->setIcon(QIcon(":/images/wall.png"));
-  addDrawWallButton->setIconSize(QSize(30, 60));
-  addDrawWallButton->setFlat(true);
-  connect(addDrawWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
-
-  QVBoxLayout *drawWallLayout = new QVBoxLayout;
-  drawWallLayout->addWidget(addDrawWallButton);
-  drawWallLayout->addWidget(drawWallsLabel);
-  floorPlanGridLayout->addLayout(drawWallLayout, 0, 0);
-  floorPlanGridLayout->setAlignment(Qt::AlignLeft);
-
-/*  QLabel *importImageLabel = new QLabel;
-  importImageLabel->setText("Import Image");
-  QPushButton *importImageButton = new QPushButton;
-  importImageButton->setIcon(QIcon(":/images/box.png"));
-  importImageButton->setIconSize(QSize(30,30));
-  importImageButton->setFlat(true);
-  connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
-
-  QVBoxLayout *importImageLayout = new QVBoxLayout;
-  importImageLayout->addWidget(importImageButton);
-  importImageLayout->addWidget(importImageLabel);
-  importImageLayout->setAlignment(Qt::AlignLeft);
-  floorPlanGridLayout->addLayout(importImageLayout, 0, 1);*/
-
-  QVBoxLayout *floorPlanLayout = new QVBoxLayout;
-  floorPlanLayout->addWidget(floorPlanLabel);
-  floorPlanLayout->addLayout(floorPlanGridLayout);
-
-  QGridLayout *windowDoorGridLayout = new QGridLayout;
-  QLabel *windowDoorLabel = new QLabel(tr("Windows & Doors"));
-  windowDoorLabel->setFont(underLineFont);
-
-  QLabel *addWindowLabel = new QLabel;
-  addWindowLabel->setText("Add Window");
-  QPushButton *addWindowButton = new QPushButton;
-  addWindowButton->setIcon(QIcon(":/images/window.png"));
-  addWindowButton->setIconSize(QSize(30, 60));
-  addWindowButton->setFlat(true);
+  // Add a window button
+  QPushButton *addWindowButton = new QPushButton(tr("Add Window"), this);
+  addWindowButton->setCheckable(true);
+  addWindowButton->setChecked(false);
+  this->brushes.push_back(addWindowButton);
   connect(addWindowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
 
-  QVBoxLayout *addWindowLayout = new QVBoxLayout;
-  addWindowLayout->addWidget(addWindowButton);
-  addWindowLayout->addWidget(addWindowLabel);
-  addWindowLayout->setAlignment(Qt::AlignLeft);
-  windowDoorGridLayout->addLayout(addWindowLayout, 0, 0);
-
-  windowDoorGridLayout->addItem(new QSpacerItem(20, 10, QSizePolicy::Minimum,
-      QSizePolicy::Minimum), 0, 1);
-
-  QLabel *addDoorLabel = new QLabel;
-  addDoorLabel->setText("Add Doorway");
-  QPushButton *addDoorButton = new QPushButton;
-  addDoorButton->setIcon(QIcon(":/images/door.png"));
-  addDoorButton->setIconSize(QSize(30, 60));
-  addDoorButton->setFlat(true);
+  // Add a door button
+  QPushButton *addDoorButton = new QPushButton(tr("Add Door"), this);
+  addDoorButton->setCheckable(true);
+  addDoorButton->setChecked(false);
+  this->brushes.push_back(addDoorButton);
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
-  QVBoxLayout *addDoorLayout = new QVBoxLayout;
-  addDoorLayout->addWidget(addDoorButton);
-  addDoorLayout->addWidget(addDoorLabel);
-  addDoorLayout->setAlignment(Qt::AlignLeft);
-  windowDoorGridLayout->addLayout(addDoorLayout, 0, 2);
-  windowDoorGridLayout->setAlignment(Qt::AlignLeft);
+  // Add a stair button
+  QPushButton *addStairButton = new QPushButton(tr("Add Stair"), this);
+  addStairButton->setCheckable(true);
+  addStairButton->setChecked(false);
+  this->brushes.push_back(addStairButton);
+  connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
 
-  QVBoxLayout *windowDoorLayout = new QVBoxLayout;
-  windowDoorLayout->addWidget(windowDoorLabel);
-  windowDoorLayout->addLayout(windowDoorGridLayout);
-
-  QLabel *otherLabel = new QLabel(tr("Other"));
-  otherLabel->setFont(underLineFont);
-
-  QGridLayout *otherGridLayout = new QGridLayout;
-
-  QLabel *addStairsLabel = new QLabel;
-  addStairsLabel->setText("Add Stairs");
-  QPushButton *addStairsButton = new QPushButton;
-  addStairsButton->setIcon(QIcon(":/images/stairs.png"));
-  addStairsButton->setIconSize(QSize(30, 60));
-  addStairsButton->setFlat(true);
-  connect(addStairsButton, SIGNAL(clicked()), this, SLOT(OnAddStairs()));
-
-  QVBoxLayout *addStairsLayout = new QVBoxLayout;
-  addStairsLayout->addWidget(addStairsButton);
-  addStairsLayout->addWidget(addStairsLabel);
-  otherGridLayout->addLayout(addStairsLayout, 0, 0);
-  otherGridLayout->setAlignment(Qt::AlignLeft);
-
-  QVBoxLayout *otherLayout = new QVBoxLayout;
-  otherLayout->addWidget(otherLabel);
-  otherLayout->addLayout(otherGridLayout);
+  // Layout to hold the drawing buttons
+  QGridLayout *gridLayout = new QGridLayout;
+  gridLayout->addWidget(addWallButton, 0, 0);
+  gridLayout->addWidget(addWindowButton, 0, 1);
+  gridLayout->addWidget(addDoorButton, 1, 0);
+  gridLayout->addWidget(addStairButton, 1, 1);
 
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-  saveButton = new QPushButton(tr("Save As"));
-  connect(saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+
+  this->saveButton = new QPushButton(tr("Save As"));
+  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+
   QPushButton *doneButton = new QPushButton(tr("Done"));
   connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(saveButton);
+  buttonsLayout->addWidget(this->saveButton);
   buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   mainLayout->addLayout(modelNameLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
-  mainLayout->addLayout(floorPlanLayout);
-  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                      QSizePolicy::Minimum));
-  mainLayout->addLayout(windowDoorLayout);
-  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                      QSizePolicy::Minimum));
-  mainLayout->addLayout(otherLayout);
+  mainLayout->addLayout(gridLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
   mainLayout->addLayout(buttonsLayout);
@@ -205,6 +136,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::editor::Events::ConnectDiscardBuildingModel(
       boost::bind(&BuildingEditorPalette::OnDiscardModel, this)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectCreateBuildingEditorItem(
+    boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -232,7 +167,7 @@ void BuildingEditorPalette::OnAddDoor()
 
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnAddStairs()
+void BuildingEditorPalette::OnAddStair()
 {
   gui::editor::Events::createBuildingEditorItem("stairs");
 }
@@ -268,4 +203,18 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 {
   this->saveButton->setText("Save");
   this->modelNameLabel->setText(tr(_saveName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
+{
+  if (_type.empty())
+  {
+    // Uncheck all the buttons
+    for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
+        iter != this->brushes.end(); ++iter)
+    {
+      (*iter)->setChecked(false);
+    }
+  }
 }

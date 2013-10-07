@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_subdirectory(test)
-
 set (msgs
   axis.proto
   boxgeom.proto
@@ -17,6 +15,7 @@ set (msgs
   fog.proto
   friction.proto
   geometry.proto
+  gps.proto
   gui_overlay_config.proto
   gui_camera.proto
   gui.proto
@@ -53,15 +52,21 @@ set (msgs
   planegeom.proto
   pid.proto
   plugin.proto
+  pointcloud.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto
   pose_trajectory.proto
   pose_v.proto
+  poses_stamped.proto
   projector.proto
+  propagation_particle.proto
+  propagation_grid.proto
   publishers.proto
   publish.proto
   quaternion.proto
+  sonar.proto
+  sonar_stamped.proto
   raysensor.proto
   request.proto
   response.proto
@@ -75,6 +80,7 @@ set (msgs
   spheregeom.proto
   subscribe.proto
   surface.proto
+  tactile.proto
   test.proto
   time.proto
   topic_info.proto
@@ -82,20 +88,25 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wireless_node.proto
+  wireless_nodes.proto
   world_control.proto
   world_reset.proto
   world_stats.proto
   world_modify.proto
+  wrench.proto
+  wrench_stamped.proto
 )
 
 set (msgs_tests_sources
   msgs_TEST.cc
+  MsgFactory_TEST.cc
 )
 gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
+add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
 set (sources msgs.cc MsgFactory.cc)
@@ -110,10 +121,13 @@ foreach(FIL ${msgs})
   list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
   list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
 
-  add_custom_command(TARGET gazebomsgs_out POST_BUILD
+  add_custom_command(
+    OUTPUT
+      "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
+      "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
-    DEPENDS ${ABS_FIL}
+    DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
 endforeach()
@@ -121,7 +135,12 @@ endforeach()
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
-target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY} gazebo_sdf_interface)
+target_link_libraries(gazebo_msgs
+  gazebo_common
+  gazebo_math
+  ${PROTOBUF_LIBRARY}
+)
+
 add_dependencies(gazebo_msgs gazebomsgs_out)
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
@@ -136,3 +155,4 @@ configure_file (${PROJECT_SOURCE_DIR}/gazebo/msgs/MessageTypes.hh.in
 
 gz_install_library(gazebo_msgs)
 gz_install_includes("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh)
+gz_install_includes("msgs/proto" ${msgs})

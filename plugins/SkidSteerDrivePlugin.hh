@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SkidSteerDrive_PLUGIN_HH__
-#define __GAZEBO_SkidSteerDrive_PLUGIN_HH__
+#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
 
 #include <string>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gazebo.hh"
 
 #define NUMBER_OF_WHEELS 4
 
@@ -65,10 +65,10 @@ namespace gazebo
     private: physics::ModelPtr model;
 
     /// \brief Pointer to each wheel joint
-    private: physics::JointPtr Joints[NUMBER_OF_WHEELS];
+    private: physics::JointPtr joints[NUMBER_OF_WHEELS];
 
     /// \brief Max force limit for each wheel joint (Default 5.0)
-    private: double MaxForce;
+    private: double maxForce;
 
     /// \brief Distance between wheels on the same axis (Determined from SDF)
     private: double wheelSeparation;

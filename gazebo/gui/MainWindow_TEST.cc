@@ -17,9 +17,9 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
@@ -34,7 +34,7 @@ void OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow_TEST::Wireframe()
 {
-  this->resMaxPercentChange = 4.0;
+  this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
   this->Load("empty.world", false, false, true);

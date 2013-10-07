@@ -15,7 +15,7 @@
  *
 */
 #include <iostream>
-#include "transport/IOManager.hh"
+#include "gazebo/transport/IOManager.hh"
 
 using namespace gazebo;
 using namespace transport;

@@ -26,7 +26,7 @@
 #include <string>
 #include <map>
 
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {

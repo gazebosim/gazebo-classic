@@ -24,8 +24,8 @@
 
 #include <iostream>
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -101,6 +101,9 @@ namespace gazebo
       public: Pose GetInverse() const;
 
       /// \brief Addition operator
+      /// A is the transform from O to P specified in frame O
+      /// B is the transform from P to Q specified in frame P
+      /// then, B + A is the transform from O to Q specified in frame O
       /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: Pose operator+(const Pose &_pose) const;
@@ -111,6 +114,8 @@ namespace gazebo
       public: const Pose &operator+=(const Pose &_pose);
 
       /// \brief Negation operator
+      /// A is the transform from O to P in frame O
+      /// then -A is transform from P to O specified in frame P
       /// \return The resulting pose
       public: inline Pose operator-() const
               {
@@ -118,6 +123,9 @@ namespace gazebo
               }
 
       /// \brief Subtraction operator
+      /// A is the transform from O to P in frame O
+      /// B is the transform from O to Q in frame O
+      /// B - A is the transform from P to Q in frame P
       /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
       public: inline Pose operator-(const Pose &_pose) const
@@ -145,6 +153,10 @@ namespace gazebo
       /// \param[in] _pose the other pose
       /// \return itself
       public: Pose operator*(const Pose &_pose);
+
+      /// \brief Equal operator
+      /// \param[in] _pose Pose to copy
+      public: Pose &operator=(const Pose &_pose);
 
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose
@@ -185,7 +197,6 @@ namespace gazebo
                 return result;
               }
 
-
       /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and
       ///        this, find a
       /// \param[in] _b the other pose
@@ -202,12 +213,6 @@ namespace gazebo
       /// \brief Round all values to _precision decimal places
       /// \param[in] _precision
       public: void Round(int _precision);
-
-      /// \brief The position
-      public: Vector3 pos;
-
-      /// \brief The rotation
-      public: Quaternion rot;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream
@@ -232,6 +237,12 @@ namespace gazebo
               _in >> _pose.pos >> _pose.rot;
               return _in;
             }
+
+      /// \brief The position
+      public: Vector3 pos;
+
+      /// \brief The rotation
+      public: Quaternion rot;
     };
     /// \}
   }

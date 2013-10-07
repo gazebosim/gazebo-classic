@@ -26,10 +26,10 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {
@@ -173,6 +173,9 @@ namespace gazebo
       /// \param[in] _param A parameter listed in the BulletParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(BulletParam _param) const;
+
+      // Documentation inherited
+      public: virtual void SetSORPGSIters(unsigned int iters);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;

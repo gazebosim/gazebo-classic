@@ -88,7 +88,7 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
   msgs::Set(this->msg.mutable_real_time(), _info.realTime);
   msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
 
-  if (this->pub)
+  if (this->pub && this->pub->HasConnections())
     this->pub->Publish(this->msg);
 
   this->msg.clear_time();

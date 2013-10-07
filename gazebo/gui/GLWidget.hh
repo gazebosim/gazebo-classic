@@ -22,24 +22,25 @@
 #include <utility>
 #include <list>
 
-#include "gui/qt.h"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/rendering/RenderTypes.hh"
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/Event.hh"
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "gui/BoxMaker.hh"
-#include "gui/SphereMaker.hh"
-#include "gui/CylinderMaker.hh"
-#include "gui/MeshMaker.hh"
-#include "gui/ModelMaker.hh"
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
+#include "gazebo/gui/SphereMaker.hh"
+#include "gazebo/gui/CylinderMaker.hh"
+#include "gazebo/gui/MeshMaker.hh"
+#include "gazebo/gui/ModelMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 namespace gazebo
 {
@@ -78,21 +79,40 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
-      private: void OnMouseMoveTranslate();
+
+      /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
-      private: void OnMouseReleaseTranslate();
+
+      /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
 
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
-      private: void OnMousePressTranslate();
+
+      /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
 
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
@@ -106,14 +126,10 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void RotateEntity(rendering::VisualPtr &_vis);
-      private: void TranslateEntity(rendering::VisualPtr &_vis);
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
+
       private: void ClearSelection();
 
       /// \brief Copy an object by name
@@ -127,16 +143,15 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
-      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
-
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
       private: rendering::ScenePtr scene;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
+
+      /// \brief The most recent keyboard event.
+      private: common::KeyEvent keyEvent;
 
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -150,17 +165,15 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
+      private: rendering::VisualPtr hoverVis, selectedVis;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
 

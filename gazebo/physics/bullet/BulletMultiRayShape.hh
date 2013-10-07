@@ -17,7 +17,7 @@
 #ifndef _BULLETMULTIRAYSHAPE_HH_
 #define _BULLETMULTIRAYSHAPE_HH_
 
-#include "physics/MultiRayShape.hh"
+#include "gazebo/physics/MultiRayShape.hh"
 
 namespace gazebo
 {

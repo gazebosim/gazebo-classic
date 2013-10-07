@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "common/MeshLoader.hh"
+#include "gazebo/common/MeshLoader.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000

@@ -21,7 +21,7 @@
 #include <string>
 
 #include "gazebo/common/Event.hh"
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {

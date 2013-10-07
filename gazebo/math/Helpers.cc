@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "math/Helpers.hh"
+#include "gazebo/math/Helpers.hh"
 
 namespace gazebo
 {

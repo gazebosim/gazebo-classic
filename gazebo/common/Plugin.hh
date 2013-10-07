@@ -31,15 +31,16 @@
 #include <list>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include <sdf/sdf.hh>
 
-#include "physics/PhysicsTypes.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -73,13 +74,27 @@ namespace gazebo
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
-            /// \brief Get the name of the handler
+    /// \brief Constructor
+    public: PluginT()
+            {
+              this->dlHandle = NULL;
+            }
+
+    /// \brief Destructor
+    public: virtual ~PluginT()
+            {
+#ifdef HAVE_DL
+              dlclose(this->dlHandle);
+#endif
+            }
+
+    /// \brief Get the name of the handler
     public: std::string GetFilename() const
             {
               return this->filename;
             }
 
-            /// \brief Get the short name of the handler
+    /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
               return this->handle;
@@ -120,15 +135,15 @@ namespace gazebo
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
-              void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-              if (!handle)
+              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              if (!dlHandle)
               {
                 gzerr << "Failed to load plugin " << fullname << ": "
                   << dlerror() << "\n";
                 return result;
               }
 
-              registerFunc.ptr = dlsym(handle, registerName.c_str());
+              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
 
               if (!registerFunc.ptr)
               {
@@ -139,8 +154,10 @@ namespace gazebo
 
               // Register the new controller.
               result.reset(registerFunc.func());
+              result->dlHandle = dlHandle;
 
 #elif HAVE_LTDL
+              gzerr << "LTDL is deprecated as of Gazebo 1.10\n";
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
@@ -180,6 +197,7 @@ namespace gazebo
 
               // Register the new controller.
               result.result(registerFunc.func());
+              result->dlHandle = NULL;
 
 #else  // HAVE_LTDL
 
@@ -215,6 +233,9 @@ namespace gazebo
                T *(*func)();
                void *ptr;
              } fptr_union_t;
+
+    /// \brief Handle used for closing the dynamic library.
+    private: void *dlHandle;
   };
 
   /// \class WorldPlugin Plugin.hh common/common.hh

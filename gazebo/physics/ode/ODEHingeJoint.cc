@@ -21,11 +21,12 @@
 
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEHingeJoint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -50,7 +51,6 @@ void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
   HingeJoint<ODEJoint>::Load(_sdf);
 
   this->SetParam(dParamFMax, 0);
-  this->SetForce(0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -103,8 +103,17 @@ void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+
   if (this->jointId)
-    dJointSetHingeAxis(this->jointId, _axis.x, _axis.y, _axis.z);
+    dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -153,35 +162,8 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForce(int _index, double _effort)
+void ODEHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling ODEHingeJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort,
-      -this->effortLimit[_index], this->effortLimit[_index]);
-
-  ODEJoint::SetForce(_index, _effort);
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
-
   if (this->jointId)
     dJointAddHingeTorque(this->jointId, _effort);
   else

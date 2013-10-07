@@ -17,11 +17,11 @@
 #ifndef _CONVERSIONS_HH_
 #define _CONVERSIONS_HH_
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Color.hh"
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {

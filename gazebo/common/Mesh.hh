@@ -20,8 +20,8 @@
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {

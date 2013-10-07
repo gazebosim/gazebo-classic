@@ -30,7 +30,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 #ifdef HAVE_GTS
@@ -212,7 +212,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -249,7 +249,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = windowManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -287,7 +287,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = doorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -352,7 +352,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     stepVisual->SetRotation(baseStepVisual->GetRotation());
   }
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -390,7 +390,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -459,7 +459,7 @@ void BuildingMaker::Reset()
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
-  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   scene->AddVisual(this->modelVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
@@ -1107,7 +1107,6 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
   startings.insert(start);
 
   std::multiset<QPointF>::iterator startIt;
-  std::multiset<QRectF>::iterator filledIt;
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here

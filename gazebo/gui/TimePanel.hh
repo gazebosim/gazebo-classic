@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
@@ -66,6 +67,10 @@ namespace gazebo
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
+
+      /// \brief Helper function to format time string.
+      /// \param[in] _msg Time message.
+      private: static std::string FormatTime(const msgs::Time &_msg);
 
       /// \brief QT callback when the reset time button is pressed.
       private slots: void OnTimeReset();
