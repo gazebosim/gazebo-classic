@@ -826,16 +826,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: get these from joint.sdf
-        const double stopStiffness = 1.0e8;
-        const double stopDissipation = 1.0;
-
         /// \TODO: make stop stiffness, damping with parameters
         /// FIXME: remove hardcoded values.
         gzJoint->limitForce =
           Force::MobilityLinearStop(this->forces, mobod,
-          SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
-          low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
 
         // gzdbg << "SimbodyPhysics SetDamping ("
         //       << gzJoint->GetDampingCoefficient()
@@ -871,16 +867,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: get these from joint.sdf
-        const double stopStiffness = 1.0e8;
-        const double stopDissipation = 1.0;
-
         /// \TODO: make stop stiffness, damping with parameters
         /// FIXME: remove hardcoded values.
         gzJoint->limitForce =
           Force::MobilityLinearStop(this->forces, mobod,
-          SimTK::MobilizerQIndex(0), stopStiffness, stopDissipation,
-          low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
 
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
