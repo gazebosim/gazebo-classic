@@ -97,6 +97,37 @@ namespace gazebo
           const math::Vector3 &_axis,
           bool _local = false);
 
+      /// \brief Snap a point at intervals of a fixed distance. Currently used
+      /// to give a snapping behavior when moving models with a mouse.
+      /// \param[in] _point Input point.
+      /// \param[in] _interval Fixed distance interval at which the point
+      /// is snapped.
+      /// \param[in] _sensitivity Sensitivity of point snapping, in terms of a
+      /// percentage of the interval.
+      /// \return Snapped 3D point.
+      public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
+          double _interval = 1.0, double _sensitivity = 0.4);
+
+      /// \brief Helper function to get the 3D position of mouse on ground
+      /// plane.
+      /// param[in] _camera Pointer to user camera.
+      /// param[in] _event Mouse event.
+      /// return Position of mouse-plane intersection in world coordinates.
+      public: static math::Vector3 GetMousePositionOnPlane(
+          rendering::CameraPtr _camera,
+          const common::MouseEvent &_event);
+
+      /// \brief Helper function to get the distance moved by the mouse.
+      /// \param[in] _camera Pointer to user camera.
+      /// \param[in] _pose Pose of origin.
+      /// \param[in] _axis Movement axis.
+      /// \param[in] _local True to get distance in local frame set the _pose.
+      public: static math::Vector3 GetMouseMoveDistance(
+          rendering::CameraPtr _camera,
+          const math::Vector2i &_start, const math::Vector2i &_end,
+          const math::Pose &_pose, const math::Vector3 &_axis,
+          bool _local);
+
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.

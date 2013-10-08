@@ -49,7 +49,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 
   QPushButton *importButton = new QPushButton("&Import");
   importButton->setDefault(true);
-  connect(importButton, SIGNAL(clicked()), this, SLOT(onImport()));
+  connect(importButton, SIGNAL(clicked()), this, SLOT(OnImport()));
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(importButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
@@ -119,7 +119,7 @@ void ImportDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void ImportDialog::onImport()
+void ImportDialog::OnImport()
 {
   this->accept();
 }

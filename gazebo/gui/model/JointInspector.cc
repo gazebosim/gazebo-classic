@@ -186,16 +186,16 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(int /*_index*/) const
+math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
 {
   return math::Vector3(this->anchorXSpinBox->value(),
       this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAxis(int _index) const
+math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 {
-  if (_index < 0 || _index > static_cast<int>(this->axisXSpinBoxes.size()))
+  if (_index > this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return math::Vector3::Zero;
@@ -207,9 +207,9 @@ math::Vector3 JointInspector::GetAxis(int _index) const
 }
 
 /////////////////////////////////////////////////
-double JointInspector::GetLowerLimit(int _index) const
+double JointInspector::GetLowerLimit(unsigned int _index) const
 {
-  if (_index < 0 || _index > static_cast<int>(this->lowerLimitSpinBoxes.size()))
+  if (_index > this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -219,9 +219,9 @@ double JointInspector::GetLowerLimit(int _index) const
 }
 
 /////////////////////////////////////////////////
-double JointInspector::GetUpperLimit(int _index) const
+double JointInspector::GetUpperLimit(unsigned int _index) const
 {
-  if (_index < 0 || _index > static_cast<int>(this->upperLimitSpinBoxes.size()))
+  if (_index > this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return 0;
@@ -263,7 +263,8 @@ void JointInspector::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
+void JointInspector::SetAnchor(unsigned int /*_index*/,
+    const math::Vector3 &_anchor)
 {
   this->anchorXSpinBox->setValue(_anchor.x);
   this->anchorYSpinBox->setValue(_anchor.y);
@@ -271,9 +272,9 @@ void JointInspector::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAxis(int _index, const math::Vector3 &_axis)
+void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  if (_index < 0 || _index > static_cast<int>(this->axisXSpinBoxes.size()))
+  if (_index > static_cast<int>(this->axisXSpinBoxes.size()))
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -285,9 +286,9 @@ void JointInspector::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetLowerLimit(int _index, double _lower)
+void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 {
-  if (_index < 0 || _index > static_cast<int>(this->lowerLimitSpinBoxes.size()))
+  if (_index > this->lowerLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;
@@ -297,9 +298,9 @@ void JointInspector::SetLowerLimit(int _index, double _lower)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetUpperLimit(int _index, double _upper)
+void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 {
-  if (_index < 0 || _index > static_cast<int>(this->upperLimitSpinBoxes.size()))
+  if (_index > this->upperLimitSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;

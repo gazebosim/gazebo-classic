@@ -75,7 +75,7 @@ namespace gazebo
       private slots: void OnCancel();
 
       /// \brief Qt callback when the import button is pressed.
-      private slots: void onImport();
+      private slots: void OnImport();
 
       /// \brief Editable line that holds the name.
       private: QLineEdit *nameLineEdit;

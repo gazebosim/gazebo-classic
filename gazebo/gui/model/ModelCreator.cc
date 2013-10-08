@@ -37,6 +37,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ModelManipulator.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -405,7 +406,6 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
   boost::filesystem::path path;
   path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
   savefile.open(path.string().c_str());
-  savefile <<  "<?xml version='1.0' ?>\n";
   savefile << this->modelSDF->ToString();
   savefile.close();
 }
@@ -590,40 +590,17 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   if (!gui::get_active_camera())
     return false;
 
-  math::Pose pose = this->mouseVisual->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  gui::get_active_camera()->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-      origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
+  math::Pose pose = this->modelVisual->GetWorldPose();
+  pose.pos = ModelManipulator::GetMousePositionOnPlane(
+      gui::get_active_camera(), _event);
 
   if (!_event.shift)
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
+    pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
-  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
+  pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 
-  this->mouseVisual->SetWorldPose(pose);
+  this->modelVisual->SetWorldPose(pose);
 
   return true;
 }

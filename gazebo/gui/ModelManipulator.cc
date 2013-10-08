@@ -132,8 +132,73 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
-    const math::Vector3 &_axis, bool _local) const
+math::Vector3 ModelManipulator::GetMousePositionOnPlane(
+    rendering::CameraPtr _camera,
+    const common::MouseEvent &_event)
+{
+  math::Vector3 origin1, dir1, p1;
+
+  // Cast ray from the camera into the world
+  _camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+      origin1, dir1);
+
+  // Compute the distance from the camera to plane of translation
+  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  double dist1 = plane.Distance(origin1, dir1);
+
+  p1 = origin1 + dir1 * dist1;
+
+  return p1;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
+    double _interval, double _sensitivity)
+{
+  if (_interval < 0)
+  {
+    gzerr << "Interval distance must be greater or equal to 0" << std::endl;
+    return math::Vector3::Zero;
+  }
+
+  if (_sensitivity < 0 || _sensitivity > 1.0)
+  {
+    gzerr << "Sensitivity must be between 0 and 1" << std::endl;
+    return math::Vector3::Zero;
+  }
+
+  math::Vector3 point = _point;
+  double snap = _interval * _sensitivity;
+
+  double remainder = fmod(point.x, _interval);
+  int sign = remainder >= 0 ? 1 : -1;
+  if (fabs(remainder) < snap)
+      point.x -= remainder;
+  else if (fabs(remainder) > (_interval - snap))
+      point.x = point.x - remainder + _interval * sign;
+
+  remainder = fmod(point.y, _interval);
+  sign = remainder >= 0 ? 1 : -1;
+  if (fabs(remainder) < snap)
+      point.y -= remainder;
+  else if (fabs(remainder) > (_interval - snap))
+      point.y = point.y - remainder + _interval * sign;
+
+  remainder = fmod(point.z, _interval);
+  sign = remainder >= 0 ? 1 : -1;
+  if (fabs(remainder) < snap)
+      point.z -= remainder;
+  else if (fabs(remainder) > (_interval - snap))
+      point.z = point.z - remainder + _interval * sign;
+
+  return point;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 ModelManipulator::GetMouseMoveDistance(
+    rendering::CameraPtr _camera,
+    const math::Vector2i &_start, const math::Vector2i &_end,
+    const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
   math::Pose pose = _pose;
 
@@ -141,10 +206,10 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
   math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
-      this->mouseEvent.pos.y, origin1, dir1);
-  this->userCamera->GetCameraToViewportRay(this->mouseStart.x,
-      this->mouseStart.y, origin2, dir2);
+  _camera->GetCameraToViewportRay(_end.x,
+      _end.y, origin1, dir1);
+  _camera->GetCameraToViewportRay(_start.x,
+      _start.y, origin2, dir2);
 
   math::Vector3 planeNorm(0, 0, 0);
   math::Vector3 projNorm(0, 0, 0);
@@ -216,6 +281,15 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
+math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
+    const math::Vector3 &_axis, bool _local) const
+{
+  return GetMouseMoveDistance(this->userCamera, this->mouseStart,
+      math::Vector2i(this->mouseEvent.pos.x, this->mouseEvent.pos.y),
+      _pose, _axis, _local);
+}
+
+/////////////////////////////////////////////////
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
@@ -274,23 +348,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
   if (this->mouseEvent.control)
   {
-    if (ceil(newScale.x) - newScale.x <= .4)
-        newScale.x = ceil(newScale.x);
-    else if (newScale.x - floor(newScale.x) <= .4)
-      newScale.x = floor(newScale.x);
-
-    if (ceil(newScale.y) - newScale.y <= .4)
-        newScale.y = ceil(newScale.y);
-    else if (newScale.y - floor(newScale.y) <= .4)
-      newScale.y = floor(newScale.y);
-
-    if (_axis.z > 0.0)
-    {
-      if (ceil(newScale.z) - newScale.z <= .4)
-        newScale.z = ceil(newScale.z);
-      else if (newScale.z - floor(newScale.z) <= .4)
-        newScale.z = floor(newScale.z);
-    }
+    newScale = SnapPoint(newScale);
   }
 
   _vis->SetScale(newScale);
@@ -307,23 +365,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
   if (this->mouseEvent.control)
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-        pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-        pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
-
-    if (_axis.z > 0.0)
-    {
-      if (ceil(pose.pos.z) - pose.pos.z <= .4)
-        pose.pos.z = ceil(pose.pos.z);
-      else if (pose.pos.z - floor(pose.pos.z) <= .4)
-        pose.pos.z = floor(pose.pos.z);
-    }
+    pose.pos = SnapPoint(pose.pos);
   }
 
   if (!(_axis.z > 0) && !_local)
