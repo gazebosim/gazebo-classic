@@ -1,6 +1,6 @@
 ### Gazebo 2.0.0 (2013-10-08)
 1. Refactor code check tool.
-  * [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
+    * [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
 1. Added pull request tool for Bitbucket.
   * [Pull Request #670](https://bitbucket.org/osrf/gazebo/pull-request/670)
   * [Pull Request #691](https://bitbucket.org/osrf/gazebo/pull-request/671)
