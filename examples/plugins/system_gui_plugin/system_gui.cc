@@ -30,8 +30,10 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~SystemGUI()
     {
+      this->connections.clear();
       if (this->userCam)
         this->userCam->EnableSaveFrame(false);
+      this->userCam.reset();
     }
 
     /////////////////////////////////////////////

@@ -148,8 +148,8 @@
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
+            <lower>-0.000001</lower>
+            <upper>0.000001</upper>
             <effort>1000.000000</effort>
             <velocity>1000.000000</velocity>
           </limit>

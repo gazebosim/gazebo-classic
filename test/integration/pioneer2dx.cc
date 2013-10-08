@@ -29,6 +29,13 @@ class Pioneer2dx : public ServerFixture,
 /////////////////////////////////////////////////
 void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not handle pioneer2dx model yet, "
+          << "Please see issue #866.\n";
+    return;
+  }
+
   Load("worlds/pioneer2dx.world", false, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
