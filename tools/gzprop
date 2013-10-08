@@ -28,8 +28,8 @@ end
 modelDir = ARGV[0]
 
 # Make sure model directory exists
-if RUBY_VERSION < "1.9" 
-  if DIR[modelDir].empty?
+if RUBY_VERSION < "1.9"
+  if Dir[modelDir].empty?
     abort("Model directory[#{modelDir}] doesn't exist")
   end
 else
@@ -50,7 +50,7 @@ metaDir = File.join(modelDir, "meta")
 
 # Create the meta directory
 if RUBY_VERSION < "1.9"
-  if DIR[modelDir].empty?
+  if Dir[modelDir].empty?
     Dir.mkdir(metaDir)
   end
 else
@@ -67,7 +67,7 @@ Dir.mktmpdir { |dir|
 
   # Copy the model information into a temp directory
   `cp -r "#{modelDir}" #{dir}`
-  
+
   # Create a tarball for the model
   `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
 }
