@@ -112,7 +112,7 @@ namespace gazebo
       /// plane.
       /// param[in] _camera Pointer to user camera.
       /// param[in] _event Mouse event.
-      /// return Position of mouse-plane intersection in world coordinates.
+      /// return Point of mouse-plane intersection in world coordinates.
       public: static math::Vector3 GetMousePositionOnPlane(
           rendering::CameraPtr _camera,
           const common::MouseEvent &_event);
@@ -121,7 +121,8 @@ namespace gazebo
       /// \param[in] _camera Pointer to user camera.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.
-      /// \param[in] _local True to get distance in local frame set the _pose.
+      /// \param[in] _local True to get distance in local frame.
+      /// \return Mouse distance moved.
       public: static math::Vector3 GetMouseMoveDistance(
           rendering::CameraPtr _camera,
           const math::Vector2i &_start, const math::Vector2i &_end,
@@ -131,7 +132,8 @@ namespace gazebo
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.
-      /// \param[in] _local True to get distance in local frame set the _pose.
+      /// \param[in] _local True to get distance in local frame.
+      /// \return Mouse distance moved.
       private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
           const math::Vector3 &_axis, bool _local) const;
 
