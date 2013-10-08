@@ -515,7 +515,7 @@ namespace gazebo
       /// \brief option to use implicit damping
       /// Deprecated, pushing this flag into individual physics engine,
       /// for example: ODEJoint::useImplicitSpringDamper.
-      protected: bool useImplicitDamping GAZEBO_DEPRECATED(2.0);
+      protected: bool useCFMDamping GAZEBO_DEPRECATED(2.0);
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.
