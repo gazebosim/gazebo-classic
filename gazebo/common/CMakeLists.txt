@@ -32,6 +32,7 @@ set (sources
   MeshManager.cc
   ModelDatabase.cc
   PID.cc
+  SDTS.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -56,6 +57,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  HeightmapData.hh
   Image.hh
   KeyEvent.hh
   KeyFrame.hh
@@ -66,6 +68,7 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
+  SDTS.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
@@ -143,6 +146,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread
+  gdal
 )
 
 if (NOT APPLE)

@@ -26,6 +26,8 @@
 #include <vector>
 
 #include "gazebo/common/Image.hh"
+#include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/SDTS.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -123,6 +125,12 @@ namespace gazebo
 
       /// \brief Image used to generate the heights.
       protected: common::Image img;
+
+      /// \brief SDTS used to generate the heights.
+      protected: common::SDTS sdts;
+
+      /// \brief HeightmapData used to generate the heights.
+      protected: common::HeightmapData *heightmapData;
 
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 
 #include <string.h>
 #include <math.h>
+#include <gdal/gdal_priv.h>
+#include <gdal/cpl_conv.h> // for CPLMalloc()
 
 #include "gazebo/math/gzmath.hh"
 
@@ -43,6 +45,9 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 {
   this->vertSize = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
+
+  // Register the GDAL drivers
+  GDALAllRegister();
 }
 
 //////////////////////////////////////////////////
@@ -75,6 +80,8 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
+  GDALDataset *poDataset;
+
   Base::Load(_sdf);
 
   std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
@@ -84,13 +91,26 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
             this->sdf->Get<std::string>("uri") + "]\n");
   }
 
-  // Use the image to get the size of the heightmap
-  this->img.Load(filename);
+  poDataset = (GDALDataset *) GDALOpen(filename.c_str(), GA_ReadOnly);
 
-  if (this->img.GetWidth() != this->img.GetHeight() ||
-      !math::isPowerOfTwo(this->img.GetWidth()-1))
+  // Check if the heightmap file is an image
+  std::string fileFormat = poDataset->GetDriver()->GetDescription();
+  if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
+    // Use the image to get the size of the heightmap
+    this->img.Load(filename);
+    this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
+  }
+  else
+  {
+    //this->sdts.Load(filename);
+    this->heightmapData = static_cast<common::HeightmapData*>(&(this->sdts));
+  }
+
+  if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
+      !math::isPowerOfTwo(this->heightmapData->GetWidth()-1))
+  {
+    gzthrow("Heightmap data size must be square, with a size of 2^n+1\n");
   }
 }
 
@@ -115,14 +135,14 @@ void HeightmapShape::Init()
   math::Vector3 terrainSize = this->GetSize();
 
   // sampling size along image width and height
-  this->vertSize = (this->img.GetWidth() * this->subSampling)-1;
+  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->img.GetMaxColor().r, 0.0f))
+  if (math::equal(this->heightmapData->GetMaxColor().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
-    this->scale.z = fabs(terrainSize.z) / this->img.GetMaxColor().r;
+    this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
 
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
@@ -150,20 +170,20 @@ void HeightmapShape::FillHeightMap()
 
   common::Color pixel;
 
-  int imgHeight = this->img.GetHeight();
-  int imgWidth = this->img.GetWidth();
+  int imgHeight = this->heightmapData->GetHeight();
+  int imgWidth = this->heightmapData->GetWidth();
 
   GZ_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
 
   // Bytes per row
-  unsigned int pitch = this->img.GetPitch();
+  unsigned int pitch = this->heightmapData->GetPitch();
 
   // Bytes per pixel
   unsigned int bpp = pitch / imgWidth;
 
   unsigned char *data = NULL;
   unsigned int count;
-  this->img.GetData(&data, count);
+  this->heightmapData->GetData(&data, count);
 
   double yf, xf, dy, dx;
   int y1, y2, x1, x2;

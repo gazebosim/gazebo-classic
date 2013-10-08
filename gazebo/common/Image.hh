@@ -30,6 +30,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/common/HeightmapData.hh"
 
 namespace gazebo
 {
@@ -65,7 +66,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class Image
+    class Image : public HeightmapData
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat
