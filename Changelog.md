@@ -15,7 +15,7 @@
   [Pull Request #704](https://bitbucket.org/osrf/gazebo/pull-request/704)
 1. Simplify command-line parsing of gztopic echo output.
   [Pull Request #674](https://bitbucket.org/osrf/gazebo/pull-request/674)
-  Resolves:
+  * Resolves:
     * [Issue #795](https://bitbucket.org/osrf/gazebo/issue/795)
 1. Use UNIX directories through the user of GNUInstallDirs cmake module.
   [Pull Request #676](https://bitbucket.org/osrf/gazebo/pull-request/676)
@@ -28,7 +28,7 @@
   [Pull Request #680](https://bitbucket.org/osrf/gazebo/pull-request/680)
 1. Add minimum version for sdformat.
   [Pull Request #682](https://bitbucket.org/osrf/gazebo/pull-request/682)
-  Resolves:
+  * Resolves:
     * [Issue #818](https://bitbucket.org/osrf/gazebo/issue/818)
 1. Allow different gtest parameter types with ServerFixture
   [Pull Request #686](https://bitbucket.org/osrf/gazebo/pull-request/686)
