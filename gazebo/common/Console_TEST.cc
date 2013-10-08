@@ -25,7 +25,7 @@
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
 {
-  // Initialize Conosol
+  // Initialize Console
   gazebo::common::Console::Instance()->Init("test.log");
 
   EXPECT_TRUE(getenv("HOME") != NULL);
