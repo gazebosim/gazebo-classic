@@ -27,7 +27,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_mgr), renderTarget(_renderTarget), texture(0),
+: sceneMgr(_mgr), renderTarget(_renderTarget),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);
@@ -172,7 +172,7 @@ void SelectionBuffer::CreateRTTOverlays()
 {
   Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
 
-  if (mgr->getByName("SelectionDebugOverlay"))
+  if (mgr && mgr->getByName("SelectionDebugOverlay"))
     return;
 
   Ogre::MaterialPtr baseWhite =
@@ -191,12 +191,21 @@ void SelectionBuffer::CreateRTTOverlays()
     static_cast<Ogre::OverlayContainer *>(
         mgr->createOverlayElement("Panel", "SelectionDebugPanel"));
 
-  panel->setMetricsMode(Ogre::GMM_PIXELS);
-  panel->setPosition(10, 10);
-  panel->setDimensions(400, 280);
-  panel->setMaterialName("SelectionDebugMaterial");
-  this->selectionDebugOverlay->add2D(panel);
-  this->selectionDebugOverlay->hide();
+  if (panel)
+  {
+    panel->setMetricsMode(Ogre::GMM_PIXELS);
+    panel->setPosition(10, 10);
+    panel->setDimensions(400, 280);
+    panel->setMaterialName("SelectionDebugMaterial");
+    this->selectionDebugOverlay->add2D(panel);
+    this->selectionDebugOverlay->hide();
+  }
+  else
+  {
+    gzlog << "Unable to create selection buffer overlay. "
+      "This will not effect Gazebo unless you're trying to debug "
+      "the selection buffer.\n";
+  }
 }
 
 /////////////////////////////////////////////////

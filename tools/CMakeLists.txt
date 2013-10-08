@@ -42,3 +42,6 @@ target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
 install (PROGRAMS gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
+
+install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
+manpage(gzprop 1)
