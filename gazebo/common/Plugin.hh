@@ -157,7 +157,7 @@ namespace gazebo
               result->dlHandle = dlHandle;
 
 #elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 1.10\n";
+              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
