@@ -568,7 +568,8 @@ void Joint::ApplyDamping()
 //////////////////////////////////////////////////
 void Joint::ApplyStiffnessDamping()
 {
-  gzerr << "Joint::ApplyStiffnessDamping should be overloaded by physics engines.\n";
+  gzerr << "Joint::ApplyStiffnessDamping should be overloaded by "
+        << "physics engines.\n";
 }
 
 //////////////////////////////////////////////////
