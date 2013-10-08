@@ -16,6 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
 using namespace gazebo;
@@ -131,31 +132,39 @@ void SaveDialog::OnSave()
   boost::filesystem::path savePath(this->GetSaveLocation());
   savePath /= this->GetSaveName() + "." + this->fileExtension;
 
-  if (boost::filesystem::exists(savePath.string()))
+  try
   {
-    std::string msg = "A file named " + savePath.string() + " already exists.\n"
-        + "Do you wish to overwrite the existing file?";
-    int ret = QMessageBox::warning(0, QString("File Exists"),
-        QString(msg.c_str()), QMessageBox::Save | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-
-    switch (ret)
+    if (boost::filesystem::exists(savePath.string()))
     {
-      case QMessageBox::Save:
-        this->accept();
-        break;
-      case QMessageBox::Cancel:
-        // Do nothing
-        break;
-      default:
-        break;
+      std::string msg = "A file named " + savePath.string() + " already exists.\n"
+          + "Do you wish to overwrite the existing file?";
+      int ret = QMessageBox::warning(0, QString("File Exists"),
+          QString(msg.c_str()), QMessageBox::Save | QMessageBox::Cancel,
+          QMessageBox::Cancel);
+
+      switch (ret)
+      {
+        case QMessageBox::Save:
+          this->accept();
+          break;
+        case QMessageBox::Cancel:
+          // Do nothing
+          break;
+        default:
+          break;
+      }
+    }
+    else
+    {
+      this->accept();
     }
   }
-  else
+  catch (const boost::filesystem::filesystem_error &ex)
   {
-    this->accept();
+    gzerr << ex.what() << std::endl;
   }
 }
+
 
 /////////////////////////////////////////////////
 void SaveDialog::SetFileExtension(const std::string &_extension)

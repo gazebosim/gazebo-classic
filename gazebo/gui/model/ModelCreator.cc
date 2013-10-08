@@ -406,8 +406,16 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
   boost::filesystem::path path;
   path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
   savefile.open(path.string().c_str());
-  savefile << this->modelSDF->ToString();
-  savefile.close();
+  if (savefile.is_open())
+  {
+    savefile << this->modelSDF->ToString();
+    savefile.close();
+  }
+  else
+  {
+    gzerr << "Unable to open file for writing: '" << path.string().c_str()
+        << "'. Possibly a permission issue." << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
