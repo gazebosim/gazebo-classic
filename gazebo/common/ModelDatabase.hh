@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <utility>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
@@ -70,11 +71,22 @@ namespace gazebo
       public: std::map<std::string, std::string> GetModels();
 
       /// \brief Get the dictionary of all model names via a callback.
-      ///
+      /// This is deprecated. Please use GetModelsNonBlocking. 
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of
       /// models.
       public: void GetModels(boost::function<
+                  void (const std::map<std::string, std::string> &)> _func)
+              GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Get the dictionary of all model names via a callback.
+      ///
+      /// This is the non-blocking version of ModelDatabase::GetModels
+      /// \param[in] _func Callback function that receives the list of
+      /// models.
+      /// \return A boost shared pointer. This pointer must remain valid in
+      /// order to receive the callback.
+      public: boost::shared_ptr<bool> GetModelsNonBlocking(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.
@@ -167,9 +179,13 @@ namespace gazebo
       private: typedef boost::function<
                void (const std::map<std::string, std::string> &)> CallbackFunc;
 
+      // \todo Remove this along with the deprecated version of GetModels.
+      private: std::list<CallbackFunc> deprecatedCallbacks;
+
       /// \brief List of all callbacks set from the
       /// ModelDatabase::GetModels function.
-      private: std::list<CallbackFunc> callbacks;
+      private: std::list<
+               std::pair<boost::shared_ptr<bool>, CallbackFunc> > callbacks;
 
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.

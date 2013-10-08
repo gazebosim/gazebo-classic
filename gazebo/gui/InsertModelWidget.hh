@@ -79,6 +79,9 @@ namespace gazebo
 
       /// \brief A file/directory watcher.
       private: QFileSystemWatcher *watcher;
+
+      /// \brief Callback reference count for retreiving models.
+      private: boost::shared_ptr<bool> getModelsCBRef;
     };
   }
 }

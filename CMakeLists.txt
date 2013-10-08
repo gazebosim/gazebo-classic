@@ -143,6 +143,7 @@ message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
+#####################################
 # Define some variables that are going to be used in two places:
 # 1. In CMake code to pass preprocessor definitions to certain source files
 # (especially in common/CMakeLists.txt).
