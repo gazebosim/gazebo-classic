@@ -208,7 +208,7 @@ double ODEGearboxJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetForceImpl(int _index, double _effort)
+void ODEGearboxJoint::SetForceImpl(int /*_index*/, double /*_effort*/)
 {
   if (this->jointId)
     gzlog << "SetForce not implemented for gearbox\n";
