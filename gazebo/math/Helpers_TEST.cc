@@ -38,5 +38,10 @@ TEST(HelpersTest, Helpers)
 TEST(HelpersTest, FixNaN)
 {
   EXPECT_DOUBLE_EQ(math::fixnan(1.0 / 0.0), 0.0);
+  EXPECT_DOUBLE_EQ(math::fixnan(-1.0 / 0.0), 0.0);
+  EXPECT_DOUBLE_EQ(math::fixnan(0.0 / 0.0), 0.0);
+
   EXPECT_FLOAT_EQ(math::fixnan(1.0f / 0.0f), 0.0f);
+  EXPECT_FLOAT_EQ(math::fixnan(-1.0f / 0.0f), 0.0f);
+  EXPECT_FLOAT_EQ(math::fixnan(0.0f / 0.0f), 0.0f);
 }
