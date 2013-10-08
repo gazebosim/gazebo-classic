@@ -24,6 +24,7 @@
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTUtils.hh"
+#include "gazebo/physics/dart/DARTPlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -65,6 +66,12 @@ void DARTCollision::Init()
   // Offset
   if (this->dtCollisionShape)
   {
+    // TODO: Don't change offset of shape until dart supports plane shape.
+    boost::shared_ptr<DARTPlaneShape> planeShape =
+        boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
+    if (planeShape)
+      return;
+
     math::Pose relativePose = this->GetRelativePose();
     this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
   }
