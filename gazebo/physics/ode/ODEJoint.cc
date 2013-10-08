@@ -1247,8 +1247,8 @@ void ODEJoint::KpKdToCFMERP(const double _dt,
                            double &_cfm, double &_erp)
 {
   /// \TODO: check for NaN cases
-  _erp = _dt * _kp / ( _dt * _kp + _kd );
-  _cfm = 1.0 / ( _dt * _kp + _kd );
+  _erp = _dt * _kp / (_dt * _kp + _kd);
+  _cfm = 1.0 / (_dt * _kp + _kd);
 }
 
 //////////////////////////////////////////////////
