@@ -56,10 +56,10 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf)
               {
                 T::Load(_sdf);
-                if (_sdf->HasElement("gear_ratio"))
+                if (_sdf->HasElement("gearbox_ratio"))
                 {
                   this->gearRatio =
-                    _sdf->GetElement("gear_ratio")->GetValueDouble();
+                    _sdf->GetElement("gearbox_ratio")->GetValueDouble();
                 }
                 else
                 {
@@ -67,10 +67,10 @@ namespace gazebo
                   this->gearRatio = 1.0;
                 }
 
-                if (_sdf->HasElement("reference_body"))
+                if (_sdf->HasElement("gearbox_reference_body"))
                 {
                   this->referenceBody =
-                    _sdf->GetElement("reference_body")->GetValueString();
+                    _sdf->GetElement("gearbox_reference_body")->GetValueString();
                 }
                 else
                 {
