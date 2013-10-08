@@ -69,20 +69,22 @@ Heightmap::~Heightmap()
 {
   this->scene.reset();
 
-  delete this->terrainGlobals;
-  this->terrainGlobals = NULL;
-
-  this->terrainGroup->removeAllTerrains();
-
-  delete this->terrainGroup;
-  this->terrainGroup = NULL;
-
   if (this->terrainPaging)
   {
     OGRE_DELETE this->terrainPaging;
     pageManager->destroyWorld(this->world);
     OGRE_DELETE this->pageManager;
   }
+  else
+  {
+    this->terrainGroup->removeAllTerrains();
+
+    OGRE_DELETE this->terrainGroup;
+    this->terrainGroup = NULL;
+  }
+
+  OGRE_DELETE this->terrainGlobals;
+  this->terrainGlobals = NULL;
 }
 
 //////////////////////////////////////////////////
