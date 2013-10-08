@@ -59,7 +59,7 @@ namespace gazebo
                 if (_sdf->HasElement("gearbox_ratio"))
                 {
                   this->gearRatio =
-                    _sdf->GetElement("gearbox_ratio")->GetValueDouble();
+                    _sdf->Get<double>("gearbox_ratio");
                 }
                 else
                 {
@@ -70,7 +70,7 @@ namespace gazebo
                 if (_sdf->HasElement("gearbox_reference_body"))
                 {
                   this->referenceBody =
-                    _sdf->GetElement("gearbox_reference_body")->GetValueString();
+                    _sdf->Get<std::string>("gearbox_reference_body");
                 }
                 else
                 {
