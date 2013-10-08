@@ -1410,7 +1410,8 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     // Take absolute value of dissipationCoefficient, since negative values of
-    // dissipationCoefficient are used for adaptive damping to enforce stability.
+    // dissipationCoefficient are used for adaptive damping to
+    // enforce stability.
     double dampingForce = -fabs(this->dissipationCoefficient[i])
       * this->GetVelocity(i);
 
