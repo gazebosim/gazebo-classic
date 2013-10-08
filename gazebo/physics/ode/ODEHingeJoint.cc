@@ -123,7 +123,7 @@ math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result;
   if (this->jointId)
-    result = dJointGetHingeAngle(this->jointId);
+    result = math::fixnan(dJointGetHingeAngle(this->jointId));
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -136,7 +136,7 @@ double ODEHingeJoint::GetVelocity(int /*index*/) const
   double result = 0;
 
   if (this->jointId)
-    result = dJointGetHingeAngleRate(this->jointId);
+    result = math::fixnan(dJointGetHingeAngleRate(this->jointId));
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -176,7 +176,7 @@ double ODEHingeJoint::GetParam(int _parameter) const
   double result = 0;
 
   if (this->jointId)
-    result = dJointGetHingeParam(this->jointId, _parameter);
+    result = math::fixnan(dJointGetHingeParam(this->jointId, _parameter));
   else
     gzerr << "ODE Joint ID is invalid\n";
 
