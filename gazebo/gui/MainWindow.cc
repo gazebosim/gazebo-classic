@@ -1083,7 +1083,7 @@ void MainWindow::CreateMenuBar()
   // editMenu->addAction(g_editTerrainAct);
 
   // \TODO: Add this back in when implementing the full Model Editor spec.
-  editMenu->addAction(g_editModelAct);
+  // editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
