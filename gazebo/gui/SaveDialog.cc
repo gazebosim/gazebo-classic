@@ -136,8 +136,8 @@ void SaveDialog::OnSave()
   {
     if (boost::filesystem::exists(savePath.string()))
     {
-      std::string msg = "A file named " + savePath.string() + " already exists.\n"
-          + "Do you wish to overwrite the existing file?";
+      std::string msg = "A file named " + savePath.string() +
+          " already exists.\nDo you wish to overwrite the existing file?";
       int ret = QMessageBox::warning(0, QString("File Exists"),
           QString(msg.c_str()), QMessageBox::Save | QMessageBox::Cancel,
           QMessageBox::Cancel);

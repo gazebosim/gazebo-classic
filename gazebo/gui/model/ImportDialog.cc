@@ -106,10 +106,21 @@ void ImportDialog::SetTitle(const std::string &_title)
 /////////////////////////////////////////////////
 void ImportDialog::OnBrowse()
 {
-  QString dir = QFileDialog::getOpenFileName(this, tr("Import Part"),
-    QDir::homePath(), tr("Mesh (*.dae *.stl)"));
-  if (!dir.isEmpty())
-    this->pathLineEdit->setText(dir);
+  QFileDialog fd(this, tr("Import Part"), QDir::homePath(),
+      tr("Mesh files (*.dae *.stl)"));
+  fd.setFilter(QDir::AllDirs | QDir::Hidden);
+  fd.setFileMode(QFileDialog::ExistingFile);
+  if (fd.exec())
+  {
+    if (!fd.selectedFiles().isEmpty())
+    {
+      QString file = fd.selectedFiles().at(0);
+      if (!file.isEmpty())
+      {
+        this->pathLineEdit->setText(file);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -121,7 +132,19 @@ void ImportDialog::OnCancel()
 /////////////////////////////////////////////////
 void ImportDialog::OnImport()
 {
-  this->accept();
+  QFileInfo info(this->pathLineEdit->text());
+  if (info.isFile())
+  {
+    this->accept();
+  }
+  else
+  {
+    std::string msg = this->pathLineEdit->text().toStdString() +
+        " is not a valid mesh file.\nPlease select another file.";
+    QMessageBox::warning(0, QString("Invalid Mesh File"),
+        QString(msg.c_str()), QMessageBox::Ok,
+        QMessageBox::Ok);
+  }
 }
 
 /////////////////////////////////////////////////
