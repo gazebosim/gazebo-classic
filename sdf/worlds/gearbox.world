@@ -187,8 +187,8 @@
         <joint name="joint_13" type="gearbox">
             <parent>link_1</parent>
             <child>link_3</child>
-            <gear_ratio>-1.5</gear_ratio>
-            <reference_body>link_2</reference_body>
+            <gearbox_ratio>-1.5</gearbox_ratio>
+            <gearbox_reference_body>link_2</gearbox_reference_body>
             <axis>
               <xyz>1.000000 0.000000 0.000000</xyz>
             </axis>
