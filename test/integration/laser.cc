@@ -36,6 +36,14 @@ class LaserTest : public ServerFixture,
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape, "
+          << "Please see issue #2. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "ray_model";
@@ -148,7 +156,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
 TEST_P(LaserTest, EmptyWorld)
 {
-  Stationary_EmptyWorld("dart");
+  Stationary_EmptyWorld(GetParam());
 }
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
@@ -157,6 +165,14 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since simbody does not support ray sensor, "
           << "Please see issue #867.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #2. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
     return;
   }
 
@@ -242,13 +258,21 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   }
 }
 
-//TEST_P(LaserTest, LaserBox)
-//{
-//  LaserUnitBox(GetParam());
-//}
+TEST_P(LaserTest, LaserBox)
+{
+  LaserUnitBox(GetParam());
+}
 
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #2. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
+    return;
+  }
+
   // Test ray sensor with noise applied
 
   Load("worlds/empty.world", true, _physicsEngine);
@@ -302,10 +326,10 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   EXPECT_NEAR(mean, maxRange + noiseMean, 3*noiseStdDev);
 }
 
-//TEST_P(LaserTest, LaserNoise)
-//{
-//  LaserUnitNoise(GetParam());
-//}
+TEST_P(LaserTest, LaserNoise)
+{
+  LaserUnitNoise(GetParam());
+}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);
 
