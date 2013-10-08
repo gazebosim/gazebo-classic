@@ -170,7 +170,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double GetDamping(int _index);
+      public: double GetDamping(unsigned int _index);
 
       /// \brief Callback to apply damping force to joint.
       /// Deprecated by ApplyStiffnessDamping.
@@ -185,14 +185,14 @@ namespace gazebo
       ///                   implemented.
       /// \param[in] _stiffness Stiffness value for the axis.
       /// \param[in] _reference Spring zero load reference position.
-      public: virtual void SetStiffnessDamping(int _index,
+      public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
-      public: double GetStiffness(int _index);
+      public: double GetStiffness(unsigned int _index);
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.

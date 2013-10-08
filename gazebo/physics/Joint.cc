@@ -657,7 +657,7 @@ double Joint::GetDamping(int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStiffness(int _index)
+double Joint::GetStiffness(unsigned int _index)
 {
   if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {

@@ -366,7 +366,8 @@ void SimbodyJoint::SetDamping(int _index, const double _damping)
 {
   if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      this->stiffnessCoefficient[_index],
       _damping);
   }
   else
@@ -379,10 +380,10 @@ void SimbodyJoint::SetDamping(int _index, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetStiffnessDamping(int _index,
+void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dampingCoefficient[_index] = _damping;
