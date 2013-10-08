@@ -69,7 +69,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       /// \TODO: check all physics engines
       if (dynamicsElem->HasElement("damping"))
       {
-        this->dampingCoefficient[0] = dynamicsElem->Get<double>("damping");
+        this->dissipationCoefficient[0] = dynamicsElem->Get<double>("damping");
       }
     }
   }
@@ -85,7 +85,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       /// \TODO: check all physics engines
       if (dynamicsElem->HasElement("damping"))
       {
-        this->dampingCoefficient[1] = dynamicsElem->Get<double>("damping");
+        this->dissipationCoefficient[1] = dynamicsElem->Get<double>("damping");
       }
     }
   }
@@ -386,7 +386,7 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   if (_index < this->GetAngleCount())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
-    this->dampingCoefficient[_index] = _damping;
+    this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
     /// \TODO: address multi-axis joints

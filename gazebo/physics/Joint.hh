@@ -480,8 +480,13 @@ namespace gazebo
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 
-      /// \brief joint dampingCoefficient
-      protected: double dampingCoefficient[MAX_JOINT_AXIS];
+      /// \brief joint dissipationCoefficient
+      /// not used, replaced by dissipationCoefficient array
+      protected: double dampingCoefficient GAZEBO_DEPRECATED(2.0);
+
+      /// \brief joint viscous damping coefficient
+      /// Replaces dampingCoefficient
+      protected: double dissipationCoefficient[MAX_JOINT_AXIS];
 
       /// \brief joint stiffnessCoefficient
       protected: double stiffnessCoefficient[MAX_JOINT_AXIS];

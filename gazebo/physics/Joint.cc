@@ -57,8 +57,8 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
-  this->dampingCoefficient[0] = 0;
-  this->dampingCoefficient[1] = 0;
+  this->dissipationCoefficient[0] = 0;
+  this->dissipationCoefficient[1] = 0;
   this->stiffnessCoefficient[0] = 0;
   this->stiffnessCoefficient[1] = 0;
   this->springReferencePosition[0] = 0;
@@ -555,7 +555,7 @@ double Joint::GetDampingCoefficient() const
 {
   gzerr << "Joint::GetDampingCoefficient() is deprecated, please switch "
         << "to Joint::GetDamping(index)\n";
-  return this->dampingCoefficient[0];
+  return this->dissipationCoefficient[0];
 }
 
 //////////////////////////////////////////////////
@@ -647,7 +647,7 @@ double Joint::GetDamping(int _index)
 {
   if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
-    return this->dampingCoefficient[_index];
+    return this->dissipationCoefficient[_index];
   }
   else
   {

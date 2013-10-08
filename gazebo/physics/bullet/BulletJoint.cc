@@ -387,7 +387,7 @@ void BulletJoint::SetStiffnessDamping(unsigned int _index,
   if (_index < this->GetAngleCount())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
-    this->dampingCoefficient[_index] = _damping;
+    this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
     /// \TODO: this check might not be needed?  attaching an object to a static
@@ -462,9 +462,9 @@ void BulletJoint::ApplyStiffnessDamping()
 {
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
-    // Take absolute value of dampingCoefficient, since negative values of
-    // dampingCoefficient are used for adaptive damping to enforce stability.
-    double dampingForce = -fabs(this->dampingCoefficient[i])
+    // Take absolute value of dissipationCoefficient, since negative values of
+    // dissipationCoefficient are used for adaptive damping to enforce stability.
+    double dampingForce = -fabs(this->dissipationCoefficient[i])
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]

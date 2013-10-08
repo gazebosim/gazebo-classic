@@ -1141,7 +1141,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     angle += dAngle;
 
-    if ((math::equal(this->dampingCoefficient[i], 0.0) &&
+    if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
          math::equal(this->stiffnessCoefficient[i], 0.0)) ||
         angle >= this->upperLimit[i].Radian() ||
         angle <= this->lowerLimit[i].Radian())
@@ -1163,7 +1163,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       // this limits oscillations if spring is pushing joint
       // into the limit.
       {
-        double dampingForce = -fabs(this->dampingCoefficient[i])
+        double dampingForce = -fabs(this->dissipationCoefficient[i])
           * this->GetVelocity(i);
         double springForce = this->stiffnessCoefficient[i]
           * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
@@ -1171,15 +1171,15 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       }
       */
     }
-    else if (!math::equal(this->dampingCoefficient[i], 0.0) ||
+    else if (!math::equal(this->dissipationCoefficient[i], 0.0) ||
              !math::equal(this->stiffnessCoefficient[i], 0.0))
     {
-      double kd = fabs(this->dampingCoefficient[i]);
+      double kd = fabs(this->dissipationCoefficient[i]);
       double kp = this->stiffnessCoefficient[i];
 
       /// \TODO: This bit of code involving adaptive damping
       /// might be too complicated, add some more comments or simplify it.
-      if (this->dampingCoefficient[i] < 0)
+      if (this->dissipationCoefficient[i] < 0)
         kd = this->ApplyAdaptiveDamping(i, kd);
 
       // update if going into DAMPING_ACTIVE mode, or
@@ -1286,7 +1286,7 @@ void ODEJoint::SetStiffnessDamping(unsigned int _index,
   if (_index < this->GetAngleCount())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
-    this->dampingCoefficient[_index] = _damping;
+    this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
     /// reset state of implicit damping state machine.
@@ -1409,9 +1409,9 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 {
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
-    // Take absolute value of dampingCoefficient, since negative values of
-    // dampingCoefficient are used for adaptive damping to enforce stability.
-    double dampingForce = -fabs(this->dampingCoefficient[i])
+    // Take absolute value of dissipationCoefficient, since negative values of
+    // dissipationCoefficient are used for adaptive damping to enforce stability.
+    double dampingForce = -fabs(this->dissipationCoefficient[i])
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
