@@ -185,6 +185,12 @@
             </axis>
         </joint>
         <joint name="joint_13" type="gearbox">
+            <!--
+              theta_1 = joint angle in the direction specified by <axis> from <gearbox_refrence_body> to <parent>
+              theta_2 = joint angle in the direction specified by <axis2> from <gearbox_refrence_body> to <child>
+              this gearbox constraint enforces that
+              theta_2 = - <gearbox_ratio> * theta_1
+            -->
             <parent>link_1</parent>
             <child>link_3</child>
             <gearbox_ratio>-1.5</gearbox_ratio>
