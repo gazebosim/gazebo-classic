@@ -28,10 +28,14 @@ end
 modelDir = ARGV[0]
 
 # Make sure model directory exists
-if RUBY_VERSION < "1.9" && DIR[modelDir].empty?
-  abort("Model directory[#{modelDir}] doesn't exist")
-elsif !Dir.exists?(modelDir)
-  abort("Model directory[#{modelDir}] doesn't exist")
+if RUBY_VERSION < "1.9" 
+  if DIR[modelDir].empty?
+    abort("Model directory[#{modelDir}] doesn't exist")
+  end
+else
+  if !Dir.exists?(modelDir)
+    abort("Model directory[#{modelDir}] doesn't exist")
+  end
 end
 
 # Make sure there is a model.sdf file in the model directory
@@ -45,10 +49,14 @@ modelName = modelDir.split('/')[-1]
 metaDir = File.join(modelDir, "meta")
 
 # Create the meta directory
-if RUBY_VERSION < "1.9" && DIR[modelDir].empty?
-  Dir.mkdir(metaDir)
-elsif !Dir.exists?(metaDir)
-  Dir.mkdir(metaDir)
+if RUBY_VERSION < "1.9"
+  if DIR[modelDir].empty?
+    Dir.mkdir(metaDir)
+  end
+else
+  if !Dir.exists?(metaDir)
+    Dir.mkdir(metaDir)
+  end
 end
 
 # Create a set of images
