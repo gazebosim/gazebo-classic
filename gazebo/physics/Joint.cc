@@ -58,8 +58,8 @@ Joint::Joint(BasePtr _parent)
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
   this->dampingCoefficient[0] = 0;
-  this->stiffnessCoefficient[0] = 0;
   this->dampingCoefficient[1] = 0;
+  this->stiffnessCoefficient[0] = 0;
   this->stiffnessCoefficient[1] = 0;
   this->springReferencePosition[0] = 0;
   this->springReferencePosition[1] = 0;
