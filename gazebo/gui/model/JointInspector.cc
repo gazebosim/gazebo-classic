@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/model/JointInspector.hh"
 
@@ -243,6 +244,7 @@ void JointInspector::SetType(JointMaker::JointType _type)
 
   std::string jointTypeStr = JointMaker::GetTypeAsString(_type);
   int axisCount = JointMaker::GetJointAxisCount(_type);
+  GZ_ASSERT(axisCount >= 0, "Invalid axis count");
 
   this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
 
@@ -274,7 +276,7 @@ void JointInspector::SetAnchor(unsigned int /*_index*/,
 /////////////////////////////////////////////////
 void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  if (_index > static_cast<int>(this->axisXSpinBoxes.size()))
+  if (_index > this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
     return;

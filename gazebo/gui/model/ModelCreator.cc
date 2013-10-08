@@ -590,7 +590,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   if (!gui::get_active_camera())
     return false;
 
-  math::Pose pose = this->modelVisual->GetWorldPose();
+  math::Pose pose = this->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
       gui::get_active_camera(), _event);
 
@@ -598,9 +598,9 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
-  pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
+  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
 
-  this->modelVisual->SetWorldPose(pose);
+  this->mouseVisual->SetWorldPose(pose);
 
   return true;
 }

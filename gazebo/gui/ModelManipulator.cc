@@ -157,7 +157,8 @@ math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
 {
   if (_interval < 0)
   {
-    gzerr << "Interval distance must be greater or equal to 0" << std::endl;
+    gzerr << "Interval distance must be greater than or equal to 0"
+        << std::endl;
     return math::Vector3::Zero;
   }
 
