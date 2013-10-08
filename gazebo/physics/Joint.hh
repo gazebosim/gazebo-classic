@@ -170,7 +170,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double GetDamping(unsigned int _index);
+      public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
       /// Deprecated by ApplyStiffnessDamping.
