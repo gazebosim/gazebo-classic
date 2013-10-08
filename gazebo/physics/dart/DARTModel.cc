@@ -45,7 +45,6 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
   this->dtSkeleton = new dart::dynamics::Skeleton();
 
   Model::Load(_sdf);
-
 }
 
 //////////////////////////////////////////////////
@@ -86,6 +85,9 @@ void DARTModel::Init()
 
   // add skeleton to world
   this->GetDARTWorld()->addSkeleton(dtSkeleton);
+
+  // This should be called after the skeleton is added to the world.
+  this->BackupState();
 }
 
 
@@ -101,6 +103,23 @@ void DARTModel::Fini()
 {
   Model::Fini();
   
+}
+
+//////////////////////////////////////////////////
+void DARTModel::BackupState()
+{
+  dtConfig = this->dtSkeleton->get_q();
+  dtVelocity = this->dtSkeleton->get_dq();
+}
+
+//////////////////////////////////////////////////
+void DARTModel::RestoreState()
+{
+  assert(dtConfig.size() == this->dtSkeleton->getNumGenCoords());
+  assert(dtVelocity.size() == this->dtSkeleton->getNumGenCoords());
+
+  this->dtSkeleton->set_q(dtConfig);
+  this->dtSkeleton->set_dq(dtVelocity);
 }
 
 //////////////////////////////////////////////////

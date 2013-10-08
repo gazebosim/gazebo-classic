@@ -42,21 +42,26 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTModel();
 
-      /// \brief Load the model.
-      /// \param[in] _sdf SDF parameters to load from.
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the model.
+      // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Update the model.
+      // Documentation inherited.
       public: virtual void Update();
 
-      /// \brief Finalize the model.
+      // Documentation inherited.
       public: virtual void Fini();
 
-      // Documentation inherited.
-      // public: virtual void Reset();
+//      // Documentation inherited.
+//      public: void Reset();
+
+      /// \brief
+      public: void BackupState();
+
+      /// \brief
+      public: void RestoreState();
 
       /// \brief
       public: dart::dynamics::Skeleton* GetDARTSkeleton();
@@ -69,6 +74,12 @@ namespace gazebo
 
       /// \brief
       protected: dart::dynamics::Skeleton* dtSkeleton;
+
+      /// \brief
+      protected: Eigen::VectorXd dtConfig;
+
+      /// \brief
+      protected: Eigen::VectorXd dtVelocity;
 
     };
     /// \}

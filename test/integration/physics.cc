@@ -1178,18 +1178,13 @@ TEST_P(PhysicsTest, JointDampingTest)
   JointDampingTest(GetParam());
 }
 
-#ifdef HAVE_DART
-TEST_F(PhysicsTest, JointDampingDART)
-{
-  JointDampingTest("dart");
-}
-#endif // HAVE_DART
-
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
   Load("worlds/drop_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
+
+  //world->GetPhysicsEngine()->SetMaxStepSize(1e-4);
 
   int i = 0;
   while (!this->HasEntity("cylinder") && i < 20)
@@ -1245,6 +1240,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
             // DART needs more tolerance until supports 'correction for
             // penetration' feature.
             // See: https://github.com/dartsim/dart/issues/100
+            //
+            // DART now supports the above feature but need time to reduce the
+            // penetration.
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
 #else
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
@@ -1273,6 +1271,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
             // DART needs more tolerance until supports 'correction for
             // penetration' feature.
             // See: https://github.com/dartsim/dart/issues/100
+            //
+            // DART now supports the above feature but need time to reduce the
+            // penetration.
             EXPECT_LT(fabs(vel.z), 0.015);
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
 #else
@@ -1304,6 +1305,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
             // DART needs more tolerance until supports 'correction for
             // penetration' feature.
             // See: https://github.com/dartsim/dart/issues/100
+            //
+            // DART now supports the above feature but need time to reduce the
+            // penetration.
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0041);
 #else
             EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);

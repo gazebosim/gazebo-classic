@@ -63,11 +63,15 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->dtWorld = new dart::simulation::World;
-
-  // TODO: Gazebo does not support design-time and runtime concept now.
-  // Therefore, we basically set dart world as runtime and never change it.
-  // When gazebo support the concept, we should apply it to dart also.
-  // this->dartWorld->changeDesignTime(false);
+  this->dtWorld->getConstraintHandler()->setCollisionDetector(
+        new dart::collision::DARTCollisionDetector());
+//  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
+//  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
+//        0.01);
+//  this->dtWorld->getConstraintHandler()->setAllowableJointViolation(
+//        DART_TO_RADIAN*1e-1);
+//  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
+//        DART_TO_RADIAN*1e-0);
 }
 
 //////////////////////////////////////////////////
@@ -109,12 +113,18 @@ void DARTPhysics::Fini()
 //////////////////////////////////////////////////
 void DARTPhysics::Reset()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+
+  // Restore state all the models
+  unsigned int modelCount = this->world->GetModelCount();
+  DARTModelPtr dartModelIt;
+
+  for (unsigned int i = 0; i < modelCount; ++i)
   {
-    this->physicsUpdateMutex->lock();
+    dartModelIt = boost::shared_dynamic_cast<DARTModel>(this->world->GetModel(i));
+    assert(dartModelIt.get());
 
-    this->dtWorld->reset();
-
-    this->physicsUpdateMutex->unlock();
+    dartModelIt->RestoreState();
   }
 }
 
@@ -130,13 +140,14 @@ void DARTPhysics::UpdateCollision()
 
   dart::constraint::ConstraintDynamics* dtConstraintDynamics =
       this->dtWorld->getConstraintHandler();
-  dart::collision::CollisionDetector* dtCollisionChecker =
-      dtConstraintDynamics->getCollisionChecker();
-  int numContacts = dtCollisionChecker->getNumContacts();
+  dart::collision::CollisionDetector* dtCollisionDetector =
+      dtConstraintDynamics->getCollisionDetector();
+  int numContacts = dtCollisionDetector->getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
-    const dart::collision::Contact& dtContact = dtCollisionChecker->getContact(i);
+    const dart::collision::Contact& dtContact =
+        dtCollisionDetector->getContact(i);
     dart::dynamics::BodyNode* dtBodyNode1 =
         dtContact.collisionNode1->getBodyNode();
     dart::dynamics::BodyNode* dtBodyNode2 =

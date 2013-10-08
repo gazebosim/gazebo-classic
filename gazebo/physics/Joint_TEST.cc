@@ -233,13 +233,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 
     EXPECT_NEAR(wrench_01.body2Force.x,  -600.0,  6.0);
     EXPECT_NEAR(wrench_01.body2Force.y,  1000.0, 10.0);
-#ifdef HAVE_DART
-    // DART need greater tolerance due to joint limit violation
-    // DART issue #100 (https://github.com/dartsim/dart/issues/100)
-    EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  8.6);
-#else
     EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  2.0);
-#endif
     EXPECT_NEAR(wrench_01.body2Torque.x, -750.0,  7.5);
     EXPECT_NEAR(wrench_01.body2Torque.y, -450.0,  4.5);
     EXPECT_NEAR(wrench_01.body2Torque.z,    0.0,  0.1);
@@ -262,13 +256,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
     EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
-#ifdef HAVE_DART
-    // DART need greater tolerance due to joint limit violation
-    // DART issue #100 (https://github.com/dartsim/dart/issues/100)
-    EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  4.3);
-#else
     EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
-#endif
     EXPECT_NEAR(wrench_12.body1Torque.x,  250.0,  5.0);
     EXPECT_NEAR(wrench_12.body1Torque.y,  150.0,  3.0);
     EXPECT_NEAR(wrench_12.body1Torque.z,    0.0,  0.1);
@@ -322,12 +310,12 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 //}
 //#endif  // HAVE_BULLET
 
-//#ifdef HAVE_DART
-//TEST_F(Joint_TEST, ForceTorque2DART)
-//{
-//  ForceTorque2("dart");
-//}
-//#endif  // HAVE_DART
+#ifdef HAVE_DART
+TEST_F(Joint_TEST, ForceTorque2DART)
+{
+  ForceTorque2("dart");
+}
+#endif  // HAVE_DART
 
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
@@ -968,51 +956,51 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(Joint_TEST, JointCreationDestructionTest)
-{
-  JointCreationDestructionTest(this->physicsEngine);
-}
+//TEST_P(Joint_TEST, JointCreationDestructionTest)
+//{
+//  JointCreationDestructionTest(this->physicsEngine);
+//}
 
-TEST_F(Joint_TEST, joint_SDF14)
-{
-  Load("worlds/SDF_1_4.world");
+//TEST_F(Joint_TEST, joint_SDF14)
+//{
+//  Load("worlds/SDF_1_4.world");
 
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+//  physics::WorldPtr world = physics::get_world("default");
+//  ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+//  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+//  ASSERT_TRUE(physics != NULL);
 
-  int i = 0;
-  while (!this->HasEntity("joint14_model") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
+//  int i = 0;
+//  while (!this->HasEntity("joint14_model") && i < 20)
+//  {
+//    common::Time::MSleep(100);
+//    ++i;
+//  }
 
-  if (i > 20)
-    gzthrow("Unable to get joint14_model");
+//  if (i > 20)
+//    gzthrow("Unable to get joint14_model");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
-  physics::ModelPtr model = world->GetModel("joint14_model");
-  EXPECT_TRUE(model);
-  physics::LinkPtr link1 = model->GetLink("body1");
-  EXPECT_TRUE(link1);
-  physics::LinkPtr link2 = model->GetLink("body2");
-  EXPECT_TRUE(link2);
+//  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+//  EXPECT_TRUE(physicsEngine);
+//  physics::ModelPtr model = world->GetModel("joint14_model");
+//  EXPECT_TRUE(model);
+//  physics::LinkPtr link1 = model->GetLink("body1");
+//  EXPECT_TRUE(link1);
+//  physics::LinkPtr link2 = model->GetLink("body2");
+//  EXPECT_TRUE(link2);
 
-  EXPECT_EQ(model->GetJointCount(), 1u);
-  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-  EXPECT_TRUE(joint);
+//  EXPECT_EQ(model->GetJointCount(), 1u);
+//  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
+//  EXPECT_TRUE(joint);
 
-  physics::LinkPtr parent = joint->GetParent();
-  EXPECT_TRUE(parent);
-  physics::LinkPtr child = joint->GetChild();
-  EXPECT_TRUE(child);
-  EXPECT_EQ(parent->GetName(), "body2");
-  EXPECT_EQ(child->GetName(), "body1");
-}
+//  physics::LinkPtr parent = joint->GetParent();
+//  EXPECT_TRUE(parent);
+//  physics::LinkPtr child = joint->GetChild();
+//  EXPECT_TRUE(child);
+//  EXPECT_EQ(parent->GetName(), "body2");
+//  EXPECT_EQ(child->GetName(), "body1");
+//}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
