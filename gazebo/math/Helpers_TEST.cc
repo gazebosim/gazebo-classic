@@ -21,6 +21,8 @@
 
 using namespace gazebo;
 
+/////////////////////////////////////////////////
+// Test a few function in Helpers
 TEST(HelpersTest, Helpers)
 {
   EXPECT_EQ(12345, math::parseInt("12345"));
@@ -29,4 +31,12 @@ TEST(HelpersTest, Helpers)
   EXPECT_FLOAT_EQ(12.345, math::parseFloat("12.345"));
   EXPECT_FLOAT_EQ(-12.345, math::parseFloat("-12.345"));
   EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
+}
+
+/////////////////////////////////////////////////
+// Test Helpers::fixnan functions
+TEST(HelpersTest, FixNaN)
+{
+  EXPECT_DOUBLE_EQ(math::fixnan(1.0 / 0.0), 0.0);
+  EXPECT_FLOAT_EQ(math::fixnan(1.0f / 0.0f), 0.0f);
 }
