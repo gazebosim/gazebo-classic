@@ -70,19 +70,17 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   double Iyy = _msg->inertial().iyy();
   double Izz = _msg->inertial().izz();
   math::Vector3 boxScale;
-  if (_msg->has_is_static() && _msg->is_static())
-  {
-    // Don't show inertia for static objects, just COM location
-    this->Load(math::Pose(xyz, q));
-  }
-  else if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
+  if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
+    // Unrealistic inertia, load with default scale
     gzerr << "The link " << _msg->name() << " has unrealistic inertia.\n";
     this->Load(math::Pose(xyz, q));
   }
   else
   {
+    // Compute dimensions of box with uniform density
+    // that has equivalent inertia.
     boxScale.x = sqrt(6*(Izz + Iyy - Ixx) / mass);
     boxScale.y = sqrt(6*(Izz + Ixx - Iyy) / mass);
     boxScale.z = sqrt(6*(Ixx + Iyy - Izz) / mass);
