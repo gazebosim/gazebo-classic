@@ -1,15 +1,15 @@
 ## Gazebo 2.0
 
 ### Gazebo 2.0.0 (2013-10-08)
-1. Change default build type to RelWithDebInfo.
+1. [Pull Request #617](https://bitbucket.org/osrf/gazebo/pull-request/617)
 
-    [Pull Request #617](https://bitbucket.org/osrf/gazebo/pull-request/617)
+    Change default build type to RelWithDebInfo.
+1. [Pull request #624](https://bitbucket.org/osrf/gazebo/pull-request/624)
 
-1. Use `TEST_TYPE` in test names.
-    * [Pull request #624](https://bitbucket.org/osrf/gazebo/pull-request/624)
-1. Use external SDF library.
+    Use `TEST_TYPE` in test names.
+1. [Pull request #627](https://bitbucket.org/osrf/gazebo/pull-request/627)
 
-  * [Pull request #627](https://bitbucket.org/osrf/gazebo/pull-request/627)
+    Use external SDF library.
 
 ## Gazebo 1.9
 
