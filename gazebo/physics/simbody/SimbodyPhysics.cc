@@ -826,8 +826,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: make stop stiffness, damping with parameters
-        /// FIXME: remove hardcoded values.
+        // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce =
           Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
@@ -867,8 +866,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
-        /// \TODO: make stop stiffness, damping with parameters
-        /// FIXME: remove hardcoded values.
+        // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce =
           Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
