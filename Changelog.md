@@ -1,12 +1,94 @@
 ## Gazebo 2.0
 
 ### Gazebo 2.0.0 (2013-10-08)
-1. [Pull Request #617](https://bitbucket.org/osrf/gazebo/pull-request/617)
-  Change default build type to RelWithDebInfo.
-1. [Pull request #624](https://bitbucket.org/osrf/gazebo/pull-request/624)
-  Use `TEST_TYPE` in test names.
-1. [Pull request #627](https://bitbucket.org/osrf/gazebo/pull-request/627)
-  Use external SDF library.
+1. Refactor code check tool.
+  [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
+1. Added pull request tool for Bitbucket.
+  [Pull Request #670](https://bitbucket.org/osrf/gazebo/pull-request/670)
+  [Pull Request #691](https://bitbucket.org/osrf/gazebo/pull-request/671)
+1. New wireless receiver and transmitter sensor models.
+  [Pull Request #644](https://bitbucket.org/osrf/gazebo/pull-request/644)
+  [Pull Request #675](https://bitbucket.org/osrf/gazebo/pull-request/675)
+  [Pull Request #727](https://bitbucket.org/osrf/gazebo/pull-request/727)
+1. Audio support using OpenAL.
+  [Pull Request #648](https://bitbucket.org/osrf/gazebo/pull-request/648)
+  [Pull Request #704](https://bitbucket.org/osrf/gazebo/pull-request/704)
+1. Simplify command-line parsing of gztopic echo output.
+  [Pull Request #674](https://bitbucket.org/osrf/gazebo/pull-request/674)
+  Resolves:
+    * [Issue #795](https://bitbucket.org/osrf/gazebo/issue/795)
+1. Use UNIX directories through the user of GNUInstallDirs cmake module.
+  [Pull Request #676](https://bitbucket.org/osrf/gazebo/pull-request/676)
+  [Pull Request #681](https://bitbucket.org/osrf/gazebo/pull-request/681)
+1. New GUI interactions for object manipulation.
+  [Pull Request #634](https://bitbucket.org/osrf/gazebo/pull-request/634)
+1. Fix for OSX menubar.
+  [Pull Request #677](https://bitbucket.org/osrf/gazebo/pull-request/677)
+1. Remove internal SDF directories and dependencies.
+  [Pull Request #680](https://bitbucket.org/osrf/gazebo/pull-request/680)
+1. Add minimum version for sdformat.
+  [Pull Request #682](https://bitbucket.org/osrf/gazebo/pull-request/682)
+  Resolves:
+    * [Issue #818](https://bitbucket.org/osrf/gazebo/issue/818)
+1. Allow different gtest parameter types with ServerFixture
+  [Pull Request #686](https://bitbucket.org/osrf/gazebo/pull-request/686)
+  Resolves:
+    * [Issue #820](https://bitbucket.org/osrf/gazebo/issue/820)
+1. GUI model scaling when using Bullet.
+  [Pull Request #683](https://bitbucket.org/osrf/gazebo/pull-request/683)
+1. Fix typo in cmake config.
+  [Pull Request #694](https://bitbucket.org/osrf/gazebo/pull-request/694)
+  Resolves:
+    * [Issue #824](https://bitbucket.org/osrf/gazebo/issue/824)
+1. Remove gazebo include subdir from pkgconfig and cmake config.
+  [Pull Request #691](https://bitbucket.org/osrf/gazebo/pull-request/691)
+1. Torsional spring demo
+  [Pull Request #693](https://bitbucket.org/osrf/gazebo/pull-request/693)
+1. Remove repeated call to SetAxis in Joint.cc
+  [Pull Request #695](https://bitbucket.org/osrf/gazebo/pull-request/695)
+  Resolves:
+    * [Issue #823](https://bitbucket.org/osrf/gazebo/issue/823)
+1. Add test for rotational joints.
+  [Pull Request #697](https://bitbucket.org/osrf/gazebo/pull-request/697)
+  Resolves:
+    * [Issue #820](https://bitbucket.org/osrf/gazebo/issue/820)
+1. Fix compilation of tests useing Joint base class
+  [Pull Request #701](https://bitbucket.org/osrf/gazebo/pull-request/701)
+1. Terrain paging implemented.
+  [Pull Request #687](https://bitbucket.org/osrf/gazebo/pull-request/687)
+1. Improve timeout error reporting in ServerFixture
+  [Pull Request #705](https://bitbucket.org/osrf/gazebo/pull-request/705)
+1. Fix mouse picking for cases where visuals overlap with the laser 
+  [Pull Request #709](https://bitbucket.org/osrf/gazebo/pull-request/709)
+1. Fix string literals for OSX 
+  [Pull Request #712](https://bitbucket.org/osrf/gazebo/pull-request/712)
+  Resolves:
+    * [Issue #803](https://bitbucket.org/osrf/gazebo/issue/803)
+1. Support for ENABLE_TESTS_COMPILATION cmake parameter 
+  [Pull Request #708](https://bitbucket.org/osrf/gazebo/pull-request/708)
+1. Updated system gui plugin
+  [Pull Request #702](https://bitbucket.org/osrf/gazebo/pull-request/702)
+1. Fix force torque unit test issue
+  [Pull Request #673](https://bitbucket.org/osrf/gazebo/pull-request/673)
+  Resolves:
+    * [Issue #813](https://bitbucket.org/osrf/gazebo/issue/813)
+1. Use variables to control auto generation of CFlags
+  [Pull Request #699](https://bitbucket.org/osrf/gazebo/pull-request/699)
+1. Remove deprecated functions.
+  [Pull Request #715](https://bitbucket.org/osrf/gazebo/pull-request/715)
+1. Fix typo in `Camera.cc`
+  [Pull Request #719](https://bitbucket.org/osrf/gazebo/pull-request/719)
+  Resolves:
+    * [Issue #846](https://bitbucket.org/osrf/gazebo/issue/846)
+1. Performance improvements
+  [Pull Request #561](https://bitbucket.org/osrf/gazebo/pull-request/561)
+1. Fix gripper model.
+  [Pull Request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+  Resolves:
+    * [Issue #314](https://bitbucket.org/osrf/gazebo/issue/314)
+1. First part of Simbody integration
+  [Pull Request #716](https://bitbucket.org/osrf/gazebo/pull-request/716)
+
 
 ## Gazebo 1.9
 
