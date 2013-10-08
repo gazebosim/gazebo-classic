@@ -1,3 +1,5 @@
+## Gazebo 2.0
+
 ### Gazebo 2.0.0 (2013-10-08)
 1. Refactor code check tool.
     * [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
