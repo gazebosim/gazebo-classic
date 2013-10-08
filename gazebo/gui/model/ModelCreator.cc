@@ -304,6 +304,9 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
   }
 
+  if (this->allParts.find(_partName) == this->allParts.end())
+    return;
+
   PartData *part = this->allParts[_partName];
   if (!part)
     return;
