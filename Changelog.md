@@ -1,15 +1,13 @@
-## Gazebo 2.0
-
 ### Gazebo 2.0.0 (2013-10-08)
 1. Refactor code check tool.
-  [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
+  * [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
 1. Added pull request tool for Bitbucket.
-  [Pull Request #670](https://bitbucket.org/osrf/gazebo/pull-request/670)
-  [Pull Request #691](https://bitbucket.org/osrf/gazebo/pull-request/671)
+  * [Pull Request #670](https://bitbucket.org/osrf/gazebo/pull-request/670)
+  * [Pull Request #691](https://bitbucket.org/osrf/gazebo/pull-request/671)
 1. New wireless receiver and transmitter sensor models.
-  [Pull Request #644](https://bitbucket.org/osrf/gazebo/pull-request/644)
-  [Pull Request #675](https://bitbucket.org/osrf/gazebo/pull-request/675)
-  [Pull Request #727](https://bitbucket.org/osrf/gazebo/pull-request/727)
+  * [Pull Request #644](https://bitbucket.org/osrf/gazebo/pull-request/644)
+  * [Pull Request #675](https://bitbucket.org/osrf/gazebo/pull-request/675)
+  * [Pull Request #727](https://bitbucket.org/osrf/gazebo/pull-request/727)
 1. Audio support using OpenAL.
   [Pull Request #648](https://bitbucket.org/osrf/gazebo/pull-request/648)
   [Pull Request #704](https://bitbucket.org/osrf/gazebo/pull-request/704)
