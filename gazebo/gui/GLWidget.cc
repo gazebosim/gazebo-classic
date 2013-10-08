@@ -945,6 +945,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
   {
     if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
     {
+      this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
     }
   }
