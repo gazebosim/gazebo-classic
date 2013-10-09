@@ -36,6 +36,14 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
     return;
   }
 
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
+          << "Please see issue #3. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/3)";
+    return;
+  }
+
   Load("worlds/pioneer2dx.world", false, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
