@@ -268,6 +268,11 @@ void Scene::Load()
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
   this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+  this->manager->addRenderQueueListener(
+      RenderEngine::Instance()->GetOverlaySystem());
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -293,7 +298,8 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  this->SetSky();
+  if (this->sdf->HasElement("sky"))
+    this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -331,7 +337,7 @@ bool Scene::GetInitialized() const
 //////////////////////////////////////////////////
 void Scene::InitDeferredShading()
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 8
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
   // Deferred Shading scheme handler
@@ -2870,4 +2876,15 @@ void Scene::SetSkyXMode(unsigned int _mode)
 
   this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
   this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveProjectors()
+{
+  for (std::map<std::string, Projector *>::iterator iter =
+      this->projectors.begin(); iter != this->projectors.end(); ++iter)
+  {
+    delete iter->second;
+  }
+  this->projectors.clear();
 }

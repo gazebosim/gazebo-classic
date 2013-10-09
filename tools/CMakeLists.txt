@@ -42,7 +42,7 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-if (${GAZEBO_VERSION} VERSION_GREATER 1.10)
+if (${GAZEBO_VERSION} VERSION_GREATER 2.0)
   message (WARNING
     "Installing deprecated manpages. This should be removed after Gazebo 1.9")
   manpage(gzfactory 1)
@@ -62,3 +62,7 @@ roffman(gz 1)
 
 install (PROGRAMS gzmodel_create gzmodel_create.sh
   DESTINATION ${BIN_INSTALL_DIR})
+
+
+install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
+manpage(gzprop 1)

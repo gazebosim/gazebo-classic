@@ -50,13 +50,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~PID();
 
-      ///  \brief Initialize PID-gains and integral term
-      ///         limits:[iMax:iMin]-[I1:I2]
-      ///  \param[in] _p  The proportional gain.
-      ///  \param[in] _i  The integral gain.
-      ///  \param[in] _d  The derivative gain.
-      ///  \param[in] _imax The integral upper limit.
-      ///  \param[in] _imin The integral lower limit.
+      /// \brief Initialize PID-gains and integral term
+      ///        limits:[iMax:iMin]-[I1:I2]
+      /// \param[in] _p  The proportional gain.
+      /// \param[in] _i  The integral gain.
+      /// \param[in] _d  The derivative gain.
+      /// \param[in] _imax The integral upper limit.
+      /// \param[in] _imin The integral lower limit.
       /// \param[in] _cmdMax Output max value.
       /// \param[in] _cmdMin Output min value.
       public: void Init(double _p = 0.0, double _i = 0.0, double _d = 0.0,

@@ -15,11 +15,6 @@
  *
 */
 
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
@@ -145,8 +140,8 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   if (_autoRender)
   {
-    this->connections.push_back(
-        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
@@ -175,7 +170,7 @@ Camera::~Camera()
   this->renderTexture = NULL;
   this->renderTarget = NULL;
 
-  if (this->camera)
+  if (this->camera && this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
     this->camera = NULL;
@@ -453,9 +448,15 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  if (this->initialized &&
-      common::Time::GetWallTime() - this->lastRenderWallTime >=
-      this->renderPeriod)
+  this->Render(false);
+}
+
+//////////////////////////////////////////////////
+void Camera::Render(bool _force)
+{
+  if (this->initialized && (_force ||
+       common::Time::GetWallTime() - this->lastRenderWallTime >=
+        this->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -1269,7 +1270,12 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+      // This #if allows ogre to antialias offscreen rendering
+     Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
+#else
+     Ogre::TU_RENDERTARGET)).getPointer();
+#endif
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 

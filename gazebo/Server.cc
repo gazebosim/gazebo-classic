@@ -578,6 +578,10 @@ void Server::ProcessControlMsgs()
     {
       this->OpenWorld((*iter).open_filename());
     }
+    else if ((*iter).has_stop() && (*iter).stop())
+    {
+      this->Stop();
+    }
   }
   this->controlMsgs.clear();
 }

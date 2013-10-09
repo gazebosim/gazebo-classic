@@ -920,6 +920,9 @@ void World::Reset()
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
 
+    math::Rand::SetSeed(math::Rand::GetSeed());
+    this->physicsEngine->SetSeed(math::Rand::GetSeed());
+
     this->ResetTime();
     this->ResetEntities(Base::BASE);
     for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
