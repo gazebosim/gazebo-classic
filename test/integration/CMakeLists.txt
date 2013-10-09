@@ -31,7 +31,6 @@ set(tests
   imu.cc
   laser.cc
   nondefault_world.cc
-  ogre_log.cc
   physics.cc
   physics_msgs.cc
   pioneer2dx.cc
@@ -69,6 +68,7 @@ set(dri_tests
   camera_sensor.cc
   gpu_laser.cc
   heightmap.cc
+  ogre_log.cc
   pr2.cc
   projector.cc
   rendering_sensor.cc
