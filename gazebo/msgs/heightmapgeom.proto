@@ -34,5 +34,5 @@ message HeightmapGeom
   optional bool use_terrain_paging = 9; // Enable terrain paging in rendering
 
   // The image filename. This will appear in Gazebo 3.0.
-  // optional string filename         = 1;
+  // optional string filename         = 10;
 }
