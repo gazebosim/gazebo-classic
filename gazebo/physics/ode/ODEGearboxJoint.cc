@@ -68,7 +68,7 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
-  ODELinkPtr odelink = boost::shared_dynamic_cast<ODELink>(_body);
+  ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
 
   if (odelink == NULL)
     gzwarn << "Reference body not valid, using inertial frame.\n";
@@ -147,9 +147,11 @@ void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
 
   if (_index == 0)
-    dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+    dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
+      globalAxis.z);
   else if (_index == 1)
-    dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+    dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
+      globalAxis.z);
   else
     gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
 }
