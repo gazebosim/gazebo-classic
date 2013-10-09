@@ -35,6 +35,7 @@ set(tests
   imu.cc
   laser.cc
   nondefault_world.cc
+  ogre_log.cc
   physics.cc
   physics_msgs.cc
   pioneer2dx.cc
