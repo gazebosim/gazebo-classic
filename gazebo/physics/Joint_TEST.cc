@@ -515,15 +515,21 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   joint = SpawnJoint(_jointType, false, true);
   EXPECT_TRUE(joint != NULL);
 
-#ifdef HAVE_DART
-  // DART assumes that: (i) every link has its parent joint (ii) root link
-  // is the only link that doesn't have parent link.
-  // Child world link breaks dart for now. Do we need to support it?
-#else
+  if (_physicsEngine == "dart")
+  {
+    // DART assumes that: (i) every link has its parent joint (ii) root link
+    // is the only link that doesn't have parent link.
+    // Child world link breaks dart for now. Do we need to support it?
+    gzerr << "Skip tests for child world link cases "
+          << "since DART does not allow joint with world as child. "
+          << "Please see issue #4. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/4)\n";
+    return;
+  }
+
   gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
   joint = SpawnJoint(_jointType, true, false);
   EXPECT_TRUE(joint != NULL);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -600,15 +606,20 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::JointPtr joint;
-#ifdef HAVE_DART
-  // DART assumes that: (i) every link has its parent joint (ii) root link
-  // is the only link that doesn't have parent link.
-  // Child world link breaks dart for now. Do we need to support it?
-  for (unsigned int i = 1; i < 2; ++i)
-#else
+
   for (unsigned int i = 0; i < 2; ++i)
-#endif
   {
+    if (_physicsEngine == "dart" && i == 0)
+    {
+      // DART assumes that: (i) every link has its parent joint (ii) root link
+      // is the only link that doesn't have parent link.
+      // Child world link breaks dart for now. Do we need to support it?
+      gzerr << "Skip tests for child world link cases "
+            << "since DART does not allow joint with world as child. "
+            << "Please see issue #4. "
+            << "(https://bitbucket.org/jlee02/gazebo_dart/issue/4)\n";
+      return;
+    }
     bool worldChild = (i == 0);
     bool worldParent = (i == 1);
     std::string child = worldChild ? "world" : "child";
@@ -849,7 +860,9 @@ TEST_F(Joint_TEST, JointTorqueTestBullet)
 TEST_F(Joint_TEST, JointTorqueTestDART)
 {
   gzerr << "JointTorqueTestDART fails because dynamic joint creating/removing "
-        << "is not yet working\n";
+        << "is not yet working. "
+        << "Please see issue #873. "
+        << "(https://bitbucket.org/osrf/gazebo/issue/873/convert-jointtorquetest-to-use-static)\n";
   // JointTorqueTest("dart");
 }
 #endif  // HAVE_DART
@@ -867,6 +880,13 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   if (_physicsEngine == "simbody")
   {
     gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
+  /// \TODO: dart not complete for this test
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #5. "
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/5)\n";
     return;
   }
 
