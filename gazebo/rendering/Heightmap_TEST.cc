@@ -55,10 +55,10 @@ TEST_F(Heightmap_TEST, splitTerrain)
     heights[i] = i + 1;
   }
 
-  heightmap->SplitHeights(heights, heightmap->numTerrainSubdivisions,
+  heightmap->SplitHeights(heights, heightmap->GetTerrainSubdivisionCount(),
       heightsSplit);
 
-  ASSERT_TRUE(heightsSplit.size() == heightmap->numTerrainSubdivisions);
+  ASSERT_TRUE(heightsSplit.size() == heightmap->GetTerrainSubdivisionCount());
 
   // Precomputed subterrains for a known 9 x 9 terrain starting from 1 and with
   // consecutive values
@@ -81,7 +81,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   slices[15] = boost::assign::list_of(61)(62)(62)(70)(71)(71)(70)(71)(71);
 
   // Make sure that the subterrain heights matches the precomputed slices
-  for (unsigned int i = 0; i < heightmap->numTerrainSubdivisions; ++i)
+  for (unsigned int i = 0; i < heightmap->GetTerrainSubdivisionCount(); ++i)
   {
     EXPECT_TRUE(std::equal(heightsSplit[i].begin(), heightsSplit[i].end(),
           slices[i].begin()));

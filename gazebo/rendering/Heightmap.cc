@@ -38,6 +38,7 @@
 using namespace gazebo;
 using namespace rendering;
 
+const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const unsigned int Heightmap::numTerrainSubdivisions = 16;
 const double Heightmap::loadRadiusFactor = 1.0;
 const double Heightmap::holdRadiusFactor = 1.15;
@@ -316,6 +317,9 @@ void Heightmap::Load()
 
     this->dataSize = geomMsg.heightmap().width();
 
+    this->useTerrainPaging = false;
+
+#if GAZEBO_MAJOR_VERSION >= 3
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap
@@ -334,10 +338,7 @@ void Heightmap::Load()
             "General");
       }
     }
-    else
-    {
-      this->useTerrainPaging = false;
-    }
+#endif
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -868,6 +869,12 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(NULL);
   }
+}
+
+/////////////////////////////////////////////////
+unsigned int Heightmap::GetTerrainSubdivisionCount() const
+{
+  return this->numTerrainSubdivisions;
 }
 
 /////////////////////////////////////////////////
@@ -2782,3 +2789,4 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
+
