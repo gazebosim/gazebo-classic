@@ -171,6 +171,7 @@ TEST_P(SurfaceTest, CollideWithoutContact)
 // This test doesn't yet work in bullet, so we'll declare it only for ode.
 // INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
 INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
+INSTANTIATE_TEST_CASE_P(TestDART, SurfaceTest, ::testing::Values("dart"));
 
 int main(int argc, char **argv)
 {
