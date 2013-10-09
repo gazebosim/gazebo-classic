@@ -364,7 +364,7 @@ void SimbodyJoint::SetAnchor(int /*_index*/,
 //////////////////////////////////////////////////
 void SimbodyJoint::SetDamping(int _index, const double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
     this->SetStiffnessDamping(static_cast<unsigned int>(_index),
       this->stiffnessCoefficient[_index],
