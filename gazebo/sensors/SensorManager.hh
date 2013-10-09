@@ -125,7 +125,7 @@ namespace gazebo
       /// \brief Deprecated.
       public: std::string CreateSensor(sdf::ElementPtr _elem,
                   const std::string &_worldName,
-                  const std::string &_parentName) GAZEBO_DEPRECATED(1.10);
+                  const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.
