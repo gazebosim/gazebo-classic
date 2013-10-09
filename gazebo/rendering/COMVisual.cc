@@ -64,7 +64,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
                      _msg->inertial().pose().orientation().z());
 
   // Use principal moments of inertia to scale COM visual
-  // TODO: rotate COM to match principal axes when product terms are nonzero
+  // \todo: rotate COM to match principal axes when product terms are nonzero
   // This can be done with Eigen, or with code from the following paper:
   // A Method for Fast Diagonalization of a 2x2 or 3x3 Real Symmetric Matrix
   // http://arxiv.org/abs/1306.6291v3
