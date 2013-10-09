@@ -35,6 +35,9 @@ DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent),
     dtBodyNode(new dart::dynamics::BodyNode)
 {
+  dtStaticJoint = new dart::dynamics::WeldJoint;
+  dtDynamicJoint = NULL;
+  staticLink = false;
 }
 
 //////////////////////////////////////////////////
@@ -42,6 +45,8 @@ DARTLink::~DARTLink()
 {
   // We don't need to delete dartBodyNode because skeletone will delete
   // dartBodyNode if this is registered to the skeletone.
+
+  delete dtStaticJoint;
 }
 
 //////////////////////////////////////////////////
@@ -445,6 +450,21 @@ void DARTLink::SetAutoDisable(bool /*_disable*/)
 //////////////////////////////////////////////////
 void DARTLink::SetLinkStatic(bool /*_static*/)
 {
+//  if (_static == staticLink)
+//    return;
+
+//  if (_static)
+//  {
+//    // Store the original joint
+//    this->dtDynamicJoint = this->dtBodyNode->getParentJoint();
+
+//    this->dtBodyNode->setParentJoint(this->dtStaticJoint);
+//  }
+//  else
+//  {
+
+//  }
+
   gzdbg << "DART does not support DARTLink::SetLinkStatic() yet.\n";
 }
 

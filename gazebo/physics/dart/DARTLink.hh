@@ -176,6 +176,14 @@ namespace gazebo
       /// \brief
       private: std::vector<DARTJointPtr> dartChildJoints;
 
+      /// \brief Weld joint for static link mode.
+      private: dart::dynamics::WeldJoint* dtStaticJoint;
+
+      /// \brief
+      private: dart::dynamics::Joint* dtDynamicJoint;
+
+      /// \biref If true, freeze link to world (inertial) frame.
+      private: bool staticLink;
     };
     /// \}
   }
