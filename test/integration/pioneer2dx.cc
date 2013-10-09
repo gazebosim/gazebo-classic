@@ -40,7 +40,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
           << "Please see issue #3. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/3)";
+          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/3)\n";
     return;
   }
 
