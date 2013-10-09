@@ -16,6 +16,7 @@
 */
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_FFMPEG
@@ -25,6 +26,7 @@ extern "C" {
 }
 #endif
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/CommonIface.hh"
 

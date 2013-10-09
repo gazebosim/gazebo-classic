@@ -86,6 +86,11 @@ namespace gazebo
     /// found.
     SensorPtr get_sensor(const std::string &_name);
 
+    /// \brief Disable sensors.
+    void disable();
+
+    /// \brief Enable sensors.
+    void enable();
     /// \}
   }
 }
