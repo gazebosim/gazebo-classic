@@ -91,7 +91,7 @@ void DARTJoint::Init()
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
-    this->dtChildBodyNode = dartChildLink->getDARTBodyNode();
+    this->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
     this->dtChildBodyNode->setParentJoint(this->dtJoint);
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
@@ -100,7 +100,7 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dtParentBodyNode = dartParentLink->getDARTBodyNode();
+    dtParentBodyNode = dartParentLink->GetDARTBodyNode();
     dtParentBodyNode->addChildBodyNode(this->dtChildBodyNode);
   }
 
@@ -341,7 +341,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
+    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
@@ -385,7 +385,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
+    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }
@@ -503,7 +503,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->getDARTBodyNode();
+    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
   }

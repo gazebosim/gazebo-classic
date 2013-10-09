@@ -52,25 +52,27 @@ void DARTModel::Init()
 {
   Model::Init();
 
+  //----------------------------------------------------------------------------
   // Name
   std::string modelName = this->GetName();
   this->dtSkeleton->setName(modelName.c_str());
 
+  //----------------------------------------------------------------------------
   // Static
   this->dtSkeleton->setMobile(!this->IsStatic());
 
+  //----------------------------------------------------------------------------
   // Check if this link is free floating body
+  // If a link of this model has no parent joint, then we add 6-dof free joint
+  // to the link.
   Link_V linkList = this->GetLinks();
-
   for (unsigned int i = 0; i < linkList.size(); ++i)
   {
     dart::dynamics::BodyNode* dtBodyNode
-        = boost::static_pointer_cast<DARTLink>(linkList[i])->getDARTBodyNode();
+        = boost::static_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
 
     if (dtBodyNode->getParentJoint() == NULL)
     {
-      // If this link has no parent joint, then we add 6-dof free joint to the
-      // link.
       dart::dynamics::FreeJoint* newFreeJoint = new dart::dynamics::FreeJoint;
 
       newFreeJoint->setTransformFromParentBodyNode(
@@ -83,10 +85,63 @@ void DARTModel::Init()
     dtSkeleton->addBodyNode(dtBodyNode);
   }
 
-  // add skeleton to world
+  //----------------------------------------------------------------------------
+  // Add the skeleton to the world
   this->GetDARTWorld()->addSkeleton(dtSkeleton);
 
-  // This should be called after the skeleton is added to the world.
+  //----------------------------------------------------------------------------
+  // Self collision
+  // Note: This process should be done after this skeleton is added to the
+  //       world.
+
+  // Check whether there exist at least one pair of self collidable links.
+  int numSelfCollidableLinks = 0;
+  bool hasPairOfSelfCollidableLinks = false;
+  for (size_t i = 0; i < linkList.size(); ++i)
+  {
+    if (linkList[i]->GetSelfCollide())
+    {
+      numSelfCollidableLinks++;
+      if (numSelfCollidableLinks >= 2)
+      {
+        hasPairOfSelfCollidableLinks = true;
+        break;
+      }
+    }
+  }
+
+  // If the skeleton has at least two self collidable links, then we set the
+  // skeleton as self collidable. If the skeleton is self collidable, then
+  // DART regards that all the links in the skeleton is self collidable. So, we
+  // disable all the pairs of which both of the links in the pair is not self
+  // collidable.
+  if (hasPairOfSelfCollidableLinks)
+  {
+    this->dtSkeleton->setSelfCollidable(true);
+
+    dart::simulation::World* dtWorld = this->GetDARTPhysics()->GetDARTWorld();
+    dart::collision::CollisionDetector* dtCollDet =
+        dtWorld->getConstraintHandler()->getCollisionDetector();
+    for (size_t i = 0; i < linkList.size() - 1; ++i)
+    {
+      for (size_t j = i + 1; j < linkList.size(); ++j)
+      {
+        if (!linkList[i]->GetSelfCollide() || !linkList[j]->GetSelfCollide())
+        {
+          dart::dynamics::BodyNode* itdtBodyNode1 =
+              boost::shared_dynamic_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+          dart::dynamics::BodyNode* itdtBodyNode2 =
+              boost::shared_dynamic_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
+
+          dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
+        }
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // Note: This function should be called after the skeleton is added to the
+  //       world.
   this->BackupState();
 }
 

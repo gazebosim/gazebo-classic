@@ -522,7 +522,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
     {
       DARTLinkPtr dartLink = boost::shared_dynamic_cast<DARTLink>(*itLink);
 
-      if (dartLink->getDARTBodyNode() == _dtBodyNode)
+      if (dartLink->GetDARTBodyNode() == _dtBodyNode)
       {
         res = dartLink;
         break;

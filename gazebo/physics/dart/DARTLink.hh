@@ -156,7 +156,7 @@ namespace gazebo
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief
-      public: dart::dynamics::BodyNode* getDARTBodyNode() const;
+      public: dart::dynamics::BodyNode* GetDARTBodyNode() const;
 
       /// \brief
       public: void SetDARTParentJoint(DARTJointPtr _dartParentJoint);
@@ -168,7 +168,7 @@ namespace gazebo
       private: DARTPhysicsPtr dartPhysics;
 
       /// \brief
-      private: dart::dynamics::BodyNode* dartBodyNode;
+      private: dart::dynamics::BodyNode* dtBodyNode;
 
       /// \brief
       private: DARTJointPtr dartParentJoint;
