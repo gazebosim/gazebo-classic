@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+startYear = 2007
+
+f = File.open('/tmp/gz_loc.csv', 'w')
+
+time = Time.new
+
+f.write("date,blank,comment,code")
+
+for y in (startYear..time.year)
+  if y == time.year
+    endMonth = time.month
+  else
+    endMonth = 13
+  end
+
+  for m in (1..endMonth)
+    date = y.to_s + "-" + m.to_s
+    cmd = "hg up -C -d \"" + date + "\""
+    `cmd`
+
+    result = `cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 *`
+
+    lines = result.split("\n")
+
+    lines.each do |line|
+      if line.include?("C++")
+        parts = line.split(",")
+        printf("%d/01/%d, %s, %s, %s", m, y, parts[2], parts[3], parts[4])
+        f.write("%d/01/%d, %s, %s, %s", m, y, parts[2], parts[3], parts[4])
+      end
+    end
+  end
+end
+
+f.close()
