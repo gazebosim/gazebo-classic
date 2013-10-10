@@ -38,6 +38,7 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::JointPtr jointExplicit;
+    private: std::string jointExplicitName;
 
     /// \brief simulate spring/damper with ExplicitUpdate function
     private: double kpExplicit;
@@ -46,6 +47,7 @@ namespace gazebo
     private: double kdExplicit;
 
     private: physics::JointPtr jointImplicit;
+    private: std::string jointImplicitName;
 
     /// \brief simulate spring/damper with Joint::SetStiffnessDamping
     private: double kpImplicit;

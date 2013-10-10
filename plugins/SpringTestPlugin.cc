@@ -34,34 +34,30 @@ void SpringTestPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   // hardcoded params for this test
-  this->jointExplicit = this->model->GetJoint(
-    _sdf->Get<std::string>("joint_explicit"));
+  this->jointExplicitName = _sdf->Get<std::string>("joint_explicit");
 
-  this->kpExplicit =
-    _sdf->Get<double>("kp_explicit");
+  this->kpExplicit = _sdf->Get<double>("kp_explicit");
 
-  this->kdExplicit =
-    _sdf->Get<double>("kd_explicit");
+  this->kdExplicit = _sdf->Get<double>("kd_explicit");
 
-  this->jointImplicit = this->model->GetJoint(
-    _sdf->Get<std::string>("joint_implicit"));
+  this->jointImplicitName = _sdf->Get<std::string>("joint_implicit");
 
-  this->kpImplicit =
-    _sdf->Get<double>("kp_implicit");
+  this->kpImplicit = _sdf->Get<double>("kp_implicit");
 
-  this->kdImplicit =
-    _sdf->Get<double>("kd_implicit");
+  this->kdImplicit = _sdf->Get<double>("kd_implicit");
+}
+
+/////////////////////////////////////////////////
+void SpringTestPlugin::Init()
+{
+  this->jointImplicit = this->model->GetJoint(this->jointImplicitName);
+  this->jointExplicit = this->model->GetJoint(this->jointExplicitName);
 
   this->jointImplicit->SetStiffnessDamping(0, this->kpImplicit,
     this->kdImplicit);
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&SpringTestPlugin::ExplicitUpdate, this));
-}
-
-/////////////////////////////////////////////////
-void SpringTestPlugin::Init()
-{
 }
 
 /////////////////////////////////////////////////

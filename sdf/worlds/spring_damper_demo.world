@@ -533,8 +533,20 @@
         <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
+      <joint name="joint_0" type="prismatic">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-1.0</lower>
+            <upper>1.0</upper>
+          </limit>
+          <xyz>0.0 0.0 1.0</xyz>
+        </axis>
+      </joint>
       <link name="link_2">
-        <pose>0.0 0.0 1.0 0.0 0.0 0.0</pose>
+        <pose>0.0 0.0 0.5 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
