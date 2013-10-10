@@ -38,7 +38,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const unsigned int Heightmap::numTerrainSubdivisions = 16;
 const double Heightmap::loadRadiusFactor = 1.0;
 const double Heightmap::holdRadiusFactor = 1.15;
