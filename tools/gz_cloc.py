@@ -28,7 +28,7 @@ for y in range(start_year, now.year+1):
 
   for m in range(1,end_month):
     date = str(y) + "-" + str(m) 
-    cmd = "hg up -d \"" + date + "\""
+    cmd = "hg up -C -d \"" + date + "\""
     print cmd
     os.system(cmd)
 
