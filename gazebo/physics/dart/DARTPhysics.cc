@@ -188,7 +188,7 @@ void DARTPhysics::UpdateCollision()
          dtBodyNode1->getWorldTransform().translation()).cross(force);
     Eigen::Vector3d torqueB =
         (dtContact.point -
-         dtBodyNode1->getWorldTransform().translation()).cross(-force);
+         dtBodyNode2->getWorldTransform().translation()).cross(-force);
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
@@ -208,7 +208,7 @@ void DARTPhysics::UpdateCollision()
       contactFeedback->wrench[0].body1Force = localForce1;
       contactFeedback->wrench[0].body1Torque = localTorque1;
     }
-    if (!dartLink1->IsStatic())
+    if (!dartLink2->IsStatic())
     {
       contactFeedback->wrench[0].body2Force = localForce2;
       contactFeedback->wrench[0].body2Torque = localTorque2;
