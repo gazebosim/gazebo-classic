@@ -1056,7 +1056,7 @@ TEST_F(Joint_TEST, SpringDamperTestODE)
 #ifdef HAVE_SIMBODY
 TEST_F(Joint_TEST, SpringDamperTestSimbody)
 {
-  gzerr << "SpringDampe unimplemented for Simbody, see issue #.";
+  gzerr << "SpringDampe unimplemented for Simbody, see issue #886.\n";
   // SpringDamperTest("simbody");
 }
 #endif  // HAVE_SIMBODY
@@ -1065,7 +1065,7 @@ TEST_F(Joint_TEST, SpringDamperTestSimbody)
 /// bullet collision parameters needs tweaking
 TEST_F(Joint_TEST, SpringDamperTestBullet)
 {
-  gzerr << "SpringDamper unimplemented for Bullet, see issue #.";
+  gzerr << "SpringDamper unimplemented for Bullet, see issue #887.\n";
   // SpringDamperTest("bullet");
 }
 #endif  // HAVE_BULLET
