@@ -62,7 +62,9 @@ namespace gazebo
 
       /// \brief Load based on a math::Pose
       /// \param[in] _pose Pose of the COM visual
-      private: void Load(const math::Pose &_pose);
+      /// \param[in] _scale Scale factor for the COM visual.
+      private: void Load(const math::Pose &_pose,
+               const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
 
       /// \brief Lines that make the cross marking the center of mass
       private: DynamicLines *crossLines;
