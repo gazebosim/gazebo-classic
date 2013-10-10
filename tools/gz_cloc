@@ -6,7 +6,7 @@ f = File.open('/tmp/gz_loc.csv', 'w')
 
 time = Time.new
 
-f.write("date,blank,comment,code")
+f.printf("date,blank,comment,code\n")
 
 for y in (startYear..time.year)
   if y == time.year
@@ -19,6 +19,8 @@ for y in (startYear..time.year)
     date = y.to_s + "-" + m.to_s
     `hg up -C -d "#{date}"`
 
+    printf("%d/01/%d : ", m, y)
+
     result = `cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 *`
 
     lines = result.split("\n")
@@ -26,8 +28,8 @@ for y in (startYear..time.year)
     lines.each do |line|
       if line.include?("C++")
         parts = line.split(",")
-        printf("%d/01/%d, %s, %s, %s", m, y, parts[2], parts[3], parts[4])
-        f.write("%d/01/%d, %s, %s, %s", m, y, parts[2], parts[3], parts[4])
+        printf("%d/01/%d, %s, %s, %s\n", m, y, parts[2], parts[3], parts[4])
+        f.printf("%d/01/%d, %s, %s, %s\n", m, y, parts[2], parts[3], parts[4])
       end
     end
   end
