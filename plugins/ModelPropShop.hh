@@ -16,6 +16,8 @@
 */
 #include <string>
 
+// Include Rand.hh first to avoid osx compilation errors
+#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/gazebo.hh"
 
