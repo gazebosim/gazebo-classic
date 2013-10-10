@@ -517,7 +517,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
+  this->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
 }
 

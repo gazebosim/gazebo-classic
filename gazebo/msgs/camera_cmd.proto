@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface CameraCmd
+/// \brief Message for camera command
+
+import "pose.proto";
+
+message CameraCmd
+{
+  required string name           = 1;
+  optional string follow_model   = 2;
+  optional Pose move_to_position = 3;
+}
