@@ -17,8 +17,7 @@ for y in (startYear..time.year)
 
   for m in (1..endMonth)
     date = y.to_s + "-" + m.to_s
-    cmd = "hg up -C -d \"" + date + "\""
-    `cmd`
+    `hg up -C -d "#{date}"`
 
     result = `cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 *`
 
