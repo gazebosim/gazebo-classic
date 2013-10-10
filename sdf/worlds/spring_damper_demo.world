@@ -533,9 +533,47 @@
         <self_collide>true</self_collide>
         <kinematic>false</kinematic>
       </link>
-      <joint name="joint_0" type="prismatic">
+      <link name="link_2">
+        <pose>0.0 0.0 1.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script>
+          </material>
+        </visual>
+        <collision name="collision_sphere">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_1" type="prismatic">
         <parent>world</parent>
-        <child>link_1</child>
+        <child>link_2</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
@@ -546,7 +584,12 @@
         </axis>
       </joint>
       <plugin name="spring_test" filename="libSpringTestPlugin.so">
-        <k>111.1111</k>
+        <joint_explicit>joint_0</joint_explicit>
+        <kp_explicit>111.1111</kp_explicit>
+        <kd_explicit>0</kd_explicit>
+        <joint_implicit>joint_1</joint_implicit>
+        <kp_implicit>111.1111</kp_implicit>
+        <kd_implicit>0</kd_implicit>
       </plugin>
       <static>false</static>
     </model>
