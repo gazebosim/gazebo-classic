@@ -159,7 +159,7 @@ void SaveDialog::OnSave()
       this->accept();
     }
   }
-  catch (const boost::filesystem::filesystem_error &ex)
+  catch(const boost::filesystem::filesystem_error &ex)
   {
     gzerr << ex.what() << std::endl;
   }
