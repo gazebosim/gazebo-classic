@@ -12,7 +12,7 @@ import datetime
 # 3. Load into a Google spreadsheet.
 # 4. Generate a graph, and select Time Line as the graph type.
 
-start_year = 2007
+start_year = 2013
 
 f = open('/tmp/gz_loc.csv', 'w')
 
