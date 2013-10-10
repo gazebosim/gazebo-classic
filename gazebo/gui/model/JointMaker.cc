@@ -175,7 +175,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     {
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
-
         this->inspectVis = vis;
         QMenu menu;
         menu.addAction(this->inspectAct);
