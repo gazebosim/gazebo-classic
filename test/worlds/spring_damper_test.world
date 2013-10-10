@@ -27,7 +27,7 @@
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>300</real_time_update_rate>
+      <real_time_update_rate>0</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <!-- a test of spring, see reference from ODE discussion
