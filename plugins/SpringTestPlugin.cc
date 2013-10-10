@@ -38,19 +38,19 @@ void SpringTestPlugin::Load(physics::ModelPtr _model,
     _sdf->Get<std::string>("joint_explicit"));
 
   this->kpExplicit =
-    _sdf->GetElement("kp_explicit")->Get<double>();
+    _sdf->Get<double>("kp_explicit");
 
   this->kdExplicit =
-    _sdf->GetElement("kd_explicit")->Get<double>();
+    _sdf->Get<double>("kd_explicit");
 
   this->jointImplicit = this->model->GetJoint(
     _sdf->Get<std::string>("joint_implicit"));
 
   this->kpImplicit =
-    _sdf->GetElement("kp_implicit")->Get<double>();
+    _sdf->Get<double>("kp_implicit");
 
   this->kdImplicit =
-    _sdf->GetElement("kd_implicit")->Get<double>();
+    _sdf->Get<double>("kd_implicit");
 
   this->jointImplicit->SetStiffnessDamping(0, this->kpImplicit,
     this->kdImplicit);

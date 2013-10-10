@@ -439,6 +439,9 @@ namespace gazebo
       /// \return The number of visuals in the Scene.
       public: uint32_t GetVisualCount() const;
 
+      /// \brief Remove all projectors.
+      public: void RemoveProjectors();
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
