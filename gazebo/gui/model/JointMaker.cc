@@ -55,6 +55,11 @@ JointMaker::JointMaker()
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
+
+
+  this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
+  connect(this->inspectAct, SIGNAL(triggered()), this,
+      SLOT(OnOpenInspector()));
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +86,7 @@ void JointMaker::Reset()
   this->selectedVis.reset();
   this->hoverVis.reset();
   this->prevHoverVis.reset();
+  this->inspectVis.reset();
 
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
@@ -158,12 +164,29 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
-
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+
+  if (_event.button == common::MouseEvent::RIGHT)
+  {
+    if (vis)
+    {
+      if (this->joints.find(vis->GetName()) != this->joints.end())
+      {
+
+        this->inspectVis = vis;
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+        return true;
+      }
+    }
+  }
+
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
 
   if (this->hoverVis)
   {
@@ -245,14 +268,12 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     // Add an event filter, which allows the JointMaker to capture mouse events.
     MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
         boost::bind(&JointMaker::OnMouseRelease, this, _1));
-
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
         boost::bind(&JointMaker::OnMouseMove, this, _1));
   }
   else
   {
     // Remove the event filters.
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
 
     // Press event added only after a joint is created. Needs to be added here
@@ -353,6 +374,31 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void JointMaker::OnOpenInspector()
+{
+  this->OpenInspector(this->inspectVis->GetName());
+  this->inspectVis.reset();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OpenInspector(const std::string &_name)
+{
+  JointData *joint = this->joints[_name];
+  joint->inspector->SetType(joint->type);
+  joint->inspector->SetName(joint->visual->GetName());
+  joint->inspector->SetAnchor(0, joint->anchor);
+  int axisCount = JointMaker::GetJointAxisCount(joint->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    joint->inspector->SetAxis(i, joint->axis[i]);
+    joint->inspector->SetAxis(i, joint->axis[i]);
+    joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
+    joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
+  }
+  joint->inspector->show();
+}
+
+/////////////////////////////////////////////////
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
@@ -362,19 +408,7 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
     {
-      JointData *joint = this->joints[vis->GetName()];
-      joint->inspector->SetType(joint->type);
-      joint->inspector->SetName(joint->visual->GetName());
-      joint->inspector->SetAnchor(0, joint->anchor);
-      int axisCount = JointMaker::GetJointAxisCount(joint->type);
-      for (int i = 0; i < axisCount; ++i)
-      {
-        joint->inspector->SetAxis(i, joint->axis[i]);
-        joint->inspector->SetAxis(i, joint->axis[i]);
-        joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
-        joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
-      }
-      joint->inspector->show();
+      this->OpenInspector(vis->GetName());
       return true;
     }
   }

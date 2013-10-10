@@ -298,9 +298,9 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   math::Pose pose = _vis->GetWorldPose();
   math::Vector3 distance =  this->GetMouseMoveDistance(pose, _axis, _local);
 
-  math::Vector3 bboxSize = bbox.GetSize() * this->mouseVisualScale;
+  math::Vector3 bboxSize = bbox.GetSize();
   math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
-      /bboxSize;
+      / bboxSize;
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
