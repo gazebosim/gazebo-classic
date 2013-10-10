@@ -32,10 +32,11 @@ for y in range(start_year, now.year+1):
     print cmd
     os.system(cmd)
 
-    cmd = "find . -name \"*.[cc,c,hh,h]\" | xargs cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude-lang=\"XML\",\"HTML\",\"XSD\",\"Python\",\"CMake\",\"make\",\"Bourne Shell\",\"Bourne Again Sheel\",\"XSLT\",\"Javascript\",\"CSS\",\"m4\",\"Ruby\",\"DOS Batch\" --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 | tail -n 1"
+    cmd = "find . -name \"*.[cc,c,hh,h,cpp,hpp]\" | xargs cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude-lang=\"XML\",\"HTML\",\"XSD\",\"Python\",\"CMake\",\"make\",\"Bourne Shell\",\"Bourne Again Sheel\",\"XSLT\",\"Javascript\",\"CSS\",\"m4\",\"Ruby\",\"DOS Batch\" --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 | tail -n 1"
     proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     out_parts = out.split(',')
+    printf("%d/01/%d, %s, %s, %s" % (m, y, out_parts[2], out_parts[3], out_parts[4]))
     f.write("%d/01/%d, %s, %s, %s" % (m, y, out_parts[2], out_parts[3], out_parts[4]))
 
 f.close()
