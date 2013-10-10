@@ -319,7 +319,6 @@ void Heightmap::Load()
 
     this->useTerrainPaging = false;
 
-#if GAZEBO_MAJOR_VERSION >= 3
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap
@@ -338,7 +337,6 @@ void Heightmap::Load()
             "General");
       }
     }
-#endif
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
