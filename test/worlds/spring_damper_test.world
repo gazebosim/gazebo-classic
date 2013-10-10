@@ -23,7 +23,7 @@
         <constraints>
           <cfm>0.0</cfm>
           <erp>1.0</erp>
-          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_max_correcting_vel>10000.0</contact_max_correcting_vel>
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
@@ -493,7 +493,7 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_4_prismatic_wth_plugin">
+    <model name="model_4_prismatic_plugin">
       <pose>0.0 1.2 1.1 0 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
