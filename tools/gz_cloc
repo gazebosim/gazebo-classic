@@ -9,17 +9,11 @@ time = Time.new
 f.printf("date,blank,comment,code\n")
 
 for y in (startYear..time.year)
-  if y == time.year
-    endMonth = time.month
-  else
-    endMonth = 13
-  end
+  endMonth = y == time.year ? time.month : 12
 
   for m in (1..endMonth)
     date = y.to_s + "-" + m.to_s
     `hg up -C -d "#{date}"`
-
-    printf("%d/01/%d : ", m, y)
 
     result = `cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 *`
 
