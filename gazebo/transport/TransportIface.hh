@@ -51,8 +51,8 @@ namespace gazebo
     /// \param[in] _timeoutIterations Number of times to wait for
     /// a connection to master.
     /// \return true if initialization succeeded; false otherwise
-    bool init(const std::string &_masterHost,
-              unsigned int _masterPort,
+    bool init(const std::string &_masterHost = "",
+              unsigned int _masterPort = 0,
               uint32_t _timeoutIterations = 30);
 
     /// \brief Run the transport component. Creates a thread to handle
