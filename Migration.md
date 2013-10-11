@@ -46,6 +46,27 @@
 1. File rename: `gazebo/gui/Gui.hh` to `gazebo/gui/GuiIface.hh`
 1. File rename: `<model>/manifest.xml` to `<model>/model.config`
 1. File rename: `<model_database>/manifest.xml` to `<model_database>/database.config`
+1. **gazebo/msgs/physics.proto**
+    + ***Removed*** optional double dt
+    + ***Replacement*** optional double min_step_size
+    ---
+    + ***Removed*** optional double update_rate
+    + ***Replacement*** optional double real_time_update_rate
+1. **gazebo/physics/ModelState.hh**
+    + ***Removed*** LinkState ModelState::GetLinkState(int _index) `API change`
+    + ***Replacement*** LinkState GetLinkState(const std::string &_linkName) const
+1. **gazebo/physics/PhyscisEngine.hh**
+    + ***Removed*** void PhysicsEngine::SetUpdateRate(double _value) `API change`
+    + ***Replacement*** void SetRealTimeUpdateRate(double _rate)
+    ---
+    + ***Removed*** double PhysicsEngine::GetUpdateRate() `API change`
+    + ***Replacement*** double PhysicsEngine::GetRealTimeUpdateRate() const
+    ---
+    + ***Removed*** void PhysicsEngine::SetStepTime(double _value) `API change`
+    + ***Replacement*** void PhysicsEngine::SetMaxStepSize(double _stepSize)
+    ---
+    + ***Removed*** double PhysicsEngine::GetStepTime() `API change`
+    + ***Replacement*** double PhysicsEngine::GetMaxStepSize() const
 1. **gazebo/physics/Joint.hh**
     + ***Removed:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos) `API chance`
     + ***Replacement:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
