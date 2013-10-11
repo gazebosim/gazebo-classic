@@ -97,14 +97,17 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   std::string fileFormat = poDataset->GetDriver()->GetDescription();
   if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
+    std::cout << "Image format detected\n";
     // Use the image to get the size of the heightmap
     this->img.Load(filename);
     this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
   }
   else
   {
+    std::cout << "SDTS detected\n";
     //this->sdts.Load(filename);
-    this->heightmapData = static_cast<common::HeightmapData*>(&(this->sdts));
+    sdts = new common::SDTS(filename);
+    this->heightmapData = static_cast<common::HeightmapData*>(this->sdts);
   }
 
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
@@ -136,13 +139,21 @@ void HeightmapShape::Init()
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
+  std::cout << "vertSize: " << this->vertSize << std::endl;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
+
+  std::cout << "GetMaxColor1: " << this->heightmapData->GetMaxColor() << std::endl;
+
 
   if (math::equal(this->heightmapData->GetMaxColor().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
     this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
+
+  std::cout << "GetMaxColor: " << this->heightmapData->GetMaxColor() << std::endl;
+  std::cout << "GetMaxColor r: " << this->heightmapData->GetMaxColor().r << std::endl;
+
 
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();

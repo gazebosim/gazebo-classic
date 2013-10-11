@@ -127,7 +127,7 @@ namespace gazebo
       protected: common::Image img;
 
       /// \brief SDTS used to generate the heights.
-      protected: common::SDTS sdts;
+      protected: common::SDTS *sdts;
 
       /// \brief HeightmapData used to generate the heights.
       protected: common::HeightmapData *heightmapData;

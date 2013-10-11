@@ -30,6 +30,7 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
@@ -96,6 +97,7 @@ int Image::Load(const std::string &_filename)
     else
     {
       gzerr << "Unknown image format[" << this->fullName << "]\n";
+      GZ_ASSERT(false, "SEGFAULT");
       return -1;
     }
 
