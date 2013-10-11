@@ -11,17 +11,10 @@
 printf("Warning: This will modify the current repository.\n")
 printf("Do you want to continue (Y/n): ")
 char = gets
-#begin
-#  system("stty raw -echo")
-#  char = STDIN.getc
-#ensure
-#  system("stty -raw echo")
-#end
 
 if char != "Y\n"
   abort
 end
-
 
 startYear = 2007
 
