@@ -2,17 +2,17 @@
 
 ### Modifications
 
-1. ***ConnectionManager::Init*** `ABI change`
+1. **ConnectionManager::Init** `ABI change`
 
-    **Compiliance:** No changes to downstream code required.
+    *Compiliance:* No changes to downstream code required.
 
-    A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+    *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 
-1. ***transport::init*** `ABI change`
+1. **transport::init** `ABI change`
 
-    **Compiliance:** No changes to downstream code required.
+    *Compiliance:* No changes to downstream code required.
 
-    A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+    *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 
 ### Additions
 
