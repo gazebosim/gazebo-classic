@@ -81,13 +81,6 @@ ConnectionManager::~ConnectionManager()
 
 //////////////////////////////////////////////////
 bool ConnectionManager::Init(const std::string &_masterHost,
-    unsigned int _masterPort)
-{
-  return this->Init(_masterHost, _masterPort, 30);
-}
-
-//////////////////////////////////////////////////
-bool ConnectionManager::Init(const std::string &_masterHost,
                              unsigned int _masterPort,
                              uint32_t _timeoutIterations)
 {
