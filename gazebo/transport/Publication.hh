@@ -119,16 +119,6 @@ namespace gazebo
                   boost::function<void(uint32_t)> _cb,
                   uint32_t _id);
 
-      /// \brief Publish data to remote subscribers
-      /// \param[in] _msg Message to be published
-      /// \param[in] _cb Callback to be invoked after publishing
-      /// is completed
-      /// \return Number of remote subscribers that will receive the
-      /// message.
-      public: int Publish_(MessagePtr _msg,
-                  boost::function<void(uint32_t)> _cb,
-                  uint32_t _id);
-
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
       /// be added
@@ -143,21 +133,6 @@ namespace gazebo
       /// \brief Add a publisher
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
-
-      /// \brief Remove a publisher.
-      /// \param[in] _pub Pointer to publisher object to remove.
-      public: void RemovePublisher(PublisherPtr _pub);
-
-      /// \brief Set the previous message for a publisher.
-      /// \param[in] _pubId ID of the publisher.
-      /// \param[in] _msg The previous message.
-      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
-
-      /// \brief Get a previous message for a publisher.
-      /// \param[in] _pubId ID of the publisher.
-      /// \return Pointer to the previous message. NULL if there is no
-      /// previous message.
-      public: MessagePtr GetPrevMsg(uint32_t _pubId);
 
       /// \brief Remove nodes that have been marked for removal
       private: void RemoveNodes();
@@ -192,9 +167,6 @@ namespace gazebo
       /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
 
-      /// \brief Publishers and their last messages.
-      private: std::map<uint32_t, MessagePtr> prevMsgs;
-
       /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
 
@@ -206,6 +178,34 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of nodes id for removed.
       private: mutable boost::mutex nodeRemoveMutex;
+
+      /// \brief Publishers and their last messages.
+      private: std::map<uint32_t, MessagePtr> prevMsgs;
+
+      /// \brief Publish data to remote subscribers
+      /// \param[in] _msg Message to be published
+      /// \param[in] _cb Callback to be invoked after publishing
+      /// is completed
+      /// \return Number of remote subscribers that will receive the
+      /// message.
+      public: int Publish_(MessagePtr _msg,
+                  boost::function<void(uint32_t)> _cb,
+                  uint32_t _id);
+
+      /// \brief Remove a publisher.
+      /// \param[in] _pub Pointer to publisher object to remove.
+      public: void RemovePublisher(PublisherPtr _pub);
+
+      /// \brief Set the previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \param[in] _msg The previous message.
+      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
+
+      /// \brief Get a previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \return Pointer to the previous message. NULL if there is no
+      /// previous message.
+      public: MessagePtr GetPrevMsg(uint32_t _pubId);
     };
     /// \}
   }
