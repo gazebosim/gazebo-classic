@@ -8,6 +8,14 @@
 # 3. Load into a Google spreadsheet.
 # 4. Generate a graph, and select Time Line as the graph type.
 
+puts "Warning: This will modify the current repository."
+puts "Do you want to continue (Y/n):"
+confirm = gets
+if gets != "Y"
+  return
+end
+
+
 startYear = 2007
 
 f = File.open('/tmp/gz_loc.csv', 'w')
