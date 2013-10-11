@@ -18,8 +18,6 @@ char = gets
 #  system("stty -raw echo")
 #end
 
-puts char
-
 if char != "Y\n"
   abort
 end
