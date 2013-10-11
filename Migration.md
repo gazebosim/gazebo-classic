@@ -3,16 +3,11 @@
 ### Modifications
 
 1. **ConnectionManager::Init** `ABI change`
-
-    *Compiliance:* No changes to downstream code required.
-
-    *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
-
+    + *Compiliance:* No changes to downstream code required.
+    + *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **transport::init** `ABI change`
-
-    *Compiliance:* No changes to downstream code required.
-
-    *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+    + *Compiliance:* No changes to downstream code required.
+    + *Note:* A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 
 ### Additions
 
@@ -51,3 +46,5 @@
 1. File rename: `gazebo/gui/Gui.hh` to `gazebo/gui/GuiIface.hh`
 1. File rename: `<model>/manifest.xml` to `<model>/model.config`
 1. File rename: `<model_database>/manifest.xml` to `<model_database>/database.config`
+1. **gazebo/physics/Joint.hh** **Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)** `ABI & API chance`
+    + Compliance: Use Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
