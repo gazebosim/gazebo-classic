@@ -61,3 +61,12 @@
     ---
     + ***Removed*** void RemoveParentJoint(const std::string &_jointName) `API change`
     + ***Replacement*** void RemoveParentJoint(const std::string &_jointName)
+1. **gazebo/physics/MeshShape.hh**
+    + ***Removed*** std::string MeshShape::GetFilename() const
+    + ***Replacement*** std::string MeshShape::GetURI() const;
+    ---
+    + ***Removed*** void MeshShape::SetFilename() const
+    + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const;
+1. **gazebo/common/Time.hh**
+    + ***Removed*** static Time::NSleep(Time _time)
+    + ***Replacement*** static Time NSleep(unsigned int _ns)
