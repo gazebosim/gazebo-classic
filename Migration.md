@@ -54,10 +54,10 @@
     + ***Replacement*** optional double real_time_update_rate
 1. **gazebo/physics/ModelState.hh**
     + ***Removed*** LinkState ModelState::GetLinkState(int _index) `API change`
-    + ***Replacement*** LinkState GetLinkState(const std::string &_linkName) const
+    + ***Replacement*** LinkState ModelState::GetLinkState(const std::string &_linkName) const
 1. **gazebo/physics/PhyscisEngine.hh**
     + ***Removed*** void PhysicsEngine::SetUpdateRate(double _value) `API change`
-    + ***Replacement*** void SetRealTimeUpdateRate(double _rate)
+    + ***Replacement*** void PhyscisEngine::SetRealTimeUpdateRate(double _rate)
     ---
     + ***Removed*** double PhysicsEngine::GetUpdateRate() `API change`
     + ***Replacement*** double PhysicsEngine::GetRealTimeUpdateRate() const
@@ -72,22 +72,22 @@
     + ***Replacement:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 1. **gazebo/common/Events.hh**
     + ***Removed:*** Events::ConnectWorldUpdateStart(T _subscriber) `API change`
-    + ***Replacement*** ConnectionPtr ConnectWorldUpdateBegin(T _subscriber)
+    + ***Replacement*** ConnectionPtr Events::ConnectWorldUpdateBegin(T _subscriber)
     ---
     + ***Removed:*** Events::DisconnectWorldUpdateStart(T _subscriber) `API change`
-    + ***Replacement*** ConnectionPtr DiconnectWorldUpdateBegin(T _subscriber)
+    + ***Replacement*** ConnectionPtr Events::DiconnectWorldUpdateBegin(T _subscriber)
 1. **gazebo/physics/Link.hh**
-    + ***Removed*** void RemoveChildJoint(JointPtr _joint) `API change`
-    + ***Replacement*** void RemoveChildJoint(const std::string &_jointName)
+    + ***Removed*** void Link::RemoveChildJoint(JointPtr _joint) `API change`
+    + ***Replacement*** void Link::RemoveChildJoint(const std::string &_jointName)
     ---
-    + ***Removed*** void RemoveParentJoint(const std::string &_jointName) `API change`
-    + ***Replacement*** void RemoveParentJoint(const std::string &_jointName)
+    + ***Removed*** void Link::RemoveParentJoint(const std::string &_jointName) `API change`
+    + ***Replacement*** void Link::RemoveParentJoint(const std::string &_jointName)
 1. **gazebo/physics/MeshShape.hh**
-    + ***Removed*** std::string MeshShape::GetFilename() const
+    + ***Removed*** std::string MeshShape::GetFilename() const `API change`
     + ***Replacement*** std::string MeshShape::GetURI() const;
     ---
-    + ***Removed*** void MeshShape::SetFilename() const
+    + ***Removed*** void MeshShape::SetFilename() const `API change`
     + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const;
 1. **gazebo/common/Time.hh**
-    + ***Removed*** static Time::NSleep(Time _time)
+    + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
