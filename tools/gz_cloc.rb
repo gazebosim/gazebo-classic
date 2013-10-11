@@ -10,9 +10,15 @@
 
 puts "Warning: This will modify the current repository."
 puts "Do you want to continue (Y/n):"
-confirm = gets
-if gets != "Y"
-  return
+begin
+  system("stty raw -echo")
+  char = STDIN.getc
+ensure
+  system("stty -raw echo")
+end
+
+if char != "Y"
+  abort
 end
 
 
