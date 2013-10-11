@@ -47,11 +47,11 @@
 1. File rename: `<model>/manifest.xml` to `<model>/model.config`
 1. File rename: `<model_database>/manifest.xml` to `<model_database>/database.config`
 1. **gazebo/physics/Joint.hh**
-    + ***Removed:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos) `ABI & API chance`
+    + ***Removed:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos) `API chance`
     + ***Replacement:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 1. **gazebo/common/Events.hh**
-    + ***Removed:*** Events::ConnectWorldUpdateStart(T _subscriber)
+    + ***Removed:*** Events::ConnectWorldUpdateStart(T _subscriber) `API change`
     + ***Replacement*** ConnectionPtr ConnectWorldUpdateBegin(T _subscriber)
     ---
-    + ***Removed:*** Events::DisconnectWorldUpdateStart(T _subscriber)
+    + ***Removed:*** Events::DisconnectWorldUpdateStart(T _subscriber) `API change`
     + ***Replacement*** ConnectionPtr DiconnectWorldUpdateBegin(T _subscriber)
