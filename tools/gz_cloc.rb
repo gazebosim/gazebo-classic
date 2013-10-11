@@ -8,8 +8,8 @@
 # 3. Load into a Google spreadsheet.
 # 4. Generate a graph, and select Time Line as the graph type.
 
-puts "Warning: This will modify the current repository."
-puts "Do you want to continue (Y/n):"
+printf("Warning: This will modify the current repository.\n")
+printf("Do you want to continue (Y/n): ")
 begin
   system("stty raw -echo")
   char = STDIN.getc
