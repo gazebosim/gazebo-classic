@@ -278,14 +278,7 @@ void Publication::LocalPublish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
-    uint32_t _id)
-{
-  this->Publish_(_msg, _cb, _id);
-}
-
-//////////////////////////////////////////////////
-int Publication::Publish_(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+int Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
     uint32_t _id)
 {
   int result = 0;

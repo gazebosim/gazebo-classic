@@ -183,7 +183,7 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->pubIds[*pubIter] = this->publication->Publish_(*iter,
+      this->pubIds[*pubIter] = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
       if (this->pubIds[*pubIter] <= 0)

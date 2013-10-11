@@ -113,11 +113,26 @@ namespace gazebo
       /// \param[in] _msg Message to be published
       /// \param[in] _cb Callback to be invoked after publishing
       /// is completed
-      // \todo Deprecation: This function should be removed in Gazebo 3.0,
-      // copy Publish_ to Publish, and then deprecate Publish_.
-      public: void Publish(MessagePtr _msg,
+      /// \return Number of remote subscribers that will receive the
+      /// message.
+      public: int Publish(MessagePtr _msg,
                   boost::function<void(uint32_t)> _cb,
                   uint32_t _id);
+
+      /// \brief Remove a publisher.
+      /// \param[in] _pub Pointer to publisher object to remove.
+      public: void RemovePublisher(PublisherPtr _pub);
+
+      /// \brief Set the previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \param[in] _msg The previous message.
+      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
+
+      /// \brief Get a previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \return Pointer to the previous message. NULL if there is no
+      /// previous message.
+      public: MessagePtr GetPrevMsg(uint32_t _pubId);
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
@@ -181,31 +196,6 @@ namespace gazebo
 
       /// \brief Publishers and their last messages.
       private: std::map<uint32_t, MessagePtr> prevMsgs;
-
-      /// \brief Publish data to remote subscribers
-      /// \param[in] _msg Message to be published
-      /// \param[in] _cb Callback to be invoked after publishing
-      /// is completed
-      /// \return Number of remote subscribers that will receive the
-      /// message.
-      public: int Publish_(MessagePtr _msg,
-                  boost::function<void(uint32_t)> _cb,
-                  uint32_t _id);
-
-      /// \brief Remove a publisher.
-      /// \param[in] _pub Pointer to publisher object to remove.
-      public: void RemovePublisher(PublisherPtr _pub);
-
-      /// \brief Set the previous message for a publisher.
-      /// \param[in] _pubId ID of the publisher.
-      /// \param[in] _msg The previous message.
-      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
-
-      /// \brief Get a previous message for a publisher.
-      /// \param[in] _pubId ID of the publisher.
-      /// \return Pointer to the previous message. NULL if there is no
-      /// previous message.
-      public: MessagePtr GetPrevMsg(uint32_t _pubId);
     };
     /// \}
   }
