@@ -1,18 +1,3 @@
-## Gazebo 2.0 to 3.0
-
-### Modifications
-
-1. **gazebo/transport/ConnectionManager.hh** 
-    + ***Removed:*** ConnectionManager::Init `ABI change`
-    + ***Replacement*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
-1. **gazebo/transport/TransportIface.hh**
-    + ***Changed*** **transport::init** `ABI change`
-    + ***Replacement:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
-
-### Additions
-
-### Deletions
-
 ## Gazebo 1.9 to 2.0
 
 ### New Deprecations
