@@ -34,10 +34,10 @@
 1. **gazebo/sensors/Collision.hh**
     + ***Deprecation*** void Collision::SetContactsEnabled(bool _enable)
     + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
-        ---
+    ---
     + ***Deprecation*** bool Colliion::GetContactsEnabled() const
     + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
-        ---
+      ---
     + ***Deprecation*** void AddContact(const Contact &_contact)
     + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
 
