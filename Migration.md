@@ -4,7 +4,7 @@
 
 1. **gazebo/transport/ConnectionManager.hh** 
     + ***Removed:*** ConnectionManager::Init `ABI change`
-    + ***Replacement** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+    + ***Replacement*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **gazebo/transport/TransportIface.hh**
     + ***Changed*** **transport::init** `ABI change`
     + ***Replacement:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
@@ -55,3 +55,9 @@
     ---
     + ***Removed:*** Events::DisconnectWorldUpdateStart(T _subscriber) `API change`
     + ***Replacement*** ConnectionPtr DiconnectWorldUpdateBegin(T _subscriber)
+1. **gazebo/physics/Link.hh**
+    + ***Removed*** void RemoveChildJoint(JointPtr _joint) `API change`
+    + ***Replacement*** void RemoveChildJoint(const std::string &_jointName)
+    ---
+    + ***Removed*** void RemoveParentJoint(const std::string &_jointName) `API change`
+    + ***Replacement*** void RemoveParentJoint(const std::string &_jointName)
