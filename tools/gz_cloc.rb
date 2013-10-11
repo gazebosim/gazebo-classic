@@ -17,6 +17,8 @@ ensure
   system("stty -raw echo")
 end
 
+puts char
+
 if char != "Y"
   abort
 end
