@@ -10,16 +10,17 @@
 
 printf("Warning: This will modify the current repository.\n")
 printf("Do you want to continue (Y/n): ")
-begin
-  system("stty raw -echo")
-  char = STDIN.getc
-ensure
-  system("stty -raw echo")
-end
+char = gets
+#begin
+#  system("stty raw -echo")
+#  char = STDIN.getc
+#ensure
+#  system("stty -raw echo")
+#end
 
 puts char
 
-if char != "Y"
+if char != "Y\n"
   abort
 end
 
