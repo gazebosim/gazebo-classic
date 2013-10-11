@@ -37,7 +37,17 @@
     ---
     + ***Deprecation*** bool Colliion::GetContactsEnabled() const
     + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
-      ---
+    ---
     + ***Deprecation*** void AddContact(const Contact &_contact)
     + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
 
+### Modifications
+
+1. File rename: `gazebo/common/Common.hh` to `gazebo/common/CommonIface.hh`
+1. File rename: `gazebo/physics/Physics.hh` to `gazebo/physics/PhysicsIface.hh`
+1. File rename: `gazebo/rendering/Rendering.hh` to `gazebo/rendering/RenderingIface.hh`
+1. File rename: `gazebo/sensors/Sensors.hh` to `gazebo/sensors/SensorsIface.hh`
+1. File rename: `gazebo/transport/Transport.hh` to `gazebo/transport/TransportIface.hh`
+1. File rename: `gazebo/gui/Gui.hh` to `gazebo/gui/GuiIface.hh`
+1. File rename: `<model>/manifest.xml` to `<model>/model.config`
+1. File rename: `<model_database>/manifest.xml` to `<model_database>/database.config`
