@@ -1451,19 +1451,19 @@ void World::ProcessModelMsgs()
       // are leaving it temporarily in case we find a need for it.
       //
       // Let all other subscribers know about the change
-       msgs::Model msg;
-       model->FillMsg(msg);
+      // msgs::Model msg;
+      // model->FillMsg(msg);
       // // FillMsg fills the visual components from initial sdf
       // // but problem is that Visuals may have changed e.g. through ~/visual,
-      // so don't publish them to subscribers.
-       for (int i = 0; i < msg.link_size(); ++i)
-       {
-         msg.mutable_link(i)->clear_visual();
-         for (int j = 0; j < msg.link(i).collision_size(); ++j)
-         {
-           msg.mutable_link(i)->mutable_collision(j)->clear_visual();
-         }
-       }
+      // // so don't publish them to subscribers.
+      // for (int i = 0; i < msg.link_size(); ++i)
+      // {
+      //   msg.mutable_link(i)->clear_visual();
+      //   for (int j = 0; j < msg.link(i).collision_size(); ++j)
+      //   {
+      //     msg.mutable_link(i)->mutable_collision(j)->clear_visual();
+      //   }
+      // }
 
       this->modelPub->Publish(*iter);
     }
