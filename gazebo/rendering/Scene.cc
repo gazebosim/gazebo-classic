@@ -1441,12 +1441,20 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    if (_msg.has_scale())
-    {
-      vm->mutable_scale()->set_x(_msg.scale().x());
-      vm->mutable_scale()->set_y(_msg.scale().y());
-      vm->mutable_scale()->set_z(_msg.scale().z());
-    }
+    this->visualMsgs.push_back(vm);
+  }
+
+  if (_msg.has_scale())
+  {
+    // update scale using a visual msg
+    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual);
+    if (_msg.has_id())
+      vm->set_id(_msg.id());
+    if (_msg.has_name())
+      vm->set_name(_msg.name());
+    vm->mutable_scale()->set_x(_msg.scale().x());
+    vm->mutable_scale()->set_y(_msg.scale().y());
+    vm->mutable_scale()->set_z(_msg.scale().z());
     this->visualMsgs.push_back(vm);
   }
 
