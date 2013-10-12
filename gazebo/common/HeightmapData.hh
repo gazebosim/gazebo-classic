@@ -31,10 +31,6 @@ namespace gazebo
     /// \brief Encapsulates a generic heightmap data file
     class HeightmapData
     {
-      /// \brief Constructor
-      /// \param[in] _filename the path to the image
-      // public: HeightmapData();
-
       /// \brief Destructor
       public: virtual ~HeightmapData();
 
