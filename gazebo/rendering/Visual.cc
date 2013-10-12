@@ -1125,13 +1125,15 @@ void Visual::SetWireframe(bool _show)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
+      if (material.isNull())
+        continue;
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
@@ -1240,6 +1242,16 @@ void Visual::SetHighlighted(bool _highlighted)
   {
     this->boundingBox->SetVisible(false);
   }
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1556,6 +1568,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }

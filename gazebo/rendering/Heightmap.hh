@@ -191,6 +191,11 @@ namespace gazebo
       public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
                   std::vector<std::vector<float> > &_v);
 
+      /// \brief Get the number of subdivision the terrain will be split
+      /// into.
+      /// \return Number of terrain subdivisions
+      public: unsigned int GetTerrainSubdivisionCount() const;
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.
@@ -218,24 +223,53 @@ namespace gazebo
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
 
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int NumTerrainSubdivisions;
+      /// \brief Update the hash of a terrain file. The hash will be written in
+      /// a file called gzterrain.SHA1 . This method will be used when the
+      /// paging is enabled and the terrain is loaded for the first time or if
+      /// the heightmap's image has been modified.
+      /// \param[in] _hash New hash value
+      /// \param[in] _terrainDir Directory where the terrain hash and the
+      /// terrain pages are stored. Ex: /tmp/gazebo-paging/heigthmap_bowl
+      private: void UpdateTerrainHash(const std::string &_hash,
+          const boost::filesystem::path &_terrainDir);
 
-      /// \brief Path for the terrain pages generated on disk.
-      private: boost::filesystem::path pagingPath;
+      /// \brief It checks if the terrain was previously loaded. In negative
+      /// case, it splits the original terrain into pieces and creates a hash
+      /// file.
+      /// \param[in] _terrainDirPath Path to the directory containing the
+      /// terrain pages and hash.
+      /// \return True if the terrain requires to regenerate the terrain files.
+      private: bool PrepareTerrainPaging(
+        const boost::filesystem::path &_terrainDirPath);
+
+      /// \brief Number of pieces in which a terrain is subdivided for paging.
+      private: static const unsigned int numTerrainSubdivisions;
 
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
       /// LoadRadiusFactor is a multiplier applied to the terrain size to create
       /// a load radius that depends on the terrain size.
-      private: static const double LoadRadiusFactor;
+      private: static const double loadRadiusFactor;
 
       /// \brief The terrain pages are held in memory but not loaded if they
       /// are not ready when the camera is within holdRadius distance. See
       /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
       /// multiplier applied to the terrain size to create a hold radius that
       /// depends on the terrain size.
-      private: static const double HoldRadiusFactor;
+      private: static const double holdRadiusFactor;
+
+      /// \brief Hash file name that should be present for every terrain file
+      /// loaded using paging.
+      private: static const boost::filesystem::path hashFilename;
+
+      /// \brief Name of the top level directory where all the paging info is
+      /// stored
+      private: static const boost::filesystem::path pagingDirname;
+
+      /// \brief When the terrain paging is enabled, the terrain information
+      /// for every piece of terrain is stored in disk. This is the path of
+      /// the top level directory where these files are located.
+      private: boost::filesystem::path gzPagingDir;
 
       /// \brief The scene.
       private: ScenePtr scene;
@@ -303,6 +337,9 @@ namespace gazebo
 
       /// \brief Flag that enables/disables the terrain paging
       private: bool useTerrainPaging;
+
+      /// \brief True if the terrain's hash does not match the image's hash
+      private: bool terrainHashChanged;
     };
     /// \}
 

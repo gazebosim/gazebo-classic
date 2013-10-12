@@ -25,6 +25,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -37,9 +38,11 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::NumTerrainSubdivisions = 16;
-const double Heightmap::LoadRadiusFactor = 1.0;
-const double Heightmap::HoldRadiusFactor = 1.15;
+const unsigned int Heightmap::numTerrainSubdivisions = 16;
+const double Heightmap::loadRadiusFactor = 1.0;
+const double Heightmap::holdRadiusFactor = 1.15;
+const boost::filesystem::path Heightmap::pagingDirname = "paging";
+const boost::filesystem::path Heightmap::hashFilename = "gzterrain.SHA1";
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -52,15 +55,13 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->terrainIdx = 0;
   this->useTerrainPaging = false;
 
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
-  boost::filesystem::path gzPagingDir = "gazebo-paging";
-  boost::filesystem::path instanceDir =
-      boost::filesystem::unique_path("instance-%%%%%%%%%%");
+  this->pageManager = NULL;
+  this->terrainPaging = NULL;
+  this->terrainHashChanged = true;
+  this->terrainsImported = true;
 
-  this->pagingPath = tmpDir / gzPagingDir / instanceDir;
-
-  // Create a temporal and unique directory for page files
-  boost::filesystem::create_directories(this->pagingPath);
+  this->gzPagingDir =
+      common::SystemPaths::Instance()->GetLogPath() / this->pagingDirname;
 }
 
 //////////////////////////////////////////////////
@@ -68,23 +69,22 @@ Heightmap::~Heightmap()
 {
   this->scene.reset();
 
-  delete this->terrainGlobals;
-  this->terrainGlobals = NULL;
-
-  this->terrainGroup->removeAllTerrains();
-
-  delete this->terrainGroup;
-  this->terrainGroup = NULL;
-
   if (this->terrainPaging)
   {
     OGRE_DELETE this->terrainPaging;
     pageManager->destroyWorld(this->world);
     OGRE_DELETE this->pageManager;
   }
+  else
+  {
+    this->terrainGroup->removeAllTerrains();
 
-  // Remove page files from disk
-  boost::filesystem::remove_all(this->pagingPath);
+    OGRE_DELETE this->terrainGroup;
+    this->terrainGroup = NULL;
+  }
+
+  OGRE_DELETE this->terrainGlobals;
+  this->terrainGlobals = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -219,6 +219,73 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 }
 
 //////////////////////////////////////////////////
+void Heightmap::UpdateTerrainHash(const std::string &_hash,
+    const boost::filesystem::path &_terrainDir)
+{
+  std::ofstream terrainHashFile;
+  boost::filesystem::path terrainHashFullPath;
+
+  // Create the subdirectories if they do not exist
+  boost::filesystem::create_directories(_terrainDir);
+
+  terrainHashFullPath = _terrainDir / this->hashFilename;
+
+  // Update the terrain hash
+  terrainHashFile.open(terrainHashFullPath.string().c_str());
+
+  // Throw an error if we couldn't open the file for writing.
+  if (terrainHashFile.is_open())
+  {
+    terrainHashFile << _hash;
+    terrainHashFile.close();
+  }
+  else
+  {
+    gzerr << "Unable to open file for creating a terrain hash: [" +
+        terrainHashFullPath.string() + "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
+bool Heightmap::PrepareTerrainPaging(
+    const boost::filesystem::path &_terrainDirPath)
+{
+  std::string heightmapHash;
+  boost::filesystem::path terrainHashFullPath;
+  bool updateHash = true;
+
+  // Compute the original heightmap's image.
+  heightmapHash = common::get_sha1<std::vector<float> >(this->heights);
+
+  // Check if the terrain hash exists
+  terrainHashFullPath = _terrainDirPath / this->hashFilename;
+  if (boost::filesystem::exists(terrainHashFullPath))
+  {
+    try
+    {
+      // Read the terrain hash
+      std::ifstream in(terrainHashFullPath.string().c_str());
+      std::stringstream buffer;
+      buffer << in.rdbuf();
+      std::string terrainHash(buffer.str());
+      updateHash = terrainHash != heightmapHash;
+    }
+    catch(std::ifstream::failure &e)
+    {
+      gzerr << "Terrain paging error: Unable to read terrain hash\n";
+    }
+  }
+
+  // Update the terrain hash and split the terrain into small pieces
+  if (updateHash)
+  {
+    this->UpdateTerrainHash(heightmapHash, _terrainDirPath);
+  }
+
+  return updateHash;
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
   if (this->terrainGlobals != NULL)
@@ -230,6 +297,10 @@ void Heightmap::Load()
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
   msgs::Geometry geomMsg;
+  boost::filesystem::path imgPath;
+  boost::filesystem::path terrainName;
+  boost::filesystem::path terrainDirPath;
+  boost::filesystem::path prefix;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
 
@@ -244,6 +315,27 @@ void Heightmap::Load()
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
+
+    this->useTerrainPaging = false;
+
+    if (geomMsg.heightmap().has_filename())
+    {
+      // Get the full path of the image heightmap
+      imgPath = geomMsg.heightmap().filename();
+      terrainName = imgPath.filename().stem();
+      terrainDirPath = this->gzPagingDir / terrainName;
+
+      // Add the top level terrain paging directory to the OGRE
+      // ResourceGroupManager
+      if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+            this->gzPagingDir.string(), "General"))
+      {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+            this->gzPagingDir.string(), "FileSystem", "General", true);
+        Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+            "General");
+      }
+    }
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -252,8 +344,14 @@ void Heightmap::Load()
   // If the paging is enabled we modify the number of subterrains
   if (this->useTerrainPaging)
   {
-    nTerrains = this->NumTerrainSubdivisions;
+    nTerrains = this->numTerrainSubdivisions;
+    prefix = terrainDirPath / "gazebo_terrain_cache";
   }
+  else
+  {
+    prefix = terrainDirPath / "gazebo_terrain_nocache";
+  }
+
   double sqrtN = sqrt(nTerrains);
 
   // Create terrain group, which holds all the individual terrain instances.
@@ -268,7 +366,6 @@ void Heightmap::Load()
       1 + ((this->dataSize - 1) / sqrtN),
       this->terrainSize.x / (sqrtN));
 
-  boost::filesystem::path prefix = this->pagingPath / "gazebo_terrain";
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
@@ -284,8 +381,13 @@ void Heightmap::Load()
 
   if (this->useTerrainPaging)
   {
-    // Split the terrain. Every subterrain will be paged
-    this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    this->terrainHashChanged = this->PrepareTerrainPaging(terrainDirPath);
+
+    if (this->terrainHashChanged)
+    {
+      // Split the terrain. Every subterrain will be saved on disk and paged
+      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+    }
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);
@@ -304,8 +406,8 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->LoadRadiusFactor * this->terrainSize.x,
-        this->HoldRadiusFactor * this->terrainSize.x,
+        this->loadRadiusFactor * this->terrainSize.x,
+        this->holdRadiusFactor * this->terrainSize.x,
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
@@ -313,7 +415,7 @@ void Heightmap::Load()
     for (int x = 0; x <= sqrtN - 1; ++x)
       this->DefineTerrain(x, y);
 
-  // sync load since we want everything in place when we start
+  // Sync load since we want everything in place when we start
   this->terrainGroup->loadAllTerrains(true);
 
   // Calculate blend maps
@@ -326,8 +428,11 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-    // Save all subterrains using files. This is required to reload the pages
-    this->terrainGroup->saveAllTerrains(true);
+    if (this->terrainHashChanged)
+    {
+      // Save all subterrains using files.
+      this->terrainGroup->saveAllTerrains(true);
+    }
   }
 
   this->terrainGroup->freeTemporaryResources();
@@ -443,24 +548,22 @@ void Heightmap::DefineTerrain(int _x, int _y)
 {
   Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
 
-  if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
-        this->terrainGroup->getResourceGroup(), filename))
+  if (!this->useTerrainPaging)
+  {
+    this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+  }
+  else if ((Ogre::ResourceGroupManager::getSingleton().resourceExists(
+             this->terrainGroup->getResourceGroup(), filename)) &&
+          (!this->terrainHashChanged))
   {
     this->terrainGroup->defineTerrain(_x, _y);
+    this->terrainsImported = false;
   }
   else
   {
-    if (this->useTerrainPaging)
-    {
       this->terrainGroup->defineTerrain(_x, _y,
           &this->subTerrains[this->terrainIdx][0]);
       ++terrainIdx;
-    }
-    else
-    {
-      this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
-    }
-    this->terrainsImported = true;
   }
 }
 
@@ -763,6 +866,12 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(NULL);
   }
+}
+
+/////////////////////////////////////////////////
+unsigned int Heightmap::GetTerrainSubdivisionCount() const
+{
+  return this->numTerrainSubdivisions;
 }
 
 /////////////////////////////////////////////////
@@ -2677,3 +2786,4 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
+
