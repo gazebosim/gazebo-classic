@@ -493,9 +493,6 @@ namespace gazebo
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<math::Vector3>("pos"));
 
-        //common::Image img(geomElem->Get<std::string>("uri"));
-        //msgs::Set(result.mutable_heightmap()->mutable_image(), img);
-
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         msgs::HeightmapGeom::Texture *tex;
         while (textureElem)

@@ -21,19 +21,15 @@
 
 #include <string.h>
 #include <math.h>
-#include <gdal/gdal_priv.h>
-#include <gdal/cpl_conv.h> // for CPLMalloc()
 
-#include "gazebo/math/gzmath.hh"
-
-#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
-
+#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -91,25 +87,25 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
             this->sdf->Get<std::string>("uri") + "]\n");
   }
 
-  poDataset = (GDALDataset *) GDALOpen(filename.c_str(), GA_ReadOnly);
+  poDataset = reinterpret_cast<GDALDataset *>
+      (GDALOpen(filename.c_str(), GA_ReadOnly));
 
   // Check if the heightmap file is an image
   std::string fileFormat = poDataset->GetDriver()->GetDescription();
   if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
-    std::cout << "Image format detected\n";
-    // Use the image to get the size of the heightmap
+    // Load the terrain file as an image
     this->img.Load(filename);
     this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
   }
   else
   {
-    std::cout << "SDTS detected\n";
-    //this->sdts.Load(filename);
+    // Load the terrain file as a SDTS
     sdts = new common::SDTS(filename);
     this->heightmapData = static_cast<common::HeightmapData*>(this->sdts);
   }
 
+  // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
       !math::isPowerOfTwo(this->heightmapData->GetWidth()-1))
   {
@@ -139,21 +135,13 @@ void HeightmapShape::Init()
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  std::cout << "vertSize: " << this->vertSize << std::endl;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
-
-  std::cout << "GetMaxColor1: " << this->heightmapData->GetMaxColor() << std::endl;
-
 
   if (math::equal(this->heightmapData->GetMaxColor().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
     this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
-
-  std::cout << "GetMaxColor: " << this->heightmapData->GetMaxColor() << std::endl;
-  std::cout << "GetMaxColor r: " << this->heightmapData->GetMaxColor().r << std::endl;
-
 
   // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();

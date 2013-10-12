@@ -1,3 +1,23 @@
+/*
+ * Copyright 2013 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include <algorithm>
+
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SDTS.hh"
 
 using namespace gazebo;
@@ -8,10 +28,15 @@ SDTS::SDTS(const std::string &_filename)
 {
   GDALAllRegister();
 
-  this->poDataset = (GDALDataset *) GDALOpen(_filename.c_str(), GA_ReadOnly);
+  this->poDataset = reinterpret_cast<GDALDataset *>
+      (GDALOpen(_filename.c_str(), GA_ReadOnly));
 
   if (this->poDataset == NULL)
-    gzthrow("Unable to find SDTS file[" + _filename + "]\n");
+    gzthrow("Unable to find SDTS file [" + _filename + "]\n");
+
+  if (poDataset->GetRasterCount() != 1 && poDataset->GetRasterCount() != 3)
+    gzthrow("Unsupported band number in file [" << _filename + "]. Found " <<
+        poDataset->GetRasterCount() << " but only 1 or 3 are valid values\n");
 }
 
 //////////////////////////////////////////////////
@@ -22,60 +47,68 @@ SDTS::~SDTS()
 //////////////////////////////////////////////////
 unsigned int SDTS::GetBPP() const
 {
-  return 3;
+  return sizeof(unsigned char) * 3;
 }
 
 //////////////////////////////////////////////////
 void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
 {
   GDALRasterBand  *poBand;
+  int nXSize = this->GetWidth();
+  int nYSize = this->GetHeight();
+  int nBands = poDataset->GetRasterCount();
+  std::vector<float*> data_v;
 
   if (*_data)
     delete [] *_data;
 
-  int nXSize = poDataset->GetRasterXSize();
-  int nYSize = poDataset->GetRasterYSize();
-  int nBands = poDataset->GetRasterCount();
-  std::vector<float*> data_v;
-
-  // Bands start at 1
+  // The first band is 1
   for (int i = 1; i <= nBands; ++i)
   {
+    // Get a pointer to the current band
     poBand = poDataset->GetRasterBand(i);
 
-    // read elements
+    // Read the whole data from the current band
     float *buffer = new float[nXSize * nYSize];
-    poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, buffer, nXSize, nYSize, GDT_Float32, 0, 0);
+    poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, buffer, nXSize, nYSize,
+        GDT_Float32, 0, 0);
+
+    // Store the pointer to this band's data for the future
     data_v.push_back(buffer);
   }
 
+  // Allocate memory for the array that will contain all the data
   _count = nXSize * nYSize * 3 * sizeof(unsigned char);
   *_data = new unsigned char[_count];
 
+  // Fill the array aligning the data
   unsigned char *p = *_data;
-
-  if (nBands == 3)
+  for (int i = 0; i < nXSize * nYSize; ++i)
   {
-    for (int i = 0; i < nXSize * nYSize; ++i)
-    {
-      p[0] = static_cast<unsigned char>(data_v[0][i]);
-      p[1] = static_cast<unsigned char>(data_v[1][i]);
-      p[2] = static_cast<unsigned char>(data_v[2][i]);
-      p += 3 * sizeof(unsigned char);
-    }
-  }
-  else if (nBands == 1)
-  {
-    for (int i = 0; i < nXSize * nYSize; ++i)
+    if (nBands == 1)
     {
       p[0] = static_cast<unsigned char>(data_v[0][i]);
       p[1] = p[0];
       p[2] = p[0];
-      p += 3 * sizeof(unsigned char);
     }
+    else if (nBands == 3)
+    {
+      p[0] = static_cast<unsigned char>(data_v[0][i]);
+      p[1] = static_cast<unsigned char>(data_v[1][i]);
+      p[2] = static_cast<unsigned char>(data_v[2][i]);
+    }
+    else
+    {
+      gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
+    }
+    p += 3 * sizeof(unsigned char);
   }
-  else
-    std::cout << "Number of bands not supported\n";
+
+  // Release the temporal array containing the data for each band
+  for (unsigned int i = 0; i < data_v.size(); ++i)
+  {
+    delete[] data_v[i];
+  }
 }
 
 //////////////////////////////////////////////////
@@ -89,38 +122,32 @@ Color SDTS::GetMaxColor()
 {
   Color maxClr;
   GDALRasterBand *poBand;
-  double max;
   std::vector<double> max_v;
 
   maxClr.Set(0, 0, 0, 0);
 
-  // read dimension sizes
-  int xsize = poDataset->GetRasterXSize();
-  int ysize = poDataset->GetRasterYSize();
+  // Read dimension sizes
+  int xsize = this->GetWidth();
+  int ysize = this->GetHeight();
   float *buffer = new float[xsize * ysize];
   int nBands = poDataset->GetRasterCount();
 
-  // Bands start at 1
+  // The first band is 1
   for (int i = 1; i <= nBands; ++i)
   {
-    // Read raster data
+    // Get a pointer to the current band
     poBand = poDataset->GetRasterBand(i);
 
-    // read elements
-    poBand->RasterIO(GF_Read, 0, 0, xsize, ysize, buffer, xsize, ysize, GDT_Float32, 0, 0);
-    
-    max = 0;
-    for (int point = 0; point < xsize * ysize; ++point)
-    {
-      if (buffer[point] > max)
-        max = buffer[point];
-    }
+    // Read the whole data from the current band
+    poBand->RasterIO(GF_Read, 0, 0, xsize, ysize, buffer, xsize, ysize,
+        GDT_Float32, 0, 0);
 
+    // Store the maximum value of this band
+    float max = *std::max_element(buffer, buffer + xsize * ysize);
     max_v.push_back(max);
-    //std::cout << "Max: " << max << std::endl;
-    //std::cout << "MAx allowed: " << poBand->GetMaximum() << std::endl;
   }
 
+  // Create a normalized color with the max values of each band
   if (max_v.size() == 1)
   {
     double v = max_v[0] / poBand->GetMaximum();
@@ -131,7 +158,7 @@ Color SDTS::GetMaxColor()
     maxClr.Set(max_v[0] / 255.0, max_v[1] / 255.0, max_v[2] / 255.0);
   }
   else
-    std::cout << "This DEM file is not supported\n";
+    gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
 
   return maxClr;
 }
