@@ -70,7 +70,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
-    result = math::fixnan(dJointGetScrewPosition(this->jointId));
+    result = dJointGetScrewPosition(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -83,7 +83,7 @@ double ODEScrewJoint::GetVelocity(int /*index*/) const
   double result = 0;
 
   if (this->jointId)
-    result = math::fixnan(dJointGetScrewPositionRate(this->jointId));
+    result = dJointGetScrewPositionRate(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -161,7 +161,7 @@ double ODEScrewJoint::GetParam(int _parameter) const
   double result = 0;
 
   if (this->jointId)
-    result = math::fixnan(dJointGetScrewParam(this->jointId, _parameter));
+    result = dJointGetScrewParam(this->jointId, _parameter);
   else
     gzerr << "ODE Joint ID is invalid\n";
 

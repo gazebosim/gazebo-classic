@@ -68,7 +68,7 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
-    result = math::fixnan(dJointGetSliderPosition(this->jointId));
+    result = dJointGetSliderPosition(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -80,7 +80,7 @@ double ODESliderJoint::GetVelocity(int /*index*/) const
 {
   double result = 0;
   if (this->jointId)
-    result = math::fixnan(dJointGetSliderPositionRate(this->jointId));
+    result = dJointGetSliderPositionRate(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -140,7 +140,7 @@ double ODESliderJoint::GetParam(int _parameter) const
   double result = 0;
 
   if (this->jointId)
-    result = math::fixnan(dJointGetSliderParam(this->jointId, _parameter));
+    result = dJointGetSliderParam(this->jointId, _parameter);
   else
     gzerr << "ODE Joint ID is invalid\n";
 

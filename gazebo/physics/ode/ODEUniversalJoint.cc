@@ -122,9 +122,9 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
   if (this->jointId)
   {
     if (_index == 0)
-      result = math::fixnan(dJointGetUniversalAngle1(this->jointId));
+      result = dJointGetUniversalAngle1(this->jointId);
     else
-      result = math::fixnan(dJointGetUniversalAngle2(this->jointId));
+      result = dJointGetUniversalAngle2(this->jointId);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -140,9 +140,9 @@ double ODEUniversalJoint::GetVelocity(int _index) const
   if (this->jointId)
   {
     if (_index == 0)
-      result = math::fixnan(dJointGetUniversalAngle1Rate(this->jointId));
+      result = dJointGetUniversalAngle1Rate(this->jointId);
     else
-      result = math::fixnan(dJointGetUniversalAngle2Rate(this->jointId));
+      result = dJointGetUniversalAngle2Rate(this->jointId);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
