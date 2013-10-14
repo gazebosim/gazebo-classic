@@ -32,7 +32,6 @@ set (sources
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
-  MainWindow.cc
   ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -53,7 +52,6 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
-  MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
@@ -93,9 +91,15 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
-  MainWindow_TEST.cc
   TimePanel_TEST.cc
 )
+
+# MainWindow is using screen rendering
+if (ENABLE_SCREEN_TESTS)
+  set (sources    ${sources} MainWindow.cc)
+  set (qt_headers ${qt_headers} MainWindow.hh)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
+endif()
 
 # Generate executables for each of the QT unit tests
 gz_build_qt_tests(${qt_tests})
