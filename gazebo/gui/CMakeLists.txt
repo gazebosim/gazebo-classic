@@ -32,6 +32,7 @@ set (sources
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
+  MainWindow.cc
   ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -71,6 +72,7 @@ set (headers
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
+  MainWindow.hh
   ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
@@ -96,8 +98,6 @@ set (qt_tests
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (sources    ${sources} MainWindow.cc)
-  set (qt_headers ${qt_headers} MainWindow.hh)
   set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
 endif()
 
