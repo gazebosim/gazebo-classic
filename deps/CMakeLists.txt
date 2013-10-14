@@ -1,3 +1,4 @@
+add_subdirectory(hacd)
 add_subdirectory(libccd)
 add_subdirectory(opende)
 # add_subdirectory(ann)

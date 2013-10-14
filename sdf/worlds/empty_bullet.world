@@ -18,5 +18,10 @@
     <include>
       <uri>model://sun</uri>
     </include>
+
+    <include>
+      <uri>model://cordless_drill</uri>
+    </include>
+
   </world>
 </sdf>
