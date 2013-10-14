@@ -53,6 +53,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  MainWindow.hh
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
@@ -72,7 +73,6 @@ set (headers
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
-  MainWindow.hh
   ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
