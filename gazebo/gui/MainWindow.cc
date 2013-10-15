@@ -979,8 +979,8 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,

@@ -2723,7 +2723,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
-  comVis->SetVisible(false);
+  comVis->SetVisible(this->showCOMs);
   this->visuals[comVis->GetId()] = comVis;
 }
 
