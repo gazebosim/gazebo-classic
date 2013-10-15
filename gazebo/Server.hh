@@ -125,7 +125,7 @@ namespace gazebo
     /// \brief Pointer to the master.
     private: Master *master;
 
-    /// \brief Thred in which the master runs.
+    /// \brief Thread in which the master runs.
     private: boost::thread *masterThread;
 
     /// \brief Communication node.
@@ -143,7 +143,7 @@ namespace gazebo
     /// \brief List of received control messages.
     private: std::list<msgs::ServerControl> controlMsgs;
 
-    /// \brief Command line params that are passed to varios Gazebo objects.
+    /// \brief Command line params that are passed to various Gazebo objects.
     private: gazebo::common::StrStr_M params;
 
     /// \brief Boost program options variable map.
