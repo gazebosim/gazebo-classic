@@ -58,10 +58,10 @@ TEST_F(ModelDatabaseTest, GetModels)
 
   Load("worlds/empty.world");
 
-  g_boolRef = common::ModelDatabase::Instance()->GetModelsNonBlocking(
+  g_boolRef = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels, _1));
 
-  g_boolRef1 = common::ModelDatabase::Instance()->GetModelsNonBlocking(
+  g_boolRef1 = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels1, _1));
 
   while (g_onModels == 0 || g_onModels1 <= 1)
@@ -81,13 +81,13 @@ TEST_F(ModelDatabaseTest, GetModelsTriple)
 
   Load("worlds/empty.world");
 
-  g_boolRef = common::ModelDatabase::Instance()->GetModelsNonBlocking(
+  g_boolRef = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels, _1));
 
-  g_boolRef1 = common::ModelDatabase::Instance()->GetModelsNonBlocking(
+  g_boolRef1 = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels1, _1));
 
-  g_boolRef2 = common::ModelDatabase::Instance()->GetModelsNonBlocking(
+  g_boolRef2 = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels2, _1));
 
   while (!g_onModels && !g_onModels1 && !g_onModels2)

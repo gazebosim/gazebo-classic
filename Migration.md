@@ -3,9 +3,9 @@
 ### Modifications
 
 1. **gazebo/common/ModelDatabase.hh** `API change`
-    + ** Removed:** void ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
-    + **Replacement:** boost::shared_ptr<bool> ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
-    + **Note:** The replacement function requires that the returned bool shared pointer remain valid in order to receive the GetModels callback. Reset the bool shared pointer to stop receiving GetModels callback.
+    + ***Removed:*** void ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
+    + ***Replacement:*** boost::shared_ptr<bool> ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
+    + ***Note:*** The replacement function requires that the returned bool shared pointer remain valid in order to receive the GetModels callback. Reset the bool shared pointer to stop receiving GetModels callback.
 
 ## Gazebo 1.9 to 2.0
 
