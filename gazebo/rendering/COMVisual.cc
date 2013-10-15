@@ -76,6 +76,9 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
+    // Unrealistic inertia, load with default scale
+    gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
+          << "unable to visualize box of equivalent inertia." << std::endl;
     this->Load(math::Pose(xyz, q));
   }
   else
