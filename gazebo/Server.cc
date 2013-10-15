@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
-namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
@@ -52,6 +51,8 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
+  this->receiveMutex = new boost::mutex();
+
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
@@ -60,6 +61,7 @@ Server::Server()
 Server::~Server()
 {
   fflush(stdout);
+  delete this->receiveMutex;
   delete this->master;
 }
 
@@ -74,20 +76,20 @@ void Server::PrintUsage()
 }
 
 /////////////////////////////////////////////////
-bool Server::ParseArgs(int _argc, char **_argv)
+bool Server::ParseArgs(int argc, char **argv)
 {
   // save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = _argc;
-  this->systemPluginsArgv = new char*[_argc];
-  for (int i = 0; i < _argc; ++i)
+  this->systemPluginsArgc = argc;
+  this->systemPluginsArgv = new char*[argc];
+  for (int i = 0; i < argc; ++i)
   {
-    int argvLen = strlen(_argv[i]) + 1;
+    int argvLen = strlen(argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
   }
 
-  po::options_description visibleDesc("Options");
-  visibleDesc.add_options()
+  po::options_description v_desc("Options");
+  v_desc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
@@ -107,22 +109,24 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
-  po::options_description hiddenDesc("Hidden options");
-  hiddenDesc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.")
+  po::options_description h_desc("Hidden options");
+  h_desc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.");
+
+  h_desc.add_options()
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
   po::options_description desc("Options");
-  desc.add(visibleDesc).add(hiddenDesc);
+  desc.add(v_desc).add(h_desc);
 
-  po::positional_options_description positionalDesc;
-  positionalDesc.add("world_file", 1).add("pass_through", -1);
+  po::positional_options_description p_desc;
+  p_desc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
-    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
-          positionalDesc).allow_unregistered().run(), this->vm);
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(
+          p_desc).allow_unregistered().run(), this->vm);
 
     po::notify(this->vm);
   }
@@ -137,7 +141,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   if (this->vm.count("help"))
   {
     this->PrintUsage();
-    std::cerr << visibleDesc << "\n";
+    std::cerr << v_desc << "\n";
     return false;
   }
 
@@ -548,7 +552,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 
