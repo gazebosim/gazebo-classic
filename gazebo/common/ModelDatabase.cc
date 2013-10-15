@@ -358,15 +358,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::GetModels(
-    boost::function<void (const std::map<std::string, std::string> &)> _func)
-{
-  this->deprecatedCallbacks.push_back(_func);
-  this->updateCacheCondition.notify_one();
-}
-
-/////////////////////////////////////////////////
-boost::shared_ptr<bool> ModelDatabase::GetModelsNonBlocking(
+boost::shared_ptr<bool> ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
   boost::shared_ptr<bool> refCount(new bool());

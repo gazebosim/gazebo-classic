@@ -71,22 +71,13 @@ namespace gazebo
       public: std::map<std::string, std::string> GetModels();
 
       /// \brief Get the dictionary of all model names via a callback.
-      /// This is deprecated. Please use GetModelsNonBlocking.
-      /// This is the non-blocking version of ModelDatabase::GetModels
-      /// \param[in] _func Callback function that receives the list of
-      /// models.
-      public: void GetModels(boost::function<
-                  void (const std::map<std::string, std::string> &)> _func)
-              GAZEBO_DEPRECATED(2.0);
-
-      /// \brief Get the dictionary of all model names via a callback.
       ///
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of
       /// models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: boost::shared_ptr<bool> GetModelsNonBlocking(boost::function<
+      public: boost::shared_ptr<bool> GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.

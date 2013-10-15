@@ -81,7 +81,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
   /// Non-blocking call to get all the models in the database.
   this->getModelsCBRef =
-    common::ModelDatabase::Instance()->GetModelsNonBlocking(
+    common::ModelDatabase::Instance()->GetModels(
       boost::bind(&InsertModelWidget::OnModels, this, _1));
 
   // Start a timer to check for the results from the ModelDatabase. We need
