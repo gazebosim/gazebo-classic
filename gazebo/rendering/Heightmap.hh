@@ -191,6 +191,11 @@ namespace gazebo
       public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
                   std::vector<std::vector<float> > &_v);
 
+      /// \brief Get the number of subdivision the terrain will be split
+      /// into.
+      /// \return Number of terrain subdivisions
+      public: unsigned int GetTerrainSubdivisionCount() const;
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.
@@ -238,7 +243,7 @@ namespace gazebo
         const boost::filesystem::path &_terrainDirPath);
 
       /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int numTerrainSubdivisions;
+      private: static const unsigned int numTerrainSubdivisions;
 
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().

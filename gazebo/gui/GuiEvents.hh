@@ -28,7 +28,7 @@ namespace gazebo
     class Events
     {
       /////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the add entity signal
+      /// \brief Connect a boost::slot the add entity signal
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return createEntity.Connect(_subscriber); }

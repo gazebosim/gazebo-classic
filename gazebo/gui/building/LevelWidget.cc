@@ -17,7 +17,7 @@
 
 #include <sstream>
 #include "gazebo/gui/building/LevelWidget.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;

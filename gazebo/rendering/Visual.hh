@@ -215,6 +215,11 @@ namespace gazebo
       /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
 
+      /// \brief Get whether or not the visual is visually highlighted. This is
+      /// most often means that an object is selected by a user via the GUI.
+      /// \return True if the visual is highlighted.
+      public: bool GetHighlighted() const;
+
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);

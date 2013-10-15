@@ -35,7 +35,7 @@ namespace gazebo
     /// \brief Deprecated.
     std::string create_sensor(sdf::ElementPtr _elem,
         const std::string &_worldName,
-        const std::string &_parentName) GAZEBO_DEPRECATED(1.10);
+        const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
 
     /// \brief Create a sensor using SDF.
     /// \param[in] _elem The SDF element that describes the sensor.
