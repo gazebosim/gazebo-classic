@@ -54,8 +54,8 @@ unsigned int SDTS::GetBPP() const
 void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
 {
   GDALRasterBand  *poBand;
-  int nXSize = this->GetWidth();
-  int nYSize = this->GetHeight();
+  int nXSize = this->poDataset->GetRasterXSize();
+  int nYSize = this->poDataset->GetRasterYSize();
   int nBands = poDataset->GetRasterCount();
   std::vector<float*> data_v;
 
@@ -78,30 +78,43 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
   }
 
   // Allocate memory for the array that will contain all the data
-  _count = nXSize * nYSize * 3 * sizeof(unsigned char);
+  _count = this->GetWidth() * this->GetHeight() * this->GetBPP();
   *_data = new unsigned char[_count];
 
   // Fill the array aligning the data
   unsigned char *p = *_data;
-  for (int i = 0; i < nXSize * nYSize; ++i)
+  for (unsigned int i = 0; i < this->GetHeight(); ++i)
   {
-    if (nBands == 1)
+    for (unsigned int j = 0; j < this->GetWidth(); ++j)
     {
-      p[0] = static_cast<unsigned char>(data_v[0][i]);
-      p[1] = p[0];
-      p[2] = p[0];
+      if ((i >= nXSize) || (j >= nYSize))
+      {
+        p[0] = 0;
+        p[1] = 0;
+        p[2] = 0;
+      }
+      else
+      {
+        int index = i * this->poDataset->GetRasterXSize() + j;
+        if (nBands == 1)
+        {
+          p[0] = static_cast<unsigned char>(data_v[0][index]);
+          p[1] = p[0];
+          p[2] = p[0];
+        }
+        else if (nBands == 3)
+        {
+          p[0] = static_cast<unsigned char>(data_v[0][index]);
+          p[1] = static_cast<unsigned char>(data_v[1][index]);
+          p[2] = static_cast<unsigned char>(data_v[2][index]);
+        }
+        else
+        {
+          gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
+        }
+      }
+      p += 3 * sizeof(unsigned char);
     }
-    else if (nBands == 3)
-    {
-      p[0] = static_cast<unsigned char>(data_v[0][i]);
-      p[1] = static_cast<unsigned char>(data_v[1][i]);
-      p[2] = static_cast<unsigned char>(data_v[2][i]);
-    }
-    else
-    {
-      gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
-    }
-    p += 3 * sizeof(unsigned char);
   }
 
   // Release the temporal array containing the data for each band
@@ -114,21 +127,21 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
 //////////////////////////////////////////////////
 unsigned int SDTS::GetHeight() const
 {
-  return this->poDataset->GetRasterYSize();
+  return math::roundUpPowerOfTwo(this->poDataset->GetRasterYSize()) + 1;
 }
 
 //////////////////////////////////////////////////
 Color SDTS::GetMaxColor()
 {
   Color maxClr;
-  GDALRasterBand *poBand;
+  GDALRasterBand *poBand = NULL;
   std::vector<double> max_v;
 
   maxClr.Set(0, 0, 0, 0);
 
   // Read dimension sizes
-  int xsize = this->GetWidth();
-  int ysize = this->GetHeight();
+  int xsize = this->poDataset->GetRasterXSize();
+  int ysize = this->poDataset->GetRasterYSize();
   float *buffer = new float[xsize * ysize];
   int nBands = poDataset->GetRasterCount();
 
@@ -172,5 +185,5 @@ int SDTS::GetPitch() const
 //////////////////////////////////////////////////
 unsigned int SDTS::GetWidth() const
 {
-  return this->poDataset->GetRasterXSize();
+  return math::roundUpPowerOfTwo(this->poDataset->GetRasterXSize()) + 1;
 }

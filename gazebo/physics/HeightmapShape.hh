@@ -150,8 +150,6 @@ namespace gazebo
 
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
-
-      //boost::filesystem::path tmpPath;
     };
     /// \}
   }

@@ -147,7 +147,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread
-  gdal
+  gdal1.7.0
 )
 
 if (NOT APPLE)

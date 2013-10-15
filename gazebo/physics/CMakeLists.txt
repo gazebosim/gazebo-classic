@@ -104,7 +104,7 @@ target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
   gazebo_physics_ode
-  gdal
+  gdal1.7.0
 )
 
 if (HAVE_BULLET)

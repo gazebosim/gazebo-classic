@@ -50,10 +50,6 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
-  std::cout << "HeightmapShape() destructor\n";
-
-  //if (boost::filesystem::is_directory(this->tmpPath))
-  //  boost::filesystem::remove_all(this->tmpPath);
 }
 
 //////////////////////////////////////////////////

@@ -31,7 +31,7 @@ TEST(HelpersTest, Helpers)
   EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
 
   EXPECT_EQ(1, math::roundUpPowerOfTwo(0));
-  EXPECT_EQ(2, math::roundUpPowerOfTwo(1));
-  EXPECT_EQ(4, math::roundUpPowerOfTwo(2));
+  EXPECT_EQ(1, math::roundUpPowerOfTwo(1));
+  EXPECT_EQ(2, math::roundUpPowerOfTwo(2));
   EXPECT_EQ(2048, math::roundUpPowerOfTwo(1025));
 }

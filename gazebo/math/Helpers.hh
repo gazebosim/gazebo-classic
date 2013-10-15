@@ -174,6 +174,9 @@ namespace gazebo
     /// it returns the smallest power of two that is greater than _x
     inline unsigned int roundUpPowerOfTwo(unsigned int _x)
     {
+      if (_x == 0)
+        return 1;
+
       if (isPowerOfTwo(_x))
         return _x;
 
