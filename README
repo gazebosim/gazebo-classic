@@ -22,7 +22,7 @@ Gazebo cmake parameters available at configuring time:
  - ENABLE_TESTS_COMPILATION (bool) [default True]
    Enabled or disable the test suite compilation. 
  - ENABLE_SCREEN_TESTS (bool) [default True]
-   Enable or disable tests that need of screen rendering to properly run.
+   Enable or disable tests that need screen rendering to run properly.
    Headless machines or machines with the screen turned off should set this to
    False 
 
