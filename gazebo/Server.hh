@@ -45,7 +45,7 @@ namespace gazebo
   {
     /// \brief Constructor.
     public: Server();
-    
+
     /// \brief Destructor.
     public: virtual ~Server();
 

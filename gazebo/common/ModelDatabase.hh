@@ -71,7 +71,7 @@ namespace gazebo
       public: std::map<std::string, std::string> GetModels();
 
       /// \brief Get the dictionary of all model names via a callback.
-      /// This is deprecated. Please use GetModelsNonBlocking. 
+      /// This is deprecated. Please use GetModelsNonBlocking.
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of
       /// models.
