@@ -93,6 +93,7 @@ set (gtest_sources
   Animation_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
+  CommonIface_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
   Material_TEST.cc

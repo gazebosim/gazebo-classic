@@ -379,7 +379,7 @@ namespace gazebo
 
       /// \brief Deprecated.
       public: VisualPtr CloneVisual(const std::string &_visualName,
-                  const std::string &_newName) GAZEBO_DEPRECATED(1.10);
+                  const std::string &_newName) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if
@@ -438,6 +438,9 @@ namespace gazebo
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
       public: uint32_t GetVisualCount() const;
+
+      /// \brief Remove all projectors.
+      public: void RemoveProjectors();
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
