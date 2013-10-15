@@ -1913,21 +1913,23 @@ void dxQuickStepper (dxWorldProcessContext *context,
                   {
 
                     // check for negative diagonal
-                    if (MOI_ptr1[si] <= 0)
+                    double m1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+                    if (m1 <= 0)
                     {
                       // yikes, keep diagonal the same
-                      printf("\n***************** si[%d] MOI_ptr1[%g]  *****************\n\n", si, MOI_ptr1[si]);
+                      // printf("\n***************** si[%d] MOI_ptr1[%g]  *****************\n\n", si, MOI_ptr1[si]);
                     }
                     else
-                      MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                      MOI_ptr1[si] = m1;
 
-                    if (MOI_ptr2[si] <= 0)
+                    double m2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
+                    if (m2 <= 0)
                     {
                       // yikes, keep diagonal the same
-                      printf("\n***************** si[%d] MOI_ptr2[%g]  *****************\n\n", si, MOI_ptr2[si]);
+                      // printf("\n***************** si[%d] MOI_ptr2[%g]  *****************\n\n", si, MOI_ptr2[si]);
                     }
                     else
-                      MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+                      MOI_ptr2[si] = m2;
                   }
                   else
                   {
