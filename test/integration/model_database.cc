@@ -64,7 +64,37 @@ TEST_F(ModelDatabaseTest, GetModels)
   g_boolRef1 = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels1, _1));
 
-  while (g_onModels == 0 || g_onModels1 <= 1)
+  while (g_onModels == 0 || g_onModels1 == 0)
+    common::Time::MSleep(500);
+
+  EXPECT_EQ(g_onModels, 1);
+  EXPECT_EQ(g_onModels1, 1);
+}
+
+/////////////////////////////////////////////////
+// Check the the first callback is called once, and the second twice
+TEST_F(ModelDatabaseTest, GetModelsTwice)
+{
+  g_onModels = 0;
+  g_onModels1 = 0;
+
+  Load("worlds/empty.world");
+
+  g_boolRef = common::ModelDatabase::Instance()->GetModels(
+        boost::bind(&OnModels, _1));
+
+  g_boolRef1 = common::ModelDatabase::Instance()->GetModels(
+        boost::bind(&OnModels1, _1));
+
+  while (g_onModels == 0 || g_onModels1 == 0)
+    common::Time::MSleep(500);
+
+  EXPECT_EQ(g_onModels, 1);
+  EXPECT_EQ(g_onModels1, 1);
+
+  common::ModelDatabase::Instance()->GetModels(boost::bind(&OnModels, _1));
+
+  while (g_onModels1 == 1)
     common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
@@ -73,7 +103,7 @@ TEST_F(ModelDatabaseTest, GetModels)
 
 /////////////////////////////////////////////////
 // Check that the second and third callbacks are received three times
-TEST_F(ModelDatabaseTest, GetModelsTriple)
+TEST_F(ModelDatabaseTest, GetModelsThrice)
 {
   g_onModels = 0;
   g_onModels1 = 0;
@@ -94,10 +124,34 @@ TEST_F(ModelDatabaseTest, GetModelsTriple)
     common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
-  EXPECT_EQ(g_onModels1, 3);
-  EXPECT_EQ(g_onModels1, 3);
+  EXPECT_EQ(g_onModels1, 1);
+  EXPECT_EQ(g_onModels2, 1);
+
+  common::ModelDatabase::Instance()->GetModels(
+      boost::bind(&OnModels, _1));
+
+  while (g_onModels1 == 1 || g_onModels2 == 1)
+    common::Time::MSleep(500);
+
+  EXPECT_EQ(g_onModels, 1);
+  EXPECT_EQ(g_onModels1, 2);
+  EXPECT_EQ(g_onModels2, 2);
+
+  // Reset bool reference, so now only g_onModels2 should increment
+  g_boolRef1.reset();
+
+  common::ModelDatabase::Instance()->GetModels(
+      boost::bind(&OnModels, _1));
+
+  while (g_onModels2 == 2)
+    common::Time::MSleep(500);
+
+  EXPECT_EQ(g_onModels, 1);
+  EXPECT_EQ(g_onModels1, 2);
+  EXPECT_EQ(g_onModels2, 3);
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

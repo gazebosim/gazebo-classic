@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,7 +275,9 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
   {
     // Wait for an update request.
     if (!_fetchImmediately)
+    {
       this->updateCacheCondition.wait(lock);
+    }
     else
       _fetchImmediately = false;
 
@@ -288,6 +290,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
       gzerr << "Unable to download model manifests\n";
     else
     {
+      boost::mutex::scoped_lock lock2(this->callbacksMutex);
+
       for (std::list<CallbackFunc>::iterator iter =
           this->deprecatedCallbacks.begin();
           iter != this->deprecatedCallbacks.end(); ++iter)
@@ -298,12 +302,16 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
 
       std::list<std::pair<boost::shared_ptr<bool>, CallbackFunc> >::iterator
         iter = this->callbacks.begin();
-      for (; iter != this->callbacks.end(); ++iter)
+      while (iter != this->callbacks.end())
       {
-        if (!(*iter).first || (*iter).first.use_count() > 1)
+        if (!(*iter).first || (*iter).first.use_count() <= 1)
+          this->callbacks.erase(iter++);
+        else
+        {
           (*iter).second(this->modelCache);
+          ++iter;
+        }
       }
-      this->callbacks.clear();
     }
     this->updateCacheCompleteCondition.notify_all();
   }
@@ -361,6 +369,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 boost::shared_ptr<bool> ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
+  boost::mutex::scoped_lock lock(this->callbacksMutex);
   boost::shared_ptr<bool> refCount(new bool());
   this->callbacks.push_back(std::make_pair(refCount, _func));
   this->updateCacheCondition.notify_one();

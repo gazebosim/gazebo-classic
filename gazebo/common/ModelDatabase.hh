@@ -153,8 +153,11 @@ namespace gazebo
       /// \brief True to stop the background thread
       private: bool stop;
 
-      /// \brief Cache update mutex
+      /// \brief Cache update mutex.
       private: boost::mutex updateMutex;
+
+      /// \brief Protects callback list.
+      private: boost::mutex callbacksMutex;
 
       /// \brief Mutex to protect cache thread status checks.
       private: boost::recursive_mutex startCacheMutex;
