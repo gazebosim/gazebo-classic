@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/HeightmapData.hh"
@@ -149,6 +150,8 @@ namespace gazebo
 
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
+
+      //boost::filesystem::path tmpPath;
     };
     /// \}
   }

@@ -167,6 +167,24 @@ namespace gazebo
       return ((_x != 0) && ((_x & (~_x + 1)) == _x));
     }
 
+    /// \brief Get the smallest power of two that is greater or equal to a given
+    /// value
+    /// \param[in] _x the number
+    /// \return the same value if _x is already a power of two. Otherwise,
+    /// it returns the smallest power of two that is greater than _x
+    inline unsigned int roundUpPowerOfTwo(unsigned int _x)
+    {
+      if (isPowerOfTwo(_x))
+        return _x;
+
+      while (_x & (_x - 1))
+        _x = _x & (_x - 1);
+
+      _x = _x << 1;
+
+      return _x;
+    }
+
     /// \brief parse string into an integer
     /// \param[in] _input the string
     /// \return an integer, 0 or 0 and a message in the error stream

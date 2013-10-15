@@ -32,7 +32,7 @@ namespace gazebo
     class HeightmapData
     {
       /// \brief Destructor
-      public: virtual ~HeightmapData();
+      //public: virtual ~HeightmapData();
 
       /// \brief Get the size of one pixel in bits
       /// \return The BPP of the image

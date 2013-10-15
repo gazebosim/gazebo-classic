@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <gdal/gdalwarper.h>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -49,6 +50,10 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
+  std::cout << "HeightmapShape() destructor\n";
+
+  //if (boost::filesystem::is_directory(this->tmpPath))
+  //  boost::filesystem::remove_all(this->tmpPath);
 }
 
 //////////////////////////////////////////////////
@@ -89,17 +94,69 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   poDataset = reinterpret_cast<GDALDataset *>
       (GDALOpen(filename.c_str(), GA_ReadOnly));
+  std::string fileFormat = poDataset->GetDriver()->GetDescription();
+  std::cout << "Terrain file format: " << fileFormat << std::endl;
+  GDALClose( (GDALDataset *) poDataset );
+
+  // Check if the terrain file is not an image
+  /*if (fileFormat != "JPEG" && fileFormat != "PNG")
+  {
+    // Convert to jpeg
+    const char *pszFormat = "JPEG";
+    GDALDriver *poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if (poDriver == NULL)
+        gzthrow("Driver not supported\n");
+
+    boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
+    boost::filesystem::path aDir = boost::filesystem::unique_path();
+    boost::filesystem::path tmpFile = boost::filesystem::unique_path(
+      "terrain-%%%%%%%%.jpg");
+    boost::filesystem::path tmpPath = tmpDir / aDir / tmpFile;
+    GDALDataset *poDstDS = poDriver->CreateCopy(
+        tmpPath.native().c_str(), poDataset, FALSE, NULL, NULL, NULL);
+    std::cout << "File generated in " << tmpPath.native() << std::endl;
+
+    // Once we're done, close properly the dataset 
+    if(poDstDS != NULL)
+      GDALClose( (GDALDatasetH) poDstDS );
+
+    filename = tmpPath.native().c_str();
+
+    //poDataset = reinterpret_cast<GDALDataset *>
+    //    (GDALOpen("output.jpg", GA_ReadOnly)); 
+  }
+  GDALClose( (GDALDataset *) poDataset );*/
+
+  // Convert to jpeg
+  /*GDALDataset *poDstDS;
+  GDALDriver *poDriver;
+  const char *pszFormat = "JPEG";
+  poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+  if( poDriver == NULL )
+  {
+      gzthrow("Driver not supported\n");
+  }
+
+  poDstDS = poDriver->CreateCopy( "output.jpg", poDataset, FALSE, NULL, NULL, NULL );
+*/
+  /* Once we're done, close properly the dataset */
+  //if( poDstDS != NULL )
+  //  GDALClose( (GDALDatasetH) poDstDS );
+
+  //poDataset = reinterpret_cast<GDALDataset *>
+  //    (GDALOpen("output.jpg", GA_ReadOnly));
 
   // Check if the heightmap file is an image
-  std::string fileFormat = poDataset->GetDriver()->GetDescription();
   if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
     // Load the terrain file as an image
     this->img.Load(filename);
+    //this->img.Rescale(65, 65);
     this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
   }
   else
   {
+    std::cout << "SDTS\n";
     // Load the terrain file as a SDTS
     sdts = new common::SDTS(filename);
     this->heightmapData = static_cast<common::HeightmapData*>(this->sdts);
