@@ -80,8 +80,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->addTopLevelItem(this->modelDatabaseItem);
 
   /// Non-blocking call to get all the models in the database.
-  this->getModelsCBRef =
-    common::ModelDatabase::Instance()->GetModels(
+  this->getModelsConnection = common::ModelDatabase::Instance()->GetModels(
       boost::bind(&InsertModelWidget::OnModels, this, _1));
 
   // Start a timer to check for the results from the ModelDatabase. We need
@@ -137,7 +136,7 @@ void InsertModelWidget::OnModels(
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->modelBuffer = _models;
-  this->getModelsCBRef.reset();
+  this->getModelsConnection.reset();
 }
 
 /////////////////////////////////////////////////

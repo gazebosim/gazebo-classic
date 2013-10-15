@@ -187,6 +187,11 @@ namespace gazebo
 
       /// \brief Singleton implementation
       private: friend class SingletonT<ModelDatabase>;
+
+      /// \brief Triggered when the model data has been updated after
+      /// calling ModelDatabase::GetModels()
+      private: static EventT<
+              void (std::map<std::string, std::string>)> modelDBUpdated;
     };
   }
 }
