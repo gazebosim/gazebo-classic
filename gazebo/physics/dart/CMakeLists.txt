@@ -1,13 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${DART_INCLUDE_DIRS}
-                    "${DART_INCLUDE_DIRS}/collision/bullet"
-                    ${FCL_INCLUDEDIR}
-                    ${ASSIMP_INCLUDEDIR})
+include_directories(${DART_INCLUDE_DIRS})
 
-link_directories(${DART_LIBRARY_DIRS}
-                 ${FCL_LIBRARY_DIRS}
-                 ${ASSIMP_LIBRARY_DIRS})
+link_directories(${DART_LIBRARY_DIRS})
 
 add_definitions(${DART_DEFINITIONS})
 
@@ -61,7 +56,7 @@ gz_build_tests(${gtest_sources})
 gz_add_library(gazebo_physics_dart ${headers} ${sources})
 
 # these flags should probably go into dart.pc
-target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -lfcl -lassimp)
+target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES})
 
 gz_install_library(gazebo_physics_dart)
 
