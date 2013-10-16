@@ -28,6 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/World.hh"
 
 namespace boost
 {
