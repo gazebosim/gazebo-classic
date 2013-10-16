@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <gazebo/physics/World.hh>
 #include <gazebo/gazebo.hh>
 
 namespace gazebo
