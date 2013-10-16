@@ -76,7 +76,7 @@ void Server::PrintUsage()
 /////////////////////////////////////////////////
 bool Server::ParseArgs(int _argc, char **_argv)
 {
-  // save a copy of argc and argv for consumption by system plugins
+  // Save a copy of argc and argv for consumption by system plugins
   this->systemPluginsArgc = _argc;
   this->systemPluginsArgv = new char*[_argc];
   for (int i = 0; i < _argc; ++i)
