@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const unsigned int Heightmap::numTerrainSubdivisions = 16;
 const double Heightmap::loadRadiusFactor = 1.0;
 const double Heightmap::holdRadiusFactor = 1.15;
@@ -319,7 +318,6 @@ void Heightmap::Load()
 
     this->useTerrainPaging = false;
 
-#if GAZEBO_MAJOR_VERSION >= 3
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap
@@ -338,7 +336,6 @@ void Heightmap::Load()
             "General");
       }
     }
-#endif
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))

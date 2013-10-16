@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1245,6 +1245,16 @@ void Visual::SetHighlighted(bool _highlighted)
 }
 
 //////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -1558,6 +1568,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }

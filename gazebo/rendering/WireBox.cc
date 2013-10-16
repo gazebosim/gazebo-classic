@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,4 +102,10 @@ void WireBox::Init(const math::Box &_box)
 void WireBox::SetVisible(bool _visible)
 {
   this->lines->setVisible(_visible);
+}
+
+/////////////////////////////////////////////////
+bool WireBox::GetVisible() const
+{
+  return this->lines->isVisible();
 }
