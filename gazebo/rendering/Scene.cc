@@ -1444,6 +1444,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     this->visualMsgs.push_back(vm);
   }
 
+  // Set the scale of the model visual
   if (_msg.has_scale())
   {
     // update scale using a visual msg
