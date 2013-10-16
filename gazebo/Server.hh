@@ -125,9 +125,6 @@ namespace gazebo
     /// \brief Pointer to the master.
     private: Master *master;
 
-    /// \brief Thread in which the master runs.
-    private: boost::thread *masterThread;
-
     /// \brief Communication node.
     private: transport::NodePtr node;
 
