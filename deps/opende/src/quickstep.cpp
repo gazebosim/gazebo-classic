@@ -1814,8 +1814,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
               printf("MOI2 b2[%d] S[%f %f %f] = %g\n",b2, S[0], S[1], S[2], moi_S2);
 #endif
 
-              // memcpy (MOI_ptr2, MOI_S2, 12 * sizeof(dReal));
-
               // dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
               // dMultiply0_333 (invMOI_ptr2,RJ1a,tmp33);
 
@@ -1824,13 +1822,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // full MOI tensor for S needs matrix outer product of S:
               //   SS = [ S * S' ]
-#if 0
+#if 1
+              // or update off-diagonal terms
               dMatrix3 SS = {
                    S[0]*S[0], S[0]*S[1], S[0]*S[2], 0,
                    S[1]*S[0], S[1]*S[1], S[1]*S[2], 0,
                    S[2]*S[0], S[2]*S[1], S[2]*S[2], 0};
 #else
-              // memcpy (MOI_ptr1, MOI_S1, 12 * sizeof(dReal));
+              // option to perserve off-diagonal terms
               dMatrix3 SS = {
                      S[0]*S[0], 0*S[0]*S[1], 0*S[0]*S[2], 0,
                    0*S[1]*S[0],   S[1]*S[1], 0*S[1]*S[2], 0,
@@ -1901,40 +1900,64 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 printf(" original    S1 [%g] S2 [%g]\n", moi_S1, moi_S2);
                 printf(" distributed S1 [%g] S2 [%g]\n", moi_S1_new, moi_S2_new);
 #endif
-                // Modify MOI by adding delta scalar MOI in tensor form.
+                // sum off-diagonals terms (to check diagonal dominantness)
+                dReal sumAbsOffDiags1[4];
+                dReal sumAbsOffDiags2[4];
+                dSetZero(sumAbsOffDiags1,4);
+                dSetZero(sumAbsOffDiags2,4);
                 for (int si = 0; si < 12; ++si)
                 {
-                  if (si % 4 == 3) //  unused term
+                  int col = si%4;
+                  int row = si/4;
+                  if (col == 3) //  unused term
                   {
                     MOI_ptr1[si] = 0;
                     MOI_ptr2[si] = 0;
                   }
-                  else if (si / 4 == si % 4)  // diagonal term
+                  if (!(row == col))  // off-diagonal terms
+                  {
+                    // either we preserve off-diagonal terms
+                    // tmpDiag1[row] += MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+                    // tmpDiag2[row] += MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
+
+                    // or update off-diagonal terms
+                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
+                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
+                    sumAbsOffDiags1[row] += dFabs(MOI_ptr1[si]);
+                    sumAbsOffDiags2[row] += dFabs(MOI_ptr2[si]);
+                  }
+                }
+
+                // Modify MOI by adding delta scalar MOI in tensor form.
+                for (int si = 0; si < 12; ++si)
+                {
+                  int col = si%4;
+                  int row = si/4;
+                  if (row == col)  // diagonal term
                   {
 
                     // check for negative diagonal
                     double m1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
-                    if (m1 <= 0)
+                    if (m1 > sumAbsOffDiags1[row])
+                      MOI_ptr1[si] = m1;
+                    else
                     {
-                      // yikes, keep diagonal the same
+                      /// \FIXME: increase diagonal dominantness to preserve stability,
+                      /// but this makes constraint "soft"
+                      MOI_ptr1[si] = sumAbsOffDiags1[row];
                       // printf("\n***************** si[%d] MOI_ptr1[%g]  *****************\n\n", si, MOI_ptr1[si]);
                     }
-                    else
-                      MOI_ptr1[si] = m1;
 
                     double m2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
-                    if (m2 <= 0)
+                    if (m2 > sumAbsOffDiags2[row])
+                      MOI_ptr2[si] = m2;
+                    else
                     {
-                      // yikes, keep diagonal the same
+                      /// \FIXME: increase diagonal dominantness to preserve stability,
+                      /// but this makes constraint "soft"
+                      MOI_ptr2[si] = sumAbsOffDiags2[row];
                       // printf("\n***************** si[%d] MOI_ptr2[%g]  *****************\n\n", si, MOI_ptr2[si]);
                     }
-                    else
-                      MOI_ptr2[si] = m2;
-                  }
-                  else
-                  {
-                    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
-                    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
                   }
                 }
 
