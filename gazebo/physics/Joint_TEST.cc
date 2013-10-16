@@ -918,6 +918,7 @@ TEST_P(Joint_TEST, JointCreationDestructionTest)
   JointCreationDestructionTest(this->physicsEngine);
 }
 
+//////////////////////////////////////////////////
 void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
 {
   // Load our inertial test world
