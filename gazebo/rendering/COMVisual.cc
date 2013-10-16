@@ -73,7 +73,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   double Iyy = _msg->inertial().iyy();
   double Izz = _msg->inertial().izz();
   math::Vector3 boxScale;
-  if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
+  if (mass < 0 || Ixx < 0 || Iyy < 0 || Izz < 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
     // Unrealistic inertia, load with default scale
