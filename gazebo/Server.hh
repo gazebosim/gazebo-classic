@@ -119,6 +119,12 @@ namespace gazebo
     /// \brief Handle all control messages.
     private: void ProcessControlMsgs();
 
+    /// \brief Save argc for access by system plugins.
+    public: int systemPluginsArgc;
+
+    /// \brief Save argv for access by system plugins.
+    public: char **systemPluginsArgv;
+
     /// \brief Boolean used to stop the server.
     private: static bool stop;
 
@@ -145,12 +151,6 @@ namespace gazebo
 
     /// \brief Boost program options variable map.
     private: boost::program_options::variables_map vm;
-
-    /// \brief Save argc for access by system plugins.
-    public: int systemPluginsArgc;
-
-    /// \brief Save argv for access by system plugins.
-    public: char **systemPluginsArgv;
   };
 }
 
