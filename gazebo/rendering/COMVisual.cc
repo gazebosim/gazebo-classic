@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,11 +73,11 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   double Iyy = _msg->inertial().iyy();
   double Izz = _msg->inertial().izz();
   math::Vector3 boxScale;
-  if (mass <= 0 || Ixx <= 0 || Iyy <= 0 || Izz <= 0 ||
+  if (mass < 0 || Ixx < 0 || Iyy < 0 || Izz < 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
     // Unrealistic inertia, load with default scale
-    gzerr << "The link " << _msg->name() << " has unrealistic inertia, "
+    gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
           << "unable to visualize box of equivalent inertia." << std::endl;
     this->Load(math::Pose(xyz, q));
   }
