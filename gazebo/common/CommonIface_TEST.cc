@@ -17,6 +17,8 @@
 
 #include <stdlib.h>
 #include <gtest/gtest.h>
+#include <string>
+#include <sstream>
 
 #include "gazebo/common/CommonIface.hh"
 
@@ -54,6 +56,15 @@ TEST(CommonIface_TEST, GetSHA1)
   computedSHA1 = common::get_sha1<std::string>(s);
   precomputedSHA1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
   EXPECT_EQ(precomputedSHA1, computedSHA1);
+
+  // Compute a bunch of SHA1's to verify consistent length
+  for (unsigned i = 0; i < 100; ++i)
+  {
+    std::stringstream stream;
+    stream << i << '\n';
+    std::string sha = common::get_sha1<std::string>(stream.str());
+    EXPECT_EQ(sha.length(), 40u);
+  }
 }
 
 /////////////////////////////////////////////////
