@@ -85,11 +85,13 @@ namespace gazebo
     }
 
     sha1.get_digest(hash);
-    stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
 
     for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
     {
-      stream << hash[i];
+      stream << std::setfill('0')
+             << std::setw(sizeof(hash[0]) * 2)
+             << std::hex
+             << hash[i];
     }
 
     return stream.str();
