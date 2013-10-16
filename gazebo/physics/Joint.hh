@@ -412,7 +412,7 @@ namespace gazebo
       /// \brief Set joint stop stiffness
       /// \param[in] _index joint axis index
       /// \param[in] _stiffness joint stop stiffness coefficient
-      public: void SetStopStiffness(int _index, double _stiffness);
+      public: void SetStopStiffness(unsigned int _index, double _stiffness);
 
       /// \brief Set joint stop dissipation
       /// \param[in] _index joint axis index

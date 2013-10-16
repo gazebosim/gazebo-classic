@@ -689,7 +689,7 @@ void Joint::SetProvideFeedback(bool _enable)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetStopStiffness(int _index, double _stiffness)
+void Joint::SetStopStiffness(unsigned int _index, double _stiffness)
 {
   if (_index < this->GetAngleCount())
   {
