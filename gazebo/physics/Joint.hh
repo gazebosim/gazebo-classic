@@ -409,25 +409,25 @@ namespace gazebo
       /// \return viscous joint damping coefficient
       public: double GetDampingCoefficient() const;
 
-      /// \brief Set joint stop stiffness
-      /// \param[in] _index joint axis index
-      /// \param[in] _stiffness joint stop stiffness coefficient
+      /// \brief Set joint stop stiffness.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _stiffness joint stop stiffness coefficient.
       public: void SetStopStiffness(unsigned int _index, double _stiffness);
 
-      /// \brief Set joint stop dissipation
-      /// \param[in] _index joint axis index
-      /// \param[in] _dissipation joint stop dissipation coefficient
-      public: void SetStopDissipation(int _index, double _dissipation);
+      /// \brief Set joint stop dissipation.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _dissipation joint stop dissipation coefficient.
+      public: void SetStopDissipation(unsigned int _index, double _dissipation);
 
-      /// \brief Get joint stop stiffness
-      /// \param[in] _index joint axis index
-      /// \return joint stop stiffness coefficient
-      public: double GetStopStiffness(int _index);
+      /// \brief Get joint stop stiffness.
+      /// \param[in] _index joint axis index.
+      /// \return joint stop stiffness coefficient.
+      public: double GetStopStiffness(unsigned int _index);
 
-      /// \brief Get joint stop dissipation
-      /// \param[in] _index joint axis index
-      /// \return joint stop dissipation coefficient
-      public: double GetStopDissipation(int _index);
+      /// \brief Get joint stop dissipation.
+      /// \param[in] _index joint axis index.
+      /// \return joint stop dissipation coefficient.
+      public: double GetStopDissipation(unsigned int _index);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.

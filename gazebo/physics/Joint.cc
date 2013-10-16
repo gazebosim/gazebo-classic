@@ -703,7 +703,7 @@ void Joint::SetStopStiffness(unsigned int _index, double _stiffness)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetStopDissipation(int _index, double _dissipation)
+void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 {
   if (_index < this->GetAngleCount())
   {
@@ -717,7 +717,7 @@ void Joint::SetStopDissipation(int _index, double _dissipation)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopStiffness(int _index)
+double Joint::GetStopStiffness(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
   {
@@ -732,7 +732,7 @@ double Joint::GetStopStiffness(int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopDissipation(int _index)
+double Joint::GetStopDissipation(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
   {
