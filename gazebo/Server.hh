@@ -147,10 +147,10 @@ namespace gazebo
     private: boost::program_options::variables_map vm;
 
     /// \brief Save argc for access by system plugins.
-    public: int systemPluginsArgc;
+    private: int systemPluginsArgc;
 
     /// \brief Save argv for access by system plugins.
-    public: char **systemPluginsArgv;
+    private: char **systemPluginsArgv;
   };
 }
 
