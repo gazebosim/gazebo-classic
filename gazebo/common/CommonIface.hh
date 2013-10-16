@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,11 +85,13 @@ namespace gazebo
     }
 
     sha1.get_digest(hash);
-    stream << std::setfill('0') << std::setw(sizeof(hash[0]) * 2) << std::hex;
 
     for (std::size_t i = 0; i < sizeof(hash) / sizeof(hash[0]); ++i)
     {
-      stream << hash[i];
+      stream << std::setfill('0')
+             << std::setw(sizeof(hash[0]) * 2)
+             << std::hex
+             << hash[i];
     }
 
     return stream.str();
