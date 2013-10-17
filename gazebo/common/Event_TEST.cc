@@ -142,7 +142,7 @@ TEST(EventTest, MultiCallbackReconnect)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, Stress)
+TEST(EventTest, ManyChanges)
 {
   g_callback = 0;
   g_callback1 = 0;

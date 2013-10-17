@@ -20,6 +20,8 @@
 
 #include <boost/function.hpp>
 #include <boost/thread/mutex.hpp>
+#include <map>
+#include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Time.hh"

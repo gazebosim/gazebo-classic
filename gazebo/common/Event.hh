@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
