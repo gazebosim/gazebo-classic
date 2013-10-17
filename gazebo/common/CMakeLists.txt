@@ -56,6 +56,7 @@ set (headers
   Console.hh
   Event.hh
   Events.hh
+  EventPrivate.hh
   Exception.hh
   Image.hh
   KeyEvent.hh
