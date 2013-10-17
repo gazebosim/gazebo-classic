@@ -1045,10 +1045,10 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   }
 }
 
-//TEST_P(PhysicsTest, RevoluteJoint)
-//{
-//  RevoluteJoint(GetParam());
-//}
+TEST_P(PhysicsTest, RevoluteJoint)
+{
+  RevoluteJoint(GetParam());
+}
 
 /// \TODO: Redo state test
 // TEST_F(PhysicsTest, State)
@@ -1156,13 +1156,18 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     EXPECT_EQ(vel.x, 0.0);
 
-#ifdef HAVE_DART
-    EXPECT_NEAR(vel.y, -10.2009, 0.012);
-    EXPECT_NEAR(vel.z, -6.51755, 0.012);
-#else
-    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
-    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
-#endif
+    if (_physicsEngine == "dart")
+    {
+      // DART needs greater tolerance. The reason is not sure yet.
+      // Please see issue #904
+      EXPECT_NEAR(vel.y, -10.2009, 0.012);
+      EXPECT_NEAR(vel.z, -6.51755, 0.012);
+    }
+    else
+    {
+      EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+      EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
+    }
 
     EXPECT_DOUBLE_EQ(pose.pos.x, 3.0);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
@@ -1236,17 +1241,17 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.0101);  // sometimes -0.01, why?
-#ifdef HAVE_DART
-            // DART needs more tolerance until supports 'correction for
-            // penetration' feature.
-            // See: https://github.com/dartsim/dart/issues/100
-            //
-            // DART now supports the above feature but need time to reduce the
-            // penetration.
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
-#else
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
-#endif
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+            }
+            else
+            {
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            }
           }
         }
 
@@ -1267,19 +1272,19 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
           else
           {
-#ifdef HAVE_DART
-            // DART needs more tolerance until supports 'correction for
-            // penetration' feature.
-            // See: https://github.com/dartsim/dart/issues/100
-            //
-            // DART now supports the above feature but need time to reduce the
-            // penetration.
-            EXPECT_LT(fabs(vel.z), 0.015);
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
-#else
-            EXPECT_LT(fabs(vel.z), 3e-5);
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
-#endif
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(vel.z), 0.015);
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+            }
+            else
+            {
+              EXPECT_LT(fabs(vel.z), 3e-5);
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            }
           }
         }
 
@@ -1301,17 +1306,17 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.011);
-#ifdef HAVE_DART
-            // DART needs more tolerance until supports 'correction for
-            // penetration' feature.
-            // See: https://github.com/dartsim/dart/issues/100
-            //
-            // DART now supports the above feature but need time to reduce the
-            // penetration.
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0041);
-#else
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
-#endif
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0041);
+            }
+            else
+            {
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
+            }
           }
         }
       }
@@ -1606,8 +1611,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 
 TEST_P(PhysicsTest, SimplePendulum)
 {
-  if (GetParam() == "dart")
-    SimplePendulum(GetParam());
+  SimplePendulum(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

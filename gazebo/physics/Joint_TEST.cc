@@ -235,7 +235,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
     EXPECT_NEAR(wrench_01.body2Force.y,  1000.0, 10.0);
     if (_physicsEngine == "dart")
     {
-      // DART need greater tolerance due to joint limit violation
+      // DART needs greater tolerance due to joint limit violation
       // Please see issue #902
       EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  8.6);
     }
@@ -267,7 +267,7 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
     EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
     if (_physicsEngine == "dart")
     {
-      // DART need greater tolerance due to joint limit violation
+      // DART needs greater tolerance due to joint limit violation
       // Please see issue #902
       EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  4.3);
     }
