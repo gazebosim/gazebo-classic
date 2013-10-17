@@ -96,9 +96,13 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
-  MainWindow_TEST.cc
   TimePanel_TEST.cc
 )
+
+# MainWindow is using screen rendering
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
+endif()
 
 # Generate executables for each of the QT unit tests
 gz_build_qt_tests(${qt_tests})
