@@ -126,13 +126,22 @@ void DARTModel::Init()
     {
       for (size_t j = i + 1; j < linkList.size(); ++j)
       {
+        dart::dynamics::BodyNode* itdtBodyNode1 =
+            boost::shared_dynamic_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+        dart::dynamics::BodyNode* itdtBodyNode2 =
+            boost::shared_dynamic_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
+
+        // If this->dtBodyNode and itdtBodyNode are connected then don't enable
+        // the pair.
+        // Please see: https://bitbucket.org/osrf/gazebo/issue/899
+        if ((itdtBodyNode1->getParentBodyNode() == itdtBodyNode2) ||
+            itdtBodyNode2->getParentBodyNode() == itdtBodyNode1)
+        {
+          dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
+        }
+
         if (!linkList[i]->GetSelfCollide() || !linkList[j]->GetSelfCollide())
         {
-          dart::dynamics::BodyNode* itdtBodyNode1 =
-              boost::shared_dynamic_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
-          dart::dynamics::BodyNode* itdtBodyNode2 =
-              boost::shared_dynamic_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
-
           dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
         }
       }

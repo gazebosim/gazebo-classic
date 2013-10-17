@@ -355,10 +355,7 @@ void DARTLink::SetSelfCollide(bool _collide)
           // Please see: https://bitbucket.org/osrf/gazebo/issue/899
           if ((this->dtBodyNode->getParentBodyNode() == itdtBodyNode) ||
               itdtBodyNode->getParentBodyNode() == this->dtBodyNode)
-          {
-            std::cout << "here\n";
             continue;
-          }
 
           dtCollDet->enablePair(this->dtBodyNode, itdtBodyNode);
         }
@@ -376,15 +373,20 @@ void DARTLink::SetSelfCollide(bool _collide)
       {
         for (size_t j = i + 1; j < links.size(); ++j)
         {
-          if (!links[i]->GetSelfCollide() || !links[j]->GetSelfCollide())
-          {
-            dart::dynamics::BodyNode* itdtBodyNode1 =
-                boost::shared_dynamic_cast<DARTLink>(links[i])->GetDARTBodyNode();
-            dart::dynamics::BodyNode* itdtBodyNode2 =
-                boost::shared_dynamic_cast<DARTLink>(links[j])->GetDARTBodyNode();
+          dart::dynamics::BodyNode* itdtBodyNode1 =
+              boost::shared_dynamic_cast<DARTLink>(links[i])->GetDARTBodyNode();
+          dart::dynamics::BodyNode* itdtBodyNode2 =
+              boost::shared_dynamic_cast<DARTLink>(links[j])->GetDARTBodyNode();
 
+          // If this->dtBodyNode and itdtBodyNode are connected then don't enable
+          // the pair.
+          // Please see: https://bitbucket.org/osrf/gazebo/issue/899
+          if ((itdtBodyNode1->getParentBodyNode() == itdtBodyNode2) ||
+              itdtBodyNode2->getParentBodyNode() == itdtBodyNode1)
             dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
-          }
+
+          if (!links[i]->GetSelfCollide() || !links[j]->GetSelfCollide())
+            dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
         }
       }
     }
