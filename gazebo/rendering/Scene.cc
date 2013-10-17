@@ -1675,15 +1675,6 @@ void Scene::PreRender()
       ++visualIter;
   }
 
-  // Process the link messages.
-  for (linkIter = linkMsgsCopy.begin(); linkIter != linkMsgsCopy.end();)
-  {
-    if (this->ProcessLinkMsg(*linkIter))
-      linkMsgsCopy.erase(linkIter++);
-    else
-      ++linkIter;
-  }
-
   // Process the joint messages.
   for (jointIter = jointMsgsCopy.begin(); jointIter != jointMsgsCopy.end();)
   {
@@ -1691,6 +1682,15 @@ void Scene::PreRender()
       jointMsgsCopy.erase(jointIter++);
     else
       ++jointIter;
+  }
+
+  // Process the link messages.
+  for (linkIter = linkMsgsCopy.begin(); linkIter != linkMsgsCopy.end();)
+  {
+    if (this->ProcessLinkMsg(*linkIter))
+      linkMsgsCopy.erase(linkIter++);
+    else
+      ++linkIter;
   }
 
   // Process the request messages
