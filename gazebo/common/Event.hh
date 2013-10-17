@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Constructor
       public: Event();
 
-      /// \brief Constructor
+      /// \brief Destructor
       public: virtual ~Event();
 
       /// \brief Disconnect
