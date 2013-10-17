@@ -33,6 +33,7 @@ class PhysicsTest : public ServerFixture,
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void DoublePendulumHighRatio(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
@@ -1562,6 +1563,108 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 TEST_P(PhysicsTest, SimplePendulum)
 {
   SimplePendulum(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// DoublePendulumHighRatio:
+// Test upper bounds of linear constraint error against
+// pre-recorded error values for a double pendulum model with
+// large inertia ratio across constrained directions of a hinge joint.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::DoublePendulumHighRatio(const std::string &_physicsEngine)
+{
+  Load("worlds/simple_pendulums_high_ratio.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  int i = 0;
+  while (!this->HasEntity("model_1") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model_1");
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model = world->GetModel("double_pendulum_with_base");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link1 = model->GetLink("upper_link");
+  EXPECT_TRUE(link1);
+  physics::LinkPtr link2 = model->GetLink("lower_link");
+  EXPECT_TRUE(link2);
+
+  physicsEngine->SetMaxStepSize(0.001);
+  physicsEngine->SetSORPGSIters(50);
+
+  double maxErrorX = 0;
+  double maxErrorY = 0;
+  double maxErrorZ = 0;
+  {
+    // test link2 drift from joint location
+    int steps = 2000;  // @todo: make this more general
+    for (int i = 0; i < steps; i ++)
+    {
+      world->StepWorld(1);
+      {
+         math::Pose pose1 = link1->GetWorldPose();
+         math::Pose pose2 = link2->GetWorldPose();
+         // in link1 frame
+         math::Pose pose12 = pose2 - pose1;
+         // track error, max error against link offset,
+         // expected value (0.25, 0, 1.0)
+         double errorX = pose12.pos.x - 0.25;
+         double errorY = pose12.pos.y - 0.0;
+         double errorZ = pose12.pos.z - 1.0;
+         if (fabs(errorX) > fabs(maxErrorX))
+           maxErrorX = errorX;
+         if (fabs(errorY) > fabs(maxErrorY))
+           maxErrorY = errorY;
+         if (fabs(errorZ) > fabs(maxErrorZ))
+           maxErrorZ = errorZ;
+         // check to see that the hinge location of link2
+         // stays consistent in link1 reference frame
+         // as pendulum swings.
+         if (_physicsEngine == "ode")
+         {
+           // recorded data from test run
+           EXPECT_LE(fabs(errorX), 0.00517);
+           EXPECT_LE(fabs(errorY), 0.00054);
+           EXPECT_LE(fabs(errorZ), 0.00095);
+         }
+         else if (_physicsEngine == "bullet")
+         {
+           // recorded data from test run
+           EXPECT_LE(fabs(errorX), 0.12315);
+           EXPECT_LE(fabs(errorY), 0.00731);
+           EXPECT_LE(fabs(errorZ), 0.00115);
+         }
+         else if (_physicsEngine == "simbody")
+         {
+           // should have no error
+           EXPECT_LE(fabs(errorX), 4.5e-16);
+           EXPECT_LE(fabs(errorY), 3.7e-6);
+           EXPECT_LE(fabs(errorZ), 6.8e-12);
+         }
+      }
+    }
+    gzlog << "DoublePendulumHighRatio test results. "
+          << "Max Error: [" << maxErrorX
+          << ", " << maxErrorY
+          << ", " << maxErrorZ
+          << "]\n";
+  }
+}
+
+TEST_P(PhysicsTest, DoublePendulumHighRatio)
+{
+  DoublePendulumHighRatio(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
