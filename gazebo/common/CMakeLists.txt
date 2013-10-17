@@ -23,6 +23,7 @@ set (sources
   Console.cc
   Event.cc
   Events.cc
+  EventPrivate.cc
   Exception.cc
   Image.cc
   KeyFrame.cc
@@ -96,6 +97,7 @@ set (gtest_sources
   CommonIface_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
+  Event_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc

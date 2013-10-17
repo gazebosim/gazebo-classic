@@ -18,17 +18,19 @@
 #ifndef _EVENT_HH_
 #define _EVENT_HH_
 
-#include <gazebo/gazebo_config.h>
-#include <gazebo/common/Time.hh>
-#include <gazebo/common/CommonTypes.hh>
+#include <iostream>
+#include <vector>
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <iostream>
-#include <vector>
+#include <gazebo/gazebo_config.h>
+#include <gazebo/common/Time.hh>
+#include <gazebo/common/CommonTypes.hh>
+#include <gazebo/math/Helpers.hh>
+#include <gazebo/common/EventPrivate.hh>
 
 namespace gazebo
 {
@@ -44,7 +46,10 @@ namespace gazebo
     class Event
     {
       /// \brief Constructor
-      public: virtual ~Event() {}
+      public: Event();
+
+      /// \brief Constructor
+      public: virtual ~Event();
 
       /// \brief Disconnect
       /// \param[in] _c A pointer to a connection
@@ -53,13 +58,23 @@ namespace gazebo
       /// \brief Disconnect
       /// \param[in] _id Integer ID of a connection
       public: virtual void Disconnect(int _id) = 0;
+
+      /// \brief Get whether this event has been signaled.
+      /// \return True if the event has been signaled.
+      public: bool GetSignaled() const;
+
+      /// \brief Allow subclass to initialize their own data pointer.
+      protected: Event(EventPrivate &_d);
+
+      /// \brief Data pointer
+      protected: EventPrivate *dataPtr;
     };
 
     /// \brief A class that encapsulates a connection
     class Connection
     {
       /// \brief Constructor
-      public: Connection() :event(NULL), id(-1) {}
+      public: Connection();
 
       /// \brief Constructor
       /// \param[in] _e Event pointer to connect with
@@ -73,18 +88,10 @@ namespace gazebo
       /// \return The id of this connection
       public: int GetId() const;
 
-      /// \brief the event for this connection
-      private: Event *event;
+      /// \brief Private data pointer.
+      private: ConnectionPrivate *dataPtr;
 
-      /// \brief the id set in the constructor
-      private: int id;
-
-      /// \brief not used. set to 0
-      private: static int counter;
-
-      /// \brief set during the constructor
-      private: common::Time creationTime;
-
+      /// \brief Friend class
       public: template<typename T> friend class EventT;
     };
 
@@ -93,6 +100,13 @@ namespace gazebo
     template< typename T>
     class EventT : public Event
     {
+      /// \def EvtConnectionMap
+      /// \brief Event Connection map typedef.
+      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
+
+      /// \brief Constructor.
+      public: EventT();
+
       /// \brief Destructor
       public: virtual ~EventT();
 
@@ -121,9 +135,13 @@ namespace gazebo
       /// \brief Signal the event for all subscribers
       public: void Signal()
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])();
+                  (*iter->second)();
                 }
               }
 
@@ -259,9 +277,13 @@ namespace gazebo
       public: template< typename P >
               void Signal(const P &_p)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p);
+                  (*iter->second)(_p);
                 }
               }
 
@@ -271,9 +293,13 @@ namespace gazebo
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2);
+                  (*iter->second)(_p1, _p2);
                 }
               }
 
@@ -284,9 +310,13 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                      iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3);
+                  (*iter->second)(_p1, _p2, _p3);
                 }
               }
 
@@ -299,9 +329,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                        iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3, _p4);
+                  (*iter->second)(_p1, _p2, _p3, _p4);
                 }
               }
 
@@ -316,9 +350,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                          iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5);
                 }
               }
 
@@ -335,9 +373,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6);
                 }
               }
 
@@ -354,9 +396,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
                 }
               }
 
@@ -374,12 +420,16 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
-           {
-             for (unsigned int i = 0; i < connections.size(); i++)
-             {
-               (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
-             }
-           }
+              {
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
+                {
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+                }
+              }
 
       /// \brief Signal the event with nine parameter
       /// \param[in] _p1 the first parameter
@@ -398,9 +448,13 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
           {
-            for (unsigned int i = 0; i < connections.size(); i++)
+            this->myDataPtr->signaled = true;
+            this->Cleanup();
+            for (typename EvtConnectionMap::iterator iter =
+                this->myDataPtr->connections.begin();
+                iter != this->myDataPtr->connections.end(); ++iter)
             {
-          (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+              (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
             }
           }
 
@@ -422,31 +476,44 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9, const P10 &_p10)
               {
-                for (unsigned int i = 0; i < connections.size(); i++)
+                this->myDataPtr->signaled = true;
+                this->Cleanup();
+                for (typename EvtConnectionMap::iterator iter =
+                    this->myDataPtr->connections.begin();
+                    iter != this->myDataPtr->connections.end(); ++iter)
                 {
-                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5,
+                  (*iter->second)(_p1, _p2, _p3, _p4, _p5,
                       _p6, _p7, _p8, _p9, _p10);
                 }
               }
 
-      /// \brief array of connection callbacks
-      private: std::vector<boost::function<T> *> connections;
+      /// \brief Cleanup disconnected connections.
+      private: void Cleanup();
 
-      /// \brief array of connection indexes
-      private: std::vector<int> connectionIds;
-
-      /// \brief a thread lock
-      private: boost::mutex lock;
+      /// \brief Private data pointer.
+      private: EventTPrivate<T> *myDataPtr;
     };
+
+    /// \brief Constructor
+    template<typename T>
+    EventT<T>::EventT()
+    : Event(*(new EventTPrivate<T>()))
+    {
+      this->myDataPtr = static_cast<EventTPrivate<T>*>(this->dataPtr);
+    }
 
     /// \brief Destructor. Deletes all the associated connections.
     template<typename T>
     EventT<T>::~EventT()
     {
-      for (unsigned int i = 0; i < this->connections.size(); i++)
-        delete this->connections[i];
-      this->connections.clear();
-      this->connectionIds.clear();
+      for (typename EvtConnectionMap::iterator iter =
+          this->myDataPtr->connections.begin();
+          iter != this->myDataPtr->connections.end(); ++iter)
+      {
+        delete iter->second;
+      }
+
+      this->myDataPtr->connections.clear();
     }
 
     /// \brief Adds a connection
@@ -454,9 +521,14 @@ namespace gazebo
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
-      int index = this->connections.size();
-      this->connections.push_back(new boost::function<T>(_subscriber));
-      this->connectionIds.push_back(index);
+      int index = 0;
+      if (!this->myDataPtr->connections.empty())
+      {
+        typename EvtConnectionMap::reverse_iterator iter =
+          this->myDataPtr->connections.rbegin();
+        index = iter->first + 1;
+      }
+      this->myDataPtr->connections[index] = new boost::function<T>(_subscriber);
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -469,14 +541,16 @@ namespace gazebo
         return;
 
       this->Disconnect(_c->GetId());
-      _c->event = NULL;
-      _c->id = -1;
+      _c->dataPtr->event = NULL;
+      _c->dataPtr->id = -1;
     }
 
+    /// \brief Get the number of connections.
+    /// \return Number of connections.
     template<typename T>
     unsigned int EventT<T>::ConnectionCount() const
     {
-      return this->connections.size();
+      return this->myDataPtr->connections.size();
     }
 
     /// \brief Removes a connection
@@ -484,16 +558,31 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      // search for index of the connection based on id
-      for (unsigned int i = 0; i < this->connectionIds.size(); i++)
+      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
+      this->myDataPtr->connectionsToErase.push_back(_id);
+    }
+
+    /// \brief Cleanup disconnected connections.
+    template<typename T>
+    void EventT<T>::Cleanup()
+    {
+      if (this->myDataPtr->connectionsToErase.empty())
+        return;
+      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
+
+      for (std::vector<int>::iterator iter =
+          this->myDataPtr->connectionsToErase.begin();
+          iter != this->myDataPtr->connectionsToErase.end(); ++iter)
       {
-        if (_id == this->connectionIds[i])
+        typename EvtConnectionMap::iterator iter2 =
+          this->myDataPtr->connections.find(*iter);
+        if (iter2 != this->myDataPtr->connections.end())
         {
-          this->connectionIds.erase(this->connectionIds.begin()+i);
-          this->connections.erase(this->connections.begin()+i);
-          break;
+          delete iter2->second;
+          this->myDataPtr->connections.erase(iter2);
         }
       }
+      this->myDataPtr->connectionsToErase.clear();
     }
     /// \}
   }
