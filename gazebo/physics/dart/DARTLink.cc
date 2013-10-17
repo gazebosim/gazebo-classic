@@ -350,6 +350,16 @@ void DARTLink::SetSelfCollide(bool _collide)
           dart::dynamics::BodyNode* itdtBodyNode =
               boost::shared_dynamic_cast<DARTLink>(links[i])->GetDARTBodyNode();
 
+          // If this->dtBodyNode and itdtBodyNode are connected then don't enable
+          // the pair.
+          // Please see: https://bitbucket.org/osrf/gazebo/issue/899
+          if ((this->dtBodyNode->getParentBodyNode() == itdtBodyNode) ||
+              itdtBodyNode->getParentBodyNode() == this->dtBodyNode)
+          {
+            std::cout << "here\n";
+            continue;
+          }
+
           dtCollDet->enablePair(this->dtBodyNode, itdtBodyNode);
         }
       }
