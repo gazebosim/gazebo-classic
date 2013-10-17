@@ -1675,15 +1675,6 @@ void Scene::PreRender()
       ++visualIter;
   }
 
-  // Process the joint messages.
-  for (jointIter = jointMsgsCopy.begin(); jointIter != jointMsgsCopy.end();)
-  {
-    if (this->ProcessJointMsg(*jointIter))
-      jointMsgsCopy.erase(jointIter++);
-    else
-      ++jointIter;
-  }
-
   // Process the link messages.
   for (linkIter = linkMsgsCopy.begin(); linkIter != linkMsgsCopy.end();)
   {
@@ -1691,6 +1682,15 @@ void Scene::PreRender()
       linkMsgsCopy.erase(linkIter++);
     else
       ++linkIter;
+  }
+
+  // Process the joint messages.
+  for (jointIter = jointMsgsCopy.begin(); jointIter != jointMsgsCopy.end();)
+  {
+    if (this->ProcessJointMsg(*jointIter))
+      jointMsgsCopy.erase(jointIter++);
+    else
+      ++jointIter;
   }
 
   // Process the request messages
@@ -1992,34 +1992,24 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  bool good = false;
+  VisualPtr childVis;
 
+  if (_msg->has_child() && _msg->child() == "world")
+    childVis = this->worldVisual;
+  else if (_msg->has_child_id())
+    childVis = this->GetVisual(_msg->child_id());
+
+  if (!childVis)
+    return false;
+
+  JointVisualPtr jointVis(new JointVisual(
+        _msg->name() + "_JOINT_VISUAL__", childVis));
+  jointVis->Load(_msg);
+  jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())
-    good = this->visuals.find(_msg->id()) != this->visuals.end();
-  else
-    good = this->GetVisual(_msg->name()) != NULL;
+    jointVis->SetId(_msg->id());
 
-  if (good)
-  {
-    VisualPtr childVis;
-
-    if (_msg->child() == "world")
-      childVis = this->worldVisual;
-    else
-      childVis = this->GetVisual(_msg->child_id());
-
-    if (!childVis)
-      return false;
-
-    JointVisualPtr jointVis(new JointVisual(
-            _msg->name() + "_JOINT_VISUAL__", childVis));
-    jointVis->Load(_msg);
-    jointVis->SetVisible(this->showJoints);
-    if (_msg->has_id())
-      jointVis->SetId(_msg->id());
-
-    this->visuals[jointVis->GetId()] = jointVis;
-  }
+  this->visuals[jointVis->GetId()] = jointVis;
 
   return true;
 }
