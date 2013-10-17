@@ -63,76 +63,77 @@ namespace gazebo
       /// \return True if the event has been signaled.
       public: bool GetSignaled() const;
 
-      /// \brief Allow subclass to initialize their own data pointer.
+      /// \brief Allow subclasses to initialize their own data pointer.
+      /// \param[in] _d Reference to data pointer.
       protected: Event(EventPrivate &_d);
 
-      /// \brief Data pointer
+      /// \brief Data pointer.
       protected: EventPrivate *dataPtr;
     };
 
-    /// \brief A class that encapsulates a connection
+    /// \brief A class that encapsulates a connection.
     class Connection
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: Connection();
 
-      /// \brief Constructor
-      /// \param[in] _e Event pointer to connect with
-      /// \param[in] _i Unique id
+      /// \brief Constructor.
+      /// \param[in] _e Event pointer to connect with.
+      /// \param[in] _i Unique id.
       public: Connection(Event *_e, int _i);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: ~Connection();
 
-      /// \brief Get the id of this connection
-      /// \return The id of this connection
+      /// \brief Get the id of this connection.
+      /// \return The id of this connection.
       public: int GetId() const;
 
       /// \brief Private data pointer.
       private: ConnectionPrivate *dataPtr;
 
-      /// \brief Friend class
+      /// \brief Friend class.
       public: template<typename T> friend class EventT;
     };
 
     /// \class EventT Event.hh common/common.hh
-    /// \brief A class for event processing
+    /// \brief A class for event processing.
     template< typename T>
     class EventT : public Event
     {
-      /// \def EvtConnectionMap
+      /// \def EvtConnectionMap.
       /// \brief Event Connection map typedef.
       typedef std::map<int, boost::function<T>*> EvtConnectionMap;
 
       /// \brief Constructor.
       public: EventT();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~EventT();
 
-      /// \brief Connect a callback to this event
-      /// \param[in] _subscriber Pointer to a callback function
+      /// \brief Connect a callback to this event.
+      /// \param[in] _subscriber Pointer to a callback function.
       /// \return A Connection object, which will automatically call
-      ///         Disconnect when it goes out of scope
+      /// Disconnect when it goes out of scope.
       public: ConnectionPtr Connect(const boost::function<T> &_subscriber);
 
-      /// \brief Disconnect a callback to this event
-      /// \param[in] _c The connection to disconnect
+      /// \brief Disconnect a callback to this event.
+      /// \param[in] _c The connection to disconnect.
       public: virtual void Disconnect(ConnectionPtr _c);
 
-      /// \brief Disconnect a callback to this event
-      /// \param[in] _id The id of the connection to disconnect
+      /// \brief Disconnect a callback to this event.
+      /// \param[in] _id The id of the connection to disconnect.
       public: virtual void Disconnect(int _id);
 
       /// \brief Get the number of connections.
       /// \return Number of connection to this Event.
       public: unsigned int ConnectionCount() const;
 
-      /// \brief Access the signal
+      /// \brief Access the signal.
       public: void operator()()
               {this->Signal();}
 
-      /// \brief Signal the event for all subscribers
+      /// \brief Signal the event for all subscribers.
       public: void Signal()
               {
                 this->myDataPtr->signaled = true;
@@ -145,70 +146,70 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with one parameter
-      /// \param[in] _p the parameter
+      /// \brief Signal the event with one parameter.
+      /// \param[in] _p the parameter.
       public: template< typename P >
               void operator()(const P &_p)
               { this->Signal(_p); }
 
-      /// \brief Signal the event with two parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
+      /// \brief Signal the event with two parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
       public: template< typename P1, typename P2 >
               void operator()(const P1 &_p1, const P2 &_p2)
               { this->Signal(_p1, _p2); }
 
-      /// \brief Signal the event with three parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
+      /// \brief Signal the event with three parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
       public: template< typename P1, typename P2, typename P3 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3)
               { this->Signal(_p1, _p2, _p3); }
 
-      /// \brief Signal the event with four parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
+      /// \brief Signal the event with four parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
       public: template< typename P1, typename P2, typename P3, typename P4 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4)
               { this->Signal(_p1, _p2, _p3, _p4); }
 
-      /// \brief Signal the event with five parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fift parameter
+      /// \brief Signal the event with five parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fift parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5)
               { this->Signal(_p1, _p2, _p3, _p4, _p5); }
 
-      /// \brief Signal the event with six parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fift parameter
-      /// \param[in] _p6 the sixt parameter
+      /// \brief Signal the event with six parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fift parameter.
+      /// \param[in] _p6 the sixt parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5, const P6 &_p6)
               { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6); }
 
-      /// \brief Signal the event with seven parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
+      /// \brief Signal the event with seven parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -216,15 +217,15 @@ namespace gazebo
                               const P7 &_p7)
               { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7); }
 
-      /// \brief Signal the event with eight parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
+      /// \brief Signal the event with eight parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -232,16 +233,16 @@ namespace gazebo
                               const P7 &_p7, const P8 &_p8)
               { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8); }
 
-      /// \brief Signal the event with nine parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
-      /// \param[in] _p9 the ninth parameter
+      /// \brief Signal the event with nine parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
+      /// \param[in] _p9 the ninth parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9 >
@@ -250,17 +251,17 @@ namespace gazebo
                               const P7 &_p7, const P8 &_p8, const P9 &_p9)
               { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9); }
 
-      /// \brief Signal the event with ten parameters
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
-      /// \param[in] _p9 the ninth parameter
-      /// \param[in] _p10 the tenth parameter
+      /// \brief Signal the event with ten parameters.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
+      /// \param[in] _p9 the ninth parameter.
+      /// \param[in] _p10 the tenth parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9, typename P10 >
@@ -272,8 +273,8 @@ namespace gazebo
                 this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
               }
 
-      /// \brief Signal the event with one parameter
-      /// \param[in] _p parameter
+      /// \brief Signal the event with one parameter.
+      /// \param[in] _p parameter.
       public: template< typename P >
               void Signal(const P &_p)
               {
@@ -287,9 +288,9 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with two parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
+      /// \brief Signal the event with two parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
               {
@@ -303,10 +304,10 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with three parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
+      /// \brief Signal the event with three parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
               {
@@ -320,11 +321,11 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with four parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
+      /// \brief Signal the event with four parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
       public: template<typename P1, typename P2, typename P3, typename P4>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
@@ -339,12 +340,12 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with five parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
+      /// \brief Signal the event with five parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -361,13 +362,13 @@ namespace gazebo
               }
 
 
-      /// \brief Signal the event with six parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
+      /// \brief Signal the event with six parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -383,14 +384,14 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with seven parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
+      /// \brief Signal the event with seven parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6, typename P7>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -406,15 +407,15 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with eight parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
+      /// \brief Signal the event with eight parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6, typename P7, typename P8>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
@@ -431,16 +432,16 @@ namespace gazebo
                 }
               }
 
-      /// \brief Signal the event with nine parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
-      /// \param[in] _p9 the ninth parameter
+      /// \brief Signal the event with nine parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
+      /// \param[in] _p9 the ninth parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9 >
@@ -458,17 +459,17 @@ namespace gazebo
             }
           }
 
-      /// \brief Signal the event with ten parameter
-      /// \param[in] _p1 the first parameter
-      /// \param[in] _p2 the second parameter
-      /// \param[in] _p3 the second parameter
-      /// \param[in] _p4 the first parameter
-      /// \param[in] _p5 the fifth parameter
-      /// \param[in] _p6 the sixth parameter
-      /// \param[in] _p7 the seventh parameter
-      /// \param[in] _p8 the eighth parameter
-      /// \param[in] _p9 the ninth parameter
-      /// \param[in] _p10 the tenth parameter
+      /// \brief Signal the event with ten parameter.
+      /// \param[in] _p1 the first parameter.
+      /// \param[in] _p2 the second parameter.
+      /// \param[in] _p3 the second parameter.
+      /// \param[in] _p4 the first parameter.
+      /// \param[in] _p5 the fifth parameter.
+      /// \param[in] _p6 the sixth parameter.
+      /// \param[in] _p7 the seventh parameter.
+      /// \param[in] _p8 the eighth parameter.
+      /// \param[in] _p9 the ninth parameter.
+      /// \param[in] _p10 the tenth parameter.
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9, typename P10 >
@@ -494,7 +495,7 @@ namespace gazebo
       private: EventTPrivate<T> *myDataPtr;
     };
 
-    /// \brief Constructor
+    /// \brief Constructor.
     template<typename T>
     EventT<T>::EventT()
     : Event(*(new EventTPrivate<T>()))
@@ -516,8 +517,8 @@ namespace gazebo
       this->myDataPtr->connections.clear();
     }
 
-    /// \brief Adds a connection
-    /// \param[in] _subscriber the subscriber to connect
+    /// \brief Adds a connection.
+    /// \param[in] _subscriber the subscriber to connect.
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
@@ -532,8 +533,8 @@ namespace gazebo
       return ConnectionPtr(new Connection(this, index));
     }
 
-    /// \brief Removes a connection
-    /// \param[in] _c the connection
+    /// \brief Removes a connection.
+    /// \param[in] _c the connection.
     template<typename T>
     void EventT<T>::Disconnect(ConnectionPtr _c)
     {
@@ -553,8 +554,8 @@ namespace gazebo
       return this->myDataPtr->connections.size();
     }
 
-    /// \brief Removes a connection
-    /// \param[in] _id the connection index
+    /// \brief Removes a connection.
+    /// \param[in] _id the connection index.
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
