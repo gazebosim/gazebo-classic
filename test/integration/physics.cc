@@ -1189,7 +1189,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
-  //world->GetPhysicsEngine()->SetMaxStepSize(1e-4);
+  // world->GetPhysicsEngine()->SetMaxStepSize(1e-4);
 
   int i = 0;
   while (!this->HasEntity("cylinder") && i < 20)
@@ -1336,7 +1336,7 @@ TEST_F(PhysicsTest, DropStuffDART)
 {
   DropStuff("dart");
 }
-#endif // HAVE_DART
+#endif  // HAVE_DART
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {

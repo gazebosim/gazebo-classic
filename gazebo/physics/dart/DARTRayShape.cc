@@ -104,10 +104,10 @@ void DARTRayShape::GetIntersection(double& _dist, std::string& _entity)
     Eigen::Vector3d end(this->globalEndPos.x, this->globalEndPos.y,
         this->globalEndPos.z);
 
-    //btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
-    //rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
-    //rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
-    //this->physicsEngine->GetDynamicsWorld()->rayTest(
+    // btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+    // rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
+    // rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
+    // this->physicsEngine->GetDynamicsWorld()->rayTest(
     //    start, end, rayCallback);
 //    if (rayCallback.hasHit())
 //    {

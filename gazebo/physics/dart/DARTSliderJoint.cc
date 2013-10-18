@@ -89,14 +89,12 @@ void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   if (_index == 0)
   {
-    //----------------------------------------------------------------------------
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
-    //----------------------------------------------------------------------------
 
     this->dtPrismaticJoint->setAxis(dartVec3);
   }

@@ -33,7 +33,6 @@ namespace gazebo
     /// \brief DART Utils class
     class DARTUtils
     {
-
     };
     /// \}
   }

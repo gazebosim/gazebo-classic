@@ -43,7 +43,7 @@ namespace gazebo
         DARTCollisionPtr dartCollisionParent =
             boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-        //math::Vector3 n = this->GetNormal();
+        // math::Vector3 n = this->GetNormal();
 
         dart::dynamics::BodyNode* dtBodyNode =
             dartCollisionParent->GetDARTBodyNode();
