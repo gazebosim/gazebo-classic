@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
+
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -175,8 +177,9 @@ void DARTModel::BackupState()
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
-  assert(dtConfig.size() == this->dtSkeleton->getNumGenCoords());
-  assert(dtVelocity.size() == this->dtSkeleton->getNumGenCoords());
+  int n = this->dtSkeleton->getNumGenCoords();
+  GZ_ASSERT(dtConfig.size() == n,   "Cannot RestoreState, invalid size");
+  GZ_ASSERT(dtVelocity.size() == n, "Cannot RestoreState, invalid size");
 
   this->dtSkeleton->set_q(dtConfig);
   this->dtSkeleton->set_dq(dtVelocity);

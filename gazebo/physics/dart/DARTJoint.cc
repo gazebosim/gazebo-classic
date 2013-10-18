@@ -15,8 +15,9 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/World.hh"
@@ -82,7 +83,7 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
   // if (theChildLink != NULL)
-  assert(dartChildLink.get() != NULL);
+  GZ_ASSERT(dartChildLink.get() != NULL, "dartChildLink pointer is NULL");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
@@ -338,7 +339,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
-    assert(dartChildBody);
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }
@@ -381,7 +382,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
-    assert(dartChildBody);
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(
       dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
   }
@@ -500,7 +501,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
-    assert(dartChildBody);
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }

@@ -123,7 +123,7 @@ void DARTPhysics::Reset()
   {
     dartModelIt =
       boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
-    assert(dartModelIt.get());
+    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is NULL");
 
     dartModelIt->RestoreState();
   }
