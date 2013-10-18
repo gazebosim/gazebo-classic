@@ -26,6 +26,7 @@ else
 fi
 
 # Install Gazebo and some tools we'll need
+sudo apt-get update
 sudo apt-get install gazebo exuberant-ctags git 
 # Also install things that are needed to build Gazebo.  We want to ensure 
 # that we end up with the same set of system packages, especially the optional
