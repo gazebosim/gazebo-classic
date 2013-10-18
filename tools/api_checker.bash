@@ -10,24 +10,50 @@
 # about it here:
 #   http://gazebosim.org/wiki/2.0/install#Ubuntu_Debians
 
-USAGE="api_checker.bash <gazebo_source_dir>"
+USAGE=$'api_checker.bash [-n] <gazebo_source_dir>
+  -n : Do not install latest Gazebo via apt-get (assumes that you have already installed the version that you want to compare against)'
 
 # Stop on error
 set -e
 
 # Parse args
+install_gazebo=1
 if [[ $# -lt 1 ]]; then
-  echo $USAGE
+  echo "$USAGE"
   exit 1
+elif [[ $# -gt 1 ]]; then
+  if [[ $1 == "-n" ]]; then
+    install_gazebo=0
+    srcdir=$2
+    # Do we have gazebo or gazebo-current installed?
+    gazebo_name="gazebo-current"
+    if ! dpkg -l $gazebo_name > /dev/null || [[ `dpkg -L $gazebo_name | wc | awk {'print $1'}` -lt 2 ]]; then
+      gazebo_name="gazebo"
+      if ! dpkg -l $gazebo_name > /dev/null || [[ `dpkg -L $gazebo_name | wc | awk {'print $1'}` -lt 2 ]]; then
+        echo "Couldn't find an existing installation of gazebo or gazebo-current, and you passed -n, telling me not to install gazebo-current."
+        exit 1
+      fi
+    fi
+    echo "Found installation of $gazebo_name."
+  else
+    echo "$USAGE"
+    exit 1
+  fi
 else
-  # Convert to absolute path, in case the developer gave something like '..'
-  GAZEBO_SOURCE_DIR=$(readlink -f $1)
-  GAZEBO_BRANCH=$(cd $GAZEBO_SOURCE_DIR && hg branch)
+  srcdir=$1
+  gazebo_name="gazebo-current"
 fi
+
+# Convert to absolute path, in case the developer gave something like '..'
+GAZEBO_SOURCE_DIR=$(readlink -f $srcdir)
+GAZEBO_BRANCH=$(cd $GAZEBO_SOURCE_DIR && hg branch)
 
 # Install Gazebo and some tools we'll need
 sudo apt-get update
-sudo apt-get install gazebo exuberant-ctags git 
+if [[ $install_gazebo -eq 1 ]]; then
+  sudo apt-get install $gazebo_name
+fi
+sudo apt-get install exuberant-ctags git 
 # Also install things that are needed to build Gazebo.  We want to ensure 
 # that we end up with the same set of system packages, especially the optional
 # ones, that are used in building the Gazebo .deb.  For now, I'm copying in the
@@ -73,6 +99,15 @@ git clone git://github.com/lvc/abi-compliance-checker.git
 cd abi-compliance-checker
 perl Makefile.pl -install --prefix=$TMPDIR/install
 
+# Figure out which libraries we're going to compare and what version of Gazebo
+# we're working with.
+GAZEBO_LIBS=$(dpkg -L $gazebo_name | grep lib.*.so)
+GAZEBO_LIBS_LOCAL=$(dpkg -L $gazebo_name | grep lib.*.so | sed -e "s:^/usr:$TMPDIR/install:g")
+BIN_VERSION=$(dpkg -l $gazebo_name | tail -n 1 | awk '{ print  $3 }')
+MAJOR_MINOR=$(echo $BIN_VERSION | cut -d . -f 1,2)
+
+echo "We're going to compare your working copy in $srcdir with the system-installed version, which is $MAJOR_MINOR."
+
 # Build and install Gazebo.  I'm doing this as a separate build to avoid
 # unexpected interactions with the developer's own build space.  An
 # optimization would be to allow reuse of an existing build space.
@@ -82,13 +117,6 @@ cmake -DENABLE_TESTS_COMPILATION:BOOL=False -DCMAKE_INSTALL_PREFIX=$TMPDIR/insta
 MAKE_JOBS=$(grep -c ^processor /proc/cpuinfo)
 make -j${MAKE_JOBS}
 make install
-
-# Figure out which libraries we're going to compare and what version of Gazebo
-# we're working with.
-GAZEBO_LIBS=$(dpkg -L gazebo | grep lib.*.so)
-GAZEBO_LIBS_LOCAL=$(dpkg -L gazebo | grep lib.*.so | sed -e "s:^/usr:$TMPDIR/install:g")
-BIN_VERSION=$(dpkg -l gazebo | tail -n 1 | awk '{ print  $3 }')
-MAJOR_MINOR=$(echo $BIN_VERSION | cut -d . -f 1,2)
 
 # Generate the spec for our reference version of Gazebo.
 cat > $TMPDIR/config/pkg.xml << CURRENT_DELIM
