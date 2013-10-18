@@ -1632,6 +1632,8 @@ void Scene::PreRender()
   {
     if (this->ProcessSceneMsg(*sIter))
     {
+      if (!this->initialized)
+        RTShaderSystem::Instance()->UpdateShaders();
       this->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }
