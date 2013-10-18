@@ -80,7 +80,6 @@ namespace gazebo
 
       /// \brief
       protected: Eigen::VectorXd dtVelocity;
-
     };
     /// \}
   }

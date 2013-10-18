@@ -348,7 +348,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this && links[i]->GetSelfCollide())
         {
           dart::dynamics::BodyNode* itdtBodyNode =
-              boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
 
           // If this->dtBodyNode and itdtBodyNode are connected then don't
           // enable the pair.
@@ -374,9 +374,9 @@ void DARTLink::SetSelfCollide(bool _collide)
         for (size_t j = i + 1; j < links.size(); ++j)
         {
           dart::dynamics::BodyNode* itdtBodyNode1 =
-              boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
           dart::dynamics::BodyNode* itdtBodyNode2 =
-              boost::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
 
           // If this->dtBodyNode and itdtBodyNode are connected then don't
           // enable the pair.
@@ -402,7 +402,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this)
         {
           dart::dynamics::BodyNode* itdtBodyNode =
-              boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
           dtCollDet->disablePair(this->dtBodyNode, itdtBodyNode);
         }
       }

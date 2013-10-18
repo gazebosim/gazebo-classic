@@ -382,7 +382,8 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(
+      dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
