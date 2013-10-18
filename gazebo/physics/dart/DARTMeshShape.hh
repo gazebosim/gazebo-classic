@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual void Update();
 
       /// \brief Transform matrix.
-      //private: dReal transform[16*2];
+      // private: dReal transform[16*2];
 
       /// \brief Transform matrix index.
       private: int transformIndex;
@@ -56,7 +56,7 @@ namespace gazebo
       private: int *indices;
 
       /// \brief DART trimesh data.
-      //private: dTriMeshDataID odeData;
+      // private: dTriMeshDataID odeData;
     };
   }
 }

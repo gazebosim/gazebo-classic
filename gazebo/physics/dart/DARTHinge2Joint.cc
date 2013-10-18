@@ -67,25 +67,21 @@ void DARTHinge2Joint::SetAxis(int _index, const math::Vector3& _axis)
 
   if (_index == 0)
   {
-    //----------------------------------------------------------------------------
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
-    //----------------------------------------------------------------------------
 
     this->dtUniveralJoint->setAxis1(dartAxis);
   }
   else if (_index == 1)
   {
-    //----------------------------------------------------------------------------
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
-    //----------------------------------------------------------------------------
 
     this->dtUniveralJoint->setAxis2(dartAxis);
   }

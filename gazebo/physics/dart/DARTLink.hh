@@ -18,6 +18,8 @@
 #ifndef _DARTLINK_HH_
 #define _DARTLINK_HH_
 
+#include <vector>
+
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"

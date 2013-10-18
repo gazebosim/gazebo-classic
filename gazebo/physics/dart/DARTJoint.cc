@@ -65,15 +65,11 @@ void DARTJoint::Init()
 {
   Joint::Init();
 
-  //----------------------------------------------------------------------------
   // Name
-  //----------------------------------------------------------------------------
   std::string jointName = this->GetName();
   this->dtJoint->setName(jointName.c_str());
 
-  //----------------------------------------------------------------------------
   // Parent and child link information
-  //----------------------------------------------------------------------------
   DARTLinkPtr dartParentLink =
     boost::static_pointer_cast<DARTLink>(this->parentLink);
   DARTLinkPtr dartChildLink =
@@ -85,7 +81,7 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformParentBodyNode = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
-  //if (theChildLink != NULL)
+  // if (theChildLink != NULL)
   assert(dartChildLink.get() != NULL);
   {
     dtTransformChildBodyNode =
@@ -343,13 +339,14 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+                           dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12 ,F2);
+  F1 = -dart::math::dAdInvR(T12, F2);
 
   if (_index == 0)
     result.Set(F1(3), F1(4), F1(5));
@@ -370,9 +367,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
     return result;
   }
 
-  //----------------------------------------------------------------------------
   // Parent and child link information
-  //----------------------------------------------------------------------------
   DARTLinkPtr theChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
@@ -393,7 +388,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12 ,F2);
+  F1 = -dart::math::dAdInvR(T12, F2);
 
   if (_index == 0)
     result.Set(F1(0), F1(1), F1(2));
@@ -505,13 +500,14 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
     assert(dartChildBody);
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+                           dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12 ,F2);
+  F1 = -dart::math::dAdInvR(T12, F2);
 
   // kind of backwards here, body1 (parent) corresponds go f2, t2
   // and body2 (child) corresponds go f1, t1

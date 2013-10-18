@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace physics
   {
-    //class Entity;
+    // class Entity;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
@@ -74,22 +74,22 @@ namespace gazebo
 
       /// \brief Constructor
       public: DARTPhysics(WorldPtr _world);
- 
+
       /// \brief Destructor
       public: virtual ~DARTPhysics();
-       
+
       /// \brief Load the DART engine
       public: virtual void Load(sdf::ElementPtr _sdf);
- 
+
       /// \brief Initialize the DART engine
       public: virtual void Init();
 
       /// \brief Finilize the DART engine.
       public: virtual void Fini();
-       
+
       /// \brief Rest the DART engine.
       public: virtual void Reset();
- 
+
       // Documentation inherited
       public: virtual void InitForThread();
 
@@ -107,7 +107,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
-      
+
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
@@ -118,7 +118,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual JointPtr CreateJoint(const std::string& _type,
                                            ModelPtr _parent);
-      
+
       // Documentation inherited
       public: virtual ShapePtr CreateShape(const std::string& _shapeType,
                                            CollisionPtr _collision);
@@ -159,9 +159,8 @@ namespace gazebo
       /// \brief
       public: dart::simulation::World* GetDARTWorld() { return dtWorld; }
 
-      /// \brief 
+      /// \brief
       private: dart::simulation::World* dtWorld;
-
     };
 
   /// \}

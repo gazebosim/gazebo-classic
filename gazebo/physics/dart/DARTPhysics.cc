@@ -90,18 +90,18 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
-  //double timeStep = this->sdf->GetValueDouble("time_step");
-  //this->dartWorld->setTimeStep(timeStep);
-  
+  // double timeStep = this->sdf->GetValueDouble("time_step");
+  // this->dartWorld->setTimeStep(timeStep);
+
   // TODO: Elements for dart settings
-  //sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  //this->stepTimeDouble = dartElem->GetElement("dt")->GetValueDouble();
+  // sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+  // this->stepTimeDouble = dartElem->GetElement("dt")->GetValueDouble();
 }
- 
+
 //////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
-  //this->dartWorld->initialize();
+  // this->dartWorld->initialize();
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +121,8 @@ void DARTPhysics::Reset()
 
   for (unsigned int i = 0; i < modelCount; ++i)
   {
-    dartModelIt = boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
+    dartModelIt =
+      boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
     assert(dartModelIt.get());
 
     dartModelIt->RestoreState();
@@ -132,7 +133,7 @@ void DARTPhysics::Reset()
 void DARTPhysics::InitForThread()
 {
 }
- 
+
 //////////////////////////////////////////////////
 void DARTPhysics::UpdateCollision()
 {
@@ -355,7 +356,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void DARTPhysics::SetGravity(const gazebo::math::Vector3& _gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  this->dtWorld->setGravity(Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+  this->dtWorld->setGravity(
+    Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
 //////////////////////////////////////////////////
@@ -535,7 +537,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
 void DARTPhysics::InitDARTWorld()
 {
-  //dtWorld->init();
+  // dtWorld->init();
 }
 
 

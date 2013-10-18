@@ -130,7 +130,8 @@ dart::dynamics::BodyNode*DARTCollision::GetDARTBodyNode() const
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape, bool _placeable)
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape,
+                                          bool _placeable)
 {
   Collision::SetCollision(_placeable);
   this->dtCollisionShape = _shape;

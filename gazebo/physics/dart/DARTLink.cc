@@ -241,12 +241,12 @@ math::Vector3 DARTLink::GetWorldLinearVel(
     const gazebo::math::Vector3& _offset,
     const gazebo::math::Quaternion& _q) const
 {
-  Eigen::Matrix3d R1          = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
+  Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);
   Eigen::Vector3d linVel =
-      this->dtBodyNode->getWorldVelocity(worldOffset).tail<3>();
+    this->dtBodyNode->getWorldVelocity(worldOffset).tail<3>();
 
-  //std::cout << R1 << std::endl;
+  // std::cout << R1 << std::endl;
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -256,7 +256,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   Eigen::Vector3d worldCOM = this->dtBodyNode->getWorldCOM();
   Eigen::Vector3d linVel
-      = this->dtBodyNode->getWorldVelocity(worldCOM).tail<3>();
+    = this->dtBodyNode->getWorldVelocity(worldCOM).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -265,7 +265,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 math::Vector3 DARTLink::GetWorldAngularVel() const
 {
   const Eigen::Vector3d& angVel
-      = this->dtBodyNode->getWorldVelocity().head<3>();
+    = this->dtBodyNode->getWorldVelocity().head<3>();
 
   return DARTTypes::ConvVec3(angVel);
 }
@@ -350,8 +350,8 @@ void DARTLink::SetSelfCollide(bool _collide)
           dart::dynamics::BodyNode* itdtBodyNode =
               boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
 
-          // If this->dtBodyNode and itdtBodyNode are connected then don't enable
-          // the pair.
+          // If this->dtBodyNode and itdtBodyNode are connected then don't
+          // enable the pair.
           // Please see: https://bitbucket.org/osrf/gazebo/issue/899
           if ((this->dtBodyNode->getParentBodyNode() == itdtBodyNode) ||
               itdtBodyNode->getParentBodyNode() == this->dtBodyNode)
@@ -378,8 +378,8 @@ void DARTLink::SetSelfCollide(bool _collide)
           dart::dynamics::BodyNode* itdtBodyNode2 =
               boost::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
 
-          // If this->dtBodyNode and itdtBodyNode are connected then don't enable
-          // the pair.
+          // If this->dtBodyNode and itdtBodyNode are connected then don't
+          // enable the pair.
           // Please see: https://bitbucket.org/osrf/gazebo/issue/899
           if ((itdtBodyNode1->getParentBodyNode() == itdtBodyNode2) ||
               itdtBodyNode2->getParentBodyNode() == itdtBodyNode1)
@@ -483,8 +483,8 @@ void DARTLink::SetLinkStatic(bool /*_static*/)
 //////////////////////////////////////////////////
 void DARTLink::updateDirtyPoseFromDARTTransformation()
 {
-  //-- Step 1: get dart body's transformation
-  //-- Step 2: set gazebo link's pose using the transformation
+  // Step 1: get dart body's transformation
+  // Step 2: set gazebo link's pose using the transformation
   math::Pose newPose = DARTTypes::ConvPose(
                          this->dtBodyNode->getWorldTransform());
 

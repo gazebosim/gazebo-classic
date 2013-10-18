@@ -77,7 +77,8 @@ void DARTModel::Init()
 
       newFreeJoint->setTransformFromParentBodyNode(
             DARTTypes::ConvPose(linkList[i]->GetWorldPose()));
-      newFreeJoint->setTransformFromChildBodyNode(Eigen::Isometry3d::Identity());
+      newFreeJoint->setTransformFromChildBodyNode(
+        Eigen::Isometry3d::Identity());
 
       dtBodyNode->setParentJoint(newFreeJoint);
     }
@@ -85,11 +86,9 @@ void DARTModel::Init()
     dtSkeleton->addBodyNode(dtBodyNode);
   }
 
-  //----------------------------------------------------------------------------
   // Add the skeleton to the world
   this->GetDARTWorld()->addSkeleton(dtSkeleton);
 
-  //----------------------------------------------------------------------------
   // Self collision
   // Note: This process should be done after this skeleton is added to the
   //       world.
@@ -127,9 +126,9 @@ void DARTModel::Init()
       for (size_t j = i + 1; j < linkList.size(); ++j)
       {
         dart::dynamics::BodyNode* itdtBodyNode1 =
-            boost::dynamic_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+          boost::dynamic_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
         dart::dynamics::BodyNode* itdtBodyNode2 =
-            boost::dynamic_pointer_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
+          boost::dynamic_pointer_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
 
         // If this->dtBodyNode and itdtBodyNode are connected then don't enable
         // the pair.
@@ -148,7 +147,6 @@ void DARTModel::Init()
     }
   }
 
-  //----------------------------------------------------------------------------
   // Note: This function should be called after the skeleton is added to the
   //       world.
   this->BackupState();
@@ -159,14 +157,12 @@ void DARTModel::Init()
 void DARTModel::Update()
 {
   Model::Update();
-  
 }
 
 //////////////////////////////////////////////////
 void DARTModel::Fini()
 {
   Model::Fini();
-  
 }
 
 //////////////////////////////////////////////////
@@ -194,7 +190,8 @@ dart::dynamics::Skeleton*DARTModel::GetDARTSkeleton()
 
 //////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const {
-  return boost::dynamic_pointer_cast<DARTPhysics>(this->GetWorld()->GetPhysicsEngine());
+  return boost::dynamic_pointer_cast<DARTPhysics>(
+    this->GetWorld()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////

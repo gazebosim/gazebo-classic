@@ -57,7 +57,7 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int /*_index*/, double /*_vel*/);
+      public: virtual void SetVelocity(int _index, double _vel);
 
       // Documentation inherited
       public: virtual double GetVelocity(int _index) const;

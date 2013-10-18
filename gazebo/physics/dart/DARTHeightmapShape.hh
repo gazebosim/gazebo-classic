@@ -45,10 +45,10 @@ namespace gazebo
       /// \param[in] _data Pointer to the heightmap data.
       /// \param[in] _x X location.
       /// \param[in] _y Y location.
-      //private: static dReal GetHeightCallback(void *_data, int _x, int _y);
+      // private: static dReal GetHeightCallback(void *_data, int _x, int _y);
 
       /// \brief The heightmap data.
-      //private: dHeightfieldDataID odeData;
+      // private: dHeightfieldDataID odeData;
     };
   }
 }
