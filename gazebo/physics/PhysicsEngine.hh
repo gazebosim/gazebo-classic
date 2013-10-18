@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet|simbody).
+      /// \brief Return the physics engine type (ode|bullet|dart|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 

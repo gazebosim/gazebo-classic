@@ -121,7 +121,7 @@ void DARTPhysics::Reset()
 
   for (unsigned int i = 0; i < modelCount; ++i)
   {
-    dartModelIt = boost::shared_dynamic_cast<DARTModel>(this->world->GetModel(i));
+    dartModelIt = boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
     assert(dartModelIt.get());
 
     dartModelIt->RestoreState();
@@ -243,7 +243,7 @@ void DARTPhysics::UpdatePhysics()
     for (unsigned int j = 0; j < linkCount; ++j)
     {
       dartLinkItr
-          = boost::shared_dynamic_cast<DARTLink>(links.at(j));
+          = boost::dynamic_pointer_cast<DARTLink>(links.at(j));
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
   }
@@ -299,7 +299,7 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   DARTCollisionPtr collision =
-    boost::shared_dynamic_cast<DARTCollision>(_collision);
+    boost::dynamic_pointer_cast<DARTCollision>(_collision);
 
   if (_type == "sphere")
     shape.reset(new DARTSphereShape(collision));
@@ -520,7 +520,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
     for (Link_V::const_iterator itLink = links.begin();
          itLink != links.end(); ++itLink)
     {
-      DARTLinkPtr dartLink = boost::shared_dynamic_cast<DARTLink>(*itLink);
+      DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(*itLink);
 
       if (dartLink->GetDARTBodyNode() == _dtBodyNode)
       {

@@ -79,7 +79,6 @@ void DARTJoint::Init()
   DARTLinkPtr dartChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
-  dart::dynamics::BodyNode* dtParentBodyNode = NULL;
   Eigen::Isometry3d dtTransformParentLinkToJoint =
       Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dtTransformChildLinkToJoint = Eigen::Isometry3d::Identity();
@@ -100,7 +99,8 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dtParentBodyNode = dartParentLink->GetDARTBodyNode();
+    dart::dynamics::BodyNode* dtParentBodyNode =
+      dartParentLink->GetDARTBodyNode();
     dtParentBodyNode->addChildBodyNode(this->dtChildBodyNode);
   }
 
@@ -169,7 +169,7 @@ LinkPtr DARTJoint::GetJointLink(int _index) const
   if (_index == 0)
   {
     DARTLinkPtr dartLink1
-        = boost::shared_static_cast<DARTLink>(this->parentLink);
+        = boost::static_pointer_cast<DARTLink>(this->parentLink);
 
     if (dartLink1 != NULL)
       return this->parentLink;
@@ -178,7 +178,7 @@ LinkPtr DARTJoint::GetJointLink(int _index) const
   if (_index == 1)
   {
     DARTLinkPtr dartLink2
-        = boost::shared_static_cast<DARTLink>(this->childLink);
+        = boost::static_pointer_cast<DARTLink>(this->childLink);
 
     if (dartLink2 != NULL)
       return this->childLink;
@@ -564,7 +564,7 @@ void DARTJoint::ApplyDamping()
 
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
-  return boost::shared_dynamic_cast<DARTModel>(this->model);
+  return boost::dynamic_pointer_cast<DARTModel>(this->model);
 }
 
 void DARTJoint::SaveForce(int _index, double _force)
