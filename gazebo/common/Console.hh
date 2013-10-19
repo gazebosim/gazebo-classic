@@ -39,21 +39,21 @@ namespace gazebo
     /// \addtogroup gazebo_util Util
     /// \{
     /// \brief Output a message
-    #define gzmsg (gazebo::common::Console::g_msg)
+    #define gzmsg (gazebo::common::Console::msg)
 
     /// \brief Output a debug message
-    #define gzdbg (gazebo::common::Console::g_dbg(__FILE__, __LINE__))
+    #define gzdbg (gazebo::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::g_warn)
+    #define gzwarn (gazebo::common::Console::warn)
 
     /// \brief Output an error message
-    #define gzerr (gazebo::common::Console::g_err(__FILE__, __LINE__))
+    #define gzerr (gazebo::common::Console::err(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file
-    #define gzlog (gazebo::common::Console::g_log)
+    #define gzlog (gazebo::common::Console::log)
 
-    #define gzLogInit(_str) (gazebo::common::Console::g_log.Init(_str))
+    #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
     /// \brief A logger that outputs messages to a file.
     class FileLogger : public std::ostream
@@ -160,19 +160,19 @@ namespace gazebo
       private: static bool quiet;
 
       /// \brief Global instance of the message logger.
-      public: static Logger g_msg;
+      public: static Logger msg;
 
       /// \brief Global instance of the error logger.
-      public: static Logger g_err;
+      public: static Logger err;
 
       /// \brief Global instance of the debug logger.
-      public: static Logger g_dbg;
+      public: static Logger dbg;
 
       /// \brief Global instance of the warning logger.
-      public: static Logger g_warn;
+      public: static Logger warn;
 
       /// \brief Global instance of the file logger.
-      public: static FileLogger g_log;
+      public: static FileLogger log;
     };
 
     /// \}

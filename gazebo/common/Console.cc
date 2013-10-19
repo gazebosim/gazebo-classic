@@ -27,11 +27,11 @@
 using namespace gazebo;
 using namespace common;
 
-FileLogger gazebo::common::Console::g_log("");
-Logger Console::g_msg("{Msg}", 32, &std::cout);
-Logger Console::g_err("{Err}", 31, &std::cerr);
-Logger Console::g_dbg("{Dbg}", 36, &std::cout);
-Logger Console::g_warn("{Wrn}", 33, &std::cerr);
+FileLogger gazebo::common::Console::log("");
+Logger Console::msg("{Msg}", 32, &std::cout);
+Logger Console::err("{Err}", 31, &std::cerr);
+Logger Console::dbg("{Dbg}", 36, &std::cout);
+Logger Console::warn("{Wrn}", 33, &std::cerr);
 
 bool Console::quiet = true;
 
@@ -74,7 +74,7 @@ Logger::Buffer::Buffer(const std::string &_prefix, int _color,
     std::ostream *_stream)
   : color(_color), stream(_stream), prefix(_prefix)
 {
-  this->log = &Console::g_log;
+  this->log = &Console::log;
 }
 
 /////////////////////////////////////////////////
