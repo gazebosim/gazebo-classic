@@ -146,7 +146,7 @@ namespace gazebo
     };
 
     /// \class Console Console.hh common/common.hh
-    class Console 
+    class Console
     {
       /// \brief Set quiet output
       /// \param[in] q True to prevent warning

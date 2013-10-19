@@ -96,7 +96,7 @@ int Logger::Buffer::sync()
   // Output to terminal
   if (!Console::GetQuiet())
   {
-    (*this->stream) << "\033[1;" 
+    (*this->stream) << "\033[1;"
       << this->color << "m" << this->str() << "\033[0m";
   }
 
