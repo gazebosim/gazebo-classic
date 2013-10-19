@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,11 +87,9 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
-  // Always log
+  // Log messages to disk
   if (this->log)
-  {
     (*this->log) << this->prefix << " " << this->str() << std::endl;
-  }
 
   // Output to terminal
   if (!Console::GetQuiet())

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,8 +75,7 @@ namespace gazebo
       protected: class Buffer : public std::stringbuf
                  {
                    /// \brief Constructor.
-                   /// \param[in] _filename Filename to write into. If empty,
-                   /// FileLogger::Init must be called separately.
+                   /// \param[in] _filename Filename to write into.
                    public: Buffer(const std::string &_filename);
 
                    /// \brief Destructor.
@@ -91,7 +90,7 @@ namespace gazebo
                  };
     };
 
-    /// \brief Base class for all console loggers.
+    /// \brief Terminal logger.
     class Logger : public std::ostream
     {
       /// \brief Constructor.
@@ -146,14 +145,16 @@ namespace gazebo
     };
 
     /// \class Console Console.hh common/common.hh
+    /// \brief Container for loggers, and global logging options
+    /// (such as verbose vs. quiet output).
     class Console
     {
-      /// \brief Set quiet output
-      /// \param[in] q True to prevent warning
+      /// \brief Set quiet output.
+      /// \param[in] q True to prevent warning.
       public: static void SetQuiet(bool _q);
 
-      /// \brief Get whether quiet output is set
-      /// \return True to if quiet output is set
+      /// \brief Get whether quiet output is set.
+      /// \return True to if quiet output is set.
       public: static bool GetQuiet();
 
       /// \brief Indicates if console messages should be quiet.

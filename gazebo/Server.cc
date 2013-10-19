@@ -88,7 +88,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
   po::options_description visibleDesc("Options");
   visibleDesc.add_options()
-    ("version,v", "Output the version number of Gazebo")
+    ("version,v", "Output the version number of Gazebo.")
     ("verbose", "Output informational messages to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
