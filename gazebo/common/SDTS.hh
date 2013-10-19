@@ -44,6 +44,14 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~SDTS();
 
+      /// \brief Extend the current terrain by joining a second terrain. This
+      /// operation modifies the current terrain width and height. The new width
+      /// and height are calculated by choosing the minimum bounding box that
+      /// covers the two terrains and satisfy Ogre restrictions (size is a power
+      /// of two plus one).
+      /// \param[in] _terrain Terrain to add.
+      // public: void Add(const SDTS &_terrain);
+
       /// \brief Get the size of each point in bytes after using GetData().
       /// \return The BPP of each point returned after GetData().
       public: unsigned int GetBPP() const;
@@ -70,8 +78,25 @@ namespace gazebo
       /// \return The terrain width.
       public: unsigned int GetWidth() const;
 
+
+      public: double GetWorldWidth();
+
+      public: double GetWorldHeight();
+
+      private: void GetGeoReference(double _pixel, double _line,
+                                    double &_xGeo, double &_yGeo);
+
+      private: double OgrDistance(double _latAdeg, double _lonAdeg,
+                                  double _LatBdeg, double _lonBdeg);
+
+      private: static double SafeAcos(double _x);
+
       /// \brief A set of associated raster bands.
       private: GDALDataset *poDataset;
+
+      private: double worldWidth;
+
+      private: double worldHeight;
     };
     /// \}
   }

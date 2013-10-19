@@ -16,9 +16,13 @@
 */
 
 #include <algorithm>
+#include <gdal/ogr_spatialref.h>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SDTS.hh"
+#include "gazebo/math/Angle.hh"
+
+#define RAD2METER ((180. / M_PI) * 60. * 1852.)
 
 using namespace gazebo;
 using namespace common;
@@ -34,9 +38,72 @@ SDTS::SDTS(const std::string &_filename)
   if (this->poDataset == NULL)
     gzthrow("Unable to find SDTS file [" + _filename + "]\n");
 
-  if (poDataset->GetRasterCount() != 1 && poDataset->GetRasterCount() != 3)
+  if (this->poDataset->GetRasterCount() != 1 &&
+      this->poDataset->GetRasterCount() != 3)
     gzthrow("Unsupported band number in file [" << _filename + "]. Found " <<
-        poDataset->GetRasterCount() << " but only 1 or 3 are valid values\n");
+       this-> poDataset->GetRasterCount() <<
+       " but only 1 or 3 are valid values\n");
+
+
+  // Define Geographic coordinate system - set it to WGS84.
+  /*OGRSpatialReference *poSRS_Geog = new OGRSpatialReference();
+  poSRS_Geog->importFromEPSG(4326); // WGS84
+
+  // Define Projected coordinate system - set to the GeoTransform.
+  const char *sProj = this->poDataset->GetProjectionRef();
+  OGRSpatialReference *poSRS_Proj = new OGRSpatialReference(sProj);
+
+  // Set up the coordinate transform (projected-to-geographic).
+  OGRCoordinateTransformation *poCT_Proj2Geog;
+  poCT_Proj2Geog = OGRCreateCoordinateTransformation(poSRS_Proj, poSRS_Geog);
+
+  // Now everything is set up and we set transforming coordinates!
+  // Pass Lon/Lat coordinates to the Transform function:
+  double x = 0;
+  double y = 0;
+  poCT_Proj2Geog->Transform( 1, &x, &y );*/
+
+  double upperLeftX = 0.0;
+  double upperLeftY = 0.0;
+  double upperRightX = this->poDataset->GetRasterXSize();
+  double upperRightY = 0.0;
+  double lowerLeftX = 0.0;
+  double lowerLeftY = this->poDataset->GetRasterYSize();
+  double upperLeftXgeo, upperLeftYgeo;
+  double upperRightXgeo, upperRightYgeo;
+  double lowerLeftXgeo, lowerLeftYgeo;
+
+  // Calculate the georeferenced coordinates
+  this->GetGeoReference(upperLeftX, upperLeftY, upperLeftXgeo, upperLeftYgeo);
+  this->GetGeoReference(upperRightX, upperRightY, upperRightXgeo, upperRightYgeo);
+  this->GetGeoReference(lowerLeftX, lowerLeftY, lowerLeftXgeo, lowerLeftYgeo);
+  
+  /*std::cout << "Upper left: (" << upperLeftXgeo << "," << upperLeftYgeo << ")\n";
+  std::cout << "Upper right: (" << upperRightXgeo << "," << upperRightYgeo << ")\n";
+  std::cout << "Lower left: (" << lowerLeftXgeo << "," << lowerLeftYgeo << ")\n";*/
+
+  // Set the world width and height
+  this->worldWidth = this->OgrDistance(upperLeftYgeo, upperLeftXgeo,
+                                       upperRightYgeo, upperRightXgeo);
+
+  this->worldHeight = this->OgrDistance(upperLeftYgeo, upperLeftXgeo,
+                                        lowerLeftYgeo, lowerLeftXgeo);
+
+  /*std::cout << "World width: " << this->worldWidth << std::endl;
+  std::cout << "World height: " << this->worldHeight << std::endl;*/
+}
+
+void SDTS::GetGeoReference(double _pixel, double _line,
+                           double &_xGeo, double &_yGeo)
+{
+  double adfGeoTransform[6];
+  if (this->poDataset->GetGeoTransform(adfGeoTransform) == CE_None)
+  {
+    _xGeo = adfGeoTransform[0] +
+            _pixel * adfGeoTransform[1] + _line * adfGeoTransform[2];
+    _yGeo = adfGeoTransform[3] +
+            _pixel * adfGeoTransform[4] + _line * adfGeoTransform[5];
+  }  
 }
 
 //////////////////////////////////////////////////
@@ -62,7 +129,7 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
   if (*_data)
     delete [] *_data;
 
-  // The first band is 1
+  // The first band starts with index 1
   for (int i = 1; i <= nBands; ++i)
   {
     // Get a pointer to the current band
@@ -145,7 +212,7 @@ Color SDTS::GetMaxColor()
   float *buffer = new float[xsize * ysize];
   int nBands = poDataset->GetRasterCount();
 
-  // The first band is 1
+  // The first band starts with index 1
   for (int i = 1; i <= nBands; ++i)
   {
     // Get a pointer to the current band
@@ -186,4 +253,46 @@ int SDTS::GetPitch() const
 unsigned int SDTS::GetWidth() const
 {
   return math::roundUpPowerOfTwo(this->poDataset->GetRasterXSize()) + 1;
+}
+
+//////////////////////////////////////////////////
+double SDTS::GetWorldWidth()
+{
+  return this->worldWidth;
+}
+
+//////////////////////////////////////////////////
+double SDTS::GetWorldHeight()
+{
+  return this->worldHeight;
+}
+
+//////////////////////////////////////////////////
+double SDTS::OgrDistance(double _latAdeg, double _lonAdeg,
+                         double _latBdeg, double _lonBdeg)
+{
+  double latArad, latBrad;
+  double cosA, cosB, sinA, sinB, cosP;
+  double cosAngle;
+ 
+  cosP = cos(GZ_DTOR(_lonBdeg - _lonAdeg));
+  latArad = GZ_DTOR(_latAdeg);
+  latBrad = GZ_DTOR(_latBdeg);
+  cosA = cos(latArad);
+  sinA = sin(latArad);
+  cosB = cos(latBrad);
+  sinB = sin(latBrad);
+  cosAngle = sinA * sinB + cosA * cosB * cosP;
+
+  return this->SafeAcos(cosAngle) * RAD2METER;
+}
+
+//////////////////////////////////////////////////
+double SDTS::SafeAcos(double _x)
+{
+  if (_x > 1)
+    _x = 1;
+  else if (_x < -1)
+    _x = -1;
+  return acos(_x);
 }
