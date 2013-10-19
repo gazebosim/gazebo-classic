@@ -86,6 +86,22 @@ namespace gazebo
       return (boost::math::isnan)(_v);
     }
 
+    /// \brief Fix a nan value.
+    /// \param[in] _v Value to correct.
+    /// \return 0 if _v is NaN, _v otherwise.
+    inline float fixnan(float _v)
+    {
+      return isnan(_v) || isinf(_v) ? 0.0f : _v;
+    }
+
+    /// \brief Fix a nan value.
+    /// \param[in] _v Value to correct.
+    /// \return 0 if _v is NaN, _v otherwise.
+    inline double fixnan(double _v)
+    {
+      return isnan(_v) || isinf(_v) ? 0.0 : _v;
+    }
+
     /// \brief get mean of vector of values
     /// \param[in] _values the vector of values
     /// \return the mean
