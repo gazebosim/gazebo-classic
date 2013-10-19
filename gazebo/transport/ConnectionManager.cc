@@ -100,7 +100,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   while (!this->masterConn->Connect(_masterHost, master_port) &&
       this->IsRunning() && timeoutCount < timeoutCountMax)
   {
-    if (!common::Console::Instance()->GetQuiet())
+    if (!common::Console::GetQuiet())
     {
       printf(".");
       fflush(stdout);
@@ -108,7 +108,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     common::Time::MSleep(waitDurationMS);
     ++timeoutCount;
   }
-  if (!common::Console::Instance()->GetQuiet())
+  if (!common::Console::GetQuiet())
     printf("\n");
 
   if (timeoutCount >= timeoutCountMax)

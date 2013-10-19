@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
+#include <boost/thread.hpp>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -34,108 +36,145 @@ namespace gazebo
 {
   namespace common
   {
-    /// \addtogroup gazebo_common Common
+    /// \addtogroup gazebo_util Util
     /// \{
-
     /// \brief Output a message
-    #define gzmsg (gazebo::common::Console::Instance()->ColorMsg("Msg", 32))
+    #define gzmsg (gazebo::common::Console::g_msg)
 
     /// \brief Output a debug message
-    #define gzdbg (gazebo::common::Console::Instance()->ColorMsg("Dbg", 36))
+    #define gzdbg (gazebo::common::Console::g_dbg(__FILE__, __LINE__))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::Instance()->ColorErr("Warning", \
-          __FILE__, __LINE__, 33))
+    #define gzwarn (gazebo::common::Console::g_warn)
 
     /// \brief Output an error message
-    #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error", \
-          __FILE__, __LINE__, 31))
+    #define gzerr (gazebo::common::Console::g_err(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file
-    #define gzlog (gazebo::common::Console::Instance()->Log())
+    #define gzlog (gazebo::common::Console::g_log)
 
-    /// Start marker
-    #define gzclr_start(clr) "\033[1;33m"
+    #define gzLogInit(_str) (gazebo::common::Console::g_log.Init(_str))
 
-    /// End marker
-    #define gzclr_end "\033[0m"
-
-    /// \addtogroup gazebo_common Common
-    /// \{
-
-    /// \class Console Console.hh common/commom.hh
-    /// \brief Message, error, warning functionality
-
-    class Console : public SingletonT<Console>
+    /// \brief A logger that outputs messages to a file.
+    class FileLogger : public std::ostream
     {
-      /// \brief Default constructor
-      private: Console();
+      /// \brief Constructor.
+      /// \param[in] _filename Filename to write into. If empty,
+      /// FileLogger::Init must be called separately.
+      public: FileLogger(const std::string &_filename = "");
 
-      /// \brief Destructor
-      private: virtual ~Console();
+      /// \brief Destructor.
+      public: virtual ~FileLogger();
 
-      /// \brief Load the message parameters
-      public: void Init(const std::string &_logFilename);
+      /// \brief Initialize the file logger.
+      /// \param[in] _filename Name and path of the log file to write output
+      /// into.
+      public: void Init(const std::string &_filename);
 
-      /// \brief Return true if Init has been called.
-      /// \return True is initialized.
-      public: bool IsInitialized() const;
+      /// \brief String buffer for the file logger.
+      protected: class Buffer : public std::stringbuf
+                 {
+                   /// \brief Constructor.
+                   /// \param[in] _filename Filename to write into. If empty,
+                   /// FileLogger::Init must be called separately.
+                   public: Buffer(const std::string &_filename);
 
+                   /// \brief Destructor.
+                   public: virtual ~Buffer();
+
+                   /// \brief Sync the stream (output the string buffer
+                   /// contents).
+                   public: virtual int sync();
+
+                   /// \brief Stream to output information into.
+                   public: std::ofstream *stream;
+                 };
+    };
+
+    /// \brief Base class for all console loggers.
+    class Logger : public std::ostream
+    {
+      /// \brief Constructor.
+      /// \param[in] _prefix String to use as prefix when logging to file.
+      /// \param[in] _color Color of the output stream.
+      /// \param[in] _stream Stream to output data onto, such as
+      /// &std::out, or &std::err.
+      public: Logger(const std::string &_prefix,
+                  int _color, std::ostream *_stream);
+
+      /// \brief Destructor.
+      public: virtual ~Logger();
+
+      /// \brief Output a filename and line number, then return a reference
+      /// to the logger.
+      /// \param[in] _file Filename to output.
+      /// \param[in] _line Line number in the _file.
+      /// \return Reference to this logger.
+      public: virtual Logger &operator()(
+                  const std::string &_file, int _line);
+
+      /// \brief String buffer for the base logger.
+      protected: class Buffer : public std::stringbuf
+                 {
+                   /// \brief Constructor.
+                   /// \param[in] _prefix String to use as prefix when
+                   /// logging to file.
+                   /// \param[in] _color Color of the output stream.
+                   /// \param[in] _stream Stream to output data onto, such as
+                   /// &std::out, or &std::err.
+                   public: Buffer(const std::string &_prefix,
+                               int _color, std::ostream *_stream);
+
+                   /// \brief Destructor.
+                   public: virtual ~Buffer();
+
+                   /// \brief Sync the stream (output the string buffer
+                   /// contents).
+                   public: virtual int sync();
+
+                   /// \brief Color for the output.
+                   public: int color;
+
+                   /// \brief Stream to output information into.
+                   public: std::ostream *stream;
+
+                   private: FileLogger *log;
+
+                   /// \brief Prefix to use when logging to file.
+                   private: std::string prefix;
+                 };
+    };
+
+    /// \class Console Console.hh common/common.hh
+    class Console 
+    {
       /// \brief Set quiet output
       /// \param[in] q True to prevent warning
-      public: void SetQuiet(bool _q);
+      public: static void SetQuiet(bool _q);
 
       /// \brief Get whether quiet output is set
       /// \return True to if quiet output is set
-      public: bool GetQuiet() const;
+      public: static bool GetQuiet();
 
-      /// \brief Use this to output a colored message to the terminal
-      /// \param[in] _lbl Text label
-      /// \param[in] _color Color to make the label
-      /// \return Reference to an output stream
-      public: std::ostream &ColorMsg(const std::string &_lbl, int _color);
+      /// \brief Indicates if console messages should be quiet.
+      private: static bool quiet;
 
-      /// \brief Use this to output a colored message to the terminal
-      /// \param[in] _lbl Text label
-      /// \return Reference to an output stream
-      public: std::ofstream &Log();
+      /// \brief Global instance of the message logger.
+      public: static Logger g_msg;
 
-      /// \brief Use this to output an error to the terminal
-      /// \param[in] _lbl Text label
-      /// \param[in] _file File containing the error
-      /// \param[in] _line Line containing the error
-      /// \param[in] _color Color to make the label
-      /// \return Reference to an output stream
-      public: std::ostream &ColorErr(const std::string &_lbl,
-                  const std::string &_file, unsigned int _line, int _color);
+      /// \brief Global instance of the error logger.
+      public: static Logger g_err;
 
+      /// \brief Global instance of the debug logger.
+      public: static Logger g_dbg;
 
-      /// \class NullStream Animation.hh common/common.hh
-      /// \brief A stream that does not output anywhere
-      private: class NullStream : public std::ostream
-               {
-                 /// \brief constructor
-                 public: NullStream() : std::ios(0), std::ostream(0) {}
-               };
+      /// \brief Global instance of the warning logger.
+      public: static Logger g_warn;
 
-      /// \brief Null stream
-      private: NullStream nullStream;
-
-      /// \brief Message stream
-      private: std::ostream *msgStream;
-
-      /// \brief Error stream
-      private: std::ostream *errStream;
-
-      /// \brief Stream for a log file.
-      private: std::ofstream *logStream;
-
-      /// \brief True to silence msg output.
-      private: bool quiet;
-
-      /// \brief This is a singleton
-      private: friend class SingletonT<Console>;
+      /// \brief Global instance of the file logger.
+      public: static FileLogger g_log;
     };
+
     /// \}
   }
 }

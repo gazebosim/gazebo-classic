@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,93 +22,149 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gazebo_config.h"
+
 using namespace gazebo;
 using namespace common;
 
-//////////////////////////////////////////////////
-Console::Console()
-{
-  this->msgStream = &std::cerr;
-  this->errStream = &std::cerr;
-  this->logStream = NULL;
-  this->quiet = false;
-}
+FileLogger gazebo::common::Console::g_log("");
+Logger Console::g_msg("{Msg}", 32, &std::cout);
+Logger Console::g_err("{Err}", 31, &std::cerr);
+Logger Console::g_dbg("{Dbg}", 36, &std::cout);
+Logger Console::g_warn("{Wrn}", 33, &std::cerr);
 
-//////////////////////////////////////////////////
-Console::~Console()
-{
-  if (this->logStream)
-    this->logStream->close();
-}
-
-//////////////////////////////////////////////////
-void Console::Init(const std::string &_logFilename)
-{
-  if (!getenv("HOME"))
-    gzthrow("Missing HOME environment variable");
-
-  boost::filesystem::path logPath(getenv("HOME"));
-  logPath = logPath / ".gazebo/" / _logFilename;
-
-  if (this->logStream)
-  {
-    this->logStream->close();
-    delete this->logStream;
-  }
-
-  this->logStream = new std::ofstream(logPath.string().c_str(), std::ios::out);
-}
-
-//////////////////////////////////////////////////
-bool Console::IsInitialized() const
-{
-  return this->logStream != NULL;
-}
+bool Console::quiet = true;
 
 //////////////////////////////////////////////////
 void Console::SetQuiet(bool _quiet)
 {
-  this->quiet = _quiet;
+  quiet = _quiet;
 }
 
 //////////////////////////////////////////////////
-bool Console::GetQuiet() const
+bool Console::GetQuiet()
 {
-  return this->quiet;
+  return quiet;
 }
 
-//////////////////////////////////////////////////
-std::ostream &Console::ColorMsg(const std::string &_lbl, int _color)
+/////////////////////////////////////////////////
+Logger::Logger(const std::string &_prefix, int _color, std::ostream *_stream)
+  : std::ostream(new Buffer(_prefix, _color, _stream))
 {
-  if (this->quiet)
-    return this->nullStream;
-  else
+}
+
+/////////////////////////////////////////////////
+Logger::~Logger()
+{
+  delete this->rdbuf();
+}
+
+/////////////////////////////////////////////////
+Logger &Logger::operator()(const std::string &_file, int _line)
+{
+  int index = _file.find_last_of("/") + 1;
+  (*this) << "[" << _file.substr(index , _file.size() - index) << ":"
+    << _line << "]";
+
+  return (*this);
+}
+
+/////////////////////////////////////////////////
+Logger::Buffer::Buffer(const std::string &_prefix, int _color,
+    std::ostream *_stream)
+  : color(_color), stream(_stream), prefix(_prefix)
+{
+  this->log = &Console::g_log;
+}
+
+/////////////////////////////////////////////////
+Logger::Buffer::~Buffer()
+{
+  this->log = NULL;
+  this->pubsync();
+}
+
+/////////////////////////////////////////////////
+int Logger::Buffer::sync()
+{
+  // Always log
+  if (this->log)
   {
-    *this->msgStream << "\033[1;" << _color << "m" << _lbl << "\033[0m ";
-    return *this->msgStream;
+    (*this->log) << this->prefix << " " << this->str() << std::endl;
+  }
+
+  // Output to terminal
+  if (!Console::GetQuiet())
+  {
+    (*this->stream) << "\033[1;" 
+      << this->color << "m" << this->str() << "\033[0m";
+  }
+
+  this->str("");
+  return !(*this->stream);
+}
+
+/////////////////////////////////////////////////
+FileLogger::FileLogger(const std::string &_filename)
+  : std::ostream(new Buffer(_filename))
+{
+}
+
+/////////////////////////////////////////////////
+FileLogger::~FileLogger()
+{
+  delete this->rdbuf();
+}
+
+/////////////////////////////////////////////////
+void FileLogger::Init(const std::string &_filename)
+{
+  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
+      this->rdbuf());
+
+  // Only allow initialization once.
+  if (buf->stream)
+    return;
+
+  if (!getenv("HOME"))
+    gzthrow("Missing HOME environment variable");
+
+  boost::filesystem::path logPath(getenv("HOME"));
+  logPath = logPath / ".gazebo/" / _filename;
+
+  buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+
+  // Output the version of Gazebo.
+  (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
+}
+
+/////////////////////////////////////////////////
+FileLogger::Buffer::Buffer(const std::string &_filename)
+  : stream(NULL)
+{
+  if (!_filename.empty())
+  {
+    this->stream = new std::ofstream(_filename.c_str(), std::ios::out);
   }
 }
 
-//////////////////////////////////////////////////
-std::ofstream &Console::Log()
+/////////////////////////////////////////////////
+FileLogger::Buffer::~Buffer()
 {
-  if (!this->logStream)
-    this->logStream = new std::ofstream("/dev/null", std::ios::out);
-
-  *this->logStream << "[" << common::Time::GetWallTime() << "] ";
-  this->logStream->flush();
-  return *this->logStream;
+  if (this->stream)
+    static_cast<std::ofstream*>(this->stream)->close();
 }
 
-//////////////////////////////////////////////////
-std::ostream &Console::ColorErr(const std::string &lbl,
-                                const std::string &file,
-                                unsigned int line, int color)
+/////////////////////////////////////////////////
+int FileLogger::Buffer::sync()
 {
-  int index = file.find_last_of("/") + 1;
+  if (!this->stream)
+    return -1;
 
-  *this->errStream << "\033[1;" << color << "m" << lbl << " [" <<
-    file.substr(index , file.size() - index)<< ":" << line << "]\033[0m ";
+  *this->stream << "(" << common::Time::GetWallTime() << ") " << this->str();
 
-  return *this->errStream;
+  this->stream->flush();
+
+  this->str("");
+  return !(*this->stream);
 }

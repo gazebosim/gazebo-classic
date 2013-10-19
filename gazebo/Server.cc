@@ -142,7 +142,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   }
 
   if (this->vm.count("quiet"))
-    gazebo::common::Console::Instance()->SetQuiet(true);
+    gazebo::common::Console::SetQuiet(true);
   else
     gazebo::print_version();
 

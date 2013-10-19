@@ -103,7 +103,7 @@ bool parse_args(int _argc, char **_argv)
   if (!vm.count("quiet"))
     gazebo::print_version();
   else
-    gazebo::common::Console::Instance()->SetQuiet(true);
+    gazebo::common::Console::SetQuiet(true);
 
 
   /// Load all the plugins specified on the command line
@@ -188,7 +188,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gazebo::common::Console::Instance()->Init("gzclient.log");
+  gzLogInit("gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();

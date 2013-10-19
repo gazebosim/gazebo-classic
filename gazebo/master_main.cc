@@ -25,24 +25,17 @@
 gazebo::Master *master = NULL;
 
 //////////////////////////////////////////////////
-void PrintVersion()
-{
-  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-//////////////////////////////////////////////////
 void SignalHandler(int /*dummy*/)
 {
   master->Stop();
   return;
 }
 
+//////////////////////////////////////////////////
 int main(int /*argc*/, char ** /*argv*/)
 {
   try
   {
-    PrintVersion();
-
     if (signal(SIGINT, SignalHandler) == SIG_ERR)
     {
       std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;

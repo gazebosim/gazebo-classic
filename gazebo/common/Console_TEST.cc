@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <boost/filesystem.hpp>
 #include <stdlib.h>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 
 /////////////////////////////////////////////////
@@ -26,7 +27,7 @@
 TEST(Console_TEST, InitAndLog)
 {
   // Initialize Console
-  gazebo::common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
 
   EXPECT_TRUE(getenv("HOME") != NULL);
 
@@ -46,32 +47,80 @@ TEST(Console_TEST, InitAndLog)
 
     // Open the log file, and read back the string
     std::ifstream ifs(testLog.string().c_str(), std::ios::in);
-    std::getline(ifs, loggedString);
+    while (!ifs.eof())
+    {
+      std::string line;
+      std::getline(ifs, line);
+      loggedString += line;
+    }
+
     EXPECT_TRUE(loggedString.find(logString) != std::string::npos);
   }
 }
 
-/////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
 /// \brief Test Console::ColorMsg
 TEST(Console_TEST, ColorMsg)
 {
-  std::ostream *stream;
-  stream = &(gazebo::common::Console::Instance()->ColorMsg("label", 20));
+  // Initialize Console
+  gzLogInit("test.log");
 
-  EXPECT_TRUE(stream != NULL);
-  EXPECT_TRUE(stream->good());
+  EXPECT_TRUE(getenv("HOME") != NULL);
+
+  // Make sure that the log file has been created
+  std::string logPath = getenv("HOME");
+  boost::filesystem::path testLog(logPath);
+  testLog = testLog / ".gazebo/test.log";
+  EXPECT_TRUE(boost::filesystem::exists(testLog));
+
+  std::string logString = "this is a msg test";
+  std::string loggedString;
+
+  gzmsg << logString << std::endl;
+
+  // Open the log file, and read back the string
+  std::ifstream ifs(testLog.string().c_str(), std::ios::in);
+  while (!ifs.eof())
+  {
+    std::string line;
+    std::getline(ifs, line);
+    loggedString += line;
+  }
+
+  EXPECT_TRUE(loggedString.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////
 /// \brief Test Console::ColorErr
 TEST(Console_TEST, ColorErr)
 {
-  std::ostream *stream;
-  stream = &(gazebo::common::Console::Instance()->ColorErr("label",
-        "myfile", 10, 20));
+  // Initialize Console
+  gzLogInit("test.log");
 
-  EXPECT_TRUE(stream != NULL);
-  EXPECT_TRUE(stream->good());
+  EXPECT_TRUE(getenv("HOME") != NULL);
+
+  // Make sure that the log file has been created
+  std::string logPath = getenv("HOME");
+  boost::filesystem::path testLog(logPath);
+  testLog = testLog / ".gazebo/test.log";
+  EXPECT_TRUE(boost::filesystem::exists(testLog));
+
+  std::string logString = "this is an error test";
+  std::string loggedString;
+
+  gzerr << logString << std::endl;
+
+  // Open the log file, and read back the string
+  std::ifstream ifs(testLog.string().c_str(), std::ios::in);
+  while (!ifs.eof())
+  {
+    std::string line;
+    std::getline(ifs, line);
+    loggedString += line;
+  }
+
+  EXPECT_TRUE(loggedString.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////
