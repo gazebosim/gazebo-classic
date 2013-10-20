@@ -26,6 +26,7 @@
 #include <string>
 #include <list>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
