@@ -194,7 +194,11 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
 //////////////////////////////////////////////////
 unsigned int SDTS::GetHeight() const
 {
-  return math::roundUpPowerOfTwo(this->poDataset->GetRasterYSize()) + 1;
+  unsigned int currentHeight = this->poDataset->GetRasterYSize();
+  if (math::isPowerOfTwo(currentHeight - 1))
+    return currentHeight;
+  else
+    return math::roundUpPowerOfTwo(currentHeight) + 1;
 }
 
 //////////////////////////////////////////////////
@@ -252,7 +256,11 @@ int SDTS::GetPitch() const
 //////////////////////////////////////////////////
 unsigned int SDTS::GetWidth() const
 {
-  return math::roundUpPowerOfTwo(this->poDataset->GetRasterXSize()) + 1;
+  unsigned int currentWidth = this->poDataset->GetRasterXSize();
+  if (math::isPowerOfTwo(currentWidth - 1))
+    return currentWidth;
+  else
+    return math::roundUpPowerOfTwo(currentWidth) + 1;
 }
 
 //////////////////////////////////////////////////
