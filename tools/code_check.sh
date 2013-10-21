@@ -14,6 +14,11 @@ else
   builddir=./build
 fi
 
+# Identify cppcheck version
+CPPCHECK_VERSION=`cppcheck --version | sed -e 's@Cppcheck @@'`
+CPPCHECK_LT_157=`echo "$CPPCHECK_VERSION 1.57" | \
+                 awk '{if ($1 < $2) print 1; else print 0}'`
+
 QUICK_CHECK=0
 if test "$1" = "--quick"
 then
@@ -43,7 +48,12 @@ else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
-  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
+  if [ $CPPCHECK_LT_157 -eq 1 ]; then
+    # cppcheck is older than 1.57, so don't check header files (issue #907)
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+  else
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
+  fi
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
 fi
@@ -70,6 +80,10 @@ echo "*:gazebo/physics/Actor.hh:46" >> $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
+if [ $CPPCHECK_LT_157 -eq 0 ]; then
+  # use --language argument if 1.57 or greater (issue #907)
+  CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
+fi
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
 CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
@@ -98,9 +112,19 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     # Fix suppressions for tmp files
     sed -i -e "s@$f@$tmp2@" $SUPPRESS
 
-    $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
-      | sed -e "s@$tmp2@$f@g" \
-      | grep -v 'use --check-config for details'
+    # Skip cppcheck for header files if cppcheck is old
+    DO_CPPCHECK=0
+    if [ $ext = 'cc' ]; then
+      DO_CPPCHECK=1
+    elif [ $CPPCHECK_LT_157 -eq 0 ]; then
+      DO_CPPCHECK=1
+    fi 
+
+    if [ $DO_CPPCHECK -eq 1 ]; then
+      $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
+        | sed -e "s@$tmp2@$f@g" \
+        | grep -v 'use --check-config for details'
+    fi
 
     # Undo changes to suppression file
     sed -i -e "s@$tmp2@$f@" $SUPPRESS
