@@ -43,7 +43,7 @@ else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
-  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
 fi
@@ -59,12 +59,22 @@ echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
+echo "*:gazebo/common/Mesh:1" >> $SUPPRESS
+echo "*:gazebo/common/Mesh.hh:190"  >> $SUPPRESS
+echo "*:gazebo/common/Mesh.hh:193"  >> $SUPPRESS
+echo "*:gazebo/common/Mesh.hh:196"  >> $SUPPRESS
+echo "*:gazebo/physics/Actor.hh:41" >> $SUPPRESS
+echo "*:gazebo/physics/Actor.hh:43" >> $SUPPRESS
+echo "*:gazebo/physics/Actor.hh:44" >> $SUPPRESS
+echo "*:gazebo/physics/Actor.hh:45" >> $SUPPRESS
+echo "*:gazebo/physics/Actor.hh:46" >> $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
-CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
+CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"\
+" --rule-file=./tools/cppcheck_rules/issue_906.rule"
 CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
@@ -87,11 +97,11 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     tmp2base=`basename "$QUICK_TMP"`
     hg cat -r $QUICK_SOURCE $hg_root/$f > $tmp2
 
-    if test $ext = "cc"; then
+    #if test $ext = "cc"; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
         | grep -v 'use --check-config for details'
-    fi
+    #fi
 
     python $hg_root/tools/cpplint.py $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \
