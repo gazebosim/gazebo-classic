@@ -137,8 +137,6 @@ namespace gazebo
                    /// \brief Stream to output information into.
                    public: std::ostream *stream;
 
-                   private: FileLogger *log;
-
                    /// \brief Prefix to use when logging to file.
                    private: std::string prefix;
                  };
@@ -175,7 +173,6 @@ namespace gazebo
       /// \brief Global instance of the file logger.
       public: static FileLogger log;
     };
-
     /// \}
   }
 }

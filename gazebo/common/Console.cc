@@ -74,13 +74,11 @@ Logger::Buffer::Buffer(const std::string &_prefix, int _color,
     std::ostream *_stream)
   : color(_color), stream(_stream), prefix(_prefix)
 {
-  this->log = &Console::log;
 }
 
 /////////////////////////////////////////////////
 Logger::Buffer::~Buffer()
 {
-  this->log = NULL;
   this->pubsync();
 }
 
@@ -88,8 +86,7 @@ Logger::Buffer::~Buffer()
 int Logger::Buffer::sync()
 {
   // Log messages to disk
-  if (this->log)
-    (*this->log) << this->prefix << " " << this->str() << std::endl;
+  Console::log << this->prefix << " " << this->str() << std::endl;
 
   // Output to terminal
   if (!Console::GetQuiet())
