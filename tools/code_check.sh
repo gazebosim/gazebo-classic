@@ -43,7 +43,7 @@ else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
-  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
 fi
@@ -87,11 +87,9 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     tmp2base=`basename "$QUICK_TMP"`
     hg cat -r $QUICK_SOURCE $hg_root/$f > $tmp2
 
-    if test $ext = "cc"; then
-      $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
-        | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
-    fi
+    $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
+      | sed -e "s@$tmp2@$f@g" \
+      | grep -v 'use --check-config for details'
 
     python $hg_root/tools/cpplint.py $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \
