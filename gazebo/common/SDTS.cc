@@ -61,7 +61,7 @@ SDTS::SDTS(const std::string &_filename)
   // Pass Lon/Lat coordinates to the Transform function:
   double x = 0;
   double y = 0;
-  poCT_Proj2Geog->Transform( 1, &x, &y );*/
+  poCT_Proj2Geog->Transform(1, &x, &y);*/
 
   double upperLeftX = 0.0;
   double upperLeftY = 0.0;
@@ -89,8 +89,8 @@ SDTS::SDTS(const std::string &_filename)
   this->worldHeight = this->OgrDistance(upperLeftYgeo, upperLeftXgeo,
                                         lowerLeftYgeo, lowerLeftXgeo);
 
-  /*std::cout << "World width: " << this->worldWidth << std::endl;
-  std::cout << "World height: " << this->worldHeight << std::endl;*/
+  std::cout << "World width: " << this->worldWidth << std::endl;
+  std::cout << "World height: " << this->worldHeight << std::endl;
 }
 
 void SDTS::GetGeoReference(double _pixel, double _line,

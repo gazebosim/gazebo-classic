@@ -77,7 +77,7 @@
 	            <!-- <uri>file://media/materials/textures/ne_small2.tif</uri> -->
               <uri>file://media/materials/textures/imgn38w123_1_129.img</uri>
               <!-- <uri>file://media/materials/textures/imgn38w123_1_squared.img</uri> -->
-              <size>500 500 10</size>
+              <size>200 200 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
@@ -115,7 +115,7 @@
               <uri>file://media/materials/textures/imgn38w123_1_129.img</uri>
               <!-- <uri>file://media/materials/textures/imgn38w123_1_squared.img</uri> -->
 
-              <size>500 500 10</size>
+              <size>200 200 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>

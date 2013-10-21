@@ -150,6 +150,12 @@ namespace gazebo
 
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
+
+      /// \brief File format of the heightmap
+      private: std::string fileFormat;
+
+      /// \brief Terrain size
+      private: math::Vector3 heigthmapSize;
     };
     /// \}
   }

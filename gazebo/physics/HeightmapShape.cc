@@ -77,6 +77,7 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
+  std::cout << "Load()\n";
   GDALDataset *poDataset;
 
   Base::Load(_sdf);
@@ -90,7 +91,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   poDataset = reinterpret_cast<GDALDataset *>
       (GDALOpen(filename.c_str(), GA_ReadOnly));
-  std::string fileFormat = poDataset->GetDriver()->GetDescription();
+  this->fileFormat = poDataset->GetDriver()->GetDescription();
   std::cout << "Terrain file format: " << fileFormat << std::endl;
   GDALClose( (GDALDataset *) poDataset );
 
@@ -149,12 +150,17 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     this->img.Load(filename);
     //this->img.Rescale(65, 65);
     this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
+    this->heigthmapSize = this->sdf->Get<math::Vector3>("size");
   }
   else
   {
     std::cout << "SDTS\n";
     // Load the terrain file as a SDTS
     sdts = new common::SDTS(filename);
+    this->heigthmapSize.x = sdts->GetWorldWidth();
+    this->heigthmapSize.y = sdts->GetWorldHeight();
+    this->heigthmapSize.z = 10.0;
+
     this->heightmapData = static_cast<common::HeightmapData*>(this->sdts);
   }
 
@@ -164,6 +170,8 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   {
     gzthrow("Heightmap data size must be square, with a size of 2^n+1\n");
   }
+
+  std::cout << "Size: " << this->heigthmapSize << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -175,6 +183,7 @@ int HeightmapShape::GetSubSampling() const
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
+  std::cout << "Init()\n";
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
@@ -190,6 +199,10 @@ void HeightmapShape::Init()
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
+
+  std::cout << "Physics. GetSize() GetSize: " << this->GetSize() << std::endl;
+  std::cout << "Physics. Init() GetWidth: " << this->heightmapData->GetWidth() << std::endl;
+  std::cout << "Physics. Init() vertSize: " << this->vertSize << std::endl;
 
   if (math::equal(this->heightmapData->GetMaxColor().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
@@ -297,7 +310,7 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->heigthmapSize;
 }
 
 //////////////////////////////////////////////////
@@ -323,6 +336,7 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
     }
   }
 
+  std::cout << "Physics. FillMsg() GetSize: " << this->GetSize() << std::endl;
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
