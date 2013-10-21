@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,8 @@ void sig_handler(int /*signo*/)
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  if (_argc >= 2 && strcmp(_argv[1], "-h") == 0)
+  if (_argc >= 2 &&
+      (strcmp(_argv[1], "-h") == 0 || strcmp(_argv[1], "--help") == 0))
   {
     help();
     return 0;
