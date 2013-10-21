@@ -49,8 +49,7 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/sdf/interface/parser.cc:544" > $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:94" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
@@ -59,6 +58,15 @@ echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
+# False positives, "struct or union member ... is never used"
+echo "*:gazebo/common/Mesh.hh:190" >> $SUPPRESS  
+echo "*:gazebo/common/Mesh.hh:193" >> $SUPPRESS  
+echo "*:gazebo/common/Mesh.hh:196" >> $SUPPRESS  
+echo "*:gazebo/physics/Actor.hh:41" >> $SUPPRESS  
+echo "*:gazebo/physics/Actor.hh:43" >> $SUPPRESS  
+echo "*:gazebo/physics/Actor.hh:44" >> $SUPPRESS  
+echo "*:gazebo/physics/Actor.hh:45" >> $SUPPRESS  
+echo "*:gazebo/physics/Actor.hh:46" >> $SUPPRESS  
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
@@ -87,9 +95,15 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     tmp2base=`basename "$QUICK_TMP"`
     hg cat -r $QUICK_SOURCE $hg_root/$f > $tmp2
 
+    # Fix suppressions for tmp files
+    sed -i -e "s@$f@$tmp2@" $SUPPRESS
+
     $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" \
       | grep -v 'use --check-config for details'
+
+    # Undo changes to suppression file
+    sed -i -e "s@$tmp2@$f@" $SUPPRESS
 
     python $hg_root/tools/cpplint.py $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \
