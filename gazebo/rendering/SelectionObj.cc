@@ -75,7 +75,11 @@ void SelectionObj::Load()
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   if (this->parent)
+  {
+    if (this->parent == _vis)
+      return;
     this->parent->DetachVisual(shared_from_this());
+  }
   this->parent = _vis;
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
