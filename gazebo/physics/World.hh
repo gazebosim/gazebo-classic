@@ -275,11 +275,12 @@ namespace gazebo
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(2.0);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void Step(int _steps);
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.

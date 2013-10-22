@@ -572,7 +572,7 @@ void World::StepWorld(int _steps)
 }
 
 //////////////////////////////////////////////////
-void World::Step(int _steps)
+void World::Step(unsigned int _steps)
 {
   if (!this->IsPaused())
   {
