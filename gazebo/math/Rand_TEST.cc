@@ -47,3 +47,24 @@ TEST(RandTest, Rand)
     EXPECT_TRUE(math::equal(d, 0.985827));
   }
 }
+
+TEST(RandTest, SetSeed)
+{
+  int N = 10;
+  std::vector<int> first;
+  std::vector<int> second;
+
+  for (int i = 0; i < N; ++i)
+  {
+    math::Rand::SetSeed(i);
+    first.push_back(math::Rand::GetIntUniform(-10, 10));
+    second.push_back(math::Rand::GetIntUniform(-10, 10));
+  }
+
+  for (int i = 0; i < N; ++i)
+  {
+    math::Rand::SetSeed(i);
+    EXPECT_EQ(first[i], math::Rand::GetIntUniform(-10, 10));
+    EXPECT_EQ(second[i], math::Rand::GetIntUniform(-10, 10));
+  }
+}
