@@ -931,7 +931,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         if (_physicsEngine == "simbody" ||
             _physicsEngine == "dart")
         {
-          gzerr << "Skipping joint detachment per #862" << std::endl;
+          gzerr << "Skipping joint detachment per #862 / #903" << std::endl;
           continue;
         }
         // Detach upper_joint.
