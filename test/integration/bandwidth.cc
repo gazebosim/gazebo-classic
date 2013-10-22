@@ -52,8 +52,8 @@ void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support closed loops in PR2, "
-          << "Please see issue #1. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/1)\n";
+          << "Please see issue #913. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/913)\n";
     return;
   }
 
