@@ -528,8 +528,8 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
     // Child world link breaks dart for now. Do we need to support it?
     gzerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
-          << "Please see issue #4. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/4)\n";
+          << "Please see issue #914. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
     return;
   }
 
@@ -622,8 +622,8 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
       // Child world link breaks dart for now. Do we need to support it?
       gzerr << "Skip tests for child world link cases "
             << "since DART does not allow joint with world as child. "
-            << "Please see issue #4. "
-            << "(https://bitbucket.org/jlee02/gazebo_dart/issue/4)\n";
+            << "Please see issue #914. "
+            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
       return;
     }
     bool worldChild = (i == 0);

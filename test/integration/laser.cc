@@ -39,8 +39,8 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray shape, "
-          << "Please see issue #2. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
     return;
   }
 
@@ -171,8 +171,8 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
-          << "Please see issue #2. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
     return;
   }
 
@@ -268,8 +268,8 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
-          << "Please see issue #2. "
-          << "(https://bitbucket.org/jlee02/gazebo_dart/issue/2).\n";
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
     return;
   }
 
