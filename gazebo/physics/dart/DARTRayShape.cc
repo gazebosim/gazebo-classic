@@ -55,7 +55,7 @@ DARTRayShape::~DARTRayShape()
 void DARTRayShape::Update()
 {
   gzerr << "Not implemented yet."
-        << "Please see issue #915.\n";
+        << "Please see issue #911.\n";
 }
 
 //////////////////////////////////////////////////
@@ -69,7 +69,7 @@ void DARTRayShape::GetIntersection(double& _dist, std::string& _entity)
   }
 
   gzerr << "Not implemented yet."
-        << "Please see issue #915.\n";
+        << "Please see issue #911.\n";
 }
 
 //////////////////////////////////////////////////
@@ -79,5 +79,5 @@ void DARTRayShape::SetPoints(const math::Vector3& _posStart,
   RayShape::SetPoints(_posStart, _posEnd);
 
   gzerr << "Not implemented yet."
-        << "Please see issue #915.\n";
+        << "Please see issue #911.\n";
 }
