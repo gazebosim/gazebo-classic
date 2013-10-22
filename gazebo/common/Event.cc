@@ -16,7 +16,6 @@
  */
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/EventPrivate.hh"
 #include "gazebo/common/Event.hh"
 
 using namespace gazebo;
