@@ -40,6 +40,7 @@ set(tests
   #state_log.cc
   surface_properties.cc
   transceiver.cc
+  world.cc
   )
 
 if (MANPAGES_SUPPORT)

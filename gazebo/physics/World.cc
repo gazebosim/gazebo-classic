@@ -710,7 +710,19 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  this->SetPaused(true);
+
+  this->publishModelPoses.clear();
+
+  // Remove all models
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    this->rootElement->RemoveChild((*iter)->GetId());
+  }
+  this->models.clear();
+
+  this->SetPaused(false);
 }
 
 //////////////////////////////////////////////////
