@@ -22,6 +22,7 @@
 
 using namespace gazebo;
 
+//////////////////////////////////////////////////
 TEST(RandTest, Rand)
 {
   double d;
@@ -48,6 +49,7 @@ TEST(RandTest, Rand)
   }
 }
 
+//////////////////////////////////////////////////
 TEST(RandTest, SetSeed)
 {
   int N = 10;
