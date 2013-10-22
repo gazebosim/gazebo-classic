@@ -168,7 +168,10 @@ void Model::Init()
     {
       LinkPtr link = boost::static_pointer_cast<Link>(*iter);
       if (link)
+      {
         link->Init();
+        this->links.push_back(link);
+      }
       else
         gzerr << "Child [" << (*iter)->GetName()
               << "] has type Base::LINK, but cannot be dynamically casted\n";
@@ -827,7 +830,7 @@ void Model::FillMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (!(_msg.has_id() && _msg.id() == this->GetId()))
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;

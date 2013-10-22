@@ -47,7 +47,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
   physics->SetGravity(math::Vector3(0, 0, -50));
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
 
   // get time step size
@@ -66,7 +66,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 1 (y)-------------------\n";
   physics->SetGravity(math::Vector3(0, 10, 0));
-  world->StepWorld(100);
+  world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0048295899143964149, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), 0.0, 1e-6);
@@ -78,7 +78,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 2 (x)-------------------\n";
   physics->SetGravity(math::Vector3(10, 0, 0));
-  world->StepWorld(100);
+  world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0050046318305403403, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.0048293115636619532, 1e-5);
@@ -90,7 +90,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 
   gzdbg << "-------------------Test 3 (joint limit)-------------------\n";
   physics->SetGravity(math::Vector3(1000, 1000, 0));
-  world->StepWorld(1000);
+  world->Step(1000);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.7, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.7, 0.001);
