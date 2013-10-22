@@ -128,9 +128,10 @@ void DARTLink::OnPoseChange()
     Eigen::Isometry3d P = Eigen::Isometry3d::Identity();
     if (this->dtBodyNode->getParentBodyNode())
       P = this->dtBodyNode->getParentBodyNode()->getWorldTransform();
-    Eigen::Vector6d t =
-        dart::math::logMap(T1.inverse() * P.inverse() * W * InvT2);
-
+    Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
+    Eigen::Vector6d t = Eigen::Vector6d::Zero();
+    t.tail<3>() = Q.translation();
+    t.head<3>() = dart::math::logMap(Q.linear());
     freeJoint->set_q(t);
   }
   else
