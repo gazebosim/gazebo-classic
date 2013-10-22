@@ -1603,10 +1603,11 @@ void PhysicsTest::DoublePendulumHighRatio(const std::string &_physicsEngine)
   physicsEngine->SetMaxStepSize(0.001);
   physicsEngine->SetSORPGSIters(50);
 
-  double maxErrorX = 0;
-  double maxErrorY = 0;
-  double maxErrorZ = 0;
   {
+    double maxErrorX = 0;
+    double maxErrorY = 0;
+    double maxErrorZ = 0;
+
     // test link2 drift from joint location
     int steps = 2000;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
