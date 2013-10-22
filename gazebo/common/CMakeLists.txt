@@ -23,7 +23,6 @@ set (sources
   Console.cc
   Event.cc
   Events.cc
-  EventPrivate.cc
   Exception.cc
   Image.cc
   KeyFrame.cc
@@ -56,7 +55,6 @@ set (headers
   Console.hh
   Event.hh
   Events.hh
-  EventPrivate.hh
   Exception.hh
   Image.hh
   KeyEvent.hh

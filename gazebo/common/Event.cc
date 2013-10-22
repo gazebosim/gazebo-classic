@@ -16,10 +16,17 @@
  */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/EventPrivate.hh"
 #include "gazebo/common/Event.hh"
 
 using namespace gazebo;
 using namespace event;
+
+//////////////////////////////////////////////////
+EventPrivate::EventPrivate()
+  : signaled(false)
+{
+}
 
 //////////////////////////////////////////////////
 Event::Event()
@@ -44,6 +51,18 @@ Event::~Event()
 bool Event::GetSignaled() const
 {
   return this->dataPtr->signaled;
+}
+
+//////////////////////////////////////////////////
+ConnectionPrivate::ConnectionPrivate()
+  : event(NULL), id(-1)
+{
+}
+
+//////////////////////////////////////////////////
+ConnectionPrivate::ConnectionPrivate(Event *_e, int _i)
+  : event(_e), id(_i)
+{
 }
 
 //////////////////////////////////////////////////

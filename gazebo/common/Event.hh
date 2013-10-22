@@ -31,7 +31,6 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
 #include <gazebo/math/Helpers.hh>
-#include <gazebo/common/EventPrivate.hh>
 
 namespace gazebo
 {
@@ -41,6 +40,18 @@ namespace gazebo
   {
     /// \addtogroup gazebo_event Events
     /// \{
+
+    /// \internal
+    // Private data members for Event class.
+    // This must be in the header due to templatization.
+    class EventPrivate
+    {
+      // \brief Constructor
+      public: EventPrivate();
+
+      /// \brief True if the event has been signaled.
+      public: bool signaled;
+    };
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
@@ -72,6 +83,28 @@ namespace gazebo
       protected: EventPrivate *dataPtr;
     };
 
+    /// \internal
+    // Private data members for Connection class.
+    class ConnectionPrivate
+    {
+      /// \brief Constructor.
+      public: ConnectionPrivate();
+
+      /// \brief Constructor.
+      /// \param[in] _e Event pointer to connect with
+      /// \param[in] _i Unique id
+      public: ConnectionPrivate(Event *_e, int _i);
+
+      /// \brief the event for this connection
+      public: Event *event;
+
+      /// \brief the id set in the constructor
+      public: int id;
+
+      /// \brief set during the constructor
+      public: common::Time creationTime;
+    };
+
     /// \brief A class that encapsulates a connection.
     class Connection
     {
@@ -95,6 +128,25 @@ namespace gazebo
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;
+    };
+
+    /// \internal
+    // Private data members for EventT<T> class.
+    template< typename T>
+    class EventTPrivate : public EventPrivate
+    {
+      /// \def EvtConnectionMap
+      /// \brief Event Connection map typedef.
+      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
+
+      /// \brief Array of connection callbacks.
+      public: EvtConnectionMap connections;
+
+      /// \brief Set of connections to erased.
+      public: std::vector<int> connectionsToErase;
+
+      /// \brief A thread lock.
+      public: boost::mutex connectionsEraseMutex;
     };
 
     /// \class EventT Event.hh common/common.hh
