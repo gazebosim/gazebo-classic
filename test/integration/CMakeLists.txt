@@ -57,6 +57,7 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 endif()
 
