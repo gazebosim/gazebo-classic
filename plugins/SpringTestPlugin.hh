@@ -17,6 +17,8 @@
 #ifndef __GAZEBO_SPRING_TEST_PLUGIN_HH__
 #define __GAZEBO_SPRING_TEST_PLUGIN_HH__
 
+#include <string>
+
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/gazebo.hh"
