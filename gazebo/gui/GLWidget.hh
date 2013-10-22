@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,13 +112,18 @@ namespace gazebo
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
-      private: void OnRequest(ConstRequestPtr &_msg);
+      /// \brief Callback for a mouse double click event.
+      /// \param[in] _event The mouse double click event
+      /// \return True if handled by this function.
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
+      private: void OnRequest(ConstRequestPtr &_msg);
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
       private: void OnCreateEntity(const std::string &_type,
                                    const std::string &_data);
+
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);

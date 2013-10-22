@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -919,6 +919,9 @@ void World::Reset()
 
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
+
+    math::Rand::SetSeed(math::Rand::GetSeed());
+    this->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);

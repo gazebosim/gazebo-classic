@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,12 @@ void RenderEngine::Load()
     {
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+#endif
 
     // Load all the plugins
     this->LoadPlugins();
@@ -571,7 +577,7 @@ void RenderEngine::SetupRenderSystem()
   const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+#if  OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   rsList = this->root->getAvailableRenderers();
 #else
   rsList = &(this->root->getAvailableRenderers());
@@ -732,3 +738,11 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
 {
   return this->windowManager;
 }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
+}
+#endif

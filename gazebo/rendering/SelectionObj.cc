@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,11 @@ void SelectionObj::Load()
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   if (this->parent)
+  {
+    if (this->parent == _vis)
+      return;
     this->parent->DetachVisual(shared_from_this());
+  }
   this->parent = _vis;
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));

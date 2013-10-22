@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,6 +214,11 @@ namespace gazebo
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
+
+      /// \brief Get whether or not the visual is visually highlighted. This is
+      /// most often means that an object is selected by a user via the GUI.
+      /// \return True if the visual is highlighted.
+      public: bool GetHighlighted() const;
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,6 +268,11 @@ void Scene::Load()
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
   this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+  this->manager->addRenderQueueListener(
+      RenderEngine::Instance()->GetOverlaySystem());
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -293,7 +298,8 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  this->SetSky();
+  if (this->sdf->HasElement("sky"))
+    this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -331,7 +337,7 @@ bool Scene::GetInitialized() const
 //////////////////////////////////////////////////
 void Scene::InitDeferredShading()
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 8
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
   // Deferred Shading scheme handler
@@ -1435,12 +1441,21 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    if (_msg.has_scale())
-    {
-      vm->mutable_scale()->set_x(_msg.scale().x());
-      vm->mutable_scale()->set_y(_msg.scale().y());
-      vm->mutable_scale()->set_z(_msg.scale().z());
-    }
+    this->visualMsgs.push_back(vm);
+  }
+
+  // Set the scale of the model visual
+  if (_msg.has_scale())
+  {
+    // update scale using a visual msg
+    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual);
+    if (_msg.has_id())
+      vm->set_id(_msg.id());
+    if (_msg.has_name())
+      vm->set_name(_msg.name());
+    vm->mutable_scale()->set_x(_msg.scale().x());
+    vm->mutable_scale()->set_y(_msg.scale().y());
+    vm->mutable_scale()->set_z(_msg.scale().z());
     this->visualMsgs.push_back(vm);
   }
 
@@ -1626,6 +1641,8 @@ void Scene::PreRender()
   {
     if (this->ProcessSceneMsg(*sIter))
     {
+      if (!this->initialized)
+        RTShaderSystem::Instance()->UpdateShaders();
       this->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }
@@ -1986,34 +2003,24 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  bool good = false;
+  VisualPtr childVis;
 
+  if (_msg->has_child() && _msg->child() == "world")
+    childVis = this->worldVisual;
+  else if (_msg->has_child_id())
+    childVis = this->GetVisual(_msg->child_id());
+
+  if (!childVis)
+    return false;
+
+  JointVisualPtr jointVis(new JointVisual(
+        _msg->name() + "_JOINT_VISUAL__", childVis));
+  jointVis->Load(_msg);
+  jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())
-    good = this->visuals.find(_msg->id()) != this->visuals.end();
-  else
-    good = this->GetVisual(_msg->name()) != NULL;
+    jointVis->SetId(_msg->id());
 
-  if (good)
-  {
-    VisualPtr childVis;
-
-    if (_msg->child() == "world")
-      childVis = this->worldVisual;
-    else
-      childVis = this->GetVisual(_msg->child_id());
-
-    if (!childVis)
-      return false;
-
-    JointVisualPtr jointVis(new JointVisual(
-            _msg->name() + "_JOINT_VISUAL__", childVis));
-    jointVis->Load(_msg);
-    jointVis->SetVisible(this->showJoints);
-    if (_msg->has_id())
-      jointVis->SetId(_msg->id());
-
-    this->visuals[jointVis->GetId()] = jointVis;
-  }
+  this->visuals[jointVis->GetId()] = jointVis;
 
   return true;
 }
@@ -2717,7 +2724,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
-  comVis->SetVisible(false);
+  comVis->SetVisible(this->showCOMs);
   this->visuals[comVis->GetId()] = comVis;
 }
 
@@ -2872,4 +2879,15 @@ void Scene::SetSkyXMode(unsigned int _mode)
 
   this->skyx->setCloudsEnabled(_mode & GZ_SKYX_CLOUDS);
   this->skyx->setMoonEnabled(_mode & GZ_SKYX_MOON);
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveProjectors()
+{
+  for (std::map<std::string, Projector *>::iterator iter =
+      this->projectors.begin(); iter != this->projectors.end(); ++iter)
+  {
+    delete iter->second;
+  }
+  this->projectors.clear();
 }

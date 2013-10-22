@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +157,7 @@ namespace gazebo
               result->dlHandle = dlHandle;
 
 #elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 1.10\n";
+              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 

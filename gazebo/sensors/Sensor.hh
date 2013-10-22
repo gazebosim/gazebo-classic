@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ namespace gazebo
       /// \brief Set the parent of the sensor.
       /// \param[in] _name Name of the parent.
       public: virtual void SetParent(const std::string &_name)
-              GAZEBO_DEPRECATED(1.10);
+              GAZEBO_DEPRECATED(2.0);
 
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.

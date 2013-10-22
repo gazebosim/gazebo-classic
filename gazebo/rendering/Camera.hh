@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,10 +103,11 @@ namespace gazebo
       /// \return The Hz rate
       public: double GetRenderRate() const;
 
-      /// \brief Render the camera
-      ///
+      /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
-      /// camera images
+      /// camera images.
+      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
+      // and change Render(bool _force) to have a default value of false.
       public: void Render();
 
       /// \brief Post render
@@ -739,6 +740,15 @@ namespace gazebo
       /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
       /// devation of the distibution from which we sample
       private: double noiseStdDev;
+
+      // \todo Move this back up to public section in Gazebo 3.0. It is here
+      // for ABI compatibility.
+      /// \brief Render the camera.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
+      public: void Render(bool _force);
     };
     /// \}
   }
