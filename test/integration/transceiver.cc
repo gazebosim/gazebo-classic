@@ -244,6 +244,13 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issue #916)" << std::endl;
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   double avgSignalLevelEmpty = 0.0;
