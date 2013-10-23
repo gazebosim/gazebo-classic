@@ -46,8 +46,8 @@ namespace gazebo
       /// \brief Get the heightmap as a data array
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
-      public: virtual void GetData(unsigned char **_data,
-                                   unsigned int &_count) const = 0;
+      //public: virtual void GetData(unsigned char **_data,
+      //                             unsigned int &_count) const = 0;
 
       /// \brief Get the height
       /// \return The image height

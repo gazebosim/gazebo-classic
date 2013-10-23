@@ -59,8 +59,8 @@ namespace gazebo
       /// \brief Get the terrain file as a data array.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size.
-      public: void GetData(unsigned char **_data,
-                           unsigned int &_count) const;
+      private: void GetData(float **_data,
+                            unsigned int &_count) const;
 
       /// \brief Get the height.
       /// \return The terrain height.

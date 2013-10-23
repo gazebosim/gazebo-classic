@@ -16,6 +16,7 @@
 */
 
 #include <algorithm>
+#include <cfloat>
 #include <gdal/ogr_spatialref.h>
 
 #include "gazebo/common/Assert.hh"
@@ -94,8 +95,9 @@ SDTS::SDTS(const std::string &_filename)
   std::cout << "World height: " << this->worldHeight << std::endl;
 
   this->dataType = this->poDataset->GetRasterBand(1)->GetRasterDataType();
+  std::cout << "Data type: " << this->dataType << std::endl;
 
-  this->numBytesPerPoint = this->dataType / 8;
+  this->numBytesPerPoint = GDALGetDataTypeSize(this->dataType) / 8;
   std::cout << "Num of bytes per cell: " << this->numBytesPerPoint << std::endl;
 }
 
@@ -120,11 +122,11 @@ SDTS::~SDTS()
 //////////////////////////////////////////////////
 unsigned int SDTS::GetBPP() const
 {
-  return sizeof(unsigned char) * 3;
+  return this->poDataset->GetRasterCount();
 }
 
 //////////////////////////////////////////////////
-void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
+void SDTS::GetData(float **_data, unsigned int &_count) const
 {
   GDALRasterBand  *poBand;
   int nXSize = this->poDataset->GetRasterXSize();
@@ -151,42 +153,54 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
   }
 
   // Allocate memory for the array that will contain all the data
-  _count = this->GetWidth() * this->GetHeight() * this->GetBPP();
-  *_data = new unsigned char[_count];
+  _count = this->GetWidth() * this->GetHeight() * nBands;
+  std::cout << _count << "\n";
+  *_data = new float[_count];
 
   // Fill the array aligning the data
-  unsigned char *p = *_data;
+  float *p = *_data;
   for (unsigned int i = 0; i < this->GetHeight(); ++i)
   {
     for (unsigned int j = 0; j < this->GetWidth(); ++j)
     {
+      // Padding
       if ((i >= nXSize) || (j >= nYSize))
       {
-        p[0] = 0;
-        p[1] = 0;
-        p[2] = 0;
-      }
-      else
-      {
-        int index = i * this->poDataset->GetRasterXSize() + j;
         if (nBands == 1)
         {
-          p[0] = static_cast<unsigned char>(data_v[0][index]);
-          p[1] = p[0];
-          p[2] = p[0];
+          p[0] = 0;
         }
         else if (nBands == 3)
         {
-          p[0] = static_cast<unsigned char>(data_v[0][index]);
-          p[1] = static_cast<unsigned char>(data_v[1][index]);
-          p[2] = static_cast<unsigned char>(data_v[2][index]);
+          p[0] = 0;
+          p[1] = 0;
+          p[2] = 0;
         }
         else
         {
           gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
         }
       }
-      p += 3 * sizeof(unsigned char);
+      else
+      {
+        int index = i * this->poDataset->GetRasterXSize() + j;
+        if (nBands == 1)
+        {
+          p[0] = data_v[0][index];
+          p++;
+        }
+        else if (nBands == 3)
+        {
+          p[0] = data_v[0][index];
+          p[1] = data_v[1][index];
+          p[2] = data_v[2][index];
+          p += 3;
+        }
+        else
+        {
+          gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
+        }
+      }
     }
   }
 
@@ -256,6 +270,9 @@ Color SDTS::GetMaxColor()
 //////////////////////////////////////////////////
 int SDTS::GetPitch() const
 {
+  std::cout << "BPP: " << this->GetBPP() << std::endl;
+  std::cout << "Width: " << this->GetWidth() << std::endl;
+  std::cout << "Pitch: " << this->GetWidth() * this->GetBPP() << std::endl;
   return this->GetWidth() * this->GetBPP();
 }
 
@@ -335,11 +352,12 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
   unsigned int pitch = this->GetPitch();
 
   // Bytes per pixel
-  unsigned int bpp = pitch / imgWidth;
+  unsigned int bpp = this->GetBPP();
 
-  unsigned char *data = NULL;
+  float *data = NULL;
   unsigned int count;
   this->GetData(&data, count);
+  std::cout << "Count: " << count << std::endl;
 
   double yf, xf, dy, dx;
   int y1, y2, x1, x2;
@@ -365,12 +383,14 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
         x2 = imgWidth-1;
       dx = xf - x1;
 
-      px1 = data[y1 * pitch + x1 * bpp];
-      px2 = data[y1 * pitch + x2 * bpp];
+      px1 = 100 * (data[y1 * pitch + x1 * bpp] / 1000);
+      px2 = 100 * (data[y1 * pitch + x2 * bpp] / 1000);
       h1 = (px1 - ((px1 - px2) * dx));
 
-      px3 = data[y2 * pitch + x1 * bpp];
-      px4 = data[y2 * pitch + x2 * bpp];
+      //std::cout << "Accessing " << x1 << "," << y2 << "\n";
+      //std::cout << "Accessing " << x2 << "," << y2 << "\n";
+      px3 = 100 * (data[y2 * pitch + x1 * bpp] / 1000);
+      px4 = 100 * (data[y2 * pitch + x2 * bpp] / 1000);
       h2 = (px3 - ((px3 - px4) * dx));
 
       h = (h1 - ((h1 - h2) * dy)) * _scale.z;
@@ -381,6 +401,7 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
       if (_size.z < 0)
         h = 1.0 - h;
 
+      std::cout << "Height: " << h << std::endl;
       // Store the height for future use
       if (!_flipY)
         _heights[y * _vertSize + x] = h;
