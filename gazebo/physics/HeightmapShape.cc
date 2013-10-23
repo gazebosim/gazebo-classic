@@ -19,11 +19,9 @@
  * Date: 8 May 2003
  */
 
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-
 #include <string.h>
 #include <math.h>
-#include <gdalwarper.h>
+#include <gdal/gdalwarper.h>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
