@@ -143,9 +143,6 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      // Documentation inherited
-      void virtual SetMaxStepSize(double _stepSize);
-
       /// \brief
       private: DARTLinkPtr FindDARTLink(
           const dart::dynamics::BodyNode* _dtBodyNode);

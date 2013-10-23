@@ -226,6 +226,7 @@ void DARTPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
+  this->dtWorld->setTimeStep(this->maxStepSize);
   this->dtWorld->step();
 
   // Update all the transformation of DART's links to gazebo's links
@@ -498,13 +499,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-}
-
-void DARTPhysics::SetMaxStepSize(double _stepSize)
-{
-  PhysicsEngine::SetMaxStepSize(_stepSize);
-
-  this->dtWorld->setTimeStep(_stepSize);
 }
 
 DARTLinkPtr DARTPhysics::FindDARTLink(
