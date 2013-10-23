@@ -273,9 +273,14 @@ namespace gazebo
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Step the world forward in time.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -316,6 +321,10 @@ namespace gazebo
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Get the total number of iterations.
+      /// \return Number of iterations that simulation has taken.
+      public: uint32_t GetIterations() const;
 
       /// \cond
       /// This is an internal function.
