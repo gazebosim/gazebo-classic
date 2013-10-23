@@ -184,6 +184,11 @@ namespace gazebo
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
+      /// \brief Create a lookup table of the terrain's height.
+      public: void FillHeightMap(std::vector<float> &_heights,
+          int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
+          const math::Vector3 &_scale, bool _flipY);
+
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const;

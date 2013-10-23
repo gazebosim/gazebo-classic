@@ -34,6 +34,11 @@ namespace gazebo
       /// \brief Destructor
       // public: virtual ~HeightmapData();
 
+      public: virtual void FillHeightMap(std::vector<float> &_heights,
+          int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
+          const math::Vector3 &_scale, bool _flipY) = 0;
+
+
       /// \brief Get the size of one pixel in bits
       /// \return The BPP of the image
       public: virtual unsigned int GetBPP() const = 0;

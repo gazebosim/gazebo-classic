@@ -115,7 +115,7 @@ namespace gazebo
       public: common::Image GetImage() const;
 
       /// \brief Create a lookup table of the terrain's height.
-      private: void FillHeightMap();
+      //private: void FillHeightMap();
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.

@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <gdal/ogr_spatialref.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SDTS.hh"
 #include "gazebo/math/Angle.hh"
@@ -91,6 +92,11 @@ SDTS::SDTS(const std::string &_filename)
 
   std::cout << "World width: " << this->worldWidth << std::endl;
   std::cout << "World height: " << this->worldHeight << std::endl;
+
+  this->dataType = this->poDataset->GetRasterBand(1)->GetRasterDataType();
+
+  this->numBytesPerPoint = this->dataType / 8;
+  std::cout << "Num of bytes per cell: " << this->numBytesPerPoint << std::endl;
 }
 
 void SDTS::GetGeoReference(double _pixel, double _line,
@@ -138,7 +144,7 @@ void SDTS::GetData(unsigned char **_data, unsigned int &_count) const
     // Read the whole data from the current band
     float *buffer = new float[nXSize * nYSize];
     poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, buffer, nXSize, nYSize,
-        GDT_Float32, 0, 0);
+        this->dataType, 0, 0);
 
     // Store the pointer to this band's data for the future
     data_v.push_back(buffer);
@@ -224,7 +230,7 @@ Color SDTS::GetMaxColor()
 
     // Read the whole data from the current band
     poBand->RasterIO(GF_Read, 0, 0, xsize, ysize, buffer, xsize, ysize,
-        GDT_Float32, 0, 0);
+        this->dataType, 0, 0);
 
     // Store the maximum value of this band
     float max = *std::max_element(buffer, buffer + xsize * ysize);
@@ -303,4 +309,85 @@ double SDTS::SafeAcos(double _x)
   else if (_x < -1)
     _x = -1;
   return acos(_x);
+}
+
+//////////////////////////////////////////////////
+void SDTS::FillHeightMap(std::vector<float> &_heights,
+    int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
+    const math::Vector3 &_scale, bool _flipY)
+{
+  unsigned int x, y;
+  float h = 0;
+  float h1 = 0;
+  float h2 = 0;
+
+  // Resize the vector to match the size of the vertices.
+  _heights.resize(_vertSize * _vertSize);
+
+  common::Color pixel;
+
+  int imgHeight = this->GetHeight();
+  int imgWidth = this->GetWidth();
+
+  GZ_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
+
+  // Bytes per row
+  unsigned int pitch = this->GetPitch();
+
+  // Bytes per pixel
+  unsigned int bpp = pitch / imgWidth;
+
+  unsigned char *data = NULL;
+  unsigned int count;
+  this->GetData(&data, count);
+
+  double yf, xf, dy, dx;
+  int y1, y2, x1, x2;
+  double px1, px2, px3, px4;
+
+  // Iterate over all the vertices
+  for (y = 0; y < _vertSize; ++y)
+  {
+    // yf ranges between 0 and 4
+    yf = y / static_cast<double>(_subSampling);
+    y1 = floor(yf);
+    y2 = ceil(yf);
+    if (y2 >= imgHeight)
+      y2 = imgHeight-1;
+    dy = yf - y1;
+
+    for (x = 0; x < _vertSize; ++x)
+    {
+      xf = x / static_cast<double>(_subSampling);
+      x1 = floor(xf);
+      x2 = ceil(xf);
+      if (x2 >= imgWidth)
+        x2 = imgWidth-1;
+      dx = xf - x1;
+
+      px1 = data[y1 * pitch + x1 * bpp];
+      px2 = data[y1 * pitch + x2 * bpp];
+      h1 = (px1 - ((px1 - px2) * dx));
+
+      px3 = data[y2 * pitch + x1 * bpp];
+      px4 = data[y2 * pitch + x2 * bpp];
+      h2 = (px3 - ((px3 - px4) * dx));
+
+      h = (h1 - ((h1 - h2) * dy)) * _scale.z;
+
+      // invert pixel definition so 1=ground, 0=full height,
+      //   if the terrain size has a negative z component
+      //   this is mainly for backward compatibility
+      if (_size.z < 0)
+        h = 1.0 - h;
+
+      // Store the height for future use
+      if (!_flipY)
+        _heights[y * _vertSize + x] = h;
+      else
+        _heights[(_vertSize - y - 1) * _vertSize + x] = h;
+    }
+  }
+
+  delete [] data;
 }

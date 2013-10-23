@@ -210,7 +210,8 @@ void HeightmapShape::Init()
     this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
 
   // Step 1: Construct the heightmap lookup table
-  this->FillHeightMap();
+  this->heightmapData->FillHeightMap(this->heights, this->subSampling,
+    this->vertSize, this->GetSize(), this->scale, this->flipY);
 }
 
 //////////////////////////////////////////////////
@@ -223,7 +224,7 @@ void HeightmapShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::FillHeightMap()
+/*void HeightmapShape::FillHeightMap()
 {
   unsigned int x, y;
   float h = 0;
@@ -299,7 +300,7 @@ void HeightmapShape::FillHeightMap()
   }
 
   delete [] data;
-}
+}*/
 
 //////////////////////////////////////////////////
 std::string HeightmapShape::GetURI() const
