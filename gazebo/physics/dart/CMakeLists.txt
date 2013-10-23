@@ -1,0 +1,64 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+include_directories(${DARTCore_INCLUDE_DIRS})
+
+link_directories(${DARTCore_LIBRARY_DIRS})
+
+set (sources
+    DARTPhysics.cc
+    DARTCollision.cc
+    DARTLink.cc
+    DARTJoint.cc
+    DARTSliderJoint.cc
+    DARTHingeJoint.cc
+    DARTHinge2Joint.cc
+    DARTUniversalJoint.cc
+    DARTBallJoint.cc
+    DARTMeshShape.cc
+    DARTRayShape.cc
+    DARTMultiRayShape.cc
+    DARTHeightmapShape.cc
+    DARTScrewJoint.cc
+    DARTModel.cc
+)
+
+SET (headers
+    dart_inc.h
+    DARTPhysics.hh
+    DARTCollision.hh
+    DARTLink.hh
+    DARTJoint.hh
+    DARTSliderJoint.hh
+    DARTHingeJoint.hh
+    DARTHinge2Joint.hh
+    DARTUniversalJoint.hh
+    DARTBallJoint.hh
+    DARTMeshShape.hh
+    DARTRayShape.hh
+    DARTMultiRayShape.hh
+    DARTHeightmapShape.hh
+    DARTSphereShape.hh
+    DARTBoxShape.hh
+    DARTPlaneShape.hh
+    DARTCylinderShape.hh
+    DARTTypes.hh
+    DARTScrewJoint.hh
+    DARTModel.hh
+)
+
+set (gtest_sources
+  #DARTPhysics_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
+gz_add_library(gazebo_physics_dart ${headers} ${sources})
+
+target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
+
+gz_install_library(gazebo_physics_dart)
+
+# unit tests
+#set (gtest_sources
+#  DARTJoint_TEST.cc
+#)
+#gz_build_tests(${gtest_sources})

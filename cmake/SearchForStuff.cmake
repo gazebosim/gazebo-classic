@@ -136,6 +136,16 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find DART
+  find_package(DARTCore)
+  if (DARTCore_FOUND)
+    set (HAVE_DART TRUE)
+  else()
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    set (HAVE_DART FALSE)
+  endif()
+
+  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)

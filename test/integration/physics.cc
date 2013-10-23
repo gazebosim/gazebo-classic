@@ -931,7 +931,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         if (_physicsEngine == "simbody" ||
             _physicsEngine == "dart")
         {
-          gzerr << "Skipping joint detachment per #862" << std::endl;
+          gzerr << "Skipping joint detachment per #862 / #903" << std::endl;
           continue;
         }
         // Detach upper_joint.
@@ -1156,8 +1156,18 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     EXPECT_EQ(vel.x, 0.0);
 
-    EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
-    EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
+    if (_physicsEngine == "dart")
+    {
+      // DART needs greater tolerance. The reason is not sure yet.
+      // Please see issue #904
+      EXPECT_NEAR(vel.y, -10.2009, 0.012);
+      EXPECT_NEAR(vel.z, -6.51755, 0.012);
+    }
+    else
+    {
+      EXPECT_NEAR(vel.y, -10.2009, PHYSICS_TOL);
+      EXPECT_NEAR(vel.z, -6.51755, PHYSICS_TOL);
+    }
 
     EXPECT_DOUBLE_EQ(pose.pos.x, 3.0);
     EXPECT_NEAR(pose.pos.y, 0.0, PHYSICS_TOL);
@@ -1229,7 +1239,17 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.0101);  // sometimes -0.01, why?
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+            }
+            else
+            {
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            }
           }
         }
 
@@ -1250,8 +1270,19 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
           else
           {
-            EXPECT_LT(fabs(vel.z), 3e-5);
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(vel.z), 0.015);
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00410);
+            }
+            else
+            {
+              EXPECT_LT(fabs(vel.z), 3e-5);
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            }
           }
         }
 
@@ -1273,7 +1304,17 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.011);
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
+            if (_physicsEngine == "dart")
+            {
+              // DART needs more tolerance until supports 'correction for
+              // penetration' feature.
+              // Please see issue #902
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0041);
+            }
+            else
+            {
+              EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
+            }
           }
         }
       }
@@ -1287,6 +1328,13 @@ TEST_F(PhysicsTest, DropStuffODE)
 {
   DropStuff("ode");
 }
+
+#ifdef HAVE_DART
+TEST_F(PhysicsTest, DropStuffDART)
+{
+  DropStuff("dart");
+}
+#endif  // HAVE_DART
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {

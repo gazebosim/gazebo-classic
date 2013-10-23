@@ -34,6 +34,12 @@ void PR2Test::Load(std::string _physicsEngine)
           << "Please see issue #857.\n";
     return;
   }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
 
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
@@ -94,6 +100,12 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   {
     gzerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
     return;
   }
 

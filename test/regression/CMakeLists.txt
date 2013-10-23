@@ -16,6 +16,10 @@ if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
+if(HAVE_DART)
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
+endif()
 
 set(tests
   846_typo_in_camera.cc

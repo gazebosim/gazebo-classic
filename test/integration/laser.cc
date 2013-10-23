@@ -36,6 +36,14 @@ class LaserTest : public ServerFixture,
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "ray_model";
@@ -160,6 +168,14 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
     return;
   }
 
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test ray sensor with 3 boxes in the world.
   // First place 2 of 3 boxes within range and verify range values, one of them
   // being a static model to verify collision filtering is working,
@@ -249,6 +265,14 @@ TEST_P(LaserTest, LaserBox)
 
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test ray sensor with noise applied
 
   Load("worlds/empty.world", true, _physicsEngine);
