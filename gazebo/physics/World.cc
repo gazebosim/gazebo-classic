@@ -710,6 +710,7 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
+  bool pauseState = this->IsPaused();
   this->SetPaused(true);
 
   this->publishModelPoses.clear();
@@ -722,7 +723,7 @@ void World::Clear()
   }
   this->models.clear();
 
-  this->SetPaused(false);
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
