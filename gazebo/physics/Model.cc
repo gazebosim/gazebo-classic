@@ -827,7 +827,7 @@ void Model::FillMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (!(_msg.has_id() && _msg.id() == this->GetId()))
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
