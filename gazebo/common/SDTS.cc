@@ -17,7 +17,7 @@
 
 #include <algorithm>
 #include <cfloat>
-#include <gdal/ogr_spatialref.h>
+//#include <gdal/ogr_spatialref.h>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"

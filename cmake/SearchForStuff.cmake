@@ -429,6 +429,16 @@ else (libdl_library AND libdl_include_dir)
 endif ()
 
 ########################################
+# Find gdal
+include (FindGDAL)
+if (NOT GDAL_FOUND)
+  BUILD_WARNING ("GDAL not found, Digital elevation terrains support will be disabled.")
+  set (HAVE_GDAL OFF CACHE BOOL "HAVE GDAL" FORCE)
+else ()
+  set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
+endif ()
+
+########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
 add_manpage_target()

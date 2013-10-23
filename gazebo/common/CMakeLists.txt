@@ -4,11 +4,14 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
   add_definitions(${gts_CFLAGS})
+endif()
+
+if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
 set (sources
@@ -147,7 +150,6 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread
-  gdal
 )
 
 if (NOT APPLE)
@@ -161,6 +163,10 @@ endif()
 
 if (HAVE_OPENAL)
   target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+endif()
+
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_common ${GDAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_common)
