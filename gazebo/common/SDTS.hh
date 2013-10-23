@@ -18,12 +18,15 @@
 #ifndef _SDTS_HH_
 #define _SDTS_HH_
 
-#include <string>
-#include <gdal/gdal_priv.h>
+#include <gazebo/gazebo_config.h>
 
-#include "gazebo/common/Color.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/HeightmapData.hh"
+#ifdef HAVE_GDAL
+# include <gdal/gdal_priv.h>
+# include <string>
+
+# include "gazebo/common/Color.hh"
+# include "gazebo/common/Exception.hh"
+# include "gazebo/common/HeightmapData.hh"
 
 namespace gazebo
 {
@@ -43,14 +46,6 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~SDTS();
-
-      /// \brief Extend the current terrain by joining a second terrain. This
-      /// operation modifies the current terrain width and height. The new width
-      /// and height are calculated by choosing the minimum bounding box that
-      /// covers the two terrains and satisfy Ogre restrictions (size is a power
-      /// of two plus one).
-      /// \param[in] _terrain Terrain to add.
-      // public: void Add(const SDTS &_terrain);
 
       /// \brief Get the size of each point in bytes after using GetData().
       /// \return The BPP of each point returned after GetData().
@@ -132,4 +127,5 @@ namespace gazebo
     /// \}
   }
 }
+#endif
 #endif

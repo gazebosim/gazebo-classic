@@ -114,8 +114,8 @@ namespace gazebo
       /// and black pixels the lowest.
       public: common::Image GetImage() const;
 
-      /// \brief Create a lookup table of the terrain's height.
-      //private: void FillHeightMap();
+      //ToDo: DOXYGEN
+      private: void LoadTerrainFile(std::string _filename);
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.
