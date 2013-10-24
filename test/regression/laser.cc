@@ -321,7 +321,7 @@ TEST_F(LaserTest, LaserNoiseBullet)
 
 int main(int argc, char **argv)
 {
-  // Set a specific seed to avoid occasional test failures due to 
+  // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
   math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
