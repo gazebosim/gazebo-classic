@@ -31,6 +31,8 @@ TEST_F(WorldTest, Clear)
   EXPECT_EQ(world->GetModelCount(), 2u);
 
   world->Clear();
+  while (world->GetModelCount() > 0u)
+    common::Time::MSleep(1000);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
