@@ -13,6 +13,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 
 * -v, --version :
  Output version information.
+* --verbose :
+ Increase the messages written to the terminal.
 * -h, --help :
  Produce this help message.
 * -u, --pause :
@@ -33,8 +35,6 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Number of iterations to simulate.
 * --minimal_comms :
  Reduce the TCP/IP traffic output by gzserver
-* --verbose :
- Increase the messages written to the terminal
 * -s, --server-plugin arg :
  Load a plugin.
 
@@ -43,7 +43,7 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
   Open Source Robotics Foundation
 
 ## COPYRIGHT 
-  Copyright 2013 Open Source Robotics Foundation
+  Copyright (C) 2012-2013 Open Source Robotics Foundation
        
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
