@@ -548,7 +548,7 @@ math::Quaternion Camera::GetWorldRotation() const
   // the global coordinate frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
   // This -1.0 multiplication is a hack to get back the correct orientation.
-  sRot.x *= -1.0;
+  // sRot.x *= -1.0;
 
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
 
@@ -589,7 +589,7 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   // the global coordinate frame is right-handed with +Y up, +X right, and +Z
   // out of the screen.
   // The -1.0 to Roll is a hack to set the correct orientation.
-  s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
+  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));

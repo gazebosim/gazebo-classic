@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <world name="default">
+    <include><uri>model://sun</uri></include>
+    <model name="cam_x_rot_test_1">
+      <pose>1 0 1 1.2 0 0</pose>
+      <static>1</static>
+      <link name="cam_x_rot_test_1_link_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="cam_x_rot_test_1_vis">
+          <geometry>
+            <box>
+              <size>0.3 0.2 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <link name="cam_x_rot_test_1_link_2">
+        <pose>0 1 0 0 0 0</pose>
+        <visual name="cam_x_rot_test_1_vis">
+          <geometry>
+            <box>
+              <size>0.3 0.2 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Green</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cam_x_rot_test_2">
+      <static>1</static>
+      <pose>0 0 1 0 0 0</pose>
+      <link name="cam_x_rot_test_2_link">
+        <visual name="cam_x_rot_test_1_vis">
+          <pose>0 0 0 1.2 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.2 0.4</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="cam_rot_test_1_cam_2" type="multicamera">
+          <update_rate>15</update_rate>
+          <pose>0 0 0 1.2 0 0</pose>
+          <camera name="left">
+            <pose>0 1.0 0 0 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <camera name="right">
+            <pose>0 0 0 0 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>
