@@ -6,7 +6,7 @@
     <severity>warning</severity>
     <summary>
       Calling isinf without namespace prefix causes problems on osx.
-      Use std::inf instead.
+      Use std::isinf instead.
     </summary>
   </message>
 </rule>
