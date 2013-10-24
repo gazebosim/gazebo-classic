@@ -114,7 +114,7 @@ void HeightmapShape::LoadTerrainFile(std::string _filename)
 void HeightmapShape::LoadTerrainFile(std::string _filename)
 {
   // Load the terrain file as an image
-  this->img.Load(filename);
+  this->img.Load(_filename);
   this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
   this->heigthmapSize = this->sdf->Get<math::Vector3>("size");
 }

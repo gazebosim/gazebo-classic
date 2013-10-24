@@ -127,9 +127,6 @@ namespace gazebo
       /// \brief Image used to generate the heights.
       protected: common::Image img;
 
-      /// \brief SDTS used to generate the heights.
-      protected: common::SDTS *sdts;
-
       /// \brief HeightmapData used to generate the heights.
       protected: common::HeightmapData *heightmapData;
 
@@ -156,6 +153,11 @@ namespace gazebo
 
       /// \brief Terrain size
       private: math::Vector3 heigthmapSize;
+
+      #ifdef HAVE_GDAL
+      /// \brief SDTS used to generate the heights.
+      private: common::SDTS *sdts;
+      #endif
     };
     /// \}
   }
