@@ -114,7 +114,10 @@ namespace gazebo
       /// and black pixels the lowest.
       public: common::Image GetImage() const;
 
-      //ToDo: DOXYGEN
+      /// \brief Load a terrain file specified by _filename. The terrain file
+      /// format might be an image or a DEM file. libgdal is required to enable
+      /// DEM support. For a list of all raster formats supported you can type
+      /// the command "gdalinfo --formats".
       private: void LoadTerrainFile(std::string _filename);
 
       /// \brief Handle request messages.
@@ -156,7 +159,7 @@ namespace gazebo
 
       #ifdef HAVE_GDAL
       /// \brief SDTS used to generate the heights.
-      private: common::SDTS *sdts;
+      private: common::SDTS sdts;
       #endif
     };
     /// \}

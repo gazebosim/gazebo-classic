@@ -91,7 +91,6 @@ Heightmap::~Heightmap()
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
-  std::cout << "Rendering. Terrainsize: " << this->terrainSize << std::endl;
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
@@ -311,15 +310,7 @@ void Heightmap::Load()
     geomMsg.ParseFromString(response->serialized_data());
 
     // Copy the height data.
-
-    std::cout << "Rendering. Load() Size: " <<
-       msgs::Convert(geomMsg.heightmap().size()) << std::endl;
-    std::cout << "Rendering. Load() Height Size: " <<
-       geomMsg.heightmap().heights().size() << std::endl;
     this->terrainSize = msgs::Convert(geomMsg.heightmap().size());
-    std::cout << "Rendering. Terrainsize: " << this->terrainSize << std::endl;
-
-
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());

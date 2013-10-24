@@ -90,7 +90,7 @@ void HeightmapShape::LoadTerrainFile(std::string _filename)
     gzthrow("Unrecognized terrain format in file [" + _filename + "]\n");
 
   this->fileFormat = poDataset->GetDriver()->GetDescription();
-  GDALClose((GDALDataset *)poDataset);
+  GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
 
   // Check if the heightmap file is an image
   if (fileFormat == "JPEG" || fileFormat == "PNG")
@@ -103,11 +103,11 @@ void HeightmapShape::LoadTerrainFile(std::string _filename)
   else
   {
     // Load the terrain file as a SDTS
-    sdts = new common::SDTS(_filename);
-    this->heigthmapSize.x = sdts->GetWorldWidth();
-    this->heigthmapSize.y = sdts->GetWorldHeight();
+    this->sdts.Load(_filename);
+    this->heigthmapSize.x = sdts.GetWorldWidth();
+    this->heigthmapSize.y = sdts.GetWorldHeight();
     this->heigthmapSize.z = 10.0;
-    this->heightmapData = static_cast<common::HeightmapData*>(this->sdts);
+    this->heightmapData = static_cast<common::HeightmapData*>(&(this->sdts));
   }
 }
 #else
@@ -173,8 +173,8 @@ void HeightmapShape::Init()
     this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
 
   // Step 1: Construct the heightmap lookup table
-  this->heightmapData->FillHeightMap(this->heights, this->subSampling,
-    this->vertSize, this->GetSize(), this->scale, this->flipY);
+  this->heightmapData->FillHeightMap(this->subSampling,
+    this->vertSize, this->GetSize(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////

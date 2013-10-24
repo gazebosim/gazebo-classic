@@ -27,6 +27,7 @@
 #endif
 #include <FreeImage.h>
 #include <string>
+#include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
@@ -184,10 +185,16 @@ namespace gazebo
       /// \return true if image has a bitmap
       public: bool Valid() const;
 
-      /// \brief Create a lookup table of the terrain's height.
-      public: void FillHeightMap(std::vector<float> &_heights,
-          int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
-          const math::Vector3 &_scale, bool _flipY);
+      /// \brief Create a lookup table of the terrain's height
+      /// \param[in] _subsampling
+      /// \param[in] _vertSize
+      /// \param[in] _size
+      /// \param[in] _scale
+      /// \param[in] _flipY
+      /// \param[out] _heights
+      public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
+          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+          std::vector<float> &_heights);
 
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,

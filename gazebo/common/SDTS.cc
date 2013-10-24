@@ -30,46 +30,9 @@ using namespace common;
 #ifdef HAVE_GDAL
 
 //////////////////////////////////////////////////
-SDTS::SDTS(const std::string &_filename)
+SDTS::SDTS()
 {
   GDALAllRegister();
-
-  this->poDataset = reinterpret_cast<GDALDataset *>
-      (GDALOpen(_filename.c_str(), GA_ReadOnly));
-
-  if (this->poDataset == NULL)
-    gzthrow("Unable to find SDTS file [" + _filename + "]\n");
-
-  if (this->poDataset->GetRasterCount() != 1 && 
-      this->poDataset->GetRasterCount() != 3)
-    gzthrow("Unsupported band number in file [" << _filename + "]. Found " <<
-       this-> poDataset->GetRasterCount() <<
-       " but only 1 or 3 are valid values\n");
-
-  double upperLeftX = 0.0;
-  double upperLeftY = 0.0;
-  double upperRightX = this->poDataset->GetRasterXSize();
-  double upperRightY = 0.0;
-  double lowerLeftX = 0.0;
-  double lowerLeftY = this->poDataset->GetRasterYSize();
-  double upperLeftXgeo, upperLeftYgeo;
-  double upperRightXgeo, upperRightYgeo;
-  double lowerLeftXgeo, lowerLeftYgeo;
-
-  // Calculate the georeferenced coordinates
-  this->GetGeoReference(upperLeftX, upperLeftY, upperLeftXgeo, upperLeftYgeo);
-  this->GetGeoReference(upperRightX, upperRightY, upperRightXgeo, upperRightYgeo);
-  this->GetGeoReference(lowerLeftX, lowerLeftY, lowerLeftXgeo, lowerLeftYgeo);
-
-  // Set the world width and height
-  this->worldWidth = this->OgrDistance(upperLeftYgeo, upperLeftXgeo,
-                                       upperRightYgeo, upperRightXgeo);
-
-  this->worldHeight = this->OgrDistance(upperLeftYgeo, upperLeftXgeo,
-                                        lowerLeftYgeo, lowerLeftXgeo);
-
-  this->dataType = this->poDataset->GetRasterBand(1)->GetRasterDataType();
-  this->numBytesPerPoint = GDALGetDataTypeSize(this->dataType) / 8;
 }
 
 void SDTS::GetGeoReference(double _pixel, double _line,
@@ -82,12 +45,53 @@ void SDTS::GetGeoReference(double _pixel, double _line,
             _pixel * adfGeoTransform[1] + _line * adfGeoTransform[2];
     _yGeo = adfGeoTransform[3] +
             _pixel * adfGeoTransform[4] + _line * adfGeoTransform[5];
-  }  
+  }
 }
 
 //////////////////////////////////////////////////
 SDTS::~SDTS()
 {
+}
+
+//////////////////////////////////////////////////
+void SDTS::Load(const std::string &_filename)
+{
+  this->poDataset = reinterpret_cast<GDALDataset *>(GDALOpen(
+    _filename.c_str(), GA_ReadOnly));
+
+  if (this->poDataset == NULL)
+    gzthrow("Unable to find SDTS file [" + _filename + "]\n");
+
+  if (this->poDataset->GetRasterCount() != 1 &&
+      this->poDataset->GetRasterCount() != 3)
+    gzthrow("Unsupported band number in file [" << _filename + "]. Found " <<
+       this-> poDataset->GetRasterCount() <<
+       " but only 1 or 3 are valid values\n");
+
+  double upLeftX = 0.0;
+  double upLeftY = 0.0;
+  double upRightX = this->poDataset->GetRasterXSize();
+  double upRightY = 0.0;
+  double lowLeftX = 0.0;
+  double lowLeftY = this->poDataset->GetRasterYSize();
+  double upLeftXgeo, upLeftYgeo;
+  double upRightXgeo, upRightYgeo;
+  double lowLeftXgeo, lowLeftYgeo;
+
+  // Calculate the georeferenced coordinates
+  this->GetGeoReference(upLeftX, upLeftY, upLeftXgeo, upLeftYgeo);
+  this->GetGeoReference(upRightX, upRightY, upRightXgeo, upRightYgeo);
+  this->GetGeoReference(lowLeftX, lowLeftY, lowLeftXgeo, lowLeftYgeo);
+
+  // Set the world width and height
+  this->worldWidth = this->OgrDistance(upLeftYgeo, upLeftXgeo,
+                                       upRightYgeo, upRightXgeo);
+
+  this->worldHeight = this->OgrDistance(upLeftYgeo, upLeftXgeo,
+                                        lowLeftYgeo, lowLeftXgeo);
+
+  this->dataType = this->poDataset->GetRasterBand(1)->GetRasterDataType();
+  this->numBytesPerPoint = GDALGetDataTypeSize(this->dataType) / 8;
 }
 
 //////////////////////////////////////////////////
@@ -100,16 +104,16 @@ unsigned int SDTS::GetBPP() const
 void SDTS::GetData(float **_data, unsigned int &_count) const
 {
   GDALRasterBand  *poBand;
-  int nXSize = this->poDataset->GetRasterXSize();
-  int nYSize = this->poDataset->GetRasterYSize();
-  int nBands = poDataset->GetRasterCount();
+  unsigned int nXSize = this->poDataset->GetRasterXSize();
+  unsigned int nYSize = this->poDataset->GetRasterYSize();
+  unsigned int nBands = poDataset->GetRasterCount();
   std::vector<float*> data_v;
 
   if (*_data)
     delete [] *_data;
 
   // The first band starts with index 1
-  for (int i = 1; i <= nBands; ++i)
+  for (unsigned int i = 1; i <= nBands; ++i)
   {
     // Get a pointer to the current band
     poBand = poDataset->GetRasterBand(i);
@@ -125,7 +129,6 @@ void SDTS::GetData(float **_data, unsigned int &_count) const
 
   // Allocate memory for the array that will contain all the data
   _count = this->GetWidth() * this->GetHeight() * nBands;
-  std::cout << _count << "\n";
   *_data = new float[_count];
 
   // Fill the array aligning the data
@@ -149,7 +152,7 @@ void SDTS::GetData(float **_data, unsigned int &_count) const
         }
         else
         {
-          gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
+          gzerr << "Found " << nBands << " bands. Only 1 or 3 are supported\n";
         }
       }
       else
@@ -169,7 +172,7 @@ void SDTS::GetData(float **_data, unsigned int &_count) const
         }
         else
         {
-          gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
+          gzerr << "Found " << nBands << " bands. Only 1 or 3 are supported\n";
         }
       }
     }
@@ -178,7 +181,8 @@ void SDTS::GetData(float **_data, unsigned int &_count) const
   // Release the temporal array containing the data for each band
   for (unsigned int i = 0; i < data_v.size(); ++i)
   {
-    delete[] data_v[i];
+    if (data_v[i])
+      delete[] data_v[i];
   }
 }
 
@@ -235,6 +239,10 @@ Color SDTS::GetMaxColor()
   else
     gzerr << "Found " << nBands << " bands and only 1 or 3 are supported\n";
 
+  // Release the temporal buffer
+  if (buffer)
+    delete[] buffer;
+
   return maxClr;
 }
 
@@ -273,7 +281,7 @@ double SDTS::OgrDistance(double _latAdeg, double _lonAdeg,
   double latArad, latBrad;
   double cosA, cosB, sinA, sinB, cosP;
   double cosAngle;
- 
+
   cosP = cos(GZ_DTOR(_lonBdeg - _lonAdeg));
   latArad = GZ_DTOR(_latAdeg);
   latBrad = GZ_DTOR(_latBdeg);
@@ -297,9 +305,9 @@ double SDTS::SafeAcos(double _x)
 }
 
 //////////////////////////////////////////////////
-void SDTS::FillHeightMap(std::vector<float> &_heights,
-    int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
-    const math::Vector3 &_scale, bool _flipY)
+void SDTS::FillHeightMap(int _subSampling, unsigned int _vertSize,
+    const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+    std::vector<float> &_heights)
 {
   unsigned int x, y;
   float h = 0;
@@ -325,7 +333,6 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
   float *data = NULL;
   unsigned int count;
   this->GetData(&data, count);
-  std::cout << "Count: " << count << std::endl;
 
   double yf, xf, dy, dx;
   int y1, y2, x1, x2;
@@ -355,8 +362,6 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
       px2 = 100 * (data[y1 * pitch + x2 * bpp] / 1000);
       h1 = (px1 - ((px1 - px2) * dx));
 
-      //std::cout << "Accessing " << x1 << "," << y2 << "\n";
-      //std::cout << "Accessing " << x2 << "," << y2 << "\n";
       px3 = 100 * (data[y2 * pitch + x1 * bpp] / 1000);
       px4 = 100 * (data[y2 * pitch + x2 * bpp] / 1000);
       h2 = (px3 - ((px3 - px4) * dx));
@@ -369,7 +374,6 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
       if (_size.z < 0)
         h = 1.0 - h;
 
-      std::cout << "Height: " << h << std::endl;
       // Store the height for future use
       if (!_flipY)
         _heights[y * _vertSize + x] = h;
@@ -378,6 +382,7 @@ void SDTS::FillHeightMap(std::vector<float> &_heights,
     }
   }
 
-  delete [] data;
+  if (data)
+    delete [] data;
 }
 #endif

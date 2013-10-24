@@ -18,6 +18,7 @@
 #ifndef _HEIGHTMAPDATA_HH_
 #define _HEIGHTMAPDATA_HH_
 
+#include <vector>
 #include "gazebo/common/Color.hh"
 
 namespace gazebo
@@ -32,22 +33,23 @@ namespace gazebo
     class HeightmapData
     {
       /// \brief Destructor
-      // public: virtual ~HeightmapData();
+      public: virtual ~HeightmapData() {}
 
-      public: virtual void FillHeightMap(std::vector<float> &_heights,
-          int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
-          const math::Vector3 &_scale, bool _flipY) = 0;
-
+      /// \brief Create a lookup table of the terrain's height
+      /// \param[in] _subsampling
+      /// \param[in] _vertSize
+      /// \param[in] _size
+      /// \param[in] _scale
+      /// \param[in] _flipY
+      /// \param[out] _heights
+      public: virtual void FillHeightMap(int _subSampling,
+          unsigned int _vertSize, const math::Vector3 &_size,
+          const math::Vector3 &_scale, bool _flipY,
+          std::vector<float> &_heights) = 0;
 
       /// \brief Get the size of one pixel in bits
       /// \return The BPP of the image
       public: virtual unsigned int GetBPP() const = 0;
-
-      /// \brief Get the heightmap as a data array
-      /// \param[out] _data Pointer to a NULL array of char.
-      /// \param[out] _count The resulting data array size
-      //public: virtual void GetData(unsigned char **_data,
-      //                             unsigned int &_count) const = 0;
 
       /// \brief Get the height
       /// \return The image height

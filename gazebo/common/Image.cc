@@ -441,9 +441,9 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-void Image::FillHeightMap(std::vector<float> &_heights,
-    int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
-    const math::Vector3 &_scale, bool _flipY)
+void Image::FillHeightMap(int _subSampling, unsigned int _vertSize,
+    const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+    std::vector<float> &_heights)
 {
   unsigned int x, y;
   float h = 0;

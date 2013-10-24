@@ -23,6 +23,8 @@
 #ifdef HAVE_GDAL
 # include <gdal/gdal_priv.h>
 # include <string>
+# include <vector>
+
 
 # include "gazebo/common/Color.hh"
 # include "gazebo/common/Exception.hh"
@@ -41,11 +43,14 @@ namespace gazebo
     class SDTS : public HeightmapData
     {
       /// \brief Constructor.
-      /// \param[in] _filename the path to the terrain file.
-      public: SDTS(const std::string &_filename="");
+      public: SDTS();
 
       /// \brief Destructor.
       public: virtual ~SDTS();
+
+      /// \brief Load a DEM file.
+      /// \param[in] _filename the path to the terrain file.
+      public: void Load(const std::string &_filename="");
 
       /// \brief Get the size of each point in bytes after using GetData().
       /// \return The BPP of each point returned after GetData().
@@ -79,9 +84,16 @@ namespace gazebo
       /// \brief Get the real world height in meters.
       public: double GetWorldHeight();
 
-      public: void FillHeightMap(std::vector<float> &_heights,
-          int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, 
-          const math::Vector3 &_scale, bool _flipY);
+      /// \brief Create a lookup table of the terrain's height
+      /// \param[in] _subsampling
+      /// \param[in] _vertSize
+      /// \param[in] _size
+      /// \param[in] _scale
+      /// \param[in] _flipY
+      /// \param[out] _heights
+      public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
+          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+          std::vector<float> &_heights);
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
       /// pixel.
