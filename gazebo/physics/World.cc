@@ -563,6 +563,9 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (this->clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
@@ -710,6 +713,13 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
+  this->clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  this->clearModels = false;
   bool pauseState = this->IsPaused();
   this->SetPaused(true);
 
