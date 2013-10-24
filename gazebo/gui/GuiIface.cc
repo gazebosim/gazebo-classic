@@ -75,8 +75,8 @@ bool parse_args(int _argc, char **_argv)
 
   po::options_description v_desc("Options");
   v_desc.add_options()
-    ("version,v", "Output the version number of Gazebo")
-    ("verbose", "Output informational messages to the terminal.")
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 

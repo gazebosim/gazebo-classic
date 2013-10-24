@@ -88,8 +88,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
   po::options_description visibleDesc("Options");
   visibleDesc.add_options()
-    ("version,v", "Output the version number of Gazebo.")
-    ("verbose", "Output informational messages to the terminal.")
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
@@ -104,7 +104,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
-    ("minimal_comms", "Reduce the messages output by gzserver")
+    ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
