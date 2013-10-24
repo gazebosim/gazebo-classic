@@ -853,13 +853,13 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
       if (iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
-      if (pentity)
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      if (ogreEntity)
       {
         try
         {
           VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                        pentity->getUserAny()));
+                                        ogreEntity->getUserAny()));
           if (v)
             _visuals.push_back(v);
         }
@@ -930,7 +930,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
           iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve
       size_t vertex_count;
@@ -939,11 +939,11 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
+      this->GetMeshInformation(ogreEntity->getMesh().get(), vertex_count,
           vertices, index_count, indices,
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
+          ogreEntity->getParentNode()->_getDerivedPosition(),
+          ogreEntity->getParentNode()->_getDerivedOrientation(),
+          ogreEntity->getParentNode()->_getDerivedScale());
 
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
@@ -976,7 +976,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
       if (new_closest_found)
       {
-        closestEntity = pentity;
+        closestEntity = ogreEntity;
         // break;
       }
     }
@@ -1018,13 +1018,14 @@ bool Scene::GetFirstContact(CameraPtr _camera,
     if (iter->distance <= 0.0)
       continue;
 
-    // Only accept a hit if there is a movable object, and it's and Entity.
+    unsigned int flags = iter->movable->getVisibilityFlags();
+
+    // Only accept a hit if there is an entity and not a gui visual
     if (iter->movable &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        iter->movable->getName().find("OrbitViewController")
-        == std::string::npos)
+        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI))
     {
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve
       size_t vertexCount;
@@ -1033,11 +1034,11 @@ bool Scene::GetFirstContact(CameraPtr _camera,
       uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation(pentity->getMesh().get(), vertexCount,
+      this->GetMeshInformation(ogreEntity->getMesh().get(), vertexCount,
           vertices, indexCount, indices,
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
+          ogreEntity->getParentNode()->_getDerivedPosition(),
+          ogreEntity->getParentNode()->_getDerivedOrientation(),
+          ogreEntity->getParentNode()->_getDerivedScale());
 
       for (int i = 0; i < static_cast<int>(indexCount); i += 3)
       {
