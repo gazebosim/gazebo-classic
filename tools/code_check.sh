@@ -86,7 +86,8 @@ if [ $CPPCHECK_LT_157 -eq 0 ]; then
 fi
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
-CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
+CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"\
+" --rule-file=./tools/cppcheck_rules/issue_906.rule"
 CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
