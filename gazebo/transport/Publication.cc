@@ -83,7 +83,7 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
     if (_callback->GetLatching())
     {
-      // Send latached messages to the subscription.
+      // Send latched messages to the subscription.
       for (std::map<uint32_t, MessagePtr>::iterator pubIter =
           this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
       {
