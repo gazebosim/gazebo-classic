@@ -84,6 +84,7 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->clearModels = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
@@ -563,6 +564,9 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (this->clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
@@ -710,7 +714,27 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  this->clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  this->clearModels = false;
+  bool pauseState = this->IsPaused();
+  this->SetPaused(true);
+
+  this->publishModelPoses.clear();
+
+  // Remove all models
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    this->rootElement->RemoveChild((*iter)->GetId());
+  }
+  this->models.clear();
+
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
