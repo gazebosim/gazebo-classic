@@ -36,7 +36,7 @@ namespace gazebo
 {
   namespace common
   {
-    /// \addtogroup gazebo_util Util
+    /// \addtogroup gazebo_common Common
     /// \{
     /// \brief Output a message
     #define gzmsg (gazebo::common::Console::msg)
@@ -93,13 +93,21 @@ namespace gazebo
     /// \brief Terminal logger.
     class Logger : public std::ostream
     {
+      /// \enum LogType.
+      /// \brief Output destination type.
+      public: enum LogType
+              {
+                /// \brief Output to stdout.
+                STDOUT,
+                /// \brief Output to stderr.
+                STDERR
+              };
+
       /// \brief Constructor.
       /// \param[in] _prefix String to use as prefix when logging to file.
       /// \param[in] _color Color of the output stream.
-      /// \param[in] _stream Stream to output data onto, such as
-      /// &std::out, or &std::err.
-      public: Logger(const std::string &_prefix,
-                  int _color, std::ostream *_stream);
+      /// \param[in] _type Output destination type (STDOUT, or STDERR)
+      public: Logger(const std::string &_prefix, int _color, LogType _type);
 
       /// \brief Destructor.
       public: virtual ~Logger();
@@ -119,10 +127,10 @@ namespace gazebo
                    /// \param[in] _prefix String to use as prefix when
                    /// logging to file.
                    /// \param[in] _color Color of the output stream.
-                   /// \param[in] _stream Stream to output data onto, such as
-                   /// &std::out, or &std::err.
+                   /// \param[in] _type Output destination type
+                   /// (STDOUT, or STDERR)
                    public: Buffer(const std::string &_prefix,
-                               int _color, std::ostream *_stream);
+                               int _color, LogType _type);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();
@@ -134,8 +142,8 @@ namespace gazebo
                    /// \brief Color for the output.
                    public: int color;
 
-                   /// \brief Stream to output information into.
-                   public: std::ostream *stream;
+                   /// \brief Destination type for the messages.
+                   public: LogType type;
 
                    /// \brief Prefix to use when logging to file.
                    private: std::string prefix;
@@ -155,9 +163,6 @@ namespace gazebo
       /// \return True to if quiet output is set.
       public: static bool GetQuiet();
 
-      /// \brief Indicates if console messages should be quiet.
-      private: static bool quiet;
-
       /// \brief Global instance of the message logger.
       public: static Logger msg;
 
@@ -172,6 +177,9 @@ namespace gazebo
 
       /// \brief Global instance of the file logger.
       public: static FileLogger log;
+
+      /// \brief Indicates if console messages should be quiet.
+      private: static bool quiet;
     };
     /// \}
   }

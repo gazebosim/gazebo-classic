@@ -28,10 +28,10 @@ using namespace gazebo;
 using namespace common;
 
 FileLogger gazebo::common::Console::log("");
-Logger Console::msg("{Msg}", 32, &std::cout);
-Logger Console::err("{Err}", 31, &std::cerr);
-Logger Console::dbg("{Dbg}", 36, &std::cout);
-Logger Console::warn("{Wrn}", 33, &std::cerr);
+Logger Console::msg("[Msg]", 32, Logger::STDOUT);
+Logger Console::err("[Err]", 31, Logger::STDERR);
+Logger Console::dbg("[Dbg]", 36, Logger::STDOUT);
+Logger Console::warn("[Wrn]", 33, Logger::STDERR);
 
 bool Console::quiet = true;
 
@@ -48,8 +48,8 @@ bool Console::GetQuiet()
 }
 
 /////////////////////////////////////////////////
-Logger::Logger(const std::string &_prefix, int _color, std::ostream *_stream)
-  : std::ostream(new Buffer(_prefix, _color, _stream))
+Logger::Logger(const std::string &_prefix, int _color, LogType _type)
+  : std::ostream(new Buffer(_prefix, _color, _type))
 {
 }
 
@@ -71,8 +71,8 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 
 /////////////////////////////////////////////////
 Logger::Buffer::Buffer(const std::string &_prefix, int _color,
-    std::ostream *_stream)
-  : color(_color), stream(_stream), prefix(_prefix)
+    LogType _type)
+  : color(_color), type(_type), prefix(_prefix)
 {
 }
 
@@ -85,19 +85,25 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
+  if (this->str().empty())
+    return -1;
+
   // Log messages to disk
   Console::log << this->prefix << " " << this->str() << std::endl;
 
   // Output to terminal
   if (!Console::GetQuiet())
   {
-    (*this->stream) << "\033[1;"
-      << this->color << "m" << this->str() << "\033[0m";
-    (*this->stream).flush();
+    if (this->type == Logger::STDOUT)
+     std::cout << "\033[1;"
+       << this->color << "m" << this->prefix << "\033[0m" << this->str();
+    else
+      std::cerr << "\033[1;"
+        << this->color << "m" << this->prefix << "\033[0m" << this->str();
   }
 
   this->str("");
-  return !(*this->stream);
+  return 0;
 }
 
 /////////////////////////////////////////////////
@@ -157,7 +163,7 @@ int FileLogger::Buffer::sync()
   if (!this->stream)
     return -1;
 
-  *this->stream << "(" << common::Time::GetWallTime() << ") " << this->str();
+  *this->stream << "[" << common::Time::GetWallTime() << ") " << this->str();
 
   this->stream->flush();
 
