@@ -33,6 +33,8 @@ TEST_F(Issue876Test, Reset)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
+  math::Rand::SetSeed(math::Rand::GetSeed());
+
   int sampleCount = 500;
 
   std::vector<int> num;
