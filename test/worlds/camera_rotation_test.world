@@ -1,7 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
   <world name="default">
-    <include><uri>model://sun</uri></include>
+    <scene>
+      <background>0 0 0 0</background>
+      <ambient>1 1 1 1</ambient>
+    </scene>
+
     <model name="cam_x_rot_test_1">
       <pose>1 0 1 1.2 0 0</pose>
       <static>1</static>
