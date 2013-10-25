@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,10 +241,6 @@ namespace gazebo
       /// \return True if the terrain requires to regenerate the terrain files.
       private: bool PrepareTerrainPaging(
         const boost::filesystem::path &_terrainDirPath);
-
-      /// \brief DO NOT USE THIS. This is here for ABI compatibilty reasons.
-      // \todo Deprecated. Remove this in Gazebo 3.0
-      public: static const unsigned int NumTerrainSubdivisions;
 
       /// \brief Number of pieces in which a terrain is subdivided for paging.
       private: static const unsigned int numTerrainSubdivisions;

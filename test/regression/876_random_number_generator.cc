@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ TEST_F(Issue876Test, Reset)
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
+
+  math::Rand::SetSeed(math::Rand::GetSeed());
 
   int sampleCount = 500;
 
