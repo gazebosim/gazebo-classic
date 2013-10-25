@@ -42,8 +42,6 @@ ODEGearboxJoint::ODEGearboxJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEGearboxJoint::~ODEGearboxJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -161,14 +159,6 @@ math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
 {
   gzlog << "GetAngle not implemented for gearbox\n";
   return math::Angle(0);
-
-  math::Angle result;
-  if (this->jointId)
-    result = dJointGetHingeAngle(this->jointId);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -176,10 +166,6 @@ double ODEGearboxJoint::GetVelocity(int /*index*/) const
 {
   gzlog << "GetVelocity not implemented for gearbox\n";
   return 0;
-
-  double result = dJointGetHingeAngleRate(this->jointId);
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -187,8 +173,6 @@ void ODEGearboxJoint::SetVelocity(int /*index*/, double _angle)
 {
   gzlog << "SetVelocity not implemented for gearbox\n";
   return;
-
-  this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -196,8 +180,6 @@ void ODEGearboxJoint::SetMaxForce(int /*index*/, double _t)
 {
   gzlog << "SetMaxForce not implemented for gearbox\n";
   return;
-
-  return this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
@@ -205,8 +187,6 @@ double ODEGearboxJoint::GetMaxForce(int /*index*/)
 {
   gzlog << "GetMaxForce not implemented for gearbox\n";
   return 0;
-
-  return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////
@@ -223,15 +203,6 @@ double ODEGearboxJoint::GetParam(int _parameter) const
 {
   gzlog << "GetParam not implemented for gearbox\n";
   return 0;
-
-  double result = 0;
-
-  if (this->jointId)
-    result = dJointGetHingeParam(this->jointId, _parameter);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -239,10 +210,4 @@ void ODEGearboxJoint::SetParam(int _parameter, double _value)
 {
   gzlog << "SetParam not implemented for gearbox\n";
   return;
-
-  ODEJoint::SetParam(_parameter, _value);
-  if (this->jointId)
-    dJointSetHingeParam(this->jointId, _parameter, _value);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
 }
