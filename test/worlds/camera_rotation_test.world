@@ -38,6 +38,7 @@
         </visual>
       </link>
     </model>
+    <!-- test rotation inside sensor tags -->
     <model name="cam_x_rot_test_2">
       <static>1</static>
       <pose>0 0 1 0 0 0</pose>
@@ -68,6 +69,50 @@
           </camera>
           <camera name="right">
             <pose>0 0 0 0 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+        </sensor>
+      </link>
+    </model>
+    <!-- test rotation inside camera tags -->
+    <model name="cam_x_rot_test_3">
+      <static>1</static>
+      <pose>0 0 1 0 0 0</pose>
+      <link name="cam_x_rot_test_2_link">
+        <visual name="cam_x_rot_test_1_vis">
+          <pose>0 0 0 1.2 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.2 0.4</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="cam_rot_test_1_cam_2" type="multicamera">
+          <update_rate>15</update_rate>
+          <camera name="left">
+            <pose>0 0.36235775447 0.93203908596 1.2 0 0</pose>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>1024</width>
+              <height>544</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <camera name="right">
+            <pose>0 0 0 1.2 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>
             <image>
               <width>1024</width>
