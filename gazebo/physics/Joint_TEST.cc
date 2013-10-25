@@ -690,25 +690,10 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, JointTorqueTestODE)
+TEST_P(Joint_TEST, JointTorqueTest)
 {
-  JointTorqueTest("ode");
+  JointTorqueTest(this->physicsEngine);
 }
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, JointTorqueTestSimbody)
-{
-  JointTorqueTest("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, JointTorqueTestBullet)
-{
-  JointTorqueTest("bullet");
-}
-#endif  // HAVE_BULLET
 
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
