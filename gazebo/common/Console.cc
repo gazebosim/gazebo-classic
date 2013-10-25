@@ -93,6 +93,7 @@ int Logger::Buffer::sync()
   {
     (*this->stream) << "\033[1;"
       << this->color << "m" << this->str() << "\033[0m";
+    (*this->stream).flush();
   }
 
   this->str("");

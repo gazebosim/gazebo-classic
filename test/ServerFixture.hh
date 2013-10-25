@@ -67,6 +67,7 @@ class ServerFixture : public testing::Test
                this->serverThread = NULL;
 
                gzLogInit("test.log");
+               gazebo::common::Console::SetQuiet(false);
                common::SystemPaths::Instance()->AddGazeboPaths(
                    TEST_INTEGRATION_PATH);
 
