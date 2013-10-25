@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ODEGearboxJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include <boost/bind.hpp>
 
