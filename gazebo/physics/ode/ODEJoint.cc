@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -922,7 +922,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
-  dJointFeedback* fb = this->GetFeedback();
+  dJointFeedback *fb = this->GetFeedback();
   if (fb)
   {
     // kind of backwards here, body1 (parent) corresponds go f2, t2

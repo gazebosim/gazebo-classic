@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,22 @@ namespace gazebo
     inline bool isnan(double _v)
     {
       return (boost::math::isnan)(_v);
+    }
+
+    /// \brief Fix a nan value.
+    /// \param[in] _v Value to correct.
+    /// \return 0 if _v is NaN, _v otherwise.
+    inline float fixnan(float _v)
+    {
+      return isnan(_v) || std::isinf(_v) ? 0.0f : _v;
+    }
+
+    /// \brief Fix a nan value.
+    /// \param[in] _v Value to correct.
+    /// \return 0 if _v is NaN, _v otherwise.
+    inline double fixnan(double _v)
+    {
+      return isnan(_v) || std::isinf(_v) ? 0.0 : _v;
     }
 
     /// \brief get mean of vector of values
