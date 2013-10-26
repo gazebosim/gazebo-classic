@@ -63,7 +63,6 @@ TEST_F(WorldTest, Clear)
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
-
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
