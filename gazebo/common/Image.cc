@@ -373,6 +373,12 @@ Color Image::GetMaxColor()
 }
 
 //////////////////////////////////////////////////
+float Image::GetMaxValue()
+{
+  return this->GetMaxColor().r;
+}
+
+//////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
@@ -517,6 +523,11 @@ void Image::FillHeightMap(int _subSampling, unsigned int _vertSize,
         _heights[(_vertSize - y - 1) * _vertSize + x] = h;
     }
   }
+
+  std::cout << "FillheightMap(). Heights at (0,0): " << _heights[0] << std::endl;
+  std::cout << "FillheightMap(). Heights at (1,0): " << _heights[1] << std::endl;
+  std::cout << "FillheightMap(). Heights at (2,0): " << _heights[2] << std::endl;
+  std::cout << "FillheightMap(). Heights at (3,0): " << _heights[3] << std::endl;
 
   delete [] data;
 }

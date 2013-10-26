@@ -176,6 +176,10 @@ namespace gazebo
       /// \return The max color
       public: Color GetMaxColor();
 
+      /// \brief Get the max value of one image component
+      /// \return The max color of one image component
+      public: float GetMaxValue();
+
       /// \brief Rescale the image
       /// \param[in] _width New image width
       /// \param[in] _height New image height

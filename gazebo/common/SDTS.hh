@@ -66,9 +66,13 @@ namespace gazebo
       /// \return The terrain height.
       public: unsigned int GetHeight() const;
 
+      public: float GetMin();
+
+      public: float GetMax();
+
       /// \brief Get the max color.
       /// \return The max color.
-      public: Color GetMaxColor();
+      public: float GetMaxValue();
 
       // \brief Get the size of a row of data after using GetData().
       /// \return The pitch of the array returned by GetData().

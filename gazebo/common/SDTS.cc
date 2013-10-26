@@ -131,6 +131,9 @@ void SDTS::GetData(float **_data, unsigned int &_count) const
   _count = this->GetWidth() * this->GetHeight() * nBands;
   *_data = new float[_count];
 
+  // Testing
+  std::cout << "GetData(). Value at (0,0): " << data_v[0][0] << std::endl;
+
   // Fill the array aligning the data
   float *p = *_data;
   for (unsigned int i = 0; i < this->GetHeight(); ++i)
@@ -196,17 +199,59 @@ unsigned int SDTS::GetHeight() const
     return math::roundUpPowerOfTwo(currentHeight) + 1;
 }
 
-//////////////////////////////////////////////////
-Color SDTS::GetMaxColor()
+float SDTS::GetMin()
 {
-  Color maxClr;
   GDALRasterBand *poBand = NULL;
   std::vector<double> max_v;
 
-  maxClr.Set(0, 0, 0, 0);
+  // Read dimension sizes
+  int xsize = this->poDataset->GetRasterXSize();
+  int ysize = this->poDataset->GetRasterYSize();
+  float *buffer = new float[xsize * ysize];
+
+  // Get a pointer to the current band
+  poBand = poDataset->GetRasterBand(1);
+
+  // Read the whole data from the current band
+  poBand->RasterIO(GF_Read, 0, 0, xsize, ysize, buffer, xsize, ysize,
+      this->dataType, 0, 0);
+
+  // Store the maximum value of this band
+  float min = *std::min_element(buffer, buffer + xsize * ysize);
+  return min;
+}
+
+float SDTS::GetMax()
+{
+  GDALRasterBand *poBand = NULL;
+  std::vector<double> max_v;
 
   // Read dimension sizes
   int xsize = this->poDataset->GetRasterXSize();
+  int ysize = this->poDataset->GetRasterYSize();
+  float *buffer = new float[xsize * ysize];
+
+  // Get a pointer to the current band
+  poBand = poDataset->GetRasterBand(1);
+
+  // Read the whole data from the current band
+  poBand->RasterIO(GF_Read, 0, 0, xsize, ysize, buffer, xsize, ysize,
+      this->dataType, 0, 0);
+
+  // Store the maximum value of this band
+  float max = *std::max_element(buffer, buffer + xsize * ysize);
+  return max;
+}
+
+//////////////////////////////////////////////////
+float SDTS::GetMaxValue()
+{
+  /*float maxValue;
+  GDALRasterBand *poBand = NULL;
+  std::vector<double> max_v;*/
+
+  // Read dimension sizes
+  /*int xsize = this->poDataset->GetRasterXSize();
   int ysize = this->poDataset->GetRasterYSize();
   float *buffer = new float[xsize * ysize];
   int nBands = poDataset->GetRasterCount();
@@ -223,14 +268,17 @@ Color SDTS::GetMaxColor()
 
     // Store the maximum value of this band
     float max = *std::max_element(buffer, buffer + xsize * ysize);
+    float min = *std::min_element(buffer, buffer + xsize * ysize);
+    std::cout << "Min: " << min << " max: " << max << std::endl;
     max_v.push_back(max);
   }
 
   // Create a normalized color with the max values of each band
   if (max_v.size() == 1)
   {
-    double v = max_v[0] / poBand->GetMaximum();
+    double v = max_v[0];
     maxClr.Set(v, v, v);
+    std::cout << "Max: " << v << std::endl;
   }
   else if (max_v.size() == 3)
   {
@@ -243,7 +291,8 @@ Color SDTS::GetMaxColor()
   if (buffer)
     delete[] buffer;
 
-  return maxClr;
+  return maxClr;*/
+  return this->GetMax();
 }
 
 //////////////////////////////////////////////////
@@ -314,6 +363,8 @@ void SDTS::FillHeightMap(int _subSampling, unsigned int _vertSize,
   float h1 = 0;
   float h2 = 0;
 
+  std::cout << "Scale: " << _scale << std::endl;
+
   // Resize the vector to match the size of the vertices.
   _heights.resize(_vertSize * _vertSize);
 
@@ -338,6 +389,8 @@ void SDTS::FillHeightMap(int _subSampling, unsigned int _vertSize,
   int y1, y2, x1, x2;
   double px1, px2, px3, px4;
 
+  float maxHrel = this->GetMax() - this->GetMin();
+
   // Iterate over all the vertices
   for (y = 0; y < _vertSize; ++y)
   {
@@ -358,21 +411,23 @@ void SDTS::FillHeightMap(int _subSampling, unsigned int _vertSize,
         x2 = imgWidth-1;
       dx = xf - x1;
 
-      px1 = 100 * (data[y1 * pitch + x1 * bpp] / 1000);
-      px2 = 100 * (data[y1 * pitch + x2 * bpp] / 1000);
+      px1 = data[y1 * pitch + x1 * bpp];
+      px2 = data[y1 * pitch + x2 * bpp];
       h1 = (px1 - ((px1 - px2) * dx));
 
-      px3 = 100 * (data[y2 * pitch + x1 * bpp] / 1000);
-      px4 = 100 * (data[y2 * pitch + x2 * bpp] / 1000);
+      px3 = data[y2 * pitch + x1 * bpp];
+      px4 = data[y2 * pitch + x2 * bpp];
       h2 = (px3 - ((px3 - px4) * dx));
 
-      h = (h1 - ((h1 - h2) * dy)) * _scale.z;
+      //h = (h1 - ((h1 - h2) * dy)) * _scale.z;
+      //h = (h1 - ((h1 - h2) * dy)) / 255.0;
+      h = (h1 - ((h1 - h2) * dy) - maxHrel) * _scale.z;
 
       // invert pixel definition so 1=ground, 0=full height,
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
       if (_size.z < 0)
-        h = 1.0 - h;
+        h *= -1;
 
       // Store the height for future use
       if (!_flipY)

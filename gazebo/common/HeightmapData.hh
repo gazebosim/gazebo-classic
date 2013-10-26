@@ -57,7 +57,7 @@ namespace gazebo
 
       /// \brief Get the max color
       /// \return The max color
-      public: virtual Color GetMaxColor() = 0;
+      public: virtual float GetMaxValue() = 0;
 
       // \brief Get the size of a row of pixel
       /// \return The pitch of the image

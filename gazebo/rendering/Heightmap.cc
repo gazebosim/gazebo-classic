@@ -549,6 +549,11 @@ void Heightmap::DefineTerrain(int _x, int _y)
 {
   Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
 
+  std::cout << "DefineTerrain(). Heights at (0,0): " << this->heights[0] << std::endl;
+  std::cout << "DefineTerrain(). Heights at (1,0): " << this->heights[1] << std::endl;
+  std::cout << "DefineTerrain(). Heights at (2,0): " << this->heights[2] << std::endl;
+  std::cout << "DefineTerrain(). Heights at (X,0): " << this->heights[3000] << std::endl;
+
   if (!this->useTerrainPaging)
   {
     this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);

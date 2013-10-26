@@ -169,14 +169,18 @@ void HeightmapShape::Init()
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->heightmapData->GetMaxColor().r, 0.0f))
+  if (math::equal(this->heightmapData->GetMaxValue().r, 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
-    this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxColor().r;
+    this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxValue().r;
+
+  std::cout << "Terrain size Z: " << terrainSize.z << std::endl;
+  std::cout << "Max value: " << this->heightmapData->GetMaxValue().r << std::endl;
+  std::cout << "Scale Z: " << this->scale.z << std::endl;
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling,
-    this->vertSize, this->GetSize(), this->scale, this->flipY, this->heights);
+    this->vertSize, this->GetSize(), this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
