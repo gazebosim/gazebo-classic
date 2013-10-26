@@ -22,6 +22,28 @@ class WorldTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
+TEST_F(WorldTest, ClearEmptyWorld)
+{
+  Load("worlds/blank.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  EXPECT_EQ(world->GetModelCount(), 0u);
+
+  world->Clear();
+
+  // Wait some bit of time since World::Clear is not immediate.
+  for (unsigned int i = 0; i < 20; ++i)
+    common::Time::MSleep(500);
+
+  EXPECT_EQ(world->GetModelCount(), 0u);
+
+  // Now spawn something, and it the model count should increase
+  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
 TEST_F(WorldTest, Clear)
 {
   Load("worlds/pioneer2dx.world");
@@ -40,6 +62,7 @@ TEST_F(WorldTest, Clear)
 
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
+
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
