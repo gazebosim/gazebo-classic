@@ -27,7 +27,7 @@
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/HeightmapData.hh"
-#include "gazebo/common/SDTS.hh"
+#include "gazebo/common/DEM.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -117,7 +117,13 @@ namespace gazebo
       /// format might be an image or a DEM file. libgdal is required to enable
       /// DEM support. For a list of all raster formats supported you can type
       /// the command "gdalinfo --formats".
-      private: void LoadTerrainFile(std::string _filename);
+      private: void LoadTerrainFile(const std::string &_filename);
+
+      /// \brief Load a DEM specified by _filename as a terrain file.
+      private: void LoadDEMAsTerrain(const std::string &_filename);
+
+      /// \brief Load an image specified by _filename as a terrain file.
+      private: void LoadImageAsTerrain(const std::string &_filename);
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.
@@ -154,11 +160,11 @@ namespace gazebo
       private: std::string fileFormat;
 
       /// \brief Terrain size
-      private: math::Vector3 heigthmapSize;
+      private: math::Vector3 heightmapSize;
 
       #ifdef HAVE_GDAL
-      /// \brief SDTS used to generate the heights.
-      private: common::SDTS sdts;
+      /// \brief DEM used to generate the heights.
+      private: common::DEM dem;
       #endif
     };
     /// \}

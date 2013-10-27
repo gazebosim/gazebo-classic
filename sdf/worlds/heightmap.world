@@ -80,6 +80,7 @@
               <!-- <uri>file://media/materials/textures/imgn38w123_1_squared.img</uri> -->
               <size>129 129 10</size>
               <pos>0 0 0</pos>
+              <!-- <use_true_size>true</use_true_size> -->
             </heightmap>
           </geometry>
         </collision>

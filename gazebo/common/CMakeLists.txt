@@ -24,6 +24,7 @@ set (sources
   Color.cc
   CommonIface.cc
   Console.cc
+  DEM.cc
   Event.cc
   Events.cc
   Exception.cc
@@ -35,7 +36,6 @@ set (sources
   MeshManager.cc
   ModelDatabase.cc
   PID.cc
-  SDTS.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -57,6 +57,7 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
+  DEM.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -71,7 +72,6 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
-  SDTS.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh

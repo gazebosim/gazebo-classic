@@ -272,7 +272,7 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetPixel(unsigned int _x, unsigned int _y)
+Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 {
   Color clr;
 
@@ -348,7 +348,7 @@ Color Image::GetAvgColor()
 }
 
 //////////////////////////////////////////////////
-Color Image::GetMaxColor()
+Color Image::GetMaxColor() const
 {
   unsigned int x, y;
   Color clr;
@@ -373,7 +373,7 @@ Color Image::GetMaxColor()
 }
 
 //////////////////////////////////////////////////
-float Image::GetMaxValue()
+float Image::GetMaxElevation() const
 {
   return this->GetMaxColor().r;
 }
@@ -523,11 +523,6 @@ void Image::FillHeightMap(int _subSampling, unsigned int _vertSize,
         _heights[(_vertSize - y - 1) * _vertSize + x] = h;
     }
   }
-
-  std::cout << "FillheightMap(). Heights at (0,0): " << _heights[0] << std::endl;
-  std::cout << "FillheightMap(). Heights at (1,0): " << _heights[1] << std::endl;
-  std::cout << "FillheightMap(). Heights at (2,0): " << _heights[2] << std::endl;
-  std::cout << "FillheightMap(). Heights at (3,0): " << _heights[3] << std::endl;
 
   delete [] data;
 }

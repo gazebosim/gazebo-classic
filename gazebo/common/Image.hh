@@ -166,7 +166,7 @@ namespace gazebo
       /// \brief Get a pixel color value
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
-      public: Color GetPixel(unsigned int _x, unsigned int _y);
+      public: Color GetPixel(unsigned int _x, unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
@@ -174,11 +174,11 @@ namespace gazebo
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color GetMaxColor();
+      public: Color GetMaxColor() const;
 
-      /// \brief Get the max value of one image component
-      /// \return The max color of one image component
-      public: float GetMaxValue();
+      /// \brief Get the maximum elevation of one image using one component
+      /// \return The elevation of the image usging one image component
+      public: float GetMaxElevation() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width
@@ -190,12 +190,15 @@ namespace gazebo
       public: bool Valid() const;
 
       /// \brief Create a lookup table of the terrain's height
-      /// \param[in] _subsampling
-      /// \param[in] _vertSize
-      /// \param[in] _size
-      /// \param[in] _scale
-      /// \param[in] _flipY
-      /// \param[out] _heights
+      /// \param[in] _subsampling Multiplier used to increase the resolution.
+      /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
+      /// vector will be 257 * 257.
+      /// \param[in] _vertSize Number of points per row.
+      /// \param[in] _size Real dimmensions of the terrain.
+      /// \param[in] _scale Vector3 used to scale the height.
+      /// \param[in] _flipY If true, it inverts the order in which the vector
+      /// is filled.
+      /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
           std::vector<float> &_heights);

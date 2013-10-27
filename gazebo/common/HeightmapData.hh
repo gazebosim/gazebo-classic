@@ -35,37 +35,32 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~HeightmapData() {}
 
-      /// \brief Create a lookup table of the terrain's height
-      /// \param[in] _subsampling
-      /// \param[in] _vertSize
-      /// \param[in] _size
-      /// \param[in] _scale
-      /// \param[in] _flipY
-      /// \param[out] _heights
+      /// \brief Create a lookup table of the terrain's height.
+      /// \param[in] _subsampling Multiplier used to increase the resolution.
+      /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
+      /// vector will be 257 * 257.
+      /// \param[in] _vertSize Number of points per row.
+      /// \param[in] _size Real dimmensions of the terrain.
+      /// \param[in] _scale Vector3 used to scale the height.
+      /// \param[in] _flipY If true, it inverts the order in which the vector
+      /// is filled.
+      /// \param[out] _heights Vector containing the terrain heights.
       public: virtual void FillHeightMap(int _subSampling,
           unsigned int _vertSize, const math::Vector3 &_size,
           const math::Vector3 &_scale, bool _flipY,
           std::vector<float> &_heights) = 0;
 
-      /// \brief Get the size of one pixel in bits
-      /// \return The BPP of the image
-      public: virtual unsigned int GetBPP() const = 0;
-
-      /// \brief Get the height
-      /// \return The image height
+      /// \brief Get the terrain's height.
+      /// \return The terrain's height.
       public: virtual unsigned int GetHeight() const = 0;
 
-      /// \brief Get the max color
-      /// \return The max color
-      public: virtual float GetMaxValue() = 0;
-
-      // \brief Get the size of a row of pixel
-      /// \return The pitch of the image
-      public: virtual int GetPitch() const = 0;
-
-      /// \brief Get the width
-      /// \return The image width
+      /// \brief Get the terrain's width.
+      /// \return The terrain's width.
       public: virtual unsigned int GetWidth() const = 0;
+
+      /// \brief Get the maximum terrain's elevation.
+      /// \return The maximum terrain's elevation.
+      public: virtual float GetMaxElevation() const = 0;
     };
     /// \}
   }

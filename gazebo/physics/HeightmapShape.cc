@@ -48,13 +48,11 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 {
   this->vertSize = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
-  this->fileFormat = "ANY_IMAGE";
 }
 
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
-  // ToDo: Delete objects created
 }
 
 //////////////////////////////////////////////////
@@ -79,8 +77,39 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
+//////////////////////////////////////////////////
+void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
+{
+  // bool use_true_size = this->sdf->Get<bool>("use_true_size");
+  bool use_true_size = false;
+
+  this->dem.Load(_filename);
+
+  if (use_true_size)
+  {
+    this->heightmapSize.x = dem.GetWorldWidth();
+    this->heightmapSize.y = dem.GetWorldHeight();
+    this->heightmapSize.z = dem.GetMaxElevation() - dem.GetMinElevation();
+  }
+  else
+  {
+    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  }
+
+  this->heightmapData = static_cast<common::HeightmapData*>(&(this->dem));
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
+{
+  this->img.Load(_filename);
+  this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
+  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+}
+
+//////////////////////////////////////////////////
 #ifdef HAVE_GDAL
-void HeightmapShape::LoadTerrainFile(std::string _filename)
+void HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
   // Register the GDAL drivers
   GDALAllRegister();
@@ -98,27 +127,19 @@ void HeightmapShape::LoadTerrainFile(std::string _filename)
   if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
     // Load the terrain file as an image
-    this->img.Load(_filename);
-    this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
-    this->heigthmapSize = this->sdf->Get<math::Vector3>("size");
+    this->LoadImageAsTerrain(_filename);
   }
   else
   {
-    // Load the terrain file as a SDTS
-    this->sdts.Load(_filename);
-    this->heigthmapSize.x = sdts.GetWorldWidth();
-    this->heigthmapSize.y = sdts.GetWorldHeight();
-    this->heigthmapSize.z = 10.0;
-    this->heightmapData = static_cast<common::HeightmapData*>(&(this->sdts));
+    // Load the terrain file as a DEM
+    this->LoadDEMAsTerrain(_filename);
   }
 }
 #else
-void HeightmapShape::LoadTerrainFile(std::string _filename)
+void HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
   // Load the terrain file as an image
-  this->img.Load(_filename);
-  this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
-  this->heigthmapSize = this->sdf->Get<math::Vector3>("size");
+  this->LoadImageAsTerrain(_filename);
 }
 #endif
 
@@ -169,18 +190,15 @@ void HeightmapShape::Init()
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->heightmapData->GetMaxValue().r, 0.0f))
+  if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
-    this->scale.z = fabs(terrainSize.z) / this->heightmapData->GetMaxValue().r;
-
-  std::cout << "Terrain size Z: " << terrainSize.z << std::endl;
-  std::cout << "Max value: " << this->heightmapData->GetMaxValue().r << std::endl;
-  std::cout << "Scale Z: " << this->scale.z << std::endl;
+    this->scale.z = fabs(terrainSize.z) /
+                    this->heightmapData->GetMaxElevation();
 
   // Step 1: Construct the heightmap lookup table
-  this->heightmapData->FillHeightMap(this->subSampling,
-    this->vertSize, this->GetSize(), this->flipY, this->heights);
+  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+      this->GetSize(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -201,7 +219,7 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->heigthmapSize;
+  return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
