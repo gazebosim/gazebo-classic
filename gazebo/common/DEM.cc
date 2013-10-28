@@ -132,7 +132,7 @@ double DEM::GetElevation(double _x, double _y)
 {
   float elevation = 0.0;
   if (this->band)
-    this->band->RasterIO(GF_Read, _x, _y, 1, 1, &elevation, 1, 1, 
+    this->band->RasterIO(GF_Read, _x, _y, 1, 1, &elevation, 1, 1,
         GDT_Float32, 0, 0);
   else
     gzerr << "You are trying to use GetElevation() without a valid band. "
@@ -314,7 +314,7 @@ void DEM::GetData(float **_data, unsigned int &_count) const
   {
     ratio = nYSize / nXSize;
     destHeight = this->side;
-    destWidth = destHeight / ratio; 
+    destWidth = destHeight / ratio;
   }
 
   // Read the whole raster data and convert it to a GDT_Float32 array

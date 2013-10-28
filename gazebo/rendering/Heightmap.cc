@@ -317,8 +317,6 @@ void Heightmap::Load()
 
     this->dataSize = geomMsg.heightmap().width();
 
-    //this->useTerrainPaging = false;
-
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap

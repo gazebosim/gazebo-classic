@@ -56,7 +56,7 @@ namespace gazebo
       /// \param[in] _y Y coordinate of the terrain.
       /// \return Terrain's elevation at (x,y).
       public: double GetElevation(double _x, double _y);
-      
+
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
       /// pixel.
       /// \param[in] _x X coordinate of the terrain.
