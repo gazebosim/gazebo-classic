@@ -75,8 +75,8 @@
               <!-- <uri>file://media/materials/textures/heightmap_bowl.png</uri> -->
 	            <!-- <uri>file://media/materials/textures/ne_small.tif</uri> -->
 	            <!-- <uri>file://media/materials/textures/ne_small2.tif</uri> -->
-              <!-- <uri>file://media/materials/textures/imgn38w123_200.img</uri> -->
-              <uri>file://media/materials/textures/dem_sample_non_squared.tif</uri>
+              <uri>file://media/materials/textures/imgn38w123_2.img</uri>
+              <!-- <uri>file://media/materials/textures/dem_sample_non_squared.tif</uri> -->
               <!-- <uri>file://media/materials/textures/output.png</uri> -->
               <!-- <uri>file://media/materials/textures/imgn38w123_1_squared.img</uri> -->
               <size>129 129 10</size>
@@ -115,8 +115,8 @@
               </blend>
               <!-- <uri>file://media/materials/textures/heightmap_bowl.png</uri> -->
 	            <!-- <uri>file://media/materials/textures/ne_small.tif</uri> -->
-              <!-- <uri>file://media/materials/textures/imgn38w123_200.img</uri> -->
-              <uri>file://media/materials/textures/dem_sample_non_squared.tif</uri>
+              <uri>file://media/materials/textures/imgn38w123_2.img</uri>
+              <!-- <uri>file://media/materials/textures/dem_sample_non_squared.tif</uri> -->
               <!-- <uri>file://media/materials/textures/output.png</uri> -->
               <!-- <uri>file://media/materials/textures/imgn38w123_1_squared.img</uri> -->
 
