@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,9 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);
+
+  // this->collisionShape->setFriction(1.0);
+  // this->collisionShape->setAnisotropicFriction(btVector3(0, 0, 0));
 }
 
 //////////////////////////////////////////////////

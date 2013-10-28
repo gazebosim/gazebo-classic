@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -733,4 +733,10 @@ void ODELink::SetAutoDisable(bool _disable)
           << " does not exist, unable to SetAutoDisable" << std::endl;
   else
     gzlog << "ODE model has joints, unable to SetAutoDisable" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void ODELink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
 }

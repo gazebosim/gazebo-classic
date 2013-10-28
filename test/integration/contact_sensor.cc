@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,12 @@ TEST_P(ContactSensor, EmptyWorld)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -132,13 +138,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   msgs::Contacts contacts02;
 
   // let objects stablize
-  world->StepWorld(1000);
+  world->Step(1000);
 
   int steps = 1000;
   while ((contacts01.contact_size() == 0 || contacts02.contact_size() == 0)
       && --steps > 0)
   {
-    world->StepWorld(1);
+    world->Step(1);
     contacts01 = contactSensor01->GetContacts();
     contacts02 = contactSensor02->GetContacts();
   }
@@ -285,6 +291,12 @@ TEST_P(ContactSensor, StackTest)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -336,13 +348,13 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   physics->SetContactMaxCorrectingVel(0);
   physics->SetSORPGSIters(100);
 
-  world->StepWorld(1);
+  world->Step(1);
 
   // run simulation until contacts occur
   int steps = 2000;
   while (contacts.contact_size() == 0 && --steps > 0)
   {
-    world->StepWorld(1);
+    world->Step(1);
     contacts = contactSensor->GetContacts();
   }
 
@@ -410,7 +422,7 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ContactSensor)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

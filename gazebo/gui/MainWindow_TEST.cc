@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <boost/filesystem.hpp>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -23,6 +23,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
+
+#include "test_config.h"
 
 bool g_gotSetWireframe = false;
 void OnRequest(ConstRequestPtr &_msg)
@@ -34,10 +36,12 @@ void OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow_TEST::Wireframe()
 {
-  this->resMaxPercentChange = 4.0;
+  this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("empty.world", false, false, true);
+  boost::filesystem::path path = TEST_PATH;
+  path = path / "worlds" / "empty_dark_plane.world";
+  this->Load(path.string(), false, false, true);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -96,26 +100,29 @@ void MainWindow_TEST::Wireframe()
   // Trigger the wireframe request.
   gazebo::gui::g_viewWireframeAct->trigger();
 
+  double avgPostWireframe = avgPreWireframe;
+
   // Redraw the screen
-  for (unsigned int i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 100 &&
+      gazebo::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
     mainWindow->repaint();
-  }
 
-  // Get the new image data, and calculate the new average color
-  image = cam->GetImageData();
-  sum = 0;
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width*depth; ++x)
+    // Get the new image data, and calculate the new average color
+    image = cam->GetImageData();
+    sum = 0;
+    for (unsigned int y = 0; y < height; ++y)
     {
-      unsigned int a = image[(y*width*depth)+x];
-      sum += a;
+      for (unsigned int x = 0; x < width*depth; ++x)
+      {
+        unsigned int a = image[(y*width*depth)+x];
+        sum += a;
+      }
     }
+    avgPostWireframe = static_cast<double>(sum) / (height*width*depth);
   }
-  double avgPostWireframe = static_cast<double>(sum) / (height*width*depth);
 
   // Make sure the request was set.
   QVERIFY(g_gotSetWireframe);
@@ -125,9 +132,6 @@ void MainWindow_TEST::Wireframe()
 
   // Removing the grey ground plane should change the image.
   QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
-
-  mainWindow->hide();
-  delete mainWindow;
 }
 
 // Generate a main function for the test

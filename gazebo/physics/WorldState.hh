@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,10 +93,6 @@ namespace gazebo
       /// Returns the number of models in this instance.
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
-
-      /// Deprecated
-      public: ModelState GetModelState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
 
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.

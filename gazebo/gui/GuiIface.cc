@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -136,6 +137,9 @@ namespace gazebo
     /////////////////////////////////////////////////
     void fini()
     {
+      // Cleanup model database.
+      common::ModelDatabase::Instance()->Fini();
+
       gui::clear_active_camera();
       rendering::fini();
       fflush(stdout);
@@ -185,6 +189,9 @@ bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
   gazebo::common::Console::Instance()->Init("gzclient.log");
+
+  // Make sure the model database has started
+  gazebo::common::ModelDatabase::Instance()->Start();
 
   if (!parse_args(_argc, _argv))
     return false;

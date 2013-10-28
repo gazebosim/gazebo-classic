@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 
   // Create the wireless receiver sensor
   std::string sensorName = this->mgr->CreateSensor(this->sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName,
@@ -110,7 +110,7 @@ void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 
   // Create the wireless receiver sensor
   ASSERT_ANY_THROW(this->mgr->CreateSensor(this->sdf,
-      "default", "ground_plane::link"));
+      "default", "ground_plane::link", 0));
 }
 
 /////////////////////////////////////////////////
@@ -215,7 +215,7 @@ void WirelessReceiver_TEST::TestUpdateImpl()
 
   // Create the wireless receiver sensor
   std::string sensorName = this->mgr->CreateSensor(this->sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName,

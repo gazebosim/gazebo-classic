@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,8 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Remove all entities from the world.
+      /// This function has delayed effect. Models are cleared at the end
+      /// of the current update iteration.
       public: void Clear();
 
       /// \brief Get the name of the world.
@@ -273,9 +275,14 @@ namespace gazebo
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Step the world forward in time.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -316,6 +323,10 @@ namespace gazebo
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Get the total number of iterations.
+      /// \return Number of iterations that simulation has taken.
+      public: uint32_t GetIterations() const;
 
       /// \cond
       /// This is an internal function.
@@ -432,6 +443,11 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
+      /// \brief Remove a model from the cached list of models.
+      /// This does not delete the model.
+      /// \param[in] _name Name of the model to remove.
+      private: void RemoveModel(const std::string &_name);
+
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -447,6 +463,10 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -684,6 +704,12 @@ namespace gazebo
 
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;
+
+      /// \brief A cached list of models. This is here for performance.
+      private: Model_V models;
+
+      /// \brief Flag used to say if/when to clear all models.
+      private: bool clearModels;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,6 @@
 
 using namespace gazebo;
 using namespace transport;
-
-//////////////////////////////////////////////////
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool /*_latch*/)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
-{
-  this->queueLimitWarned = false;
-  this->updatePeriod = 0;
-  this->waiting = false;
-}
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
@@ -267,22 +257,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
 }
 
 //////////////////////////////////////////////////
-void Publisher::SetPublication(PublicationPtr &_publication, int _i)
-{
-  if (_i == 0)
-    this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr _publication)
 {
   this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
-bool Publisher::GetLatching() const
-{
-  return false;
 }
 
 //////////////////////////////////////////////////

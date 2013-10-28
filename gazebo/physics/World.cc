@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->clearModels = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
@@ -313,7 +314,7 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  // Initialize all the entities
+  // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
 
@@ -563,14 +564,23 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (this->clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
 void World::StepWorld(int _steps)
 {
+  this->Step(_steps);
+}
+
+//////////////////////////////////////////////////
+void World::Step(unsigned int _steps)
+{
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    gzwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
@@ -608,7 +618,6 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
 
-  event::Events::worldUpdateStart();
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
@@ -699,6 +708,7 @@ void World::Fini()
     this->physicsEngine.reset();
   }
 
+  this->models.clear();
   this->prevStates[0].SetWorld(WorldPtr());
   this->prevStates[1].SetWorld(WorldPtr());
 
@@ -710,7 +720,27 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  this->clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  this->clearModels = false;
+  bool pauseState = this->IsPaused();
+  this->SetPaused(true);
+
+  this->publishModelPoses.clear();
+
+  // Remove all models
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    this->rootElement->RemoveChild((*iter)->GetId());
+  }
+  this->models.clear();
+
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
@@ -764,7 +794,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
-    model.reset(new Model(_parent));
+    model = this->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
@@ -782,6 +812,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   }
 
   this->PublishModelPose(model);
+  this->models.push_back(model);
   return model;
 }
 
@@ -865,58 +896,26 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 //////////////////////////////////////////////////
 unsigned int World::GetModelCount() const
 {
-  // Not all children of the root element are models. We have to iterate
-  // through the children and count only the models.
-  unsigned int result = 0;
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    result += this->rootElement->GetChild(i)->HasType(Base::MODEL) ? 1 : 0;
-  return result;
+  return this->models.size();
 }
 
 //////////////////////////////////////////////////
 ModelPtr World::GetModel(unsigned int _index) const
 {
-  ModelPtr model;
-
-  if (_index < this->rootElement->GetChildCount())
-  {
-    // Not all children of the root element are models. We have to iterate
-    // through the children and count only the models.
-    for (unsigned int i = 0, count = 0;
-         i < this->rootElement->GetChildCount(); i++)
-    {
-      if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
-      {
-        if (count == _index)
-        {
-          model = boost::static_pointer_cast<Model>(
-              this->rootElement->GetChild(i));
-          break;
-        }
-        count++;
-      }
-    }
-
-    if (!model)
-      gzerr << "Unable to get model with index[" << _index << "]\n";
-  }
-  else
+  if (_index >= this->models.size())
   {
     gzerr << "Given model index[" << _index << "] is out of range[0.."
-          << this->rootElement->GetChildCount() << "]\n";
+          << this->models.size() << "]\n";
+    return ModelPtr();
   }
 
-  return model;
+  return this->models[_index];
 }
 
 //////////////////////////////////////////////////
 Model_V World::GetModels() const
 {
-  Model_V models;
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    models.push_back(this->GetModel(i));
-
-  return models;
+  return this->models;
 }
 
 //////////////////////////////////////////////////
@@ -944,6 +943,9 @@ void World::Reset()
 
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
+
+    math::Rand::SetSeed(math::Rand::GetSeed());
+    this->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
@@ -1189,7 +1191,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 //////////////////////////////////////////////////
 /*void World::ModelUpdateTBB()
 {
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
+  tbb::parallel_for (tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models));
 }*/
 
@@ -1313,6 +1315,7 @@ void World::ProcessEntityMsgs()
     }
 
     this->rootElement->RemoveChild((*iter));
+    this->RemoveModel(*iter);
   }
 
   if (!this->deleteEntity.empty())
@@ -1471,23 +1474,28 @@ void World::ProcessModelMsgs()
     {
       model->ProcessMsg(*iter);
 
+      // May 30, 2013: The following code was removed because it has a
+      // major performance impact when dragging complex object via the GUI.
+      // This code also does not seem to be necessary, since can just
+      // publish the incoming changes instead of a full model message. We
+      // are leaving it temporarily in case we find a need for it.
+      //
       // Let all other subscribers know about the change
-      msgs::Model msg;
-      model->FillMsg(msg);
+      // msgs::Model msg;
+      // model->FillMsg(msg);
+      // // FillMsg fills the visual components from initial sdf
+      // // but problem is that Visuals may have changed e.g. through ~/visual,
+      // // so don't publish them to subscribers.
+      // for (int i = 0; i < msg.link_size(); ++i)
+      // {
+      //   msg.mutable_link(i)->clear_visual();
+      //   for (int j = 0; j < msg.link(i).collision_size(); ++j)
+      //   {
+      //     msg.mutable_link(i)->mutable_collision(j)->clear_visual();
+      //   }
+      // }
 
-      // FillMsg fills the visual components from initial sdf
-      // but problem is that Visuals may have changed e.g. through ~/visual,
-      // so don't publish them to subscribers.
-      for (int i = 0; i < msg.link_size(); ++i)
-      {
-        msg.mutable_link(i)->clear_visual();
-        for (int j = 0; j < msg.link(i).collision_size(); ++j)
-        {
-          msg.mutable_link(i)->mutable_collision(j)->clear_visual();
-        }
-      }
-
-      this->modelPub->Publish(msg);
+      this->modelPub->Publish(*iter);
     }
   }
   if (this->modelMsgs.size())
@@ -1646,9 +1654,16 @@ void World::ProcessFactoryMsgs()
   for (std::list<sdf::ElementPtr>::iterator iter2 = modelsToLoad.begin();
        iter2 != modelsToLoad.end(); ++iter2)
   {
-    ModelPtr model = this->LoadModel(*iter2, this->rootElement);
-    model->Init();
-    model->LoadPlugins();
+    try
+    {
+      ModelPtr model = this->LoadModel(*iter2, this->rootElement);
+      model->Init();
+      model->LoadPlugins();
+    }
+    catch(...)
+    {
+      gzerr << "Loading model from factory message failed\n";
+    }
   }
 }
 
@@ -1739,15 +1754,21 @@ std::string World::StripWorldName(const std::string &_name) const
 //////////////////////////////////////////////////
 void World::EnableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(true);
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    (*iter)->SetEnabled(true);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::DisableAllModels()
 {
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-    this->GetModel(i)->SetEnabled(false);
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    (*iter)->SetEnabled(false);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1843,6 +1864,7 @@ void World::ProcessMessages()
 
           // Publish the model's relative pose
           poseMsg->set_name((*iter)->GetScopedName());
+          poseMsg->set_id((*iter)->GetId());
           msgs::Set(poseMsg, (*iter)->GetRelativePose());
 
           // Publish each of the model's children relative poses
@@ -1852,9 +1874,11 @@ void World::ProcessMessages()
           {
             poseMsg = msg.add_pose();
             poseMsg->set_name((*linkIter)->GetScopedName());
+            poseMsg->set_id((*linkIter)->GetId());
             msgs::Set(poseMsg, (*linkIter)->GetRelativePose());
           }
         }
+
         if (this->posePub && this->posePub->HasConnections())
           this->posePub->Publish(msg);
       }
@@ -1951,4 +1975,24 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+uint32_t World::GetIterations() const
+{
+  return this->iterations;
+}
+
+//////////////////////////////////////////////////
+void World::RemoveModel(const std::string &_name)
+{
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->models.erase(iter);
+      break;
+    }
+  }
 }

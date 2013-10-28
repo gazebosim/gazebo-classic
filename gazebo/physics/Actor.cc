@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     this->visualName = actorName + "::" + actorName + "_pose::"
                              + actorName + "_visual";
+
+    this->visualId = gazebo::physics::getUniqueId();
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
@@ -524,6 +526,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
+  msg.set_model_id(this->visualId);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
   math::Pose mainLinkPose;

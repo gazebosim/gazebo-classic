@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,11 +148,14 @@ class ServerFixture : public testing::Test
                       << " seconds, timeout after "
                       << static_cast<double>(maxWaitCount)/100.0
                       << " seconds\n";
-               ASSERT_LT(waitCount, maxWaitCount);
+
+               if (waitCount >= maxWaitCount)
+                 this->launchTimeoutFailure(
+                     "while waiting for Load() function", waitCount);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
-               this->poseSub = this->node->Subscribe("~/pose/info",
+               this->poseSub = this->node->Subscribe("~/pose/local/info",
                    &ServerFixture::OnPose, this, true);
                this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
@@ -188,17 +191,21 @@ class ServerFixture : public testing::Test
              {
                // Wait for the scene to get loaded.
                int i = 0;
-               while (rendering::get_scene(_sceneName) == NULL && i < 20)
+               int timeoutDS = 20;
+               while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
 
-               if (i >= 20)
+               if (i >= timeoutDS)
+               {
                  gzerr << "Unable to load the rendering scene.\n"
-                   << "Test will fail";
+                       << "Test will fail";
+                 this->launchTimeoutFailure(
+                     "while waiting to load rendering scene", i);
+               }
 
-               EXPECT_LT(i, 20);
                return rendering::get_scene(_sceneName);
              }
 
@@ -489,13 +496,25 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing Camera", i);
+
+               i = 0;
+               while (sensors::get_sensor(_cameraName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
@@ -557,13 +576,25 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing RaySensor", i);
+
+               i = 0;
+               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -626,13 +657,25 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing GpuRaySensor", i);
+
+               i = 0;
+               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -669,6 +712,7 @@ class ServerFixture : public testing::Test
                  << "    <imu>" << std::endl;
 
                if (_noiseType.size() > 0)
+               {
                  newModelStr << "      <noise>" << std::endl
                  << "        <type>" << _noiseType << "</type>" << std::endl
                  << "        <rate>" << std::endl
@@ -692,6 +736,7 @@ class ServerFixture : public testing::Test
                  << "</bias_stddev>" << std::endl
                  << "        </accel>" << std::endl
                  << "      </noise>" << std::endl;
+               }
 
                newModelStr << "    </imu>" << std::endl
                  << "  </sensor>" << std::endl
@@ -703,13 +748,25 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 1000;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
+               while (!this->HasEntity(_modelName) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
+
+               i = 0;
+               while (sensors::get_sensor(_imuSensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -748,6 +805,13 @@ class ServerFixture : public testing::Test
                  << "    <geometry>"
                  << shapeStr.str()
                  << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.005</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
@@ -767,13 +831,24 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 100;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 100)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(100);
                  ++i;
                }
-               EXPECT_LT(i, 100);
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ContactSensor", i);
+
+               i = 0;
+               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
 
   /// \brief Spawn an IMU sensor on a link
@@ -836,14 +911,36 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                int i = 0;
+               int timeoutDS = 50;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 50)
+               while (!this->HasEntity(_name) && i < timeoutDS)
                {
                  common::Time::MSleep(20);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+
+               if (i >= timeoutDS)
+                 this->launchTimeoutFailure(
+                     "while waiting for spawing ImuSensor", i);
+
+               i = 0;
+               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
+               {
+                 common::Time::MSleep(100);
+                 ++i;
+               }
+               ASSERT_LT(i, 100);
              }
+
+  /// \brief generate a gtest failure from a timeout error and display a
+  /// log message about the problem.
+  /// \param[in] log_msg: error msg related to the timeout
+  /// \param[in] timeoutCS: failing period (in centiseconds)
+  private: void launchTimeoutFailure(const char *_logMsg, const int _timeoutCS)
+  {
+      FAIL() << "ServerFixture timeout (wait more than " << _timeoutCS / 100
+             << "s): " << _logMsg;
+  }
 
   /// \brief Spawn an Wireless transmitter sensor on a link
   /// \param[in] _name Model name
@@ -854,44 +951,45 @@ class ServerFixture : public testing::Test
   /// \param[in] _freq Frequency of transmission (MHz)
   /// \param[in] _power Transmission power (dBm)
   /// \param[in] _gain Antenna gain (dBi)
-  /// \param[in] _visualize Enable sensor visualization             
+  /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
-    const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
-    const std::string &_essid,
-    double _freq,
-    double _power,
-    double _gain,
-    bool _visualize = true)
-{
-  msgs::Factory msg;
-  std::ostringstream newModelStr;
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 const std::string &_essid,
+                 double _freq,
+                 double _power,
+                 double _gain,
+                 bool _visualize = true)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
 
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << "<model name ='" << _name << "'>"
-    << "<static>true</static>"
-    << "<pose>" << _pos << " " << _rpy << "</pose>"
-    << "<link name ='link'>"
-    << "  <sensor name='" << _sensorName << "' type='wireless_transmitter'>"
-    << "    <always_on>1</always_on>"
-    << "    <update_rate>1</update_rate>"
-    << "    <visualize>" << _visualize << "</visualize>"
-    << "    <transceiver>"
-    << "      <essid>" << _essid << "</essid>"
-    << "      <frequency>" << _freq << "</frequency>"
-    << "      <power>" << _power << "</power>"
-    << "      <gain>" << _gain << "</gain>"
-    << "    </transceiver>"
-    << "  </sensor>"
-    << "</link>"
-    << "</model>"
-    << "</sdf>";
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName
+                 <<         "' type='wireless_transmitter'>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>" << _visualize << "</visualize>"
+                 << "    <transceiver>"
+                 << "      <essid>" << _essid << "</essid>"
+                 << "      <frequency>" << _freq << "</frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
-  WaitUntilEntitySpawn(_name, 100, 100);
-}
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 100, 100);
+             }
 
   /// \brief Spawn an Wireless receiver sensor on a link
   /// \param[in] _name Model name
@@ -905,61 +1003,67 @@ class ServerFixture : public testing::Test
   /// \param[in] _sensitivity Receiver sensitibity (dBm)
   /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
-      const std::string &_sensorName,
-      const math::Vector3 &_pos,
-      const math::Vector3 &_rpy,
-      double _minFreq,
-      double _maxFreq,
-      double _power,
-      double _gain,
-      double _sensitivity,
-      bool _visualize = true)
- {
-    msgs::Factory msg;
-    std::ostringstream newModelStr;
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 double _minFreq,
+                 double _maxFreq,
+                 double _power,
+                 double _gain,
+                 double _sensitivity,
+                 bool _visualize = true)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
 
-    newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-      << "<model name ='" << _name << "'>"
-      << "<static>true</static>"
-      << "<pose>" << _pos << " " << _rpy << "</pose>"
-      << "<link name ='link'>"
-      << "  <sensor name='" << _sensorName << "' type='wireless_receiver'>"
-      << "    <update_rate>1</update_rate>"
-      << "    <visualize>" << _visualize << "</visualize>"
-      << "    <transceiver>"
-      << "      <min_frequency>" << _minFreq << "</min_frequency>"
-      << "      <max_frequency>" << _maxFreq << "</max_frequency>"
-      << "      <power>" << _power << "</power>"
-      << "      <gain>" << _gain << "</gain>"
-      << "      <sensitivity>" << _sensitivity << "</sensitivity>"
-      << "    </transceiver>"
-      << "  </sensor>"
-      << "</link>"
-      << "</model>"
-      << "</sdf>";
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos << " " << _rpy << "</pose>"
+                 << "<link name ='link'>"
+                 << "  <sensor name='" << _sensorName
+                 <<         "' type='wireless_receiver'>"
+                 << "    <update_rate>1</update_rate>"
+                 << "    <visualize>" << _visualize << "</visualize>"
+                 << "    <transceiver>"
+                 << "      <min_frequency>" << _minFreq << "</min_frequency>"
+                 << "      <max_frequency>" << _maxFreq << "</max_frequency>"
+                 << "      <power>" << _power << "</power>"
+                 << "      <gain>" << _gain << "</gain>"
+                 << "      <sensitivity>" << _sensitivity << "</sensitivity>"
+                 << "    </transceiver>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
 
-    msg.set_sdf(newModelStr.str());
-    this->factoryPub->Publish(msg);
-    WaitUntilEntitySpawn(_name, 100, 100);
-  }
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+               WaitUntilEntitySpawn(_name, 100, 100);
+             }
 
   /// \brief Wait for a number of ms. and attempts until the entity is spawned
   /// \param[in] _name Model name
   /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
   private: void WaitUntilEntitySpawn(const std::string &_name,
-               unsigned int sleep_each,
-               int retries)
-           {
-             int i = 0;
-             // Wait for the entity to spawn
-             while (!this->HasEntity(_name) && i < retries)
+                                     unsigned int _sleepEach,
+                                     int _retries)
              {
-               common::Time::MSleep(sleep_each);
-               ++i;
+               int i = 0;
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name) && i < _retries)
+               {
+                 common::Time::MSleep(_sleepEach);
+                 ++i;
+               }
+               EXPECT_LT(i, _retries);
+
+               if (i >= _retries)
+                 FAIL() << "ServerFixture timeout: max number of retries ("
+                        << _retries
+                        << ") exceeded while awaiting the spawn of " << _name;
              }
-             EXPECT_LT(i, retries);
-           }
 
   protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -1204,7 +1308,7 @@ class ServerFixture : public testing::Test
              }
 
   protected: void LoadPlugin(const std::string &_filename,
-                 const std::string &_name)
+                             const std::string &_name)
              {
                // Get the first world...we assume it the only one running
                physics::WorldPtr world = physics::get_world();
@@ -1233,40 +1337,40 @@ class ServerFixture : public testing::Test
              }
 
   protected: void GetMemInfo(double &_resident, double &_share)
-             {
+            {
 #ifdef __linux__
-               int totalSize, residentPages, sharePages;
-               totalSize = residentPages = sharePages = 0;
+              int totalSize, residentPages, sharePages;
+              totalSize = residentPages = sharePages = 0;
 
-               std::ifstream buffer("/proc/self/statm");
-               buffer >> totalSize >> residentPages >> sharePages;
-               buffer.close();
+              std::ifstream buffer("/proc/self/statm");
+              buffer >> totalSize >> residentPages >> sharePages;
+              buffer.close();
 
-               // in case x86-64 is configured to use 2MB pages
-               int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
+              // in case x86-64 is configured to use 2MB pages
+              int64_t pageSizeKb = sysconf(_SC_PAGE_SIZE) / 1024;
 
-               _resident = residentPages * pageSizeKb;
-               _share = sharePages * pageSizeKb;
+              _resident = residentPages * pageSizeKb;
+              _share = sharePages * pageSizeKb;
 #elif __MACH__
-               // /proc is only available on Linux
-               // for OSX, use task_info to get resident and virtual memory
-               struct task_basic_info t_info;
-               mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
-               if (KERN_SUCCESS != task_info(mach_task_self(),
-                     TASK_BASIC_INFO,
-                     (task_info_t)&t_info,
-                     &t_info_count))
-               {
-                 gzerr << "failure calling task_info\n";
-                 return;
-               }
-               _resident = static_cast<double>(t_info.resident_size/1024);
-               _share = static_cast<double>(t_info.virtual_size/1024);
+              // /proc is only available on Linux
+              // for OSX, use task_info to get resident and virtual memory
+              struct task_basic_info t_info;
+              mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+              if (KERN_SUCCESS != task_info(mach_task_self(),
+                                            TASK_BASIC_INFO,
+                                            (task_info_t)&t_info,
+                                            &t_info_count))
+              {
+                gzerr << "failure calling task_info\n";
+                return;
+              }
+              _resident = static_cast<double>(t_info.resident_size/1024);
+              _share = static_cast<double>(t_info.virtual_size/1024);
 #else
-               gzerr << "Unsupported architecture\n";
-               return;
+              gzerr << "Unsupported architecture\n";
+              return;
 #endif
-             }
+            }
 
   protected: Server *server;
   protected: boost::thread *serverThread;

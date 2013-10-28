@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@
 /// \brief Render GUI visuals mask.
 #define GZ_VISIBILITY_GUI             0x00000001
 
-/// \def GZ_VISIBILITY_NOT_SELECTABLE
-/// \brief Render visuals that are not selectable mask.
-#define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
+/// \def GZ_VISIBILITY_SELECTABLE
+/// \brief Render visuals that are selectable mask.
+#define GZ_VISIBILITY_SELECTABLE      0x00000002
 
 namespace gazebo
 {

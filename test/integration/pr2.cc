@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,13 @@ class PR2Test : public ServerFixture,
 
 void PR2Test::Load(std::string _physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
   boost::filesystem::create_directories("/tmp/gazebo_test");
@@ -83,6 +90,13 @@ TEST_P(PR2Test, Load)
 ////////////////////////////////////////////////////////////////////////
 void PR2Test::StaticPR2(std::string _physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+
   ServerFixture::Load("worlds/static_pr2.world", true, _physicsEngine);
 
   // The body of this is copied from PhysicsTest::EmptyWorld
@@ -95,14 +109,14 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
-  world->StepWorld(steps);
+  world->Step(steps);
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
@@ -114,7 +128,7 @@ TEST_P(PR2Test, StaticPR2)
   StaticPR2(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(PR2Test)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PR2Test, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

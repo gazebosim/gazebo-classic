@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,9 @@ void BulletHingeJoint::Init()
 
   // Allows access to impulse
   this->bulletHinge->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -175,13 +178,6 @@ math::Vector3 BulletHingeJoint::GetAnchor(int /*_index*/) const
     this->bulletHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
   return math::Vector3(trans.getOrigin().getX(),
       trans.getOrigin().getY(), trans.getOrigin().getZ());
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetAnchor(int /*_index*/,
-                                 const math::Vector3 &/*_anchor*/)
-{
-  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -212,12 +208,6 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
   /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -273,33 +263,10 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForce(int _index, double _effort)
+void BulletHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling BulletHingeJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort unless effortLimit is negative.
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
-       this->effortLimit[_index]);
-
   if (this->bulletHinge)
   {
-    BulletJoint::SetForce(_index, _effort);
-
     // z-axis of constraint frame
     btVector3 hingeAxisLocalA =
       this->bulletHinge->getFrameOffsetA().getBasis().getColumn(2);

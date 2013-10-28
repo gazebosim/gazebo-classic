@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,4 +60,10 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
     dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
   else
     gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
 }

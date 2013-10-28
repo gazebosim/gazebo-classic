@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
 
 #include <dirent.h>
 #include <sstream>
@@ -145,8 +140,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   if (_autoRender)
   {
-    this->connections.push_back(
-        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
@@ -172,7 +167,7 @@ Camera::~Camera()
   this->renderTexture = NULL;
   this->renderTarget = NULL;
 
-  if (this->camera)
+  if (this->camera && this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
@@ -280,6 +275,9 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->initialized = false;
+  this->connections.clear();
+
   if (this->gaussianNoiseCompositorListener)
   {
     this->gaussianNoiseInstance->removeListener(
@@ -290,6 +288,9 @@ void Camera::Fini()
 
   if (this->renderTarget && this->scene->GetInitialized())
     this->renderTarget->removeAllViewports();
+
+  this->viewport = NULL;
+  this->renderTarget = NULL;
 
   this->connections.clear();
 }
@@ -328,11 +329,17 @@ void Camera::Update()
     {
       msgs::TrackVisual msg;
       msg.ParseFromString((*iter).data());
-      if (this->AttachToVisualImpl(msg.name(), msg.inherit_orientation(),
-                                    msg.min_dist(), msg.max_dist()))
-      {
+      bool result = false;
+
+      if (msg.id() < GZ_UINT32_MAX)
+        result = this->AttachToVisualImpl(msg.id(),
+            msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
+      else
+        result = this->AttachToVisualImpl(msg.name(),
+            msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
+
+      if (result)
         erase = true;
-      }
     }
 
     if (erase)
@@ -421,8 +428,15 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
-      this->renderPeriod)
+  this->Render(false);
+}
+
+//////////////////////////////////////////////////
+void Camera::Render(bool _force)
+{
+  if (this->initialized && (_force ||
+       common::Time::GetWallTime() - this->lastRenderWallTime >=
+        this->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -583,6 +597,14 @@ math::Quaternion Camera::GetWorldRotation() const
   math::Vector3 sRot, pRot;
 
   sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
+
+  // As far as I can tell, OGRE is broken. It makes a strong assumption
+  // that the camera is always oriented along its local -Z axis, and that
+  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
+  // out of the screen.
+  // This -1.0 multiplication is a hack to get back the correct orientation.
+  sRot.x *= -1.0;
+
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
 
   return math::Quaternion(sRot.x, pRot.y, sRot.z);
@@ -616,13 +638,22 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
-  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
+
+  // As far as I can tell, OGRE is broken. It makes a strong assumption
+  // that the camera is always oriented along its local -Z axis, and that
+  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
+  // out of the screen.
+  // The -1.0 to Roll is a hack to set the correct orientation.
+  s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
   this->pitchNode->setOrientation(
       Ogre::Quaternion(p.w, p.x, p.y, p.z));
+
+  this->sceneNode->needUpdate();
+  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -842,11 +873,17 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-void Camera::EnableSaveFrame(bool enable)
+void Camera::EnableSaveFrame(bool _enable)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("save");
-  elem->GetAttribute("enabled")->Set(enable);
-  this->captureData = true;
+  elem->GetAttribute("enabled")->Set(_enable);
+  this->captureData = _enable;
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetCaptureData() const
+{
+  return this->captureData;
 }
 
 //////////////////////////////////////////////////
@@ -1241,18 +1278,23 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::CreateRenderTexture(const std::string &textureName)
+void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName,
+      _textureName,
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(),
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+      // This #if allows ogre to antialias offscreen rendering
+     Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
+#else
+     Ogre::TU_RENDERTARGET)).getPointer();
+#endif
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
@@ -1270,13 +1312,9 @@ void Camera::CreateCamera()
 {
   this->camera = this->scene->GetManager()->createCamera(this->name);
 
-  // Use X/Y as horizon, Z up
-  this->camera->pitch(Ogre::Degree(90));
-
-  // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
-  this->camera->setDirection(1, 0, 0);
+  this->camera->setFixedYawAxis(false);
+  this->camera->yaw(Ogre::Degree(-90.0));
+  this->camera->roll(Ogre::Degree(-90.0));
 }
 
 //////////////////////////////////////////////////
@@ -1317,7 +1355,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
-    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
+        ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
@@ -1389,12 +1428,41 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
+void Camera::AttachToVisual(uint32_t _visualId,
+                            bool _inheritOrientation,
+                            double _minDist, double _maxDist)
+{
+  msgs::Request request;
+  msgs::TrackVisual track;
+
+  track.set_name(this->GetName() + "_attach_to_visual_track");
+  track.set_id(_visualId);
+  track.set_min_dist(_minDist);
+  track.set_max_dist(_maxDist);
+  track.set_inherit_orientation(_inheritOrientation);
+
+  std::string *serializedData = request.mutable_data();
+  track.SerializeToString(serializedData);
+
+  request.set_request("attach_visual");
+  request.set_id(_visualId);
+  this->requests.push_back(request);
+}
+
+//////////////////////////////////////////////////
 void Camera::AttachToVisual(const std::string &_visualName,
                             bool _inheritOrientation,
                             double _minDist, double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
+
+  VisualPtr visual = this->scene->GetVisual(_visualName);
+
+  if (visual)
+    track.set_id(visual->GetId());
+  else
+    track.set_id(GZ_UINT32_MAX);
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
@@ -1417,6 +1485,15 @@ void Camera::TrackVisual(const std::string &_name)
   request.set_data(_name);
   request.set_id(0);
   this->requests.push_back(request);
+}
+
+//////////////////////////////////////////////////
+bool Camera::AttachToVisualImpl(uint32_t _id,
+    bool _inheritOrientation, double _minDist, double _maxDist)
+{
+  VisualPtr visual = this->scene->GetVisual(_id);
+  return this->AttachToVisualImpl(visual, _inheritOrientation,
+                                  _minDist, _maxDist);
 }
 
 //////////////////////////////////////////////////
@@ -1678,12 +1755,6 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
-}
-
-//////////////////////////////////////////////////
-bool Camera::IsInitialized() const
-{
-  return this->GetInitialized();
 }
 
 //////////////////////////////////////////////////

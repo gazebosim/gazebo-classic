@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ namespace Ogre
 {
   class Root;
   class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo
@@ -126,6 +127,12 @@ namespace gazebo
       /// \return Pointer to the window manager.
       public: WindowManagerPtr GetWindowManager() const;
 
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      public: Ogre::OverlaySystem *GetOverlaySystem() const;
+#endif
+
       /// \brief Create a render context.
       /// \return True if the context was created.
       private: bool CreateContext();
@@ -187,6 +194,10 @@ namespace gazebo
 
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      private: Ogre::OverlaySystem *overlaySystem;
+#endif
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;

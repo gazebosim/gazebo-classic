@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,11 @@ void SelectionObj::Load()
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   if (this->parent)
+  {
+    if (this->parent == _vis)
+      return;
     this->parent->DetachVisual(shared_from_this());
+  }
   this->parent = _vis;
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
@@ -367,9 +371,12 @@ void SelectionObj::CreateTranslateVisual()
 
   this->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
 
-  this->transXVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->transYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->transZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->transXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->transYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->transZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Add to scene so they are selectable by the mouse
   this->scene->AddVisual(this->transXVisual);
@@ -445,9 +452,12 @@ void SelectionObj::CreateRotateVisual()
 
   this->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
 
-  this->rotXVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->rotYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->rotZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->rotXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->rotYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->rotZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Add to scene so they are selectable by the mouse
   this->scene->AddVisual(this->rotXVisual);
@@ -559,9 +569,12 @@ void SelectionObj::CreateScaleVisual()
 
   this->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
 
-  this->scaleXVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->scaleYVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->scaleZVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->scaleXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->scaleYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  this->scaleZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Add to scene so they are selectable by the mouse
   this->scene->AddVisual(this->scaleXVisual);

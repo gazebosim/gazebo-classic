@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ TEST_P(SpeedTest, ShapesWorld)
   ShapesWorld(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(SpeedTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

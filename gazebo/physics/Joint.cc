@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,13 @@
 using namespace gazebo;
 using namespace physics;
 
+sdf::ElementPtr Joint::sdfJoint;
+
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
-  this->forceApplied[0] = 0;
-  this->forceApplied[1] = 0;
   this->effortLimit[0] = -1;
   this->effortLimit[1] = -1;
   this->velocityLimit[0] = -1;
@@ -57,6 +57,14 @@ Joint::Joint(BasePtr _parent)
   this->upperLimit[1] =  1e16;
   this->inertiaRatio[0] = 0;
   this->inertiaRatio[1] = 0;
+  this->dampingCoefficient = 0;
+  this->provideFeedback = false;
+
+  if (!this->sdfJoint)
+  {
+    this->sdfJoint.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", this->sdfJoint);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -68,12 +76,6 @@ Joint::~Joint()
     sensors::remove_sensor(*iter);
   }
   this->sensors.clear();
-}
-
-//////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
-{
-  this->Load(_parent, _child, math::Pose(_pos, math::Quaternion()));
 }
 
 //////////////////////////////////////////////////
@@ -97,7 +99,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   // Joint is loaded without sdf from a model
   // Initialize this->sdf so it can be used for data storage
-  sdf::initFile("joint.sdf", this->sdf);
+  this->sdf = this->sdfJoint->Clone();
 
   this->LoadImpl(_pose);
 }
@@ -106,6 +108,16 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
+
+  // Joint force and torque feedback
+  if (_sdf->HasElement("physics"))
+  {
+    sdf::ElementPtr physicsElem = _sdf->GetElement("physics");
+    if (physicsElem->HasElement("provide_feedback"))
+    {
+      this->SetProvideFeedback(physicsElem->Get<bool>("provide_feedback"));
+    }
+  }
 
   sdf::ElementPtr parentElem = _sdf->GetElement("parent");
   sdf::ElementPtr childElem = _sdf->GetElement("child");
@@ -141,12 +153,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Vector3 &_pos)
-{
-  this->LoadImpl(math::Pose(_pos, math::Quaternion()));
-}
-
-/////////////////////////////////////////////////
 void Joint::LoadImpl(const math::Pose &_pose)
 {
   BasePtr myBase = shared_from_this();
@@ -176,7 +182,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName());
+              this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       else
@@ -255,17 +261,8 @@ void Joint::Init()
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
 
-  // Set axis in physics engines
-  if (this->sdf->HasElement("axis"))
-  {
-    this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
-  }
-  if (this->sdf->HasElement("axis2"))
-  {
-    this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-  }
-
-  this->ComputeInertiaRatio();
+  // for debugging only
+  // this->ComputeInertiaRatio();
 }
 
 //////////////////////////////////////////////////
@@ -361,6 +358,7 @@ LinkPtr Joint::GetParent() const
 void Joint::FillMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
+  _msg.set_id(this->GetId());
 
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
 
@@ -405,14 +403,26 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.mutable_axis1()->set_friction(0);
 
   if (this->GetParent())
+  {
     _msg.set_parent(this->GetParent()->GetScopedName());
+    _msg.set_parent_id(this->GetParent()->GetId());
+  }
   else
+  {
     _msg.set_parent("world");
+    _msg.set_parent_id(0);
+  }
 
   if (this->GetChild())
+  {
     _msg.set_child(this->GetChild()->GetScopedName());
+    _msg.set_child_id(this->GetChild()->GetId());
+  }
   else
+  {
     _msg.set_child("world");
+    _msg.set_parent_id(0);
+  }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
        iter != this->sensors.end(); ++iter)
@@ -501,46 +511,50 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetForce(int _index, double _force)
+double Joint::CheckAndTruncateForce(int _index, double _effort)
 {
-  // this bit of code actually doesn't do anything physical,
-  // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
-    this->forceApplied[_index] = _force;
-  else
-    gzerr << "Something's wrong, joint [" << this->GetName()
-          << "] index [" << _index
-          << "] out of range.\n";
+  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  {
+    gzerr << "Calling Joint::SetForce with an index ["
+          << _index << "] out of range\n";
+    return _effort;
+  }
+
+  // truncating SetForce effort if velocity limit is reached and
+  // effort is applied in the same direction.
+  if (this->velocityLimit[_index] >= 0)
+  {
+    if (this->GetVelocity(_index) > this->velocityLimit[_index])
+      _effort = _effort > 0 ? 0 : _effort;
+    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
+      _effort = _effort < 0 ? 0 : _effort;
+  }
+
+  // truncate effort if effortLimit is not negative
+  if (this->effortLimit[_index] >= 0.0)
+    _effort = math::clamp(_effort, -this->effortLimit[_index],
+      this->effortLimit[_index]);
+
+  return _effort;
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(unsigned int _index)
+double Joint::GetForce(unsigned int /*_index*/)
 {
-  if (_index < this->GetAngleCount())
-  {
-    return this->forceApplied[_index];
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get force\n";
-    return 0;
-  }
+  gzerr << "Joint::GetForce should be overloaded by physics engines.\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(int _index)
+double Joint::GetDampingCoefficient() const
 {
-  return this->GetForce(static_cast<unsigned int>(_index));
+  return this->dampingCoefficient;
 }
 
 //////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
-  // Take absolute value of dampingCoefficient, since negative values of
-  // dampingCoefficient are used for adaptive damping to enforce stability.
-  double dampingForce = -fabs(this->dampingCoefficient) * this->GetVelocity(0);
-  this->SetForce(0, dampingForce);
+  gzerr << "Joint::ApplyDamping should be overloaded by physics engines.\n";
 }
 
 //////////////////////////////////////////////////

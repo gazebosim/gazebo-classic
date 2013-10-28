@@ -1,7 +1,3 @@
-#!/bin/bash
-lower=`echo $1 | tr '[:upper:]' '[:lower:]'`
-guard=_GAZEBO_`echo $1 | tr '[:lower:]' '[:upper:]'`_HH_
-cat <<END
 /*
  * Copyright 2013 Open Source Robotics Foundation
  *
@@ -18,16 +14,10 @@ cat <<END
  * limitations under the License.
  *
 */
-#ifndef $guard
-#define $guard
 
-// Deprecated header file for case-sensitive filesystems
-#warning The gazebo/$lower/$1.hh header file is deprecated \\
-  as of gazebo 1.9 and will be removed in the next release. \\
-  Please include gazebo/$lower/$1Iface.hh instead.
-#include "gazebo/$lower/$1Iface.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 
-#endif
+using namespace gazebo;
+using namespace gui;
 
-END
-
+event::EventT<void ()> model::Events::finishModel;

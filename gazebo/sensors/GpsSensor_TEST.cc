@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
 
   // Create the Ray sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName, std::string("default::ground_plane::link::gps"));

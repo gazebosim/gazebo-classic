@@ -13,6 +13,10 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 add_subdirectory(msgs)
 add_subdirectory(math)
 add_subdirectory(transport)
@@ -32,7 +36,7 @@ add_dependencies(gazebo_sensors gazebo_rendering)
 if(HAVE_BULLET)
   add_dependencies(gazebo_physics_bullet gazebo_msgs)
 endif()
-if (HAVE_Simbody)
+if (HAVE_SIMBODY)
   add_dependencies(gazebo_physics_simbody gazebo_msgs)
 endif()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,10 @@ namespace gazebo
     /// \brief Return true if any world is running.
     /// \return True if any world is running.
     bool worlds_running();
+
+    /// \brief Get a unique ID
+    /// \return A unique integer
+    uint32_t getUniqueId();
     /// \}
   }
 }

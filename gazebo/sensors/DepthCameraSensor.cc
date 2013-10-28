@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,12 +50,6 @@ DepthCameraSensor::DepthCameraSensor()
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void DepthCameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -114,7 +108,7 @@ void DepthCameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
     this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
     this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";

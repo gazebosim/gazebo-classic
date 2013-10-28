@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,19 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-unsigned int Base::idCounter = 0;
-
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->id = ++idCounter;
+  this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
 
@@ -154,7 +153,7 @@ std::string Base::GetName() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Base::GetId() const
+uint32_t Base::GetId() const
 {
   return this->id;
 }

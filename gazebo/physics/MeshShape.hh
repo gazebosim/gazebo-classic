@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,18 +56,9 @@ namespace gazebo
       /// \return The size of the triangle mesh.
       public: virtual math::Vector3 GetSize() const;
 
-      /// Deprecated
-      /// \sa GetMeshURI
-      public: std::string GetFilename() const GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
       public: std::string GetMeshURI() const;
-
-      /// Deprecated.
-      /// \sa SetMesh
-      public: void SetFilename(
-                  const std::string &_filename) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.

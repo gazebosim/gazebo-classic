@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,36 @@ pid_t  pid1, pid2;
 bool killed1 = false;
 bool killed2 = false;
 
+/////////////////////////////////////////////////
+void help()
+{
+  std::cerr << "gazebo -- Run the Gazebo server and GUI.\n\n";
+  std::cerr << "`gazebo` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops. This also starts the Gazebo GUI client in a separate "
+    << "process.\n\n";
+
+  std::cerr << "Options:\n"
+  << "  -q [ --quiet ]                Reduce output to stdout.\n"
+  << "  -h [ --help ]                 Produce this help message.\n"
+  << "  -u [ --pause ]                Start the server in a paused state.\n"
+  << "  -e [ --physics ] arg          Specify a physics engine "
+  << "(ode|bullet|simbody).\n"
+  << "  -p [ --play ] arg             Play a log file.\n"
+  << "  -r [ --record ]               Record state data.\n"
+  << "  --record_encoding arg (=zlib) Compression encoding format for log "
+  << "data \n"
+  << "                                (zlib|bz2|txt).\n"
+  << "  --record_path arg             Absolute path in which to store "
+  << "state data\n"
+  << "  --seed arg                    Start with a given random number seed.\n"
+  << "  --iters arg                   Number of iterations to simulate.\n"
+  << "  --minimal_comms               Reduce the messages output by gzserver\n"
+  << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
+}
+
+/////////////////////////////////////////////////
 void sig_handler(int /*signo*/)
 {
   sig_killed = true;
@@ -66,8 +96,16 @@ void sig_handler(int /*signo*/)
   }
 }
 
+/////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+  if (_argc >= 2 &&
+      (strcmp(_argv[1], "-h") == 0 || strcmp(_argv[1], "--help") == 0))
+  {
+    help();
+    return 0;
+  }
+
   if (signal(SIGINT, sig_handler) == SIG_ERR)
   {
     gzerr << "Stopping. Unable to catch SIGINT.\n"

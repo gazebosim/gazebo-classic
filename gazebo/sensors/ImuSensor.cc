@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,8 +235,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     this->dataIndex ^= 1;
     this->dataDirty = false;
   }
-
-  this->lastUpdateTime = this->world->GetSimTime();
 
   // toggle the index
   msg.CopyFrom(*this->incomingLinkData[readIndex].get());

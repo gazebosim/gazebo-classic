@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,15 +215,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 
       if (!boost::filesystem::is_directory(fullPath))
       {
-        if (dIter->filename() == "manifest.xml")
-        {
-          boost::filesystem::path tmpPath = boost::filesystem::path(_path) /
-            "database.config";
-          gzwarn << "manifest.xml for a model database is deprecated. "
-                 << "Please rename " << fullPath <<  " to "
-                 << tmpPath << "\n";
-        }
-        else if (dIter->filename() != "database.config")
+        if (dIter->filename() != "database.config")
         {
           gzlog << "Invalid filename or directory[" << fullPath
             << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
@@ -233,18 +225,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         continue;
       }
 
-      // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-      // exist, try to get the deprecated version.
+      // Get the GZ_MODEL_MANIFEST_FILENAME.
       if (boost::filesystem::exists(manifest / GZ_MODEL_MANIFEST_FILENAME))
         manifest /= GZ_MODEL_MANIFEST_FILENAME;
       else if (boost::filesystem::exists(manifest / "manifest.xml"))
       {
-        gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-          << "Please rename manifest.xml to "
-          << GZ_MODEL_MANIFEST_FILENAME << " for model "
+        gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
-
-        manifest /= "manifest.xml";
       }
 
       if (!boost::filesystem::exists(manifest) || manifest == fullPath)

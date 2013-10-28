@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ void MultiCameraSensor::Init()
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentName, true);
+    camera->AttachToVisual(this->parentId, true);
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);
@@ -216,8 +216,6 @@ bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
   if (!this->rendered)
     return false;
-
-  this->lastUpdateTime = this->scene->GetSimTime();
 
   bool publish = this->imagePub->HasConnections();
 
