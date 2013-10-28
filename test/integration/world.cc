@@ -38,7 +38,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
-  // Now spawn something, and it the model count should increase
+  // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
