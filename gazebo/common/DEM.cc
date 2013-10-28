@@ -16,8 +16,10 @@
 */
 
 #include <algorithm>
+#include <boost/filesystem.hpp>
 
-#include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/DEM.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Angle.hh"
@@ -36,23 +38,42 @@ DEM::DEM()
 //////////////////////////////////////////////////
 DEM::~DEM()
 {
-  GDALClose(reinterpret_cast<GDALDataset *>(this->dataSet));
+  if (this->dataSet)
+    GDALClose(reinterpret_cast<GDALDataset *>(this->dataSet));
 }
 
 //////////////////////////////////////////////////
-void DEM::Load(const std::string &_filename)
+int DEM::Load(const std::string &_filename)
 {
-  this->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
-    _filename.c_str(), GA_ReadOnly));
-
   // Sanity check
+  std::string fullName = _filename;
+  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+    fullName = common::find_file(_filename);
+
+  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+  {
+    gzerr << "Unable to open DEM file[" << _filename
+          << "], check your GAZEBO_RESOURCE_PATH settings.\n";
+    return -1;
+  }
+
+  this->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
+    fullName.c_str(), GA_ReadOnly));
+
   if (this->dataSet == NULL)
-    gzthrow("Unable to find DEM file [" + _filename + "]\n");
+  {
+    gzerr << "Unable to open DEM file[" << fullName
+          << "]. Format not recognised as a supported dataset.\n";
+    return -1;
+  }
 
   int nBands = this->dataSet->GetRasterCount();
   if (nBands != 1)
-    gzthrow("Unsupported number of bands in file [" << _filename + "]. Found "
-       << nBands << " but only 1 is a valid value\n");
+  {
+    gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
+          << nBands << " but only 1 is a valid value.\n";
+    return -1;
+  }
 
   // Set the pointer to the band
   this->band = this->dataSet->GetRasterBand(1);
@@ -88,71 +109,34 @@ void DEM::Load(const std::string &_filename)
     delete[] buffer;
 
   // Set the width/height (after the padding)
+  unsigned int width;
+  unsigned int height;
+
   if (math::isPowerOfTwo(ySize - 1))
-    this->height = ySize;
+    height = ySize;
   else
-    this->height = math::roundUpPowerOfTwo(ySize) + 1;
+    height = math::roundUpPowerOfTwo(ySize) + 1;
 
   if (math::isPowerOfTwo(xSize - 1))
-    this->width = xSize;
+    width = xSize;
   else
-    this->width = math::roundUpPowerOfTwo(xSize) + 1;
+    width = math::roundUpPowerOfTwo(xSize) + 1;
 
-  GZ_ASSERT(this->width == this->height, "DEM after padding must be square");
-}
+  this->side = std::max(width, height);
 
-//////////////////////////////////////////////////
-void DEM::GetData(float **_data, unsigned int &_count) const
-{
-  unsigned int nXSize = this->dataSet->GetRasterXSize();
-  unsigned int nYSize = this->dataSet->GetRasterYSize();
-
-  if (*_data)
-    delete [] *_data;
-
-  // Allocate memory for the array that will contain all the data
-  _count = this->GetWidth() * this->GetHeight();
-  *_data = new float[_count];
-
-  // Read the whole raster data and convert it to a GDT_Float32 array
-  float *buffer = new float[nXSize * nYSize];
-  this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, buffer, nXSize, nYSize,
-      GDT_Float32, 0, 0);
-
-  // Fill the array aligning the data
-  float *p = *_data;
-  for (unsigned int y = 0; y < this->GetHeight(); ++y)
-  {
-    for (unsigned int x = 0; x < this->GetWidth(); ++x)
-    {
-      // Add the padding
-      if ((y >= nYSize) || (x >= nXSize))
-      {
-        p[0] = 0;
-      }
-      else
-      {
-        p[0] = buffer[y * nXSize + x];
-      }
-      p++;
-    }
-  }
-
-  // Release the temporary buffer
-  if (buffer)
-    delete[] buffer;
+  return 0;
 }
 
 //////////////////////////////////////////////////
 unsigned int DEM::GetHeight() const
 {
-  return this->height;
+  return this->side;
 }
 
 //////////////////////////////////////////////////
 unsigned int DEM::GetWidth() const
 {
-  return this->width;
+  return this->side;
 }
 
 //////////////////////////////////////////////////
@@ -180,17 +164,71 @@ double DEM::GetWorldHeight() const
 }
 
 //////////////////////////////////////////////////
-void DEM::GetGeoReference(double _x, double _y, double &_xGeo, double &_yGeo)
+void DEM::FillHeightMap(int _subSampling, unsigned int _vertSize,
+    const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+    std::vector<float> &_heights)
 {
-  double geoTransf[6];
-  if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
+  unsigned int x, y;
+  float h = 0;
+  float h1 = 0;
+  float h2 = 0;
+
+  // Resize the vector to match the size of the vertices.
+  _heights.resize(_vertSize * _vertSize);
+
+  float *data = NULL;
+  unsigned int count;
+  this->GetData(&data, count);
+
+  double yf, xf, dy, dx;
+  unsigned int y1, y2, x1, x2;
+  double px1, px2, px3, px4;
+
+  // Iterate over all the vertices
+  for (y = 0; y < _vertSize; ++y)
   {
-    _xGeo = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-    _yGeo = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+    yf = y / static_cast<double>(_subSampling);
+    y1 = floor(yf);
+    y2 = ceil(yf);
+    if (y2 >= this->side)
+      y2 = this->side - 1;
+    dy = yf - y1;
+
+    for (x = 0; x < _vertSize; ++x)
+    {
+      xf = x / static_cast<double>(_subSampling);
+      x1 = floor(xf);
+      x2 = ceil(xf);
+      if (x2 >= this->side)
+        x2 = this->side - 1;
+      dx = xf - x1;
+
+      px1 = data[y1 * this->side + x1];
+      px2 = data[y1 * this->side + x2];
+      h1 = (px1 - ((px1 - px2) * dx));
+
+      px3 = data[y2 * this->side + x1];
+      px4 = data[y2 * this->side + x2];
+      h2 = (px3 - ((px3 - px4) * dx));
+
+      h = (h1 - ((h1 - h2) * dy) - this->GetMinElevation()) * _scale.z;
+
+      // invert pixel definition so 1=ground, 0=full height,
+      //   if the terrain size has a negative z component
+      //   this is mainly for backward compatibility
+      if (_size.z < 0)
+        h *= -1;
+
+      // Store the height for future use
+      if (!_flipY)
+        _heights[y * _vertSize + x] = h;
+      else
+        _heights[(_vertSize - y - 1) * _vertSize + x] = h;
+    }
   }
-  else
-    gzthrow("Unable to obtain the georeferenced values for line [" << _y <<
-            "] and pixel [" << _x << "]\n");
+
+  if (data)
+    delete [] data;
 }
 
 //////////////////////////////////////////////////
@@ -222,70 +260,52 @@ double DEM::Distance(double _latAdeg, double _lonAdeg,
 }
 
 //////////////////////////////////////////////////
-void DEM::FillHeightMap(int _subSampling, unsigned int _vertSize,
-    const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-    std::vector<float> &_heights)
+void DEM::GetData(float **_data, unsigned int &_count) const
 {
-  unsigned int x, y;
-  float h = 0;
-  float h1 = 0;
-  float h2 = 0;
+  unsigned int destWidth;
+  unsigned int destHeight;
+  unsigned int nXSize = this->dataSet->GetRasterXSize();
+  unsigned int nYSize = this->dataSet->GetRasterYSize();
+  float ratio;
 
-  // Resize the vector to match the size of the vertices.
-  _heights.resize(_vertSize * _vertSize);
+  if (*_data)
+    delete [] *_data;
 
-  float *data = NULL;
-  unsigned int count;
-  this->GetData(&data, count);
+  // Allocate memory for the array that will contain all the data
+  _count = this->side * this->side;
+  *_data = new float[_count];
 
-  double yf, xf, dy, dx;
-  int y1, y2, x1, x2;
-  double px1, px2, px3, px4;
-
-  // Iterate over all the vertices
-  for (y = 0; y < _vertSize; ++y)
+  // Scale the terrain keeping the same ratio between width and height
+  if (nXSize > nYSize)
   {
-    yf = y / static_cast<double>(_subSampling);
-    y1 = floor(yf);
-    y2 = ceil(yf);
-    if (y2 >= this->height)
-      y2 = this->height - 1;
-    dy = yf - y1;
-
-    for (x = 0; x < _vertSize; ++x)
-    {
-      xf = x / static_cast<double>(_subSampling);
-      x1 = floor(xf);
-      x2 = ceil(xf);
-      if (x2 >= this->width)
-        x2 = this->width - 1;
-      dx = xf - x1;
-
-      px1 = data[y1 * this->width + x1];
-      px2 = data[y1 * this->width + x2];
-      h1 = (px1 - ((px1 - px2) * dx));
-
-      px3 = data[y2 * this->width + x1];
-      px4 = data[y2 * this->width + x2];
-      h2 = (px3 - ((px3 - px4) * dx));
-
-      h = (h1 - ((h1 - h2) * dy) - this->GetMinElevation()) * _scale.z;
-
-      // invert pixel definition so 1=ground, 0=full height,
-      //   if the terrain size has a negative z component
-      //   this is mainly for backward compatibility
-      if (_size.z < 0)
-        h *= -1;
-
-      // Store the height for future use
-      if (!_flipY)
-        _heights[y * _vertSize + x] = h;
-      else
-        _heights[(_vertSize - y - 1) * _vertSize + x] = h;
-    }
+    ratio = nXSize / nYSize;
+    destWidth = this->side;
+    destHeight = destWidth / ratio;
+  }
+  else
+  {
+    ratio = nYSize / nXSize;
+    destHeight = this->side;
+    destWidth = destHeight / ratio; 
   }
 
-  if (data)
-    delete [] data;
+  // Read the whole raster data and convert it to a GDT_Float32 array
+  this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, *_data,
+                       destWidth, destHeight, GDT_Float32, 0, 0);
 }
+
+//////////////////////////////////////////////////
+void DEM::GetGeoReference(double _x, double _y, double &_xGeo, double &_yGeo)
+{
+  double geoTransf[6];
+  if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
+  {
+    _xGeo = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+    _yGeo = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+  }
+  else
+    gzthrow("Unable to obtain the georeferenced values for line [" << _y <<
+            "] and pixel [" << _x << "]\n");
+}
+
 #endif

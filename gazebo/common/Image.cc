@@ -19,19 +19,14 @@
  * Date: 14 July 2008
  */
 
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-
-#include <iostream>
 #include <boost/filesystem.hpp>
+#include <string>
 
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace common;

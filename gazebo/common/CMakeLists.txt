@@ -101,6 +101,7 @@ set (gtest_sources
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
+  DEM_TEST.cc
   Exception_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc

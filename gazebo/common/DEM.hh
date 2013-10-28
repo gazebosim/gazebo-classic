@@ -47,12 +47,8 @@ namespace gazebo
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
-      public: void Load(const std::string &_filename="");
-
-      /// \brief Get the terrain file as a data array.
-      /// \param[out] _data Pointer to a NULL array of char.
-      /// \param[out] _count The resulting data array size.
-      private: void GetData(float **_data, unsigned int &_count) const;
+      /// \return 0 when the operation succeeds to open a file or -1 when fails.
+      public: int Load(const std::string &_filename="");
 
       /// \brief Get the terrain height. Due to the Ogre constrains, this
       /// value will be equal to GetWidth() and a power of two plus one. The
@@ -70,12 +66,6 @@ namespace gazebo
       /// terrain with a width value that must be a power of two plus one).
       public: unsigned int GetWidth() const;
 
-      /// \brief Get the real world width in meters.
-      public: double GetWorldWidth() const;
-
-      /// \brief Get the real world height in meters.
-      public: double GetWorldHeight() const;
-
       /// \brief Get the minimum terrain's elevation.
       /// \return The minimum elevation.
       public: float GetMinElevation() const;
@@ -83,6 +73,12 @@ namespace gazebo
       /// \brief Get the maximum terrain's elevation.
       /// \return The maximum elevation.
       public: float GetMaxElevation() const;
+
+      /// \brief Get the real world width in meters.
+      public: double GetWorldWidth() const;
+
+      /// \brief Get the real world height in meters.
+      public: double GetWorldHeight() const;
 
       /// \brief Create a lookup table of the terrain's height
       /// \param[in] _subsampling Multiplier used to increase the resolution.
@@ -98,15 +94,6 @@ namespace gazebo
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
           std::vector<float> &_heights);
 
-      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel.
-      /// \param[in] _x X coordinate of the terrain.
-      /// \param[in] _y Y coordinate of the terrain.
-      /// \param[out] _xGeo Georeferenced longitude.
-      /// \param[out] _yGeo Georeferenced latitude.
-      private: void GetGeoReference(double _x, double _y,
-                                    double &_xGeo, double &_yGeo);
-
       /// \brief Get the distance between two points expressed in geographic
       /// latitude and longitude.
       /// Example: _latAdeg = 38.0016667 and _lonAdeg = -123.0016667) represents
@@ -118,6 +105,20 @@ namespace gazebo
       /// \return Distance in meters.
       private: double Distance(double _latAdeg, double _lonAdeg,
                                double _LatBdeg, double _lonBdeg);
+
+      /// \brief Get the terrain file as a data array.
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size.
+      private: void GetData(float **_data, unsigned int &_count) const;
+
+      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
+      /// pixel.
+      /// \param[in] _x X coordinate of the terrain.
+      /// \param[in] _y Y coordinate of the terrain.
+      /// \param[out] _xGeo Georeferenced longitude.
+      /// \param[out] _yGeo Georeferenced latitude.
+      private: void GetGeoReference(double _x, double _y,
+                                    double &_xGeo, double &_yGeo);
 
       /// \brief A set of associated raster bands.
       private: GDALDataset *dataSet;
@@ -131,11 +132,8 @@ namespace gazebo
       /// \brief Real height of the world in meters.
       private: double worldHeight;
 
-      /// \brief Terrain's width (after the padding).
-      private: int width;
-
-      /// \brief Terrain's height (after the padding).
-      private: int height;
+      /// \brief Terrain's side (after the padding).
+      private: unsigned int side;
 
       /// \brief Minimum height in meters.
       private: double minElevation;

@@ -83,7 +83,8 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
   // bool use_true_size = this->sdf->Get<bool>("use_true_size");
   bool use_true_size = false;
 
-  this->dem.Load(_filename);
+  if (this->dem.Load(_filename) != 0)
+    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
 
   if (use_true_size)
   {
@@ -102,7 +103,9 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 //////////////////////////////////////////////////
 void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
 {
-  this->img.Load(_filename);
+  if (this->img.Load(_filename) != 0)
+    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
+
   this->heightmapData = static_cast<common::HeightmapData*>(&(this->img));
   this->heightmapSize = this->sdf->Get<math::Vector3>("size");
 }

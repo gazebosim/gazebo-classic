@@ -29,7 +29,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/HeightmapData.hh"
 
@@ -110,6 +109,7 @@ namespace gazebo
 
       /// \brief Load an image. Return 0 on success
       /// \param[in] _filename the path to the image file
+      /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename);
 
       /// \brief Save the image in PNG format
@@ -166,6 +166,7 @@ namespace gazebo
       /// \brief Get a pixel color value
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
+      /// \return The color of the given pixel
       public: Color GetPixel(unsigned int _x, unsigned int _y) const;
 
       /// \brief Get the average color
