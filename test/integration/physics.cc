@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,7 +234,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // debug
   // for (int i = 0; i < steps; ++i)
   // {
-  //   world->StepWorld(1);
+  //   world->Step(1);
   //   if (physics->GetType()  == "bullet")
   //   {
   //     model = world->GetModel("link_offset_box");

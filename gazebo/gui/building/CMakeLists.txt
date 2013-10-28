@@ -3,13 +3,13 @@ include (${QT_USE_FILE})
 
 set (sources
   BuildingEditor.cc
+  BuildingEditorEvents.cc
   BuildingEditorPalette.cc
   BuildingEditorWidget.cc
   BuildingItem.cc
   BuildingMaker.cc
   BuildingModelManip.cc
   DoorItem.cc
-  EditorEvents.cc
   EditorItem.cc
   EditorView.cc
   FinishBuildingDialog.cc
@@ -53,10 +53,10 @@ set (qt_headers
 )
 
 set (headers
+  BuildingEditorEvents.hh
   BuildingEditorWidget.hh
   BuildingItem.hh
   BuildingMaker.hh
-  EditorEvents.hh
   GrabberHandle.hh
   GridLines.hh
   LineSegmentItem.hh

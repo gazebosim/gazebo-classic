@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -851,13 +851,13 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
       if (iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
-      if (pentity)
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      if (ogreEntity)
       {
         try
         {
           VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                        pentity->getUserAny()));
+                                        ogreEntity->getUserAny()));
           if (v)
             _visuals.push_back(v);
         }
@@ -928,7 +928,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
           iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve
       size_t vertex_count;
@@ -937,11 +937,11 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
+      this->GetMeshInformation(ogreEntity->getMesh().get(), vertex_count,
           vertices, index_count, indices,
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
+          ogreEntity->getParentNode()->_getDerivedPosition(),
+          ogreEntity->getParentNode()->_getDerivedOrientation(),
+          ogreEntity->getParentNode()->_getDerivedScale());
 
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
@@ -974,7 +974,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
       if (new_closest_found)
       {
-        closestEntity = pentity;
+        closestEntity = ogreEntity;
         // break;
       }
     }
@@ -1016,13 +1016,14 @@ bool Scene::GetFirstContact(CameraPtr _camera,
     if (iter->distance <= 0.0)
       continue;
 
-    // Only accept a hit if there is a movable object, and it's and Entity.
+    unsigned int flags = iter->movable->getVisibilityFlags();
+
+    // Only accept a hit if there is an entity and not a gui visual
     if (iter->movable &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        iter->movable->getName().find("OrbitViewController")
-        == std::string::npos)
+        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI))
     {
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve
       size_t vertexCount;
@@ -1031,11 +1032,11 @@ bool Scene::GetFirstContact(CameraPtr _camera,
       uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation(pentity->getMesh().get(), vertexCount,
+      this->GetMeshInformation(ogreEntity->getMesh().get(), vertexCount,
           vertices, indexCount, indices,
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
+          ogreEntity->getParentNode()->_getDerivedPosition(),
+          ogreEntity->getParentNode()->_getDerivedOrientation(),
+          ogreEntity->getParentNode()->_getDerivedScale());
 
       for (int i = 0; i < static_cast<int>(indexCount); i += 3)
       {
@@ -1439,12 +1440,21 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    if (_msg.has_scale())
-    {
-      vm->mutable_scale()->set_x(_msg.scale().x());
-      vm->mutable_scale()->set_y(_msg.scale().y());
-      vm->mutable_scale()->set_z(_msg.scale().z());
-    }
+    this->visualMsgs.push_back(vm);
+  }
+
+  // Set the scale of the model visual
+  if (_msg.has_scale())
+  {
+    // update scale using a visual msg
+    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual);
+    if (_msg.has_id())
+      vm->set_id(_msg.id());
+    if (_msg.has_name())
+      vm->set_name(_msg.name());
+    vm->mutable_scale()->set_x(_msg.scale().x());
+    vm->mutable_scale()->set_y(_msg.scale().y());
+    vm->mutable_scale()->set_z(_msg.scale().z());
     this->visualMsgs.push_back(vm);
   }
 
@@ -1630,6 +1640,8 @@ void Scene::PreRender()
   {
     if (this->ProcessSceneMsg(*sIter))
     {
+      if (!this->initialized)
+        RTShaderSystem::Instance()->UpdateShaders();
       this->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }
@@ -1990,34 +2002,24 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  bool good = false;
+  VisualPtr childVis;
 
+  if (_msg->has_child() && _msg->child() == "world")
+    childVis = this->worldVisual;
+  else if (_msg->has_child_id())
+    childVis = this->GetVisual(_msg->child_id());
+
+  if (!childVis)
+    return false;
+
+  JointVisualPtr jointVis(new JointVisual(
+        _msg->name() + "_JOINT_VISUAL__", childVis));
+  jointVis->Load(_msg);
+  jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())
-    good = this->visuals.find(_msg->id()) != this->visuals.end();
-  else
-    good = this->GetVisual(_msg->name()) != NULL;
+    jointVis->SetId(_msg->id());
 
-  if (good)
-  {
-    VisualPtr childVis;
-
-    if (_msg->child() == "world")
-      childVis = this->worldVisual;
-    else
-      childVis = this->GetVisual(_msg->child_id());
-
-    if (!childVis)
-      return false;
-
-    JointVisualPtr jointVis(new JointVisual(
-            _msg->name() + "_JOINT_VISUAL__", childVis));
-    jointVis->Load(_msg);
-    jointVis->SetVisible(this->showJoints);
-    if (_msg->has_id())
-      jointVis->SetId(_msg->id());
-
-    this->visuals[jointVis->GetId()] = jointVis;
-  }
+  this->visuals[jointVis->GetId()] = jointVis;
 
   return true;
 }
@@ -2721,7 +2723,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
-  comVis->SetVisible(false);
+  comVis->SetVisible(this->showCOMs);
   this->visuals[comVis->GetId()] = comVis;
 }
 

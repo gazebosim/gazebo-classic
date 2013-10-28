@@ -46,6 +46,7 @@ set(tests
   #state_log.cc
   surface_properties.cc
   transceiver.cc
+  world.cc
   )
 
 if (MANPAGES_SUPPORT)
@@ -75,6 +76,7 @@ set(dri_tests
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
+  ogre_log.cc
   pr2.cc
   projector.cc
   rendering_sensor.cc

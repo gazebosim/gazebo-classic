@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,8 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Remove all entities from the world.
+      /// This function has delayed effect. Models are cleared at the end
+      /// of the current update iteration.
       public: void Clear();
 
       /// \brief Get the name of the world.
@@ -273,13 +275,14 @@ namespace gazebo
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(1.9);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void Step(int _steps);
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -460,6 +463,10 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -700,6 +707,9 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \brief Flag used to say if/when to clear all models.
+      private: bool clearModels;
     };
     /// \}
   }

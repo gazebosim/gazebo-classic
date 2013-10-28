@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,6 +317,9 @@ TEST_F(CameraSensor, CheckNoise)
 
 int main(int argc, char **argv)
 {
+  // Set a specific seed to avoid occasional test failures due to
+  // statistically unlikely, but possible results.
+  math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

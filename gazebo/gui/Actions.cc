@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
 QAction *gazebo::gui::g_editBuildingAct = 0;
 QAction *gazebo::gui::g_editTerrainAct = 0;
+QAction *gazebo::gui::g_editModelAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,6 +316,8 @@ void Heightmap::Load()
 
     this->dataSize = geomMsg.heightmap().width();
 
+    this->useTerrainPaging = false;
+
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap
@@ -333,10 +335,6 @@ void Heightmap::Load()
         Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
             "General");
       }
-    }
-    else
-    {
-      this->useTerrainPaging = false;
     }
   }
 
@@ -868,6 +866,12 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(NULL);
   }
+}
+
+/////////////////////////////////////////////////
+unsigned int Heightmap::GetTerrainSubdivisionCount() const
+{
+  return this->numTerrainSubdivisions;
 }
 
 /////////////////////////////////////////////////
@@ -2782,3 +2786,4 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
+
