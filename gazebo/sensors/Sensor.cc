@@ -145,10 +145,10 @@ bool Sensor::NeedsUpdate()
   else
     simTime = this->world->GetSimTime();
 
-  if (simTime == this->lastUpdateTime)
+  if (simTime <= this->lastMeasurementTime)
     return false;
 
-  return (simTime - this->lastUpdateTime +
+  return (simTime - this->lastMeasurementTime +
       this->updateDelay) >= this->updatePeriod;
 }
 
@@ -163,7 +163,7 @@ void Sensor::Update(bool _force)
     else
       simTime = this->world->GetSimTime();
 
-    if (simTime == this->lastUpdateTime && !_force)
+    if (simTime <= this->lastUpdateTime && !_force)
       return;
 
     // Adjust time-to-update period to compensate for delays caused by another

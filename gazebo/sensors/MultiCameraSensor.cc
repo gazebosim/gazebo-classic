@@ -198,15 +198,15 @@ void MultiCameraSensor::Render()
   if (this->cameras.empty() || !this->IsActive() || !this->NeedsUpdate())
     return;
 
-  this->lastMeasurementTime = this->scene->GetSimTime();
-
   // Update all the cameras
   for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
       iter != this->cameras.end(); ++iter)
   {
     (*iter)->Render();
   }
+
   this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
 }
 
 //////////////////////////////////////////////////
@@ -217,7 +217,8 @@ bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
   if (!this->rendered)
     return false;
 
-  this->lastUpdateTime = this->lastMeasurementTime;
+  this->lastUpdateTime = this->scene->GetSimTime();
+
   bool publish = this->imagePub->HasConnections();
 
   msgs::Set(this->msg.mutable_time(), this->lastMeasurementTime);
