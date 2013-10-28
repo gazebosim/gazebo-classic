@@ -317,7 +317,7 @@ void Heightmap::Load()
 
     this->dataSize = geomMsg.heightmap().width();
 
-    this->useTerrainPaging = false;
+    //this->useTerrainPaging = false;
 
     if (geomMsg.heightmap().has_filename())
     {
@@ -389,6 +389,8 @@ void Heightmap::Load()
       // Split the terrain. Every subterrain will be saved on disk and paged
       this->SplitHeights(this->heights, nTerrains, this->subTerrains);
     }
+
+    std::cout << "Num terrains: " << nTerrains << std::endl;
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);

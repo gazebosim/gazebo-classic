@@ -128,6 +128,34 @@ int DEM::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+double DEM::GetElevation(double _x, double _y)
+{
+  float elevation = 0.0;
+  if (this->band)
+    this->band->RasterIO(GF_Read, _x, _y, 1, 1, &elevation, 1, 1, 
+        GDT_Float32, 0, 0);
+  else
+    gzerr << "You are trying to use GetElevation() without a valid band. "
+          << "Did you forget to load your DEM?" << std::endl;
+  return elevation;
+}
+
+//////////////////////////////////////////////////
+void DEM::GetGeoReference(double _x, double _y,
+                          double &_xGeo, double &_yGeo)
+{
+  double geoTransf[6];
+  if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
+  {
+    _xGeo = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+    _yGeo = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+  }
+  else
+    gzthrow("Unable to obtain the georeferenced values for line [" << _y <<
+            "] and pixel [" << _x << "]\n");
+}
+
+//////////////////////////////////////////////////
 unsigned int DEM::GetHeight() const
 {
   return this->side;
@@ -293,19 +321,4 @@ void DEM::GetData(float **_data, unsigned int &_count) const
   this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, *_data,
                        destWidth, destHeight, GDT_Float32, 0, 0);
 }
-
-//////////////////////////////////////////////////
-void DEM::GetGeoReference(double _x, double _y, double &_xGeo, double &_yGeo)
-{
-  double geoTransf[6];
-  if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
-  {
-    _xGeo = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-    _yGeo = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
-  }
-  else
-    gzthrow("Unable to obtain the georeferenced values for line [" << _y <<
-            "] and pixel [" << _x << "]\n");
-}
-
 #endif

@@ -27,16 +27,16 @@
 #include <string.h>
 #include <math.h>
 
-#include "gazebo/math/gzmath.hh"
-
-#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
-
+#include "gazebo/common/SphericalCoordinates.hh"
+#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -98,6 +98,31 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->dem);
+
+  // Modify the reference geotedic latitude/longitude.
+  // A GPS sensor will use the real georeferenced coordinates of the terrain.
+  common::SphericalCoordinatesPtr sphericalCoordinates;
+  sphericalCoordinates = this->world->GetSphericalCoordinates();
+
+  if (sphericalCoordinates)
+  {
+    math::Angle latitude, longitude;
+    double xGeo;
+    double yGeo;
+    double elevation;
+
+    dem.GetGeoReference(0.0, 0.0, xGeo, yGeo);
+    longitude.SetFromDegree(xGeo);
+    latitude.SetFromDegree(yGeo);
+    elevation = dem.GetElevation(0.0, 0.0);
+
+    sphericalCoordinates->SetLatitudeReference(latitude);
+    sphericalCoordinates->SetLongitudeReference(longitude);
+    sphericalCoordinates->SetElevationReference(elevation);
+    sphericalCoordinates.reset();
+  }
+  else
+    gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
 }
 
 //////////////////////////////////////////////////

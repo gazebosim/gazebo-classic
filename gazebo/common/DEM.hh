@@ -50,6 +50,22 @@ namespace gazebo
       /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename="");
 
+      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
+      /// pixel.
+      /// \param[in] _x X coordinate of the terrain.
+      /// \param[in] _y Y coordinate of the terrain.
+      /// \return Terrain's elevation at (x,y).
+      public: double GetElevation(double _x, double _y);
+      
+      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
+      /// pixel.
+      /// \param[in] _x X coordinate of the terrain.
+      /// \param[in] _y Y coordinate of the terrain.
+      /// \param[out] _xGeo Georeferenced longitude.
+      /// \param[out] _yGeo Georeferenced latitude.
+      public: void GetGeoReference(double _x, double _y,
+                                   double &_xGeo, double &_yGeo);
+
       /// \brief Get the terrain height. Due to the Ogre constrains, this
       /// value will be equal to GetWidth() and a power of two plus one. The
       /// value returned might be different that the original DEM height because
@@ -110,15 +126,6 @@ namespace gazebo
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size.
       private: void GetData(float **_data, unsigned int &_count) const;
-
-      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel.
-      /// \param[in] _x X coordinate of the terrain.
-      /// \param[in] _y Y coordinate of the terrain.
-      /// \param[out] _xGeo Georeferenced longitude.
-      /// \param[out] _yGeo Georeferenced latitude.
-      private: void GetGeoReference(double _x, double _y,
-                                    double &_xGeo, double &_yGeo);
 
       /// \brief A set of associated raster bands.
       private: GDALDataset *dataSet;
