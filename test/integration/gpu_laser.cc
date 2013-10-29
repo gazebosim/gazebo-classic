@@ -209,8 +209,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
 
 /////////////////////////////////////////////////
-/// \brief Test GPU ray sensor range values,
-/// Adapted from LaserUnitBox test in laser.cc
+/// \brief Test GPU ray sensor interaction with terrain
 TEST_F(GPURaySensorTest, Heightmap)
 {
   Load("worlds/gpu_laser_heightmap.world");
