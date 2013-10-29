@@ -18,6 +18,10 @@ link_directories(
 
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 # Build gtest
 add_library(gtest STATIC gtest/src/gtest-all.cc)
 add_library(gtest_main STATIC gtest/src/gtest_main.cc)
