@@ -63,6 +63,20 @@ GpuLaser::~GpuLaser()
 {
   delete [] this->laserBuffer;
   delete [] this->laserScan;
+
+  for (unsigned int i = 0; i < this->textureCount; ++i)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->firstPassTextures[i]->getName());
+  }
+  Ogre::TextureManager::getSingleton().remove(
+      this->secondPassTexture->getName());
+
+  this->scene->GetManager()->destroyCamera(this->orthoCam);
+
+  this->visual.reset();
+  this->texIdx.clear();
+  texCount = 0;
 }
 
 //////////////////////////////////////////////////
@@ -167,13 +181,16 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     Ogre::Pass *pass = technique->getPass(0);
     GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
 
-    texUnit = pass->createTextureUnitState(
-          this->firstPassTextures[i]->getName(), texIndex);
+    if (!pass->getTextureUnitState(this->firstPassTextures[i]->getName()))
+    {
+      texUnit = pass->createTextureUnitState(
+            this->firstPassTextures[i]->getName(), texIndex);
 
-    this->texIdx.push_back(texIndex);
+      this->texIdx.push_back(texIndex);
 
-    texUnit->setTextureFiltering(Ogre::TFO_NONE);
-    texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+      texUnit->setTextureFiltering(Ogre::TFO_NONE);
+      texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    }
   }
 
   this->CreateCanvas();
