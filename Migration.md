@@ -2,9 +2,12 @@
 
 ### New Deprecations
 
+1. **gazebo/physics/World.hh**
+    + ***Deprecation*** void World::StepWorld(int _steps)
+    + ***Replacement*** void World::Step(unsigned int _steps)
 1. **gazebo/sensors/SensorsIface.hh**
     + ***Deprecation*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName,const std::string &_parentName)
-    + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId);
+    + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId)
 1. **gazebo/sensors/Sensor.hh**
     + ***Deprecation*** void Sensor::SetParent(const std::string &_name)
     + ***Replacement*** void Sensor::SetParent(const std::string &_name, uint32_t _id)

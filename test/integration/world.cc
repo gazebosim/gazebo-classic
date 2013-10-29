@@ -14,49 +14,34 @@
  * limitations under the License.
  *
 */
-
 #include "ServerFixture.hh"
-#include "gazebo/math/Rand.hh"
+#include "gazebo/physics/physics.hh"
 
-using namespace gazebo;
-
-class Issue876Test : public ServerFixture
+class WorldTest : public ServerFixture
 {
 };
 
-
 /////////////////////////////////////////////////
-// \brief Test for issue #876
-TEST_F(Issue876Test, Reset)
+TEST_F(WorldTest, Clear)
 {
-  Load("worlds/empty.world");
+  Load("worlds/pioneer2dx.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
-  math::Rand::SetSeed(math::Rand::GetSeed());
+  EXPECT_EQ(world->GetModelCount(), 2u);
 
-  int sampleCount = 500;
+  world->Clear();
+  while (world->GetModelCount() > 0u)
+    common::Time::MSleep(1000);
 
-  std::vector<int> num;
-  for (int i = 0; i < sampleCount; ++i)
-    num.push_back(math::Rand::GetIntUniform(-10, 10));
+  EXPECT_EQ(world->GetModelCount(), 0u);
 
-  for (int j = 0; j < 1000; ++j)
-  {
-    world->Reset();
+  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
 
-    std::vector<int> numReset;
-    for (int i = 0; i < sampleCount; ++i)
-      numReset.push_back(math::Rand::GetIntUniform(-10, 10));
-
-    // Using ASSERT_EQ to prevent spamming of similar errors.
-    for (int i = 0; i < sampleCount; ++i)
-      ASSERT_EQ(num[i], numReset[i]);
-  }
+  EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
 /////////////////////////////////////////////////
-/// Main
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
