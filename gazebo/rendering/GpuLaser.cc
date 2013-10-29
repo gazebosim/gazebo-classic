@@ -53,6 +53,10 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
   this->laserScan = NULL;
   this->matFirstPass = NULL;
   this->matSecondPass = NULL;
+  for (int i = 0; i < 3; ++i)
+    this->firstPassTextures[i] = NULL;
+  this->secondPassTexture = NULL;
+  this->orthoCam = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
   this->visual.reset();
@@ -66,13 +70,20 @@ GpuLaser::~GpuLaser()
 
   for (unsigned int i = 0; i < this->textureCount; ++i)
   {
-    Ogre::TextureManager::getSingleton().remove(
-        this->firstPassTextures[i]->getName());
+    if (this->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->firstPassTextures[i]->getName());
+    }
   }
-  Ogre::TextureManager::getSingleton().remove(
-      this->secondPassTexture->getName());
+  if (this->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->secondPassTexture->getName());
+  }
 
-  this->scene->GetManager()->destroyCamera(this->orthoCam);
+  if (this->scene && this->orthoCam)
+    this->scene->GetManager()->destroyCamera(this->orthoCam);
 
   this->visual.reset();
   this->texIdx.clear();
