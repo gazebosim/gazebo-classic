@@ -119,17 +119,28 @@ ODE_API static inline dReal dNormalizeAngle(dReal angle)
  * would always be -pi <= result <= pi.  Adding the result
  * to "from" will always get you an equivelent angle to "to".
  */
-  
 ODE_API static inline dReal dShortestAngularDistance(dReal from, dReal to)
 {
-  dReal result = dNormalizeAnglePositive(dNormalizeAnglePositive(to) - dNormalizeAnglePositive(from));
+  dReal result = dNormalizeAngle(dNormalizeAnglePositive(dNormalizeAnglePositive(to) -
+    dNormalizeAnglePositive(from)));
 
-  return dNormalizeAngle(result);
+  return result;
 }
 
+/*!
+ * \function
+ * \brief dShortestAngularDistanceUpdate
+ *
+ * Given 2 angles, this returns the shortest angular
+ * difference.  The inputs and ouputs are radians.
+ *
+ * This function returns (from + delta) where delta is in the range of [-pi, pi].
+ * However, if |delta| > tol, then this function simply returns incoming parameter "to".
+ *
+ */
 ODE_API static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.3)
 {
-  dReal result = dNormalizeAngle(dNormalizeAnglePositive(dNormalizeAnglePositive(to) - dNormalizeAnglePositive(from)));
+  dReal result = dShortestAngularDistance(from, to);
 
   if (dFabs(result) > tol)
     return to;

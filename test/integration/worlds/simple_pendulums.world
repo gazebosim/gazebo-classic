@@ -1,5 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.3">
+  <!-- model_1: pendulum rod body and a sphere point mass attached by fixed
+                joint at the end of the rod.
+       model_2: pendulum rod body with same mass properties as model_1.
+       model_3: same as model_2 but perpendicular to it.
+  -->
   <world name="default">
     <gui>
       <camera name="user_camera">
