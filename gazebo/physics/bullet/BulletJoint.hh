@@ -171,7 +171,7 @@ namespace gazebo
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
-      private: bool dampingInitialized;
+      private: bool stiffnessDampingInitialized;
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the

@@ -1313,17 +1313,20 @@ void ODEJoint::SetStiffnessDamping(unsigned int _index,
     bool childStatic =
       this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-    if (!this->stiffnessDampingInitialized && !parentStatic && !childStatic)
+    if (!this->stiffnessDampingInitialized)
     {
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
-      this->stiffnessDampingInitialized = true;
-    }
-    else
-    {
-      gzwarn << "Damping for Joint[" << this->GetName()
-             << "] is not initialized because either parent[" << parentStatic
-             << "] or child[" << childStatic << "] is static.\n";
+      if (!parentStatic && !childStatic)
+      {
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+        this->stiffnessDampingInitialized = true;
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
     }
   }
   else

@@ -37,7 +37,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
   this->constraint = NULL;
   this->bulletWorld = NULL;
   this->feedback = NULL;
-  this->dampingInitialized = false;
+  this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
 }
@@ -397,11 +397,20 @@ void BulletJoint::SetStiffnessDamping(unsigned int _index,
     bool childStatic =
       this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-    if (!this->dampingInitialized && !parentStatic && !childStatic)
+    if (!this->stiffnessDampingInitialized)
     {
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
-      this->dampingInitialized = true;
+      if (!parentStatic && !childStatic)
+      {
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
+        this->stiffnessDampingInitialized = true;
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
     }
   }
   else
