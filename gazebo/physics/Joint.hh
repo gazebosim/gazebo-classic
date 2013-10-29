@@ -159,12 +159,10 @@ namespace gazebo
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
-      /// Deprecated by SetStiffnessDamping.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
-      public: virtual void SetDamping(int _index, double _damping)
-        GAZEBO_DEPRECATED(3.0) = 0;
+      public: virtual void SetDamping(int _index, double _damping) = 0;
 
       /// \brief Returns the current joint damping coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -187,6 +185,12 @@ namespace gazebo
       /// \param[in] _reference Spring zero load reference position.
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0) = 0;
+
+      /// \brief Set the joint spring stiffness.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
+      /// \param[in] _stiffness Spring stiffness value for the axis.
+      public: virtual void SetStiffness(int _index, double _stiffness) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be

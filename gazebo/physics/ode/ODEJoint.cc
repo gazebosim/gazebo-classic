@@ -1280,6 +1280,24 @@ void ODEJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::SetStiffness(int _index, double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "ODEJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {

@@ -380,6 +380,24 @@ void SimbodyJoint::SetDamping(int _index, const double _damping)
 }
 
 //////////////////////////////////////////////////
+void SimbodyJoint::SetStiffness(int _index, const double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "SimbodyJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
 void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {

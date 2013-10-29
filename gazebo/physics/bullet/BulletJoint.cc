@@ -381,6 +381,24 @@ void BulletJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
+void BulletJoint::SetStiffness(int _index, double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "BulletJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
 void BulletJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
