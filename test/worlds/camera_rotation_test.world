@@ -56,7 +56,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name="multicamera_sensor" type="multicamera">
+        <sensor name="multicamera_sensor_unrotated" type="multicamera">
           <update_rate>15</update_rate>
           <pose>0 0 0 0 0 0</pose>
           <camera name="left">
@@ -139,7 +139,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name="multicamera_sensor" type="multicamera">
+        <sensor name="multicamera_sensor_rotated1" type="multicamera">
           <update_rate>15</update_rate>
           <pose>0 0 0 1.2 0 0</pose>
           <camera name="left">
@@ -184,7 +184,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name="multicamera_sensor" type="multicamera">
+        <sensor name="multicamera_sensor_rotated2" type="multicamera">
           <update_rate>15</update_rate>
           <camera name="left">
             <pose>0 0.36235775447 0.93203908596 1.2 0 0</pose>
