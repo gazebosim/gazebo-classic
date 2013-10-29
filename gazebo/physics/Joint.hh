@@ -490,6 +490,12 @@ namespace gazebo
 
       /// \brief Angle used when the joint is parent of a static model.
       private: math::Angle staticAngle;
+
+      // Added in 2.1 down here to preserve ABI
+      /// \brief Set the effort limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _effort Effort limit for the axis.
+      public: virtual void SetEffortLimit(unsigned int _index, double _effort);
     };
     /// \}
   }
