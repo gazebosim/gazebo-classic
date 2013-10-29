@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"

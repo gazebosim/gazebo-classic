@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 #include <iostream>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/transport/Transport.hh"
-#include "gazebo/sensors/Sensors.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/gazebo.hh"

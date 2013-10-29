@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ void gazebo::add_plugin(const std::string &_filename)
 /////////////////////////////////////////////////
 bool gazebo::load(int _argc, char **_argv)
 {
+  gazebo::common::load();
+
   // The SDF find file callback.
   sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 

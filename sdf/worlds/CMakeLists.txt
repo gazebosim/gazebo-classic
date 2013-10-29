@@ -2,8 +2,10 @@ set (files
   actor.world
   actor_demo.world
   actor_circle.world
+  blank.world
   two_actors.world
   camera.world
+  gripper.world
   joint_damping_demo.world
   depth_camera.world
   empty.world
@@ -14,6 +16,7 @@ set (files
   lights.world
   model_nesting.world
   pioneer2dx.world
+  openal.world
   trimesh_test.world
   cart_test.world
   double_pendulums.world

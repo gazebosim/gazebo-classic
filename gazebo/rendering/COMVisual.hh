@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,9 @@ namespace gazebo
 
       /// \brief Load based on a math::Pose
       /// \param[in] _pose Pose of the COM visual
-      private: void Load(const math::Pose &_pose);
+      /// \param[in] _scale Scale factor for the COM visual.
+      private: void Load(const math::Pose &_pose,
+               const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
 
       /// \brief Lines that make the cross marking the center of mass
       private: DynamicLines *crossLines;

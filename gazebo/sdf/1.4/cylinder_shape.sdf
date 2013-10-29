@@ -1,9 +1,0 @@
-<element name="cylinder" required="0">
-  <description>Cylinder shape</description>
-  <element name="radius" type="double" default="1" required="1">
-    <description>Radius of the cylinder</description>
-  </element>
-  <element name="length" type="double" default="1" required="1">
-    <description>Length of the cylinder</description>
-  </element>
-</element>

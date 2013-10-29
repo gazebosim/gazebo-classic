@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,8 +63,11 @@ namespace gazebo
                    }
                    else
                    {
-                     gzerr << "should not see this\n";
                      this->threadPitch = 1.0;
+                     gzwarn << "<thread_pitch> element not specified. "
+                            << "Using default value of "
+                            << this->threadPitch
+                            << ". \n";
                    }
 
                    if (_sdf->HasElement("axis"))

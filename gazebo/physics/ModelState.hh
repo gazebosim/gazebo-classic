@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,16 +118,6 @@ namespace gazebo
       /// \return List of joint states whose names match the regular
       /// expression.
       public: JointState_M GetJointStates(const boost::regex &_regex) const;
-
-      /// \brief Get a link state.
-      ///
-      /// Get a Link State based on an index, where index is in the range of
-      /// 0...ModelState::GetLinkStateCount
-      /// \param[in] _index Index of the LinkState
-      /// \return State of the Link.
-      /// \throws common::Exception When _index is out of range.
-      public: LinkState GetLinkState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
 
       /// \brief Get a link state by Link name
       ///

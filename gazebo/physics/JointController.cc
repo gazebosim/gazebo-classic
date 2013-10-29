@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@ JointController::JointController(ModelPtr _model)
 void JointController::AddJoint(JointPtr _joint)
 {
   this->joints[_joint->GetScopedName()] = _joint;
-  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
-  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
+  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1, 1000, -1000);
+  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1, 1000, -1000);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +141,6 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 
     if (_msg->has_force())
       this->forces[_msg->name()] = _msg->force();
-
 
     if (_msg->has_position())
     {
@@ -309,7 +308,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       /// \TODO: ideally we want to set this according to
       /// Joint Trajectory velocity and use time step since last update.
       /// double dt =
-      /// this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      /// this->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
       /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updatedLinks.push_back(_link);
@@ -334,7 +333,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       /// \TODO: ideally we want to set this according to Joint Trajectory
       /// velocity and use time step since last update.
       /// double dt = this->model->GetWorld()->GetPhysicsEngine()->
-      /// GetStepTime();
+      /// GetMaxStepTime();
       /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updatedLinks.push_back(_link);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,11 @@ void UserCamera::Init()
   this->viewController = this->orbitViewController;
 
   Camera::Init();
+
+  // Don't yaw along variable axis, causes leaning
+  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->camera->setDirection(1, 0, 0);
+
   this->SetHFOV(GZ_DTOR(60));
 
   // Careful when setting this value.

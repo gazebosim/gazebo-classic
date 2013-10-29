@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -501,7 +501,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->firstPassViewports[_index]->setBackgroundColour(
         Ogre::ColourValue(this->far, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   if (_index == 0)
   {
@@ -527,7 +527,7 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
     this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
     this->secondPassViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
       0, static_cast<float>(this->GetImageWidth() / 10.0),
@@ -657,7 +657,8 @@ void GpuLaser::CreateCanvas()
         meshName));
 
   this->visual->AttachObject(this->object);
-  this->object->setVisibilityFlags(GZ_VISIBILITY_ALL);
+  this->object->setVisibilityFlags(GZ_VISIBILITY_ALL
+      & ~GZ_VISIBILITY_SELECTABLE);
 
   math::Pose pose;
   pose.pos = math::Vector3(0.01, 0, 0);

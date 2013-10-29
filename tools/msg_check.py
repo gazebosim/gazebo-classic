@@ -11,6 +11,11 @@ cwd = os.getcwd()
 if cwd.endswith("/tools"):
   cwd = cwd + "/.."
 
+# XML always need a results tag, even when there is no errors
+if len(sys.argv) > 1 and sys.argv[1] == "xml":
+  sys.stderr.write('''<?xml version="1.0" encoding="UTF-8"?>\n''')
+  sys.stderr.write('''<results>\n''')
+ 
 # Iterate over all the .proto files
 for filename in os.listdir(cwd + "/gazebo/msgs"):
   if filename.endswith('.proto'):
@@ -30,9 +35,9 @@ for filename in os.listdir(cwd + "/gazebo/msgs"):
       if iface != msg:
         msg = "Mismatch between \interface and message: %s" % filename
         if len(sys.argv) > 1 and sys.argv[1] == "xml":
-          sys.stderr.write('''<?xml version="1.0" encoding="UTF-8"?>\n''')
-          sys.stderr.write('''<results>\n''')
           sys.stderr.write('''<error file="%s" line="0" id="0" severity="error" msg="%s">\n''' % (filename, msg))
-          sys.stderr.write('''</results>\n''')
         else:
           sys.stderr.write(msg + "\n")
+
+if len(sys.argv) > 1 and sys.argv[1] == "xml":
+  sys.stderr.write('''</results>\n''')
