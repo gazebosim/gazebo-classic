@@ -3,9 +3,6 @@
 ### New Deprecations
 
 1. **gazebo/physics/Joint.hh**
-    + ***Deprecation*** virtual void SetDamping(int _index, double _damping) = 0
-    + ***Replacement*** virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
-    ---
     + ***Deprecation*** virtual void ApplyDamping()
     + ***Replacement*** virtual void ApplyStiffnessDamping()
     ---
@@ -18,6 +15,10 @@
 ### Modifications
 
 ### Additions
+
+1. **gazebo/physics/Joint.hh**
+    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
 
 ### Deletions
 
