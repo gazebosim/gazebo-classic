@@ -12,6 +12,7 @@ import "planegeom.proto";
 import "imagegeom.proto";
 import "heightmapgeom.proto";
 import "meshgeom.proto";
+import "mesh.proto";
 import "vector3d.proto";
 
 message Geometry
@@ -37,7 +38,9 @@ message Geometry
   optional SphereGeom sphere        = 5;
   optional ImageGeom image          = 6;
   optional HeightmapGeom heightmap  = 7;
-  optional MeshGeom      mesh       = 8;
+  optional MeshGeom mesh            = 8;
 
   repeated Vector3d points          = 9;
+
+  optional Mesh triangleMesh        = 10;
 }

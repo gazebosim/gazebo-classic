@@ -111,9 +111,14 @@ std::string MeshShape::GetMeshURI() const
 }
 
 //////////////////////////////////////////////////
-void MeshShape::SetMesh(const std::string &_uri,
-                           const std::string &_submesh,
-                           bool _center)
+const common::Mesh *MeshShape::GetMesh() const
+{
+  return this->mesh;
+}
+
+//////////////////////////////////////////////////
+void MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh,
+    bool _center)
 {
   this->sdf->GetElement("uri")->Set(_uri);
 

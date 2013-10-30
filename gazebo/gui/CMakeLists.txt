@@ -101,11 +101,11 @@ set (qt_tests
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
+  set (qt_tests ${qt_tests} MainWindow_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+# gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 

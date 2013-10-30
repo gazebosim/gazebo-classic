@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <physics type="ode">
+      <gravity>-1.5 0 -9.8</gravity>
+    </physics>
+
+    <include>
+      <uri>model://flat_box</uri>
+      <pose>1 0 0.1 0 0 0</pose>
+    </include>
+
+    <model name="cylinder">
+      <static>true</static>
+      <pose>0 0 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>0.1 0.1 1.0</size></box>
+            <!--
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
+-->
+          </geometry>
+          <surface>
+            <contact>
+              <collide_without_contact>true</collide_without_contact>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>0.1 0.1 1.0</size></box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name="drill" filename="libDrillPlugin.so">
+        <drill_bit_collision>collision</drill_bit_collision>
+      </plugin>
+    </model>
+  </world>
+</sdf>

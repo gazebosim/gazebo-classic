@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Mesh 
+/// \brief Message for a mesh
+
+
+import "vector3d.proto";
+
+message Mesh
+{
+  message SubMesh
+  {
+    repeated Vector3d vertex = 1;
+    repeated Vector3d normal = 2;
+    repeated Vector3d index  = 3;
+  }
+
+  repeated SubMesh submesh  = 1;
+}

@@ -43,6 +43,7 @@ set (msgs
   log_control.proto
   log_status.proto
   material.proto
+  mesh.proto
   meshgeom.proto
   model.proto
   model_configuration.proto

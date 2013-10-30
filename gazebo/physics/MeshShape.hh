@@ -60,6 +60,10 @@ namespace gazebo
       /// \return The URI of the mesh data.
       public: std::string GetMeshURI() const;
 
+      /// \brief Get a pointer to the mesh.
+      /// \return A pointer to the mesh data.
+      public: const common::Mesh *GetMesh() const;
+
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.
       /// \param[in] _submesh Name of the submesh to use within the mesh
