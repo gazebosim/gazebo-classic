@@ -40,8 +40,6 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-//  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-
   this->laserScanSub = this->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
 
@@ -92,27 +90,6 @@ void LaserVisual::Update()
   math::Vector3 pt;
   math::Pose offset = msgs::Convert(this->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
-
-  /*for (size_t j = 0;
-      static_cast<int>(j) < this->laserMsg->scan().vertical_count(); ++j)
-    for (size_t i = 0;
-        static_cast<int>(i) < this->laserMsg->scan().count(); ++i)
-  //       static_cast<int>(i) < this->laserMsg->scan().ranges_size(); ++i)
-    {
-      r = this->laserMsg->scan().ranges(i);
-      pt.x = 0 + r * cos(angle);
-      pt.y = 0 + r * sin(angle);
-      pt.z = 0;
-      pt = offset.rot * pt + offset.pos;
-
-      if (i+1 >= this->rayFan->GetPointCount())
-        this->rayFan->AddPoint(pt);
-      else
-        this->rayFan->SetPoint(i+1, pt);
-
-      angle += this->laserMsg->scan().angle_step();
-    }
-  }*/
 
   unsigned int vertCount = this->laserMsg->scan().has_vertical_count() ?
       this->laserMsg->scan().vertical_count() : 1u;
