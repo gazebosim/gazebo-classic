@@ -184,16 +184,19 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    struct NodeAssignment
+    class NodeAssignment
     {
+      /// \brief Constructor.
+      public: NodeAssignment();
+
       /// \brief index of the vertex
-      unsigned int vertexIndex;
+      public: unsigned int vertexIndex;
 
       /// \brief node (or bone) index
-      unsigned int nodeIndex;
+      public: unsigned int nodeIndex;
 
       /// \brief the weight (between 0 and 1)
-      float weight;
+      public: float weight;
     };
 
     /// \brief A child mesh
