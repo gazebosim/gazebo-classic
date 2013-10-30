@@ -67,7 +67,7 @@ namespace gazebo
       private: transport::SubscriberPtr laserScanSub;
 
       /// \brief Renders the laser data.
-      private: DynamicLines *rayFan;
+      private: std::vector<DynamicLines *> rayFans;
 
       /// \brief Mutex to protect the contact message.
       private: boost::mutex mutex;

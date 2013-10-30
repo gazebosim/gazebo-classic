@@ -31,6 +31,7 @@ class LaserTest : public ServerFixture,
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void LaserUnitBox(const std::string &_physicsEngine);
+  public: void LaserVertical(const std::string &_physicsEngine);
   public: void LaserUnitNoise(const std::string &_physicsEngine);
 };
 
@@ -50,7 +51,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
       math::Quaternion(0, 0, 0));
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0, minRange, maxRange,
       rangeResolution, samples);
 
   sensors::RaySensorPtr laser =
@@ -179,7 +180,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
       math::Quaternion(0, 0, 0));
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
@@ -247,6 +248,103 @@ TEST_P(LaserTest, LaserBox)
   LaserUnitBox(GetParam());
 }
 
+void LaserTest::LaserVertical(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support ray sensor, "
+          << "Please see issue #867.\n";
+    return;
+  }
+
+  // Test a ray sensor that has a vertical range component.
+  // Place a box within range and verify range values,
+  // then move the box out of range and verify range values
+
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  double hMinAngle = -M_PI/2.0;
+  double hMaxAngle = M_PI/2.0;
+  double vMinAngle = -0.1;
+  double vMaxAngle = 0.1;
+  double minRange = 0.0;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 640;
+  unsigned int vSamples = 3;
+  double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
+  math::Pose testPose(math::Vector3(0.25, 0, 0.5),
+      math::Quaternion(0, 0, 0));
+
+  SpawnRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+      minRange, maxRange, rangeResolution, samples, vSamples);
+
+  std::string box01 = "box_01";
+
+  // box in front of ray sensor
+  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+
+  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
+      box01Pose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::RaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+
+  raySensor->Init();
+  raySensor->Update(true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  unsigned int mid = samples / 2;
+  double unitBoxSize = 1.0;
+
+
+  double angleStep = vMinAngle;
+  // all vertical laser planes should sense box
+  for (unsigned int i = 0; i < vSamples; ++i)
+  {
+    double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2
+        - testPose.pos.x;
+    expectedRangeAtMidPoint = expectedRangeAtMidPoint / cos(angleStep);
+
+    EXPECT_NEAR(raySensor->GetRange(i*samples + mid),
+        expectedRangeAtMidPoint, LASER_TOL);
+
+    angleStep += vAngleStep;
+
+    // WARNING: for readings of no return, gazebo returns max range rather
+    // than +inf. issue #124
+    EXPECT_NEAR(raySensor->GetRange(i*samples), maxRange, LASER_TOL);
+    EXPECT_NEAR(raySensor->GetRange(i*samples + samples-1),
+        maxRange, LASER_TOL);
+  }
+
+  // Move box out of range
+  world->GetModel(box01)->SetWorldPose(
+      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+  world->Step(1);
+  raySensor->Update(true);
+
+  for (int j = 0; j < raySensor->GetVerticalRayCount(); ++j)
+  {
+    for (int i = 0; i < raySensor->GetRayCount(); ++i)
+    {
+      EXPECT_NEAR(raySensor->GetRange(j*raySensor->GetRayCount() + i),
+          maxRange, LASER_TOL);
+    }
+  }
+}
+
+TEST_P(LaserTest, LaserVertical)
+{
+  LaserVertical(GetParam());
+}
+
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
   // Test ray sensor with noise applied
@@ -270,8 +368,8 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
       math::Quaternion(0, 0, 0));
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
-      rangeResolution, samples,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0, minRange, maxRange,
+      rangeResolution, samples, 1,
       noiseType, noiseMean, noiseStdDev);
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
