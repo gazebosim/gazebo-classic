@@ -24,9 +24,9 @@
 #ifdef HAVE_GDAL
 # include <gdal/gdalwarper.h>
 #endif
-#include <string.h>
-#include <math.h>
-
+#include <algorithm>
+#include <cmath>
+#include <string>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
@@ -90,7 +90,7 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
   {
     this->heightmapSize.x = dem.GetWorldWidth();
     this->heightmapSize.y = dem.GetWorldHeight();
-    this->heightmapSize.z = dem.GetMaxElevation() - dem.GetMinElevation();
+    this->heightmapSize.z = dem.GetMaxElevation() - std::max(0.0f, dem.GetMinElevation());
   }
   else
   {

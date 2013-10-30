@@ -108,6 +108,9 @@ int DEM::Load(const std::string &_filename)
   if (buffer)
     delete[] buffer;
 
+  std::cout << "Min: " << this->minElevation << std::endl;
+  std::cout << "Max: " << this->maxElevation << std::endl;
+
   // Set the width/height (after the padding)
   unsigned int width;
   unsigned int height;
@@ -239,13 +242,16 @@ void DEM::FillHeightMap(int _subSampling, unsigned int _vertSize,
       px4 = data[y2 * this->side + x2];
       h2 = (px3 - ((px3 - px4) * dx));
 
-      h = (h1 - ((h1 - h2) * dy) - this->GetMinElevation()) * _scale.z;
+      h = (h1 - ((h1 - h2) * dy) - std::max(0.0f, this->GetMinElevation())) * _scale.z;
 
       // invert pixel definition so 1=ground, 0=full height,
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
       if (_size.z < 0)
         h *= -1;
+
+      if (_size.z >= 0 && h < 0)
+        h = 0;
 
       // Store the height for future use
       if (!_flipY)
