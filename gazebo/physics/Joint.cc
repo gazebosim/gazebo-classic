@@ -59,6 +59,10 @@ Joint::Joint(BasePtr _parent)
   this->inertiaRatio[1] = 0;
   this->dampingCoefficient = 0;
   this->provideFeedback = false;
+  this->stopStiffness[0] = 1e8;
+  this->stopDissipation[0] = 1.0;
+  this->stopStiffness[1] = 1e8;
+  this->stopDissipation[1] = 1.0;
 
   if (!this->sdfJoint)
   {
@@ -116,6 +120,31 @@ void Joint::Load(sdf::ElementPtr _sdf)
     if (physicsElem->HasElement("provide_feedback"))
     {
       this->SetProvideFeedback(physicsElem->Get<bool>("provide_feedback"));
+    }
+  }
+
+  if (_sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = _sdf->GetElement("axis");
+    if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+      // store joint stop stiffness and dissipation coefficients
+      this->stopStiffness[0] = limitElem->Get<double>("stiffness");
+      this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+    }
+  }
+  if (_sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
+    if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+      // store joint stop stiffness and dissipation coefficients
+      this->stopStiffness[1] = limitElem->Get<double>("stiffness");
+      this->stopDissipation[1] = limitElem->Get<double>("dissipation");
     }
   }
 
@@ -657,4 +686,62 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 void Joint::SetProvideFeedback(bool _enable)
 {
   this->provideFeedback = _enable;
+}
+
+//////////////////////////////////////////////////
+void Joint::SetStopStiffness(unsigned int _index, double _stiffness)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stopStiffness[_index] = _stiffness;
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set joint stop stiffness.\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stopDissipation[_index] = _dissipation;
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to set joint stop dissipation.\n";
+  }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetStopStiffness(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->stopStiffness[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get joint stop stiffness.\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetStopDissipation(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->stopDissipation[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get joint stop dissipation.\n";
+    return 0;
+  }
 }
