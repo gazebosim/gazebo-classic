@@ -1196,7 +1196,10 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+      Ogre::TU_RENDERTARGET,
+      0,
+      false,
+      4)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
   this->initialized = true;
