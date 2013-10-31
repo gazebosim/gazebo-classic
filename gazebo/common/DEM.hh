@@ -57,31 +57,6 @@ namespace gazebo
       /// \return Terrain's elevation at (x,y).
       public: double GetElevation(double _x, double _y);
 
-      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel.
-      /// \param[in] _x X coordinate of the terrain.
-      /// \param[in] _y Y coordinate of the terrain.
-      /// \param[out] _xGeo Georeferenced longitude.
-      /// \param[out] _yGeo Georeferenced latitude.
-      public: void GetGeoReference(double _x, double _y,
-                                   double &_xGeo, double &_yGeo);
-
-      /// \brief Get the terrain height. Due to the Ogre constrains, this
-      /// value will be equal to GetWidth() and a power of two plus one. The
-      /// value returned might be different that the original DEM height because
-      /// GetData() adds the padding if necessary.
-      /// \return The terrain height satisfying the ogre constrains (squared
-      /// terrain with a height value that must be a power of two plus one).
-      public: unsigned int GetHeight() const;
-
-      /// \brief Get the terrain width. Due to the Ogre constrains, this
-      /// value will be equal to GetHeight() and a power of two plus one. The
-      /// value returned might be different that the original DEM width because
-      /// GetData() adds the padding if necessary.
-      /// \return The terrain width satisfying the ogre constrains (squared
-      /// terrain with a width value that must be a power of two plus one).
-      public: unsigned int GetWidth() const;
-
       /// \brief Get the minimum terrain's elevation.
       /// \return The minimum elevation.
       public: float GetMinElevation() const;
@@ -89,6 +64,28 @@ namespace gazebo
       /// \brief Get the maximum terrain's elevation.
       /// \return The maximum elevation.
       public: float GetMaxElevation() const;
+
+      /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
+      /// origin.
+      /// \param[out] _xGeo Georeferenced longitude.
+      /// \param[out] _yGeo Georeferenced latitude.
+      public: void GetGeoReferenceOrigin(double &_xGeo, double &_yGeo);
+
+            /// \brief Get the terrain height. Due to the Ogre constrains, this
+      /// value will be a power of two plus one. The value returned might be
+      /// different that the original DEM height because GetData() adds the
+      /// padding if necessary.
+      /// \return The terrain height satisfying the ogre constrains (squared
+      /// terrain with a height value that must be a power of two plus one).
+      public: unsigned int GetHeight() const;
+
+      /// \brief Get the terrain width. Due to the Ogre constrains, this
+      /// value will be a power of two plus one. The value returned might be
+      /// different that the original DEM width because GetData() adds the
+      /// padding if necessary.
+      /// \return The terrain width satisfying the ogre constrains (squared
+      /// terrain with a width value that must be a power of two plus one).
+      public: unsigned int GetWidth() const;
 
       /// \brief Get the real world width in meters.
       public: double GetWorldWidth() const;
@@ -122,10 +119,20 @@ namespace gazebo
       private: double Distance(double _latAdeg, double _lonAdeg,
                                double _LatBdeg, double _lonBdeg);
 
+      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
+      /// pixel.
+      /// \param[in] _x X coordinate of the terrain.
+      /// \param[in] _y Y coordinate of the terrain.
+      /// \param[out] _xGeo Georeferenced longitude.
+      /// \param[out] _yGeo Georeferenced latitude.
+      private: void GetGeoReference(double _x, double _y,
+                                    double &_xGeo, double &_yGeo);
+
       /// \brief Get the terrain file as a data array.
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size.
-      private: void GetData(float **_data, unsigned int &_count) const;
+      /// \return 0 when success or -1 
+      private: void LoadData();
 
       /// \brief A set of associated raster bands.
       private: GDALDataset *dataSet;
@@ -147,6 +154,9 @@ namespace gazebo
 
       /// \brief Maximum height in meters.
       private: double maxElevation;
+
+      /// \brief DEM data converted to be OGRE-compatible.
+      private: std::vector<float> demData;
     };
     /// \}
   }

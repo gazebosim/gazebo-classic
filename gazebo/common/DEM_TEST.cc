@@ -15,38 +15,104 @@
  *
 */
 
+#include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 
 #include "gazebo/common/DEM.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 
 #ifdef HAVE_GDAL
-TEST(DEMTest, DEM)
+
+/////////////////////////////////////////////////
+TEST(DEMTest, MisingFile)
 {
-  std::string basedir = "file://media/materials/";
   common::DEM dem;
-
-  // Unexisting file
   EXPECT_EQ(-1, dem.Load("/file/shouldn/never/exist.png"));
+}
 
-  // Not a DEM file
-  EXPECT_EQ(-1, dem.Load(basedir + "scripts/CMakeLists.txt"));
+/////////////////////////////////////////////////
+TEST(DEMTest, NotDEM)
+{
+  common::DEM dem;
+  boost::filesystem::path path;
 
-  // DEM file but unsupported format (more than 1 band)
-  EXPECT_EQ(-1, dem.Load(basedir + "textures/wood.jpg"));
+  path = "file://media/materials/scripts/CMakeLists.txt";
+  EXPECT_EQ(-1, dem.Load(path.string()));
+}
 
-  // DEM non squared
-  EXPECT_EQ(0, dem.Load(basedir + "textures/dem_sample_non_squared.tif"));
+/////////////////////////////////////////////////
+TEST(DEMTest, UnsupportedDEM)
+{
+  common::DEM dem;
+  boost::filesystem::path path;
 
-  // Load a squared GeoTiff DEM file and exercise the basic API
-  EXPECT_EQ(0, dem.Load(basedir + "textures/dem_sample.tif"));
+  path = "file://media/materials/textures/wood.jpg";
+  EXPECT_EQ(-1, dem.Load(path.string()));
+}
+
+/////////////////////////////////////////////////
+TEST(DEMTest, NonSquaredDEM)
+{
+  common::DEM dem;
+  boost::filesystem::path path = TEST_PATH;
+
+  path /= "data/dem_non_squared.tif";
+  EXPECT_EQ(0, dem.Load(path.string()));
+}
+
+/////////////////////////////////////////////////
+TEST(DEMTest, SquaredDEM)
+{
+  common::DEM dem;
+  boost::filesystem::path path = TEST_PATH;
+
+  path /= "data/dem_squared.tif";
+  EXPECT_EQ(0, dem.Load(path.string()));
+}
+
+/////////////////////////////////////////////////
+TEST(DEMTest, BasicAPI)
+{
+  common::DEM dem;
+  boost::filesystem::path path = TEST_PATH;
+
+  path /= "data/dem_squared.tif";
+  EXPECT_EQ(0, dem.Load(path.string()));
+
+  // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(dem.GetHeight()));
   EXPECT_EQ(129, static_cast<int>(dem.GetWidth()));
   EXPECT_FLOAT_EQ(3981.8, dem.GetWorldHeight());
   EXPECT_FLOAT_EQ(3137.63, dem.GetWorldWidth());
   EXPECT_FLOAT_EQ(65.3583, dem.GetMinElevation());
   EXPECT_FLOAT_EQ(318.441, dem.GetMaxElevation());
+
+  // Check GetElevation()
+  unsigned int width = dem.GetWidth();
+  unsigned int height = dem.GetHeight();
+  EXPECT_FLOAT_EQ(215.82324, dem.GetElevation(0, 0));
+  EXPECT_FLOAT_EQ(216.04961, dem.GetElevation(width - 1, 0));
+  EXPECT_FLOAT_EQ(142.2274, dem.GetElevation(0, height - 1));
+  EXPECT_FLOAT_EQ(209.14784, dem.GetElevation(width - 1, height - 1));
+
+  // Check GetGeoReferenceOrigin()
+  double latitude;
+  double longitude;
+  dem.GetGeoReferenceOrigin(longitude, latitude);
+  EXPECT_FLOAT_EQ(38.001667, latitude);
+  EXPECT_FLOAT_EQ(-122.22278, longitude);
+}
+
+/////////////////////////////////////////////////
+TEST(DEMTest, FillHeightmap)
+{
+  common::DEM dem;
+  boost::filesystem::path path = TEST_PATH;
+
+  path /= "data/dem_squared.tif";
+  EXPECT_EQ(0, dem.Load(path.string()));
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;

@@ -80,8 +80,8 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
-  // bool use_true_size = this->sdf->Get<bool>("use_true_size");
-  bool use_true_size = false;
+  bool use_true_size = this->sdf->Get<bool>("use_true_size");
+  //bool use_true_size = false;
 
   if (this->dem.Load(_filename) != 0)
     gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
@@ -111,7 +111,7 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
     double yGeo;
     double elevation;
 
-    dem.GetGeoReference(0.0, 0.0, xGeo, yGeo);
+    dem.GetGeoReferenceOrigin(xGeo, yGeo);
     longitude.SetFromDegree(xGeo);
     latitude.SetFromDegree(yGeo);
     elevation = dem.GetElevation(0.0, 0.0);
