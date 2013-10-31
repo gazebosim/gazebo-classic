@@ -205,7 +205,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
       box03Pose.rot.GetAsEuler());
-getchar();
+
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
     boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
@@ -228,7 +228,6 @@ getchar();
   // WARNING: for readings of no return, gazebo returns max range rather
   // than +inf. issue #124
   EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
-getchar();
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
