@@ -23,8 +23,8 @@ class BitbucketPullRequests
 
     def initialize(jsonHash)
       @id          = jsonHash["id"]
-      @source      = jsonHash["source"]["commit"]["sha"]
-      @destination = jsonHash["destination"]["commit"]["sha"]
+      @source      = jsonHash["source"]["commit"]["hash"]
+      @destination = jsonHash["destination"]["commit"]["hash"]
       @branch      = jsonHash["source"]["branch"]["name"]
     end
 
