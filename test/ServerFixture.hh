@@ -575,6 +575,7 @@ class ServerFixture : public testing::Test
                  << "      </noise>";
 
                newModelStr << "    </ray>"
+                 << "    <visualize>true</visualize>"
                  << "  </sensor>"
                  << "</link>"
                  << "</model>"
