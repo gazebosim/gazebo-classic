@@ -698,9 +698,6 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
-
-      /// \brief Flag used to say if/when to clear all models.
-      private: bool clearModels;
     };
     /// \}
   }
