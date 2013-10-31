@@ -123,7 +123,6 @@ void LaserVisual::Update()
 
       angle += this->laserMsg->scan().angle_step();
     }
-
     verticalAngle += this->laserMsg->scan().vertical_angle_step();
   }
 }

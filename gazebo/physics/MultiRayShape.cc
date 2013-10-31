@@ -41,7 +41,6 @@ void MultiRayShape::Init()
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle;
   math::Quaternion ray;
-  double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
   // double horzResolution = 1.0;
@@ -73,10 +72,12 @@ void MultiRayShape::Init()
   horzMaxAngle = this->horzElem->Get<double>("max_angle");
   horzSamples = this->horzElem->Get<unsigned int>("samples");
   // horzResolution = this->horzElem->Get<double>("resolution");
-  yDiff = horzMaxAngle - horzMinAngle;
+  double yDiff = horzMaxAngle - horzMinAngle;
 
   minRange = this->rangeElem->Get<double>("min");
   maxRange = this->rangeElem->Get<double>("max");
+  double yRes = yDiff / (horzSamples - 1);
+  double pRes = pDiff / (vertSamples - 1);
 
   this->offset = this->collisionParent->GetRelativePose();
 
@@ -85,20 +86,17 @@ void MultiRayShape::Init()
   {
     for (unsigned int i = 0; i < (unsigned int)horzSamples; ++i)
     {
-      yawAngle = (horzSamples == 1) ? 0 :
-        i * yDiff / (horzSamples - 1) + horzMinAngle;
+      yawAngle = (horzSamples == 1) ? 0 : i * yRes + horzMinAngle;
+      pitchAngle = (vertSamples == 1)? 0 : j * pRes + vertMinAngle;
 
-      pitchAngle = (vertSamples == 1)? 0 :
-        j * pDiff / (vertSamples - 1) + vertMinAngle;
+      double rx = cos(pitchAngle) * cos(yawAngle);
+      double ry = sin(yawAngle);
+      double rz = sin(pitchAngle) * cos(yawAngle);
 
-      // since we're rotating a unit x vector, a pitch rotation will now be
-      // around the negative y axis
-      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
-
-      start = (axis * minRange) + this->offset.pos;
-      end = (axis * maxRange) + this->offset.pos;
-
+      start = math::Vector3(minRange*rx, minRange*ry, minRange*rz);
+      end = math::Vector3(maxRange*rx, maxRange*ry, maxRange*rz);
+      start = this->offset.rot * start + this->offset.pos;
+      end = this->offset.rot * end + this->offset.pos;
       this->AddRay(start, end);
     }
   }

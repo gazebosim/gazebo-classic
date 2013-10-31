@@ -303,7 +303,6 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   unsigned int mid = samples / 2;
   double unitBoxSize = 1.0;
 
-
   double angleStep = vMinAngle;
   // all vertical laser planes should sense box
   for (unsigned int i = 0; i < vSamples; ++i)
