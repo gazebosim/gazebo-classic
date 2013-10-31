@@ -94,6 +94,8 @@ void LaserVisual::Update()
   unsigned int vertCount = this->laserMsg->scan().has_vertical_count() ?
       this->laserMsg->scan().vertical_count() : 1u;
 
+  math::Quaternion ray;
+  math::Vector3 axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     if (j+1 > this->rayFans.size())
@@ -111,10 +113,14 @@ void LaserVisual::Update()
     for (unsigned int i = 0; i < count; ++i)
     {
       r = this->laserMsg->scan().ranges(j*count + i);
-      pt.x = r * cos(verticalAngle) * cos(angle);
+      /*pt.x = r * cos(verticalAngle) * cos(angle);
       pt.y = r * sin(angle);
       pt.z = r * sin(verticalAngle) * cos(angle);
-      pt = offset.rot * pt + offset.pos;
+      pt = offset.rot * pt + offset.pos;*/
+
+      ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
+      axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      pt = (axis * r) + offset.pos;
 
       if (i+1 >= this->rayFans[j]->GetPointCount())
         this->rayFans[j]->AddPoint(pt);
