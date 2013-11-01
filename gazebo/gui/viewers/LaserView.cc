@@ -61,7 +61,7 @@ LaserView::LaserView(QWidget *_parent)
   connect(fitButton, SIGNAL(clicked()), this, SLOT(OnFitInView()));
 
   this->vertScanSpin = new QSpinBox(this);
-  this->vertScanSpin->setRange(0,0);
+  this->vertScanSpin->setRange(0, 0);
   this->vertScanSpin->setToolTip("Select vertical scan");
 
   QRadioButton *degreeToggle = new QRadioButton();
