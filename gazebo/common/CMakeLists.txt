@@ -24,7 +24,7 @@ set (sources
   Color.cc
   CommonIface.cc
   Console.cc
-  DEM.cc
+  Dem.cc
   Event.cc
   Events.cc
   Exception.cc
@@ -57,7 +57,7 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
-  DEM.hh
+  Dem.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -101,7 +101,7 @@ set (gtest_sources
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
-  DEM_TEST.cc
+  Dem_TEST.cc
   Exception_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc

@@ -37,13 +37,13 @@ namespace gazebo
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
     /// Examples of DEM formats are GeoTIFF or HFA/Erdas.
-    class DEM : public HeightmapData
+    class Dem : public HeightmapData
     {
       /// \brief Constructor.
-      public: DEM();
+      public: Dem();
 
       /// \brief Destructor.
-      public: virtual ~DEM();
+      public: virtual ~Dem();
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.

@@ -18,7 +18,7 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 
-#include "gazebo/common/DEM.hh"
+#include "gazebo/common/Dem.hh"
 #include "test_config.h"
 
 using namespace gazebo;
@@ -26,16 +26,16 @@ using namespace gazebo;
 #ifdef HAVE_GDAL
 
 /////////////////////////////////////////////////
-TEST(DEMTest, MisingFile)
+TEST(DemTest, MisingFile)
 {
-  common::DEM dem;
+  common::Dem dem;
   EXPECT_EQ(-1, dem.Load("/file/shouldn/never/exist.png"));
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, NotDEM)
+TEST(DemTest, NotDem)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path;
 
   path = "file://media/materials/scripts/CMakeLists.txt";
@@ -43,9 +43,9 @@ TEST(DEMTest, NotDEM)
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, UnsupportedDEM)
+TEST(DemTest, UnsupportedDem)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path;
 
   path = "file://media/materials/textures/wood.jpg";
@@ -53,9 +53,9 @@ TEST(DEMTest, UnsupportedDEM)
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, NonSquaredDEM)
+TEST(DemTest, NonSquaredDem)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_non_squared.tif";
@@ -63,9 +63,9 @@ TEST(DEMTest, NonSquaredDEM)
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, SquaredDEM)
+TEST(DemTest, SquaredDem)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";
@@ -73,9 +73,9 @@ TEST(DEMTest, SquaredDEM)
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, BasicAPI)
+TEST(DemTest, BasicAPI)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";
@@ -106,9 +106,9 @@ TEST(DEMTest, BasicAPI)
 }
 
 /////////////////////////////////////////////////
-TEST(DEMTest, FillHeightmap)
+TEST(DemTest, FillHeightmap)
 {
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";

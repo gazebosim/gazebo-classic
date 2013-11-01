@@ -27,7 +27,7 @@
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/HeightmapData.hh"
-#include "gazebo/common/DEM.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -164,7 +164,7 @@ namespace gazebo
 
       #ifdef HAVE_GDAL
       /// \brief DEM used to generate the heights.
-      private: common::DEM dem;
+      private: common::Dem dem;
       #endif
     };
     /// \}

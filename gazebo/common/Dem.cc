@@ -20,7 +20,7 @@
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/DEM.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Angle.hh"
 
@@ -30,14 +30,14 @@ using namespace common;
 #ifdef HAVE_GDAL
 
 //////////////////////////////////////////////////
-DEM::DEM()
+Dem::Dem()
 {
   this->dataSet = NULL;
   GDALAllRegister();
 }
 
 //////////////////////////////////////////////////
-DEM::~DEM()
+Dem::~Dem()
 {
   this->demData.clear();
 
@@ -46,7 +46,7 @@ DEM::~DEM()
 }
 
 //////////////////////////////////////////////////
-int DEM::Load(const std::string &_filename)
+int Dem::Load(const std::string &_filename)
 {
   // Sanity check
   std::string fullName = _filename;
@@ -136,7 +136,7 @@ int DEM::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-double DEM::GetElevation(double _x, double _y)
+double Dem::GetElevation(double _x, double _y)
 {
   if (_x >= this->GetWidth() || _y >= this->GetHeight())
   {
@@ -150,19 +150,19 @@ double DEM::GetElevation(double _x, double _y)
 }
 
 //////////////////////////////////////////////////
-float DEM::GetMinElevation() const
+float Dem::GetMinElevation() const
 {
   return minElevation;
 }
 
 //////////////////////////////////////////////////
-float DEM::GetMaxElevation() const
+float Dem::GetMaxElevation() const
 {
   return maxElevation;
 }
 
 //////////////////////////////////////////////////
-void DEM::GetGeoReference(double _x, double _y,
+void Dem::GetGeoReference(double _x, double _y,
                           double &_xGeo, double &_yGeo)
 {
   double geoTransf[6];
@@ -177,37 +177,37 @@ void DEM::GetGeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void DEM::GetGeoReferenceOrigin(double &_xGeo, double &_yGeo)
+void Dem::GetGeoReferenceOrigin(double &_xGeo, double &_yGeo)
 {
   return this->GetGeoReference(0, 0, _xGeo, _yGeo);
 }
 
 //////////////////////////////////////////////////
-unsigned int DEM::GetHeight() const
+unsigned int Dem::GetHeight() const
 {
   return this->side;
 }
 
 //////////////////////////////////////////////////
-unsigned int DEM::GetWidth() const
+unsigned int Dem::GetWidth() const
 {
   return this->side;
 }
 
 //////////////////////////////////////////////////
-double DEM::GetWorldWidth() const
+double Dem::GetWorldWidth() const
 {
   return this->worldWidth;
 }
 
 //////////////////////////////////////////////////
-double DEM::GetWorldHeight() const
+double Dem::GetWorldHeight() const
 {
   return this->worldHeight;
 }
 
 //////////////////////////////////////////////////
-void DEM::FillHeightMap(int _subSampling, unsigned int _vertSize,
+void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
     const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
     std::vector<float> &_heights)
 {
@@ -273,7 +273,7 @@ void DEM::FillHeightMap(int _subSampling, unsigned int _vertSize,
 
 //////////////////////////////////////////////////
 /// Based on OGRXPlane_Distance() (ogr_xplange_geo_utils.cpp, gdal).
-double DEM::Distance(double _latAdeg, double _lonAdeg,
+double Dem::Distance(double _latAdeg, double _lonAdeg,
                      double _latBdeg, double _lonBdeg)
 {
   double Rad2Meter = (180. / M_PI) * 60. * 1852.;
@@ -300,7 +300,7 @@ double DEM::Distance(double _latAdeg, double _lonAdeg,
 }
 
 //////////////////////////////////////////////////
-void DEM::LoadData()
+void Dem::LoadData()
 {
     unsigned int destWidth;
     unsigned int destHeight;

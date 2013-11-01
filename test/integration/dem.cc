@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/DEM.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/sensors/GpsSensor.hh"
 #include "ServerFixture.hh"
 
@@ -59,7 +59,7 @@ TEST_F(Dem_TEST, GPS)
   double latitude;
   double longitude;
   double elevation;
-  common::DEM dem;
+  common::Dem dem;
   boost::filesystem::path path;
   path = "file://media/dem/volcano.tif";
   dem.Load(path.string());
