@@ -455,6 +455,13 @@ void Heightmap::ConfigureTerrainDefaults()
   // the lightmapped terrain.
   this->terrainGlobals->setCompositeMapDistance(2000);
 
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
+
   // Get the first directional light
   LightPtr directionalLight;
   for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
@@ -2789,4 +2796,3 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
-
