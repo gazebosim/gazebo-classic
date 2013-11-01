@@ -213,6 +213,9 @@ namespace gazebo
 
       /// \brief Angle output
       private: QLineEdit *angleEdit;
+
+      /// \brief Spin box for choosing vertical ray.
+      private: QSpinBox *vertScanSpin;
     };
   }
 }
