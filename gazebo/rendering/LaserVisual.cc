@@ -113,11 +113,6 @@ void LaserVisual::Update()
     for (unsigned int i = 0; i < count; ++i)
     {
       r = this->laserMsg->scan().ranges(j*count + i);
-      /*pt.x = r * cos(verticalAngle) * cos(angle);
-      pt.y = r * sin(angle);
-      pt.z = r * sin(verticalAngle) * cos(angle);
-      pt = offset.rot * pt + offset.pos;*/
-
       ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
       axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.pos;
