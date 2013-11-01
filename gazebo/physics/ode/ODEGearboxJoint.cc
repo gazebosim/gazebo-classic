@@ -165,14 +165,14 @@ double ODEGearboxJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetVelocity(int /*index*/, double _angle)
+void ODEGearboxJoint::SetVelocity(int /*index*/, double /*_angle*/)
 {
   gzlog << "SetVelocity not implemented for gearbox\n";
   return;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetMaxForce(int /*index*/, double _t)
+void ODEGearboxJoint::SetMaxForce(int /*index*/, double /*_t*/)
 {
   gzlog << "SetMaxForce not implemented for gearbox\n";
   return;
@@ -195,14 +195,14 @@ void ODEGearboxJoint::SetForceImpl(int /*_index*/, double /*_effort*/)
 }
 
 //////////////////////////////////////////////////
-double ODEGearboxJoint::GetParam(int _parameter) const
+double ODEGearboxJoint::GetParam(int /*_parameter*/) const
 {
   gzlog << "GetParam not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetParam(int _parameter, double _value)
+void ODEGearboxJoint::SetParam(int /*_parameter*/, double /*_value*/)
 {
   gzlog << "SetParam not implemented for gearbox\n";
   return;
