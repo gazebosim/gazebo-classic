@@ -177,6 +177,11 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   unsigned int samples = 320;
   math::Pose testPose(math::Vector3(0, 0, 0),
       math::Quaternion(0, 0, 0));
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION >= 2.82)
+  {
+    testPose.pos.z = 0.1;
+    gzwarn << "Raising sensor for bullet as workaround for #934" << std::endl;
+  }
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
