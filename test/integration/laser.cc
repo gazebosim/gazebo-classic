@@ -393,16 +393,21 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   unsigned int h, v;
-  for (h = 0; h < hSamples; ++h)
+
+  for (v = 0; v < vSamples; ++v)
   {
-    for (v = 0; v < vSamples; ++v)
+    for (h = 0; h < hSamples; ++h)
     {
-      // pitch angle of beam plane
-      double p = vMidAngle - (vMinAngle + v*vAngleStep);
-      // yaw angle of ray within beam plane
+      // pitch angle
+      double p = vMinAngle + v*vAngleStep;
+      // yaw angle
       double y = hMinAngle + h*hAngleStep;
       double R = raySensor->GetRange(v*hSamples + h);
-      EXPECT_NEAR(R*cos(y)*sin(p), z0, rangeResolution);
+
+      math::Quaternion rot(0.0, -p, y);
+      math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
+      math::Vector3 intersection = (axis * R) + testPose.pos;
+      EXPECT_NEAR(intersection.z, 0.0, rangeResolution);
     }
   }
 }
