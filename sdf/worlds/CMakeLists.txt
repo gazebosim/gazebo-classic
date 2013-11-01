@@ -7,6 +7,7 @@ set (files
   joint_damping_demo.world
   depth_camera.world
   empty.world
+  empty_sky.world
   force_torque_demo.world
   force_torque_demo2.world
   joints.world
