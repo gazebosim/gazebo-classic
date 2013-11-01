@@ -103,6 +103,7 @@ set (gtest_sources
   Console_TEST.cc
   Dem_TEST.cc
   Exception_TEST.cc
+  Event_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
