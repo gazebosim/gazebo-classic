@@ -1708,7 +1708,8 @@ void World::UpdateStateSDF()
   sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  this->prevStates[(this->stateToggle + 1) % 2].FillSDF(stateElem);
+  WorldState currentState(shared_from_this());
+  currentState.FillSDF(stateElem);
 }
 
 //////////////////////////////////////////////////
