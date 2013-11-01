@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _EDITOR_EVENTS_HH_
-#define _EDITOR_EVENTS_HH_
+#ifndef _BUILDING_EDITOR_EVENTS_HH_
+#define _BUILDING_EDITOR_EVENTS_HH_
 
 #include <string>
 #include "gazebo/common/Event.hh"

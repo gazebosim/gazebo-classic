@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,6 +447,26 @@ namespace gazebo
       /// \return viscous joint damping coefficient
       public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(3.0);
 
+      /// \brief Set joint stop stiffness.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _stiffness joint stop stiffness coefficient.
+      public: void SetStopStiffness(unsigned int _index, double _stiffness);
+
+      /// \brief Set joint stop dissipation.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _dissipation joint stop dissipation coefficient.
+      public: void SetStopDissipation(unsigned int _index, double _dissipation);
+
+      /// \brief Get joint stop stiffness.
+      /// \param[in] _index joint axis index.
+      /// \return joint stop stiffness coefficient.
+      public: double GetStopStiffness(unsigned int _index);
+
+      /// \brief Get joint stop dissipation.
+      /// \param[in] _index joint axis index.
+      /// \return joint stop dissipation coefficient.
+      public: double GetStopDissipation(unsigned int _index);
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -541,6 +561,12 @@ namespace gazebo
 
       /// \brief Angle used when the joint is parent of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief Joint stop stiffness
+      private: double stopStiffness[MAX_JOINT_AXIS];
+
+      /// \brief Joint stop dissipation
+      private: double stopDissipation[MAX_JOINT_AXIS];
     };
     /// \}
   }

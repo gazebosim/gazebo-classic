@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   world->GetModel(box02)->SetWorldPose(
       math::Pose(math::Vector3(0, -(maxRange + 1), 0),
       math::Quaternion(0, 0, 0)));
-  world->StepWorld(1);
+  world->Step(1);
   raySensor->Update(true);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
@@ -311,6 +311,9 @@ INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
+  // Set a specific seed to avoid occasional test failures due to
+  // statistically unlikely, but possible results.
+  math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
