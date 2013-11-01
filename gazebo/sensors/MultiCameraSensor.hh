@@ -97,6 +97,7 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void Fini();
 
+      /// \brief Handle the render event.
       private: void Render();
 
       /// \brief All the cameras.

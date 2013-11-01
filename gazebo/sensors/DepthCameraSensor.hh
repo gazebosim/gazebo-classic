@@ -81,9 +81,18 @@ namespace gazebo
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
 
+      /// \brief Handle the render event.
+      private: void Render();
+
+      /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
 
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
+
     };
     /// \}
   }

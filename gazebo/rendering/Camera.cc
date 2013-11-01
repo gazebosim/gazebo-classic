@@ -1282,19 +1282,14 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      _textureName,
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(),
-      this->GetImageHeight(),
-      0,
-      (Ogre::PixelFormat)this->imageFormat,
-#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
-      // This #if allows ogre to antialias offscreen rendering
-     Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
-#else
-     Ogre::TU_RENDERTARGET)).getPointer();
-#endif
+        _textureName,
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(),
+        this->GetImageHeight(),
+        0,
+        (Ogre::PixelFormat)this->imageFormat,
+        Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 

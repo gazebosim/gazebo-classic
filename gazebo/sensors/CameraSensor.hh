@@ -97,10 +97,20 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive();
 
+      /// \brief Handle the render event.
+      private: void Render();
+
+      /// \brief Pointer to the camera.
       private: rendering::CameraPtr camera;
+
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
 
+      /// \brief Publisher of image messages.
       private: transport::PublisherPtr imagePub;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }

@@ -45,6 +45,10 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -160,14 +164,25 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+void CameraSensor::Render()
+{
+  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  // Update all the cameras
+  this->camera->Render();
+
+  this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
+}
+
+//////////////////////////////////////////////////
 bool CameraSensor::UpdateImpl(bool /*_force*/)
 {
-  if (!this->camera)
+  if (!this->rendered)
     return false;
 
-  this->camera->Render();
   this->camera->PostRender();
-  this->lastMeasurementTime = this->scene->GetSimTime();
 
   if (this->imagePub->HasConnections())
   {
@@ -188,6 +203,7 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
       this->imagePub->Publish(msg);
   }
 
+  this->rendered = false;
   return true;
 }
 
