@@ -873,7 +873,7 @@ void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
   // contact behavior.
   for (int i = 0; i < 5000; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
 
     // count up and down cycles
     if (linkPrismatic->GetWorldLinearVel().z > vT && velPrismatic < -vT)
