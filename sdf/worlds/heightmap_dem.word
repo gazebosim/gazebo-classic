@@ -12,8 +12,8 @@
         <collision name="collision">
           <geometry>
             <heightmap>
-              <uri>file://media/materials/textures/canary_islands.tif</uri>
-              <size>129 129 10</size>
+              <uri>file://media/dem/volcano.tif</uri>
+              <size>129 129 50</size>
               <pos>0 0 0</pos>
               <use_true_size>false</use_true_size>
             </heightmap>
@@ -48,7 +48,7 @@
                 <fade_dist>5</fade_dist>
               </blend>
               <uri>file://media/materials/textures/canary_islands.tif</uri>
-              <size>129 129 10</size>
+              <size>129 129 50</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
