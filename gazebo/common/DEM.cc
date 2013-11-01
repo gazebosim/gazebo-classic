@@ -111,8 +111,8 @@ int DEM::Load(const std::string &_filename)
   if (buffer)
     delete[] buffer;
 
-  //std::cout << "Min: " << this->minElevation << std::endl;
-  //std::cout << "Max: " << this->maxElevation << std::endl;
+  // std::cout << "Min: " << this->minElevation << std::endl;
+  // std::cout << "Max: " << this->maxElevation << std::endl;
 
   // Set the width/height (after the padding)
   unsigned int width;
@@ -143,7 +143,7 @@ double DEM::GetElevation(double _x, double _y)
     gzerr << "Illegal coordinates. You are asking for the elevation in (" <<
           _x << "," << _y << ") but the terrain is (" << this->GetWidth() <<
            " x " << this->GetHeight() << std::endl;
-    return -1; 
+    return -1;
   }
 
   return this->demData.at(_y * this->GetWidth() + _x);

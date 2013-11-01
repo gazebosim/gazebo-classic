@@ -130,7 +130,7 @@ namespace gazebo
       /// \param[out] _data Pointer to a NULL array of char.
       /// \param[out] _count The resulting data array size
       public: void GetData(unsigned char **_data,
-                            unsigned int &_count) const;
+                           unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
@@ -206,7 +206,7 @@ namespace gazebo
 
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const;
+          FIBITMAP *_img) const;
 
       /// \brief Count the number of images created. Used for initialising
       /// free image

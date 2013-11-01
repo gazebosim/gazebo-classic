@@ -92,7 +92,6 @@ int Image::Load(const std::string &_filename)
     else
     {
       gzerr << "Unknown image format[" << this->fullName << "]\n";
-      GZ_ASSERT(false, "SEGFAULT");
       return -1;
     }
 
