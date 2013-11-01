@@ -102,18 +102,6 @@ int Dem::Load(const std::string &_filename)
   this->worldWidth = this->Distance(gUpLeftY, gUpLeftX, gUpRightY, gUpRightX);
   this->worldHeight = this->Distance(gUpLeftY, gUpLeftX, gLowLeftY, gLowLeftX);
 
-  // Set the min/max heights
-  float *buffer = new float[xSize * ySize];
-  this->band->RasterIO(GF_Read, 0, 0, xSize, ySize, buffer, xSize, ySize,
-      GDT_Float32, 0, 0);
-  this->minElevation = *std::min_element(buffer, buffer + xSize * ySize);
-  this->maxElevation = *std::max_element(buffer, buffer + xSize * ySize);
-  if (buffer)
-    delete[] buffer;
-
-  // std::cout << "Min: " << this->minElevation << std::endl;
-  // std::cout << "Max: " << this->maxElevation << std::endl;
-
   // Set the width/height (after the padding)
   unsigned int width;
   unsigned int height;
@@ -132,6 +120,15 @@ int Dem::Load(const std::string &_filename)
 
   this->LoadData();
 
+  // Set the min/max heights
+  this->minElevation = *std::min_element(&this->demData[0],
+      &this->demData[0] + this->side * this->side);
+  this->maxElevation = *std::max_element(&this->demData[0],
+      &this->demData[0] + this->side * this->side);
+
+  // std::cout << "Min: " << this->minElevation << std::endl;
+  // std::cout << "Max: " << this->maxElevation << std::endl;
+
   return 0;
 }
 
@@ -140,10 +137,9 @@ double Dem::GetElevation(double _x, double _y)
 {
   if (_x >= this->GetWidth() || _y >= this->GetHeight())
   {
-    gzerr << "Illegal coordinates. You are asking for the elevation in (" <<
-          _x << "," << _y << ") but the terrain is (" << this->GetWidth() <<
-           " x " << this->GetHeight() << std::endl;
-    return -1;
+    gzthrow("Illegal coordinates. You are asking for the elevation in (" <<
+          _x << "," << _y << ") but the terrain is [" << this->GetWidth() <<
+           " x " << this->GetHeight() << "]\n");
   }
 
   return this->demData.at(_y * this->GetWidth() + _x);

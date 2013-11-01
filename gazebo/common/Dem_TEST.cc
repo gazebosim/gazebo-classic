@@ -53,12 +53,22 @@ TEST(DemTest, UnsupportedDem)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, NonSquaredDem)
+TEST(DemTest, NonSquaredDemPortrait)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
 
-  path /= "data/dem_non_squared.tif";
+  path /= "data/dem_portrait.tif";
+  EXPECT_EQ(0, dem.Load(path.string()));
+}
+
+/////////////////////////////////////////////////
+TEST(DemTest, NonSquaredDemLandscape)
+{
+  common::Dem dem;
+  boost::filesystem::path path = TEST_PATH;
+
+  path /= "data/dem_landscape.tif";
   EXPECT_EQ(0, dem.Load(path.string()));
 }
 
@@ -96,6 +106,11 @@ TEST(DemTest, BasicAPI)
   EXPECT_FLOAT_EQ(216.04961, dem.GetElevation(width - 1, 0));
   EXPECT_FLOAT_EQ(142.2274, dem.GetElevation(0, height - 1));
   EXPECT_FLOAT_EQ(209.14784, dem.GetElevation(width - 1, height - 1));
+
+  // Illegal coordinates
+  ASSERT_ANY_THROW(dem.GetElevation(0, height));
+  ASSERT_ANY_THROW(dem.GetElevation(width, 0));
+  ASSERT_ANY_THROW(dem.GetElevation(width, height));
 
   // Check GetGeoReferenceOrigin()
   double latitude;
