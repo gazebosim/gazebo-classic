@@ -91,7 +91,9 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      // since we're rotating a unit x vector, a pitch rotation will now be
+      // around the negative y axis
+      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
