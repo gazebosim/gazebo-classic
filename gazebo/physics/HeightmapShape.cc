@@ -80,7 +80,8 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
-  bool use_true_size = this->sdf->Get<bool>("use_true_size");
+  // bool use_true_size = this->sdf->Get<bool>("use_true_size");
+  bool use_true_size = true;
 
   if (this->dem.Load(_filename) != 0)
     gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");

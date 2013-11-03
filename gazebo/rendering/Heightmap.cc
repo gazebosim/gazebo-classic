@@ -378,6 +378,23 @@ void Heightmap::Load()
   this->ConfigureTerrainDefaults();
   this->SetupShadows(true);
 
+  // Move the user camera above the heightmap
+  std::cout << "Load()" << std::endl;
+  if (this->heights.size() > 0)
+  {
+    double h = *std::max_element(&this->heights[0],
+                                 &this->heights[0] + this->heights.size());
+    math::Vector3 camPos(5, -5, h + 200);
+    math::Vector3 lookAt(0, 0, h);
+    math::Vector3 delta = lookAt - camPos;
+
+    double yaw = atan2(delta.y, delta.x);
+    double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+
+    this->scene->GetUserCamera(0)->SetWorldPose(math::Pose(camPos,
+          math::Vector3(0, pitch, yaw)));
+  }
+
   if (this->useTerrainPaging)
   {
     this->terrainHashChanged = this->PrepareTerrainPaging(terrainDirPath);

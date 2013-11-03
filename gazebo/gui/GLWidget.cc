@@ -635,6 +635,7 @@ void GLWidget::OnMouseReleaseNormal()
 //////////////////////////////////////////////////
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
+  std::cout << "ViewScene()" << std::endl;
   if (_scene->GetUserCameraCount() == 0)
     this->userCamera = _scene->CreateUserCamera("gzclient_camera");
   else
