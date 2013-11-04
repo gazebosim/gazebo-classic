@@ -277,9 +277,9 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       h = (h1 - ((h1 - h2) * dy) - std::max(0.0f, this->GetMinElevation())) *
           _scale.z;
 
-      // invert pixel definition so 1=ground, 0=full height,
-      //   if the terrain size has a negative z component
-      //   this is mainly for backward compatibility
+      // Invert pixel definition so 1=ground, 0=full height,
+      // if the terrain size has a negative z component
+      // this is mainly for backward compatibility
       if (_size.z < 0)
         h *= -1;
 
@@ -304,26 +304,47 @@ void Dem::LoadData()
     unsigned int nXSize = this->dataSet->GetRasterXSize();
     unsigned int nYSize = this->dataSet->GetRasterYSize();
     float ratio;
+    std::vector<float> buffer;
 
-    this->demData.resize(this->GetWidth() * this->GetHeight());
+    std::cout << "nXSize: " << nXSize << std::endl;
+    std::cout << "nYSize: " << nYSize << std::endl;
+
+    std::cout << "Width: " << this->GetWidth() << std::endl;
+    std::cout << "Height: " << this->GetHeight() << std::endl;
 
     // Scale the terrain keeping the same ratio between width and height
     if (nXSize > nYSize)
     {
-      ratio = nXSize / nYSize;
+      ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
       destWidth = this->side;
-      destHeight = destWidth / ratio;
+      destHeight = static_cast<float>(destWidth) / static_cast<float>(ratio);
     }
     else
     {
-      ratio = nYSize / nXSize;
+      ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
+      std::cout << "Ratio :" << ratio << std::endl;
       destHeight = this->side;
-      destWidth = destHeight / ratio;
+      std::cout << "DestHeight: " << destHeight << std::endl;
+      destWidth = static_cast<float>(destHeight) / static_cast<float>(ratio);
+      std::cout << "DestWidth: " << destWidth << std::endl;
     }
 
-    // Read the whole raster data and convert it to a GDT_Float32 array
-    this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &this->demData[0],
+    // Read the whole raster data and convert it to a GDT_Float32 array.
+    // In this step the DEM is scaled to destWidth x destHeight
+    buffer.resize(destWidth * destHeight);
+    this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
                          destWidth, destHeight, GDT_Float32, 0, 0);
+
+    // Copy and align 'buffer' into the target vector. The destination vector is
+    // initialized to 0, so all the points not contained in 'buffer' will be
+    // padding
+    this->demData.resize(this->GetWidth() * this->GetHeight());
+    for (unsigned int y = 0; y < destHeight; ++y)
+    {
+        std::copy(&buffer[destWidth * y], &buffer[destWidth * y] + destWidth,
+                  this->demData.begin() + this->GetWidth() * y);
+    }
+    buffer.clear();
 }
 
 #endif
