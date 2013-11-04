@@ -142,7 +142,7 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 
   double r;
   for (unsigned int i = 0;
-       i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
+       i < static_cast<unsigned int>(_msg->scan().count()); i++)
   {
     r = _msg->scan().ranges(i);
 

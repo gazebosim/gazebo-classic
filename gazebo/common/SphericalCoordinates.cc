@@ -32,6 +32,8 @@ using namespace common;
 // wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
 const double g_EarthWGS84AxisEquatorial = 6378137.0;
 const double g_EarthWGS84AxisPolar = 6356752.314245;
+
+const double g_EarthSphere = 6371000.0;
 // const double g_EarthWGS84Flattening = 1/298.257223563;
 
 //////////////////////////////////////////////////
@@ -199,14 +201,12 @@ double SphericalCoordinates::Distance(const math::Angle &_latA,
                                       const math::Angle &_latB,
                                       const math::Angle &_lonB)
 {
-  double R = 6371000;
-
   math::Angle dLat = _latB - _latA;
   math::Angle dLon = _lonB - _lonA;
   double a = sin(dLat.Radian() / 2) * sin(dLat.Radian() / 2) +
              sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
              cos(_latA.Radian()) * cos(_latB.Radian());
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double d = R * c;
+  double d = g_EarthSphere * c;
   return d;
 }

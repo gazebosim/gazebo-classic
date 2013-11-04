@@ -264,6 +264,13 @@ math::Angle RaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
+double RaySensor::GetVerticalAngleResolution() const
+{
+  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+    (this->GetVerticalRangeCount()-1);
+}
+
+//////////////////////////////////////////////////
 void RaySensor::GetRanges(std::vector<double> &_ranges)
 {
   boost::mutex::scoped_lock lock(this->mutex);
@@ -333,6 +340,12 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   scan->set_angle_min(this->GetAngleMin().Radian());
   scan->set_angle_max(this->GetAngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
+  scan->set_count(this->GetRayCount());
+
+  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+  scan->set_vertical_count(this->GetVerticalRayCount());
 
   scan->set_range_min(this->GetRangeMin());
   scan->set_range_max(this->GetRangeMax());
