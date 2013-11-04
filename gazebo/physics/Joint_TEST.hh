@@ -62,6 +62,10 @@ class Joint_TEST : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointTorqueTest(const std::string &_physicsEngine);
 
+  /// \brief Test spring dampers
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SpringDamperTest(const std::string &_physicsEngine);
+
   /// \brief Create and destroy joints repeatedly, monitors memory usage.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointCreationDestructionTest(const std::string &_physicsEngine);

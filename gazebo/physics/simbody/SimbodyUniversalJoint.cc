@@ -61,12 +61,6 @@ math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetAxis(int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {

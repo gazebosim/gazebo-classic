@@ -840,7 +840,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // on the fly.
         gzJoint->damper =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
         #ifdef ADD_JOINT_SPRINGS
         // KLUDGE add spring (stiffness proportional to mass)
@@ -877,7 +877,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // on the fly.
         gzJoint->damper =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
         #ifdef ADD_JOINT_SPRINGS
         // KLUDGE add spring (stiffness proportional to mass)
