@@ -37,7 +37,6 @@ namespace gazebo
 
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    /// Examples of DEM formats are GeoTIFF or HFA/Erdas.
     class Dem : public HeightmapData
     {
       /// \brief Constructor.
@@ -51,19 +50,18 @@ namespace gazebo
       /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename="");
 
-      /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel.
+      /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
-      /// \return Terrain's elevation at (x,y).
+      /// \return Terrain's elevation at (x,y) in meters.
       public: double GetElevation(double _x, double _y);
 
-      /// \brief Get the minimum terrain's elevation.
-      /// \return The minimum elevation.
+      /// \brief Get the minimum terrain's elevation in meters.
+      /// \return The minimum elevation (meters).
       public: float GetMinElevation() const;
 
-      /// \brief Get the maximum terrain's elevation.
-      /// \return The maximum elevation.
+      /// \brief Get the maximum terrain's elevation in meters.
+      /// \return The maximum elevation (meters).
       public: float GetMaxElevation() const;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
@@ -73,20 +71,22 @@ namespace gazebo
       public: void GetGeoReferenceOrigin(math::Angle &_latitude,
                                          math::Angle &_longitude);
 
-      /// \brief Get the terrain height. Due to the Ogre constrains, this
+      /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
       /// different that the original DEM height because GetData() adds the
       /// padding if necessary.
-      /// \return The terrain height satisfying the ogre constrains (squared
-      /// terrain with a height value that must be a power of two plus one).
+      /// \return The terrain's height (points) satisfying the ogre constrains
+      /// (squared terrain with a height value that must be a power of two plus
+      /// one).
       public: unsigned int GetHeight() const;
 
-      /// \brief Get the terrain width. Due to the Ogre constrains, this
+      /// \brief Get the terrain's width. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
       /// different that the original DEM width because GetData() adds the
       /// padding if necessary.
-      /// \return The terrain width satisfying the ogre constrains (squared
-      /// terrain with a width value that must be a power of two plus one).
+      /// \return The terrain's width (points) satisfying the ogre constrains
+      /// (squared terrain with a width value that must be a power of two plus
+      /// one).
       public: unsigned int GetWidth() const;
 
       /// \brief Get the real world width in meters.
@@ -97,12 +97,12 @@ namespace gazebo
       /// \return Terrain's real world height in meters.
       public: double GetWorldHeight() const;
 
-      /// \brief Create a lookup table of the terrain's height
+      /// \brief Create a lookup table of the terrain's height.
       /// \param[in] _subsampling Multiplier used to increase the resolution.
       /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
       /// vector will be 257 * 257.
       /// \param[in] _vertSize Number of points per row.
-      /// \param[in] _size Real dimmensions of the terrain.
+      /// \param[in] _size Real dimmensions of the terrain in meters.
       /// \param[in] _scale Vector3 used to scale the height.
       /// \param[in] _flipY If true, it inverts the order in which the vector
       /// is filled.

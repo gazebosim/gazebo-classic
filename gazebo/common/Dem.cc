@@ -306,12 +306,6 @@ void Dem::LoadData()
     float ratio;
     std::vector<float> buffer;
 
-    std::cout << "nXSize: " << nXSize << std::endl;
-    std::cout << "nYSize: " << nYSize << std::endl;
-
-    std::cout << "Width: " << this->GetWidth() << std::endl;
-    std::cout << "Height: " << this->GetHeight() << std::endl;
-
     // Scale the terrain keeping the same ratio between width and height
     if (nXSize > nYSize)
     {
@@ -322,11 +316,8 @@ void Dem::LoadData()
     else
     {
       ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
-      std::cout << "Ratio :" << ratio << std::endl;
       destHeight = this->side;
-      std::cout << "DestHeight: " << destHeight << std::endl;
       destWidth = static_cast<float>(destHeight) / static_cast<float>(ratio);
-      std::cout << "DestWidth: " << destWidth << std::endl;
     }
 
     // Read the whole raster data and convert it to a GDT_Float32 array.
