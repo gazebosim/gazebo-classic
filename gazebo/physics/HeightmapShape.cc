@@ -24,6 +24,7 @@
 #ifdef HAVE_GDAL
 # include <gdal/gdalwarper.h>
 #endif
+
 #include <algorithm>
 #include <cmath>
 #include <string>
