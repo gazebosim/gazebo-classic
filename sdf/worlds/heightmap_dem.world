@@ -15,7 +15,7 @@
               <uri>file://media/dem/volcano.tif</uri>
               <size>129 129 80</size>
               <pos>0 0 0</pos>
-              <!-- <use_true_size>false</use_true_size> -->
+              <use_true_size>false</use_true_size>
             </heightmap>
           </geometry>
         </collision>

@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Dem.hh"
+#include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/GpsSensor.hh"
 #include "ServerFixture.hh"
 
@@ -30,20 +31,17 @@ class Dem_TEST : public ServerFixture
 /// \brief Test the integration between GPS and a DEM terrain.
 TEST_F(Dem_TEST, GPS)
 {
+  math::Angle latitude, longitude;
+  double elevation;
+  common::Dem dem;
+  boost::filesystem::path path = "file://media/dem/volcano.tif";
+
   // Load a DEM world with a GPS sensor (without noise) attached to a box.
   Load("worlds/dem_gps.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
-
-  // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run DEM test\n";
-    return;
-  }
 
   // Get a pointer to the GPS sensor.
   sensors::GpsSensorPtr sensor =
@@ -56,18 +54,12 @@ TEST_F(Dem_TEST, GPS)
   sensor->Update(true);
 
   // Get the georeference coordinates of the DEM's origin
-  double latitude;
-  double longitude;
-  double elevation;
-  common::Dem dem;
-  boost::filesystem::path path;
-  path = "file://media/dem/volcano.tif";
   dem.Load(path.string());
-  dem.GetGeoReferenceOrigin(longitude, latitude);
+  dem.GetGeoReferenceOrigin(latitude, longitude);
   elevation = dem.GetElevation(0.0, 0.0);
 
-  EXPECT_NEAR(sensor->GetLatitude().Degree(), latitude, DOUBLE_TOL);
-  EXPECT_NEAR(sensor->GetLongitude().Degree(), longitude, DOUBLE_TOL);
+  EXPECT_NEAR(sensor->GetLatitude().Degree(), latitude.Degree(), DOUBLE_TOL);
+  EXPECT_NEAR(sensor->GetLongitude().Degree(), longitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->GetAltitude(), elevation, 1);
 }
 

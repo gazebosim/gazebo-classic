@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Dem.hh"
+#include "gazebo/math/Angle.hh"
 #include "test_config.h"
 
 using namespace gazebo;
@@ -94,8 +95,8 @@ TEST(DemTest, BasicAPI)
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(dem.GetHeight()));
   EXPECT_EQ(129, static_cast<int>(dem.GetWidth()));
-  EXPECT_FLOAT_EQ(3981.8, dem.GetWorldHeight());
-  EXPECT_FLOAT_EQ(3137.63, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(3984.4849, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(3139.7456, dem.GetWorldWidth());
   EXPECT_FLOAT_EQ(65.3583, dem.GetMinElevation());
   EXPECT_FLOAT_EQ(318.441, dem.GetMaxElevation());
 
@@ -113,11 +114,10 @@ TEST(DemTest, BasicAPI)
   ASSERT_ANY_THROW(dem.GetElevation(width, height));
 
   // Check GetGeoReferenceOrigin()
-  double latitude;
-  double longitude;
-  dem.GetGeoReferenceOrigin(longitude, latitude);
-  EXPECT_FLOAT_EQ(38.001667, latitude);
-  EXPECT_FLOAT_EQ(-122.22278, longitude);
+  math::Angle latitude, longitude;
+  dem.GetGeoReferenceOrigin(latitude, longitude);
+  EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
+  EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
 }
 
 /////////////////////////////////////////////////

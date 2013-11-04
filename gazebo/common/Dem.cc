@@ -17,12 +17,17 @@
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
-#include <gdal/ogr_spatialref.h>
+#include <gazebo/gazebo_config.h>
+
+#ifdef HAVE_GDAL
+# include <gdal/ogr_spatialref.h>
+#endif
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Dem.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
@@ -49,6 +54,13 @@ Dem::~Dem()
 //////////////////////////////////////////////////
 int Dem::Load(const std::string &_filename)
 {
+  unsigned int width;
+  unsigned int height;
+  int xSize, ySize;
+  double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
+  math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  math::Angle lowLeftLat, lowLeftLong;
+
   // Sanity check
   std::string fullName = _filename;
   if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
@@ -82,34 +94,32 @@ int Dem::Load(const std::string &_filename)
   // Set the pointer to the band
   this->band = this->dataSet->GetRasterBand(1);
 
-  int xSize = this->dataSet->GetRasterXSize();
-  int ySize = this->dataSet->GetRasterYSize();
-  double upLeftX = 0.0;
-  double upLeftY = 0.0;
-  double upRightX = xSize;
-  double upRightY = 0.0;
-  double lowLeftX = 0.0;
-  double lowLeftY = ySize;
-  double gUpLeftX, gUpLeftY;
-  double gUpRightX, gUpRightY;
-  double gLowLeftX, gLowLeftY;
+  // Raster width and height
+  xSize = this->dataSet->GetRasterXSize();
+  ySize = this->dataSet->GetRasterYSize();
+
+  // Corner coordinates
+  upLeftX = 0.0;
+  upLeftY = 0.0;
+  upRightX = xSize;
+  upRightY = 0.0;
+  lowLeftX = 0.0;
+  lowLeftY = ySize;
 
   // Calculate the georeferenced coordinates of the terrain corners
-  this->GetGeoReference(upLeftX, upLeftY, gUpLeftX, gUpLeftY);
-  this->GetGeoReference(upRightX, upRightY, gUpRightX, gUpRightY);
-  this->GetGeoReference(lowLeftX, lowLeftY, gLowLeftX, gLowLeftY);
+  this->GetGeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
+  this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
+  this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
   // Set the world width and height
-  this->worldWidth = this->Distance(gUpLeftY, gUpLeftX, gUpRightY, gUpRightX);
-  this->worldHeight = this->Distance(gUpLeftY, gUpLeftX, gLowLeftY, gLowLeftX);
+  this->worldWidth =
+     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                            upRightLat, upRightLong);
+  this->worldHeight =
+     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                            lowLeftLat, lowLeftLong);
 
-  std::cout << "Width: " << this->worldWidth << std::endl;
-  std::cout << "Height: " << this->worldHeight << std::endl;
-
-  // Set the width/height (after the padding)
-  unsigned int width;
-  unsigned int height;
-
+  // Set the terrain's side (the terrain will be squared after the padding)
   if (math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
@@ -122,6 +132,7 @@ int Dem::Load(const std::string &_filename)
 
   this->side = std::max(width, height);
 
+  // Preload the DEM's data
   this->LoadData();
 
   // Set the min/max heights
@@ -129,9 +140,6 @@ int Dem::Load(const std::string &_filename)
       &this->demData[0] + this->side * this->side);
   this->maxElevation = *std::max_element(&this->demData[0],
       &this->demData[0] + this->side * this->side);
-
-  std::cout << "Min: " << this->minElevation << std::endl;
-  std::cout << "Max: " << this->maxElevation << std::endl;
 
   return 0;
 }
@@ -163,44 +171,39 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          double &_xGeo, double &_yGeo)
+                          math::Angle &_latitude, math::Angle &_longitude)
 {
   double geoTransf[6];
   if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
     OGRSpatialReference sourceCs;
     OGRSpatialReference targetCs;
-    OGRCoordinateTransformation *poCT;
+    OGRCoordinateTransformation *cT;
+    double xGeoDeg, yGeoDeg;
 
+    // Transform the terrain's coordinate system to WGS84
     char* importString = strdup(this->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
-    poCT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
 
-    _xGeo = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
-    _yGeo = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
+    xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
+    yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
 
-    std::cout << "Punto src (" << _xGeo << "," << _yGeo << ")" << std::endl;
+    cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    double xx, yy;
-    xx = _xGeo;
-    yy = _yGeo;
-
-    poCT->Transform(1, &xx, &yy);
-
-    _xGeo = xx;
-    _yGeo = yy;
-    std::cout << "Punto dst (" << xx << "," << yy << ")" << std::endl;
+    _latitude.SetFromDegree(yGeoDeg);
+    _longitude.SetFromDegree(xGeoDeg);
   }
   else
-    gzthrow("Unable to obtain the georeferenced values for line [" << _y <<
-            "] and pixel [" << _x << "]\n");
+    gzthrow("Unable to obtain the georeferenced values for coordinates ("
+            << _x << "," << _y << ")\n");
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(double &_xGeo, double &_yGeo)
+void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
 {
-  return this->GetGeoReference(0, 0, _xGeo, _yGeo);
+  return this->GetGeoReference(0, 0, _latitude, _longitude);
 }
 
 //////////////////////////////////////////////////
@@ -229,8 +232,8 @@ double Dem::GetWorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-    const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-    std::vector<float> &_heights)
+                        const math::Vector3 &_size, const math::Vector3 &_scale,
+                        bool _flipY, std::vector<float> &_heights)
 {
   unsigned int x, y;
   float h = 0;
@@ -280,8 +283,9 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       if (_size.z < 0)
         h *= -1;
 
-      //if (_size.z >= 0 && h < 0)
-        //h = 0;
+      // Convert to 0 if a NODATA value is found
+      if (_size.z >= 0 && h < 0)
+        h = 0;
 
       // Store the height for future use
       if (!_flipY)
@@ -290,52 +294,6 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
         _heights[(_vertSize - y - 1) * _vertSize + x] = h;
     }
   }
-}
-
-//////////////////////////////////////////////////
-/// Based on OGRXPlane_Distance() (ogr_xplange_geo_utils.cpp, gdal).
-/*double Dem::Distance(double _latAdeg, double _lonAdeg,
-                     double _latBdeg, double _lonBdeg)
-{
-  double Rad2Meter = (180. / M_PI) * 60. * 1852.;
-  double latArad, latBrad;
-  double cosA, cosB, sinA, sinB, cosP;
-  double cosAngle;
-
-  cosP = cos(GZ_DTOR(_lonBdeg - _lonAdeg));
-  latArad = GZ_DTOR(_latAdeg);
-  latBrad = GZ_DTOR(_latBdeg);
-  cosA = cos(latArad);
-  sinA = sin(latArad);
-  cosB = cos(latBrad);
-  sinB = sin(latBrad);
-  cosAngle = sinA * sinB + cosA * cosB * cosP;
-
-  // Crop
-  if (cosAngle > 1)
-    cosAngle = 1;
-  else if (cosAngle < - 1)
-    cosAngle = -1;
-
-  return acos(cosAngle) * Rad2Meter;
-}*/
-
-//////////////////////////////////////////////////
-/// Based on OGRXPlane_Distance() (ogr_xplange_geo_utils.cpp, gdal).
-double Dem::Distance(double _latAdeg, double _lonAdeg,
-                     double _latBdeg, double _lonBdeg)
-{
-  double R = 6371000;
-
-  double dLat = GZ_DTOR(_latBdeg - _latAdeg);
-  double dLon = GZ_DTOR(_lonBdeg - _lonAdeg);
-  double lat1 = GZ_DTOR(_latAdeg);
-  double lat2 = GZ_DTOR(_latBdeg);
-  double a = sin(dLat / 2) * sin(dLat / 2) +
-             sin(dLon / 2) * sin(dLon / 2) * cos(lat1) * cos(lat2); 
-  double c = 2 * atan2(sqrt(a), sqrt(1 - a)); 
-  double d = R * c;
-  return d;
 }
 
 //////////////////////////////////////////////////
@@ -348,9 +306,6 @@ void Dem::LoadData()
     float ratio;
 
     this->demData.resize(this->GetWidth() * this->GetHeight());
-
-    std::cout << "GetWidth: " << this->GetWidth() << std::endl;
-    std::cout << "GetHeight: " << this->GetHeight() << std::endl;
 
     // Scale the terrain keeping the same ratio between width and height
     if (nXSize > nYSize)

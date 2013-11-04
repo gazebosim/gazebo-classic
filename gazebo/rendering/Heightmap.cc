@@ -379,8 +379,7 @@ void Heightmap::Load()
   this->SetupShadows(true);
 
   // Move the user camera above the heightmap
-  std::cout << "Load()" << std::endl;
-  if (this->heights.size() > 0)
+  if (!this->heights.empty())
   {
     double h = *std::max_element(&this->heights[0],
                                  &this->heights[0] + this->heights.size());
@@ -389,7 +388,7 @@ void Heightmap::Load()
     math::Vector3 delta = lookAt - camPos;
 
     double yaw = atan2(delta.y, delta.x);
-    double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+    double pitch = atan2(-delta.z, sqrt(delta.x * delta.x + delta.y * delta.y));
 
     this->scene->GetUserCamera(0)->SetWorldPose(math::Pose(camPos,
           math::Vector3(0, pitch, yaw)));
@@ -404,8 +403,6 @@ void Heightmap::Load()
       // Split the terrain. Every subterrain will be saved on disk and paged
       this->SplitHeights(this->heights, nTerrains, this->subTerrains);
     }
-
-    std::cout << "Num terrains: " << nTerrains << std::endl;
 
     this->pageManager = OGRE_NEW Ogre::PageManager();
     this->pageManager->setPageProvider(&this->dummyPageProvider);

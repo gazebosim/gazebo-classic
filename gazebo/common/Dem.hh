@@ -26,6 +26,7 @@
 # include <vector>
 
 # include "gazebo/common/HeightmapData.hh"
+# include "gazebo/math/Angle.hh"
 
 namespace gazebo
 {
@@ -66,12 +67,13 @@ namespace gazebo
       public: float GetMaxElevation() const;
 
       /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
-      /// origin.
-      /// \param[out] _xGeo Georeferenced longitude.
-      /// \param[out] _yGeo Georeferenced latitude.
-      public: void GetGeoReferenceOrigin(double &_xGeo, double &_yGeo);
+      /// origin in WGS84.
+      /// \param[out] _latitude Georeferenced latitude.
+      /// \param[out] _longitude Georeferenced longitude.
+      public: void GetGeoReferenceOrigin(math::Angle &_latitude,
+                                         math::Angle &_longitude);
 
-            /// \brief Get the terrain height. Due to the Ogre constrains, this
+      /// \brief Get the terrain height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
       /// different that the original DEM height because GetData() adds the
       /// padding if necessary.
@@ -88,9 +90,11 @@ namespace gazebo
       public: unsigned int GetWidth() const;
 
       /// \brief Get the real world width in meters.
+      /// \return Terrain's real world width in meters.
       public: double GetWorldWidth() const;
 
       /// \brief Get the real world height in meters.
+      /// \return Terrain's real world height in meters.
       public: double GetWorldHeight() const;
 
       /// \brief Create a lookup table of the terrain's height
@@ -107,31 +111,19 @@ namespace gazebo
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
           std::vector<float> &_heights);
 
-      /// \brief Get the distance between two points expressed in geographic
-      /// latitude and longitude.
-      /// Example: _latAdeg = 38.0016667 and _lonAdeg = -123.0016667) represents
-      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
-      /// \param[in] _latAdeg Latitude of point A.
-      /// \param[in] _longAdef Longitude of point A.
-      /// \param[in] _latBdeg Latitude of point B.
-      /// \param[in] _longBdeg Longitude of point B.
-      /// \return Distance in meters.
-      private: double Distance(double _latAdeg, double _lonAdeg,
-                               double _LatBdeg, double _lonBdeg);
-
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
-      /// pixel.
+      /// pixel in WGS84.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
-      /// \param[out] _xGeo Georeferenced longitude.
-      /// \param[out] _yGeo Georeferenced latitude.
+      /// \param[out] _latitude Georeferenced latitude.
+      /// \param[out] _longitude Georeferenced longitude.
       private: void GetGeoReference(double _x, double _y,
-                                    double &_xGeo, double &_yGeo);
+                                    math::Angle &_latitude,
+                                    math::Angle &_longitude);
 
-      /// \brief Get the terrain file as a data array.
-      /// \param[out] _data Pointer to a NULL array of char.
-      /// \param[out] _count The resulting data array size.
-      /// \return 0 when success or -1.
+      /// \brief Get the terrain file as a data array. Due to the Ogre
+      /// constrains, the data might be stored in a bigger vector representing
+      /// a squared terrain with padding.
       private: void LoadData();
 
       /// \brief A set of associated raster bands.
@@ -149,10 +141,10 @@ namespace gazebo
       /// \brief Terrain's side (after the padding).
       private: unsigned int side;
 
-      /// \brief Minimum height in meters.
+      /// \brief Minimum elevation in meters.
       private: double minElevation;
 
-      /// \brief Maximum height in meters.
+      /// \brief Maximum elevation in meters.
       private: double maxElevation;
 
       /// \brief DEM data converted to be OGRE-compatible.

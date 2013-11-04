@@ -191,3 +191,22 @@ math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
   double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
   return math::Vector3(east, north, _xyz.z);
 }
+
+//////////////////////////////////////////////////
+/// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
+double SphericalCoordinates::Distance(const math::Angle &_latA,
+                                      const math::Angle &_lonA,
+                                      const math::Angle &_latB,
+                                      const math::Angle &_lonB)
+{
+  double R = 6371000;
+
+  math::Angle dLat = _latB - _latA;
+  math::Angle dLon = _lonB - _lonA;
+  double a = sin(dLat.Radian() / 2) * sin(dLat.Radian() / 2) +
+             sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
+             cos(_latA.Radian()) * cos(_latB.Radian());
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  double d = R * c;
+  return d;
+}
