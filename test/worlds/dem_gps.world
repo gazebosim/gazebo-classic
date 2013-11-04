@@ -105,7 +105,7 @@
                 <min_height>4</min_height>
                 <fade_dist>5</fade_dist>
               </blend>
-              <uri>file://media/materials/textures/dem_sample_non_squared.tif</uri>
+              <uri>file://media/dem/volcano.tif</uri>
               <size>129 129 0.1</size>
               <pos>0 0 0</pos>
             </heightmap>
