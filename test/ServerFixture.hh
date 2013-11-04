@@ -495,26 +495,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 50;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeoutDS)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing Camera", i);
-
-               i = 0;
-               while (sensors::get_sensor(_cameraName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 50);
+               WaitUntilSensorSpawn(_cameraName, 100, 100);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
@@ -575,26 +557,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 100;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeoutDS)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing RaySensor", i);
-
-               i = 0;
-               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 100);
+               WaitUntilSensorSpawn(_raySensorName, 100, 100);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -656,26 +620,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 100;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeoutDS)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing GpuRaySensor", i);
-
-               i = 0;
-               while (sensors::get_sensor(_raySensorName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 100);
+               WaitUntilSensorSpawn(_raySensorName, 100, 100);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -747,26 +693,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 1000;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < timeoutDS)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing ImuSensor", i);
-
-               i = 0;
-               while (sensors::get_sensor(_imuSensorName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 1000);
+               WaitUntilSensorSpawn(_imuSensorName, 100, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -830,25 +758,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 100;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < timeoutDS)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing ContactSensor", i);
-
-               i = 0;
-               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_name, 100, 100);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
   /// \brief Spawn an IMU sensor on a link
@@ -910,26 +821,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               int timeoutDS = 50;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < timeoutDS)
-               {
-                 common::Time::MSleep(20);
-                 ++i;
-               }
-
-               if (i >= timeoutDS)
-                 this->launchTimeoutFailure(
-                     "while waiting for spawing ImuSensor", i);
-
-               i = 0;
-               while (sensors::get_sensor(_sensorName) == NULL && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               ASSERT_LT(i, 100);
+               WaitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
   /// \brief generate a gtest failure from a timeout error and display a
@@ -988,7 +881,9 @@ class ServerFixture : public testing::Test
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
+
                WaitUntilEntitySpawn(_name, 100, 100);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
   /// \brief Spawn an Wireless receiver sensor on a link
@@ -1039,7 +934,9 @@ class ServerFixture : public testing::Test
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
+
                WaitUntilEntitySpawn(_name, 100, 100);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
   /// \brief Wait for a number of ms. and attempts until the entity is spawned
@@ -1053,6 +950,29 @@ class ServerFixture : public testing::Test
                int i = 0;
                // Wait for the entity to spawn
                while (!this->HasEntity(_name) && i < _retries)
+               {
+                 common::Time::MSleep(_sleepEach);
+                 ++i;
+               }
+               EXPECT_LT(i, _retries);
+
+               if (i >= _retries)
+                 FAIL() << "ServerFixture timeout: max number of retries ("
+                        << _retries
+                        << ") exceeded while awaiting the spawn of " << _name;
+             }
+
+  /// \brief Wait for a number of ms. and attempts until the sensor is spawned
+  /// \param[in] _name Sensor name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilSensorSpawn(const std::string &_name,
+                                     unsigned int _sleepEach,
+                                     int _retries)
+             {
+               int i = 0;
+               // Wait for the sensor to spawn
+               while (!sensors::get_sensor(_name) && i < _retries)
                {
                  common::Time::MSleep(_sleepEach);
                  ++i;
