@@ -542,14 +542,6 @@ math::Quaternion Camera::GetWorldRotation() const
   math::Vector3 sRot, pRot;
 
   sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
-
-  // As far as I can tell, OGRE is broken. It makes a strong assumption
-  // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
-  // out of the screen.
-  // This -1.0 multiplication is a hack to get back the correct orientation.
-  sRot.x *= -1.0;
-
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
 
   return math::Quaternion(sRot.x, pRot.y, sRot.z);
@@ -584,12 +576,8 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   math::Vector3 rpy = _quant.GetAsEuler();
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
 
-  // As far as I can tell, OGRE is broken. It makes a strong assumption
-  // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
-  // out of the screen.
-  // The -1.0 to Roll is a hack to set the correct orientation.
-  s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
+  // Set the roll and yaw.
+  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));

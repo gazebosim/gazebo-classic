@@ -496,6 +496,13 @@ math::Angle GpuRaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
+double GpuRaySensor::GetVerticalAngleResolution() const
+{
+  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+    (this->GetVerticalRangeCount()-1);
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::SetVerticalAngleMax(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
@@ -563,6 +570,12 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     scan->set_angle_min(this->GetAngleMin().Radian());
     scan->set_angle_max(this->GetAngleMax().Radian());
     scan->set_angle_step(this->GetAngleResolution());
+    scan->set_count(this->GetRayCount());
+
+    scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+    scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+    scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+    scan->set_vertical_count(this->GetVerticalRayCount());
 
     scan->set_range_min(this->GetRangeMin());
     scan->set_range_max(this->GetRangeMax());
