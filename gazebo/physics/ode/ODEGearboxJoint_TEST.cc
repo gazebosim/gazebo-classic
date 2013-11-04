@@ -58,7 +58,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   {
     joint1->SetForce(0, -1.5);
     joint3->SetForce(0,  1.0);
-    world->StepWorld(1);
+    world->Step(1);
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->GetSimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
@@ -77,7 +77,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   {
     joint1->SetForce(0, -1.0);
     joint3->SetForce(0,  1.0);
-    world->StepWorld(1);
+    world->Step(1);
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->GetSimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
