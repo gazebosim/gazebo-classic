@@ -37,7 +37,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: GearboxJoint(BasePtr _parent) : T(_parent)
+      public: GearboxJoint(BasePtr _parent) : T(_parent), gearRatio(1.0)
               { this->AddType(Base::GEARBOX_JOINT); }
       /// \brief Destructor
       public: virtual ~GearboxJoint()
@@ -79,6 +79,11 @@ namespace gazebo
                  {
                    T::Init();
                  }
+
+      /// \brief Get gearbox joint gear ratio.
+      /// \return Gear ratio value.
+      public: virtual double GetGearRatio() const
+              { return this->gearRatio; }
 
       /// \brief Set gearbox joint gear ratio.
       ///
