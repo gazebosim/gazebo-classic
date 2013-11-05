@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/physics/ode/ODEGearBoxJoint.hh"
+#include "gazebo/physics/ode/ODEGearboxJoint.hh"
 #include "test/ServerFixture.hh"
 
 #define TOL 1e-6
