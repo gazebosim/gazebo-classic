@@ -145,6 +145,13 @@ void Heightmap::Load()
 
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
+
   msgs::Geometry geomMsg;
   boost::shared_ptr<msgs::Response> response = transport::request(
      this->scene->GetName(), "heightmap_data");
