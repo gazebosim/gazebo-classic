@@ -119,8 +119,10 @@ namespace gazebo
       /// the command "gdalinfo --formats".
       private: void LoadTerrainFile(const std::string &_filename);
 
+      #ifdef HAVE_GDAL
       /// \brief Load a DEM specified by _filename as a terrain file.
       private: void LoadDEMAsTerrain(const std::string &_filename);
+      #endif
 
       /// \brief Load an image specified by _filename as a terrain file.
       private: void LoadImageAsTerrain(const std::string &_filename);

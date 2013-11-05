@@ -79,6 +79,17 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
+{
+  if (this->img.Load(_filename) != 0)
+    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
+
+  this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
+  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+}
+
+#ifdef HAVE_GDAL
+//////////////////////////////////////////////////
 void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
   bool use_true_size = this->sdf->Get<bool>("use_true_size");
@@ -123,17 +134,6 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
-{
-  if (this->img.Load(_filename) != 0)
-    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
-
-  this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
-}
-
-//////////////////////////////////////////////////
-#ifdef HAVE_GDAL
 void HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
   // Register the GDAL drivers
