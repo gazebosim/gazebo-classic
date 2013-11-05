@@ -256,15 +256,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR ("Missing: Convex Collision Library (libccd-dev)")
   endif()
 
-  #pkg_check_modules(FCL fcl>=0.2.9)
-  #if (FCL_FOUND)
-  #  set (HAVE_FCL TRUE)
-  #else()
-  #  set (HAVE_FCL FALSE)
-  #  BUILD_ERROR ("Missing: Flexible Collision Library (libfcl-dev)")
-  #endif()
-
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
