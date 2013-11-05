@@ -17,6 +17,8 @@
 #ifndef __GAZEBO_SPRING_TEST_PLUGIN_HH__
 #define __GAZEBO_SPRING_TEST_PLUGIN_HH__
 
+#include <string>
+
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/gazebo.hh"
@@ -29,7 +31,7 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
 
-    private: void OnUpdate();
+    private: void ExplicitUpdate();
 
     private: event::ConnectionPtr updateConnection;
 
@@ -37,7 +39,23 @@ namespace gazebo
 
     private: common::Time prevUpdateTime;
 
-    private: double k;
+    private: physics::JointPtr jointExplicit;
+    private: std::string jointExplicitName;
+
+    /// \brief simulate spring/damper with ExplicitUpdate function
+    private: double kpExplicit;
+
+    /// \brief simulate spring/damper with ExplicitUpdate function
+    private: double kdExplicit;
+
+    private: physics::JointPtr jointImplicit;
+    private: std::string jointImplicitName;
+
+    /// \brief simulate spring/damper with Joint::SetStiffnessDamping
+    private: double kpImplicit;
+
+    /// \brief simulate spring/damper with Joint::SetStiffnessDamping
+    private: double kdImplicit;
   };
 }
 #endif
