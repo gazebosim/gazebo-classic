@@ -300,21 +300,35 @@ double RaySensor::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRetro(int index)
+double RaySensor::GetRetro(int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  if (this->laserShape)
-    return this->laserShape->GetRetro(index);
-  else
-    return -1;
+  if (this->laserMsg.scan().intensities_size() == 0)
+  {
+    gzwarn << "intensities not constructed yet (zero sized)\n";
+    return 0.0;
+  }
+  if (_index < 0 || _index >= this->laserMsg.scan().intensities_size())
+  {
+    gzerr << "Invalid intensity index[" << _index << "]\n";
+    return 0.0;
+  }
+
+  return this->laserMsg.scan().intensities(_index);
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetFiducial(int index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->laserShape->GetFiducial(index);
+
+  int vIdx = index / this->GetRangeCount();
+  vIdx = vIdx * this->GetVerticalRayCount() / this->GetVerticalRangeCount();
+  int hIdx = index % this->GetRangeCount();
+  hIdx = hIdx * this->GetRayCount() / this->GetRangeCount();
+  int idx = vIdx * this->GetRayCount()  + hIdx;
+  return this->laserShape->GetFiducial(idx);
 }
 
 //////////////////////////////////////////////////
@@ -340,12 +354,12 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   scan->set_angle_min(this->GetAngleMin().Radian());
   scan->set_angle_max(this->GetAngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
-  scan->set_count(this->GetRayCount());
+  scan->set_count(this->GetRangeCount());
 
   scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
   scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
-  scan->set_vertical_count(this->GetVerticalRayCount());
+  scan->set_vertical_count(this->GetVerticalRangeCount());
 
   scan->set_range_min(this->GetRangeMin());
   scan->set_range_max(this->GetRangeMax());
@@ -353,28 +367,103 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   scan->clear_ranges();
   scan->clear_intensities();
 
-  // todo: add loop for vertical range count
-  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
-  for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
+  unsigned int rayCount = this->GetRayCount();
+  unsigned int rangeCount = this->GetRangeCount();
+  unsigned int verticalRayCount = this->GetVerticalRayCount();
+  unsigned int verticalRangeCount = this->GetVerticalRangeCount();
+
+  // Interpolation: for every point in range count, compute interpoated value
+  // using four bounding ray samples.
+  // (vja, hja)   (vja, hjb)
+  //       x---------x
+  //       |         |
+  //       |    o    |
+  //       |         |
+  //       x---------x
+  // (vjb, hja)   (vjb, hjb)
+  // where o: is the range to be interpolated
+  //       x: ray sample
+  //       vja: is the previous index of ray in vertical direction
+  //       vjb: is the next index of ray in vertical direction
+  //       hja: is the previous index of ray in horizontal direction
+  //       hjb: is the next index of ray in horizontal direction
+  unsigned int hja, hjb;
+  unsigned int vja, vjb;
+  // percentage of interpolation between rays
+  double vb, hb;
+  // indices of ray samples
+  int j1, j2, j3, j4;
+  // range values of ray samples
+  double r1, r2, r3, r4;
+
+  // interpolate in vertical direction
+  for (unsigned int j = 0; j < verticalRangeCount; ++j)
   {
-    double range = this->laserShape->GetRange(j * this->GetRayCount() + i);
-    if (this->noiseActive)
+    vb = (verticalRangeCount == 1) ? 0 :
+        static_cast<double>(j * (verticalRayCount - 1))
+        / (verticalRangeCount - 1);
+    vja = static_cast<int>(floor(vb));
+    vjb = std::min(vja + 1, verticalRayCount - 1);
+    vb = vb - floor(vb);
+
+    GZ_ASSERT(vja < verticalRayCount,
+        "Invalid vertical ray index used for interpolation");
+    GZ_ASSERT(vjb < verticalRayCount,
+        "Invalid vertical ray index used for interpolation");
+
+    // interpolate in horizontal direction
+    for (unsigned int i = 0; i < rangeCount; ++i)
     {
-      switch (this->noiseType)
+      hb = (rangeCount == 1)? 0 : static_cast<double>(i * (rayCount - 1))
+          / (rangeCount - 1);
+      hja = static_cast<int>(floor(hb));
+      hjb = std::min(hja + 1, rayCount - 1);
+      hb = hb - floor(hb);
+
+      GZ_ASSERT(hja < rayCount,
+          "Invalid horizontal ray index used for interpolation");
+      GZ_ASSERT(hjb < rayCount,
+          "Invalid horizontal ray index used for interpolation");
+
+      // indices of 4 corners
+      j1 = hja + vja * rayCount;
+      j2 = hjb + vja * rayCount;
+      j3 = hja + vjb * rayCount;
+      j4 = hjb + vjb * rayCount;
+
+      // range readings of 4 corners
+      r1 = this->GetLaserShape()->GetRange(j1);
+      r2 = this->GetLaserShape()->GetRange(j2);
+      r3 = this->GetLaserShape()->GetRange(j3);
+      r4 = this->GetLaserShape()->GetRange(j4);
+      double range = (1-vb)*((1 - hb) * r1 + hb * r2)
+          + vb *((1 - hb) * r3 + hb * r4);
+
+      // intensity is averaged
+      double intensity = 0.25 * (this->GetLaserShape()->GetRetro(j1)
+          + this->GetLaserShape()->GetRetro(j2)
+          + this->GetLaserShape()->GetRetro(j3)
+          + this->GetLaserShape()->GetRetro(j4));
+
+      if (this->noiseActive)
       {
-        case GAUSSIAN:
-          // Add independent (uncorrelated) Gaussian noise to each beam.
-          range += math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
-          // No real laser would return a range outside its stated limits.
-          range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
+        switch (this->noiseType)
+        {
+          case GAUSSIAN:
+            // Add independent (uncorrelated) Gaussian noise to each beam.
+            range +=
+                math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
+            // No real laser would return a range outside its stated limits.
+            range =
+                math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+            break;
+          default:
+            GZ_ASSERT(false, "Invalid noise model type");
+        }
       }
+      scan->add_ranges(range);
+      scan->add_intensities(intensity);
     }
-    scan->add_ranges(range);
-    scan->add_intensities(
-        this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
 
   if (this->scanPub && this->scanPub->HasConnections())

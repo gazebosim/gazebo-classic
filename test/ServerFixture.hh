@@ -524,7 +524,8 @@ class ServerFixture : public testing::Test
                  double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
                  double _minRange = 0.08, double _maxRange = 10,
                  double _rangeResolution = 0.01, unsigned int _samples = 640,
-                 unsigned int _vSamples = 1,
+                 unsigned int _vSamples = 1, double _hResolution = 1.0,
+                 double _vResolution = 1.0,
                  const std::string &_noiseType = "", double _noiseMean = 0.0,
                  double _noiseStdDev = 0.0)
              {
@@ -550,13 +551,13 @@ class ServerFixture : public testing::Test
                  << "      <scan>"
                  << "        <horizontal>"
                  << "          <samples>" << _samples << "</samples>"
-                 << "          <resolution> 1 </resolution>"
+                 << "          <resolution>" << _hResolution << "</resolution>"
                  << "          <min_angle>" << _hMinAngle << "</min_angle>"
                  << "          <max_angle>" << _hMaxAngle << "</max_angle>"
                  << "        </horizontal>"
                  << "        <vertical>"
                  << "          <samples>" << _vSamples << "</samples>"
-                 << "          <resolution> 1 </resolution>"
+                 << "          <resolution>" << _vResolution << "</resolution>"
                  << "          <min_angle>" << _vMinAngle << "</min_angle>"
                  << "          <max_angle>" << _vMaxAngle << "</max_angle>"
                  << "        </vertical>"
