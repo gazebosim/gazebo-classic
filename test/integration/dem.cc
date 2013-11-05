@@ -27,6 +27,7 @@ class Dem_TEST : public ServerFixture
 {
 };
 
+#ifdef HAVE_GDAL
 /////////////////////////////////////////////////
 /// \brief Test the integration between GPS and a DEM terrain.
 TEST_F(Dem_TEST, GPS)
@@ -62,6 +63,7 @@ TEST_F(Dem_TEST, GPS)
   EXPECT_NEAR(sensor->GetLongitude().Degree(), longitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->GetAltitude(), elevation, 1);
 }
+#endif
 
 int main(int argc, char **argv)
 {
