@@ -306,7 +306,7 @@ double RaySensor::GetRetro(int _index)
 
   if (this->laserMsg.scan().intensities_size() == 0)
   {
-    gzwarn << "intensities not constructed yet (zero sized)\n";
+    gzwarn << "Intensities not constructed yet (zero size)\n";
     return 0.0;
   }
   if (_index < 0 || _index >= this->laserMsg.scan().intensities_size())
