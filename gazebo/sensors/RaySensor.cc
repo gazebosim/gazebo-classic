@@ -319,13 +319,13 @@ double RaySensor::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int RaySensor::GetFiducial(int index)
+int RaySensor::GetFiducial(int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  int vIdx = index / this->GetRangeCount();
+  int vIdx = _index / this->GetRangeCount();
   vIdx = vIdx * this->GetVerticalRayCount() / this->GetVerticalRangeCount();
-  int hIdx = index % this->GetRangeCount();
+  int hIdx = _index % this->GetRangeCount();
   hIdx = hIdx * this->GetRayCount() / this->GetRangeCount();
   int idx = vIdx * this->GetRayCount()  + hIdx;
   return this->laserShape->GetFiducial(idx);
