@@ -80,6 +80,11 @@ namespace gazebo
                    T::Init();
                  }
 
+      /// \brief Get gearbox joint gear ratio.
+      /// \return Gear ratio value.
+      public: virtual double GetGearRatio() const
+              { return this->gearRatio; }
+
       /// \brief Set gearbox joint gear ratio.
       ///
       /// This must be implemented in a child class

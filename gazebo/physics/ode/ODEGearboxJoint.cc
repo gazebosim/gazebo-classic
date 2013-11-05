@@ -73,6 +73,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetGearRatio(double _gearRatio)
 {
+  this->gearRatio = _gearRatio;
   dJointSetGearboxRatio(this->jointId, _gearRatio);
 }
 
