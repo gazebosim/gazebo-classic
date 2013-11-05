@@ -356,12 +356,15 @@ dReal dJointGetHingeAngle( dJointID j )
                                    joint->axis1,
                                    joint->qrel );
         // from angle, update cumulative_angle, which does not wrap
-        joint->cumulative_angle =
+        // dJointGetHingeAngle is static, so do not overwrite
+        // joint->cumulative_angle by updated joint angle.
+        // Simply calculate the current angle and return it.
+        dReal joint_angle =
           dShortestAngularDistanceUpdate(joint->cumulative_angle,ang);
         if ( joint->flags & dJOINT_REVERSE )
-            return -joint->cumulative_angle;
+            return -joint_angle;
         else
-            return joint->cumulative_angle;
+            return joint_angle;
     }
     else return 0;
 }
