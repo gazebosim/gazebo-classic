@@ -133,7 +133,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   // scene_info
   // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, true);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->sdf.reset(new sdf::Element);
