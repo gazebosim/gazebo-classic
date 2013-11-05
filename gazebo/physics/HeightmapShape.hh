@@ -117,14 +117,17 @@ namespace gazebo
       /// format might be an image or a DEM file. libgdal is required to enable
       /// DEM support. For a list of all raster formats supported you can type
       /// the command "gdalinfo --formats".
+      /// \param[in] _filename The path to the terrain file.
       private: void LoadTerrainFile(const std::string &_filename);
 
       #ifdef HAVE_GDAL
       /// \brief Load a DEM specified by _filename as a terrain file.
+      /// \param[in] _filename The path to the terrain file.
       private: void LoadDEMAsTerrain(const std::string &_filename);
       #endif
 
       /// \brief Load an image specified by _filename as a terrain file.
+      /// \param[in] _filename The path to the terrain file.
       private: void LoadImageAsTerrain(const std::string &_filename);
 
       /// \brief Handle request messages.
