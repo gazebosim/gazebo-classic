@@ -20,30 +20,24 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_JOINTS_H_
-#define _ODE_JOINTS_H_
+#ifndef _ODE_JOINT_DHINGE_
+#define _ODE_JOINT_DHINGE_
 
-#include <ode/common.h>
-
-#include "joint.h"
-
-#include "ball.h"
-#include "hinge.h"
-#include "slider.h"
-#include "screw.h"
 #include "dball.h"
-#include "dhinge.h"
-#include "gearbox.h"
-#include "contact.h"
-#include "universal.h"
-#include "hinge2.h"
-#include "fixed.h"
-#include "null.h"
-#include "amotor.h"
-#include "lmotor.h"
-#include "plane2d.h"
-#include "pu.h"
-#include "pr.h"
-#include "piston.h"
+
+struct dxJointDHinge : public dxJointDBall 
+{
+    dVector3 axis1, axis2;
+    
+    dxJointDHinge(dxWorld *w);
+
+    virtual void getSureMaxInfo( SureMaxInfo* info );
+    virtual void getInfo1( Info1* info );
+    virtual void getInfo2( dReal worldFPS, dReal worldERP, const Info2* info );
+    virtual dJointType type() const;
+    virtual size_t size() const;
+
+};
+
 
 #endif
