@@ -92,21 +92,19 @@ void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
 //////////////////////////////////////////////////
 void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
-  bool use_true_size = this->sdf->Get<bool>("use_true_size");
-
   if (this->dem.Load(_filename) != 0)
     gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
 
-  if (use_true_size)
+  if (this->sdf->HasElement("size"))
+  {
+    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  }
+  else
   {
     this->heightmapSize.x = this->dem.GetWorldWidth();
     this->heightmapSize.y = this->dem.GetWorldHeight();
     this->heightmapSize.z = this->dem.GetMaxElevation() -
         std::max(0.0f, this->dem.GetMinElevation());
-  }
-  else
-  {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->dem);
