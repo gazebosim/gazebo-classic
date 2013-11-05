@@ -109,28 +109,28 @@ namespace gazebo
                 GEARBOX_JOINT   = 0x00002000,
 
                 /// \brief Shape type
-                SHAPE           = 0x00002000,
+                SHAPE           = 0x00010000,
                 /// \brief BoxShape type
-                BOX_SHAPE       = 0x00004000,
+                BOX_SHAPE       = 0x00020000,
                 /// \brief CylinderShape type
-                CYLINDER_SHAPE  = 0x00008000,
+                CYLINDER_SHAPE  = 0x00040000,
                 /// \brief HeightmapShape type
-                HEIGHTMAP_SHAPE = 0x00010000,
+                HEIGHTMAP_SHAPE = 0x00080000,
                 /// \brief MapShape type
-                MAP_SHAPE       = 0x00020000,
+                MAP_SHAPE       = 0x00100000,
                 /// \brief MultiRayShape type
-                MULTIRAY_SHAPE  = 0x00040000,
+                MULTIRAY_SHAPE  = 0x00200000,
                 /// \brief RayShape type
-                RAY_SHAPE       = 0x00080000,
+                RAY_SHAPE       = 0x00400000,
                 /// \brief PlaneShape type
-                PLANE_SHAPE     = 0x00100000,
+                PLANE_SHAPE     = 0x00800000,
                 /// \brief SphereShape type
-                SPHERE_SHAPE    = 0x00200000,
+                SPHERE_SHAPE    = 0x01000000,
                 /// \brief MeshShape type
-                MESH_SHAPE   = 0x00400000,
+                MESH_SHAPE      = 0x02000000,
 
                 /// \brief Indicates a collision shape used for sensing
-                SENSOR_COLLISION   = 0x00800000
+                SENSOR_COLLISION = 0x10000000
               };
 
       /// \brief Constructor
