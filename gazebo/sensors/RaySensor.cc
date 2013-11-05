@@ -372,7 +372,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   unsigned int verticalRayCount = this->GetVerticalRayCount();
   unsigned int verticalRangeCount = this->GetVerticalRangeCount();
 
-  // Interpolation: for every point in range count, compute interpoated value
+  // Interpolation: for every point in range count, compute interpolated value
   // using four bounding ray samples.
   // (vja, hja)   (vja, hjb)
   //       x---------x
