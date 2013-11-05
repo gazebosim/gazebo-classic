@@ -99,10 +99,10 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (use_true_size)
   {
-    this->heightmapSize.x = dem.GetWorldWidth();
-    this->heightmapSize.y = dem.GetWorldHeight();
-    this->heightmapSize.z = dem.GetMaxElevation() -
-        std::max(0.0f, dem.GetMinElevation());
+    this->heightmapSize.x = this->dem.GetWorldWidth();
+    this->heightmapSize.y = this->dem.GetWorldHeight();
+    this->heightmapSize.z = this->dem.GetMaxElevation() -
+        std::max(0.0f, this->dem.GetMinElevation());
   }
   else
   {
@@ -121,8 +121,8 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
     math::Angle latitude, longitude;
     double elevation;
 
-    dem.GetGeoReferenceOrigin(latitude, longitude);
-    elevation = dem.GetElevation(0.0, 0.0);
+    this->dem.GetGeoReferenceOrigin(latitude, longitude);
+    elevation = this->dem.GetElevation(0.0, 0.0);
 
     sphericalCoordinates->SetLatitudeReference(latitude);
     sphericalCoordinates->SetLongitudeReference(longitude);
