@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -695,4 +695,11 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   meshSdf->GetElement("filename")->Set(this->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
+}
+
+//////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),
+  translated(false)
+{
 }

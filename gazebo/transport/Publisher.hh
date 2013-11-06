@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <list>
 #include <map>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo

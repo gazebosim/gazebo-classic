@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->clearModels = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
@@ -563,14 +564,23 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (this->clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
 void World::StepWorld(int _steps)
 {
+  this->Step(_steps);
+}
+
+//////////////////////////////////////////////////
+void World::Step(unsigned int _steps)
+{
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    gzwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
@@ -710,7 +720,27 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  this->clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  this->clearModels = false;
+  bool pauseState = this->IsPaused();
+  this->SetPaused(true);
+
+  this->publishModelPoses.clear();
+
+  // Remove all models
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    this->rootElement->RemoveChild((*iter)->GetId());
+  }
+  this->models.clear();
+
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
@@ -1945,6 +1975,12 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+uint32_t World::GetIterations() const
+{
+  return this->iterations;
 }
 
 //////////////////////////////////////////////////

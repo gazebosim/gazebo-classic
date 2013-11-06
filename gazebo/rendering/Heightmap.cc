@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,6 +451,13 @@ void Heightmap::ConfigureTerrainDefaults()
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
   this->terrainGlobals->setCompositeMapDistance(2000);
+
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
 
   // Get the first directional light
   LightPtr directionalLight;
@@ -2786,4 +2793,3 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
-
