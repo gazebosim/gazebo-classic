@@ -1754,11 +1754,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
               dReal *invMOI_ptr1 = invMOI + b1 * 12;
               dReal *MOI_ptr1 = MOI + b1 * 12;
 
-              // ode seems to leave these values uninitialized, unused too
-              // MOI_ptr1[0*4+3] = 0.0;
-              // MOI_ptr1[1*4+3] = 0.0;
-              // MOI_ptr1[2*4+3] = 0.0;
-
 #ifdef DEBUG_INERTIA_PROPAGATION
               printf("--------old MOI-----------\n");
               printf("MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
@@ -1767,30 +1762,18 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
 #endif
 
-              // compute scalar MOI in line with S:
+              // compute scalar MOI in line with S, where S is a unit vector in the constraint direction:
               //   moi_S = S' * I * S
               dVector3 S = // line about which we want to compute MOI along
                    { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
+              dNormalize3(S);
               dVector3 tmp31;
               dMultiply0_133(tmp31, S, MOI_ptr1);
               dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
 
-              // dMatrix3 tmp33;
-
-              // dMultiply2_333 (tmp33,invMOI_ptr1,RJ1a);
-              // dMultiply0_333 (invMOI_ptr1,RJ1a,tmp33);
-
-              // dMultiply2_333 (tmp33,MOI_ptr1,RJ1a);
-              // dMultiply0_333 (MOI_ptr1,RJ1a,tmp33);
-
               // get MOI from body 2
               dReal *invMOI_ptr2 = invMOI + b2 * 12;
               dReal *MOI_ptr2 = MOI + b2 * 12;
-
-              // ode seems to leave these values uninitialized, unused too
-              // MOI_ptr2[0*4+3] = 0.0;
-              // MOI_ptr2[1*4+3] = 0.0;
-              // MOI_ptr2[2*4+3] = 0.0;
 
 #ifdef DEBUG_INERTIA_PROPAGATION
               printf("MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
@@ -1813,12 +1796,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
               //   RJ1a[2*4+0],RJ1a[2*4+1],RJ1a[2*4+2],RJ1a[2*4+3]);
               printf("MOI2 b2[%d] S[%f %f %f] = %g\n",b2, S[0], S[1], S[2], moi_S2);
 #endif
-
-              // dMultiply2_333 (tmp33,invMOI_ptr2,RJ1a);
-              // dMultiply0_333 (invMOI_ptr2,RJ1a,tmp33);
-
-              // dMultiply2_333 (tmp33,MOI_ptr2,RJ1a);
-              // dMultiply0_333 (MOI_ptr2,RJ1a,tmp33);
 
               // full MOI tensor for S needs matrix outer product of S:
               //   SS = [ S * S' ]
@@ -1843,37 +1820,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 SS[1*4+0],SS[1*4+1],SS[1*4+2],SS[1*4+3],
                 SS[2*4+0],SS[2*4+1],SS[2*4+2],SS[2*4+3]);
 #endif
-
-              // get max ratio between matrices coupled through SS
-              //  MOI_ptr1[0*4+0] =
-              //  MOI_ptr1[0*4+1] =
-              //  MOI_ptr1[0*4+2] =
-
-              //  MOI_ptr1[1*4+0] = MOI_ptr1[0*4+1];
-              //  MOI_ptr1[1*4+1] =
-              //  MOI_ptr1[1*4+2] =
-
-              //  MOI_ptr1[2*4+0] = MOI_ptr1[0*4+2];
-              //  MOI_ptr1[2*4+1] = MOI_ptr1[1*4+2];
-              //  MOI_ptr1[2*4+2] =
-
-              //  MOI_ptr2[0*4+0] =
-              //  MOI_ptr2[0*4+1] =
-              //  MOI_ptr2[0*4+2] =
-
-              //  MOI_ptr2[1*4+0] = MOI_ptr2[0*4+1];
-              //  MOI_ptr2[1*4+1] =
-              //  MOI_ptr2[1*4+2] =
-
-              //  MOI_ptr2[2*4+0] = MOI_ptr2[0*4+2];
-              //  MOI_ptr2[2*4+1] = MOI_ptr2[1*4+2];
-              //  MOI_ptr2[2*4+2] =
-
-              //  for (int si = 0; si < 12; ++si)
-              //  {
-              //    MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
-              //    MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
-              //  }
 
               // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
               dReal moi_sum = (moi_S1 + moi_S2);
@@ -1900,7 +1846,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 printf(" original    S1 [%g] S2 [%g]\n", moi_S1, moi_S2);
                 printf(" distributed S1 [%g] S2 [%g]\n", moi_S1_new, moi_S2_new);
 #endif
-                // sum off-diagonals terms (to check diagonal dominantness)
+                // sum off-diagonals terms (to check diagonal dominance)
                 dReal sumAbsOffDiags1[4];
                 dReal sumAbsOffDiags2[4];
                 dSetZero(sumAbsOffDiags1,4);
@@ -1942,7 +1888,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                       MOI_ptr1[si] = m1;
                     else
                     {
-                      /// \FIXME: increase diagonal dominantness to preserve stability,
+                      /// \FIXME: increase diagonal dominance to preserve stability,
                       /// but this makes constraint "soft"
                       MOI_ptr1[si] = sumAbsOffDiags1[row];
                       // printf("\n***************** si[%d] MOI_ptr1[%g]  *****************\n\n", si, MOI_ptr1[si]);
@@ -1953,7 +1899,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                       MOI_ptr2[si] = m2;
                     else
                     {
-                      /// \FIXME: increase diagonal dominantness to preserve stability,
+                      /// \FIXME: increase diagonal dominance to preserve stability,
                       /// but this makes constraint "soft"
                       MOI_ptr2[si] = sumAbsOffDiags2[row];
                       // printf("\n***************** si[%d] MOI_ptr2[%g]  *****************\n\n", si, MOI_ptr2[si]);
@@ -2025,7 +1971,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 #endif
 
 #ifdef DEBUG_INERTIA_PROPAGATION
-                // check diagonally-dominant-ness
+                // check if diagonally-dominant
                 if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
                   printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
                 if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
