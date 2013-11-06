@@ -390,8 +390,9 @@ void Heightmap::Load()
     double yaw = atan2(delta.y, delta.x);
     double pitch = atan2(-delta.z, sqrt(delta.x * delta.x + delta.y * delta.y));
 
-    this->scene->GetUserCamera(0)->SetWorldPose(math::Pose(camPos,
-          math::Vector3(0, pitch, yaw)));
+    UserCameraPtr userCam = this->scene->GetUserCamera(0);
+    if (userCam)
+      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
   }
 
   if (this->useTerrainPaging)
