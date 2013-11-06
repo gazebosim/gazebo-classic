@@ -1,5 +1,17 @@
 ## Gazebo 2.0 to 3.0
 
+### New Deprecations
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void ApplyDamping()
+    + ***Replacement*** virtual void ApplyStiffnessDamping()
+    ---
+    + ***Deprecation*** double GetDampingCoefficient() const
+    + ***Replacement*** double GetDamping(int _index)
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** void CFMDamping()
+    + ***Replacement*** void ApplyImplicitStiffnessDamping()
+
 ### Modifications
 
 1. **gazebo/common/ModelDatabase.hh** `API change`
@@ -7,10 +19,21 @@
     + ***Replacement:*** boost::shared_ptr<bool> ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
     + ***Note:*** The replacement function requires that the returned bool shared pointer remain valid in order to receive the GetModels callback. Reset the bool shared pointer to stop receiving GetModels callback.
 
+### Additions
+
+1. **gazebo/physics/Joint.hh**
+    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+
+### Deletions
+
 ## Gazebo 1.9 to 2.0
 
 ### New Deprecations
 
+1. **gazebo/physics/World.hh**
+    + ***Deprecation*** void World::StepWorld(int _steps)
+    + ***Replacement*** void World::Step(unsigned int _steps)
 1. **gazebo/sensors/SensorsIface.hh**
     + ***Deprecation*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName,const std::string &_parentName)
     + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId);

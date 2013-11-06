@@ -23,7 +23,6 @@ set (sources
   Console.cc
   Event.cc
   Events.cc
-  EventPrivate.cc
   Exception.cc
   Image.cc
   KeyFrame.cc

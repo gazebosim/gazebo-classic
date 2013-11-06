@@ -299,7 +299,6 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
       }
       this->deprecatedCallbacks.clear();
 
-      std::cout << "ConnectionCOunt[" << this->modelDBUpdated.ConnectionCount() << "]\n";
       this->modelDBUpdated(this->modelCache);
 
       /*

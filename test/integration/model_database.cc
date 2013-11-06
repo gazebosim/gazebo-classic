@@ -35,26 +35,23 @@ class ModelDatabaseTest : public ServerFixture
 
 void OnModels(const std::map<std::string, std::string> & /*_models*/)
 {
-  printf("OnModels\n");
   g_onModels++;
   g_Connection.reset();
 }
 
 void OnModels1(const std::map<std::string, std::string> & /*_models*/)
 {
-  printf("OnModels 1\n");
   g_onModels1++;
 }
 
 void OnModels2(const std::map<std::string, std::string> & /*_models*/)
 {
-  printf("OnModels 2\n");
   g_onModels2++;
 }
 
 /////////////////////////////////////////////////
 // Check the the first callback is called once, and the second twice
-/*TEST_F(ModelDatabaseTest, GetModels)
+TEST_F(ModelDatabaseTest, GetModels)
 {
   g_onModels = 0;
   g_onModels1 = 0;
@@ -103,7 +100,7 @@ TEST_F(ModelDatabaseTest, GetModelsTwice)
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 2);
 }
-*/
+
 /////////////////////////////////////////////////
 // Check that the second and third callbacks are received three times
 TEST_F(ModelDatabaseTest, GetModelsThrice)
@@ -123,10 +120,8 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   g_Connection2 = common::ModelDatabase::Instance()->GetModels(
         boost::bind(&OnModels2, _1));
 
-  printf("Waiting 1\n");
   while (g_onModels == 0 || g_onModels1 == 0 || g_onModels2 == 0)
   {
-    std::cout << "One[" << g_onModels << "] Two[" << g_onModels1 << "] Three[" << g_onModels2 << "]\n";
     common::Time::MSleep(1000);
   }
 
@@ -137,7 +132,6 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   common::ModelDatabase::Instance()->GetModels(
       boost::bind(&OnModels, _1));
 
-  printf("Waiting 2\n");
   while (g_onModels1 == 1 || g_onModels2 == 1)
     common::Time::MSleep(500);
 
@@ -151,7 +145,6 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   common::ModelDatabase::Instance()->GetModels(
       boost::bind(&OnModels, _1));
 
-  printf("Waiting 3\n");
   while (g_onModels2 == 2)
     common::Time::MSleep(500);
 
