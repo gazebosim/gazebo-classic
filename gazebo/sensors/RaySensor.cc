@@ -323,6 +323,10 @@ int RaySensor::GetFiducial(int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
+  // Convert range index to ray index.
+  // Find vertical/horizontal range indices (vIdx, hIdx) and mulitply
+  // by the ratio of ray count to range count to get the vertical/horizontal
+  // ray indices, which are then used to compute the final index into ray array.
   int vIdx = _index / this->GetRangeCount();
   vIdx = vIdx * this->GetVerticalRayCount() / this->GetVerticalRangeCount();
   int hIdx = _index % this->GetRangeCount();
