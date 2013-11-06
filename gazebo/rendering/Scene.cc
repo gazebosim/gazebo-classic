@@ -270,6 +270,8 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
+  // Create Sky. This initializes SkyX, and makes it invisible. A Sky
+  // message must be received (via a scene message or on the ~/sky topic).
   this->SetSky();
 
   // Create Fog
@@ -1328,6 +1330,13 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
+  // Process the sky message.
+  if (_msg->has_sky())
+  {
+    boost::shared_ptr<msgs::Sky> sm(new msgs::Sky(_msg->sky()));
+    this->OnSkyMsg(sm);
+  }
+
   if (_msg->has_fog())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("fog");
@@ -2314,6 +2323,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->skyx)
     return;
+
+  this->skyx->setVisible(true);
+
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
@@ -2450,6 +2462,7 @@ void Scene::SetSky()
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 
   this->skyx->update(0);
+  this->skyx->setVisible(false);
 }
 
 /////////////////////////////////////////////////
