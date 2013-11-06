@@ -45,10 +45,6 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Set joint damping, not yet implemented
-      /// \sa Hinge2Joint::SetDamping
-      public: virtual void SetDamping(int _index, double _damping);
-
       // Documentation inherited.
       public: virtual void Init();
 

@@ -642,7 +642,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   if (this->GetJoint(joint->GetScopedName()) != NULL)
   {
     gzerr << "can't have two joint with the same name\n";
-    gzthrow("can't have two joint with the same name");
+    gzthrow("can't have two joints with the same name ["+
+      joint->GetScopedName() + "]\n");
   }
 
   this->joints.push_back(joint);
