@@ -50,8 +50,8 @@ namespace gazebo
       /// \brief Initialize the connection manager.
       /// \param[in] _masterHost Host where the master is running.
       /// \param[in] _masterPort Port where the master is running.
-      /// \param[in] _timeoutIterations Number of times to wait for.
-      /// a connection to master..
+      /// \param[in] _timeoutIterations Number of times to wait for
+      /// a connection to master.
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
                         unsigned int _masterPort,
