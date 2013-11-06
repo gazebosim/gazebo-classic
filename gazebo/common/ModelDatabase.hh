@@ -24,6 +24,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -77,7 +78,7 @@ namespace gazebo
       /// models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: boost::shared_ptr<bool> GetModels(boost::function<
+      public: event::ConnectionPtr  GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.
@@ -190,8 +191,8 @@ namespace gazebo
 
       /// \brief Triggered when the model data has been updated after
       /// calling ModelDatabase::GetModels()
-      private: static EventT<
-              void (std::map<std::string, std::string>)> modelDBUpdated;
+      private: event::EventT<
+               void (std::map<std::string, std::string>)> modelDBUpdated;
     };
   }
 }

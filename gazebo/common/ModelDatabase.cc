@@ -299,7 +299,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
       }
       this->deprecatedCallbacks.clear();
 
-      events::Event::modelDBUpdated(this->modelCache);
+      std::cout << "ConnectionCOunt[" << this->modelDBUpdated.ConnectionCount() << "]\n";
+      this->modelDBUpdated(this->modelCache);
 
       /*
       std::list<std::pair<boost::shared_ptr<bool>, CallbackFunc> >::iterator
@@ -380,11 +381,12 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 }*/
 
 /////////////////////////////////////////////////
-ConnectionPtr ModelDatabase::GetModels(
+event::ConnectionPtr ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
-  return modelDBUpdated.Connect(_func);
+  boost::mutex::scoped_lock lock2(this->callbacksMutex);
   this->updateCacheCondition.notify_one();
+  return this->modelDBUpdated.Connect(_func);
 }
 
 /////////////////////////////////////////////////

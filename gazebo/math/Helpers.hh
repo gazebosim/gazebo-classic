@@ -44,6 +44,12 @@
 /// \brief 32bit unsigned integer minimum value
 #define GZ_UINT32_MIN std::numeric_limits<uint32_t>::min()
 
+/// \brief 32bit integer maximum value
+#define GZ_INT32_MAX std::numeric_limits<int32_t>::max()
+
+/// \brief 32bit integer minimum value
+#define GZ_INT32_MIN std::numeric_limits<int32_t>::min()
+
 
 namespace gazebo
 {

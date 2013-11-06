@@ -21,6 +21,7 @@
 #include <map>
 #include <boost/thread/mutex.hpp>
 
+#include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
 
 class QTreeWidget;
@@ -81,7 +82,7 @@ namespace gazebo
       private: QFileSystemWatcher *watcher;
 
       /// \brief Callback reference count for retreiving models.
-      private: boost::shared_ptr<bool> getModelsCBRef;
+      private: event::ConnectionPtr getModelsConnection;
     };
   }
 }
