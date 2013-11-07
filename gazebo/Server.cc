@@ -47,7 +47,8 @@
 namespace po = boost::program_options;
 using namespace gazebo;
 
-bool Server::stop = true;
+bool Server::stop = false;
+static bool g_initialized = false;
 
 /////////////////////////////////////////////////
 Server::Server()
@@ -266,7 +267,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->stop && !transport::is_stopped();
+  return g_initialized && !this->stop && !transport::is_stopped();
 }
 
 /////////////////////////////////////////////////
@@ -409,7 +410,7 @@ void Server::Init()
   sensors::init();
 
   physics::init_worlds();
-  this->stop = false;
+  g_initialized = true;
 }
 
 /////////////////////////////////////////////////
