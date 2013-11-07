@@ -18,6 +18,7 @@
 #define _INSERT_MODEL_WIDGET_HH_
 
 #include <string>
+#include <map>
 
 #include "gazebo/gui/qt.h"
 

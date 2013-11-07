@@ -116,7 +116,8 @@ void InsertModelWidget::Update()
     if (!this->dataPtr->modelBuffer.empty())
     {
       for (std::map<std::string, std::string>::const_iterator iter =
-          this->dataPtr->modelBuffer.begin(); iter != this->dataPtr->modelBuffer.end(); ++iter)
+          this->dataPtr->modelBuffer.begin();
+          iter != this->dataPtr->modelBuffer.end(); ++iter)
       {
         // Add a child item for the model
         QTreeWidgetItem *childItem = new QTreeWidgetItem(

@@ -62,6 +62,7 @@ size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
 
 /////////////////////////////////////////////////
 ModelDatabase::ModelDatabase()
+  : dataPtr(new ModelDatabasePrivate)
 {
   this->dataPtr->updateCacheThread = NULL;
   this->Start();
