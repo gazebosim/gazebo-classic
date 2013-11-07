@@ -1453,9 +1453,9 @@ struct dJointWithInfo1
 };
 
 //***************************************************************************
-// Mofifying inertia without modifying dynamics,
-// Except in the case where moment of inertia modification makes the system unstable,
-// diagonal terms are increased to make moi diagonally dominant.
+// Modifying inertia without modifying dynamics,
+// Unless moment of inertia modification makes the system unstable,
+// in which case, diagonal terms are increased to make moi diagonally dominant.
 static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,
                             dRealMutablePtr invMOI, dRealMutablePtr MOI)
