@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
  * limitations under the License.
  *
  */
-#include "gazebo_config.h"
+#include <sdf/sdf.hh>
+
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -28,15 +30,13 @@
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
@@ -46,8 +46,8 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/model/ModelEditor.hh"
 
-#include "sdf/sdf.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -106,7 +106,6 @@ MainWindow::MainWindow()
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
-  this->logPlay = new LogPlayWidget(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -133,11 +132,8 @@ MainWindow::MainWindow()
 
   mainLayout->setSpacing(0);
   mainLayout->addLayout(centerLayout, 1);
-  mainLayout->addWidget(this->logPlay);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
-
-  this->logPlay->hide();
 
   mainWidget->setLayout(mainLayout);
 
@@ -167,6 +163,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
       gui::Events::ConnectInputStepSize(
       boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
+
+  this->connections.push_back(
+      gui::Events::ConnectFollow(
+        boost::bind(&MainWindow::OnFollow, this, _1)));
 
   gui::ViewFactory::RegisterAll();
 
@@ -205,8 +205,6 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->serverControlSub = this->node->Subscribe("/gazebo/server/status",
-        &MainWindow::OnServerStatus, this);
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
@@ -290,23 +288,6 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OpenLog()
-{
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Open log file"), "",
-      tr("SDF Files (*.log)")).toStdString();
-
-  if (!filename.empty())
-  {
-    msgs::ServerControl msg;
-    msg.set_open_log_filename(filename);
-    this->serverControlPub->Publish(msg);
-
-    this->logPlay->show();
   }
 }
 
@@ -506,6 +487,22 @@ void MainWindow::OnInputStepSizeChanged(int _value)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnFollow(const std::string &_modelName)
+{
+  if (_modelName.empty())
+  {
+    this->renderWidget->DisplayOverlayMsg("", 0);
+    this->editMenu->setEnabled(true);
+  }
+  else
+  {
+    this->renderWidget->DisplayOverlayMsg(
+        "Press Escape to exit Follow mode", 0);
+    this->editMenu->setEnabled(false);
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::NewModel()
 {
   /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
@@ -549,6 +546,12 @@ void MainWindow::Translate()
 void MainWindow::Rotate()
 {
   gui::Events::manipMode("rotate");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Scale()
+{
+  gui::Events::manipMode("scale");
 }
 
 /////////////////////////////////////////////////
@@ -777,11 +780,6 @@ void MainWindow::CreateActions()
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  g_openLogAct = new QAction(tr("&Open Log"), this);
-  g_openLogAct->setShortcut(tr("Ctrl+L"));
-  g_openLogAct->setStatusTip(tr("Open an log file"));
-  connect(g_openLogAct, SIGNAL(triggered()), this, SLOT(OpenLog()));
-
   /*g_importAct = new QAction(tr("&Import Mesh"), this);
   g_importAct->setShortcut(tr("Ctrl+I"));
   g_importAct->setStatusTip(tr("Import a Collada mesh"));
@@ -837,20 +835,16 @@ void MainWindow::CreateActions()
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
 
+  g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
+  g_editModelAct->setShortcut(tr("Ctrl+M"));
+  g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
+  g_editModelAct->setCheckable(true);
+  g_editModelAct->setChecked(false);
+
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
-  QIcon icon = g_stepAct->icon();
-
-  // step action's icon is already in gray scale so there is no change in
-  // appearance when it is disabled. So create a custom semi-transparent
-  // icon for the disabled state.
-  QPixmap pixmap(":/images/end.png");
-  QPainter p(&pixmap);
-  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
-  icon.addPixmap(pixmap, QIcon::Disabled);
-  g_stepAct->setIcon(icon);
+  this->CreateDisabledIcon(":/images/end.png", g_stepAct);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
@@ -872,23 +866,36 @@ void MainWindow::CreateActions()
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
-      tr("Translation Mode"), this);
+      tr("&Translation Mode"), this);
   g_translateAct->setStatusTip(tr("Translate an object"));
   g_translateAct->setCheckable(true);
   g_translateAct->setChecked(false);
+  g_translateAct->setToolTip(tr("Translation Mode (T)"));
   connect(g_translateAct, SIGNAL(triggered()), this, SLOT(Translate()));
+  this->CreateDisabledIcon(":/images/translate.png", g_translateAct);
 
   g_rotateAct = new QAction(QIcon(":/images/rotate.png"),
       tr("Rotation Mode"), this);
   g_rotateAct->setStatusTip(tr("Rotate an object"));
   g_rotateAct->setCheckable(true);
   g_rotateAct->setChecked(false);
+  g_rotateAct->setToolTip(tr("Rotation Mode (R)"));
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
+  this->CreateDisabledIcon(":/images/rotate.png", g_rotateAct);
+
+  g_scaleAct = new QAction(QIcon(":/images/scale.png"),
+      tr("Scale Mode"), this);
+  g_scaleAct->setStatusTip(tr("Scale an object"));
+  g_scaleAct->setCheckable(true);
+  g_scaleAct->setChecked(false);
+  g_scaleAct->setToolTip(tr("Scale Mode (S)"));
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));
   g_boxCreateAct->setCheckable(true);
   connect(g_boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
+  this->CreateDisabledIcon(":/images/box.png", g_boxCreateAct);
 
   g_sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
       tr("Sphere"), this);
@@ -896,6 +903,7 @@ void MainWindow::CreateActions()
   g_sphereCreateAct->setCheckable(true);
   connect(g_sphereCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSphere()));
+  this->CreateDisabledIcon(":/images/sphere.png", g_sphereCreateAct);
 
   g_cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Cylinder"), this);
@@ -903,6 +911,7 @@ void MainWindow::CreateActions()
   g_cylinderCreateAct->setCheckable(true);
   connect(g_cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
+  this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
 
   g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Mesh"), this);
@@ -910,6 +919,7 @@ void MainWindow::CreateActions()
   g_meshCreateAct->setCheckable(true);
   connect(g_meshCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateMesh()));
+  this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
 
 
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
@@ -918,6 +928,7 @@ void MainWindow::CreateActions()
   g_pointLghtCreateAct->setCheckable(true);
   connect(g_pointLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreatePointLight()));
+  this->CreateDisabledIcon(":/images/pointlight.png", g_pointLghtCreateAct);
 
   g_spotLghtCreateAct = new QAction(QIcon(":/images/spotlight.png"),
       tr("Spot Light"), this);
@@ -925,6 +936,7 @@ void MainWindow::CreateActions()
   g_spotLghtCreateAct->setCheckable(true);
   connect(g_spotLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSpotLight()));
+  this->CreateDisabledIcon(":/images/spotlight.png", g_spotLghtCreateAct);
 
   g_dirLghtCreateAct = new QAction(QIcon(":/images/directionallight.png"),
       tr("Directional Light"), this);
@@ -932,6 +944,7 @@ void MainWindow::CreateActions()
   g_dirLghtCreateAct->setCheckable(true);
   connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
+  this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
 
   g_resetAct = new QAction(tr("Reset Camera"), this);
   g_resetAct->setStatusTip(tr("Move camera to pose"));
@@ -966,8 +979,8 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
@@ -1030,6 +1043,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   {
     this->CreateMenuBar();
     this->menuLayout->addWidget(this->menuBar);
+    this->setMenuBar(this->menuBar);
   }
   else
   {
@@ -1052,7 +1066,6 @@ void MainWindow::CreateMenuBar()
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
-  fileMenu->addAction(g_openLogAct);
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1061,13 +1074,16 @@ void MainWindow::CreateMenuBar()
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  QMenu *editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
+
+  // \TODO: Add this back in when implementing the full Model Editor spec.
+  editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1378,6 +1394,21 @@ void MainWindow::CreateEditors()
 
   // Create a Building Editor
   this->editors.push_back(new BuildingEditor(this));
+
+  // Create a Model Editor
+  this->editors.push_back(new ModelEditor(this));
+}
+
+/////////////////////////////////////////////////
+void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
+{
+  QIcon icon = _act->icon();
+  QPixmap pixmap(_pixmap.c_str());
+  QPainter p(&pixmap);
+  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
+  icon.addPixmap(pixmap, QIcon::Disabled);
+  _act->setIcon(icon);
 }
 
 /////////////////////////////////////////////////

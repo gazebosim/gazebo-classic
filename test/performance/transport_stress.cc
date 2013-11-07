@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ TEST_F(TransportStressTest, ManyNodes)
   #endif
 
   // Check if there is enough memory available
-  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
+  if (!gazebo::test::memory::IsMemoryAvailable(requiredMB))
   {
     gzdbg << "Skipped test since " << requiredMB <<
               "Mb of RAM were not available \n";
@@ -219,7 +219,9 @@ TEST_F(TransportStressTest, ManyNodes)
   // The total publish duration should always be very short.
   // The calculation here is the number of messages published multiplied by
   // the expected time to publish a single image message.
-  EXPECT_LE(pubDiff.sec, 1);
+  // We used to check against 1 sec. However, the time can occasionally jump
+  // depending on the system and its usage.
+  EXPECT_LE(pubDiff.sec, 2);
 
   // The total receive duration will be longer.
   EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);

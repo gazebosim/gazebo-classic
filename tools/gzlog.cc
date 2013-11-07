@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,9 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <sdf/sdf.hh>
+
 #include <gazebo/gazebo.hh>
-#include <gazebo/sdf/sdf.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/WorldState.hh>
 #include <gazebo/common/Time.hh>
@@ -750,22 +751,30 @@ class ProcessChunk_TBB
 
 /////////////////////////////////////////////////
 /// \brief Print general help
-void help()
+void help(po::options_description &_options)
 {
-  std::cerr << "Help:\n";
-  std::cerr << "This tool introspects Gazebo log files.\n\n";
-  std::cerr << "Usage: gzlog [command] <options> [log file]\n\n";
+  std::cerr << "gzlog -- Tool to instrospect Gazebo log files\n\n";
+
+  std::cerr << "`gzlog` [command] <options> [log file]\n\n";
+
+  std::cerr << "Introspect Gazebo log files through different commands.\n\n";
 
   std::cerr << "Commands:\n"
-    << "  help\t Output this help message.\n"
-    << "  info\t Display statistical information about a log file.\n"
-    << "  echo\t Output the contents of a log file to screen.\n"
-    << "  step\t Step through the contents of a log file.\n"
-    << "  start\t Start recording a log file on an active Gazebo server.\n"
-    << "  stop\t Stop recording a log file on an active Gazebo server.\n"
-    << "  play\t Play a log file in an active Gazebo server";
-
+            << "  help\t Output this help message.\n"
+            << "  info\t Display statistical information about a log file.\n"
+            << "  echo\t Output the contents of a log file to screen.\n"
+            << "  step\t Step through the contents of a log file.\n";
+            // << "  start\t Start recording a log file on an active Gazebo "
+            // << "server.\n"
+            // << "  stop\t Stop recording a log file on an active Gazebo "
+            // << "server.\n";
   std::cerr << "\n";
+
+  std::cerr << _options << "\n";
+
+  std::cerr << "See also:\n"
+    << "Example and more information can be found at: "
+    << "http://gazebosim.org/wiki/Tools#Data_Log_Tool\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -1162,8 +1171,8 @@ int main(int argc, char **argv)
     ("start", po::value<double>(), "Start time.")
     ("stamp,s", po::value<std::string>(), "Add a timestamp to each line of "
      "output. Valid values are (sim,real,wall)")
-    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate.\
-     Only valid for echo and step commands.")
+    ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
+     "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only for the echo and step commands")
@@ -1209,9 +1218,7 @@ int main(int argc, char **argv)
   // Output help when appropriate
   if (command.empty() || command == "help" || vm.count("help"))
   {
-    help();
-    std::cerr << visibleOptions << "\n";
-
+    help(visibleOptions);
     return 0;
   }
 

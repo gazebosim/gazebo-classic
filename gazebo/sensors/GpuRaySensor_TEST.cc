@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   printf("E\n");
   EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
   EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalAngleMin(), -0.7554);
-  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.7554);
+  EXPECT_EQ(sensor->GetVerticalAngleMin(), 0.0);
+  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.0);
 
   printf("F\n");
   EXPECT_TRUE(sensor->IsActive());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -28,21 +30,21 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "gazebo/sdf/sdf.hh"
-
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
@@ -50,93 +52,78 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
-  this->receiveMutex = new boost::mutex();
-
   if (signal(SIGINT, Server::SigInt) == SIG_ERR)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
-
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
-
-  // Start transport.
-  gazebo::transport::init();
 }
 
 /////////////////////////////////////////////////
 Server::~Server()
 {
   fflush(stdout);
-  delete this->receiveMutex;
   delete this->master;
 }
 
 /////////////////////////////////////////////////
 void Server::PrintUsage()
 {
-  std::cerr << "Run the Gazebo server.\n\n"
-    << "Usage: gzserver [options] <world_file>\n\n";
+  std::cerr << "gzserver -- Run the Gazebo server.\n\n";
+  std::cerr << "`gzserver` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops.\n\n";
 }
 
 /////////////////////////////////////////////////
+bool Server::ParseArgs(int _argc, char **_argv)
 bool Server::ParseArgs(int argc, char **argv)
 {
-  // save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = argc;
-  this->systemPluginsArgv = new char*[argc];
-
-  for (int i = 0; i < argc; ++i)
+  // Save a copy of argc and argv for consumption by system plugins
+  this->systemPluginsArgc = _argc;
+  this->systemPluginsArgv = new char*[_argc];
+  for (int i = 0; i < _argc; ++i)
   {
-    int argvLen = strlen(argv[i]) + 1;
+    int argvLen = strlen(_argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
   }
 
-  po::options_description v_desc("Allowed options");
-  v_desc.add_options()
+  po::options_description visibleDesc("Options");
+  visibleDesc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet).")
+     "Specify a physics engine (ode|bullet|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
-     "Compression encoding format for log data.")
+     "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
-     "Aboslute path in which to store state data")
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
-    ("steps",  po::value<unsigned int>(),
-     "Number of steps to simulate.")
-    ("step-delay",  po::value<unsigned int>(),
-     "Delay between steps.")
+    ("iters",  po::value<unsigned int>(),
+     "Number of iterations to simulate.")
+    ("minimal_comms", "Reduce the messages output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
-  po::options_description h_desc("Hidden options");
-  h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  h_desc.add_options()
+  po::options_description hiddenDesc("Hidden options");
+  hiddenDesc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
-  po::options_description desc("Allowed options");
-  desc.add(v_desc).add(h_desc);
+  po::options_description desc("Options");
+  desc.add(visibleDesc).add(hiddenDesc);
 
-  po::positional_options_description p_desc;
-  p_desc.add("world_file", 1).add("pass_through", -1);
+  po::positional_options_description positionalDesc;
+  positionalDesc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), this->vm);
+    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
+          positionalDesc).allow_unregistered().run(), this->vm);
 
     po::notify(this->vm);
   }
@@ -148,11 +135,22 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << visibleDesc << "\n";
+    return false;
+  }
+
   if (this->vm.count("quiet"))
     gazebo::common::Console::Instance()->SetQuiet(true);
   else
     gazebo::print_version();
 
+  if (this->vm.count("minimal_comms"))
+    gazebo::transport::setMinimalComms(true);
+  else
+    gazebo::transport::setMinimalComms(false);
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
@@ -165,13 +163,6 @@ bool Server::ParseArgs(int argc, char **argv)
     {
       gzerr << "Unable to set random number seed. Must supply a number.\n";
     }
-  }
-
-  if (this->vm.count("help"))
-  {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
-    return false;
   }
 
   /// Load all the plugins specified on the command line
@@ -195,33 +186,18 @@ bool Server::ParseArgs(int argc, char **argv)
         this->vm["record_encoding"].as<std::string>();
   }
 
-  if (this->vm.count("steps"))
+  if (this->vm.count("iters"))
   {
     try
     {
-      this->params["steps"] = boost::lexical_cast<std::string>(
-          this->vm["steps"].as<unsigned int>());
+      this->params["iterations"] = boost::lexical_cast<std::string>(
+          this->vm["iters"].as<unsigned int>());
     }
     catch(...)
     {
-      this->params["steps"] = "0";
-      gzerr << "Unable to set steps of [" <<
-        this->vm["steps"].as<unsigned int>() << "]\n";
-    }
-  }
-
-  if (this->vm.count("step-delay"))
-  {
-    try
-    {
-      this->params["step-delay"] = boost::lexical_cast<std::string>(
-          this->vm["step-delay"].as<unsigned int>());
-    }
-    catch(...)
-    {
-      this->params["step-delay"] = "0";
-      gzerr << "Unable to set step-delay of [" <<
-        this->vm["step-delay"].as<unsigned int>() << "]\n";
+      this->params["iterations"] = "0";
+      gzerr << "Unable to set iterations of [" <<
+        this->vm["iters"].as<unsigned int>() << "]\n";
     }
   }
 
@@ -229,6 +205,12 @@ bool Server::ParseArgs(int argc, char **argv)
     this->params["pause"] = "true";
   else
     this->params["pause"] = "false";
+
+  if (!this->PreLoad())
+  {
+    gzerr << "Unable to load gazebo\n";
+    return false;
+  }
 
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
@@ -285,7 +267,7 @@ bool Server::ParseArgs(int argc, char **argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->IsStopped() && !transport::is_stopped();
+  return !this->stop && !transport::is_stopped();
 }
 
 /////////////////////////////////////////////////
@@ -309,7 +291,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
@@ -339,12 +321,25 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
+bool Server::PreLoad()
+{
+  std::string host = "";
+  unsigned int port = 0;
+
+  gazebo::transport::get_master_uri(host, port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->master->RunThread();
+
+  // Load gazebo
+  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+}
+
+/////////////////////////////////////////////////
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
-  // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
-
   /// Load the sensors library
   sensors::load();
 
@@ -398,9 +393,6 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->worldModPub =
     this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
-  this->serverPub =
-    this->node->Advertise<msgs::GzString>("/gazebo/server/status");
-
   // Run the gazebo, starts a new thread
   gazebo::run();
 
@@ -418,39 +410,28 @@ void Server::Init()
   sensors::init();
 
   physics::init_worlds();
-  this->Stop(false);
+  this->stop = false;
 }
 
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
   stop = true;
+
+  // Signal to plugins/etc that a shutdown event has occured
+  event::Events::sigInt();
 }
 
 /////////////////////////////////////////////////
-void Server::Stop(bool _stop)
+void Server::Stop()
 {
-  boost::recursive_mutex::scoped_lock lock(this->stopMutex);
-  this->stop = _stop;
-}
-
-/////////////////////////////////////////////////
-bool Server::IsStopped() const
-{
-  boost::recursive_mutex::scoped_lock lock(this->stopMutex);
-  return this->stop;
+  this->stop = true;
 }
 
 /////////////////////////////////////////////////
 void Server::Fini()
 {
   this->Stop();
-
-  // Stop gazebo
-  gazebo::stop();
-
-  // Stop the master
-  this->master->Stop();
 
   gazebo::fini();
 
@@ -470,32 +451,7 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
-  bool localStop = false;
-
-  while (!localStop)
-  {
-    localStop = true;
-    this->RunImpl();
-
-    {
-      boost::mutex::scoped_lock lock(this->openLogMutex);
-
-      // Open a log if one was specified
-      if (!this->openLogFilename.empty())
-      {
-        // Continue if the OpenLog function was successful.
-        localStop = !this->OpenLog(this->openLogFilename);
-        this->Stop(false);
-        this->openLogFilename.clear();
-      }
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void Server::RunImpl()
-{
-  if (this->IsStopped())
+  if (this->stop)
     return;
 
   // Make sure the sensors are updated once before running the world.
@@ -505,61 +461,43 @@ void Server::RunImpl()
   // Run the sensor threads
   sensors::run_threads();
 
+  unsigned int iterations = 0;
+  common::StrStr_M::iterator piter = this->params.find("iterations");
+  if (piter != this->params.end())
   {
-    boost::recursive_mutex::scoped_lock lock(this->stopMutex);
-
-    unsigned int steps = 0;
-    common::StrStr_M::iterator piter = this->params.find("steps");
-    if (piter != this->params.end())
+    try
     {
-      try
-      {
-        steps = boost::lexical_cast<unsigned int>(piter->second);
-      }
-      catch(...)
-      {
-        steps = 0;
-        gzerr << "Unable to cast steps[" << piter->second << "] "
-          << "to unsigned integer\n";
-      }
+      iterations = boost::lexical_cast<unsigned int>(piter->second);
     }
-
-    unsigned int stepDelay = 0;
-    piter = this->params.find("step-delay");
-    if (piter != this->params.end())
+    catch(...)
     {
-      try
-      {
-        stepDelay = boost::lexical_cast<unsigned int>(piter->second);
-      }
-      catch(...)
-      {
-        stepDelay = 0;
-        gzerr << "Unable to cast step-delay[" << piter->second << "] "
-          << "to unsigned integer\n";
-      }
+      iterations = 0;
+      gzerr << "Unable to cast iterations[" << piter->second << "] "
+        << "to unsigned integer\n";
     }
-
-    // Run each world. Each world starts a new thread
-    physics::run_worlds(steps, stepDelay);
   }
 
+  // Run each world. Each world starts a new thread
+  physics::run_worlds(iterations);
+
   // Update the sensors.
-  do
+  while (!this->stop && physics::worlds_running())
   {
     this->ProcessControlMsgs();
     sensors::run_once();
     common::Time::MSleep(1);
-  } while (!this->IsStopped() && physics::worlds_running());
-
-  {
-    boost::recursive_mutex::scoped_lock lock(this->stopMutex);
-
-    // Stop all the worlds
-    physics::stop_worlds();
-
-    sensors::stop();
   }
+
+  // Stop all the worlds
+  physics::stop_worlds();
+
+  sensors::stop();
+
+  // Stop gazebo
+  gazebo::stop();
+
+  // Stop the master
+  this->master->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -611,7 +549,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 
@@ -625,13 +563,10 @@ void Server::ProcessControlMsgs()
     if ((*iter).has_save_world_name())
     {
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      if (world)
-      {
-        if ((*iter).has_save_filename())
-          world->Save((*iter).save_filename());
-        else
-          gzerr << "No filename specified.\n";
-      }
+      if ((*iter).has_save_filename())
+        world->Save((*iter).save_filename());
+      else
+        gzerr << "No filename specified.\n";
     }
     else if ((*iter).has_new_world() && (*iter).new_world())
     {
@@ -641,88 +576,16 @@ void Server::ProcessControlMsgs()
     {
       this->OpenWorld((*iter).open_filename());
     }
-    else if ((*iter).has_open_log_filename())
+    else if ((*iter).has_stop() && (*iter).stop())
     {
-      boost::mutex::scoped_lock lock(this->openLogMutex);
-      if (!this->IsStopped() && this->openLogFilename.empty())
-      {
-        this->openLogFilename = (*iter).open_log_filename();
-        this->Stop(true);
-      }
+      this->Stop();
     }
   }
   this->controlMsgs.clear();
 }
 
 /////////////////////////////////////////////////
-bool Server::OpenLog(const std::string &_filename)
-{
-  transport::pause(true);
-  transport::clear_buffers();
-
-  sensors::fini();
-  physics::remove_worlds();
-  transport::clear_buffers();
-
-  // Load the log file
-  util::LogPlay::Instance()->Open(_filename);
-
-  gzmsg << "\nLog playback:\n"
-    << "  Log Version: "
-    << util::LogPlay::Instance()->GetLogVersion() << "\n"
-    << "  Gazebo Version: "
-    << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
-    << "  Random Seed: "
-    << util::LogPlay::Instance()->GetRandSeed() << "\n";
-
-  // Get the SDF world description from the log file
-  std::string sdfString;
-  util::LogPlay::Instance()->Step(sdfString);
-
-  // Load the world file
-  sdf::SDFPtr sdf(new sdf::SDF);
-  if (!sdf::init(sdf))
-  {
-    gzerr << "Unable to initialize sdf\n";
-    return false;
-  }
-
-  if (!sdf::readString(sdfString, sdf))
-  {
-    gzerr << "Unable to read SDF string[" << sdfString << "]\n";
-    return false;
-  }
-
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  if (worldElem)
-  {
-    physics::WorldPtr world = physics::create_world(
-        worldElem->GetValueString("name"));
-
-    // Create the world
-    try
-    {
-      world->Load(worldElem);
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "Failed to load the World\n"  << e;
-      return false;
-    }
-
-    world->Init();
-  }
-  transport::pause(false);
-
-  msgs::GzString msg;
-  msg.set_data("logfile_opened");
-  this->serverPub->Publish(msg);
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool Server::OpenWorld(const std::string &/*_filename*/)
+bool Server::OpenWorld(const std::string & /*_filename*/)
 {
   gzerr << "Open World is not implemented\n";
   return false;

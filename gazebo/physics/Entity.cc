@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -30,7 +30,7 @@
 #include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/RayShape.hh"
@@ -53,8 +53,8 @@ Entity::Entity(BasePtr _parent)
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
+  this->visualMsg->set_id(this->id);
   this->visualMsg->set_parent_name(this->world->GetName());
-  this->poseMsg = new msgs::Pose;
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -64,21 +64,18 @@ Entity::Entity(BasePtr _parent)
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
   // TODO: put this back in
   // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
   delete this->visualMsg;
   this->visualMsg = NULL;
-
-  delete this->poseMsg;
-  this->poseMsg = NULL;
 
   this->visPub.reset();
   this->requestPub.reset();
@@ -102,24 +99,27 @@ void Entity::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->GetValuePose("pose") +
+      this->worldPose = this->sdf->Get<math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->GetValuePose("pose");
+      this->worldPose = this->sdf->Get<math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->GetValuePose("pose");
+    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
   }
 
   if (this->parent)
+  {
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+    this->visualMsg->set_parent_id(this->parent->GetId());
+  }
   else
+  {
     this->visualMsg->set_parent_name(this->world->GetName());
-
+    this->visualMsg->set_parent_id(0);
+  }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
-
-  this->poseMsg->set_name(this->GetScopedName());
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
@@ -540,7 +540,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->GetValuePose("pose");
+  math::Pose newPose = _sdf->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);

@@ -1,17 +1,14 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
-
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
     </include>
-
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
-
     <model name="model_1">
       <static>true</static>
       <pose>0 0 0.035 0. 0 0</pose>
@@ -55,9 +52,9 @@
               </horizontal>
               <vertical>
                 <samples>1</samples>
-                <resolution>0.5</resolution>
-                <min_angle>-0.7554</min_angle>
-                <max_angle>0.7554</max_angle>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
               </vertical>
             </scan>
             <range>

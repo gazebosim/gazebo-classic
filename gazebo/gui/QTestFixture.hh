@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,16 @@
 #include <string>
 #include <boost/thread.hpp>
 
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include "gazebo/Server.hh"
+#endif
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/rendering/rendering.hh"
-#include "gazebo/Server.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qt_test.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "test_config.h"
 
 /// \brief Base class for all Gazebo GUI unit tests.

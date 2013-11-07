@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Get the length of the ray.
       /// \return The ray length.
       public: double GetLength() const;
+
+      /// \brief Set the scale of the ray
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
       /// \brief Update the ray collision.
       public: virtual void Update() = 0;

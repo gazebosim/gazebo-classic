@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {
@@ -184,16 +184,19 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    struct NodeAssignment
+    class NodeAssignment
     {
+      /// \brief Constructor.
+      public: NodeAssignment();
+
       /// \brief index of the vertex
-      unsigned int vertexIndex;
+      public: unsigned int vertexIndex;
 
       /// \brief node (or bone) index
-      unsigned int nodeIndex;
+      public: unsigned int nodeIndex;
 
       /// \brief the weight (between 0 and 1)
-      float weight;
+      public: float weight;
     };
 
     /// \brief A child mesh

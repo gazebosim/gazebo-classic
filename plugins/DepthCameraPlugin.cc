@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
   }
 
   int index =  ((_height * 0.5) * _width) + _width * 0.5;
-  printf("W[%d] H[%d] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n",
+  printf("W[%u] H[%u] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n",
       width, height, index, _image[index], min, max);
 
   /*rendering::Camera::SaveFrame(_image, this->width,

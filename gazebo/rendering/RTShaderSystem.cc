@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,13 +114,6 @@ void RTShaderSystem::AddScene(ScenePtr _scene)
   if (!this->initialized)
     return;
 
-  for (std::vector<ScenePtr>::iterator iter = this->scenes.begin();
-      iter != this->scenes.end(); ++iter)
-  {
-    if ((*iter) == _scene)
-      return;
-  }
-
   // Set the scene manager
   this->shaderGenerator->addSceneManager(_scene->GetManager());
   this->shaderGenerator->createScheme(_scene->GetName() +
@@ -189,9 +182,8 @@ void RTShaderSystem::Clear()
 void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  if (_viewport && _scene)
-    _viewport->setMaterialScheme(_scene->GetName() +
-        Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  _viewport->setMaterialScheme(_scene->GetName() +
+      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
 }
 
@@ -199,7 +191,7 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  if (_viewport && _scene)
+  if (_viewport && _scene && _scene->GetInitialized())
     _viewport->setMaterialScheme(_scene->GetName());
 #endif
 }
