@@ -922,7 +922,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
-  dJointFeedback* fb = this->GetFeedback();
+  dJointFeedback *fb = this->GetFeedback();
   if (fb)
   {
     // kind of backwards here, body1 (parent) corresponds go f2, t2

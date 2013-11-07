@@ -139,6 +139,12 @@ else()
   message (STATUS "High memory tests: disabled, low memory versions will be used")
 endif()
 
+######################################
+# Enable screen tests by default
+if(NOT DEFINED ENABLE_SCREEN_TESTS)
+  set(ENABLE_SCREEN_TESTS TRUE)
+endif()
+
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")

@@ -619,8 +619,11 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    if (this->useRTShader)
+    if (this->useRTShader && this->scene->GetInitialized() &&
+      _obj->getName().find("__COLLISION_VISUAL__") == std::string::npos)
+    {
       RTShaderSystem::Instance()->UpdateShaders();
+    }
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
@@ -840,6 +843,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
   else
   {
+    if ( this->myMaterialName == _materialName)
+      return;
     this->myMaterialName = _materialName;
   }
 
@@ -884,8 +889,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized() &&
+    this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
+  {
     RTShaderSystem::Instance()->UpdateShaders();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1220,7 +1228,7 @@ void Visual::SetTransparency(float _trans)
     }
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1473,7 +1481,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1489,7 +1497,7 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetAttribute("type")->Set(_type);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 

@@ -110,6 +110,8 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Remove all entities from the world.
+      /// This function has delayed effect. Models are cleared at the end
+      /// of the current update iteration.
       public: void Clear();
 
       /// \brief Get the name of the world.
@@ -452,6 +454,10 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
