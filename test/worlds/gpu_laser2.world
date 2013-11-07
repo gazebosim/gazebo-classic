@@ -52,9 +52,9 @@
               </horizontal>
               <vertical>
                 <samples>1</samples>
-                <resolution>0.5</resolution>
-                <min_angle>-0.7554</min_angle>
-                <max_angle>0.7554</max_angle>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
               </vertical>
             </scan>
             <range>

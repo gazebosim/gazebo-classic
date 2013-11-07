@@ -43,6 +43,7 @@ set(tests
   sensor_stress.cc
   server_fixture.cc
   speed.cc
+  stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   transceiver.cc
@@ -73,6 +74,7 @@ gz_build_display_tests(${display_tests})
 
 set(dri_tests
   camera_sensor.cc
+  multicamera_sensor.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc

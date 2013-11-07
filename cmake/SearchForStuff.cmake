@@ -312,7 +312,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet>=2.81)
+  # First and preferred option is to look for bullet standard pkgconfig, 
+  # so check it first. if it is not present, check for the OSRF 
+  # custom bullet2.82.pc file
+  pkg_check_modules(BULLET bullet>=2.82)
+  if (NOT BULLET_FOUND)
+     pkg_check_modules(BULLET bullet2.82>=2.82)
+  endif()
+
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
     add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )

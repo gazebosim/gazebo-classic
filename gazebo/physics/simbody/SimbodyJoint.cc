@@ -69,7 +69,23 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       /// \TODO: check all physics engines
       if (dynamicsElem->HasElement("damping"))
       {
-        this->dampingCoefficient = dynamicsElem->Get<double>("damping");
+        this->dissipationCoefficient[0] = dynamicsElem->Get<double>("damping");
+      }
+    }
+  }
+
+  if (this->sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      /// \TODO: switch to GetElement so default values apply
+      /// \TODO: check all physics engines
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->dissipationCoefficient[1] = dynamicsElem->Get<double>("damping");
       }
     }
   }
@@ -346,9 +362,62 @@ void SimbodyJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetDamping(int /*_index*/, const double /*_damping*/)
+void SimbodyJoint::SetDamping(int _index, const double _damping)
 {
-  gzdbg << "Not implement in Simbody\n";
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "SimbodyJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetStiffness(int _index, const double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "SimbodyJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
+  double _stiffness, double _damping, double _reference)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dissipationCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// \TODO: address multi-axis joints
+    this->damper.setDamping(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      _damping);
+
+    /// \TODO: add spring force element
+    gzdbg << "Joint [" << this->GetName()
+           << "] stiffness not implement in Simbody\n";
+  }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
