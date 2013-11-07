@@ -409,6 +409,11 @@ namespace gazebo
       /// \return viscous joint damping coefficient
       public: double GetDampingCoefficient() const;
 
+      /// \brief Get initial Anchor Pose specified by model
+      /// <joint><pose>...</pose></joint>
+      /// \return Joint::anchorPose, initial joint anchor pose.
+      public: math::Pose GetInitialAnchorPose();
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
