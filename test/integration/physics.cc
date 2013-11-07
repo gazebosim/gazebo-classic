@@ -1612,7 +1612,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 
   {
     // Test:  Introduce a large constraint error by breaking
-    //        one of the model joints to the world
+    //        some model joints to the world
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
