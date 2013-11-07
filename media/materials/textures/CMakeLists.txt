@@ -1,5 +1,6 @@
 set (files
   beigeWall.jpg
+  carpet.jpg
   ceiling_tiled.jpg
   clouds.jpg
   dirt_diffusespecular.png
@@ -14,6 +15,7 @@ set (files
   grass_normal.png
   hardwood_floor.jpg
   heightmap_bowl.png
+  net.png
   paintedWall.jpg
   pioneerBody.jpg
   projection_filter.png

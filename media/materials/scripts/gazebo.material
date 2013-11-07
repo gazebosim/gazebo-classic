@@ -222,6 +222,19 @@ material Gazebo/Blue
 	}
 }
 
+material Gazebo/SkyBlue
+{
+  technique
+  {
+      pass ambient
+      {
+      ambient 0.13 0.44 0.70
+            diffuse 0 0 1
+            specular 0.1 0.1 0.1 1 1
+          }
+  }
+}
+
 material Gazebo/Yellow
 {
 	technique
@@ -976,4 +989,43 @@ material Gazebo/PointCloud
          point_size_attenuation off
       }
    }
+}
+
+material Gazebo/Carpet
+{
+  technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.2 0.2 0.2 1.0 12.5
+
+      texture_unit
+      {
+        scale 0.1 0.1
+        texture carpet.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Net
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      texture_unit
+      {
+        scale 0.1 0.1
+        texture net.png
+        filtering trilinear
+      }
+    }
+  }
 }
