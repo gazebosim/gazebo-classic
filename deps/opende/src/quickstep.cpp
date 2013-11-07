@@ -1797,6 +1797,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               printf("MOI2 b2[%d] S[%f %f %f] = %g\n",b2, S[0], S[1], S[2], moi_S2);
 #endif
 
+              /// get full axis MOI tensor representing the scalar axis MOI.
               // full MOI tensor for S needs matrix outer product of S:
               //   SS = [ S * S' ]
 #if 1
@@ -1842,7 +1843,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
               if (modify_inertia)
               {
 #ifdef DEBUG_INERTIA_PROPAGATION
-              printf("---------S Scalars--------\n");
+                printf("---------S Scalars--------\n");
                 printf(" original    S1 [%g] S2 [%g]\n", moi_S1, moi_S2);
                 printf(" distributed S1 [%g] S2 [%g]\n", moi_S1_new, moi_S2_new);
 #endif
@@ -1851,6 +1852,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 dReal sumAbsOffDiags2[4];
                 dSetZero(sumAbsOffDiags1,4);
                 dSetZero(sumAbsOffDiags2,4);
+
+                /// Keep parent/child MOI/invMOI in inertial frame.
+
+                /// compute abs sum of off diagonals and store in sumAbsOffDiags.
                 for (int si = 0; si < 12; ++si)
                 {
                   int col = si%4;
@@ -1875,6 +1880,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                 }
 
                 // Modify MOI by adding delta scalar MOI in tensor form.
+                // Check and maintain diagonal dominance.
                 for (int si = 0; si < 12; ++si)
                 {
                   int col = si%4;
@@ -1885,24 +1891,32 @@ void dxQuickStepper (dxWorldProcessContext *context,
                     // check for negative diagonal
                     double m1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
                     if (m1 > sumAbsOffDiags1[row])
+                    {
+                      // modify inertia in the constrained direction,
+                      // doing so should not alter dynamics of the system.
                       MOI_ptr1[si] = m1;
+                    }
                     else
                     {
                       /// \FIXME: increase diagonal dominance to preserve stability,
-                      /// but this makes constraint "soft"
+                      /// Even though this changes the dynamics of the system,
+                      /// it's either this or unstable simulation.
                       MOI_ptr1[si] = sumAbsOffDiags1[row];
-                      // printf("\n***************** si[%d] MOI_ptr1[%g]  *****************\n\n", si, MOI_ptr1[si]);
                     }
 
                     double m2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
                     if (m2 > sumAbsOffDiags2[row])
+                    {
+                      // modify inertia in the constrained direction,
+                      // doing so should not alter dynamics of the system.
                       MOI_ptr2[si] = m2;
+                    }
                     else
                     {
                       /// \FIXME: increase diagonal dominance to preserve stability,
-                      /// but this makes constraint "soft"
+                      /// Even though this changes the dynamics of the system,
+                      /// it's either this or unstable simulation.
                       MOI_ptr2[si] = sumAbsOffDiags2[row];
-                      // printf("\n***************** si[%d] MOI_ptr2[%g]  *****************\n\n", si, MOI_ptr2[si]);
                     }
                   }
                 }
@@ -1989,46 +2003,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
               }
             }
           }
-          ///     *. get scalar axis MOI in the constrained axis direction.
-          ///     *. get full axis MOI tensor representing the scalar axis MOI.
-          ///     *. add/subtrace full axis MOI tensor from parent/child MOI to reduce MOI ratio for
-          ///        constrained direction.
-          ///     *. keep parent/child MOI/invMOI in inertial frame.
-
-
 
           // update index for next joint
           ofsi += infom;
 
           // double check jb_ptr length
           dIASSERT (jb_ptr == jb+2*m);
-        }
-      }
-
-      // Inertia tweaking for better convergence
-      // modify MOI and invMOI per constraint
-      if (0)
-      {
-        dReal *invMOIrow = invMOI;
-        dReal *MOIrow = MOI;
-        dxBody *const *const bodyend = body + nb;
-        for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
-          dMatrix3 tmp;
-          dxBody *b_ptr = *bodycurr;
-
-          // compute inverse inertia tensor in global frame
-          dMultiply2_333 (tmp,b_ptr->invI,b_ptr->posr.R);
-          dMultiply0_333 (invMOIrow,b_ptr->posr.R,tmp);
-
-          // also store MOI for later use by preconditioner
-          dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
-          dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
-
-          if (b_ptr->flags & dxBodyGyroscopic) {
-            // compute rotational force
-            dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
-            dSubtractVectorCross3(b_ptr->tacc,b_ptr->avel,tmp);
-          }
         }
       }
 
