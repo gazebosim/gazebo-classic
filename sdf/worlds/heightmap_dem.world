@@ -6,6 +6,12 @@
       <uri>model://sun</uri>
     </include>
 
+    <!--<gui>
+      <camera name="user_camera">
+        <pose>0 0 100 0 0 0</pose>
+      </camera>
+    </gui>-->
+
     <model name="heightmap">
       <static>true</static>
       <link name="link">
