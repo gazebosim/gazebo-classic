@@ -1152,6 +1152,11 @@
             <damping>0.01</damping>
           </dynamics>
         </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
       </joint>
       <link name='r_clav'>
         <pose>0.05191 -0.13866 0.31915 0 -0 0</pose>
@@ -2531,13 +2536,18 @@
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <lower>-1e+16</lower>
-            <upper>1e+16</upper>
+            <lower>0</lower>
+            <upper>0</upper>
           </limit>
           <dynamics>
-            <damping>0.0</damping>
+            <damping>0.1</damping>
           </dynamics>
         </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
       </joint>
       <joint name='l_foot_world_pin' type='revolute'>
         <child>l_foot</child>
@@ -2545,13 +2555,18 @@
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <lower>-1e+16</lower>
-            <upper>1e+16</upper>
+            <lower>0</lower>
+            <upper>0</upper>
           </limit>
           <dynamics>
-            <damping>0.0</damping>
+            <damping>0.1</damping>
           </dynamics>
         </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
       </joint>
       <pose>0 0 1.1 0 -0 0</pose>
       <!-- test pid controller joints -->
