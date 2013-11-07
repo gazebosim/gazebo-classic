@@ -1579,7 +1579,9 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "skipping physics engine [" << _physicsEngine << "].\n";
+    gzerr << "Skipping SphereAtlasLargeError for physics engine ["
+          << _physicsEngine
+          << "] as this test only works for ODE for now.\n";
     return;
   }
 
@@ -1590,6 +1592,8 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics->SetGravity(math::Vector3(0, 0, 0));
 
   int i = 0;
   while (!this->HasEntity("sphere_atlas") && i < 20)
@@ -1606,19 +1610,73 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   physics::LinkPtr head = model->GetLink("head");
   EXPECT_TRUE(head);
 
-  // introduce a large error by moving the model
-  model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
-  world->StepWorld(1);
+  {
+    // Test:  Introduce a large constraint error by breaking
+    //        one of the model joints to the world
+    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
-  // let model settle
-  world->StepWorld(6000);
+    // let model settle
+    world->StepWorld(750);
 
-  // check model stability
-  math::Vector3 headVel = head->GetWorldLinearVel();
-  EXPECT_LT(fabs(headVel.x), 0.01);
-  EXPECT_LT(fabs(headVel.y), 0.01);
-  EXPECT_LT(fabs(headVel.z), 0.01);
-  gzdbg << "final head velocity [" << headVel << "].\n";
+    for (unsigned int n = 0; n < 10; ++n)
+    {
+      world->StepWorld(1);
+      // manually check joint constraint violation for each joint
+      physics::Link_V links = model->GetLinks();
+      for (unsigned int i = 0; i < links.size(); ++i)
+      {
+        math::Pose childInWorld = links[i]->GetWorldPose();
+
+        physics::Joint_V parentJoints = links[i]->GetParentJoints();
+        for (unsigned int j = 0; j < parentJoints.size(); ++j)
+        {
+          // anchor position in world frame
+          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+
+          // anchor pose in child link frame
+          math::Pose anchorInChild =
+            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+
+          // initial anchor pose in child link frame
+          math::Pose anchorInitialInChild =
+            parentJoints[j]->GetInitialAnchorPose();
+
+          physics::LinkPtr parent = parentJoints[j]->GetParent();
+          if (parent)
+          {
+            // compare everything in the parent frame
+            math::Pose childInitialInParent =
+              links[i]->GetInitialRelativePose() -  // rel to model
+              parent->GetInitialRelativePose();  // rel to model
+
+            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose childInParent = childInWorld - parentInWorld;
+            math::Pose anchorInParent = anchorInChild + childInParent;
+            math::Pose anchorInitialInParent =
+              anchorInitialInChild + childInitialInParent;
+            math::Pose jointError = anchorInParent - anchorInitialInParent;
+
+            // joint constraint violation must be less than...
+            EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
+
+            // debug
+            if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
+              gzdbg << "i [" << n
+                    << "] link [" << links[i]->GetName()
+                    // << "] parent[" << parent->GetName()
+                    << "] error[" << jointError.pos.GetSquaredLength()
+                    // << "] pose[" << childInWorld
+                    << "] anchor[" << anchorInChild
+                    << "] cinp[" << childInParent
+                    << "] ainp0[" << anchorInitialInParent
+                    << "] ainp[" << anchorInParent
+                    << "] diff[" << jointError
+                    << "]\n";
+          }
+        }
+      }
+    }
+  }
 }
 
 TEST_P(PhysicsTest, SphereAtlasLargeError)
