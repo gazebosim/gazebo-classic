@@ -16,8 +16,8 @@
 
 1. **gazebo/common/ModelDatabase.hh** `API change`
     + ***Removed:*** void ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
-    + ***Replacement:*** boost::shared_ptr<bool> ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
-    + ***Note:*** The replacement function requires that the returned bool shared pointer remain valid in order to receive the GetModels callback. Reset the bool shared pointer to stop receiving GetModels callback.
+    + ***Replacement:*** event::ConnectionPtr ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
+    + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
 
 ### Additions
 
@@ -36,7 +36,7 @@
     + ***Replacement*** void World::Step(unsigned int _steps)
 1. **gazebo/sensors/SensorsIface.hh**
     + ***Deprecation*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName,const std::string &_parentName)
-    + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId);
+    + ***Replacement*** std::string sensors::create_sensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId)
 1. **gazebo/sensors/Sensor.hh**
     + ***Deprecation*** void Sensor::SetParent(const std::string &_name)
     + ***Replacement*** void Sensor::SetParent(const std::string &_name, uint32_t _id)
@@ -101,10 +101,10 @@
     + ***Replacement*** void Link::RemoveParentJoint(const std::string &_jointName)
 1. **gazebo/physics/MeshShape.hh**
     + ***Removed*** std::string MeshShape::GetFilename() const `API change`
-    + ***Replacement*** std::string MeshShape::GetURI() const;
+    + ***Replacement*** std::string MeshShape::GetURI() const
     ---
     + ***Removed*** void MeshShape::SetFilename() const `API change`
-    + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const;
+    + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
