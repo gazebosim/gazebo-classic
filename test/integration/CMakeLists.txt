@@ -38,6 +38,7 @@ set(tests
   transport.cc
   server_fixture.cc
   speed.cc
+  stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   transceiver.cc

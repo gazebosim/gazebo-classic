@@ -222,6 +222,7 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 {
+  /// \TODO: special case bullet specific linear damping, this needs testing.
   if (this->bulletSlider)
     this->bulletSlider->setDampingDirLin(_damping);
 }

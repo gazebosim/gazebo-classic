@@ -1,3 +1,27 @@
+## Gazebo 2.0 to 3.0
+
+### New Deprecations
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void ApplyDamping()
+    + ***Replacement*** virtual void ApplyStiffnessDamping()
+    ---
+    + ***Deprecation*** double GetDampingCoefficient() const
+    + ***Replacement*** double GetDamping(int _index)
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** void CFMDamping()
+    + ***Replacement*** void ApplyImplicitStiffnessDamping()
+
+### Modifications
+
+### Additions
+
+1. **gazebo/physics/Joint.hh**
+    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+
+### Deletions
+
 ## Gazebo 1.9 to 2.0
 
 ### New Deprecations
@@ -16,13 +40,13 @@
     + ***Replacement*** std::string CreateSensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId)
 1. **gazebo/sensors/Collision.hh**
     + ***Deprecation*** void Collision::SetContactsEnabled(bool _enable)
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
     ---
     + ***Deprecation*** bool Colliion::GetContactsEnabled() const
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
     ---
     + ***Deprecation*** void AddContact(const Contact &_contact)
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
 
 ### Modifications
 
