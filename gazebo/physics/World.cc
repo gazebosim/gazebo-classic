@@ -330,7 +330,7 @@ void World::Init()
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
+      boost::bind(&World::OnLog, this, _1, _2));
 
   this->prevStates[0].SetWorld(shared_from_this());
   this->prevStates[1].SetWorld(shared_from_this());
@@ -352,10 +352,11 @@ void World::Init()
 }
 
 //////////////////////////////////////////////////
-void World::Run(unsigned int _iterations)
+void World::Run(uint64_t _steps, uint64_t _stepDelayMS)
 {
   this->stop = false;
-  this->stopIterations = _iterations;
+  this->stopIterations = _steps;
+  this->stepDelayMS = _stepDelayMS;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
 }
@@ -392,11 +393,11 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
-
   // Get the first state
   this->prevStates[0] = WorldState(shared_from_this());
   this->stateToggle = 0;
+
+  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
 
   if (!util::LogPlay::Instance()->IsOpen())
   {
@@ -404,6 +405,8 @@ void World::RunLoop()
         (!this->stopIterations || (this->iterations < this->stopIterations));)
     {
       this->Step();
+      if (this->stepDelayMS > 0)
+        gazebo::common::Time::MSleep(this->stepDelayMS);
     }
   }
   else
@@ -413,6 +416,8 @@ void World::RunLoop()
         (!this->stopIterations || (this->iterations < this->stopIterations));)
     {
       this->LogStep();
+      if (this->stepDelayMS > 0)
+        gazebo::common::Time::MSleep(this->stepDelayMS);
     }
   }
 
@@ -1788,8 +1793,10 @@ void World::UpdateStateSDF()
 }
 
 //////////////////////////////////////////////////
-bool World::OnLog(std::ostringstream &_stream)
+bool World::OnLog(std::ostringstream &_stream, uint64_t &_segments)
 {
+  _segments = 0;
+
   int bufferIndex = this->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
@@ -1800,6 +1807,7 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << "'>\n";
     _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
+    _segments++;
   }
   else if (this->states[bufferIndex].size() >= 1)
   {
@@ -1812,6 +1820,7 @@ bool World::OnLog(std::ostringstream &_stream)
         iter != this->states[bufferIndex].end(); ++iter)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>" << *iter << "</sdf>";
+      _segments++;
     }
 
     this->states[bufferIndex].clear();
@@ -1828,11 +1837,13 @@ bool World::OnLog(std::ostringstream &_stream)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[this->currentStateBuffer^1][i] << "</sdf>";
+      _segments++;
     }
     for (size_t i = 0; i < this->states[this->currentStateBuffer].size(); ++i)
     {
       _stream << "<sdf version='" << SDF_VERSION << "'>"
         << this->states[this->currentStateBuffer][i] << "</sdf>";
+      _segments++;
     }
 
     // Clear everything.

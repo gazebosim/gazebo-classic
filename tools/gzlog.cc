@@ -631,14 +631,15 @@ class StateFilter : public FilterBase
             std::ostringstream result;
 
             if (this->start > 0 &&
-                this->stateSdf->GetValueTime("sim_time").Double() < this->start)
+                this->stateSdf->Get<gazebo::common::Time>("sim_time").Double() <
+                this->start)
             {
               return std::string();
             }
 
             if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
             {
-              if ((this->stateSdf->GetValueTime("sim_time")
+              if ((this->stateSdf->Get<gazebo::common::Time>("sim_time")
                   - this->prevTime).Double() < 1.0 / this->hz)
               {
                 return result.str();

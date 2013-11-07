@@ -32,6 +32,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
+#include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 
@@ -42,11 +43,13 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
-#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+
+#include "gazebo/gui/MainWindow.hh"
 
 
 #ifdef HAVE_QWT
@@ -288,6 +291,23 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OpenLog()
+{
+  std::string filename = QFileDialog::getOpenFileName(this,
+      tr("Open log file"), "",
+      tr("SDF Files (*.log)")).toStdString();
+
+  if (!filename.empty())
+  {
+    msgs::ServerControl msg;
+    msg.set_open_log_filename(filename);
+    this->serverControlPub->Publish(msg);
+
+    this->logPlay->show();
   }
 }
 
@@ -780,6 +800,11 @@ void MainWindow::CreateActions()
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
+  g_openLogAct = new QAction(tr("&Open Log"), this);
+  g_openLogAct->setShortcut(tr("Ctrl+L"));
+  g_openLogAct->setStatusTip(tr("Open an log file"));
+  connect(g_openLogAct, SIGNAL(triggered()), this, SLOT(OpenLog()));
+
   /*g_importAct = new QAction(tr("&Import Mesh"), this);
   g_importAct->setShortcut(tr("Ctrl+I"));
   g_importAct->setStatusTip(tr("Import a Collada mesh"));
@@ -1066,6 +1091,7 @@ void MainWindow::CreateMenuBar()
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(g_openLogAct);
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);

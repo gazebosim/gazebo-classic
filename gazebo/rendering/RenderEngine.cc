@@ -154,14 +154,19 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
-  this->scenes.push_back(scene);
+  ScenePtr scene;
 
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
-    gzerr << "RenderEngine is not initialized\n";
+  {
+    boost::mutex::scoped_lock lock(this->sceneMutex);
+    scene.reset(new Scene(_name, _enableVisualizations, _isServer));
+    this->scenes.push_back(scene);
+
+    scene->Load();
+    if (this->initialized)
+      scene->Init();
+    else
+      gzerr << "RenderEngine is not initialized\n";
+  }
 
   rendering::Events::createScene(_name);
 
@@ -174,6 +179,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
   if (this->renderPathType == NONE)
     return;
 
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -192,11 +198,31 @@ void RenderEngine::RemoveScene(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+void RenderEngine::RemoveScenes()
+{
+  boost::mutex::scoped_lock lock(this->sceneMutex);
+  for (std::vector<ScenePtr>::iterator iter = this->scenes.begin();
+      iter != this->scenes.end(); ++iter)
+  {
+    if (*iter)
+    {
+      RTShaderSystem::Instance()->Clear();
+      rendering::Events::removeScene((*iter)->GetName());
+
+      (*iter)->Fini();
+      (*iter).reset();
+    }
+  }
+  this->scenes.clear();
+}
+
+//////////////////////////////////////////////////
 ScenePtr RenderEngine::GetScene(const std::string &_name)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -207,13 +233,14 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-ScenePtr RenderEngine::GetScene(unsigned int index)
+ScenePtr RenderEngine::GetScene(unsigned int _index)
 {
-  if (index < this->scenes.size())
-    return this->scenes[index];
+  boost::mutex::scoped_lock lock(this->sceneMutex);
+  if (_index < this->scenes.size())
+    return this->scenes[_index];
   else
   {
-    gzerr << "Invalid Scene Index[" << index << "]\n";
+    gzerr << "Invalid Scene Index[" << _index << "]\n";
     return ScenePtr();
   }
 }
@@ -221,6 +248,7 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
 //////////////////////////////////////////////////
 unsigned int RenderEngine::GetSceneCount() const
 {
+  boost::mutex::scoped_lock lock(this->sceneMutex);
   return this->scenes.size();
 }
 
@@ -271,8 +299,11 @@ void RenderEngine::Init()
   RTShaderSystem::Instance()->Init();
   rendering::Material::CreateMaterials();
 
-  for (unsigned int i = 0; i < this->scenes.size(); i++)
-    this->scenes[i]->Init();
+  {
+    boost::mutex::scoped_lock lock(this->sceneMutex);
+    for (unsigned int i = 0; i < this->scenes.size(); i++)
+      this->scenes[i]->Init();
+  }
 
   this->initialized = true;
 }
@@ -296,7 +327,6 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
-  // Deallocate memory for every scene
   while (!this->scenes.empty())
   {
     this->RemoveScene(this->scenes.front()->GetName());

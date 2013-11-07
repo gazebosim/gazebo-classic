@@ -53,7 +53,6 @@ Link::Link(EntityPtr _parent)
   this->parentJoints.clear();
   this->childJoints.clear();
   this->publishData = false;
-  this->publishDataMutex = new boost::recursive_mutex();
 }
 
 
@@ -105,9 +104,6 @@ Link::~Link()
   this->requestPub.reset();
   this->dataPub.reset();
   this->connections.clear();
-
-  delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
 
   this->collisions.clear();
 }
@@ -246,7 +242,6 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
-  std::vector<std::string>::iterator iter;
   this->connections.clear();
 
   {
@@ -942,7 +937,7 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 void Link::SetPublishData(bool _enable)
 {
   {
-    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
+    boost::recursive_mutex::scoped_lock lock(this->publishDataMutex);
     if (this->publishData == _enable)
       return;
 

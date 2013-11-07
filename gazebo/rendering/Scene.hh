@@ -826,6 +826,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       private: JointMsgs_M joints;
+
+      /// \brief True if the scene is tied to the server.
+      private: bool isServer;
     };
     /// \}
   }

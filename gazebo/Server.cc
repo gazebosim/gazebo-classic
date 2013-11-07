@@ -75,7 +75,6 @@ void Server::PrintUsage()
 
 /////////////////////////////////////////////////
 bool Server::ParseArgs(int _argc, char **_argv)
-bool Server::ParseArgs(int argc, char **argv)
 {
   // Save a copy of argc and argv for consumption by system plugins
   this->systemPluginsArgc = _argc;

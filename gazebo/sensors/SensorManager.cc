@@ -24,6 +24,7 @@
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorsIface.hh"

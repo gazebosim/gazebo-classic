@@ -94,8 +94,8 @@ namespace gazebo
       /// \param[in] _steps Run for this many iterations, then stop.
       /// A value of zero disables run stop.
       /// \param[in] _stepDelayMS Delay in MS to wait between steps.
-      public: void Run(unsigned int _steps = 0,
-                       unsigned int _stepDelayMS = 0);
+      public: void Run(uint64_t _steps = 0,
+                       uint64_t _stepDelayMS = 0);
 
       /// \brief Return the running state of the world.
       /// \return True if the world is running.
@@ -663,7 +663,7 @@ namespace gazebo
       /// \brief Keep track of current state buffer being updated
       private: int currentStateBuffer;
 
-      private: WorldState *prevStates[2];
+      private: WorldState prevStates[2];
       private: int stateToggle;
 
       private: sdf::ElementPtr logPlayStateSDF;

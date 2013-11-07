@@ -89,6 +89,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   // this contactVisId is unique.
   this->contactVisId = GZ_UINT32_MAX;
 
+  this->isServer = _isServer;
   this->initialized = false;
   this->showCOMs = false;
   this->showCollisions = false;
@@ -2896,7 +2897,7 @@ void Scene::InitComms()
 
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
 
-  if (_isServer)
+  if (this->isServer)
   {
     this->poseSub = this->node->Subscribe("~/pose/local/info",
         &Scene::OnPoseMsg, this);

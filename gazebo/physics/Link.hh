@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <boost/thread.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -523,7 +524,7 @@ namespace gazebo
       private: bool publishData;
 
       /// \brief Mutex to protect the publishData variable
-      private: boost::recursive_mutex *publishDataMutex;
+      private: boost::recursive_mutex publishDataMutex;
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
