@@ -177,12 +177,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual unsigned int GetImageHeight() const;
 
-      /// brief Show if the user camera pos has been changed in the world file.
-      /// return true if the camera pos changed in the world file.
+      /// brief Show if the user camera pose has changed in the world file.
+      /// return true if the camera pose changed in the world file.
       public: bool IsCameraSetInWorldFile();
 
-      /// brief Set if the user camera has changed in the world file.
-      /// \param[in] _value True if the camera has changed in the world file.
+      /// brief Set if the user camera pose has changed in the world file.
+      /// \param[in] _value True if the camera pose changed in the world file.
       public: void SetCameraSetInWorldFile(bool _value);
 
       /// \brief Set the camera to be attached to a visual.
@@ -244,7 +244,7 @@ namespace gazebo
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;
 
-      /// \brief Flag to detect if the camera pos was changed by the user in the
+      /// \brief Flag to detect if the user changed the camera pose in the
       /// world file.
       private: bool isCameraSetInWorldFile;
     };

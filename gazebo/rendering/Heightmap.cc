@@ -378,7 +378,6 @@ void Heightmap::Load()
   this->ConfigureTerrainDefaults();
   this->SetupShadows(true);
 
-  // Move the user camera above the heightmap
   if (!this->heights.empty())
   {
     UserCameraPtr userCam = this->scene->GetUserCamera(0);
