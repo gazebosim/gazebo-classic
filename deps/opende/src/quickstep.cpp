@@ -1740,6 +1740,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 #endif
             /// \FIXME: For now, implement only for the two non-free axial rotation constraints for hinge joints.
             /// this only makes sense if joint connects two dynamic bodies (b2 >= 0)
+            /// Skip this entire block if we don't want to modify inertia for stability.
             if (b2 >= 0 && jicurr->joint->type() == dJointTypeHinge && (j == 3 || j == 4))
             {
               /// In hinge joint, pure rotational constraint,
