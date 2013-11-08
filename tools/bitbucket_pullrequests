@@ -38,7 +38,7 @@ class BitbucketPullRequests
 
   # constructor
   def initialize
-    @url_prefix = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests'
+    @url_prefix = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests/?state=OPEN'
   end
 
   # summary of open pull requests
