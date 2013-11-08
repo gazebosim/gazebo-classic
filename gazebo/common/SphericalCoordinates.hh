@@ -85,7 +85,7 @@ namespace gazebo
       public: static SurfaceType Convert(const std::string &_str);
 
       /// \brief Get the distance between two points expressed in geographic
-      /// latitude and longitude.
+      /// latitude and longitude. It assumes that both points are at sea level.
       /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
       /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
       /// \param[in] _latA Latitude of point A.
