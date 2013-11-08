@@ -1604,7 +1604,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // number = {1},
         // pages = {91--97},
         // title = {{Generalized line criterion for Gauss-Seidel method}},
-        // url = {http://www.scielo.br/scielo.php?script=sci\_arttext\&pid=S0101-82052003000100006\&lng=en\&nrm=iso\&tlng=en},
+        // url = {http://www.scielo.br/scielo.php?pid=S1807-03022003000100006&script=sci_arttext},
         // volume = {22},
         // year = {2003}
         // }
