@@ -153,34 +153,20 @@ void GpuRaySensor::Init()
     }
     this->laserCam->SetCaptureData(true);
 
-    // initialize GpuLaser from sdf
-    // if (this->vertRayCount == 1)
-    // {
-    //   this->vertRangeCount = 1;
-    //   this->laserCam->SetIsHorizontal(true);
-    // }
-    // else
-    //   this->laserCam->SetIsHorizontal(false);
-
-    // assume horizontal sweep (rotation around z axis) like cpu ray sensor
+    // Assume horizontal sweep (rotation around z axis) like cpu ray sensor.
+    // TODO: verify vertical laser sweep also works.
     this->laserCam->SetIsHorizontal(true);
-    bool hasVertical = this->vertRayCount > 1;
 
     this->rangeCountRatio = this->horzRangeCount / this->vertRangeCount;
 
     this->laserCam->SetNearClip(this->GetRangeMin());
     this->laserCam->SetFarClip(this->GetRangeMax());
 
+    // horizontal laser setup
     this->laserCam->SetHorzFOV(
       (this->GetAngleMax() - this->GetAngleMin()).Radian());
-    this->laserCam->SetVertFOV((this->GetVerticalAngleMax()
-            - this->GetVerticalAngleMin()).Radian());
-
     this->laserCam->SetHorzHalfAngle(
       (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0);
-
-    this->laserCam->SetVertHalfAngle((this->GetVerticalAngleMax()
-            + this->GetVerticalAngleMin()).Radian() / 2.0);
 
     if (this->GetHorzFOV() > 2 * M_PI)
       this->laserCam->SetHorzFOV(2*M_PI);
@@ -198,15 +184,22 @@ void GpuRaySensor::Init()
     this->laserCam->SetHorzFOV(this->GetHorzFOV() / this->GetCameraCount());
     this->horzRayCount /= this->GetCameraCount();
 
-    if (this->GetVertFOV() > M_PI / 2)
+    // vertical laser setup
+    double vfov = (this->GetVerticalAngleMax()
+        - this->GetVerticalAngleMin()).Radian();
+    if (vfov > M_PI / 2)
     {
+      vfov = M_PI / 2;
       gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
-      this->laserCam->SetVertFOV(M_PI / 2);
-      this->SetVerticalAngleMin(this->laserCam->GetVertHalfAngle() -
-                                (this->GetVertFOV() / 2));
-      this->SetVerticalAngleMax(this->laserCam->GetVertHalfAngle() +
-                                (this->GetVertFOV() / 2));
     }
+    this->laserCam->SetVertFOV(vfov);
+    this->SetVerticalAngleMin(this->laserCam->GetVertHalfAngle() -
+                              (vfov / 2));
+    this->SetVerticalAngleMax(this->laserCam->GetVertHalfAngle() +
+                              (vfov / 2));
+
+    this->laserCam->SetVertHalfAngle((this->GetVerticalAngleMax()
+            + this->GetVerticalAngleMin()).Radian() / 2.0);
 
     if ((this->horzRayCount * this->vertRayCount) <
         (this->horzRangeCount * this->vertRangeCount))
@@ -215,6 +208,7 @@ void GpuRaySensor::Init()
       this->vertRayCount = std::max(this->vertRayCount, this->vertRangeCount);
     }
 
+    // Set laser camera aspect ratio
     if (this->laserCam->IsHorizontal())
     {
       if (this->vertRayCount > 1)

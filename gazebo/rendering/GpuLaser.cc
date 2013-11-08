@@ -232,7 +232,6 @@ void GpuLaser::PostRender()
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->secondPassTexture->getBuffer();
-//    pixelBuffer = this->firstPassTextures[0]->getBuffer();
 
     size_t size = Ogre::PixelUtil::getMemorySize(
                     width, height, 1, Ogre::PF_FLOAT32_RGB);
@@ -538,19 +537,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   {
     this->camera->setAspectRatio(this->rayCountRatio);
 
-    gzerr << "b4 camera fov " << this->camera->getFOVy().valueRadians() <<
-        " " << this->camera->getAspectRatio() << std::endl;
-
-    //this->fovPadding = 0.8;
-    this->fovPadding = 0.0;
-    this->camera->setFOVy(Ogre::Radian(this->vfov + this->fovPadding));
-
-  //  double ratio = this->vfov/(this->vfov + this->fovPadding);
-
-//    this->camera->setAspectRatio(this->rayCountRatio * ratio);
-
-    gzerr << "camera fov " << this->camera->getFOVy().valueRadians() <<
-        " " << this->camera->getAspectRatio() << std::endl;
+    this->camera->setFOVy(Ogre::Radian(this->vfov));
   }
 }
 
@@ -616,12 +603,9 @@ void GpuLaser::CreateMesh()
   double startX = dx;
   double startY = viewHeight;
 
-  // padding
-  double paddingRatio = this->vfov / (this->vfov + this->fovPadding);
-  //double paddingRatio = (this->vfov-0.8) / this->vfov;
-
-  double phi = this->vfov / 2;
-  //double phi = (this->vfov-0.8) / 2;
+  // half of actual camera vertical FOV without padding
+  double phi = (this->vfov-this->vfovPadding) / 2;
+  double theta = this->hfov / 2;
 
   double vAngMin = -phi;
 
@@ -630,6 +614,9 @@ void GpuLaser::CreateMesh()
 
   // index of ray
   unsigned int ptsOnLine = 0;
+
+  gazebo::math::Vector3 axis;
+  math::Quaternion ray;
 
   for (unsigned int j = 0; j < this->h2nd; ++j)
   {
@@ -643,11 +630,6 @@ void GpuLaser::CreateMesh()
     {
       // total laser hfov
       double thfov = this->textureCount * this->hfov;
-//      double thfov = this->textureCount * (this->hfov - 0.8);
-
-      // half of camera hfov
-       double theta = this->hfov / 2;
-      //double theta = (this->hfov-0.8) / 2;
 
       // current horizontal angle from start of laser scan
       double delta = ((thfov / (this->w2nd - 1)) * i);
@@ -662,9 +644,8 @@ void GpuLaser::CreateMesh()
         delta -= (thfov / (this->w2nd - 1));
       }
 
-      // adjust delta:
       // first compute angle from the start of current camera's horizontal
-      // min angle, then work out angle from center of current camera.
+      // min angle, then set delta to be angle from center of current camera.
       delta = delta - (texture * (theta*2));
       delta = delta - theta;
 
@@ -682,59 +663,33 @@ void GpuLaser::CreateMesh()
       // together the final depth image.
       submesh->AddVertex(texture/1000.0, startX, startY);
 
-
-      //============
-      gazebo::math::Vector3 axis;
-      double yawAngle = delta;
-      double pitchAngle = gamma;
-      math::Quaternion ray;
-      ray.SetFromEuler(gazebo::math::Vector3(0.0, -pitchAngle, yawAngle));
+      // convert laser scan from plane to cone sweep for non zero pitch angles,
+      // this samples the depth image in a shape of a parabola.
+      ray.SetFromEuler(gazebo::math::Vector3(0.0, -gamma, delta));
       axis = ray * math::Vector3(1.0, 0.0, 0.0);
-      //double l = sqrt(axis.x*axis.x + axis.y*axis.y);
       double newGamma = atan(axis.z / axis.x);
       double newDelta = atan(axis.y / axis.x);
-
-      //if (math::equal(gamma, 0.0))
-      //gzerr << " gamma " << gamma << " " << newGamma <<
-      //    " delta " << delta << " " << newDelta << " " << std::endl;
-
-      //gamma = newGamma;
-      //delta = newDelta;
-
-      //math::Vector3 euler = ray.GetAsEuler();
-
-/*      math::Quaternion pitch(math::Vector3(1, 0, 0), gamma);
-      math::Quaternion yaw(math::Vector3(0, 0, 1), delta);
-      math::Vector3 ax(0, 1, 0);
-      //ax = yaw * pitch;
-      //ax = pitch * ax;
-      math::Quaternion q =  yaw * pitch;
-            math::Vector3 euler = q.GetAsEuler();*/
-
-     //     axis = ray * math::Vector3(1.0, 0.0, 0.0);
-
-//      gzerr << " ray " << ray << " euler " << euler.x << " " <<
-//          euler.y << " " << euler.z  << std::endl;
-      //============
 
       // adjust uv coordinates of depth texture to match projection of current
       // laser ray the depth image plane.
       double u, v;
-      u = -(cos(phi) * tan(newDelta))/(2 * tan(theta) * cos(newGamma)) + 0.5;
-      v = math::equal(phi, 0.0) ? 0.5 : -tan(newGamma)/(2 * tan(phi)) + 0.5;
-      if (u > 1.0 || v > 1.0 || u < 0 || v < 0)
-        gzerr << u << " , " << v << std::endl;
-      /*if (this->isHorizontal)
+      //if (u > 1.0 || v > 1.0 || u < 0 || v < 0)
+      //  gzerr << u << " , " << v << std::endl;
+      if (this->isHorizontal)
       {
-        u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = math::equal(phi, 0.0) ? 0.5 : -tan(gamma)/(2 * tan(phi)) + 0.5;
+        // u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
+        // v = math::equal(phi, 0.0) ? 0.5 : -tan(gamma)/(2 * tan(phi)) + 0.5;
+        u = -(cos(this->vfov/2.0) * tan(newDelta))/
+            (2 * tan(theta) * cos(newGamma)) + 0.5;
+        v = math::equal(this->vfov/2.0, 0.0) ? 0.5 :
+            -tan(newGamma)/(2 * tan(this->vfov/2.0)) + 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
         u = math::equal(theta, 0.0) ?  0.5 :
              -tan(delta)/(2 * tan(theta)) + 0.5;
-      }*/
+      }
       submesh->AddTexCoord(u, v);
     }
   }
@@ -842,7 +797,8 @@ void GpuLaser::SetHorzFOV(double _hfov)
 //////////////////////////////////////////////////
 void GpuLaser::SetVertFOV(double _vfov)
 {
-  this->vfov = _vfov;
+  this->vfov = math::equal(_vfov, 0.0) ? 0.0 : M_PI / 2.0;
+  this->vfovPadding = this->vfov - _vfov;
 }
 
 //////////////////////////////////////////////////

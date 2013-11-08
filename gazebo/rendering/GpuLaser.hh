@@ -370,10 +370,13 @@ namespace gazebo
       /// rendering pass.
       private: std::vector<int> texIdx;
 
-      /// Number of second pass texture units created.
+      /// \brief Number of second pass texture units created.
       private: static int texCount;
 
-      private: double fovPadding;
+      /// \brief Padding added to vertical FOV in order capture a large enough
+      /// depth image needed when undistorting min and max vertical laser scans
+      /// in a horizontal sweep.
+      private: double vfovPadding;
     };
     /// \}
   }
