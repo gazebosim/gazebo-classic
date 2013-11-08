@@ -32,6 +32,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
@@ -231,6 +232,7 @@ void GpuLaser::PostRender()
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->secondPassTexture->getBuffer();
+//    pixelBuffer = this->firstPassTextures[0]->getBuffer();
 
     size_t size = Ogre::PixelUtil::getMemorySize(
                     width, height, 1, Ogre::PF_FLOAT32_RGB);
@@ -430,6 +432,7 @@ void GpuLaser::RenderImpl()
     this->UpdateRenderTarget(this->firstPassTargets[i],
                   this->matFirstPass, this->camera);
     this->firstPassTargets[i]->update(false);
+    this->firstPassTargets[i]->writeContentsToFile("firstpass.png");
   }
 
   if (this->textureCount > 1)
@@ -534,7 +537,20 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   if (_index == 0)
   {
     this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
+
+    gzerr << "b4 camera fov " << this->camera->getFOVy().valueRadians() <<
+        " " << this->camera->getAspectRatio() << std::endl;
+
+    //this->fovPadding = 0.8;
+    this->fovPadding = 0.0;
+    this->camera->setFOVy(Ogre::Radian(this->vfov + this->fovPadding));
+
+  //  double ratio = this->vfov/(this->vfov + this->fovPadding);
+
+//    this->camera->setAspectRatio(this->rayCountRatio * ratio);
+
+    gzerr << "camera fov " << this->camera->getFOVy().valueRadians() <<
+        " " << this->camera->getAspectRatio() << std::endl;
   }
 }
 
@@ -594,38 +610,62 @@ void GpuLaser::CreateMesh()
 
   dx = 0.1;
 
+  // startX ranges from 0 to -(w2nd/10) at dx=0.1 increments
+  // startY ranges from h2nd/10 to 0 at dy=0.1 decrements
+  // see GpuLaser::Set2ndPassTarget() on how the ortho cam is set up
   double startX = dx;
   double startY = viewHeight;
 
+  // padding
+  double paddingRatio = this->vfov / (this->vfov + this->fovPadding);
+  //double paddingRatio = (this->vfov-0.8) / this->vfov;
+
   double phi = this->vfov / 2;
+  //double phi = (this->vfov-0.8) / 2;
 
   double vAngMin = -phi;
 
   if (this->GetImageHeight() == 1)
     phi = 0;
 
+  // index of ray
   unsigned int ptsOnLine = 0;
+
   for (unsigned int j = 0; j < this->h2nd; ++j)
   {
     double gamma = 0;
     if (this->h2nd != 1)
+    {
+      // gamma: current vertical angle
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + vAngMin;
+    }
     for (unsigned int i = 0; i < this->w2nd; ++i)
     {
+      // total laser hfov
       double thfov = this->textureCount * this->hfov;
-      double theta = this->hfov / 2;
+//      double thfov = this->textureCount * (this->hfov - 0.8);
+
+      // half of camera hfov
+       double theta = this->hfov / 2;
+      //double theta = (this->hfov-0.8) / 2;
+
+      // current horizontal angle from start of laser scan
       double delta = ((thfov / (this->w2nd - 1)) * i);
 
+      // index of texture that contains the depth value
       unsigned int texture = delta / (theta*2);
 
+      // cap texture index and horizontal angle
       if (texture > this->textureCount-1)
       {
         texture -= 1;
         delta -= (thfov / (this->w2nd - 1));
       }
 
+      // adjust delta:
+      // first compute angle from the start of current camera's horizontal
+      // min angle, then work out angle from center of current camera.
       delta = delta - (texture * (theta*2));
-
       delta = delta - theta;
 
       startX -= dx;
@@ -636,19 +676,65 @@ void GpuLaser::CreateMesh()
         startY -= dy;
       }
       ptsOnLine++;
+
+      // the texture/1000.0 value is used in the laser_2nd_pass.frag shader
+      // as a trick to determine which camera texture to use when stitching
+      // together the final depth image.
       submesh->AddVertex(texture/1000.0, startX, startY);
 
+
+      //============
+      gazebo::math::Vector3 axis;
+      double yawAngle = delta;
+      double pitchAngle = gamma;
+      math::Quaternion ray;
+      ray.SetFromEuler(gazebo::math::Vector3(0.0, -pitchAngle, yawAngle));
+      axis = ray * math::Vector3(1.0, 0.0, 0.0);
+      //double l = sqrt(axis.x*axis.x + axis.y*axis.y);
+      double newGamma = atan(axis.z / axis.x);
+      double newDelta = atan(axis.y / axis.x);
+
+      //if (math::equal(gamma, 0.0))
+      //gzerr << " gamma " << gamma << " " << newGamma <<
+      //    " delta " << delta << " " << newDelta << " " << std::endl;
+
+      //gamma = newGamma;
+      //delta = newDelta;
+
+      //math::Vector3 euler = ray.GetAsEuler();
+
+/*      math::Quaternion pitch(math::Vector3(1, 0, 0), gamma);
+      math::Quaternion yaw(math::Vector3(0, 0, 1), delta);
+      math::Vector3 ax(0, 1, 0);
+      //ax = yaw * pitch;
+      //ax = pitch * ax;
+      math::Quaternion q =  yaw * pitch;
+            math::Vector3 euler = q.GetAsEuler();*/
+
+     //     axis = ray * math::Vector3(1.0, 0.0, 0.0);
+
+//      gzerr << " ray " << ray << " euler " << euler.x << " " <<
+//          euler.y << " " << euler.z  << std::endl;
+      //============
+
+      // adjust uv coordinates of depth texture to match projection of current
+      // laser ray the depth image plane.
       double u, v;
-      if (this->isHorizontal)
+      u = -(cos(phi) * tan(newDelta))/(2 * tan(theta) * cos(newGamma)) + 0.5;
+      v = math::equal(phi, 0.0) ? 0.5 : -tan(newGamma)/(2 * tan(phi)) + 0.5;
+      if (u > 1.0 || v > 1.0 || u < 0 || v < 0)
+        gzerr << u << " , " << v << std::endl;
+      /*if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = math::equal(phi, 0.0) ? 0.5 : -tan(gamma)/(2 * tan(phi)) + 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
-      }
+        u = math::equal(theta, 0.0) ?  0.5 :
+             -tan(delta)/(2 * tan(theta)) + 0.5;
+      }*/
       submesh->AddTexCoord(u, v);
     }
   }
@@ -696,7 +782,6 @@ void GpuLaser::CreateCanvas()
 
   this->visual->SetMaterial("Gazebo/Green");
   this->visual->SetAmbient(common::Color(0, 1, 0, 1));
-  this->visual->SetVisible(true);
   this->scene->AddVisual(this->visual);
 }
 

@@ -372,6 +372,8 @@ namespace gazebo
 
       /// Number of second pass texture units created.
       private: static int texCount;
+
+      private: double fovPadding;
     };
     /// \}
   }
