@@ -44,12 +44,22 @@ void JointVisual::Load(ConstJointPtr &_msg)
 {
   Visual::Load();
 
+  // joint axis is in the model frame so set up the scene node to be
+  // the same orientation as the model then apply rotations later.
+  VisualPtr model = this->GetRootVisual();
+  if (model)
+  {
+    math::Quaternion quat = model->GetRotation();
+    this->GetSceneNode()->_setDerivedOrientation(Conversions::Convert(quat));
+  }
+
   this->axisVisual.reset(
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
   this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  this->SetRotation(this->GetRotation() *
+      msgs::Convert(_msg->pose().orientation()));
 
   if (math::equal(_msg->axis1().xyz().x(), 1.0))
     this->axisVisual->ShowRotation(0);
