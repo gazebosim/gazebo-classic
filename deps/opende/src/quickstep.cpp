@@ -1590,7 +1590,26 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
         /// Keep parent/child MOI/invMOI in inertial frame.
 
-        /// compute abs sum of off diagonals and store in sumAbsOffDiags.
+        // Stability is presumed maintained by the following condition:
+        //
+        // On a per row basis, sum of absolute values of off-diagonal elements
+        // is less than absolute value of the diagonal element itself.
+        //
+        // @article{Garcia2003,
+        // author = {Garcia, M.V.P. and {Humes Jr.}, C. and Stern, J.M.},
+        // doi = {10.1590/S0101-82052003000100006},
+        // issn = {0101-8205},
+        // journal = {Computational \& Applied Mathematics},
+        // keywords = {gauss-seidel method,line criterion,manufacturing sys-,stability and control of},
+        // number = {1},
+        // pages = {91--97},
+        // title = {{Generalized line criterion for Gauss-Seidel method}},
+        // url = {http://www.scielo.br/scielo.php?script=sci\_arttext\&pid=S0101-82052003000100006\&lng=en\&nrm=iso\&tlng=en},
+        // volume = {22},
+        // year = {2003}
+        // }
+        //
+        // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiags.
         for (int si = 0; si < 12; ++si)
         {
           int col = si%4;
@@ -1613,9 +1632,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             sumAbsOffDiags2[row] += dFabs(MOI_ptr2[si]);
           }
         }
-
-        // Modify MOI by adding delta scalar MOI in tensor form.
-        // Check and maintain diagonal dominance.
+        //
+        // Then modify MOI by adding delta scalar MOI in tensor form, but
+        // check and maintain diagonal dominance using the precomputed off-diagonal-sums.
         for (int si = 0; si < 12; ++si)
         {
           int col = si%4;
@@ -1623,32 +1642,33 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           if (row == col)  // diagonal term
           {
 
-            // check for negative diagonal
-            double m1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
-            if (m1 > sumAbsOffDiags1[row])
+            // check per row, that sum of absolute values of off-diagonal elements
+            // is less than absolute value of the diagonal element itself.
+            double newMOI1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+            if (newMOI1 > sumAbsOffDiags1[row])
             {
               // modify inertia in the constrained direction,
               // doing so should not alter dynamics of the system.
-              MOI_ptr1[si] = m1;
+              MOI_ptr1[si] = newMOI1;
             }
             else
             {
-              /// \FIXME: increase diagonal dominance to preserve stability,
+              /// Increase diagonal dominance to preserve stability,
               /// Even though this changes the dynamics of the system,
               /// it's either this or unstable simulation.
               MOI_ptr1[si] = sumAbsOffDiags1[row];
             }
 
-            double m2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
-            if (m2 > sumAbsOffDiags2[row])
+            double newMOI2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
+            if (newMOI2 > sumAbsOffDiags2[row])
             {
               // modify inertia in the constrained direction,
               // doing so should not alter dynamics of the system.
-              MOI_ptr2[si] = m2;
+              MOI_ptr2[si] = newMOI2;
             }
             else
             {
-              /// \FIXME: increase diagonal dominance to preserve stability,
+              /// Increase diagonal dominance to preserve stability,
               /// Even though this changes the dynamics of the system,
               /// it's either this or unstable simulation.
               MOI_ptr2[si] = sumAbsOffDiags2[row];
