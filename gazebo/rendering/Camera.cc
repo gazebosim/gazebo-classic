@@ -1270,14 +1270,17 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-        _textureName,
-        "General",
-        Ogre::TEX_TYPE_2D,
-        this->GetImageWidth(),
-        this->GetImageHeight(),
-        0,
-        (Ogre::PixelFormat)this->imageFormat,
-        Ogre::TU_RENDERTARGET, NULL, false, 4)).getPointer();
+      _textureName,
+      "General",
+      Ogre::TEX_TYPE_2D,
+      this->GetImageWidth(),
+      this->GetImageHeight(),
+      0,
+      (Ogre::PixelFormat)this->imageFormat,
+      Ogre::TU_RENDERTARGET,
+      0,
+      false,
+      4)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
