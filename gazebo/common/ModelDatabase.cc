@@ -274,7 +274,15 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
   {
     // Wait for an update request.
     if (!_fetchImmediately)
-      this->updateCacheCondition.wait(lock);
+    {
+      // Wait in a loop around timed_wait() to avoid potential deadlock in
+      // the case of a shutdown that happens very early, while things are
+      // still getting setup.
+      boost::posix_time::time_duration timeout =
+        boost::posix_time::milliseconds(10);
+      while (!this->stop)
+        this->updateCacheCondition.timed_wait(lock, timeout);
+    }
     else
       _fetchImmediately = false;
 
