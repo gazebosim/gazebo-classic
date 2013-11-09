@@ -28,6 +28,7 @@ namespace gazebo
     public: SphereAtlasTestPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
+    public: virtual void Reset();
 
     private: void OnUpdate();
 
