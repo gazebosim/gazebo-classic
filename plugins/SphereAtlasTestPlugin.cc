@@ -167,8 +167,9 @@ void SphereAtlasTestPlugin::Init()
 /////////////////////////////////////////////////
 void SphereAtlasTestPlugin::Reset()
 {
-  gzwarn << "This is not a typical usage of plugin Reset function, "
-         << "we are doing this just for testing purposes.\n";
+  gzlog << "SphereAtlasTestPlugin: \n"
+        << "  This is not a typical usage of plugin Reset function,\n"
+        << "  we are doing this just for testing purposes.\n";
   if (this->updateConnection)
   {
     event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
