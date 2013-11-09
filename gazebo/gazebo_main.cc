@@ -64,8 +64,10 @@ void sig_handler(int /*signo*/)
   sig_killed = true;
   kill(pid1, SIGINT);
   kill(pid2, SIGINT);
-  // wait some time and if not dead, escalate to SIGKILL
-  for (unsigned int i = 0; i < 5; ++i)
+  double sleepSecs = 0.001;
+  double totalWaitSecs = 500.0;
+  // Wait some time and if not dead, escalate to SIGKILL
+  for (unsigned int i = 0; i < (unsigned int)(totalWaitSecs*1/sleepSecs); ++i)
   {
     if (!killed1)
     {
@@ -81,8 +83,8 @@ void sig_handler(int /*signo*/)
     }
     if (killed1 && killed2)
       break;
-    /// @todo: fix hardcoded timeout
-    sleep(1);
+    // Sleep briefly
+    gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
   }
   if (!killed1)
   {
@@ -106,7 +108,9 @@ int main(int _argc, char **_argv)
     return 0;
   }
 
-  if (signal(SIGINT, sig_handler) == SIG_ERR)
+  struct sigaction sigact;
+  sigact.sa_handler = sig_handler;
+  if (sigaction(SIGINT, &sigact, NULL))
   {
     gzerr << "Stopping. Unable to catch SIGINT.\n"
           << " Please visit http://gazebosim.org/support.html for help.\n";
@@ -115,10 +119,17 @@ int main(int _argc, char **_argv)
 
   pid1 = fork();
 
-  char** myargv = new char*[_argc+1];
-  for (int i = 0; i < _argc; ++i)
-    myargv[i] = _argv[i];
-  myargv[_argc] = static_cast<char*>(NULL);
+  char** argv_server = new char*[_argc+1];
+  char** argv_client = new char*[_argc+1];
+  argv_server[0] = (char*)"gzserver";
+  argv_client[0] = (char*)"gzclient";
+  for (int i = 1; i < _argc; ++i)
+  {
+    argv_server[i] = _argv[i];
+    argv_client[i] = _argv[i];
+  }
+  argv_server[_argc] = static_cast<char*>(NULL);
+  argv_client[_argc] = static_cast<char*>(NULL);
 
   if (pid1)
   {
@@ -138,7 +149,7 @@ int main(int _argc, char **_argv)
     {
       // gazebo::gui::run(_argc, _argv);
       // gzclient argv
-      execvp("gzclient", myargv);
+      execvp(argv_client[0], argv_client);
     }
   }
   else
@@ -150,10 +161,11 @@ int main(int _argc, char **_argv)
     // server->Fini();
     // delete server;
     // server = NULL;
-    execvp("gzserver", myargv);
+    execvp(argv_server[0], argv_server);
   }
 
-  delete[] myargv;
+  delete[] argv_server;
+  delete[] argv_client;
 
   return 0;
 }

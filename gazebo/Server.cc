@@ -47,14 +47,11 @@
 namespace po = boost::program_options;
 using namespace gazebo;
 
-bool Server::stop = false;
-static bool g_initialized = false;
+bool Server::stop = true;
 
 /////////////////////////////////////////////////
 Server::Server()
 {
-  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -267,7 +264,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return g_initialized && !this->stop && !transport::is_stopped();
+  return !this->stop && !transport::is_stopped();
 }
 
 /////////////////////////////////////////////////
@@ -410,7 +407,7 @@ void Server::Init()
   sensors::init();
 
   physics::init_worlds();
-  g_initialized = true;
+  this->stop = false;
 }
 
 /////////////////////////////////////////////////
@@ -451,6 +448,13 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = Server::SigInt;
+  if (sigaction(SIGINT, &sigact, NULL))
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
   if (this->stop)
     return;
 
