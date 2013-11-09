@@ -1611,6 +1611,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   EXPECT_TRUE(head);
 
   {
+    gzdbg << "Testing large perturbation with PID controller active.\n";
     // Test:  With Robot PID controller active, introduce a large
     //        constraint error by breaking some model joints to the world
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
@@ -1679,6 +1680,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   }
 
   {
+    gzdbg << "Testing large perturbation with PID controller disabled.\n";
     // Test:  Turn off Robot PID controller, then introduce a large
     //        constraint error by breaking some model joints to the world
 
