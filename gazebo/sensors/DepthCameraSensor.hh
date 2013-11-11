@@ -92,7 +92,6 @@ namespace gazebo
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;
-
     };
     /// \}
   }
