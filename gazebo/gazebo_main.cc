@@ -121,8 +121,8 @@ int main(int _argc, char **_argv)
 
   char** argv_server = new char*[_argc+1];
   char** argv_client = new char*[_argc+1];
-  argv_server[0] = (char*)"gzserver";
-  argv_client[0] = (char*)"gzclient";
+  argv_server[0] = const_cast<char*>("gzserver");
+  argv_client[0] = const_cast<char*>("gzclient");
   for (int i = 1; i < _argc; ++i)
   {
     argv_server[i] = _argv[i];
