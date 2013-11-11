@@ -6,17 +6,21 @@ endif()
 
 set (sources 
   Diagnostics.cc
+  ImgParser.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
+  ZadeatImgParser.cc
 )
 
 set (headers 
   Diagnostics.hh
+  ImgParser.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
   UtilTypes.hh
+  ZadeatImgParser.cc
 )
 
 set (gtest_sources

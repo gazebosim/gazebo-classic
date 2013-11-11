@@ -18,7 +18,7 @@ if(HAVE_BULLET)
 endif()
 
 set(tests
-  LogParser.cc
+  images.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
