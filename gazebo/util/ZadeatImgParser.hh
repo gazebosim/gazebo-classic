@@ -77,8 +77,8 @@ namespace gazebo
       /// \param[out] _r R component.
       /// \param[out] _g G component.
       /// \param[out] _b B component.
-      private: void Yuv2rgb(unsigned char _y, unsigned char _u,
-                            unsigned char _v, unsigned char &_r,
+      private: void Yuv2rgb(const unsigned char _y, const unsigned char _u,
+                            const unsigned char _v, unsigned char &_r,
                             unsigned char &_g, unsigned char &_b);
     };
     /// \}

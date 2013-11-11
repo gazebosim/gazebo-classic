@@ -92,8 +92,8 @@ void ZadeatImgParser::ToRGB(const unsigned char *_src, unsigned char *_dst)
 }
 
 //////////////////////////////////////////////////
-void ZadeatImgParser::Yuv2rgb(unsigned char _y, unsigned char _u,
-                              unsigned char _v, unsigned char &_r,
+void ZadeatImgParser::Yuv2rgb(const unsigned char _y, const unsigned char _u,
+                              const unsigned char _v, unsigned char &_r,
                               unsigned char &_g, unsigned char &_b)
 {
   int r = _y + ((1436 * (_v - 128)) >> 10);
