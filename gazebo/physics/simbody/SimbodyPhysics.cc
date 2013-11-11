@@ -242,6 +242,9 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 void SimbodyPhysics::Reset()
 {
   this->integ->initialize(this->system.getDefaultState());
+
+  // restore potentially user run-time modified gravity
+  this->SetGravity(this->GetGravity());
 }
 
 //////////////////////////////////////////////////
@@ -840,7 +843,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // on the fly.
         gzJoint->damper =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
         #ifdef ADD_JOINT_SPRINGS
         // KLUDGE add spring (stiffness proportional to mass)
@@ -877,7 +880,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // on the fly.
         gzJoint->damper =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
-                                   gzJoint->GetDampingCoefficient());
+                                   gzJoint->GetDamping(0));
 
         #ifdef ADD_JOINT_SPRINGS
         // KLUDGE add spring (stiffness proportional to mass)
