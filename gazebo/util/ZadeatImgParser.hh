@@ -68,7 +68,7 @@ namespace gazebo
       public: void GetNextImage(unsigned char *_img);
 
       // Documentation inherited.
-      private: void ToRGB(unsigned char *_src, unsigned char *_dst);
+      private: void ToRGB(const unsigned char *_src, unsigned char *_dst);
 
       /// \brief Convert a pixel from YUV422 to RGB888.
       /// \param[in] _y Y component.

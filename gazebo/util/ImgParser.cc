@@ -84,7 +84,8 @@ void ImgParser::Parse()
 }
 
 //////////////////////////////////////////////////
-void ImgParser::SaveImage(const std::string &_filename, unsigned char *_img)
+void ImgParser::SaveImage(const std::string &_filename,
+                          const unsigned char *_img)
 {
   std::ofstream myFile(_filename.c_str(), std::ios::out | std::ios::binary);
 
@@ -97,7 +98,7 @@ void ImgParser::SaveImage(const std::string &_filename, unsigned char *_img)
 
   // Write the data
   uint32_t dataSize = this->GetWidth() * this->GetHeight() * this->BppDst;
-  myFile.write(reinterpret_cast<char *>(_img), dataSize);
+  myFile.write(reinterpret_cast<const char *>(_img), dataSize);
 
   myFile.close();
 }

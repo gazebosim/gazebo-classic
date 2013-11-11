@@ -72,7 +72,8 @@ namespace gazebo
       /// \brief Convert an image to RGB888.
       /// \param[in] _src Source image.
       /// \param[out] _dst Destination image converted to RGB888.
-      private: virtual void ToRGB(unsigned char *_src, unsigned char *_dst) = 0;
+      private: virtual void ToRGB(const unsigned char *_src,
+                                  unsigned char *_dst) = 0;
 
       /// \brief Parse the image dataset and save the RGB images on disk.
       public: void Parse();
@@ -80,7 +81,8 @@ namespace gazebo
       /// \brief Save an image into disk.
       /// \param[in] _filename the path to the image to be saved.
       /// \param[in] _img Image data.
-      public: void SaveImage(const std::string &_filename, unsigned char *_img);
+      public: void SaveImage(const std::string &_filename,
+                             const unsigned char *_img);
 
       /// \brief File containing the log dataset.
       protected: std::ifstream logFile;

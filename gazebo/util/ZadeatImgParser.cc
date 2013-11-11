@@ -66,7 +66,7 @@ void ZadeatImgParser::GetNextImage(unsigned char *_img)
 }
 
 //////////////////////////////////////////////////
-void ZadeatImgParser::ToRGB(unsigned char *_src, unsigned char *_dst)
+void ZadeatImgParser::ToRGB(const unsigned char *_src, unsigned char *_dst)
 {
   for (int i = 0; i < GetHeight(); ++i)
     {
