@@ -2,70 +2,71 @@
 
 ### Gazebo 2.1.0 (2013-11-08)
 1. Fix mainwindow unit test
-  * [Pull request #752](https://bitbucket.org/osrf/gazebo/pull-request/752)
+    * [Pull request #752](https://bitbucket.org/osrf/gazebo/pull-request/752)
 1. Visualize moment of inertia
-  * Pull request [#745](https://bitbucket.org/osrf/gazebo/pull-request/745), [#769](https://bitbucket.org/osrf/gazebo/pull-request/769), [#787](https://bitbucket.org/osrf/gazebo/pull-request/787)
-  * Issue # 203
+    * Pull request [#745](https://bitbucket.org/osrf/gazebo/pull-request/745), [#769](https://bitbucket.org/osrf/gazebo/pull-request/769), [#787](https://bitbucket.org/osrf/gazebo/pull-request/787)
+    * [Issue #203](https://bitbucket.org/osrf/gazebo/issue/203)
 1. Update tool to cound lines of code
-  * [Pull request #758](https://bitbucket.org/osrf/gazebo/pull-request/758)
+    * [Pull request #758](https://bitbucket.org/osrf/gazebo/pull-request/758)
 1. Implement World::Clear
-  * Pull request [#785](https://bitbucket.org/osrf/gazebo/pull-request/785), [#804](https://bitbucket.org/osrf/gazebo/pull-request/804)
+    * Pull request [#785](https://bitbucket.org/osrf/gazebo/pull-request/785), [#804](https://bitbucket.org/osrf/gazebo/pull-request/804)
 1. Improve Bullet support
-  * [Pull request #805](https://bitbucket.org/osrf/gazebo/pull-request/805)
+    * [Pull request #805](https://bitbucket.org/osrf/gazebo/pull-request/805)
 1. Fix doxygen spacing
-  * [Pull request #740](https://bitbucket.org/osrf/gazebo/pull-request/740)
+    * [Pull request #740](https://bitbucket.org/osrf/gazebo/pull-request/740)
 1. Add tool to generate model images for thepropshop.org
-  * [Pull request #734](https://bitbucket.org/osrf/gazebo/pull-request/734)
+    * [Pull request #734](https://bitbucket.org/osrf/gazebo/pull-request/734)
 1. Added paging support for terrains
-  * [Pull request #707](https://bitbucket.org/osrf/gazebo/pull-request/707)
+    * [Pull request #707](https://bitbucket.org/osrf/gazebo/pull-request/707)
 1. Added plugin path to LID_LIBRARY_PATH in setup.sh
-  * [Pull request #750](https://bitbucket.org/osrf/gazebo/pull-request/750)
+    * [Pull request #750](https://bitbucket.org/osrf/gazebo/pull-request/750)
 1. Fixe for OSX
-  * [Pull request #766](https://bitbucket.org/osrf/gazebo/pull-request/766)
-  * [Pull request #786](https://bitbucket.org/osrf/gazebo/pull-request/786)
-  * Issue #906
+    * [Pull request #766](https://bitbucket.org/osrf/gazebo/pull-request/766)
+    * [Pull request #786](https://bitbucket.org/osrf/gazebo/pull-request/786)
+    * [Issue #906](https://bitbucket.org/osrf/gazebo/issue/906)
 1. Update copyright information
-  * [Pull request #771](https://bitbucket.org/osrf/gazebo/pull-request/771)
+    * [Pull request #771](https://bitbucket.org/osrf/gazebo/pull-request/771)
 1. Enable screen dependant tests
-  * [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
-  * Issue #811
+    * [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
+    * [Issue #811](https://bitbucket.org/osrf/gazebo/issue/811)
 1. Fix gazebo command line help message
-  * [Pull request #775](https://bitbucket.org/osrf/gazebo/pull-request/775)
-  * Issue #898
+    * [Pull request #775](https://bitbucket.org/osrf/gazebo/pull-request/775)
+    * [Issue #898](https://bitbucket.org/osrf/gazebo/issue/898)
 1. Fix man page test
-  * [Pull request #774](https://bitbucket.org/osrf/gazebo/pull-request/774)
+    * [Pull request #774](https://bitbucket.org/osrf/gazebo/pull-request/774)
 1. Improve load time by reducing calls to RTShader::Update
-  * [Pull request #773](https://bitbucket.org/osrf/gazebo/pull-request/773)
-  * Issue #877
+    * [Pull request #773](https://bitbucket.org/osrf/gazebo/pull-request/773)
+    * [Issue #877](https://bitbucket.org/osrf/gazebo/issue/877)
 1. Fix joint visualization
-  * [Pull request #776](https://bitbucket.org/osrf/gazebo/pull-request/776)
-  * [Pull request #802](https://bitbucket.org/osrf/gazebo/pull-request/802)
-  * Issue #464
+    * [Pull request #776](https://bitbucket.org/osrf/gazebo/pull-request/776)
+    * [Pull request #802](https://bitbucket.org/osrf/gazebo/pull-request/802)
+    * [Issue #464](https://bitbucket.org/osrf/gazebo/issue/464)
 1. Add helpers to fix NaN
-  * [Pull request #742](https://bitbucket.org/osrf/gazebo/pull-request/742)
+    * [Pull request #742](https://bitbucket.org/osrf/gazebo/pull-request/742)
 1. Fix model resizing via the GUI
-  * [Pull request #763](https://bitbucket.org/osrf/gazebo/pull-request/763)
-  * Issue #885
+    * [Pull request #763](https://bitbucket.org/osrf/gazebo/pull-request/763)
+    * [Issue #885](https://bitbucket.org/osrf/gazebo/issue/885)
 1. Simplify gzlog test by using sha1
-  * [Pull request #781](https://bitbucket.org/osrf/gazebo/pull-request/781)
-  * Issue #837
+    * [Pull request #781](https://bitbucket.org/osrf/gazebo/pull-request/781)
+    * [Issue #837](https://bitbucket.org/osrf/gazebo/issue/837)
 1. Enable cppcheck for header files
-  * [Pull request #782](https://bitbucket.org/osrf/gazebo/pull-request/782)
-  * Issue #907
+    * [Pull request #782](https://bitbucket.org/osrf/gazebo/pull-request/782)
+    * [Issue #907](https://bitbucket.org/osrf/gazebo/issue/907)
 1. Fix broken regression test
-  * [Pull request #784](https://bitbucket.org/osrf/gazebo/pull-request/784)
-  * Issue #884
+    * [Pull request #784](https://bitbucket.org/osrf/gazebo/pull-request/784)
+    * [Issue #884](https://bitbucket.org/osrf/gazebo/issue/884)
 1. All simbody and dart to pass tests
-  * [Pull request #790](https://bitbucket.org/osrf/gazebo/pull-request/790)
-  * Issue #873
+    * [Pull request #790](https://bitbucket.org/osrf/gazebo/pull-request/790)
+    * [Issue #873](https://bitbucket.org/osrf/gazebo/issue/873)
 1. Fix camera rotation from SDF
-  * [Pull request #789](https://bitbucket.org/osrf/gazebo/pull-request/789)
-  * Issue #920
+    * [Pull request #789](https://bitbucket.org/osrf/gazebo/pull-request/789)
+    * [Issue #920](https://bitbucket.org/osrf/gazebo/issue/920)
 1. Fix bitbucket pullrequest command line tool to match new API
-  * [Pull request #803](https://bitbucket.org/osrf/gazebo/pull-request/803)
+    * [Pull request #803](https://bitbucket.org/osrf/gazebo/pull-request/803)
 1. Fix transceiver spanw errors in tests
-  * [Pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
-  * [Pull request #814](https://bitbucket.org/osrf/gazebo/pull-request/814)
+    * [Pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
+    * [Pull request #814](https://bitbucket.org/osrf/gazebo/pull-request/814)
+    *
 ### Gazebo 2.0.0 (2013-10-08)
 1. Refactor code check tool.
     * [Pull Request #669](https://bitbucket.org/osrf/gazebo/pull-request/669)
@@ -148,18 +149,34 @@
 ## Gazebo 1.9
 
 ### Gazebo 1.9.2 (2013-11-08)
-* Fix enable/disable sky and clouds from SDF in pull request #809.
-* Fix occasional blank GUI screen on startup in pull request #815.
-* Fix GPU laser when interacting with heightmaps in pull request #796.
-* Added API/ABI cheker command line tool in pull request #765.
-* Added gtest version information in pull request #801.
-* Fix GUI world saving in pull request #806.
-* Enable anti-aliasing for camera sensor in pull #800.
-* Make sensor noise deterministic in pull request #788.
-* Fix build problem described in issue #901 with pull request #778.
-* Fix issue #846 with pull request #720. There was a typo in Camera.cc.
-* Fix OSX menu bar in pull request #688.
-* Fix [issue #187](https://bitbucket.org/osrf/gazebo/issue/817) by calling sdf::setFindCallback() before loading the sdf in gzfactory.
+1. Fix enable/disable sky and clouds from SDF
+    * [Pull request #809](https://bitbucket.org/osrf/gazebo/pull-request/809])
+1. Fix occasional blank GUI screen on startup 
+    * [Pull request #815](https://bitbucket.org/osrf/gazebo/pull-request/815])
+1. Fix GPU laser when interacting with heightmaps
+    * [Pull request #796](https://bitbucket.org/osrf/gazebo/pull-request/796])
+1. Added API/ABI cheker command line tool
+    * [Pull request #765](https://bitbucket.org/osrf/gazebo/pull-request/765])
+1. Added gtest version information 
+    * [Pull request #801](https://bitbucket.org/osrf/gazebo/pull-request/801])
+1. Fix GUI world saving
+    * [Pull request #806](https://bitbucket.org/osrf/gazebo/pull-request/806])
+1. Enable anti-aliasing for camera sensor
+    * [Pull request #800](https://bitbucket.org/osrf/gazebo/pull-request/800])
+1. Make sensor noise deterministic
+    * [Pull request #788](https://bitbucket.org/osrf/gazebo/pull-request/788])
+1. Fix build problem
+    * [Issue #901](https://bitbucket.org/osrf/gazebo/issue/901)
+    * [Pull request #778](https://bitbucket.org/osrf/gazebo/pull-request/778])
+1. Fix a typo in Camera.cc
+    * [Pull request #720](https://bitbucket.org/osrf/gazebo/pull-request/720])
+    * [Issue #846](https://bitbucket.org/osrf/gazebo/issue/846)
+1. Fix OSX menu bar
+    * [Pull request #688](https://bitbucket.org/osrf/gazebo/pull-request/688])
+1. Fix gazebo::init by calling sdf::setFindCallback() before loading the sdf in gzfactory.
+    * [Pull request #678](https://bitbucket.org/osrf/gazebo/pull-request/678])
+    * [Issue #817](https://bitbucket.org/osrf/gazebo/issue/817)
+
 ### Gazebo 1.9.1 (2013-08-20)
 * Deprecate header files that require case-sensitive filesystem (e.g. Common.hh, Physics.hh) [https://bitbucket.org/osrf/gazebo/pull-request/638/fix-for-775-deprecate-headers-that-require]
 * Initial support for building on Mac OS X [https://bitbucket.org/osrf/gazebo/pull-request/660/osx-support-for-gazebo-19] [https://bitbucket.org/osrf/gazebo/pull-request/657/cmake-fixes-for-osx]
