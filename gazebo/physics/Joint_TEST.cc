@@ -473,18 +473,46 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::JointPtr joint;
-  gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
-  joint = SpawnJoint(_jointType, false, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
-  joint = SpawnJoint(_jointType, false, true);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, true);
+    ASSERT_TRUE(joint != NULL);
+    // Check child link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    EXPECT_TRUE(parent == NULL);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
-  joint = SpawnJoint(_jointType, true, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, true, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check parent link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    EXPECT_TRUE(child == NULL);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -512,13 +540,13 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
 
   gzdbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
-  EXPECT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != NULL);
 
   physics::LinkPtr parent, child;
   child = joint->GetChild();
   parent = joint->GetParent();
-  EXPECT_TRUE(child != NULL);
-  EXPECT_TRUE(parent != NULL);
+  ASSERT_TRUE(child != NULL);
+  ASSERT_TRUE(parent != NULL);
 
   math::Vector3 pos(10, 10, 10);
   math::Vector3 vel(10, 10, 10);
