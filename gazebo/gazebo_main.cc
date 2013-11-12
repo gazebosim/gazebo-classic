@@ -119,17 +119,17 @@ int main(int _argc, char **_argv)
 
   pid1 = fork();
 
-  char** argv_server = new char*[_argc+1];
-  char** argv_client = new char*[_argc+1];
-  argv_server[0] = const_cast<char*>("gzserver");
-  argv_client[0] = const_cast<char*>("gzclient");
+  char **argvServer = new char*[_argc+1];
+  char **argvClient = new char*[_argc+1];
+  argvServer[0] = const_cast<char*>("gzserver");
+  argvClient[0] = const_cast<char*>("gzclient");
   for (int i = 1; i < _argc; ++i)
   {
-    argv_server[i] = _argv[i];
-    argv_client[i] = _argv[i];
+    argvServer[i] = _argv[i];
+    argvClient[i] = _argv[i];
   }
-  argv_server[_argc] = static_cast<char*>(NULL);
-  argv_client[_argc] = static_cast<char*>(NULL);
+  argvServer[_argc] = static_cast<char*>(NULL);
+  argvClient[_argc] = static_cast<char*>(NULL);
 
   if (pid1)
   {
@@ -149,7 +149,7 @@ int main(int _argc, char **_argv)
     {
       // gazebo::gui::run(_argc, _argv);
       // gzclient argv
-      execvp(argv_client[0], argv_client);
+      execvp(argvClient[0], argvClient);
     }
   }
   else
@@ -161,11 +161,11 @@ int main(int _argc, char **_argv)
     // server->Fini();
     // delete server;
     // server = NULL;
-    execvp(argv_server[0], argv_server);
+    execvp(argvServer[0], argvServer);
   }
 
-  delete[] argv_server;
-  delete[] argv_client;
+  delete[] argvServer;
+  delete[] argvClient;
 
   return 0;
 }
