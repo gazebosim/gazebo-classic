@@ -65,7 +65,7 @@ void sig_handler(int /*signo*/)
   kill(pid1, SIGINT);
   kill(pid2, SIGINT);
   double sleepSecs = 0.001;
-  double totalWaitSecs = 500.0;
+  double totalWaitSecs = 5.0;
   // Wait some time and if not dead, escalate to SIGKILL
   for (unsigned int i = 0; i < (unsigned int)(totalWaitSecs*1/sleepSecs); ++i)
   {
