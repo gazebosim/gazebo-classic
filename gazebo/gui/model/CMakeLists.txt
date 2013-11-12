@@ -18,11 +18,11 @@ set (qt_headers
   JointMaker.hh
   ModelCreator.hh
   ModelEditor.hh
-  ModelEditorEvents.hh
   ModelEditorPalette.hh
 )
 
 set (headers
+  ModelEditorEvents.hh
 )
 
 set (resources ../resources.qrc)

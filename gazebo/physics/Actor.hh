@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,29 @@ namespace gazebo
 
   namespace physics
   {
-    struct TrajectoryInfo
+    /// \brief Information about a trajectory for an Actor.
+    class TrajectoryInfo
     {
-      unsigned int id;
-      std::string type;
-      double duration;
-      double startTime;
-      double endTime;
-      bool translated;
+      /// \brief Constructor.
+      public: TrajectoryInfo();
+
+      /// \brief ID of the trajectory.
+      public: unsigned int id;
+
+      /// \brief Type of trajectory.
+      public: std::string type;
+
+      /// \brief Duration of the trajectory.
+      public: double duration;
+
+      /// \brief Start time of the trajectory.
+      public: double startTime;
+
+      /// \brief End time of the trajectory.
+      public: double endTime;
+
+      /// \brief True if the trajectory is tranlated.
+      public: bool translated;
     };
 
     /// \addtogroup gazebo_physics

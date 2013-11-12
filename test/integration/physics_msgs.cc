@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 
     while (*iter != physics->GetGravity())
     {
-      world->StepWorld(1);
+      world->Step(1);
       common::Time::MSleep(1);
     }
 
@@ -143,7 +143,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
       while (*iter != model->GetWorldPose())
       {
-        world->StepWorld(1);
+        world->Step(1);
         common::Time::MSleep(1);
       }
 
@@ -214,7 +214,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double x0, y0;
 
   // Allow objects to settle on ground_plane
-  world->StepWorld(100);
+  world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
   for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
@@ -264,7 +264,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Issue #856, simbody doesn't support shape resizes.
   if (_physicsEngine == "simbody")
