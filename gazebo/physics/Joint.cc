@@ -159,9 +159,11 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
-  else if (this->childLink)
+
+  if (this->childLink)
     this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
-  else
+
+  if (!this->parentLink && !this->childLink)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
@@ -657,4 +659,10 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 void Joint::SetProvideFeedback(bool _enable)
 {
   this->provideFeedback = _enable;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetInitialAnchorPose()
+{
+  return this->anchorPose;
 }
