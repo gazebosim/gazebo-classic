@@ -52,8 +52,6 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
-  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -450,6 +448,13 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = Server::SigInt;
+  if (sigaction(SIGINT, &sigact, NULL))
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
   if (this->stop)
     return;
 
