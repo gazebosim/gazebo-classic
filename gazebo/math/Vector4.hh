@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
  * Date: 19 Aug 2008
  */
 
-#ifndef VECTOR4_HH
-#define VECTOR4_HH
+#ifndef _VECTOR4_HH_
+#define _VECTOR4_HH_
 
 #include <iostream>
 #include <fstream>
-#include "math/Matrix4.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector4 Vector4.hh math/gzmath.hh
     /// \brief double Generic x, y, z, w vector
     class Vector4
     {

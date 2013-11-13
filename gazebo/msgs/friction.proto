@@ -1,9 +1,9 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Frction 
+/// \interface Friction 
 /// \brief Information about friction
-/// \verbatim
+
 
 import "vector3d.proto";
 
@@ -15,4 +15,4 @@ message Friction
   optional double   slip1  = 4;
   optional double   slip2  = 5;
 }
-/// \endverbatim
+

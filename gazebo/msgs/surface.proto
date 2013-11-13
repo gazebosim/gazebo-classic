@@ -1,9 +1,9 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Surface 
+/// \interface Surface
 /// \brief Information about a surface element
-/// \verbatim
+
 
 import "friction.proto";
 
@@ -18,5 +18,6 @@ message Surface
   optional double kd                        = 7;
   optional double max_vel                   = 8;
   optional double min_depth                 = 9;
+  optional bool collide_without_contact     = 10;
+  optional uint32 collide_without_contact_bitmask = 11;
 }
-/// \endverbatim

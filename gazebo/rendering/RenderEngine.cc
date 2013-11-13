@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,48 +18,51 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+#ifndef Q_OS_MAC  // Not Apple
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <GL/glx.h>
+#endif
 
-#include <stdint.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <string>
 #include <iostream>
+
 #include <boost/filesystem.hpp>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
-#include "common/Common.hh"
-#include "common/Color.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/SystemPaths.hh"
 
-#include "rendering/Material.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Grid.hh"
-#include "rendering/Visual.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
-
 
 //////////////////////////////////////////////////
 RenderEngine::RenderEngine()
@@ -72,8 +75,8 @@ RenderEngine::RenderEngine()
   this->initialized = false;
 
   this->renderPathType = NONE;
+  this->windowManager.reset(new WindowManager);
 }
-
 
 //////////////////////////////////////////////////
 RenderEngine::~RenderEngine()
@@ -90,64 +93,68 @@ void RenderEngine::Load()
     return;
   }
 
-  this->connections.push_back(event::Events::ConnectPreRender(
-        boost::bind(&RenderEngine::PreRender, this)));
-  this->connections.push_back(event::Events::ConnectRender(
-        boost::bind(&RenderEngine::Render, this)));
-  this->connections.push_back(event::Events::ConnectPostRender(
-        boost::bind(&RenderEngine::PostRender, this)));
-
-  // Create a new log manager and prevent output from going to stdout
-  this->logManager = new Ogre::LogManager();
-
-  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
-  logPath += "/ogre.log";
-
-  this->logManager->createLog(logPath, true, false, false);
-
-  if (this->root)
+  if (!this->root)
   {
-    gzerr << "Attempting to load, but root already exist\n";
-    return;
+    this->connections.push_back(event::Events::ConnectPreRender(
+          boost::bind(&RenderEngine::PreRender, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&RenderEngine::Render, this)));
+    this->connections.push_back(event::Events::ConnectPostRender(
+          boost::bind(&RenderEngine::PostRender, this)));
+
+    // Create a new log manager and prevent output from going to stdout
+    this->logManager = new Ogre::LogManager();
+
+    std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+    logPath += "/ogre.log";
+
+    this->logManager->createLog(logPath, true, false, false);
+
+    // Make the root
+    try
+    {
+      this->root = new Ogre::Root();
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzthrow("Unable to create an Ogre rendering environment, no Root ");
+    }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+#endif
+
+    // Load all the plugins
+    this->LoadPlugins();
+
+    // Setup the rendering system, and create the context
+    this->SetupRenderSystem();
+
+    // Initialize the root node, and don't create a window
+    this->root->initialise(false);
+
+    // Setup the available resources
+    this->SetupResources();
   }
-
-  // Make the root
-  try
-  {
-    this->root = new Ogre::Root();
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzthrow("Unable to create an Ogre rendering environment, no Root ");
-  }
-
-  // Load all the plugins
-  this->LoadPlugins();
-
-  // Setup the rendering system, and create the context
-  this->SetupRenderSystem();
-
-  // Initialize the root node, and don't create a window
-  this->root->initialise(false);
-
-  // Setup the available resources
-  this->SetupResources();
 
   std::stringstream stream;
   stream << (int32_t)this->dummyWindowId;
 
-  WindowManager::Instance()->CreateWindow(stream.str(), 1, 1);
+  this->windowManager->CreateWindow(stream.str(), 1, 1);
   this->CheckSystemCapabilities();
 }
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
-                                   bool _enableVisualizations)
+                                   bool _enableVisualizations,
+                                   bool _isServer)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
   this->scenes.push_back(scene);
 
   scene->Load();
@@ -193,7 +200,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
-    if ((*iter)->GetName() == _name)
+    if (_name.empty() || (*iter)->GetName() == _name)
       return (*iter);
 
   return ScenePtr();
@@ -277,16 +284,23 @@ void RenderEngine::Fini()
   if (!this->initialized)
     return;
 
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->connections.clear();
 
   // TODO: this was causing a segfault on shutdown
   // Close all the windows first;
-  WindowManager::Instance()->Fini();
+  this->windowManager->Fini();
 
   RTShaderSystem::Instance()->Fini();
 
-  this->scenes.clear();
+  // Deallocate memory for every scene
+  while (!this->scenes.empty())
+  {
+    this->RemoveScene(this->scenes.front()->GetName());
+  }
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
@@ -315,6 +329,7 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -324,6 +339,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
+#endif
 
   this->initialized = false;
 }
@@ -336,7 +352,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -350,37 +366,41 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL.so");
-    plugins.push_back(path+"/Plugin_ParticleFX.so");
-    plugins.push_back(path+"/Plugin_BSPSceneManager.so");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+#ifdef __APPLE__
+    std::string prefix = "lib";
+    std::string extension = ".dylib";
+#else
+    std::string prefix = "";
+    std::string extension = ".so";
+#endif
 
-    // This is needed by the Ogre::Terrain System.
-    // We should spend some tim fixing Ogre::Terrain so that GLSL is
-    // supported.
-    plugins.push_back(path+"/Plugin_CgProgramManager.so");
+    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
+    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter);
+        this->root->loadPlugin(*piter+extension);
       }
       catch(Ogre::Exception &e)
       {
-        if ((*piter).find("RenderSystem") != std::string::npos)
+        try
         {
-          gzerr << "Unable to load Ogre Plugin[" << *piter
-                << "]. Rendering will not be possible."
-                << "Make sure you have installed OGRE and Gazebo properly.\n";
+          // Load the debug plugin into OGRE
+          this->root->loadPlugin(*piter+"_d"+extension);
         }
-        else if ((*piter).find("CgProgramManager") != std::string::npos)
+        catch(Ogre::Exception &ed)
         {
-          gzwarn << "Unable to load Ogre Plugin[" << *piter
-                 << "]Heightmaps(Terrain) will not display properly."
-                 << "You'll need to install Ogre3d from source."
-                 << "Please visit www.ogre3d.org.\n";
+          if ((*piter).find("RenderSystem") != std::string::npos)
+          {
+            gzerr << "Unable to load Ogre Plugin[" << *piter
+                  << "]. Rendering will not be possible."
+                  << "Make sure you have installed OGRE and Gazebo properly.\n";
+          }
         }
       }
     }
@@ -411,10 +431,8 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
       Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
           "General");
 
-
       // Parse all material files in the path if any exist
       boost::filesystem::path dir(path);
-      std::list<boost::filesystem::path> resultSet;
 
       if (boost::filesystem::exists(dir) &&
           boost::filesystem::is_directory(dir))
@@ -429,13 +447,13 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
         for (std::vector<boost::filesystem::path>::iterator dIter =
             paths.begin(); dIter != paths.end(); ++dIter)
         {
-          if (dIter->filename().find(".material") != std::string::npos)
+          if (dIter->filename().extension() == ".material")
           {
-            std::string fullPath = path + "/" + dIter->filename();
+            boost::filesystem::path fullPath = path / dIter->filename();
 
             Ogre::DataStreamPtr stream =
               Ogre::ResourceGroupManager::getSingleton().openResource(
-                  fullPath, "General");
+                  fullPath.string(), "General");
 
             // There is a material file under there somewhere, read the thing in
             try
@@ -443,7 +461,8 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
               Ogre::MaterialManager::getSingleton().parseScript(
                   stream, "General");
               Ogre::MaterialPtr matPtr =
-                Ogre::MaterialManager::getSingleton().getByName(fullPath);
+                Ogre::MaterialManager::getSingleton().getByName(
+                    fullPath.string());
 
               if (!matPtr.isNull())
               {
@@ -462,9 +481,9 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
       }
     }
   }
-  catch(Ogre::Exception)
+  catch(Ogre::Exception &/*_e*/)
   {
-    gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
+    gzthrow("Unable to load Ogre Resources.\nMake sure the"
         "resources path in the world file is set correctly.");
   }
 }
@@ -535,17 +554,17 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
             aiter->first, "FileSystem", aiter->second);
       }
-      catch(Ogre::Exception)
+      catch(Ogre::Exception &/*_e*/)
       {
-        gzthrow(std::string("Unable to load Ogre Resources.\n") +
-            "Make sure the resources path in the world file is set correctly.");
+        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+            "in the world file is set correctly.");
       }
     }
   }
@@ -558,7 +577,7 @@ void RenderEngine::SetupRenderSystem()
   const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+#if  OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   rsList = this->root->getAvailableRenderers();
 #else
   rsList = &(this->root->getAvailableRenderers());
@@ -606,6 +625,9 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
+#ifdef Q_OS_MAC
+  this->dummyDisplay = 0;
+#else
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -652,7 +674,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
-
+#endif
 
   return result;
 }
@@ -687,21 +709,40 @@ void RenderEngine::CheckSystemCapabilities()
   bool hasGLSL =
     std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();
 
-  if (!hasGLSL || !hasFBO)
-  {
-    gzerr << "Your machine does not meet the minimal rendering requirements.\n";
-    if (!hasGLSL)
-      gzerr << "   GLSL is missing.\n";
-    if (!hasFBO)
-      gzerr << "   Frame Buffer Objects (FBO) is missing.\n";
-  }
+  if (!hasFragmentPrograms || !hasVertexPrograms)
+    gzwarn << "Vertex and fragment shaders are missing. "
+           << "Fixed function rendering will be used.\n";
 
-  if (hasVertexPrograms && hasFragmentPrograms)
+  if (!hasGLSL)
+    gzwarn << "GLSL is missing."
+           << "Fixed function rendering will be used.\n";
+
+  if (!hasFBO)
+    gzwarn << "Frame Buffer Objects (FBO) is missing. "
+           << "Rendering will be disabled.\n";
+
+  this->renderPathType = RenderEngine::NONE;
+
+  if (hasFBO && hasGLSL && hasVertexPrograms && hasFragmentPrograms)
     this->renderPathType = RenderEngine::FORWARD;
-  else
+  else if (hasFBO)
     this->renderPathType = RenderEngine::VERTEX;
 
   // Disable deferred rendering for now. Needs more work.
   // if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
   //  this->renderPathType = RenderEngine::DEFERRED;
 }
+
+/////////////////////////////////////////////////
+WindowManagerPtr RenderEngine::GetWindowManager() const
+{
+  return this->windowManager;
+}
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
+}
+#endif

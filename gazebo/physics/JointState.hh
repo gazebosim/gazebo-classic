@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
  * Author: Nate Koenig
  */
 
-#ifndef JOINT_STATE_HH
-#define JOINT_STATE_HH
+#ifndef _JOINTSTATE_HH_
+#define _JOINTSTATE_HH_
 
 #include <vector>
 #include <string>
 
-#include "physics/State.hh"
-#include "math/Pose.hh"
+#include "gazebo/physics/State.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -34,26 +34,101 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
     class JointState : public State
     {
-      /// \brief Default constructor
+      /// \brief Default constructor.
       public: JointState();
 
-      /// \brief Constructor
-      public: JointState(JointPtr _joint);
+      /// \brief Constructor.
+      /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      public: JointState(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
-      /// \brief Destructor
+      /// \brief Constructor.
+      /// \param[in] _joint Joint to get the state of.
+      public: explicit JointState(JointPtr _joint);
+
+      /// \brief Constructor
+      ///
+      /// Build a JointState from SDF data
+      /// \param[in] _sdf SDF data to load a joint state from.
+      public: explicit JointState(const sdf::ElementPtr _sdf);
+
+      /// \brief Destructor.
       public: virtual ~JointState();
 
-      /// \brief Load state from SDF element
-      public: virtual void Load(sdf::ElementPtr _elem);
+      /// \brief Load.
+      /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      public: void Load(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
-      /// \brief Get the number of angles
+      /// \brief Load state from SDF element.
+      /// \param[in] _elem SDf values to load from.
+      public: virtual void Load(const sdf::ElementPtr _elem);
+
+      /// \brief Get the number of angles.
+      /// \return The number of angles.
       public: unsigned int GetAngleCount() const;
 
-      /// \brief Get the joint angle
+      /// \brief Get the joint angle.
+      /// \param[in] _axis The axis index.
+      /// \return Angle of the axis.
+      /// \throw common::Exception When _axis is invalid.
       public: math::Angle GetAngle(unsigned int _axis) const;
+
+      /// \brief Get the angles.
+      /// \return Vector of angles.
+      public: const std::vector<math::Angle> &GetAngles() const;
+
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: JointState &operator=(const JointState &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: JointState operator-(const JointState &_state) const;
+
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: JointState operator+(const JointState &_state) const;
+
+      /// \brief Stream insertion operator.
+      /// \param[in] _out output stream.
+      /// \param[in] _state Joint state to output.
+      /// \return The stream.
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::JointState &_state)
+      {
+        _out << "<joint name='" << _state.GetName() << "'>";
+
+        int i = 0;
+        for (std::vector<math::Angle>::const_iterator iter =
+            _state.angles.begin(); iter != _state.angles.end(); ++iter)
+        {
+          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
+        }
+
+        _out << "</joint>";
+
+        return _out;
+      }
 
       private: std::vector<math::Angle> angles;
     };

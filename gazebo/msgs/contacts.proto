@@ -3,12 +3,13 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Contacts
 /// \brief Contacts from collision detection
-/// \verbatim
+
 
 import "contact.proto";
+import "time.proto";
 
 message Contacts
 {
   repeated Contact contact   = 1;
+  required Time time         = 2;
 }
-/// \endverbatim

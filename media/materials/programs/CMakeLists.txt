@@ -26,6 +26,8 @@ set (files
   laser_2nd_pass.vert
   plain_color_vs.glsl
   plain_color_fs.glsl
-) 
+  camera_noise_gaussian_fs.glsl
+  camera_noise_gaussian_vs.glsl
+)
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/programs/)

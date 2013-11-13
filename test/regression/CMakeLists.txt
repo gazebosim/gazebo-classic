@@ -1,6 +1,4 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/gazebo 
-  ${PROJECT_BINARY_DIR}/gazebo
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
@@ -8,62 +6,37 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-link_directories(  
-  ${OGRE_LIBRARY_PATH}
-  ${Boost_LIBRARY_DIRS} 
+link_directories(
+  ${ogre_library_dirs}
+  ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
 )
 
-# Disable the player test for now, until we figure out a better way to test them
-#if (INCLUDE_PLAYER)
-#  add_subdirectory(player)
-#endif()
+if(HAVE_BULLET)
+  include_directories ( ${BULLET_INCLUDE_DIRS} )
+  link_directories ( ${BULLET_LIBRARY_DIRS} )
+endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
+set(tests
+  846_typo_in_camera.cc
+  876_random_number_generator.cc
+)
 
-set (gtest_sources
-  common.cc
-  factory.cc
-  file_handling.cc
-  heightmap.cc
-  laser.cc
-  math.cc
-  msgs.cc
-  physics.cc
-  pioneer2dx.cc
-  pr2.cc
-  projector.cc
-  speed.cc
-  transport.cc)
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+  "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
+gz_build_tests(${tests})
 
-set (plugins)
+set(display_tests
+)
 
-configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
+# Build the display tests (need extra sources to compile)
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
+gz_build_display_tests(${display_tests})
 
-# Build plugins
-foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors)
-endforeach (src ${plugins})
+set(dri_tests
+)
 
-# Build tests
-foreach(GTEST_SOURCE_file ${gtest_sources})
-  string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-  add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/gazebo/Server.cc ${PROJECT_SOURCE_DIR}/gazebo/Master.cc ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc)
-
-target_link_libraries(${BINARY_NAME}
-  ${GTEST_LIBRARY} 
-  ${GTEST_MAIN_LIBRARY} 
-    gazebo_common
-    gazebo_sdf_interface
-    gazebo_transport
-    gazebo_physics
-    gazebo_sensors
-    gazebo_rendering
-    gazebo_msgs
-    pthread
-    ${tinyxml_libraries}
-    )
-  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-  set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
-endforeach()
+set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
+    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
+gz_build_dri_tests(${dri_tests})

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,17 @@
 #include <vector>
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
-#include "common/Event.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {
   class Root;
   class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo
@@ -57,13 +58,13 @@ namespace gazebo
       public: enum RenderPathType
               {
                 /// \brief No rendering is done.
-                NONE,
+                NONE = 0,
                 /// \brief Most basic rendering, with least fidelity.
-                VERTEX,
+                VERTEX = 1,
                 /// \brief Utilizes the RTT shader system.
-                FORWARD,
+                FORWARD = 2,
                 /// \brief Utilizes deferred rendering. Best fidelity.
-                DEFERRED,
+                DEFERRED = 3,
                 /// \brief Count of the rendering path enums.
                 RENDER_PATH_COUNT
               };
@@ -89,7 +90,8 @@ namespace gazebo
       /// \param[in] _enableVisualizations True enables visualization
       /// elements such as laser lines.
       public: ScenePtr CreateScene(const std::string &_name,
-                                   bool _enableVisualizations);
+                                   bool _enableVisualizations,
+                                   bool _isServer = false);
 
       /// \brief Remove a scene
       /// \param[in] _name The name of the scene to remove.
@@ -99,7 +101,7 @@ namespace gazebo
       /// \param[in] _name Name of the scene to retreive.
       /// \return A pointer to the Scene, or NULL if the scene doesn't
       /// exist.
-      public: ScenePtr GetScene(const std::string &_name);
+      public: ScenePtr GetScene(const std::string &_name="");
 
       /// \brief Get a scene by index. The index should be between 0 and
       /// GetSceneCount().
@@ -120,6 +122,16 @@ namespace gazebo
       /// automatically determined based on the computers capabilities
       /// \return The RenderPathType
       public: RenderPathType GetRenderPathType() const;
+
+      /// \brief Get a pointer to the window manager.
+      /// \return Pointer to the window manager.
+      public: WindowManagerPtr GetWindowManager() const;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      public: Ogre::OverlaySystem *GetOverlaySystem() const;
+#endif
 
       /// \brief Create a render context.
       /// \return True if the context was created.
@@ -179,6 +191,13 @@ namespace gazebo
 
       /// \brief The type of render path used.
       private: RenderPathType renderPathType;
+
+      /// \brief Pointer to the window manager.
+      private: WindowManagerPtr windowManager;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      private: Ogre::OverlaySystem *overlaySystem;
+#endif
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;

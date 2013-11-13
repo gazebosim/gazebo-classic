@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Sky 
 /// \brief Information about the sky
-/// \verbatim
+
 
 import "color.proto";
 
@@ -19,4 +19,4 @@ message Sky
   optional double humidity       = 7;
   optional double mean_cloud_size = 8;
 }
-/// \endverbatim
+

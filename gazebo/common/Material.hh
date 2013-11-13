@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include <string>
 #include <iostream>
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {
@@ -28,6 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class Material Material.hh common/common.hh
     /// \brief Encapsulates description of a material
     class Material
     {
@@ -52,13 +53,13 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Set a texture image
-      /// \param[i] _tex The name of the texture, which must be in Gazebo's
+      /// \param[in] _tex The name of the texture, which must be in Gazebo's
       ///             resource path
       public: void SetTextureImage(const std::string &_tex);
 
       /// \brief Set a texture image
-      /// \param[i] _tex The name of the texture
-      /// \param[_resourcePath] _resourcePath Path which contains _tex
+      /// \param[in] _tex The name of the texture
+      /// \param[in] _resourcePath Path which contains _tex
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 

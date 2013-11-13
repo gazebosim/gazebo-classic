@@ -1,102 +1,84 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- */
+*/
 /* Desc: A screw or primastic joint
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
-#ifndef ODESCREWJOINT_HH
-#define ODESCREWJOINT_HH
+#ifndef _ODESCREWJOINT_HH_
+#define _ODESCREWJOINT_HH_
 
-#include "physics/ScrewJoint.hh"
-#include "physics/ode/ODEJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief A screw joint
+    /// \brief A screw joint.
     class ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
-      /// \brief Constructor
-      public: ODEScrewJoint(dWorldID worldId, BasePtr _parent);
+      /// \brief Constructor.
+      /// \param[in] _worldId ODE world id.
+      /// \param[in] _parent Pointer to the Link that is the joint' parent
+      public: ODEScrewJoint(dWorldID _worldId, BasePtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEScrewJoint();
 
-      /// \brief Load the ODEScrewJoint from ::Element
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the axis of rotation of an ODEScrewJoint
-      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Set the axis of motion
-      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+      // Documentation inherited
+      public: virtual void SetAxis(int index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      // Documentation inherited
+      public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
-      /// \brief Set screw joint thread pitch
-      public: virtual void SetThreadPitch(int index,
-                                          const double _thread_pitch);
+      // Documentation inherited
+      public: virtual double GetThreadPitch(unsigned int _index);
 
-      /// \brief callback to apply damping force to joint
-      public: void ApplyDamping();
+      // Documentation inherited
+      public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngleImpl(int index) const;
+      // Documentation inherited
+      public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Get the rate of change
-      public: virtual double GetVelocity(int index) const;
+      // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
+      // Documentation inherited
+      public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Set the screw force
-      public: virtual void SetForce(int index, double force);
+      // Documentation inherited
+      public: virtual double GetMaxForce(int _index);
 
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
+      // Documentation inherited
+      public: virtual double GetParam(int _parameter) const;
 
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
+      // Documentation inherited
+      public: virtual void SetParam(int _parameter, double _value);
 
-      /// \brief Get the _parameter
-      public: virtual double GetParam(int parameter) const;
-
-      /// \brief Set the _parameter
-      public: virtual void SetParam(int parameter, double value);
+      // Documentation inherited
+      protected: virtual void SetForceImpl(int _index, double _effort);
     };
-
-  /// \}
   }
 }
 #endif
-
-
-
-
-
-

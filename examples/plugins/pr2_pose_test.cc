@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 #include <boost/bind.hpp>
-#include "physics/physics.h"
-#include "gazebo.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 
-#include "transport/TransportTypes.hh"
-#include "msgs/MessageTypes.hh"
-#include "common/Time.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {
@@ -29,7 +29,7 @@ namespace gazebo
     public: void Load(physics::ModelPtr &/*_parent*/, sdf::ElementPtr &_sdf)
     {
       // Get then name of the parent model
-      std::string modelName = _sdf->GetParent()->GetValueString("name");
+      std::string modelName = _sdf->GetParent()->Get<std::string>("name");
 
       // Get the world name.
       std::string worldName = _sdf->GetWorldName();
@@ -44,7 +44,7 @@ namespace gazebo
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateStart(
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&PR2PoseTest::OnUpdate, this));
       gzdbg << "plugin model name: " << modelName << "\n";
 

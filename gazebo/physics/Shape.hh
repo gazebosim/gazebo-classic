@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef SHAPE_HH
-#define SHAPE_HH
+#ifndef _SHAPE_HH_
+#define _SHAPE_HH_
 
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "common/CommonTypes.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/Inertial.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "physics/Base.hh"
+#include "gazebo/common/CommonTypes.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Inertial.hh"
+#include "gazebo/physics/Base.hh"
 
 namespace gazebo
 {
@@ -33,31 +34,41 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Shape Shape.hh physics/physics.hh
     /// \brief Base class for all shapes.
     class Shape : public Base
     {
-      /// \brief Constructor
-      public: Shape(CollisionPtr p);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent of the shape.
+      public: explicit Shape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Shape();
 
-      /// \brief Initialize the shape
+      /// \brief Initialize the shape.
       public: virtual void Init() = 0;
 
-      /// \brief Get the mass of a shape
-      public: virtual double GetMass(double _density) const
-              {return _density;}
+      /// \brief Set the scale of the shape.
+      /// \param[in] _scale Scale to set the shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale) = 0;
 
-      /// \brief Get inertial for a shape
-      public: virtual void GetInertial(double _mass,
-                                       InertialPtr _inertial) const;
+      /// \brief Get the scale of the shape.
+      /// \return Scale of the shape.
+      public: virtual math::Vector3 GetScale() const;
 
-      public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
+      /// \brief Fill in the values for a geometry message.
+      /// \param[out] _msg The geometry message to fill.
+      public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
 
+      /// \brief Process a geometry message.
+      /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
 
-      public: CollisionPtr collisionParent;
+      /// \brief This shape's collision parent.
+      protected: CollisionPtr collisionParent;
+
+      /// \brief This shape's scale;
+      protected: math::Vector3 scale;
     };
     /// \}
   }

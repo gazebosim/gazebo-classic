@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 #ifndef _KEYFRAME_HH_
 #define _KEYFRAME_HH_
 
-#include "math/Vector3.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -27,6 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class KeyFrame KeyFrame.hh common/common.hh
     /// \brief A key frame in an animation
     class KeyFrame
     {
@@ -64,7 +65,7 @@ namespace gazebo
       public: const math::Vector3 &GetTranslation() const;
 
       /// \brief Set the rotation for the keyframe
-      /// \param[in] _trans Rotation amount
+      /// \param[in] _rot Rotation amount
       public: void SetRotation(const math::Quaternion &_rot);
 
       /// \brief Get the rotation of the keyframe
@@ -82,7 +83,7 @@ namespace gazebo
     class NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
-      /// \param[in] Time of the keyframe
+      /// \param[in] _time Time of the keyframe
       public: NumericKeyFrame(double _time);
 
       /// \brief Destructor

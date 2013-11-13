@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #ifndef _BULLETUNIVERSALJOINT_HH_
 #define _BULLETUNIVERSALJOINT_HH_
 
-#include "physics/UniversalJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/UniversalJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btUniversalConstraint;
 
@@ -45,20 +45,17 @@ namespace gazebo
       /// \brief Destuctor
       public: virtual ~BulletUniversalJoint();
 
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
       /// \brief Set the first axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Get the first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;
@@ -72,9 +69,6 @@ namespace gazebo
       /// \brief Get the angular rate of axis 1
       public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int _index, double _torque);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
@@ -82,10 +76,10 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, math::Angle _angle);
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, math::Angle _angle);
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int _index);
@@ -99,7 +93,11 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btUniversalConstraint *btUniversal;
+      /// \brief Set the torque of a joint.
+      protected: virtual void SetForceImpl(int _index, double _torque);
+
+      /// \brief Pointer to bullet universal constraint
+      private: btUniversalConstraint *bulletUniversal;
     };
 
     /// \}

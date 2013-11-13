@@ -1,35 +1,31 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- */
+*/
 /*
  * Desc: Contact Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
-#ifndef GAZEBO_RAY_PLUGIN_HH
-#define GAZEBO_RAY_PLUGIN_HH
+#ifndef _GAZEBO_RAY_PLUGIN_HH_
+#define _GAZEBO_RAY_PLUGIN_HH_
 
-#include "common/Plugin.hh"
-#include "sensors/SensorTypes.hh"
-#include "sensors/RaySensor.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/RaySensor.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
@@ -39,12 +35,11 @@ namespace gazebo
     /// \brief Constructor
     public: RayPlugin();
 
-    /// \brief  Destructor
-    public: ~RayPlugin();
+    /// \brief Destructor
+    public: virtual ~RayPlugin();
 
-    // update callback
+    /// \brief Update callback
     public: virtual void OnNewLaserScans();
-    private: event::ConnectionPtr newLaserScansConnection;
 
     /// \brief Load the plugin
     /// \param take in SDF root element
@@ -55,8 +50,9 @@ namespace gazebo
 
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
+
+    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    private: event::ConnectionPtr newLaserScansConnection;
   };
 }
-
 #endif
-

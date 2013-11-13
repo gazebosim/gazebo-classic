@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <ctime>
 
-#include "math/Rand.hh"
+#include "gazebo/math/Rand.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -32,7 +32,22 @@ using namespace math;
 // We don't seed with time for the cases when two processes are started the
 // same time (this mostly happens with launch scripts that start a server
 // and gui simultaneously).
-GeneratorType *Rand::randGenerator = new GeneratorType(getpid());
+uint32_t Rand::seed = getpid();
+
+GeneratorType *Rand::randGenerator = new GeneratorType(seed);
+
+//////////////////////////////////////////////////
+void Rand::SetSeed(uint32_t _seed)
+{
+  seed = _seed;
+  randGenerator->seed(seed);
+}
+
+//////////////////////////////////////////////////
+uint32_t Rand::GetSeed()
+{
+  return seed;
+}
 
 //////////////////////////////////////////////////
 double Rand::GetDblUniform(double _min, double _max)

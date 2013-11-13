@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sensors/DepthCameraSensor.hh"
+#include "gazebo/sensors/DepthCameraSensor.hh"
 #include "plugins/CameraPlugin.hh"
 
 using namespace gazebo;
@@ -26,18 +26,25 @@ CameraPlugin::CameraPlugin() : SensorPlugin()
 }
 
 /////////////////////////////////////////////////
+CameraPlugin::~CameraPlugin()
+{
+  this->parentSensor.reset();
+  this->camera.reset();
+}
+
+/////////////////////////////////////////////////
 void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(_sensor);
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
   if (!this->parentSensor)
   {
     gzerr << "CameraPlugin requires a CameraSensor.\n";
-    if (boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor))
+    if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
       gzmsg << "It is a depth camera sensor\n";
   }
 

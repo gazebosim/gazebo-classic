@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "math/Vector2i.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {
@@ -28,29 +28,41 @@ namespace gazebo
   {
     class Visual;
   }
-
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class CylinderMaker CylinderMaker.hh
+    /// \brief to make a cylinder
     class CylinderMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: CylinderMaker();
+      /// \brief Deconstructor
       public: virtual ~CylinderMaker();
 
+      /// Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
-
+      /// Documentation inherited
       public: virtual void Stop();
+      /// Documentation inherited
       public: virtual bool IsActive() const;
 
+      /// Documentation inherited
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Get the SDF information for the cylinder.
       /// \return The SDF as a string.
       public: std::string GetSDFString();
 
-
+      /// Documentation inherited
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;

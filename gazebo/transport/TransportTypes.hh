@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef TRANSPORT_TYPES_HH
-#define TRANSPORT_TYPES_HH
+#ifndef _TRANSPORT_TYPES_HH_
+#define _TRANSPORT_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <google/protobuf/message.h>
 
 /// \file
 /// \ingroup gazebo_transport
@@ -33,11 +34,32 @@ namespace gazebo
     class SubscriptionTransport;
     class Node;
 
+    /// \def MessagePtr
+    /// \brief Shared_ptr to protobuf message
+    typedef boost::shared_ptr<google::protobuf::Message> MessagePtr;
+
+    /// \def PublisherPtr
+    /// \brief Shared_ptr to Publisher object
     typedef boost::shared_ptr<Publisher> PublisherPtr;
+
+    /// \def SubscriberPtr
+    /// \brief Shared_ptr to Subscriber object
     typedef boost::shared_ptr<Subscriber> SubscriberPtr;
+
+    /// \def NodePtr
+    /// \brief Shared_ptr to Node object
     typedef boost::shared_ptr<Node> NodePtr;
+
+    /// \def PublicationPtr
+    /// \brief Shared_ptr to Publication object
     typedef boost::shared_ptr<Publication> PublicationPtr;
+
+    /// \def PublicationTransportPtr
+    /// \brief Shared_ptr to PublicationTransport
     typedef boost::shared_ptr<PublicationTransport> PublicationTransportPtr;
+
+    /// \def SubscriptionTransportPtr
+    /// \brief Shared_ptr to SubscriptionTransportPtr
     typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#include "math/Vector2i.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/FPSViewController.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 
 #define TYPE_STRING "fps"
 
@@ -88,4 +88,14 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 std::string FPSViewController::GetTypeString()
 {
   return TYPE_STRING;
+}
+
+//////////////////////////////////////////////////
+void FPSViewController::HandleKeyReleaseEvent(const std::string &/*_key*/)
+{
+}
+
+//////////////////////////////////////////////////
+void FPSViewController::HandleKeyPressEvent(const std::string &/*_key*/)
+{
 }

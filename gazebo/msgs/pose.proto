@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Pose 
 /// \brief Message for a pose
-/// \verbatim
+
 
 import "vector3d.proto";
 import "quaternion.proto";
@@ -11,8 +11,7 @@ import "quaternion.proto";
 message Pose
 {
   optional string name            = 1;
-  required Vector3d position      = 2;
-  required Quaternion orientation = 3;
+  optional uint32 id              = 2;
+  required Vector3d position      = 3;
+  required Quaternion orientation = 4;
 }
-
-/// \endverbatim

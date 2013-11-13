@@ -5,11 +5,11 @@ import "header.proto";
 /// \ingroup gazebo_msgs
 /// \interface Test
 /// \brief A test message
-/// \verbatim
+
 
 message Test
 {
   required Header header = 1;
 }
 
-/// \endverbatim
+

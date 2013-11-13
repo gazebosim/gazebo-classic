@@ -1,14 +1,15 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Model 
+/// \interface Model
 /// \brief Information about a model
-/// \verbatim
+
 
 import "joint.proto";
 import "link.proto";
 import "pose.proto";
 import "visual.proto";
+import "vector3d.proto";
 
 message Model
 {
@@ -20,5 +21,5 @@ message Model
   repeated Link link           = 6;
   optional bool deleted        = 7;
   repeated Visual visual       = 8;
+  optional Vector3d scale      = 9;
 }
-/// \endverbatim

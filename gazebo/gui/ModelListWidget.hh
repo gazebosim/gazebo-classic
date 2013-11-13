@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  *
  */
-#ifndef MODEL_LIST_WIDGET_HH
-#define MODEL_LIST_WIDGET_HH
+#ifndef _MODEL_LIST_WIDGET_HH_
+#define _MODEL_LIST_WIDGET_HH_
 
 #include <string>
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "gui/qt.h"
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -61,7 +61,8 @@ namespace gazebo
       private slots: void OnPropertyChanged(QtProperty *_item);
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
@@ -159,9 +160,9 @@ namespace gazebo
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
-
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
+      private: void ProcessRemoveEntity();
 
       public: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
@@ -218,6 +219,9 @@ namespace gazebo
       typedef std::list<msgs::Light> LightMsgs_L;
       private: LightMsgs_L lightMsgs;
 
+      typedef std::list<std::string> RemoveEntity_L;
+      private: RemoveEntity_L removeEntityList;
+
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;
@@ -229,6 +233,9 @@ namespace gazebo
       private: std::deque<std::string> fillTypes;
 
       private: msgs::Light::LightType lightType;
+
+      /// \brief Type of physics engine.
+      private: msgs::Physics_Type physicsType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

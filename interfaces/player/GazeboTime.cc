@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  */
 
 #include <math.h>
-#include "common/common.h"
-#include "transport/transport.h"
+#include "gazebo/common/common.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "GazeboTime.hh"
 

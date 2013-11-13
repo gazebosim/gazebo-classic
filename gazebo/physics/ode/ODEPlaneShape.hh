@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,33 @@
 #ifndef _ODEPLANESHAPE_HH_
 #define _ODEPLANESHAPE_HH_
 
-#include "physics/PlaneShape.hh"
-#include "physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/PlaneShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief An ODE Plane shape
+    /// \brief An ODE Plane shape.
     class ODEPlaneShape : public PlaneShape
     {
-      /// \brief Constructor
-      public: ODEPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit ODEPlaneShape(CollisionPtr _parent)
+              : PlaneShape(_parent) {}
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEPlaneShape() {}
 
-      /// \brief Create the plane
-      public: void CreatePlane()
+      // Documentation inherited
+      public: virtual void CreatePlane()
       {
         PlaneShape::CreatePlane();
         ODECollisionPtr oParent;
         oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-
-        double altitude = 0;
-
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
+        math::Pose pose = oParent->GetWorldPose();
+        double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
@@ -56,32 +53,25 @@ namespace gazebo
                               n.x, n.y, n.z, altitude);
       }
 
-      /// Set the altitude of the plane
-      public: void SetAltitude(const math::Vector3 &pos)
+      // Documentation inherited
+      public: virtual void SetAltitude(const math::Vector3 &_pos)
       {
-        PlaneShape::SetAltitude(pos);
+        PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;
         odeParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         dVector4 vec4;
 
         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
 
         // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
+        vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
 
         dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
                             vec4[2], vec4[3]);
       }
     };
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

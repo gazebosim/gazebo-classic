@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,48 +14,50 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "msgs/MessageTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/transport/TransportIface.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "physics/Contact.hh"
-#include "physics/Shape.hh"
-#include "physics/BoxShape.hh"
-#include "physics/CylinderShape.hh"
-#include "physics/TrimeshShape.hh"
-#include "physics/SphereShape.hh"
-#include "physics/HeightmapShape.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/MeshShape.hh"
+#include "gazebo/physics/SphereShape.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link)
+    : Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
   this->link = _link;
 
-  this->transparency = 0;
-  this->contactsEnabled = false;
+  this->placeable = false;
 
   this->surface.reset(new SurfaceParams());
+  sdf::initFile("collision.sdf", this->sdf);
+
+  this->collisionVisualId = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -66,15 +68,17 @@ Collision::~Collision()
 //////////////////////////////////////////////////
 void Collision::Fini()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete",
-      this->GetScopedName()+"__COLLISION_VISUAL__");
-  this->requestPub->Publish(*msg, true);
+  if (this->requestPub)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        this->GetScopedName()+"__COLLISION_VISUAL__");
+    this->requestPub->Publish(*msg, true);
+  }
 
   Entity::Fini();
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
-  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -82,10 +86,15 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->SetMaxContacts(this->maxContacts);
+
+  if (this->sdf->HasElement("laser_retro"))
+    this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
+
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
-
 
   if (this->shape)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
@@ -109,10 +118,10 @@ void Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::Init()
 {
-  this->SetRelativePose(
-    this->sdf->GetValuePose("pose"));
-
   this->shape->Init();
+
+  this->SetRelativePose(
+    this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -184,26 +193,25 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool _enable)
+void Collision::SetScale(const math::Vector3 &_scale)
 {
-  this->contactsEnabled = _enable;
+  this->shape->SetScale(_scale);
+}
+
+//////////////////////////////////////////////////
+void Collision::SetContactsEnabled(bool /*_enable*/)
+{
 }
 
 //////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
-  return this->contactsEnabled;
+  return false;
 }
 
 //////////////////////////////////////////////////
-void Collision::AddContact(const Contact &_contact)
+void Collision::AddContact(const Contact & /*_contact*/)
 {
-  if (!this->GetContactsEnabled() ||
-      this->HasType(Base::RAY_SHAPE) ||
-      this->HasType(Base::PLANE_SHAPE))
-    return;
-
-  this->contact(this->GetScopedName(), _contact);
 }
 
 //////////////////////////////////////////////////
@@ -285,14 +293,15 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Collision::FillCollisionMsg(msgs::Collision &_msg)
+void Collision::FillMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
-  this->shape->FillShapeMsg(*_msg.mutable_geometry());
-  this->surface->FillSurfaceMsg(*_msg.mutable_surface());
+
+  this->shape->FillMsg(*_msg.mutable_geometry());
+  this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
@@ -336,69 +345,20 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+
+  // Put in a unique ID because this is a special visual.
+  msg.set_id(this->collisionVisualId);
   msg.set_parent_name(this->parent->GetScopedName());
+  msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
-  msg.mutable_material()->mutable_script()->set_uri(
+  msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(
       "Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
-
-  if (this->shape->HasType(BOX_SHAPE))
-  {
-    BoxShape *box = static_cast<BoxShape*>(this->shape.get());
-    geom->set_type(msgs::Geometry::BOX);
-    math::Vector3 size = box->GetSize();
-    msgs::Set(geom->mutable_box()->mutable_size(), size);
-  }
-  else if (this->shape->HasType(CYLINDER_SHAPE))
-  {
-    CylinderShape *cyl = static_cast<CylinderShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
-    geom->mutable_cylinder()->set_radius(cyl->GetRadius());
-    geom->mutable_cylinder()->set_length(cyl->GetLength());
-  }
-
-  else if (this->shape->HasType(SPHERE_SHAPE))
-  {
-    SphereShape *sph = static_cast<SphereShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
-    geom->mutable_sphere()->set_radius(sph->GetRadius());
-  }
-
-  else if (this->shape->HasType(HEIGHTMAP_SHAPE))
-  {
-    HeightmapShape *hgt = static_cast<HeightmapShape*>(this->shape.get());
-    geom->set_type(msgs::Geometry::HEIGHTMAP);
-
-    msgs::Set(geom->mutable_heightmap()->mutable_image(),
-              common::Image(hgt->GetURI()));
-    msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
-    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetPos());
-  }
-
-  else if (this->shape->HasType(MAP_SHAPE))
-  {
-    msg.mutable_geometry()->set_type(msgs::Geometry::IMAGE);
-  }
-
-  else if (this->shape->HasType(PLANE_SHAPE))
-  {
-    msg.mutable_geometry()->set_type(msgs::Geometry::PLANE);
-  }
-  else if (this->shape->HasType(TRIMESH_SHAPE))
-  {
-    TrimeshShape *msh = static_cast<TrimeshShape*>(this->shape.get());
-    msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
-    math::Vector3 size = msh->GetSize();
-    msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
-    geom->mutable_mesh()->set_filename(msh->GetFilename());
-  }
-  else
-    gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
-
+  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
 
   return msg;
 }
@@ -406,12 +366,24 @@ msgs::Visual Collision::CreateCollisionVisual()
 /////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
-  return CollisionState(
-      boost::shared_static_cast<Collision>(shared_from_this()));
+  return this->state;
 }
 
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
+  this->SetRelativePose(_state.GetPose());
+}
+
+/////////////////////////////////////////////////
+void Collision::SetMaxContacts(double _maxContacts)
+{
+  this->maxContacts = static_cast<int>(_maxContacts);
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+int Collision::GetMaxContacts()
+{
+  return this->maxContacts;
 }

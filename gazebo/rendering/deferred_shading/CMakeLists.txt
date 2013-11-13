@@ -29,6 +29,10 @@ set (headers
   TechniqueDefinitions.hh
 )
 
+link_directories(  
+  ${ogre_library_dirs}
+)
+
 gz_add_library(gazebo_rendering_deferred ${sources})
 
 target_link_libraries(gazebo_rendering_deferred

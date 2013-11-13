@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,27 +25,30 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/TransportTypes.hh"
+#include <sdf/sdf.hh>
 
-#include "common/CommonTypes.hh"
-#include "common/Event.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/math/Helpers.hh"
 
-#include "physics/Collision.hh"
-#include "physics/RayShape.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/RayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
 RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   : Shape(CollisionPtr())
 {
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = DBL_MAX;
+  this->contactLen = GZ_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -57,7 +60,7 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = DBL_MAX;
+  this->contactLen = GZ_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
@@ -125,6 +128,17 @@ void RayShape::SetLength(double _len)
 }
 
 //////////////////////////////////////////////////
+void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  /// TODO RayShape::SetScale not yet implemented.
+}
+
+//////////////////////////////////////////////////
 double RayShape::GetLength() const
 {
   return this->contactLen;
@@ -156,5 +170,15 @@ int RayShape::GetFiducial() const
 
 //////////////////////////////////////////////////
 void RayShape::Init()
+{
+}
+
+//////////////////////////////////////////////////
+void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
+{
+}
+
+//////////////////////////////////////////////////
+void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
 }

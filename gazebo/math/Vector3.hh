@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef VECTOR3_HH
-#define VECTOR3_HH
+#ifndef _VECTOR3_HH_
+#define _VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
 #include <fstream>
 
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/math/Helpers.hh"
 
 namespace gazebo
 {
@@ -35,11 +35,27 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector3 Vector3.hh math/gzmath.hh
     /// \brief The Vector3 class represents the generic vector containing 3
     ///        elements.  Since it's commonly used to keep coordinate system
     ///        related information, its elements are labeled by x, y, z.
     class Vector3
     {
+      /// \brief math::Vector3(0, 0, 0)
+      public: static const Vector3 Zero;
+
+      /// \brief math::Vector3(1, 1, 1)
+      public: static const Vector3 One;
+
+      /// \brief math::Vector3(1, 0, 0)
+      public: static const Vector3 UnitX;
+
+      /// \brief math::Vector3(0, 1, 0)
+      public: static const Vector3 UnitY;
+
+      /// \brief math::Vector3(0, 0, 1)
+      public: static const Vector3 UnitZ;
+
       /// \brief Constructor
       public: Vector3();
 
@@ -77,7 +93,7 @@ namespace gazebo
       public: double GetLength() const;
 
       /// \brief Return the square of the length (magnitude) of the vector
-      /// \return the lenght
+      /// \return the squared length
       public: double GetSquaredLength() const;
 
       /// \brief Normalize the vector length
@@ -107,23 +123,9 @@ namespace gazebo
       /// \return the product
       public: Vector3 Cross(const Vector3 &_pt) const;
 
-      /// \brief Return the cross product of this vector and pt
-      /// \return the product
-      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
-              {
-                return this->Cross(_pt);
-              }
-
       /// \brief Return the dot product of this vector and pt
       /// \return the product
       public: double Dot(const Vector3 &_pt) const;
-
-      /// \brief  Return the dot product of this vector and pt
-      /// \return the product
-      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
-              {
-                return this->Dot(_pt);
-              }
 
       /// \brief Get the absolute value of the vector
       /// \return a vector with positive elements
@@ -154,7 +156,7 @@ namespace gazebo
 
       /// \brief Set this vector's components to the minimum of itself and the
       ///        passed in vector
-      /// \param[in] the minimumn clamping vector
+      /// \param[in] _v the minimum clamping vector
       public: void SetToMin(const Vector3 &_v);
 
       /// \brief Get the maximum value in the vector
@@ -184,6 +186,13 @@ namespace gazebo
       /// \param[in] _v vector to add
       public: const Vector3 &operator+=(const Vector3 &_v);
 
+      /// \brief Negation operator
+      /// \return negative of this vector
+      public: inline Vector3 operator-() const
+              {
+                return Vector3(-this->x, -this->y, -this->z);
+              }
+
       /// \brief Subtraction operators
       /// \param[in] _pt a vector to substract
       /// \return a vector
@@ -195,14 +204,17 @@ namespace gazebo
               }
 
       /// \brief Subtraction operators
+      /// \param[in] _pt subtrahend
       public: const Vector3 &operator-=(const Vector3 &_pt);
 
       /// \brief Division operator
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 operator/(const Vector3 &_pt) const;
 
       /// \brief Division assignment operator
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 &operator/=(const Vector3 &_pt);
@@ -229,6 +241,14 @@ namespace gazebo
       public: const Vector3 &operator*=(const Vector3 &_v);
 
       /// \brief Multiplication operators
+      /// \param[in] _s the scaling factor
+      /// \param[in] _v input vector
+      /// \return a scaled vector
+      public: friend inline Vector3 operator*(double _s,
+                                              const Vector3 &_v)
+      { return Vector3(_v.x * _s, _v.y * _s, _v.z * _s); }
+
+      /// \brief Multiplication operators
       /// \param[in] _v the scaling factor
       /// \return a scaled vector
       public: Vector3 operator*(double _v) const;
@@ -239,12 +259,13 @@ namespace gazebo
       public: const Vector3 &operator*=(double _v);
 
       /// \brief Equal to operator
+      /// \param[in] _pt The vector to compare against
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       public: bool operator ==(const Vector3 &_pt) const;
 
       /// \brief Not equal to operator
-      /// \param[in] _v a vector
+      /// \param[in] _v The vector to compare against
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       public: bool operator!=(const Vector3 &_v) const;
@@ -292,7 +313,8 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
-        _out << _pt.x << " " << _pt.y << " " << _pt.z;
+        _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
+             << precision(_pt.z, 6);
         return _out;
       }
 
@@ -313,4 +335,3 @@ namespace gazebo
   }
 }
 #endif
-

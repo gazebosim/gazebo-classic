@@ -1,10 +1,14 @@
 <?xml version="1.0" ?>
-<gazebo version="1.2">
+<sdf version="1.4">
   <world name="default">
     <!-- Ground -->
-    <include><uri>model://ground_plane</uri></include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
     <!-- A global light source -->
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <!-- Pioneer2dx model with a hokuyo laser and camera-->
     <model name="pioneer2dx">
       <include filename="pioneer2dx.model" />
@@ -12,4 +16,4 @@
       <include filename="camera.model" model_pose="0.2 0 0.5 0 0 0" />
     </model>
   </world>
-</gazebo>
+</sdf>

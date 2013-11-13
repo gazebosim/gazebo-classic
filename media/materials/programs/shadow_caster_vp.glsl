@@ -5,7 +5,7 @@ varying vec4 vertex_depth;
 
 void main()
 {
-  gl_Position = world_view_proj_mat * gl_Vertex;
-  vertex_depth = gl_Position;
+  vertex_depth = world_view_proj_mat * gl_Vertex;
+  gl_Position = vertex_depth;
   gl_Position.xy += texel_offsets.zw * gl_Position.w;
 }

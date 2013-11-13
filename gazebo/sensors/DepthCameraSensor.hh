@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 
 #include <string>
 
-#include "sensors/Sensor.hh"
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -47,10 +47,6 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
-
-      /// \brief Set the parent of the sensor
-      /// \param[in] _name Name of parent
-      public: virtual void SetParent(const std::string &_name);
 
       /// \brief Load the sensor with SDF parameters
       /// \param[in] _sdf SDF Sensor parameters
@@ -85,11 +81,6 @@ namespace gazebo
       /// \param[in] Name of file to save as
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
-
-      /// \brief 
-      /// \param[in] _msg
-      /// \TODO nate fill in
-      private: void OnPose(ConstPosePtr &_msg);
 
       private: rendering::DepthCameraPtr camera;
 

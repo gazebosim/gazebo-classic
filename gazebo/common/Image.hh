@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@
 #include <FreeImage.h>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {
@@ -38,12 +38,39 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \brief String names for the pixel formats.
+    /// \sa Image::PixelFormat.
+    static std::string PixelFormatNames[] =
+    {
+      "UNKNOWN_PIXEL_FORMAT",
+      "L_INT8",
+      "L_INT16",
+      "RGB_INT8",
+      "RGBA_INT8",
+      "BGRA_INT8",
+      "RGB_INT16",
+      "RGB_INT32",
+      "BGR_INT8",
+      "BGR_INT16",
+      "BGR_INT32",
+      "R_FLOAT16",
+      "RGB_FLOAT16",
+      "R_FLOAT32",
+      "RGB_FLOAT32",
+      "BAYER_RGGB8",
+      "BAYER_RGGR8",
+      "BAYER_GBRG8",
+      "BAYER_GRBG8"
+    };
+
+    /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
     class Image
     {
       /// \brief Pixel formats enumeration
-      public: enum PixelFormat {
-                UNKNOWN,
+      public: enum PixelFormat
+              {
+                UNKNOWN_PIXEL_FORMAT = 0,
                 L_INT8,
                 L_INT16,
                 RGB_INT8,
@@ -61,12 +88,20 @@ namespace gazebo
                 BAYER_RGGB8,
                 BAYER_RGGR8,
                 BAYER_GBRG8,
-                BAYER_GRBG8
+                BAYER_GRBG8,
+                PIXEL_FORMAT_COUNT
               };
+
+
+      /// \brief Convert a string to a Image::PixelFormat.
+      /// \param[in] _format Pixel format string. \sa Image::PixelFormatNames
+      /// \return Image::PixelFormat
+      public: static Image::PixelFormat ConvertPixelFormat(
+                  const std::string &_format);
 
       /// \brief Constructor
       /// \param[in] _filename the path to the image
-      public: Image(const std::string &_filename="");
+      public: explicit Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();
@@ -78,19 +113,6 @@ namespace gazebo
       /// \brief Save the image in PNG format
       /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
-
-      /// \brief Set the image from raw data (R8G8B8)
-      /// \param[in] _data Pointer to the raw image data
-      /// \param[in] _width Width in pixels
-      /// \param[in] _height Height in pixels
-      /// \param[in] _scanline_bytes Size of a image row in bytes
-      /// \param[in] _bpp Bits per pixels, aka depth
-      public: void SetFromData(const unsigned char *_data,
-                               unsigned int _width,
-                               unsigned int _height,
-                               int _scanline_bytes,
-                               unsigned int _bpp)
-              GAZEBO_DEPRECATED;
 
       /// \brief Set the image from raw data
       /// \param[in] _data Pointer to the raw image data

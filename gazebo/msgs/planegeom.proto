@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface PlaneGeom
 /// \brief Message for a plane geometry
-/// \verbatim
+
 
 import "vector3d.proto";
 import "vector2d.proto";
@@ -15,4 +15,4 @@ message PlaneGeom
   optional double d         = 3 [default = 0];
 }
 
-/// \endverbatim
+

@@ -1,0 +1,7 @@
+#ifndef _GAZEBO_UTIL_HH_
+#define _GAZEBO_UTIL_HH_
+
+// Automatically generated
+${util_headers}
+
+#endif

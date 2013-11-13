@@ -3,11 +3,11 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface GzString_V
 /// \brief A message for a vector of string data
-/// \verbatim
+
 
 message GzString_V
 {
   repeated string data = 1;
 }
 
-/// \endverbatim
+

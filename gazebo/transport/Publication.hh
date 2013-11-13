@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  *
 */
 
-#ifndef PUBLICATION_HH
-#define PUBLICATION_HH
+#ifndef _PUBLICATION_HH_
+#define _PUBLICATION_HH_
 
+#include <utility>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <list>
 #include <string>
 #include <vector>
 
-#include "transport/CallbackHelper.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/PublicationTransport.hh"
 
 namespace gazebo
 {
@@ -34,75 +36,147 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
+    /// \class Publication Publication.hh transport/transport.hh
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
     class Publication
     {
       /// \brief Constructor
-      public: Publication(const std::string &topic,
-                           const std::string &msgType);
+      /// \param[in] _topic The topic we're publishing
+      /// \param[in] _msgType The type of the topic we're publishing
+      public: Publication(const std::string &_topic,
+                           const std::string &_msgType);
 
       /// \brief Destructor
       public: virtual ~Publication();
 
       /// \brief Get the type of message
+      /// \return The type of message
       public: std::string GetMsgType() const;
 
-      public: void AddSubscription(const CallbackHelperPtr &callback);
+      /// \brief Subscribe a callback to our topic
+      /// \param[in] _callback The callback
+      public: void AddSubscription(const CallbackHelperPtr _callback);
+
+      /// \brief Subscribe a node to our topic
+      /// \param[in] _node The node
       public: void AddSubscription(const NodePtr &_node);
 
-      /// \brief Remove a subscription
+      /// \brief Unsubscribe a node from our topic
+      /// \param[in] _node The node
       public: void RemoveSubscription(const NodePtr &_node);
 
-      /// \brief Remove a subscription
-      public: void RemoveSubscription(const std::string &host,
-                                      unsigned int port);
+      /// \brief Unsubscribe a a node by host/port from our topic
+      /// \param[in] _host The node's hostname
+      /// \param[in] _port The node's port
+      public: void RemoveSubscription(const std::string &_host,
+                                      unsigned int _port);
 
-      public: void RemoveTransport(const std::string &host, unsigned int port);
+      /// \brief Remove a transport
+      /// \param[in] _host The transport's hostname
+      /// \param[in] _port The transport's port
+      public: void RemoveTransport(const std::string &_host, unsigned
+                                   int _port);
 
+      /// \brief Get the number of transports
+      /// \return The number of transports
       public: unsigned int GetTransportCount() const;
+
+      /// \brief Get the number of callbacks
+      /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
+
+      /// \brief Get the number of nodes
+      /// \return The number of nodes
       public: unsigned int GetNodeCount() const;
+
+      /// \brief Get the number of remote subscriptions
+      /// \return The number of remote subscriptions
       public: unsigned int GetRemoteSubscriptionCount();
 
-      /// \brief Return true if the topic has been advertised from this
-      ///        process.
+      /// \brief Was the topic has been advertised from this process?
+      /// \return true if the topic has been advertised from this process,
+      /// false otherwise
       public: bool GetLocallyAdvertised() const;
 
       /// \brief Set whether this topic has been advertised from this process
+      /// \param[in] _value If true, the topic was locally advertise,
+      /// otherwise it was not
       public: void SetLocallyAdvertised(bool _value);
 
-      /// \brief Publish data
-      public: void LocalPublish(const std::string &data);
+      /// \brief Publish data to local subscribers (skip serialization)
+      /// \param[in] _data The data to be published
+      public: void LocalPublish(const std::string &_data);
 
-      public: void Publish(const google::protobuf::Message &msg,
-                           const boost::function<void()> &cb = NULL);
+      /// \brief Publish data to remote subscribers
+      /// \param[in] _msg Message to be published
+      /// \param[in] _cb Callback to be invoked after publishing
+      /// is completed
+      public: void Publish(MessagePtr _msg,
+                  boost::function<void(uint32_t)> _cb,
+                  uint32_t _id);
 
-      public: void AddTransport(const PublicationTransportPtr &publink);
+      /// \brief Add a transport
+      /// \param[in] _publink Pointer to publication transport object to
+      /// be added
+      public: void AddTransport(const PublicationTransportPtr &_publink);
+
+      /// \brief Does a given transport exist?
+      /// \param[in] _host Hostname of the transport
+      /// \param[in] _port Port of the transport
+      /// \return true if the transport exists, false otherwise
       public: bool HasTransport(const std::string &_host, unsigned int _port);
 
+      /// \brief Add a publisher
+      /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
 
+      /// \brief Remove nodes that have been marked for removal
+      private: void RemoveNodes();
+
+      /// \brief Unique if of the publication.
       private: unsigned int id;
+
+      /// \brief Counter to produce unique IDs
       private: static unsigned int idCounter;
+
+      /// \brief Name of the topic messages are output on.
       private: std::string topic;
+
+      /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages
+      /// \brief Remote nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
-      /// \brief Local nodes that recieve messages
+      /// \brief Local nodes that recieve messages.
       private: std::list<NodePtr> nodes;
 
+      /// \brief List of node IDs to remove from nodes list.
+      private: std::list<unsigned int> removeNodes;
+
+      /// \brief List of host and port callbacks to remove.
+      private: std::list<std::pair<std::string, unsigned int> > removeCallbacks;
+
+      /// \brief List of transport mechanisms.
       private: std::list<PublicationTransportPtr> transports;
 
+      /// \brief List of publishers.
       private: std::vector<PublisherPtr> publishers;
 
+      /// \brief True if the publication is advertised in the same process.
       private: bool locallyAdvertised;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex nodeMutex;
+
+      /// \brief Mutex to protect the list of nodes.
+      private: mutable boost::mutex callbackMutex;
+
+      /// \brief Mutex to protect the list of nodes id for removed.
+      private: mutable boost::mutex nodeRemoveMutex;
     };
     /// \}
   }
 }
 #endif
-
-

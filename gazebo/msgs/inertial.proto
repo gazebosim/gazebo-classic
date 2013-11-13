@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Inertial 
 /// \brief Information about inertia
-/// \verbatim
+
 
 import "pose.proto";
 
@@ -18,4 +18,4 @@ message Inertial
   optional double iyz              = 7;
   optional double izz              = 8;
 }
-/// \endverbatim
+

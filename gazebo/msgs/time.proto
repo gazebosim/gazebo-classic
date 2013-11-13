@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Time
 /// \brief A message for time data
-/// \verbatim
+
 
 message Time
 {
@@ -11,4 +11,4 @@ message Time
   required int32 nsec = 2;
 }
 
-/// \endverbatim
+

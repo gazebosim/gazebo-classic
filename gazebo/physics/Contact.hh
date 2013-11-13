@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,18 @@
  * Date: 10 Nov 2009
  */
 
-#ifndef CONTACT_HH
-#define CONTACT_HH
+#ifndef _CONTACT_HH_
+#define _CONTACT_HH_
 
 #include <vector>
+#include <string>
 
-#include "common/Time.hh"
-#include "math/Vector3.hh"
-#include "JointFeedback.hh"
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -43,41 +47,70 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
-    ///        a numnber of contact points
+    /// a number of contact points
     class Contact
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: Contact();
 
       /// \brief Copy constructor
-      public: Contact(const Contact &c);
+      /// \param[in] _contact Contact to copy.
+      public: Contact(const Contact &_contact);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Contact();
 
-      /// \brief Clone the contact
-      public: Contact Clone() const;
+      /// \brief Operator =.
+      /// \param[in] _contact Contact to copy.
+      /// \return Reference to this contact
+      public: Contact &operator =(const Contact &_contact);
 
-      /// \brief Operator =
-      public: Contact &operator =(const Contact &contact);
+      /// \brief Operator =.
+      /// \param[in] _contact msgs::Contact to copy.
+      /// \return Reference to this contact
+      public: Contact &operator =(const msgs::Contact &_contact);
 
-      /// \brief Reset
+      /// \brief Populate a msgs::Contact with data from this.
+      /// \param[out] _msg Contact message the will hold the data.
+      public: void FillMsg(msgs::Contact &_msg) const;
+
+      /// \brief Produce a debug string.
+      /// \return A string that contains the values of the contact.
+      public: std::string DebugString() const;
+
+      /// \brief Reset to default values.
       public: void Reset();
 
+      /// \brief Pointer to the first collision object
       public: Collision *collision1;
+
+      /// \brief Pointer to the second collision object
       public: Collision *collision2;
 
-      public: JointFeedback forces[MAX_CONTACT_JOINTS];
+      /// \brief Array of forces for the contact.
+      /// All forces and torques are relative to the center of mass of the
+      /// respective links that the collision elments are attached to.
+      public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
+      /// \brief Array of force positions.
       public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+
+      /// \brief Array of force normals.
       public: math::Vector3 normals[MAX_CONTACT_JOINTS];
 
+      /// \brief Array of contact depths
       public: double depths[MAX_CONTACT_JOINTS];
 
+      /// \brief Length of all the arrays.
       public: int count;
 
+      /// \brief Time at which the contact occurred.
       public: common::Time time;
+
+      /// \brief World in which the contact occurred
+      public: WorldPtr world;
     };
     /// \}
   }

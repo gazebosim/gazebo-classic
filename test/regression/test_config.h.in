@@ -1,1 +1,0 @@
-#define TEST_REGRESSION_PATH "${PROJECT_SOURCE_DIR}/test/regression"

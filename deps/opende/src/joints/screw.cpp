@@ -115,8 +115,8 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
 
     info->m = 5;
 
-/* comment out joint limits for now, add back later after verifying continuous is working
     // if proper joint limits are specified
+
     // see if we're at a joint limit for the rotational hinge
     if ( limot.lostop <= limot.histop )
     {
@@ -126,10 +126,13 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
         // from angle, update cumulative_angle, which does not wrap
         cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
 
+        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle, limot.lostop, limot.histop);
+
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
 
+    /* uncommnet to enforce slider joint limit
     // see if we're at a joint limit for the slider
     limot.limit = 0;
     if ( ( limot.lostop > -dInfinity || limot.histop < dInfinity ) &&
@@ -137,6 +140,9 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
     {
         // measure joint position
         dReal pos = dJointGetScrewPosition ( this );
+
+        // printf("pos: %f lo[%f] hi[%f]\n", pos, limot.lostop, limot.histop);
+
         if ( pos <= limot.lostop )
         {
             limot.limit = 1;
@@ -150,15 +156,29 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
             info->m = 6;
         }
     }
-*/
-
+    */
 }
 
 
 void
 dxJointScrew::getInfo2( dxJoint::Info2 *info )
 {
-    // set the constraint on the two sliding axis
+    // Added by OSRF
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+      info->cfm[5] = cfm;
+    }
+
+    // constrain the slider like DOFs
     {
       // pull out pos and R for both bodies. also get the `connection'
       // vector pos2-pos1.
@@ -293,8 +313,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
               for ( i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
       }
 
-      // if the slider is powered, or has joint limits, add in the extra row
-      // limot.addLimot ( this, info, 5, ax1, 0 ); // comment out as this will be the screw constraint
+      // uncommnet to enforce slider joint limit
+      // limot.addLimot ( this, info, 5, ax1, 0 );
 
       /* comment out linear damping, use only rotation damping
       // linear joint damping
@@ -382,8 +402,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       info->c[3] = k * dCalcVectorDot3( b, p );
       info->c[4] = k * dCalcVectorDot3( b, q );
 
-      // if the screw is powered, or has joint limits, add in the stuff
-      //limot.addLimot( this, info, 5, ax1, 1 ); // comment out as this will be the screw constraint
+      // enforcing rotation joint limit
+      limot.addLimot( this, info, 5, ax1, 1 );
 
       // rotational joint damping
       if (this->use_damping)
@@ -527,7 +547,20 @@ void dJointSetScrewParam( dJointID j, int parameter, dReal value )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    joint->limot.set( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+        break;
+      case dParamCFM:
+        joint->cfm = value;
+        // dParamCFM label is also used for normal_cfm
+        joint->limot.set( parameter, value );
+        break;
+      default:
+        joint->limot.set( parameter, value );
+        break;
+    }
 }
 
 
@@ -536,7 +569,15 @@ dReal dJointGetScrewParam( dJointID j, int parameter )
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Screw );
-    return joint->limot.get( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 

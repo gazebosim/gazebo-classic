@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Quaternion
 /// \brief A message for a quaternion
-/// \verbatim
+
 
 message Quaternion
 {
@@ -13,4 +13,4 @@ message Quaternion
   required double w = 5;
 }
 
-/// \endverbatim
+

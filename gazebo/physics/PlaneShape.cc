@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/Collision.hh"
-#include "physics/PlaneShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/PlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -61,7 +61,7 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->GetValueVector3("normal");
+  return this->sdf->Get<math::Vector3>("normal");
 }
 
 //////////////////////////////////////////////////
@@ -73,11 +73,23 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
-  return this->sdf->GetValueVector2d("size");
+  return this->sdf->Get<math::Vector2d>("size");
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::FillShapeMsg(msgs::Geometry &_msg)
+void PlaneShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  this->SetSize(size);
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
   msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal());

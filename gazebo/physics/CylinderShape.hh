@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  * Date: 8 May 2003
  */
 
-#ifndef CYLINDERSHAPE_HH
-#define CYLINDERSHAPE_HH
+#ifndef _CYLINDERSHAPE_HH_
+#define _CYLINDERSHAPE_HH_
 
-#include "physics/Shape.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {
@@ -31,42 +31,52 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class CylinderShape CylinderShape.hh physics/physics.hh
     /// \brief Cylinder collision
     class CylinderShape : public Shape
     {
-      /// \brief Constructor
-      public: CylinderShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent of the shape.
+      public: explicit CylinderShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~CylinderShape();
 
-      /// \brief Initialize the cylinder
+      /// \brief Initialize the cylinder.
       public: void Init();
 
-      /// \brief Set radius
-      public: void SetRadius(const double &radius);
+      /// \brief Set radius.
+      /// \param[in} _radius New radius of the cylinder.
+      public: void SetRadius(double _radius);
 
-      /// \brief Set length
-      public: void SetLength(const double &length);
+      /// \brief Set length.
+      /// \param[in] _length New length of the cylinder.
+      public: void SetLength(double _length);
 
-       /// \brief Get radius
+      /// \brief Get radius.
+      /// \return The cylinder radius.
       public: double GetRadius() const;
 
-      /// \brief Get length
+      /// \brief Get length.
+      /// \return The cylinder length.
       public: double GetLength() const;
 
-      /// \brief Set the size of the cylinder
-      public: virtual void SetSize(const double &radius, const double &length);
+      /// \brief Set the size of the cylinder.
+      /// \param[in] _radius New radius.
+      /// \param[in] _lenght New length.
+      public: virtual void SetSize(double _radius, double _length);
 
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      /// \brief Set scale of cylinder.
+      /// \param[in] _scale Scale to set the cylinder to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
+      /// \brief Fill in the values for a geomertry message.
+      /// \param[out] _msg The geometry message to fill.
+      public: void FillMsg(msgs::Geometry &_msg);
+
+      /// \brief Update values based on a message.
+      /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
-
-      public: virtual double GetMass(double _density) const;
-
-      /// \brief Get inertial for a shape
-      public: virtual void GetInertial(double _mass,
-                                       InertialPtr _inertial) const;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,18 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef QUATERN_HH
-#define QUATERN_HH
+#ifndef _QUATERNION_HH_
+#define _QUATERNION_HH_
 
 #include <math.h>
 #include <iostream>
 #include <cmath>
 
-#include "math/Helpers.hh"
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "math/Matrix3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {
@@ -39,6 +39,7 @@ namespace gazebo
   /// \addtogroup gazebo_math
   /// \{
 
+  /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
   class Quaternion
   {
@@ -53,7 +54,7 @@ namespace gazebo
     public: Quaternion(const double &_w, const double &_x, const double &_y,
                         const double &_z);
 
-    /// \brief Constructor from Euler angles
+    /// \brief Constructor from Euler angles in radians
     /// \param[in] _roll  roll
     /// \param[in] _pitch pitch
     /// \param[in] _yaw   yaw
@@ -77,8 +78,8 @@ namespace gazebo
     public: ~Quaternion();
 
     /// \brief Equal operator
-    /// \param[in] qt Quaternion to copy
-    public: Quaternion &operator =(const Quaternion &qt);
+    /// \param[in] _qt Quaternion to copy
+    public: Quaternion &operator =(const Quaternion &_qt);
 
     /// \brief Invert the quaternion
     public: void Invert();
@@ -145,9 +146,16 @@ namespace gazebo
     /// \param[in] _z z
     public: void Set(double _u, double _x, double _y, double _z);
 
-    /// \brief Set the quaternion from Euler angles
+    /// \brief Set the quaternion from Euler angles. The order of operations
+    /// are roll, pitch, yaw.
     /// \param[in] vec  Euler angle
     public: void SetFromEuler(const Vector3 &_vec);
+
+    /// \brief Set the quaternion from Euler angles.
+    /// \param[in] _roll Roll angle (radians).
+    /// \param[in] _pitch Roll angle (radians).
+    /// \param[in] _yaw Roll angle (radians).
+    public: void SetFromEuler(double _roll, double _pitch, double _yaw);
 
     /// \brief Return the rotation in Euler angles
     /// \return This quaternion as an Euler vector
@@ -158,9 +166,9 @@ namespace gazebo
     public: static Quaternion EulerToQuaternion(const Vector3 &_vec);
 
     /// \brief Convert euler angles to quatern.
-    /// \param _x rotation along x
-    /// \param _y rotation along y
-    /// \param _z rotation along z
+    /// \param[in] _x rotation along x
+    /// \param[in] _y rotation along y
+    /// \param[in] _z rotation along z
     public: static Quaternion EulerToQuaternion(double _x,
                                                 double _y,
                                                 double _z);
@@ -187,7 +195,7 @@ namespace gazebo
     public: void Scale(double _scale);
 
     /// \brief Addition operator
-    /// \param _qt[in] quaternion for addition
+    /// \param[in] _qt quaternion for addition
     /// \return this quaternion + _qt
     public: Quaternion operator+(const Quaternion &_qt) const;
 
@@ -229,7 +237,8 @@ namespace gazebo
     public: Quaternion operator*=(const Quaternion &qt);
 
     /// \brief Vector3 multiplication operator
-    public: Vector3 operator*(const Vector3 &v) const;
+    /// \param[in] _v vector to multiply
+    public: Vector3 operator*(const Vector3 &_v) const;
 
     /// \brief Equal to operator
     /// \param[in] _qt Quaternion for comparison
@@ -309,7 +318,7 @@ namespace gazebo
     public: void Round(int _precision);
 
     /// \brief Dot product
-    /// \param[in] the other quaternion
+    /// \param[in] _q the other quaternion
     /// \return the product
     public: double Dot(const Quaternion &_q) const;
 
@@ -357,7 +366,8 @@ namespace gazebo
                 const gazebo::math::Quaternion &_q)
     {
       Vector3 v(_q.GetAsEuler());
-      _out << v.x << " " << v.y << " " << v.z;
+      _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
+           << precision(v.z, 6);
       return _out;
     }
 
@@ -368,13 +378,13 @@ namespace gazebo
     public: friend std::istream &operator>>(std::istream &_in,
                                              gazebo::math::Quaternion &_q)
     {
-      Angle r, p, y;
+      Angle roll, pitch, yaw;
 
       // Skip white spaces
       _in.setf(std::ios_base::skipws);
-      _in >> r >> p >> y;
+      _in >> roll >> pitch >> yaw;
 
-      _q.SetFromEuler(Vector3(*r, *p, *y));
+      _q.SetFromEuler(Vector3(*roll, *pitch, *yaw));
 
       return _in;
     }

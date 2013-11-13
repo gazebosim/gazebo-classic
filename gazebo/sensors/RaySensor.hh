@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@
  * Date: 23 february 2004
 */
 
-#ifndef RAYSENSOR_HH
-#define RAYSENSOR_HH
+#ifndef _RAYSENSOR_HH_
+#define _RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
 {
@@ -40,9 +40,10 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    /// \class RaySensor RaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
+    /// \class RaySensor RaySensor.hh sensors/sensors.hh
     /// \brief Sensor with one or more rays.
     ///
     /// This sensor cast rays into the world, tests for intersections, and
@@ -56,38 +57,30 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RaySensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
-
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the ray
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Update the sensor information
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the ray
+      // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Gets the topic name of the sensor
-      /// \return Topic name
+      // Documentation inherited
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the minimum angle
-      /// \return The minimum angle
+      /// \return The minimum angle object
       public: math::Angle GetAngleMin() const;
 
       /// \brief Get the maximum angle
-      /// \return the maximum angle
+      /// \return the maximum angle object
       public: math::Angle GetAngleMax() const;
 
-      /// \brief Get radians between each range
+      /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
       public: double GetAngleResolution() const;
 
@@ -126,6 +119,10 @@ namespace gazebo
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
+
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double GetVerticalAngleResolution() const;
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -169,15 +166,33 @@ namespace gazebo
       public: physics::MultiRayShapePtr GetLaserShape() const
               {return this->laserShape;}
 
-      private: physics::LinkPtr link;
+      // Documentation inherited
+      public: virtual bool IsActive();
+
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
       private: physics::EntityPtr parentEntity;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
-      private: boost::mutex *mutex;
-      private: msgs::LaserScan laserMsg;
+      private: boost::mutex mutex;
+      private: msgs::LaserScanStamped laserMsg;
+
+      // Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+      // If true, apply the noise model specified by other noise parameters
+      private: bool noiseActive;
+      // Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
+      // from which we sample
+      private: double noiseMean;
+      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
+      // the distibution from which we sample
+      private: double noiseStdDev;
     };
     /// \}
   }

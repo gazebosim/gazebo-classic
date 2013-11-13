@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
-<gazebo version="1.2">
+<sdf version="1.4">
   <world name="default">
     <scene>
       <grid>false</grid>
     </scene>
     <!-- A global light source -->
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <!-- Invisible ground plane -->
     <model name="ground">
       <link name="body">
@@ -33,4 +35,4 @@
       <point>100 0 0</point>
     </road>
   </world>
-</gazebo>
+</sdf>

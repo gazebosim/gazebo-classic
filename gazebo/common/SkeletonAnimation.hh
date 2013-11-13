@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 #ifndef _SKELETONANIMATION_HH_
 #define _SKELETONANIMATION_HH_
 
-#include <math/Matrix4.hh>
-#include <math/Pose.hh>
-
 #include <map>
 #include <utility>
 #include <string>
+
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -31,6 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common Animation
     /// \{
 
+    /// \class NodeAnimation SkeletonAnimation.hh common/common.hh
     /// \brief Node animation
     class NodeAnimation
     {

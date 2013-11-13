@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
  */
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include <sdf/sdf.hh>
 
-#include "transport/transport.hh"
-#include "common/common.hh"
-#include "math/gzmath.hh"
-#include "gazebo_config.h"
-#include "gazebo.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/util/LogRecord.hh"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/gazebo.hh"
 
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
@@ -54,13 +56,23 @@ void gazebo::add_plugin(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-bool gazebo::load(int argc, char** argv)
+bool gazebo::load(int _argc, char **_argv)
 {
+  gazebo::common::load();
+
+  // The SDF find file callback.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
+  // Initialize the informational logger. This will log warnings, and
+  // errors.
+  if (!gazebo::common::Console::Instance()->IsInitialized())
+    gazebo::common::Console::Instance()->Init("default.log");
+
   // Load all the plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
        g_plugins.begin(); iter != g_plugins.end(); ++iter)
   {
-    (*iter)->Load(argc, argv);
+    (*iter)->Load(_argc, _argv);
   }
 
   // Start the transport system by connecting to the master.
@@ -89,6 +101,7 @@ void gazebo::run()
 /////////////////////////////////////////////////
 void gazebo::stop()
 {
+  util::LogRecord::Instance()->Stop();
   gazebo::transport::stop();
 }
 
@@ -96,7 +109,7 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
+  util::LogRecord::Instance()->Fini();
   g_plugins.clear();
   gazebo::transport::fini();
 }
-

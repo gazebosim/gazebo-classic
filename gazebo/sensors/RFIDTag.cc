@@ -1,5 +1,6 @@
-/* Copyright (C)
- *     Jonas Mellin & Zakiruz Zaman
+/*
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+*/
 /* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "math/Vector3.hh"
-
-#include "sensors/SensorFactory.hh"
-#include "sensors/RFIDTagManager.hh"
-#include "sensors/RFIDTag.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/RFIDSensor.hh"
+#include "gazebo/sensors/RFIDTag.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -37,10 +37,9 @@ GZ_REGISTER_STATIC_SENSOR("rfidtag", RFIDTag)
 
 /////////////////////////////////////////////////
 RFIDTag::RFIDTag()
-: Sensor()
+: Sensor(sensors::OTHER)
 {
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
@@ -61,14 +60,21 @@ void RFIDTag::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->GetValueString());
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 
   this->entity = this->world->GetEntity(this->parentName);
 
-  RFIDTagManager::Instance()->AddTaggedModel(this);
+  // Add the tag to all the RFID sensors.
+  Sensor_V sensors = SensorManager::Instance()->GetSensors();
+  for (Sensor_V::iterator iter = sensors.begin(); iter != sensors.end(); ++iter)
+  {
+    if ((*iter)->GetType() == "rfid")
+    {
+      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +111,7 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     // msg.set_range_min( this->GetRangeMin() );
     // msg.set_range_max( this->GetRangeMax() );
 
-    // for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    // for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
     // {
     //   msg.add_ranges(this->laserShape->GetRange(i));
     //   msg.add_intensities(0);

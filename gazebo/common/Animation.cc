@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 */
 #include <algorithm>
 
-#include "math/Spline.hh"
-#include "math/RotationSpline.hh"
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
+#include "gazebo/math/Spline.hh"
+#include "gazebo/math/RotationSpline.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -103,9 +104,20 @@ unsigned int Animation::GetKeyFrameCount() const
 }
 
 /////////////////////////////////////////////////
-KeyFrame* Animation::GetKeyFrame(unsigned int _index) const
+KeyFrame *Animation::GetKeyFrame(unsigned int _index) const
 {
-  return this->keyFrames[_index];
+  KeyFrame *result = NULL;
+
+  if (_index < this->keyFrames.size())
+    result = this->keyFrames[_index];
+  else
+  {
+    gzerr << "Key frame index[" << _index
+          << "] is larger than key frame array size["
+          << this->keyFrames.size() << "]\n";
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////

@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ForceTorque
+/// \brief ForceTorque from constraint solving
+
+
+import "joint_wrench.proto";
+import "time.proto";
+
+message ForceTorque
+{
+  repeated JointWrench wrench = 1;
+  required Time time          = 2;
+}
+

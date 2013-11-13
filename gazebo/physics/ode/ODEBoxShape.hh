@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,52 +14,49 @@
  * limitations under the License.
  *
 */
-#ifndef ODEBOXSHAPE_HH
-#define ODEBOXSHAPE_HH
+#ifndef _ODEBOXSHAPE_HH_
+#define _ODEBOXSHAPE_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief ODE Box shape
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODECollisionPtr _parent) : BoxShape(_parent) {}
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit ODEBoxShape(ODECollisionPtr _parent)
+              : BoxShape(_parent) {}
+
+      /// \brief Destructor.
       public: virtual ~ODEBoxShape() {}
-      public: virtual void SetSize(const math::Vector3 &size)
+
+      // Documentation inherited.
+      public: virtual void SetSize(const math::Vector3 &_size)
       {
-        BoxShape::SetSize(size);
+        BoxShape::SetSize(_size);
 
         ODECollisionPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODECollision>(
+        oParent = boost::dynamic_pointer_cast<ODECollision>(
             this->collisionParent);
 
         if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateBox(0, size.x, size.y, size.z), true);
+          oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
         else
-          dGeomBoxSetLengths(oParent->GetCollisionId(), size.x, size.y, size.z);
+          dGeomBoxSetLengths(oParent->GetCollisionId(),
+                             _size.x, _size.y, _size.z);
       }
     };
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

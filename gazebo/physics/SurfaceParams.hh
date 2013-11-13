@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
  * Date: 30 July 2003
  */
 
-#ifndef SURFACEPARAMS_HH
-#define SURFACEPARAMS_HH
+#ifndef _SURFACEPARAMS_HH_
+#define _SURFACEPARAMS_HH_
 
-#include "msgs/msgs.hh"
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -32,22 +33,25 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
     /// \brief SurfaceParams defines various Surface contact parameters.
-    ///        These parameters defines the properties of a
-    ///        physics::Contact constraint.
+    /// These parameters defines the properties of a
+    /// physics::Contact constraint.
     class SurfaceParams
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: SurfaceParams();
 
-      /// \brief Constructor
+      /// \brief Destructor.
       public: virtual ~SurfaceParams();
 
-      /// \brief Load the contact params
+      /// \brief Load the contact params.
+      /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Fill in a surface message
-      public: void FillSurfaceMsg(msgs::Surface &_msg);
+      /// \brief Fill in a surface message.
+      /// \param[in] _msg Message to fill with this object's values.
+      public: void FillMsg(msgs::Surface &_msg);
 
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
@@ -66,8 +70,8 @@ namespace gazebo
       /// \sa    See for example
       ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2
       ///        for more details.
-
       public: double kp;
+
       /// \brief spring damping constant equivalents of a contact as a
       ///        function of SurfaceParams::cfm and SurfaceParams::erp.
       /// \sa    See for example
@@ -129,10 +133,15 @@ namespace gazebo
       ///        to the contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: math::Vector3 fdir1;
+
+      /// \brief Allow collision checking without generating a contact joint.
+      public: bool collideWithoutContact;
+
+      /// \brief Custom collision filtering used when collideWithoutContact is
+      /// true.
+      public: unsigned int collideWithoutContactBitmask;
     };
     /// \}
   }
 }
 #endif
-
-

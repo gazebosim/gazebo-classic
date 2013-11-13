@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include "msgs/msgs.hh"
-#include "transport/Connection.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Connection.hh"
 
 namespace gazebo
 {
@@ -35,6 +35,10 @@ namespace gazebo
   ///        communication.
   class Master
   {
+    /// \def Map of unique id's to connections.
+    typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
+
+
     /// \brief Constructor
     public: Master();
 
@@ -76,7 +80,7 @@ namespace gazebo
 
     /// \brief Accept a new connection
     /// \param[in] _newConnection The new connection
-    private: void OnAccept(const transport::ConnectionPtr &_newConnection);
+    private: void OnAccept(transport::ConnectionPtr _newConnection);
 
     /// \brief Get a publisher for the given topic
     /// \param[in] _topic Name of the topic
@@ -92,8 +96,9 @@ namespace gazebo
 
 
     /// \brief Remove a connection.
-    /// \param[in] _index Index of the connection to remove.
-    private: void RemoveConnection(unsigned int _index);
+    /// \param[in] _connIter Iterator to the connection to remove.
+    /// _connIter will be incremented when removed.
+    private: void RemoveConnection(Connection_M::iterator _connIter);
 
     /// \brief Remove a publisher.
     /// \param[in] _pub Publish message that contains the info necessary to
@@ -104,9 +109,6 @@ namespace gazebo
     /// \param[in] _pub Subscribe message that contains the info necessary to
     /// remove a subscriber.
     private: void RemoveSubscriber(const msgs::Subscribe _sub);
-
-    /// \def Map of unique id's to connections.
-    typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
 
     /// \def Map of publish messages to connections.
     typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
@@ -132,7 +134,7 @@ namespace gazebo
     private: std::list<std::pair<unsigned int, std::string> > msgs;
 
     /// \brief Our server connection.
-    private: transport::Connection *connection;
+    private: transport::ConnectionPtr connection;
 
     /// \brief Thread to run the main loop.
     private: boost::thread *runThread;
@@ -141,10 +143,10 @@ namespace gazebo
     private: bool stop;
 
     /// \brief Mutex to protect connections.
-    private: boost::recursive_mutex *connectionMutex;
+    private: boost::recursive_mutex connectionMutex;
 
     /// \brief Mutex to protect msg bufferes.
-    private: boost::recursive_mutex *msgsMutex;
+    private: boost::recursive_mutex msgsMutex;
   };
 }
 #endif

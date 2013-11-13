@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Vector2d 
 /// \brief Message for a vector2 double
-/// \verbatim
+
 
 import "header.proto";
 
@@ -13,4 +13,4 @@ message Vector2d
   required double y = 2;
 }
 
-/// \endverbatim
+

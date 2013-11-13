@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
 #define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include <sdf/sdf.hh>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/Camera.hh"
 
 namespace Ogre
 {
@@ -60,7 +60,7 @@ namespace gazebo
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
       public: DepthCamera(const std::string &_namePrefix,
-                          Scene *_scene, bool _autoRender = true);
+                          ScenePtr _scene, bool _autoRender = true);
 
       /// \brief Destructor
       public: virtual ~DepthCamera();
@@ -109,8 +109,8 @@ namespace gazebo
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
-              event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
-              { return newRGBPointCloud.Connect(subscriber); }
+              event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+              { return newRGBPointCloud.Connect(_subscriber); }
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect

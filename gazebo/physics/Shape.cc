@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -29,6 +29,8 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -39,7 +41,7 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
-void Shape::GetInertial(double /*_mass*/, InertialPtr /*_inertial*/) const
+math::Vector3 Shape::GetScale() const
 {
-  return;
+  return this->scale;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,22 @@
  * Date: 15 July 2003
  */
 
-#include <sstream>
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Image.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/transport.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/physics/World.hh"
 
-#include "physics/World.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/Camera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
-
-#include "sensors/SensorFactory.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -44,20 +43,13 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
 CameraSensor::CameraSensor()
-    : Sensor()
+    : Sensor(sensors::IMAGE)
 {
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -80,8 +72,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->node->Init(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -101,7 +93,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -112,7 +104,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -133,11 +125,21 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentName, true);
+    math::Pose cameraPose = this->pose;
+    if (cameraSdf->HasElement("pose"))
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
+    this->camera->SetWorldPose(cameraPose);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -145,17 +147,16 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
+  this->imagePub.reset();
   Sensor::Fini();
+
   if (this->camera)
-    this->camera->Fini();
+  {
+    this->scene->RemoveCamera(this->camera->GetName());
+  }
+
   this->camera.reset();
   this->scene.reset();
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetActive(bool value)
-{
-  Sensor::SetActive(value);
 }
 
 //////////////////////////////////////////////////
@@ -165,19 +166,25 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastUpdateTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->scene->GetSimTime();
 
     if (this->imagePub->HasConnections())
     {
       msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      // msg.mutable_image()->set_pixel_format(this->camera->GetImageFormat());
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+          this->camera->GetImageDepth());
       msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * 3 * msg.image().height());
-      this->imagePub->Publish(msg);
+          msg.image().width() * this->camera->GetImageDepth() *
+          msg.image().height());
+
+      if (this->imagePub && this->imagePub->HasConnections())
+        this->imagePub->Publish(msg);
     }
   }
 }
@@ -209,4 +216,11 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
   return this->camera->SaveFrame(_filename);
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::IsActive()
+{
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

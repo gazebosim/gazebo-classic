@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface IMU
+/// \brief Data from an IMU sensor
+
+
+import "time.proto";
+import "vector3d.proto";
+import "quaternion.proto";
+
+message IMU
+{
+  required Time stamp                   = 1;
+  required string entity_name           = 2;
+  required Quaternion orientation       = 3;
+  required Vector3d angular_velocity    = 4;
+  required Vector3d linear_acceleration = 5;
+}

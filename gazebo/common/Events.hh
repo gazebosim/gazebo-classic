@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,26 @@
  * limitations under the License.
  *
 */
-#ifndef EVENTS_HH
-#define EVENTS_HH
+#ifndef _EVENTS_HH_
+#define _EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/Event.hh"
 
 namespace gazebo
 {
   namespace event
   {
+    /// \addtogroup gazebo_event
+    /// \{
+
+    /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
     class Events
     {
-      /// \addtogroup gazebo_event
-      /// \{
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
       /// \param[in] _subscriber the subscriber to this event
@@ -37,10 +41,12 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPause(T _subscriber)
               { return pause.Connect(_subscriber); }
+
       /// \brief Disconnect a boost::slot the the pause signal
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectPause(ConnectionPtr _subscriber)
               { pause.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the step signal
       /// \param[in] _subscriber the subscriber to this event
@@ -122,18 +128,19 @@ namespace gazebo
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               { addEntity.Disconnect(_subscriber); }
 
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
-              static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
-              { return worldUpdateStart.Connect(_subscriber); }
+              static ConnectionPtr ConnectWorldUpdateBegin(T _subscriber)
+              { return worldUpdateBegin.Connect(_subscriber); }
+
       /// \brief Disconnect a boost::slot the the world update start signal
       /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-              { worldUpdateStart.Disconnect(_subscriber); }
+      public: static void DisconnectWorldUpdateBegin(
+                  ConnectionPtr _subscriber);
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
       /// \param[in] _subscriber the subscriber to this event
@@ -145,17 +152,7 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               { worldUpdateEnd.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static ConnectionPtr ConnectEntitySelected(T _subscriber)
-              { return entitySelected.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectEntitySelected(ConnectionPtr _subscriber)
-              { entitySelected.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
@@ -212,6 +209,18 @@ namespace gazebo
       public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
               { diagTimerStop.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectSigInt(T _subscriber)
+              { return sigInt.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the sigint event
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectSigInt(ConnectionPtr _subscriber)
+              { sigInt.Disconnect(_subscriber); }
+
       /// \brief Pause signal
       public: static EventT<void (bool)> pause;
 
@@ -221,6 +230,9 @@ namespace gazebo
       /// \brief Simulation stop signal
       public: static EventT<void ()> stop;
 
+      /// \brief Simulation stop signal
+      public: static EventT<void ()> sigInt;
+
       /// \brief A world has been created
       public: static EventT<void (std::string)> worldCreated;
 
@@ -228,7 +240,7 @@ namespace gazebo
       public: static EventT<void (std::string)> entityCreated;
 
       /// \brief An entity has been selected
-      public: static EventT<void (std::string)> setSelectedEntity;
+      public: static EventT<void (std::string, std::string)> setSelectedEntity;
 
       /// \brief An entity has been added
       public: static EventT<void (std::string)> addEntity;
@@ -236,11 +248,8 @@ namespace gazebo
       /// \brief An entity has been deleted
       public: static EventT<void (std::string)> deleteEntity;
 
-      /// \brief Entity has been selected
-      public: static EventT<void (std::string)> entitySelected;
-
       /// \brief World update has started
-      public: static EventT<void ()> worldUpdateStart;
+      public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \class Animation Animation.hh common/common.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
     class Animation

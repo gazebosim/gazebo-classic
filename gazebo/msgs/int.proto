@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Int 
 /// \brief Integer message
-/// \verbatim
+
 
 message Int
 {
@@ -11,4 +11,4 @@ message Int
   required int32 data = 1;
 }
 
-/// \endverbatim
+

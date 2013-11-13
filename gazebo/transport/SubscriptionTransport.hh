@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SUBSCRIPTIONTRANSPORT_HH
-#define SUBSCRIPTIONTRANSPORT_HH
+#ifndef _SUBSCRIPTIONTRANSPORT_HH_
+#define _SUBSCRIPTIONTRANSPORT_HH_
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -30,7 +30,10 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// \brief Handles sending data over the wire to remote subscribers
+    /// \class SubscriptionTransport SubscriptionTransport.hh
+    /// transport/transport.hh
+    /// \brief Handles sending data over the wire to
+    /// remote subscribers
     class SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
@@ -40,15 +43,29 @@ namespace gazebo
       public: virtual ~SubscriptionTransport();
 
       /// \brief Initialize the publication link
-      public: void Init(const ConnectionPtr &conn, bool _latching);
+      /// \param[in] _conn The connection to use
+      /// \param[in] _latching If true, latch the latest message; if false,
+      /// don't latch
+      public: void Init(ConnectionPtr _conn, bool _latching);
 
       /// \brief Output a message to a connection
-      public: virtual bool HandleData(const std::string &newdata);
+      /// \param[in] _newdata The message to be handled
+      /// \return true if the message was handled successfully, false otherwise
+      /// \param[in] _cb If non-null, callback to be invoked after
+      /// transmission is complete.
+      /// \param[in] _id ID associated with the message data.
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id);
 
-      /// \brief Get the connection
+      // Documentation inherited
+      public: virtual bool HandleMessage(MessagePtr _newMsg);
+
+      /// \brief Get the connection we're using
+      /// \return Pointer to the connection we're using
       public: const ConnectionPtr &GetConnection() const;
 
-      /// \brief Return true if the callback is local, false if the callback
+      /// \brief Is the callback local?
+      /// \return true if the callback is local, false if the callback
       /// is tied to a  remote connection
       public: virtual bool IsLocal() const;
 

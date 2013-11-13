@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Collision 
 /// \brief Information about a collision element
-/// \verbatim
+
 
 import "header.proto";
 import "pose.proto";
@@ -23,4 +23,4 @@ message Collision
 
   repeated Visual visual        = 8;
 }
-/// \endverbatim
+

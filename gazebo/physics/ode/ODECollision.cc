@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,14 @@
 
 #include <sstream>
 
-#include "common/Console.hh"
-#include "math/Box.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Box.hh"
 
-#include "physics/SurfaceParams.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -39,6 +40,9 @@ ODECollision::ODECollision(LinkPtr _link)
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+
+  this->SetSpaceId(
+      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
 }
 
 //////////////////////////////////////////////////
@@ -53,9 +57,6 @@ ODECollision::~ODECollision()
 void ODECollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
-
-  this->SetSpaceId(
-      boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
 
   if (this->IsStatic())
   {
@@ -103,7 +104,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    assert(dGeomGetSpace(this->collisionId) != 0);
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
   }
 
   if (this->collisionId && this->placeable)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,15 @@
  * Date: 30 July 2003
  */
 
-#ifndef ODESURFACEPARAMS_HH
-#define ODESURFACEPARAMS_HH
+#ifndef _ODESURFACEPARAMS_HH_
+#define _ODESURFACEPARAMS_HH_
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief Surface params
     class ODESurfaceParams
     {
@@ -41,17 +37,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODESurfaceParams();
 
-      /// \brief Load the contact params
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
     };
-    typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

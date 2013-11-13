@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 
 #include <string>
 
-#include "sdf/sdf.hh"
-#include "physics/PhysicsTypes.hh"
-#include "common/Time.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {
@@ -34,8 +35,8 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class State State.hh physics/State.hh
-    /// \brief State of an entity
+    /// \class State State.hh physics/physics.hh
+    /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
     class State
@@ -61,12 +62,27 @@ namespace gazebo
       ///
       /// Populates the State information from data stored in an SDF::Element
       /// \param _elem Pointer to the SDF::Element
-      public: virtual void Load(sdf::ElementPtr _elem) = 0;
+      public: virtual void Load(const sdf::ElementPtr _elem);
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: State &operator=(const State &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: State operator-(const State &_state) const;
 
       /// \brief Get the name associated with this State
       /// \return Name associated with this state information. Typically
       /// a name of an Entity.
       public: std::string GetName() const;
+
+      /// \brief Set the name associated with this State.
+      /// \param[in] _name Name associated with this state information.
+      /// Typically the name of an Entity.
+      public: void SetName(const std::string &_name);
 
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.
@@ -79,6 +95,19 @@ namespace gazebo
       /// \brief Get the sim time when this state was generated
       /// \return Simulation time when the data was recorded.
       public: common::Time GetSimTime() const;
+
+      /// \brief Set the wall time when this state was generated
+      /// \param[in] _time The absolute clock time when the State
+      /// data was recorded.
+      public: virtual void SetWallTime(const common::Time &_time);
+
+      /// \brief Set the real time when this state was generated
+      /// \param[in] _time Clock time since simulation was stated.
+      public: virtual void SetRealTime(const common::Time &_time);
+
+      /// \brief Set the sim time when this state was generated
+      /// \param[in] _time Simulation time when the data was recorded.
+      public: virtual void SetSimTime(const common::Time &_time);
 
       /// Name associated with this State
       protected: std::string name;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #define _LASERVISUAL_HH_
 
 #include <string>
+#include <vector>
 
-#include "rendering/Visual.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -55,7 +56,10 @@ namespace gazebo
       public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Callback when laser data is received.
-      private: void OnScan(ConstLaserScanPtr &_msg);
+      private: void OnScan(ConstLaserScanStampedPtr &_msg);
+
+      /// \brief Update the Visual
+      private: void Update();
 
       /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;
@@ -64,7 +68,19 @@ namespace gazebo
       private: transport::SubscriberPtr laserScanSub;
 
       /// \brief Renders the laser data.
-      private: DynamicLines *rayFan;
+      private: std::vector<DynamicLines *> rayFans;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      /// \brief True if we have received a message.
+      private: bool receivedMsg;
+
+      /// \brief The current contact message.
+      private: boost::shared_ptr<msgs::LaserScanStamped const> laserMsg;
+
+      /// \brief Pre render connection.
+      private: event::ConnectionPtr connection;
     };
     /// \}
   }

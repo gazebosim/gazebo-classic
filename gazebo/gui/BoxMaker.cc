@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "gui/GuiEvents.hh"
-#include "math/Quaternion.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/BoxMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -40,7 +40,7 @@ BoxMaker::BoxMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
-  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+  this->visualMsg->mutable_material()->mutable_script()->add_uri(
       "gazebo://media/materials/scripts/gazebo.material");
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
@@ -177,7 +177,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 std::string BoxMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<gazebo version ='1.2'>"
+  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='unit_box_" << counter << "'>"
     << "<pose>0 0 0.5 0 0 0</pose>"
     << "<link name ='link'>"
@@ -204,7 +204,7 @@ std::string BoxMaker::GetSDFString()
     <<   "</visual>"
     << "</link>"
     << "</model>"
-    << "</gazebo>";
+    << "</sdf>";
 
   return newModelStr.str();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,28 @@
  */
 
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "physics/World.hh"
-#include "physics/Base.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
-
-unsigned int Base::idCounter = 0;
 
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->id = ++idCounter;
+  this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
 
   this->sdf.reset(new sdf::Element);
   this->sdf->AddAttribute("name", "string", "__default__", true);
+  this->name = "__default__";
 
   if (this->parent)
   {
@@ -66,23 +67,38 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  if (_sdf)
+    this->sdf = _sdf;
+
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+
+  if (this->sdf->HasAttribute("name"))
+    this->name = this->sdf->Get<std::string>("name");
+  else
+    this->name.clear();
+
   if (this->parent)
   {
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
+
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
 void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Copy(_sdf);
 }
 
@@ -92,7 +108,8 @@ void Base::Fini()
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Fini();
+    if (*iter)
+      (*iter)->Fini();
 
   this->children.clear();
   this->childrenEnd = this->children.end();
@@ -122,20 +139,21 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
+  this->name = _name;
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
 std::string Base::GetName() const
 {
-  if (this->sdf->HasAttribute("name"))
-    return this->sdf->GetValueString("name");
-  else
-    return std::string();
+  return this->name;
 }
 
 //////////////////////////////////////////////////
-unsigned int Base::GetId() const
+uint32_t Base::GetId() const
 {
   return this->id;
 }
@@ -290,32 +308,21 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName() const
 {
+  return this->scopedName;
+}
+
+//////////////////////////////////////////////////
+void Base::ComputeScopedName()
+{
   BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
+  this->scopedName = this->GetName();
 
   while (p)
   {
     if (p->GetParent())
-      scopedName.insert(0, p->GetName()+"::");
+      this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
-
-  return scopedName;
-}
-
-//////////////////////////////////////////////////
-std::string Base::GetCompleteScopedName() const
-{
-  BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
-
-  while (p)
-  {
-    scopedName.insert(0, p->GetName()+"::");
-    p = p->GetParent();
-  }
-
-  return scopedName;
 }
 
 //////////////////////////////////////////////////
@@ -331,14 +338,13 @@ unsigned int Base::GetType() const
 }
 
 //////////////////////////////////////////////////
-void Base::Print(std::string _prefix)
+void Base::Print(const std::string &_prefix)
 {
   Base_V::iterator iter;
   gzmsg << _prefix << this->GetName() << "\n";
 
-  _prefix += "  ";
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Print(_prefix);
+    (*iter)->Print(_prefix + "  ");
 }
 
 //////////////////////////////////////////////////
@@ -386,6 +392,7 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
+  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Update();
   return this->sdf;
 }

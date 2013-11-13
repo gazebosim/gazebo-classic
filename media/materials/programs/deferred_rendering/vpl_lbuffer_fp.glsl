@@ -22,7 +22,7 @@ void main()
 	vec3 L = normalize(lightToFrag);
 	float NL = max(0.0, dot(normal, L));
 
-	float att = clamp(dot(gl_TexCoord[3], -normal), 0.0, 1.0);
+	float att = clamp(dot(gl_TexCoord[3].xyz, -normal), 0.0, 1.0);
 
 	att *= 1.0 / (1.0 + attenuation * dot(lightToFrag, lightToFrag)); 
 

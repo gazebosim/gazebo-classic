@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *
 */
 #include <map>
-#include "gazebo.hh"
-#include "common/common.h"
-#include "physics/physics.h"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo
 {

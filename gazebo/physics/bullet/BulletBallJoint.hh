@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
-#include "physics/BallJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/BallJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btPoint2PointConstraint;
 
@@ -45,17 +45,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletBallJoint();
 
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
+
       /// \brief Get joint's anchor point
       public: math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief Set joint's anchor point
-      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
-
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int /*_index*/) const
@@ -73,16 +70,23 @@ namespace gazebo
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int _index) const;
+      /// \brief Set the high stop of an axis(index).
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      /// \brief Set the low stop of an axis(index).
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the angle of rotation
+      // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btPoint2PointConstraint *btBall;
+      // Documentation inherited.
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _torque);
+
+      /// \brief Pointer to Bullet ball constraint
+      private: btPoint2PointConstraint *bulletBall;
     };
 
     /// \}

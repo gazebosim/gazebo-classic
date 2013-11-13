@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface ImageGeom 
 /// \brief Message for a image geometry
-/// \verbatim
+
 
 message ImageGeom
 {
@@ -14,4 +14,4 @@ message ImageGeom
   optional int32 granularity  = 5;
 }
 
-/// \endverbatim
+

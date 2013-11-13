@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Shadows
 /// \brief A message for shadow data
-/// \verbatim
+
 
 import "color.proto";
 
@@ -20,4 +20,4 @@ message Shadows
   optional Color color = 6;
 }
 
-/// \endverbatim
+

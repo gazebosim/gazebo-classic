@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef BOX_HH
-#define BOX_HH
+#ifndef _BOX_HH_
+#define _BOX_HH_
 
 #include <iostream>
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -27,6 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
     class Box
     {

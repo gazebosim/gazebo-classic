@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef PLANE_HH
-#define PLANE_HH
+#ifndef _PLANE_HH_
+#define _PLANE_HH_
 
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {
@@ -27,6 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Plane Plane.hh math/gzmath.hh
     /// \brief A plane and related functions.
     class Plane
     {

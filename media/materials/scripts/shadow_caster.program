@@ -15,7 +15,7 @@ fragment_program shadow_caster_fp_glsl glsl
 
   default_params
   {
-    param_named_auto depth_range scene_depth_range
+    // param_named_auto depth_range shadow_scene_depth_range
   }
 }
 
@@ -27,11 +27,6 @@ material Gazebo/shadow_caster
     // all this will do is write depth and depth*depth to red and green
     pass
     {
-      depth_check on
-      depth_write on
-      //cull_software none
-      //cull_hardware none
-
       vertex_program_ref shadow_caster_vp_glsl
       {
       }

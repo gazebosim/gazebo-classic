@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Color 
 /// \brief Color message
-/// \verbatim
+
 
 message Color
 {
@@ -13,4 +13,4 @@ message Color
   optional float a = 5 [default = 1.0];
 }
 
-/// \endverbatim
+

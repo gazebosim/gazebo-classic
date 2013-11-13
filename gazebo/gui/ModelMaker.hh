@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef MODELMAKER_HH
-#define MODELMAKER_HH
+#ifndef _MODEL_MAKER_HH_
+#define _MODEL_MAKER_HH_
 
 #include <list>
 #include <string>
+#include <sdf/sdf.hh>
 
-#include "sdf/sdf.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {
@@ -37,9 +37,9 @@ namespace gazebo
       public: ModelMaker();
       public: virtual ~ModelMaker();
 
-      public: void InitFromModel(const std::string &_modelName);
-      public: void InitFromSDFString(const std::string &_data);
-      public: void InitFromFile(const std::string &_filename);
+      // public: bool InitFromModel(const std::string &_modelName);
+      public: bool InitFromSDFString(const std::string &_data);
+      public: bool InitFromFile(const std::string &_filename);
 
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
@@ -52,7 +52,7 @@ namespace gazebo
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Internal init function.
-      private: void Init();
+      private: bool Init();
 
       private: virtual void CreateTheEntity();
       private: int state;

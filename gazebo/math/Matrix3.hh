@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef MATRIX3_HH
-#define MATRIX3_HH
+#ifndef _MATRIX3_HH_
+#define _MATRIX3_HH_
 
 #include <assert.h>
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -28,6 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Matrix3 Matrix3hh math/gzmath.hh
     /// \brief A 3x3 matrix class
     class Matrix3
     {
@@ -74,7 +75,65 @@ namespace gazebo
       /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
-      /// \brief Equality test operatorr
+      /// \brief returns the element wise difference of two matrices
+      public: Matrix3 operator-(const Matrix3 &_m) const
+      {
+        return Matrix3(
+        // first row
+        this->m[0][0]-_m[0][0], this->m[0][1]-_m[0][1], this->m[0][2]-_m[0][2],
+        this->m[1][0]-_m[1][0], this->m[1][1]-_m[1][1], this->m[1][2]-_m[1][2],
+        this->m[2][0]-_m[2][0], this->m[2][1]-_m[2][1], this->m[2][2]-_m[2][2]);
+      }
+
+      /// \brief returns the element wise sum of two matrices
+      public: Matrix3 operator+(const Matrix3 &_m) const
+      {
+        return Matrix3(
+        // first row
+        this->m[0][0]+_m[0][0], this->m[0][1]+_m[0][1], this->m[0][2]+_m[0][2],
+        this->m[1][0]+_m[1][0], this->m[1][1]+_m[1][1], this->m[1][2]+_m[1][2],
+        this->m[2][0]+_m[2][0], this->m[2][1]+_m[2][1], this->m[2][2]+_m[2][2]);
+      }
+
+      /// \brief returns the element wise scalar multiplication
+      public: Matrix3 operator*(const double &_s) const
+      {
+        return Matrix3(
+          // first row
+          _s * this->m[0][0], _s * this->m[0][1], _s * this->m[0][2],
+          _s * this->m[1][0], _s * this->m[1][1], _s * this->m[1][2],
+          _s * this->m[2][0], _s * this->m[2][1], _s * this->m[2][2]);
+      }
+
+      /// \brief Multiplication operators
+      /// \param[in] _s the scaling factor
+      /// \param[in] _m input matrix
+      /// \return a scaled matrix
+      public: friend inline Matrix3 operator*(double _s,
+                                              const Matrix3 &_m)
+      { return _m * _s; }
+
+      /// \brief Matrix multiplication operator
+      /// \param[in] _m Matrix3 to multiply
+      /// \return product of this * _m
+      public: Matrix3 operator*(const Matrix3 &_m) const
+      {
+        return Matrix3(
+          // first row
+          this->m[0][0]*_m[0][0]+this->m[0][1]*_m[1][0]+this->m[0][2]*_m[2][0],
+          this->m[0][0]*_m[0][1]+this->m[0][1]*_m[1][1]+this->m[0][2]*_m[2][1],
+          this->m[0][0]*_m[0][2]+this->m[0][1]*_m[1][2]+this->m[0][2]*_m[2][2],
+          // second row
+          this->m[1][0]*_m[0][0]+this->m[1][1]*_m[1][0]+this->m[1][2]*_m[2][0],
+          this->m[1][0]*_m[0][1]+this->m[1][1]*_m[1][1]+this->m[1][2]*_m[2][1],
+          this->m[1][0]*_m[0][2]+this->m[1][1]*_m[1][2]+this->m[1][2]*_m[2][2],
+          // third row
+          this->m[2][0]*_m[0][0]+this->m[2][1]*_m[1][0]+this->m[2][2]*_m[2][0],
+          this->m[2][0]*_m[0][1]+this->m[2][1]*_m[1][1]+this->m[2][2]*_m[2][1],
+          this->m[2][0]*_m[0][2]+this->m[2][1]*_m[1][2]+this->m[2][2]*_m[2][2]);
+      }
+
+      /// \brief Equality test operator
       /// \param[in] _m Matrix3 to test
       /// \return True if equal (using the default tolerance of 1e-6)
       public: bool operator==(const Matrix3 &_m) const;

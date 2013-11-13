@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef MOUSEEVENT_HH
-#define MOUSEEVENT_HH
+#ifndef _MOUSEEVENT_HH_
+#define _MOUSEEVENT_HH_
 
-#include "math/Vector2i.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace gazebo
 {
@@ -26,6 +26,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \class MouseEvent MouseEvent.hh common/common.hh
     /// \brief Generic description of a mouse event.
     class MouseEvent
     {

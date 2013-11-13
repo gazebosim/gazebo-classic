@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +20,42 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
-#include "sdf/sdf.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Events.hh"
+#include <sdf/sdf.hh>
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "rendering/Light.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "gui/Gui.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/GuiIface.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
-#include "math/Angle.hh"
-#include "math/Helpers.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/GuiEvents.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/qtpropertybrowser/qttreepropertybrowser.h"
-#include "gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gui/ModelListWidget.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Helpers.hh"
+
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
+#include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
+#include "gazebo/gui/ModelListWidget.hh"
+
+// avoid collision from Mac OS X's ConditionalMacros.h
+#ifdef __MACH__
+#undef TYPE_BOOL
+#endif
 
 using namespace gazebo;
 using namespace gui;
@@ -62,7 +72,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->propMutex = new boost::mutex();
   this->receiveMutex = new boost::mutex();
 
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
@@ -73,8 +82,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
-  this->modelTreeWidget->setItemDelegate(
-      new ModelListSheetDelegate(this->modelTreeWidget, this->modelTreeWidget));
 
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
@@ -130,7 +137,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1)));
+        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1, _2)));
 
   QTimer::singleShot(500, this, SLOT(Update()));
 }
@@ -148,34 +155,31 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
-
-    if (name == "scene")
+    this->propTreeBrowser->clear();
+    if (name == "Scene")
     {
-      this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("scene_info",
                          this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
-    else if (name == "models")
+    else if (name == "Models")
     {
-      this->modelsItem->setSelected(false);
       this->modelsItem->setExpanded(!this->modelsItem->isExpanded());
     }
-    else if (name == "lights")
+    else if (name == "Lights")
     {
-      this->lightsItem->setSelected(false);
       this->lightsItem->setExpanded(!this->lightsItem->isExpanded());
     }
-    else if (name == "physics")
+    else if (name == "Physics")
     {
-      this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("physics_info",
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
     else
     {
-      event::Events::setSelectedEntity(name);
+      this->propTreeBrowser->clear();
+      event::Events::setSelectedEntity(name, "normal");
     }
   }
   else
@@ -183,7 +187,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
+void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
+                                          const std::string &/*_mode*/)
 {
   this->selectedEntityName = _name;
 
@@ -201,6 +206,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
           this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
       this->modelTreeWidget->setCurrentItem(mItem);
+      mItem->setExpanded(!mItem->isExpanded());
     }
     else if (lItem)
     {
@@ -210,7 +216,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
 
       light->FillMsg(this->lightMsg);
       this->propTreeBrowser->clear();
-      this->fillTypes.push_back("light");
+      this->fillTypes.push_back("Light");
 
       this->modelTreeWidget->setCurrentItem(lItem);
     }
@@ -224,23 +230,23 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillTypes.size() > 0)
+  if (!this->fillTypes.empty())
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;
     this->propTreeBrowser->clear();
 
-    if (this->fillTypes[0] == "model")
+    if (this->fillTypes[0] == "Model")
       this->FillPropertyTree(this->modelMsg, NULL);
-    else if (this->fillTypes[0] == "link")
+    else if (this->fillTypes[0] == "Link")
       this->FillPropertyTree(this->linkMsg, NULL);
-    else if (this->fillTypes[0] == "joint")
+    else if (this->fillTypes[0] == "Joint")
       this->FillPropertyTree(this->jointMsg, NULL);
-    else if (this->fillTypes[0] == "scene")
+    else if (this->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->sceneMsg, NULL);
-    else if (this->fillTypes[0] == "physics")
+    else if (this->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->physicsMsg, NULL);
-    else if (this->fillTypes[0] == "light")
+    else if (this->fillTypes[0] == "Light")
       this->FillPropertyTree(this->lightMsg, NULL);
 
     this->fillingPropertyTree = false;
@@ -253,6 +259,7 @@ void ModelListWidget::Update()
     this->propTreeBrowser->clear();
   }
 
+  this->ProcessRemoveEntity();
   this->ProcessModelMsgs();
   this->ProcessLightMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
@@ -339,8 +346,6 @@ void ModelListWidget::ProcessModelMsgs()
     }
   }
   this->modelMsgs.clear();
-
-  this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -353,49 +358,49 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("model");
+    this->fillTypes.push_back("Model");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("link");
+    this->fillTypes.push_back("Link");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->jointMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->jointMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("joint");
+    this->fillTypes.push_back("Joint");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("scene");
+    this->fillTypes.push_back("Scene");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->physicsMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("physics");
+    this->fillTypes.push_back("Physics");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->lightMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("light");
+    this->fillTypes.push_back("Light");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
     if (_msg->response() == "nonexistant")
     {
-      this->RemoveEntity(this->selectedEntityName);
+      this->removeEntityList.push_back(this->selectedEntityName);
     }
   }
 
@@ -406,18 +411,21 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::RemoveEntity(const std::string &_name)
 {
-  if (gui::has_entity_name(_name))
+  QTreeWidgetItem *items[2];
+  items[0] = this->modelsItem;
+  items[1] = this->lightsItem;
+
+  for (int i = 0; i < 2; ++i)
   {
-    QTreeWidgetItem *listItem = this->GetListItem(_name, this->modelsItem);
+    QTreeWidgetItem *listItem = this->GetListItem(_name, items[i]);
     if (listItem)
     {
-      int i = this->modelsItem->indexOfChild(listItem);
-      this->modelsItem->takeChild(i);
-
+      items[i]->takeChild(items[i]->indexOfChild(listItem));
       this->propTreeBrowser->clear();
       this->selectedEntityName.clear();
       this->sdfElement.reset();
       this->fillTypes.clear();
+      return;
     }
   }
 }
@@ -460,7 +468,17 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
 
+  // Check to see if the selected item is a model
   int i = this->modelsItem->indexOfChild(item);
+  if (i >= 0)
+  {
+    g_modelRightMenu->Run(item->text(0).toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt));
+    return;
+  }
+
+  // Check to see if the selected item is a light
+  i = this->lightsItem->indexOfChild(item);
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
@@ -480,12 +498,12 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
-  if (!this->propMutex->try_lock())
+  boost::mutex::scoped_try_lock lock(*this->propMutex);
+  if (!lock)
     return;
 
   if (this->selectedProperty != _item || this->fillingPropertyTree)
   {
-    this->propMutex->unlock();
     return;
   }
 
@@ -499,8 +517,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (this->modelTreeWidget->currentItem() == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
-
-  this->propMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -515,6 +531,23 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
     if ((*iter)->propertyName().toStdString() == "name")
       msg.set_name(this->variantManager->value(
             (*iter)).toString().toStdString());
+    else if ((*iter)->propertyName().toStdString() == "pose")
+    {
+      math::Pose pose;
+      pose.Set(this->variantManager->value(
+                 this->GetChildItem((*iter), "x")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "y")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "z")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "roll")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "pitch")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "yaw")).toDouble());
+      msgs::Set(msg.mutable_pose(), pose);
+    }
     else if ((*iter)->propertyName().toStdString() == "range")
       msg.set_range(this->variantManager->value((*iter)).toDouble());
     else if ((*iter)->propertyName().toStdString() == "diffuse")
@@ -558,12 +591,10 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
   {
     if ((*iter)->propertyName().toStdString() == "gravity")
       this->FillVector3Msg((*iter), msg.mutable_gravity());
-    else if ((*iter)->propertyName().toStdString() == "update rate")
-      msg.set_update_rate(this->variantManager->value((*iter)).toDouble());
+    else if ((*iter)->propertyName().toStdString() == "enable physics")
+      msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      msg.set_dt(this->variantManager->value(
-            this->GetChildItem((*iter), "step size")).toDouble());
       msg.set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
       msg.set_sor(this->variantManager->value(
@@ -580,9 +611,18 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       msg.set_contact_surface_layer(this->variantManager->value(
             this->GetChildItem((*iter), "surface layer")).toDouble());
     }
+    else if ((*iter)->propertyName().toStdString() == "real time update rate")
+    {
+      msg.set_real_time_update_rate(
+          this->variantManager->value((*iter)).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "max step size")
+    {
+      msg.set_max_step_size(this->variantManager->value((*iter)).toDouble());
+    }
   }
 
-  msg.set_type(msgs::Physics::ODE);
+  msg.set_type(this->physicsType);
   this->physicsPub->Publish(msg);
 }
 
@@ -656,7 +696,10 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     }
   }
 
-  this->modelPub->Publish(msg);
+  // \todo Renable when modifying a model is fixed.
+  // this->modelPub->Publish(msg);
+  gzwarn << "Model modification is currently disabled. "
+         << "Look for this feature in Gazebo 2.0\n";
 }
 
 /////////////////////////////////////////////////
@@ -1925,7 +1968,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.x));
+  item->setValue(rpy.x);
 
   // Add Pitch value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
@@ -1937,7 +1980,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.y));
+  item->setValue(rpy.y);
 
   // Add Yaw value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
@@ -1949,7 +1992,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(GZ_RTOD(rpy.z));
+  item->setValue(rpy.z);
 }
 
 /////////////////////////////////////////////////
@@ -1966,8 +2009,19 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    this->RemoveEntity(_msg->data());
+    this->removeEntityList.push_back(_msg->data());
   }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessRemoveEntity()
+{
+  for (RemoveEntity_L::iterator iter = this->removeEntityList.begin();
+       iter != this->removeEntityList.end(); ++iter)
+  {
+    this->RemoveEntity(*iter);
+  }
+  this->removeEntityList.clear();
 }
 
 /////////////////////////////////////////////////
@@ -1975,7 +2029,8 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->ResetTree();
   this->propTreeBrowser->clear();
-  this->node->Fini();
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
   this->requestPub.reset();
@@ -2046,20 +2101,20 @@ void ModelListWidget::ResetTree()
 
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("physics"))));
-    this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("physics")));
+        QStringList(QString("%1").arg(tr("Physics"))));
+    this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
 
     this->modelsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("models"))));
-    this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("models")));
+        QStringList(QString("%1").arg(tr("Models"))));
+    this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("Models")));
     this->modelTreeWidget->addTopLevelItem(this->modelsItem);
 
     this->lightsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("lights"))));
-    this->lightsItem->setData(0, Qt::UserRole, QVariant(tr("lights")));
+        QStringList(QString("%1").arg(tr("Lights"))));
+    this->lightsItem->setData(0, Qt::UserRole, QVariant(tr("Lights")));
     this->modelTreeWidget->addTopLevelItem(this->lightsItem);
   }
 
@@ -2119,8 +2174,8 @@ void ModelListWidget::ResetScene()
 {
   this->sceneItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem*>(0),
-      QStringList(QString("%1").arg(tr("scene"))));
-  this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
+      QStringList(QString("%1").arg(tr("Scene"))));
+  this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("Scene")));
   this->modelTreeWidget->addTopLevelItem(this->sceneItem);
 }
 
@@ -2191,12 +2246,31 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 {
   QtVariantProperty *item = NULL;
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("update rate"));
+  if (_msg.has_type())
+    this->physicsType = _msg.type();
+
+  item = this->variantManager->addProperty(QVariant::Bool,
+    tr("enable physics"));
+  if (_msg.has_enable_physics())
+    item->setValue(_msg.enable_physics());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+      tr("real time update rate"));
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_update_rate())
-    item->setValue(_msg.update_rate());
+  if (_msg.has_real_time_update_rate())
+    item->setValue(_msg.real_time_update_rate());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+      tr("max step size"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_max_step_size())
+    item->setValue(_msg.max_step_size());
   this->propTreeBrowser->addProperty(item);
 
   QtProperty *gravityItem = this->variantManager->addProperty(
@@ -2216,13 +2290,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtProperty *solverItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
-  item = this->variantManager->addProperty(QVariant::Double, tr("step size"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_dt())
-    item->setValue(_msg.dt());
-  solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
   if (_msg.has_iters())
@@ -2282,6 +2349,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
+  QtProperty *topItem = NULL;
 
   this->lightType = _msg.type();
 
@@ -2289,6 +2357,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_name())
     item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
+  this->propTreeBrowser->addProperty(topItem);
+  if (_msg.has_pose())
+    this->FillPoseProperty(_msg.pose(), topItem);
+  else
+    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface TopicInfo
 /// \brief A message for topic information
-/// \verbatim
+
 
 import "publish.proto";
 import "subscribe.proto";
@@ -15,4 +15,4 @@ message TopicInfo
   repeated Subscribe subscriber = 3;
 }
 
-/// \endverbatim
+

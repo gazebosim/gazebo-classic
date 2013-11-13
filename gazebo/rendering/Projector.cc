@@ -1,21 +1,17 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 /*
@@ -23,12 +19,12 @@
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
 
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
-#include "rendering/Conversions.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Projector.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Projector.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -80,9 +76,6 @@ void Projector::Load(const std::string &_name,
     // set the projector pose relative to body
     this->projector.SetPose(_pose);
 
-    // Add the projector as an Ogre frame listener
-    Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
-
     if (!this->projector.initialized)
     {
       gzwarn << "starting projector failed, retrying in 1 sec.\n";
@@ -90,6 +83,9 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
+
+  // Add the projector as an Ogre frame listener
+  Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
 
   this->projector.SetEnabled(true);
 
@@ -109,21 +105,21 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
+    pose = _sdf->Get<math::Pose>("pose");
 
   if (_sdf->HasElement("texture_name"))
-    textureName = _sdf->GetValueString("texture_name");
+    textureName = _sdf->Get<std::string>("texture_name");
 
   if (_sdf->HasElement("near_clip"))
-    nearClip = _sdf->GetValueDouble("near_clip");
+    nearClip = _sdf->Get<double>("near_clip");
 
   if (_sdf->HasElement("far_clip"))
-    farClip = _sdf->GetValueDouble("far_clip");
+    farClip = _sdf->Get<double>("far_clip");
 
   if (_sdf->HasElement("fov"))
-    fov = _sdf->GetValueDouble("fov");
+    fov = _sdf->Get<double>("fov");
 
-  this->Load(_sdf->GetValueString("name"), pose, textureName,
+  this->Load(_sdf->Get<std::string>("name"), pose, textureName,
              nearClip, farClip, fov);
 }
 
@@ -223,6 +219,8 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 
   delete this->frustum;
   delete this->filterFrustum;
+  this->frustum = NULL;
+  this->filterFrustum = NULL;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
@@ -404,7 +402,7 @@ void Projector::ProjectorFrameListener::AddPassToVisibleMaterials()
   Ogre::SceneQueryResultMovableList::iterator it;
   for (it = result.movables.begin(); it != result.movables.end(); ++it)
   {
-    Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(*it);
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(*it);
     if (entity && entity->getName().find("visual") != std::string::npos)
     {
       for (unsigned int i = 0; i < entity->getNumSubEntities(); i++)

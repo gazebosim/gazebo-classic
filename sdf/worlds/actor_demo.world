@@ -1,8 +1,12 @@
 <?xml version="1.0" ?>
-<gazebo version="1.2">
+<sdf version="1.4">
   <world name="default">
-    <include><uri>model://ground_plane</uri></include>
-    <include><uri>model://sun</uri></include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
     <model name="cube">
       <pose>-0.4 0 0.275 0 0 0</pose>
       <link name="link">
@@ -28,4 +32,4 @@
     </model>
     <include filename="actor_demo.model" />
   </world>
-</gazebo>
+</sdf>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,12 @@
 
 #include <string>
 #include <iostream>
+#include <sdf/sdf.hh>
 
-#include "msgs/msgs.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/Event.hh"
-#include "common/Color.hh"
-
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Color.hh"
 
 namespace Ogre
 {
@@ -59,7 +58,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
-      public: Light(Scene *_scene);
+      public: Light(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Light();
@@ -204,7 +203,7 @@ namespace gazebo
       private: static unsigned int lightCounter;
 
       /// \brief Pointer to the scene.
-      private: Scene *scene;
+      private: ScenePtr scene;
     };
     /// \}
   }

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface PoseStamped
 /// \brief Message for a pose with a time
-/// \verbatim
+
 
 import "time.proto";
 import "pose.proto";
@@ -14,4 +14,4 @@ message PoseStamped
   required Pose pose          = 2;
 }
 
-/// \endverbatim
+

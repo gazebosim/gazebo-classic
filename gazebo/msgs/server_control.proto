@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface ServerControl
 /// \brief A message that allows for control of the server functions
-/// \verbatim
+
 
 import "header.proto";
 
@@ -13,6 +13,5 @@ message ServerControl
   optional string save_filename   = 2;
   optional string open_filename   = 3;
   optional bool new_world         = 4;
+  optional bool stop              = 5;
 }
-
-/// \endverbatim

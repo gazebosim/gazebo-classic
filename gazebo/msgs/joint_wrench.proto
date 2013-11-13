@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface JointWrench
+/// \brief Joint wrench message
+
+import "wrench.proto";
+
+message JointWrench
+{
+  required string body_1_name = 1;
+  required uint32 body_1_id   = 2;
+  required string body_2_name = 3;
+  required uint32 body_2_id   = 4;
+
+  required Wrench body_1_wrench = 5;
+  required Wrench body_2_wrench = 6;
+}

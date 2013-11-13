@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Scene
 /// \brief A message containing a description of a scene
-/// \verbatim
+
 
 import "header.proto";
 import "color.proto";
@@ -31,4 +31,4 @@ message Scene
   repeated Joint joint         = 10;
 }
 
-/// \endverbatim
+

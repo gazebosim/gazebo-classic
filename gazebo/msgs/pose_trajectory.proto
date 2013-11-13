@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface PoseTrajectory
 /// \brief Message for a pose trajectory
-/// \verbatim
+
 
 import "pose_stamped.proto";
 
@@ -14,4 +14,4 @@ message PoseTrajectory
   repeated PoseStamped pose_stamped = 3;
 }
 
-/// \endverbatim
+

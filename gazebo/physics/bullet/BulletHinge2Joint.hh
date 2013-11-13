@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/Hinge2Joint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/Hinge2Joint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btHinge2Constraint;
 
@@ -47,23 +47,17 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletHinge2Joint();
 
-      /// \brief Load the BulletHinge2Joint
+      // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Get anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set the first axis of rotation
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;
@@ -77,9 +71,6 @@ namespace gazebo
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the torque
-      public: void SetForce(int _index, double _torque);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
@@ -87,10 +78,10 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, math::Angle _angle);
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, math::Angle _angle);
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int _index);
@@ -104,7 +95,11 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      private: btHinge2Constraint *btHinge2;
+      /// \brief Set the torque
+      protected: virtual void SetForceImpl(int _index, double _torque);
+
+      /// \brief Pointer to bullet hinge2 constraint
+      private: btHinge2Constraint *bulletHinge2;
     };
 
   /// \}

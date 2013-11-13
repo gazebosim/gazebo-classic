@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,31 @@
 #ifndef _ODECYLINDERSHAPE_HH_
 #define _ODECYLINDERSHAPE_HH_
 
-#include "physics/CylinderShape.hh"
-#include "physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief ODE cylinder shape
     class ODECylinderShape : public CylinderShape
     {
-      /// constructor
-      public: ODECylinderShape(CollisionPtr _parent) : CylinderShape(_parent) {}
+      /// \brief Constructor
+      /// \param[in] _parent Collision parent.
+      public: explicit ODECylinderShape(CollisionPtr _parent)
+              : CylinderShape(_parent) {}
 
-      /// destructor
+      /// \brief Destructor.
       public: virtual ~ODECylinderShape() {}
 
-      /// Set radius and length of a cylinder
-      public: void SetSize(const double &_radius, const double &_length)
+      // Documentation inerited.
+      public: void SetSize(double _radius, double _length)
       {
         CylinderShape::SetSize(_radius, _length);
         ODECollisionPtr oParent;
         oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
@@ -51,14 +49,6 @@ namespace gazebo
           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
-
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

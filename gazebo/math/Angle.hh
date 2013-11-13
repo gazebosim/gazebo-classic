@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 18 Aug 2008
  */
 
-#ifndef ANGLE_HH
-#define ANGLE_HH
+#ifndef _ANGLE_HH_
+#define _ANGLE_HH_
 
 #include <math.h>
 #include <iostream>
@@ -50,9 +50,22 @@ namespace gazebo
   /// \addtogroup gazebo_math Math
   /// \{
 
+  /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
   class Angle
   {
+    /// \brief math::Angle(0)
+    public: static const Angle Zero;
+
+    /// \brief math::Angle(M_PI)
+    public: static const Angle Pi;
+
+    /// \brief math::Angle(M_PI * 0.5)
+    public: static const Angle HalfPi;
+
+    /// \brief math::Angle(M_PI * 2)
+    public: static const Angle TwoPi;
+
     /// \brief Constructor
     public: Angle();
 
@@ -77,15 +90,7 @@ namespace gazebo
 
     /// \brief Get the angle in radians
     /// \return double containing the angle's radian value
-    public: double GetAsRadian() const __attribute__((deprecated));
-
-    /// \brief Get the angle in radians
-    /// \return double containing the angle's radian value
     public: double Radian() const;
-
-    /// \brief Get the angle in degrees
-    /// \return double containing the angle's degree value
-    public: double GetAsDegree() const __attribute__((deprecated));
 
     /// \brief Get the angle in degrees
     /// \return double containing the angle's degree value

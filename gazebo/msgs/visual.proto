@@ -3,26 +3,30 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Visual
 /// \brief A message containing visual information for rendering::Visual
-/// \verbatim
+
 
 import "pose.proto";
 import "geometry.proto";
 import "material.proto";
+import "plugin.proto";
+import "vector3d.proto";
 
 message Visual
 {
   required string name         = 1;
-  optional string parent_name  = 2;
-  optional bool cast_shadows   = 3;
-  optional double transparency = 4;
-  optional double laser_retro  = 5;
-  optional Pose pose           = 6;
-  optional Geometry geometry   = 7;
-  optional Material material   = 8;
+  optional uint32 id           = 2; 
+  required string parent_name  = 3;
+  optional uint32 parent_id    = 4;
+  optional bool cast_shadows   = 5;
+  optional double transparency = 6;
+  optional double laser_retro  = 7;
+  optional Pose pose           = 8;
+  optional Geometry geometry   = 9;
+  optional Material material   = 10;
 
-  optional bool visible        = 9;
-  optional bool delete_me      = 11;
-  optional bool is_static      = 12;
+  optional bool visible        = 11;
+  optional bool delete_me      = 12;
+  optional bool is_static      = 13;
+  optional Plugin plugin       = 14;
+  optional Vector3d scale      = 15;
 }
-
-/// \endverbatim
