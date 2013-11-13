@@ -210,30 +210,6 @@ bool LogPlay::Step(std::string &_data, int _stepInc)
     return false;
   }
 
-  /*if (this->currentStep < this->minStep + this->stepBuffer.size() &&
-      this->currentStep >= this->minStep)
-  {
-    _data = this->stepBuffer[this->currentStep - this->minStep];
-  }
-  else if (this->currentStep >= this->minStep + this->stepBuffer.size())
-  {
-    while (this->currentStep >= this->minStep + this->stepBuffer.size() &&
-        this->GetStep(_data))
-    {
-      this->stepBuffer.push_back(_data);
-
-      if (this->stepBuffer.size() > 1000)
-      {
-        this->stepBuffer.pop_front();
-        this->minStep++;
-      }
-    }
-  }
-  else if (this->currentStep < this->minStep)
-  {
-  }
-  */
-
   if (this->currentStep < static_cast<int64_t>(this->stepBuffer.size()))
     _data = this->stepBuffer[this->currentStep];
 
@@ -243,15 +219,8 @@ bool LogPlay::Step(std::string &_data, int _stepInc)
     this->stepBuffer.push_back(_data);
   }
 
-  std::cout << "CurrentStep[" << this->currentStep << "] Inc[" << _stepInc << "]\n";
-  if (!this->pause)// && this->currentStep < this->segmentCount &&
-      //this->currentStep > 0)
-  {
-    //++this->currentStep;
-
+  if (!this->pause)
     this->PublishStatus();
-  }
-
 
   return !_data.empty();
 }
