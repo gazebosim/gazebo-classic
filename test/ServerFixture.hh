@@ -495,8 +495,8 @@ class ServerFixture : public testing::Test
 
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
-               
-	       WaitUntilEntitySpawn(_modelName, 100, 50);
+
+               WaitUntilEntitySpawn(_modelName, 100, 50);
                WaitUntilSensorSpawn(_cameraName, 100, 100);
              }
 
