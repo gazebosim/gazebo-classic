@@ -59,6 +59,10 @@ namespace gazebo
       /// \brief QT callback when slider is released.
       private slots: void OnScrubberReleased();
 
+      /// \brief Triggered when the log play button is pressed.
+      /// \param[in] _toggle True if the button is toggled on.
+      private slots: void OnPlay(bool _toggle);
+
       /// \brief Callback for status messages.
       private: void OnStatusMsg(ConstLogPlayStatusPtr &_msg);
 
@@ -74,8 +78,23 @@ namespace gazebo
       /// \brief Publish log play control messages.
       private: transport::PublisherPtr controlPub;
 
+      /// \brief Publish world control messages.
+      private: transport::PublisherPtr worldControlPub;
+
       /// \brief True when the slider is pressed.
       private: bool sliderPressed;
+
+      /// \brief The button used to start and pause logging.
+      private: QToolButton *playButton;
+
+      /// \brief The button used to step forward in time.
+      private: QToolButton *stepForwardButton;
+
+      /// \brief The button used to step backward in time.
+      private: QToolButton *stepBackwardButton;
+
+      private: QToolButton *jumpForwardButton;
+      private: QToolButton *jumpBackwardButton;
     };
   }
 }

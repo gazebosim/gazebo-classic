@@ -867,7 +867,7 @@ int info(const std::string &_filename)
 
   // Get the SDF world description from the log file
   std::string sdfString;
-  gazebo::util::LogPlay::Instance()->Step(sdfString);
+  gazebo::util::LogPlay::Instance()->Step(sdfString, 1);
 
   // Parse the first SDF world description
   sdf::ElementPtr sdf(new sdf::Element);
@@ -1007,7 +1007,7 @@ int echo(const std::string &_filename, const std::string &_filter, bool _raw,
     std::cerr << "\nEcho complete.\n";
 
   // Get the first step, which is the world definition
-  play->Step(stateString);
+  play->Step(stateString, 1);
   result[0].push_back(stateString);
 
   // Output the result
@@ -1063,7 +1063,7 @@ int step(const std::string &_filename, const std::string &_filter,
   filter.Init(_filter);
 
   unsigned int i = 0;
-  while (play->Step(stateString) && c != 'q')
+  while (play->Step(stateString, 1) && c != 'q')
   {
     if (i > 0)
       stateString = filter.Filter(stateString);

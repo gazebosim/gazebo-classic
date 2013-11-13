@@ -46,7 +46,8 @@ namespace gazebo
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
-    extern QAction *g_stepAct;
+    extern QAction *g_stepForwardAct;
+    extern QAction *g_stepBackwardAct;
 
     extern QAction *g_boxCreateAct;
     extern QAction *g_sphereCreateAct;

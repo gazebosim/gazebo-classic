@@ -117,9 +117,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
-  this->connections.push_back(
-      event::Events::ConnectPostRender(boost::bind(&Scene::PostRender, this)));
-
   this->sceneSimTimePosesApplied = common::Time();
   this->sceneSimTimePosesReceived = common::Time();
 }
@@ -208,8 +205,10 @@ void Scene::Fini()
 //////////////////////////////////////////////////
 void Scene::Init()
 {
-  this->initialized = false;
+
   this->InitComms();
+
+  this->initialized = false;
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
   this->worldVisual->SetId(0);
   this->visuals[0] = this->worldVisual;
@@ -248,13 +247,6 @@ void Scene::Init()
   this->SetShadowsEnabled(true);
 
   this->requestPub->WaitForConnection();
-  // \TODO: This causes the Scene to occasionally miss the response to
-  // scene_info
-  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
-  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
-
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
@@ -1504,11 +1496,6 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
-  if (!this->initialized)
-    return;
-
-  boost::mutex::scoped_lock lock1(this->preRenderMutex);
-
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
   static bool first = true;
 
@@ -1706,6 +1693,7 @@ void Scene::PreRender()
 
   {
     boost::mutex::scoped_lock lock(this->receiveMutex);
+    boost::recursive_mutex::scoped_lock lock1(this->poseMsgMutex);
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
@@ -1775,16 +1763,6 @@ void Scene::PreRender()
   }
 }
 
-//////////////////////////////////////////////////
-void Scene::PostRender()
-{
-  // Try to lock the mutex. This guarantees that we have a lock, incase we
-  // somehow missed ::PreRender.
-  // this->renderMutex.try_lock();
-
-  // Unlock the render event.
-  // this->renderMutex.unlock();
-}
 
 /////////////////////////////////////////////////
 void Scene::OnJointMsg(ConstJointPtr &_msg)
@@ -2352,6 +2330,9 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
     else
       this->poseMsgs.insert(
           std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+
+    // this->poseMsgs[_msg->pose(i).id()].set_name(linkName);
+    // this->poseMsgs[_msg->pose(i).id()].set_id(_msg.link(j).id());
   }
 }
 
@@ -2921,12 +2902,19 @@ void Scene::InitComms()
 
   this->requestSub = this->node->Subscribe("~/request",
       &Scene::OnRequest, this);
+
+  // \TODO: This causes the Scene to occasionally miss the response to
+  // scene_info
+  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responseSub = this->node->Subscribe("~/response",
+      &Scene::OnResponse, this, true);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 }
 
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  // boost::mutex::scoped_lock lock1(this->renderMutex);
+  boost::recursive_mutex::scoped_lock lock1(this->poseMsgMutex);
   boost::mutex::scoped_lock lock2(this->preRenderMutex);
   boost::mutex::scoped_lock lock(this->receiveMutex);
 

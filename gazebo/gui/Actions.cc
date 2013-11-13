@@ -41,7 +41,8 @@ QAction *gazebo::gui::g_editModelAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
-QAction *gazebo::gui::g_stepAct = 0;
+QAction *gazebo::gui::g_stepForwardAct = 0;
+QAction *gazebo::gui::g_stepBackwardAct = 0;
 
 QAction *gazebo::gui::g_boxCreateAct = 0;
 QAction *gazebo::gui::g_sphereCreateAct = 0;

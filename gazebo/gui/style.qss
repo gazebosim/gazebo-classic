@@ -193,6 +193,46 @@ QToolButton#dataLoggerStopButton:hover
   background-color: #dddddd;
 }
 
+QToolButton#logPlayButton
+{
+  padding: 0px;
+  margin-left: 4px;
+  margin-top: 0px;
+  margin-right: 4px;
+  margin-bottom: 0px;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 2px;
+  border: 0px;
+}
+
+QToolButton#logPlayButton:hover
+{
+  background-color: #999999;
+}
+
+QToolButton#logStepButton
+{
+  padding: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 2px;
+  border: 0px;
+}
+
+QToolButton#logStepButton:hover
+{
+  background-color: #999999;
+}
+
 QListView
 {
   color: #d0d0d0;

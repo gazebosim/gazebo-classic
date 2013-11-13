@@ -109,12 +109,19 @@ MainWindow::MainWindow()
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+  this->logPlay = new LogPlayWidget(mainWidget);
 
-  QHBoxLayout *centerLayout = new QHBoxLayout;
+  QFrame *centerFrame = new QFrame();
+  QVBoxLayout *centerLayout = new QVBoxLayout;
+  centerLayout->addWidget(this->renderWidget);
+  centerLayout->addWidget(this->logPlay);
+  centerFrame->setLayout(centerLayout);
+
+  QHBoxLayout *mainContentLayout = new QHBoxLayout;
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->leftColumn);
-  splitter->addWidget(this->renderWidget);
+  splitter->addWidget(centerFrame);
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
@@ -129,14 +136,16 @@ MainWindow::MainWindow()
   splitter->setCollapsible(2, false);
   splitter->setHandleWidth(10);
 
-  centerLayout->addWidget(splitter);
-  centerLayout->setContentsMargins(0, 0, 0, 0);
-  centerLayout->setSpacing(0);
+  mainContentLayout->addWidget(splitter);
+  mainContentLayout->setContentsMargins(0, 0, 0, 0);
+  mainContentLayout->setSpacing(0);
 
   mainLayout->setSpacing(0);
-  mainLayout->addLayout(centerLayout, 1);
+  mainLayout->addLayout(mainContentLayout, 1);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
+
+  this->logPlay->hide();
 
   mainWidget->setLayout(mainLayout);
 
@@ -492,10 +501,19 @@ void MainWindow::Pause()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Step()
+void MainWindow::StepForward()
 {
   msgs::WorldControl msg;
   msg.set_multi_step(this->inputStepSize);
+
+  this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::StepBackward()
+{
+  msgs::WorldControl msg;
+  msg.set_multi_step(-this->inputStepSize);
 
   this->worldControlPub->Publish(msg);
 }
@@ -866,20 +884,27 @@ void MainWindow::CreateActions()
   g_editModelAct->setCheckable(true);
   g_editModelAct->setChecked(false);
 
-  g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
-  g_stepAct->setStatusTip(tr("Step the world"));
-  connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
-  this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  g_stepForwardAct = new QAction(QIcon(":/images/step_forward.svg"),
+      tr("Step Forward"), this);
+  g_stepForwardAct->setStatusTip(tr("Step simulation forward"));
+  connect(g_stepForwardAct, SIGNAL(triggered()), this, SLOT(StepForward()));
+  this->CreateDisabledIcon(":/images/step_forward.svg", g_stepForwardAct);
 
-  g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
-  g_playAct->setStatusTip(tr("Run the world"));
+  g_stepBackwardAct = new QAction(QIcon(":/images/step_backward.svg"),
+      tr("Step Backward"), this);
+  g_stepBackwardAct->setStatusTip(tr("Step simulation backward"));
+  connect(g_stepBackwardAct, SIGNAL(triggered()), this, SLOT(StepBackward()));
+  this->CreateDisabledIcon(":/images/step_backward.svg", g_stepBackwardAct);
+
+  g_playAct = new QAction(QIcon(":/images/play.svg"), tr("Play"), this);
+  g_playAct->setStatusTip(tr("Play simulation"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
   this->OnPlayActionChanged();
 
-  g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
-  g_pauseAct->setStatusTip(tr("Pause the world"));
+  g_pauseAct = new QAction(QIcon(":/images/pause.svg"), tr("Pause"), this);
+  g_pauseAct->setStatusTip(tr("Pause simulation"));
   g_pauseAct->setVisible(true);
   connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
@@ -1163,7 +1188,7 @@ void MainWindow::CreateToolbars()
   this->playToolbar = this->addToolBar(tr("Play"));
   this->playToolbar->addAction(g_playAct);
   this->playToolbar->addAction(g_pauseAct);
-  this->playToolbar->addAction(g_stepAct);
+  this->playToolbar->addAction(g_stepForwardAct);
 }
 
 /////////////////////////////////////////////////
@@ -1371,13 +1396,13 @@ void MainWindow::OnPlayActionChanged()
 {
   if (g_playAct->isVisible())
   {
-    g_stepAct->setToolTip("Step the world");
-    g_stepAct->setEnabled(true);
+    g_stepForwardAct->setToolTip("Step the world");
+    g_stepForwardAct->setEnabled(true);
   }
   else
   {
-    g_stepAct->setToolTip("Pause the world before stepping");
-    g_stepAct->setEnabled(false);
+    g_stepForwardAct->setToolTip("Pause the world before stepping");
+    g_stepForwardAct->setEnabled(false);
   }
 }
 

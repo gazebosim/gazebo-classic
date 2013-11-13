@@ -49,6 +49,7 @@ LogPlay::LogPlay()
   this->chunkCount = 0;
   this->logStartXml = NULL;
   this->xmlDoc = NULL;
+  this->currentStep = -1;
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("/gazebo");
@@ -188,9 +189,26 @@ uint32_t LogPlay::GetRandSeed() const
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::Step(std::string &_data)
+bool LogPlay::Step(std::string &_data, int _stepInc)
 {
   this->needsStep = false;
+
+  int64_t prevStep = this->currentStep;
+  this->currentStep += _stepInc;
+
+  this->currentStep = std::max(0l, this->currentStep);
+  this->currentStep = std::min(this->currentStep, this->segmentCount-1);
+
+  // Don't do anything if the step hasn't actually changed.
+  if (prevStep == this->currentStep)
+    return false;
+
+  if (this->currentStep < 0)
+  {
+    gzwarn << "LogPlay has a negative value for the current step. "
+      << "There is probably something wrong with the log file.\n";
+    return false;
+  }
 
   /*if (this->currentStep < this->minStep + this->stepBuffer.size() &&
       this->currentStep >= this->minStep)
@@ -216,22 +234,26 @@ bool LogPlay::Step(std::string &_data)
   }
   */
 
-  if (this->currentStep < this->stepBuffer.size())
+  if (this->currentStep < static_cast<int64_t>(this->stepBuffer.size()))
     _data = this->stepBuffer[this->currentStep];
 
-  while (this->currentStep >= this->stepBuffer.size() &&
+  while (this->currentStep >= static_cast<int64_t>(this->stepBuffer.size()) &&
          this->GetStep(_data))
   {
     this->stepBuffer.push_back(_data);
   }
 
-  if (!this->pause && this->currentStep < this->segmentCount)
+  std::cout << "CurrentStep[" << this->currentStep << "] Inc[" << _stepInc << "]\n";
+  if (!this->pause)// && this->currentStep < this->segmentCount &&
+      //this->currentStep > 0)
   {
-    ++this->currentStep;
+    //++this->currentStep;
+
     this->PublishStatus();
   }
 
-  return true;
+
+  return !_data.empty();
 }
 
 /////////////////////////////////////////////////
@@ -444,9 +466,10 @@ void LogPlay::OnLogControl(ConstLogPlayControlPtr &_data)
   }
 
   if (_data->has_pause())
-  {
     this->pause = _data->pause();
-  }
+
+  if (_data->has_start())
+    this->needsStep = this->needsStep || _data->start();
 }
 
 /////////////////////////////////////////////////
@@ -466,4 +489,10 @@ void LogPlay::Fini()
   if (this->node)
     this->node->Fini();
   this->node.reset();
+}
+
+/////////////////////////////////////////////////
+int64_t LogPlay::GetCurrentStep() const
+{
+  return this->currentStep;
 }

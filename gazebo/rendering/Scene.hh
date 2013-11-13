@@ -111,9 +111,6 @@ namespace gazebo
       /// \brief Process all received messages.
       public: void PreRender();
 
-      /// \brief Handl the post render event.
-      public: void PostRender();
-
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
       public: Ogre::SceneManager *GetManager() const;

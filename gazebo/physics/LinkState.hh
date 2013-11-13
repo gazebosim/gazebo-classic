@@ -192,7 +192,6 @@ namespace gazebo
           << q.z << " "
           << "</pose>";
 
-        /// Disabling this for efficiency.
         q = _state.velocity.rot.GetAsEuler();
          _out << std::fixed <<std::setprecision(4)
            << "<velocity>"
@@ -203,8 +202,9 @@ namespace gazebo
            << q.y << " "
            << q.z << " "
            << "</velocity>";
-        // << "<acceleration>" << _state.acceleration << "</acceleration>"
-        // << "<wrench>" << _state.wrench << "</wrench>";
+
+         _out << "<acceleration>" << _state.acceleration << "</acceleration>"
+              << "<wrench>" << _state.wrench << "</wrench>";
 
         /// Disabling this for efficiency.
         // for (std::vector<CollisionState>::const_iterator iter =

@@ -435,15 +435,28 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->stepInc > 0)
+  if (util::LogPlay::Instance()->NeedsStep() || !this->IsPaused() ||
+      this->stepInc != 0)
   {
+    this->stepInc = this->stepInc == 0 ? 1 : this->stepInc;
     std::string data;
-    if (!util::LogPlay::Instance()->Step(data))
+    if (!util::LogPlay::Instance()->Step(data, this->stepInc))
     {
       this->SetPaused(true);
     }
-    else
+    else if (!data.empty())
     {
+
+      // The first element in a log file has the complete world. This if
+      // block handles that special case by removing the world contents.
+      if (data.find("<world ") != std::string::npos)
+      {
+        size_t worldStart = data.find("<world ");
+        size_t startStart = data.find("<state ");
+        data.erase(worldStart, startStart - worldStart);
+        data.erase(data.find("</world>"), 8);
+      }
+
       this->logPlayStateSDF->ClearElements();
       sdf::readString(data, this->logPlayStateSDF);
 
@@ -482,11 +495,14 @@ void World::LogStep()
 
       this->SetState(this->logPlayState);
       this->Update();
-      this->iterations++;
+
+      this->iterations = util::LogPlay::Instance()->GetCurrentStep();
     }
 
     if (this->stepInc > 0)
       this->stepInc--;
+    else if (this->stepInc < 0)
+      this->stepInc++;
   }
 
   this->PublishWorldStats();

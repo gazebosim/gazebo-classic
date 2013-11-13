@@ -80,7 +80,9 @@ namespace gazebo
 
       /// \brief Step through the open log file.
       /// \param[out] _data Data from next entry in the log file.
-      public: bool Step(std::string &_data);
+      /// \pparam[in] _stepInc Number of steps (positive or negative, which
+      /// equates to forward or reverse in the log file).
+      public: bool Step(std::string &_data, int _stepInc);
 
       /// \brief Get the number of steps in the log file.
       public: uint64_t GetSegmentCount() const;
@@ -113,6 +115,10 @@ namespace gazebo
 
       /// \brief Finialize, and shutdown.
       public: void Fini();
+
+      /// \brief Get the current step.
+      /// \return The current step.
+      public: int64_t GetCurrentStep() const;
 
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
@@ -167,10 +173,10 @@ namespace gazebo
       private: std::string currentChunk;
 
       /// \brief The current step count.
-      private: uint64_t currentStep;
+      private: int64_t currentStep;
 
       /// \brief Total number of segments.
-      private: uint64_t segmentCount;
+      private: int64_t segmentCount;
 
       /// \brief Total number of chunks.
       private: uint64_t chunkCount;

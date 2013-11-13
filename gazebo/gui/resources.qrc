@@ -39,5 +39,11 @@
   <file>images/left_arrow.png</file>
   <file>images/up_arrow.png</file>
   <file>images/screenshot.png</file>  
+  <file>images/play.svg</file>
+  <file>images/pause.svg</file>
+  <file>images/step_forward.svg</file>
+  <file>images/step_backward.svg</file>
+  <file>images/jump_forward.svg</file>
+  <file>images/jump_backward.svg</file>
 </qresource>
 </RCC>

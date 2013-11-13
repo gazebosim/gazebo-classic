@@ -138,12 +138,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   playFrame->setFixedHeight(25);
   QToolBar *playToolbar = new QToolBar;
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
+  // playToolbar->addAction(g_playAct);
+  // playToolbar->addAction(g_pauseAct);
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
+  //playToolbar->addAction(g_stepAct);
   playToolbar->addWidget(stepToolBarLabel);
   playToolbar->addWidget(this->stepButton);
 
