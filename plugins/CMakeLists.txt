@@ -39,3 +39,10 @@ foreach (src ${plugins})
   install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
+
+link_directories(/opt/ros/hydro/lib)
+add_library(RosBag SHARED RosBag.cc)
+target_link_libraries(RosBag libgazebo rosbag ${ogre_libraries})
+install (TARGETS RosBag DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
+gz_install_includes("plugins" RosBag.hh)
+
