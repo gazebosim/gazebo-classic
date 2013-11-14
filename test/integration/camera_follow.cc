@@ -69,7 +69,7 @@ TEST_F(CameraFollow, Follow)
   pub->WaitForConnection();
   pub->Publish(msg, true);
 
-  world->StepWorld(1000);
+  world->Step(1000);
 
   // Make sure the sensor is at the correct initial pose
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
