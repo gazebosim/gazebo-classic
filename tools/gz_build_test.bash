@@ -45,6 +45,7 @@ fi
 
 start_time=`eval date +%s`
 
+export GAZEBO_MASTER_URI=http://localhost:11342
 export DISPLAY=:0
 export PATH=$BUILD_ROOT/install/bin:$PATH
 export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$BUILD_ROOT/install/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
@@ -65,7 +66,8 @@ do
   cd build
   cmake .. \
     -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/install \
-    -DFORCE_GRAPHIC_TESTS_COMPILATION=True
+    -DENABLE_SCREEN_TESTS:BOOL=False \
+    -DFORCE_GRAPHIC_TESTS_COMPILATION:BOOL=True
   make -j4 install
   . $BUILD_ROOT/install/share/gazebo/setup.sh
 
@@ -77,10 +79,10 @@ do
   cd $BUILD_ROOT/source
   sh tools/code_check.sh >> $logfile
 
-  echo "Test Results" >> $logfile
   # Run make test many times, only capture failures
   for i in {1..100}
   do
+    echo "Test results try $i of 100" >> $logfile
     cd $BUILD_ROOT/source/build
 
     # make test with verbose output
