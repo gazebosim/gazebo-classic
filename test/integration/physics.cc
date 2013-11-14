@@ -1617,11 +1617,11 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->StepWorld(1000);
+    world->Step(1000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {
-      world->StepWorld(1);
+      world->Step(1);
       // manually check joint constraint violation for each joint
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
@@ -1687,16 +1687,16 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     // special hook in SphereAtlasTestPlugin disconnects
     // PID controller on Reset.
     world->Reset();
-    world->StepWorld(1);
+    world->Step(1);
 
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->StepWorld(1000);
+    world->Step(1000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {
-      world->StepWorld(1);
+      world->Step(1);
       // manually check joint constraint violation for each joint
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
