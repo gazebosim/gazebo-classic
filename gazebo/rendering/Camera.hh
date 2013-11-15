@@ -603,10 +603,10 @@ namespace gazebo
       /// \brief Name of the camera.
       protected: std::string name;
 
-      /// \brief Scene ccoped name of the camera.
+      /// \brief Scene scoped name of the camera.
       protected: std::string scopedName;
 
-      /// \brief Scene ccoped name of the camera with a unique ID.
+      /// \brief Scene scoped name of the camera with a unique ID.
       protected: std::string scopedUniqueName;
 
       /// \brief Camera's SDF values.
