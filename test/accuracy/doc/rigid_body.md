@@ -1,8 +1,8 @@
 # Physics Accuracy Testing for a Single Rigid Body
 
-This document will describe simple motion of a rigid body for which analytical
-solutions can be computed. Consider an inertial frame <math>O</math> and
-a rigid body with coordinate frame <math>c</math> attached at the center of mass:
+This document will describe simple motion of a rigid body for which analytical solutions can be computed.
+  Consider an inertial frame <math>O</math> and a rigid body with coordinate frame <math>c</math>
+  attached at the center of mass:
 
 * The position of the center of gravity (cg) in <math>O</math> is given by <math>\textbf{c}</math>.
 * The orientation of <math>c</math> with respect to <math>O</math> is given by the quaternion <math>q</math>.
@@ -35,8 +35,8 @@ the center of gravity, expressed in <math>O</math>:
 * <math>\textbf{H}(t) = \textbf{R}^T(\textbf{q}(t))\textbf{I}\boldsymbol{\omega}(t)</math>,
 * initial value of <math>\textbf{H}_0</math>
 
-Let <math>T</math> represent the kinetic energy as
-<math>T = \frac{1}{2} m \dot{\textbf{c}}^T \dot{\textbf{c}} +
+Let <math>T(t)</math> represent the kinetic energy as
+<math>T(t) = \frac{1}{2} m \dot{\textbf{c}}^T \dot{\textbf{c}} +
      \frac{1}{2} \textbf{I} \boldsymbol{\omega}^T \boldsymbol{\omega}</math>,
 and an initial value of <math>T_0</math>
 
@@ -80,11 +80,18 @@ print I
  [ 0.          0.          0.41666667]]
 ~~~
 
-Details of accuracy test, sampling time, thresholds, etc.
+* Energy conservation:
+
+    * <math>T(t) = T_0</math>
 
 ## With gravity
 
 With gravity vector <math>\textbf{g}</math> acting:
+    * Define potential energy <math>V</math> based on gravity direction.
+    * Let <math>V_0</math> be the initial potential energy at <math>\textbf{c}_0</math>.
+    * The potential energy is then
+      <math>V(t) = V_0 + m \textbf{g} \cdot (\textbf{c}(t) - \textbf{c}_0)</math>
+    * The total energy is defined as <math>E = T+V</math> with initial value <math>E_0</math>.
 
 * Linear momentum: Newton implies:
     * <math>\dot{\textbf{p}}(t) = m \textbf{g}</math>,
@@ -92,9 +99,15 @@ With gravity vector <math>\textbf{g}</math> acting:
     * <math>\dot{\textbf{c}}(t) = \dot{\textbf{c}}_0 + \textbf{g} (t-t_0)</math>,
     * <math>\textbf{c}(t) = \textbf{c}_0 + \dot{\textbf{c}}_0(t-t_0) + \frac{1}{2} \textbf{g} (t-t_0)^2</math>
 
-* Angular momentum: see previous section "Without gravity".
+* Angular momentum: see previous section "Gravity-free environment".
 
-* Energy conservation: define potential energy <math>V</math> based on gravity direction.
-    * Let <math>V_0</math> be the initial potential energy at <math>\textbf{c}_0</math>.
-    * The potential energy is then
-      <math>V(t) = V_0 + m \textbf{g} \cdot (\textbf{c}(t) - \textbf{c}_0)</math>
+* Energy conservation:
+    * <math>E(t) = E_0</math>
+
+## Implementation of accuracy test
+
+* Specify initial conditions and simulate rigid body motion for <math>[t_0,t_f]</math>.
+* Take measurements with sampling rate <math>t_s</math> of
+  <math>\textbf{c}(t), \dot{\textbf{c}}(t), \textbf{q}(t), \boldsymbol{\omega}(t)</math>.
+* Compare to the analytical solutions based on momentum and energy conservation by computing max and RMS error.
+
