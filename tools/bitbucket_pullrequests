@@ -37,7 +37,7 @@ class BitbucketPullRequests
   end
 
   # constructor
-  def initialize options
+  def initialize(options)
     @url_pullrequests = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests'
     @options = options
   end
