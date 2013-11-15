@@ -21,7 +21,7 @@
 
 using namespace gazebo;
 
-void TimeTest(common::Time _t, msgs::Time _msg)
+void TimeTest(const common::Time &_t, const msgs::Time &_msg)
 {
   EXPECT_LE(_t.sec, _msg.sec());
   if (_t.sec == _msg.sec())
