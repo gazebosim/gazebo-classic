@@ -952,7 +952,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Model name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  private: void WaitUntilEntitySpawn(const std::string &_name,
+  protected: void WaitUntilEntitySpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries)
              {
@@ -975,7 +975,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Sensor name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  private: void WaitUntilSensorSpawn(const std::string &_name,
+  protected: void WaitUntilSensorSpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries)
              {

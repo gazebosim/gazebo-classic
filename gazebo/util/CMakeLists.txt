@@ -10,6 +10,7 @@ set (sources
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
+  ZadeatGTParser.cc
   ZadeatImgParser.cc
 )
 
@@ -20,7 +21,8 @@ set (headers
   LogRecord.hh
   OpenAL.hh
   UtilTypes.hh
-  ZadeatImgParser.cc
+  ZadeatGTParser.hh
+  ZadeatImgParser.hh
 )
 
 set (gtest_sources
