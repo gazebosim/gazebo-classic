@@ -18,7 +18,6 @@ if(HAVE_BULLET)
 endif()
 
 set(tests
-  images.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
@@ -34,6 +33,7 @@ set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+images.cc
 )
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS

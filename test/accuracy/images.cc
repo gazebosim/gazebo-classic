@@ -27,6 +27,19 @@ class ImageAccuracyTest : public ServerFixture
 {
 };
 
+unsigned char* img = NULL;
+int imageCount = 0;
+
+void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+                  const unsigned char *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &/*_format*/)
+{
+  memcpy(_imageDest, _image, _width * _height * _depth);
+  *_imageCounter += 1;
+}
+
 /////////////////////////////////////////////////
 TEST_F(ImageAccuracyTest, ZadeatDataset)
 {
@@ -37,6 +50,14 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
 
   Load("worlds/empty.world");
 
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
   double timestamp;
   double headRoll, headPitch, headYaw;
   double headX, headY, headZ;
@@ -44,15 +65,55 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
   double torsoX, torsoY, torsoZ;
 
   gazebo::util::ZadeatGTParser *gtParser = new gazebo::util::ZadeatGTParser(
-    "/data/naoDataset/run0/ground_truth_0.csv");
+    "/opt/naoDataset/run02/ground_truth_2.csv");
+
+  // spawn sensors of various sizes to test speed
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
+  math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensor->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+          _1, _2, _3, _4, _5));
+
+  int total_images = 1;
+  while (imageCount < total_images)
+    common::Time::MSleep(10);
+
+  // Save the image
+  std::ofstream myFile("/tmp/image.ppm", std::ios::out | std::ios::binary);
+
+  std::string strWidth = boost::lexical_cast<std::string>(width);
+  std::string strHeight = boost::lexical_cast<std::string>(height);
+  std::string header = "P6 " + strWidth + " " + strHeight + " 255\n";
+
+  // Write a PPM header
+  myFile.write(header.c_str(), header.size());
+
+  // Write the data
+  uint32_t dataSize = width * height * 3;
+  myFile.write(reinterpret_cast<const char *>(img), dataSize);
+
+  myFile.close();
 
   /*while (gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
                               headX, headY, headZ,
                               torsoRoll, torsoPitch, torsoYaw,
                               torsoX, torsoY, torsoZ))
   {*/
-  
-  gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
+
+  /*gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
                               headX, headY, headZ,
                               torsoRoll, torsoPitch, torsoYaw,
                               torsoX, torsoY, torsoZ);
@@ -67,20 +128,20 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
       cameraPose.pos, cameraPose.rot.GetAsEuler());
 
   WaitUntilEntitySpawn("test_camera_model", 100, 50);
-  WaitUntilSensorSpawn("test_camera", 100, 100); 
+  WaitUntilSensorSpawn("test_camera", 100, 100);
 
   // Take a snapshot
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene);
 
-  rendering::CameraPtr camera = scene->GetCamera("test_camera");
-  ASSERT_TRUE(camera);
- 
-  camera->Render(true);
+  rendering::CameraPtr camera = scene->GetCamera("test_camera");*/
+  //ASSERT_TRUE(camera);
+
+  /*camera->Render(true);
   camera->PostRender();
-  
+
   // Store the image
-  camera->SaveFrame("/tmp/testImage.png");
+  camera->SaveFrame("/tmp/testImage.png");*/
   //}
 
 }
