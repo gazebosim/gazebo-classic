@@ -559,7 +559,7 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                WaitUntilEntitySpawn(_modelName, 100, 100);
-               WaitUntilSensorSpawn(_raySensorName, 100, 1);
+               WaitUntilSensorSpawn(_raySensorName, 100, 100);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -683,7 +683,7 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               WaitUntilEntitySpawn(_modelName, 100, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 1000);
                WaitUntilSensorSpawn(_imuSensorName, 100, 100);
              }
 
@@ -811,7 +811,7 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               WaitUntilEntitySpawn(_name, 100, 100);
+               WaitUntilEntitySpawn(_name, 20, 50);
                WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
