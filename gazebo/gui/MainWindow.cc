@@ -211,6 +211,8 @@ void MainWindow::Init()
   winSize.setWidth(std::max(1024, winSize.width()));
   winSize.setHeight(std::max(768, winSize.height()));
 
+  winSize.setWidth(1920);
+  winSize.setHeight(1080);
   this->resize(winSize);
 
   this->worldControlPub =

@@ -18,6 +18,7 @@
 #include <ros/ros.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
+#include <geometry_msgs/WrenchStamped.h>
 
 // Include Rand.hh first to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -53,5 +54,23 @@ namespace gazebo
     private: rosbag::Bag bag;
     private: rosbag::View view;
     private: rosbag::View::iterator viewIter;
+    private: ros::NodeHandle *rosNode;
+    private: ros::Publisher atlasStatePubLeft;
+    private: ros::Publisher atlasStatePubRight;
+
+    private: ros::Publisher atlasStatePubUnLeft;
+    private: ros::Publisher atlasStatePubUnRight;
+
+    private: ros::Publisher timePub;
+
+    private: double filCoefA[2];
+    private: double filCoefB[2];
+    private: geometry_msgs::Wrench leftWrenchIn[2];
+    private: geometry_msgs::Wrench leftWrenchOut[2];
+
+    private: geometry_msgs::Wrench rightWrenchIn[2];
+    private: geometry_msgs::Wrench rightWrenchOut[2];
+
+    private: std::ofstream csvOut;
   };
 }
