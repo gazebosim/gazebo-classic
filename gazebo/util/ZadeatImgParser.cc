@@ -15,7 +15,10 @@
  *
 */
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 #include "gazebo/util/ZadeatImgParser.hh"
@@ -53,14 +56,52 @@ int ZadeatImgParser::GetWidth()
   return this->Width;
 }
 
+// double
+static void swap8(void *v)
+{
+    char    in[8], out[8];
+    memcpy(in, v, 8);
+    out[0] = in[7];
+    out[1] = in[6];
+    out[2] = in[5];
+    out[3] = in[4];
+    out[4] = in[3];
+    out[5] = in[2];
+    out[6] = in[1];
+    out[7] = in[0];
+    memcpy(v, out, 8);
+}
+
+double ReverseDouble(const double _inDouble)
+{
+   double retVal;
+   char *doubleToConvert = ( char* ) & _inDouble;
+   char *returnDouble = ( char* ) & retVal;
+
+   // swap the bytes into a temporary buffer
+   returnDouble[0] = doubleToConvert[7];
+   returnDouble[1] = doubleToConvert[6];
+   returnDouble[2] = doubleToConvert[5];
+   returnDouble[3] = doubleToConvert[4];
+   returnDouble[4] = doubleToConvert[3];
+   returnDouble[5] = doubleToConvert[2];
+   returnDouble[6] = doubleToConvert[1];
+   returnDouble[7] = doubleToConvert[0];
+
+   return retVal;
+}
+
 //////////////////////////////////////////////////
 void ZadeatImgParser::GetNextImage(unsigned char *_img)
 {
   // Timestamp included in every image.
   unsigned char imgTimestamp[this->TimestampLength];
 
-  this->logFile.read(reinterpret_cast<char *>(imgTimestamp),
+  double timeStamp = 0.0;
+
+  this->logFile.read(reinterpret_cast<char *>(&timeStamp),
       this->TimestampLength);
+  std::cout << "Timestamp: " << ReverseDouble(timeStamp) << std::endl;
   uint32_t size = this->GetWidth() * this->GetHeight() * this->GetBpp();
   this->logFile.read(reinterpret_cast<char *>(_img), size);
 }

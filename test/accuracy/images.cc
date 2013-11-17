@@ -30,14 +30,14 @@ class ImageAccuracyTest : public ServerFixture
 unsigned char* img = NULL;
 int imageCount = 0;
 
-void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+void OnNewCameraFrame(bool* _newImage, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
   memcpy(_imageDest, _image, _width * _height * _depth);
-  *_imageCounter += 1;
+  *_newImage = true;
 }
 
 /////////////////////////////////////////////////
@@ -46,9 +46,11 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
   /*gazebo::util::ZadeatImgParser *imgParser = new gazebo::util::ZadeatImgParser
     ("/opt/naoDataset/run02/camera_2.strm", "/opt/naoDataset/run02/images/");
 
-  imgParser->Parse();*/
+  imgParser->Parse();
 
-  Load("worlds/empty.world");
+  return;*/
+
+  Load("worlds/robocup09_spl_field.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -71,78 +73,80 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
-  double updateRate = 10;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  imageCount = 0;
+  unsigned int height = 240;
+  double updateRate = 30;
+
+  int counter = 0;
+  bool newImage = false;
   img = new unsigned char[width * height * 3];
+  math::Pose cameraInitPose(0, 0, 0, 0, 0, 0);
+
+  SpawnCamera(modelName, cameraName, cameraInitPose.pos,
+        cameraInitPose.rot.GetAsEuler(), width, height, updateRate);
+    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+    sensors::CameraSensorPtr camSensor =
+      boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
   event::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+        boost::bind(&::OnNewCameraFrame, &newImage, img,
           _1, _2, _3, _4, _5));
 
-  int total_images = 1;
-  while (imageCount < total_images)
-    common::Time::MSleep(10);
-
-  // Save the image
-  std::ofstream myFile("/tmp/image.ppm", std::ios::out | std::ios::binary);
-
-  std::string strWidth = boost::lexical_cast<std::string>(width);
-  std::string strHeight = boost::lexical_cast<std::string>(height);
-  std::string header = "P6 " + strWidth + " " + strHeight + " 255\n";
-
-  // Write a PPM header
-  myFile.write(header.c_str(), header.size());
-
-  // Write the data
-  uint32_t dataSize = width * height * 3;
-  myFile.write(reinterpret_cast<const char *>(img), dataSize);
-
-  myFile.close();
-
-  /*while (gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
+  while (gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
                               headX, headY, headZ,
                               torsoRoll, torsoPitch, torsoYaw,
                               torsoX, torsoY, torsoZ))
-  {*/
+  {
 
   /*gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
                               headX, headY, headZ,
                               torsoRoll, torsoPitch, torsoYaw,
-                              torsoX, torsoY, torsoZ);
+                              torsoX, torsoY, torsoZ);*/
 
-  // Move the Gazebo camera to that position
-  //math::Pose cameraPose(headX, headY, headZ, headRoll, headPitch, headYaw);
+    // Move the Gazebo camera to that position
 
-  math::Pose cameraPose(0, 0, 0, 0, 0, 0);
+    /*headX = 2.36742;
+    headY = -1.45686;
+    headZ = 0.44459;
+    headRoll = -0.0771;
+    headPitch = 0.0312;
+    headYaw = 2.5127;*/
 
-  // Spawn a camera that will do the following
-  SpawnCamera("test_camera_model", "test_camera",
-      cameraPose.pos, cameraPose.rot.GetAsEuler());
+    // Conversion from mm to m.
+    headX /= 1000.0;
+    headY /= 1000.0;
+    headZ /= 1000.0;
 
-  WaitUntilEntitySpawn("test_camera_model", 100, 50);
-  WaitUntilSensorSpawn("test_camera", 100, 100);
+    // Translation and rotation from the center of the head to the lower cam.
+    headX += 0.0488;
+    headZ -= 0.04409;
+    headPitch = GZ_NORMALIZE(headPitch + GZ_DTOR(40.0));
 
-  // Take a snapshot
-  rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+    math::Pose cameraPose(headX, headY, headZ, headRoll, headPitch, headYaw);
+    /*std::cout << "Head (" << headX << "," << headY << "," << headZ << ")(" <<
+      headRoll << "," << headPitch << "," << headYaw << ")" << std::endl;*/
 
-  rendering::CameraPtr camera = scene->GetCamera("test_camera");*/
-  //ASSERT_TRUE(camera);
+    rendering::CameraPtr camera = camSensor->GetCamera();
+    camera->SetWorldPose(cameraPose);
 
-  /*camera->Render(true);
-  camera->PostRender();
+    newImage = false;
+    while (!newImage)
+      common::Time::MSleep(1);
 
-  // Store the image
-  camera->SaveFrame("/tmp/testImage.png");*/
-  //}
+    // Save the image on disk
+    std::ostringstream ss;
+    ss << std::setw(5) << std::setfill('0') << counter / 8;
+    std::string s2(ss.str());
+    std::string filename = "/opt/naoDataset/run02/gazebo_images/" +
+                           ss.str() + ".ppm";
+    if (counter % 8 == 0)
+    {
+      std::cout << filename << std::endl;
+      camSensor->SaveFrame(filename);
+    }
+    ++counter;
+    //camSensor->SaveFrame("/tmp/image.ppm");
+  }
 
 }
 

@@ -468,7 +468,8 @@ class ServerFixture : public testing::Test
                  << "    <update_rate>" << _rate << "</update_rate>"
                  << "    <visualize>true</visualize>"
                  << "    <camera>"
-                 << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+                 //<< "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+                 << "      <horizontal_fov>0.8342</horizontal_fov>"
                  << "      <image>"
                  << "        <width>" << _width << "</width>"
                  << "        <height>" << _height << "</height>"
@@ -952,7 +953,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Model name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  protected: void WaitUntilEntitySpawn(const std::string &_name,
+  private: void WaitUntilEntitySpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries)
              {
@@ -975,7 +976,7 @@ class ServerFixture : public testing::Test
   /// \param[in] _name Sensor name
   /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
   /// \param[in] _retries Number of iterations until give up
-  protected: void WaitUntilSensorSpawn(const std::string &_name,
+  private: void WaitUntilSensorSpawn(const std::string &_name,
                                      unsigned int _sleepEach,
                                      int _retries)
              {

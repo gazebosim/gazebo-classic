@@ -18,9 +18,16 @@
     </include>
 
     <!-- RoboCup SPL ball -->
-    <include>
-      <pose>0 0 0 0 0 0</pose>
+    <!--<include>
       <uri>model://robocup_spl_ball</uri>
+    </include>-->
+
+    <include>
+      <static>true</static>
+      <uri>model://camera</uri>
+      <pose>2.41622 -1.45686 0.4005 -0.0771 0.729332 2.5127</pose>
+      <!--<pose>2.36742 -1.45686 0.44459 -0.0771 0.0312 2.5127</pose>-->
+      <name>camera 2</name>
     </include>
 
   </world>

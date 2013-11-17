@@ -19,6 +19,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include <iomanip>
 #include <string>
 
 #include "gazebo/common/Exception.hh"
@@ -74,8 +75,9 @@ void ImgParser::Parse()
   {
     this->GetNextImage(srcImage.get());
     this->ToRGB(srcImage.get(), dstImage.get());
-    std::string imgName = this->imgDstDir +
-      boost::lexical_cast<std::string>(counter) + ".ppm";
+    std::ostringstream ss;
+    ss << std::setw(5) << std::setfill('0') << counter;
+    std::string imgName = this->imgDstDir + ss.str() + ".ppm";
     this->SaveImage(imgName.c_str(), dstImage.get());
     ++counter;
   }
