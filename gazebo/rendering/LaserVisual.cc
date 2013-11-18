@@ -38,14 +38,14 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
-      &LaserVisual::OnScan, this);
-
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->laserScanSub = this->node->Subscribe(_topicName,
+      &LaserVisual::OnScan, this);
 }
 
 /////////////////////////////////////////////////

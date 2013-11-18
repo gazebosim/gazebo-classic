@@ -21,6 +21,13 @@
 
 using namespace gazebo;
 
+void TimeTest(const common::Time &_t, const msgs::Time &_msg)
+{
+  EXPECT_LE(_t.sec, _msg.sec());
+  if (_t.sec == _msg.sec())
+    EXPECT_LE(_t.nsec, _msg.nsec());
+}
+
 TEST(MsgsTest, Msg)
 {
   common::Time t = common::Time::GetWallTime();
@@ -29,13 +36,12 @@ TEST(MsgsTest, Msg)
   msgs::Init(msg, "_test_");
   msgs::Init(msg2);
 
-  EXPECT_TRUE(msg.header().has_stamp());
-  EXPECT_TRUE(msg2.header().has_stamp());
-
-  EXPECT_EQ(t.sec, msg.header().stamp().sec());
-  EXPECT_TRUE(t.nsec <= msg.header().stamp().nsec());
+  ASSERT_TRUE(msg.header().has_stamp());
+  TimeTest(t, msg.header().stamp());
   EXPECT_STREQ("_test_", msg.header().str_id().c_str());
 
+  ASSERT_TRUE(msg2.header().has_stamp());
+  TimeTest(t, msg2.header().stamp());
   EXPECT_FALSE(msg2.header().has_str_id());
 
   msgs::Header *header = msgs::GetHeader(msg);
@@ -60,8 +66,7 @@ TEST(MsgsTest, Time)
   common::Time t = common::Time::GetWallTime();
   msgs::Time msg;
   msgs::Stamp(&msg);
-  EXPECT_EQ(t.sec, msg.sec());
-  EXPECT_TRUE(t.nsec <= msg.nsec());
+  TimeTest(t, msg);
 }
 
 
@@ -70,8 +75,7 @@ TEST(MsgsTest, TimeFromHeader)
   common::Time t = common::Time::GetWallTime();
   msgs::Header msg;
   msgs::Stamp(&msg);
-  EXPECT_EQ(t.sec, msg.stamp().sec());
-  EXPECT_TRUE(t.nsec <= msg.stamp().nsec());
+  TimeTest(t, msg.stamp());
 }
 
 
