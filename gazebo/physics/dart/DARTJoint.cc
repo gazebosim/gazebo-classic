@@ -39,7 +39,7 @@ DARTJoint::DARTJoint(BasePtr _parent)
 {
   this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
-
+  this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
 }
@@ -227,26 +227,75 @@ void DARTJoint::Detach()
 //////////////////////////////////////////////////
 void DARTJoint::SetDamping(int _index, double _damping)
 {
-  this->dampingCoefficient = _damping;
-
-  if (this->GetAngleCount() > 2)
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
-     gzerr << "Incompatible joint type, GetAngleCount() = "
-           << this->GetAngleCount() << " > 2\n";
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "DARTJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
      return;
   }
+}
 
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
-
-  /// \TODO:  this check might not be needed?  attaching an object to a static
-  /// body should not affect damping application.
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-  if (!parentStatic && !childStatic)
+//////////////////////////////////////////////////
+void DARTJoint::SetStiffness(int _index, const double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
   {
-    this->dtJoint->setDampingCoefficient(_index, _damping);
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
   }
+  else
+  {
+     gzerr << "DARTJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetStiffnessDamping(unsigned int _index,
+  double _stiffness, double _damping, double _reference)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dissipationCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// \TODO: this check might not be needed?  attaching an object to a static
+    /// body should not affect damping application.
+    bool parentStatic =
+      this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+      this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!this->stiffnessDampingInitialized)
+    {
+      if (!parentStatic && !childStatic)
+      {
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&DARTJoint::ApplyStiffnessDamping, this));
+        this->dtJoint->setDampingCoefficient(_index, _damping);
+        this->stiffnessDampingInitialized = true;
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
+    }
+  }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
@@ -555,7 +604,7 @@ unsigned int DARTJoint::GetAngleCount() const
   return angleCount;
 }
 
-void DARTJoint::ApplyDamping()
+void DARTJoint::ApplyStiffnessDamping()
 {
   // DART applying damping force inside of DART.
 }
