@@ -5,12 +5,12 @@ package gazebo.msgs;
 /// \brief Message for a mesh geometry
 
 
-import "vector3d.proto";
+import "robot_msgs/vector3d.proto";
 
 message MeshGeom
 {
   required string filename = 1;
-  optional Vector3d scale  = 2;
+  optional robot_msgs.Vector3d scale  = 2;
   optional string submesh  = 3;
   optional bool center_submesh = 4;
 }

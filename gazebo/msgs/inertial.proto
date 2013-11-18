@@ -5,12 +5,12 @@ package gazebo.msgs;
 /// \brief Information about inertia
 
 
-import "pose.proto";
+import "robot_msgs/pose.proto";
 
 message Inertial
 {
   optional double mass             = 1;
-  optional Pose pose               = 2;
+  optional robot_msgs.Pose pose               = 2;
   optional double ixx              = 3;
   optional double ixy              = 4;
   optional double ixz              = 5;

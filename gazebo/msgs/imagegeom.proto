@@ -4,7 +4,6 @@ package gazebo.msgs;
 /// \interface ImageGeom 
 /// \brief Message for a image geometry
 
-
 message ImageGeom
 {
   required string uri         = 1;
@@ -13,5 +12,3 @@ message ImageGeom
   optional double height      = 4;
   optional int32 granularity  = 5;
 }
-
-

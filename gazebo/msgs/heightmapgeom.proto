@@ -4,14 +4,14 @@ package gazebo.msgs;
 /// \interface HeightmapGeom 
 /// \brief Message for a heightmap geometry
 
-import "image.proto";
-import "vector3d.proto";
+import "robot_msgs/image.proto";
+import "robot_msgs/vector3d.proto";
 
 message HeightmapGeom
 {
-  optional Image  image            = 1; // The height data
-  required Vector3d size           = 2; // Size in meters
-  optional Vector3d origin         = 3; // Origin in world coordinate frame
+  optional robot_msgs.Image  image            = 1; // The height data
+  required robot_msgs.Vector3d size           = 2; // Size in meters
+  optional robot_msgs.Vector3d origin         = 3; // Origin in world coordinate frame
   repeated float heights           = 4;
   optional int32 width             = 5;
   optional int32 height            = 6;

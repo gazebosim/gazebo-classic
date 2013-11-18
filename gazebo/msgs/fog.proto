@@ -4,9 +4,7 @@ package gazebo.msgs;
 /// \interface Fog 
 /// \brief Message for fog data
 
-
-
-import "color.proto";
+import "robot_msgs/color.proto";
 
 message Fog
 {
@@ -17,10 +15,9 @@ message Fog
     EXPONENTIAL  = 3;
     EXPONENTIAL2 = 4;
   }
-  optional FogType type = 1;
-  optional Color color = 2;
-  optional float density = 3;
-  optional float start = 4;
-  optional float end = 5;
+  optional FogType type           = 1;
+  optional robot_msgs.Color color = 2;
+  optional float density          = 3;
+  optional float start            = 4;
+  optional float end              = 5;
 }
-

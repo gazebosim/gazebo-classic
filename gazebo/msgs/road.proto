@@ -5,13 +5,13 @@ package gazebo.msgs;
 /// \brief Message for a road
 
 
-import "vector3d.proto";
+import "robot_msgs/vector3d.proto";
 
 message Road
 {
   required string name      = 1;
   required double width     = 2;
-  repeated Vector3d point   = 3;
+  repeated robot_msgs.Vector3d point   = 3;
 }
 
 

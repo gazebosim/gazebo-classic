@@ -6,8 +6,8 @@ package gazebo.msgs;
 /// \todo Document me.
 
 
-import "pose.proto";
-import "time.proto";
+import "robot_msgs/pose.proto";
+import "robot_msgs/time.proto";
 
 message JointAnimation
 {
@@ -17,9 +17,7 @@ message JointAnimation
     repeated double angle = 2;
   }
 
-  required string model_name   = 1;
-  repeated Joint joint         = 2;
-  repeated Time  time          = 3;
+  required string model_name       = 1;
+  repeated Joint joint             = 2;
+  repeated robot_msgs.Time  time   = 3;
 }
-
-

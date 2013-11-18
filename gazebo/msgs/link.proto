@@ -11,7 +11,7 @@ import "collision.proto";
 import "visual.proto";
 import "sensor.proto";
 import "projector.proto";
-import "pose.proto";
+import "robot_msgs/pose.proto";
 
 message Link
 {
@@ -22,7 +22,7 @@ message Link
   optional bool kinematic       = 5;
   optional bool enabled         = 6;
   optional Inertial inertial    = 7;
-  optional Pose pose            = 8;
+  optional robot_msgs.Pose pose            = 8;
   repeated Visual visual        = 9;
   repeated Collision collision  = 10;
   repeated Sensor sensor        = 11;

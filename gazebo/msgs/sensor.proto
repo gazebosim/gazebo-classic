@@ -5,7 +5,7 @@ package gazebo.msgs;
 /// \brief Information about a sensor element
 
 
-import "pose.proto";
+import "robot_msgs/pose.proto";
 import "camerasensor.proto";
 import "raysensor.proto";
 import "contactsensor.proto";
@@ -19,7 +19,7 @@ message Sensor
   required string type             = 5;
   optional bool always_on          = 6;
   optional double update_rate      = 7;
-  optional Pose pose               = 8;
+  optional robot_msgs.Pose pose               = 8;
   optional CameraSensor camera     = 9;
   optional RaySensor ray           = 10;
   optional ContactSensor contact   = 11;

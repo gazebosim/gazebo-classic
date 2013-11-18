@@ -124,6 +124,16 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find robot_msgs
+  find_package(robot_msgs)
+  if (NOT robot_msgs_FOUND)
+    message(STATUS "Looking for robot_msgs - not found")
+    BUILD_ERROR("Robot Message package was not found. This package contains mandatory message definitions.")
+  else()
+    message(STATUS "Looking for robot_msgs - found")
+  endif()
+
+  #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 

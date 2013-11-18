@@ -5,7 +5,7 @@ package gazebo.msgs;
 /// \brief Information about a material
 
 
-import "color.proto";
+import "robot_msgs/color.proto";
 
 message Material
 {
@@ -26,9 +26,9 @@ message Material
   optional Script script          = 1;
   optional ShaderType shader_type = 2;
   optional string normal_map      = 3;
-  optional Color ambient          = 4;
-  optional Color diffuse          = 5;
-  optional Color specular         = 6;
-  optional Color emissive         = 7;
+  optional robot_msgs.Color ambient          = 4;
+  optional robot_msgs.Color diffuse          = 5;
+  optional robot_msgs.Color specular         = 6;
+  optional robot_msgs.Color emissive         = 7;
 }
 

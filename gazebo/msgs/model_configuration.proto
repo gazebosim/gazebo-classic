@@ -5,15 +5,20 @@ package gazebo.msgs;
 /// \brief Message for model configuration (joint positions)
 
 
-import "time.proto";
-import "pose.proto";
+import "robot_msgs/time.proto";
+import "robot_msgs/pose.proto";
 
 message ModelConfiguration
 {
-  required Time time                        = 1; // Time when the pose should be enforced
-  repeated string joint_names               = 2;
-  repeated double joint_positions           = 3;
-  optional Pose pose                        = 4; // Specify model pose
-  optional string link_name                 = 5; // Option to set model pose by specifying pose of link
+  // Time when the pose should be enforced
+  required robot_msgs.Time time    = 1;
+  repeated string joint_names      = 2;
+  repeated double joint_positions  = 3;
+
+  // Specify model pose
+  optional robot_msgs.Pose pose    = 4;
+
+  // Option to set model pose by specifying pose of link
+  optional string link_name        = 5;
 }
 

@@ -12,7 +12,7 @@ import "planegeom.proto";
 import "imagegeom.proto";
 import "heightmapgeom.proto";
 import "meshgeom.proto";
-import "vector3d.proto";
+import "robot_msgs/vector3d.proto";
 
 message Geometry
 {
@@ -39,5 +39,5 @@ message Geometry
   optional HeightmapGeom heightmap  = 7;
   optional MeshGeom      mesh       = 8;
 
-  repeated Vector3d points          = 9;
+  repeated robot_msgs.Vector3d points          = 9;
 }

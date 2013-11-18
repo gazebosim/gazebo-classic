@@ -5,9 +5,9 @@ package gazebo.msgs;
 /// \brief Message for creating joint in rendering::Scene
 
 
-import "vector3d.proto";
+import "robot_msgs/vector3d.proto";
 import "axis.proto";
-import "pose.proto";
+import "robot_msgs/pose.proto";
 import "sensor.proto";
 
 message Joint
@@ -31,7 +31,7 @@ message Joint
   optional uint32 parent_id      = 6;
   optional string child          = 7;
   optional uint32 child_id       = 8;
-  optional Pose pose             = 9;
+  optional robot_msgs.Pose pose             = 9;
   optional Axis axis1            = 10;
   optional Axis axis2            = 11;
 

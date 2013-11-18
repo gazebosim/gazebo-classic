@@ -5,12 +5,12 @@ package gazebo.msgs;
 /// \brief General information included by many messages
 
 
-import "time.proto";
+import "robot_msgs/time.proto";
 
 message Header
 {
   optional string str_id = 1;
-  optional Time stamp    = 2;
+  optional robot_msgs.Time stamp    = 2;
   optional int32 index   = 3;
 } 
 

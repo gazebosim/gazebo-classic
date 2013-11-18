@@ -5,13 +5,12 @@ package gazebo.msgs;
 /// \brief Information about a camera sensor element
 
 
-
-import "vector2d.proto";
+import "robot_msgs/vector2d.proto";
 
 message CameraSensor
 {
   optional double horizontal_fov = 1;
-  optional Vector2d image_size   = 2;
+  optional robot_msgs.Vector2d image_size   = 2;
   optional string image_format   = 3;
   optional double near_clip      = 4;
   optional double far_clip       = 5;

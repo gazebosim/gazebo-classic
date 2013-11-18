@@ -5,11 +5,11 @@ package gazebo.msgs;
 /// \brief Data from a GPS sensor
 
 
-import "time.proto";
+import "robot_msgs/time.proto";
 
 message GPS
 {
-  required Time time                    = 1;
+  required robot_msgs.Time time         = 1;
   required string link_name             = 2;
   required double latitude_deg          = 3;
   required double longitude_deg         = 4;

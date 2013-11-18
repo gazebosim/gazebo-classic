@@ -1,17 +1,17 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface PoseAnimation 
+/// \interface robot_msgs.PoseAnimation 
 /// \brief Message for a model pose animation
 
 
-import "pose.proto";
-import "time.proto";
+import "robot_msgs/pose.proto";
+import "robot_msgs/time.proto";
 
 message PoseAnimation
 {
   required string model_name      = 1;
   optional uint32 model_id        = 2;
-  repeated Pose pose              = 3;
-  repeated Time time              = 4;
+  repeated robot_msgs.Pose pose   = 3;
+  repeated robot_msgs.Time time   = 4;
 }

@@ -4,9 +4,9 @@ package gazebo.msgs;
 /// \interface BoxGeom 
 /// \brief Information about a box geometry
 
-import "vector3d.proto";
+import "robot_msgs/vector3d.proto";
 
 message BoxGeom
 {
-  required Vector3d size  = 1;
+  required robot_msgs.Vector3d size  = 1;
 }

@@ -6,13 +6,13 @@ package gazebo.msgs;
 
 
 import "header.proto";
-import "time.proto";
+import "robot_msgs/time.proto";
 
 message WorldStatistics
 {
-  required Time  sim_time    = 2;
-  required Time  pause_time  = 3;
-  required Time  real_time   = 4;
+  required robot_msgs.Time  sim_time    = 2;
+  required robot_msgs.Time  pause_time  = 3;
+  required robot_msgs.Time  real_time   = 4;
   required bool  paused      = 5;
   required uint64 iterations = 6;
   optional int32 model_count = 7;

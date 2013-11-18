@@ -6,13 +6,13 @@ package gazebo.msgs;
 
 
 
-import "pose.proto";
+import "robot_msgs/pose.proto";
 import "track_visual.proto";
 
 message GUICamera
 {
   required string name                  = 1;
   optional string view_controller       = 2;
-  optional Pose pose                    = 3;
+  optional robot_msgs.Pose pose                    = 3;
   optional TrackVisual track            = 4;
 }

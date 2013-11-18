@@ -4,7 +4,7 @@ package gazebo.msgs;
 /// \interface LogStatus
 /// \brief A message that contains information about data logging
 
-import "time.proto";
+import "robot_msgs/time.proto";
 
 message LogStatus
 {
@@ -25,6 +25,6 @@ message LogStatus
     optional Units size_units  = 5;
   }
 
-  optional Time sim_time     = 1;
-  optional LogFile log_file  = 2;
+  optional robot_msgs.Time sim_time     = 1;
+  optional LogFile log_file             = 2;
 }

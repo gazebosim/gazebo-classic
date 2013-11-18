@@ -1,101 +1,74 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (msgs
-  axis.proto
-  boxgeom.proto
-  camerasensor.proto
-  collision.proto
-  color.proto
-  contact.proto
-  contacts.proto
-  contactsensor.proto
-  cylindergeom.proto
-  diagnostics.proto
-  factory.proto
-  fog.proto
-  friction.proto
-  geometry.proto
-  gps.proto
-  gui_overlay_config.proto
-  gui_camera.proto
-  gui.proto
-  gz_string.proto
-  gz_string_v.proto
-  header.proto
-  heightmapgeom.proto
-  imagegeom.proto
-  image.proto
-  image_stamped.proto
-  images_stamped.proto
-  imu.proto
-  inertial.proto
-  int.proto
-  joint.proto
-  joint_animation.proto
-  joint_cmd.proto
-  joint_wrench.proto
-  joint_wrench_stamped.proto
-  laserscan.proto
-  laserscan_stamped.proto
-  light.proto
-  link.proto
-  link_data.proto
-  log_control.proto
-  log_status.proto
-  material.proto
-  meshgeom.proto
-  model.proto
-  model_configuration.proto
-  model_v.proto
-  packet.proto
-  physics.proto
-  planegeom.proto
-  pid.proto
-  plugin.proto
-  pointcloud.proto
-  pose.proto
-  pose_animation.proto
-  pose_stamped.proto
-  pose_trajectory.proto
-  pose_v.proto
-  poses_stamped.proto
-  projector.proto
-  propagation_particle.proto
-  propagation_grid.proto
-  publishers.proto
-  publish.proto
-  quaternion.proto
-  sonar.proto
-  sonar_stamped.proto
-  raysensor.proto
-  request.proto
-  response.proto
-  road.proto
-  scene.proto
-  selection.proto
-  sensor.proto
-  server_control.proto
-  shadows.proto
-  sky.proto
-  spheregeom.proto
-  subscribe.proto
-  surface.proto
-  tactile.proto
-  test.proto
-  time.proto
-  topic_info.proto
-  track_visual.proto
-  vector2d.proto
-  vector3d.proto
-  visual.proto
-  wireless_node.proto
-  wireless_nodes.proto
-  world_control.proto
-  world_reset.proto
-  world_stats.proto
-  world_modify.proto
-  wrench.proto
-  wrench_stamped.proto
+axis.proto
+boxgeom.proto
+camerasensor.proto
+collision.proto
+contact.proto
+contactsensor.proto
+contacts.proto
+cylindergeom.proto
+diagnostics.proto
+factory.proto
+fog.proto
+friction.proto
+geometry.proto
+gps.proto
+gui_camera.proto
+gui_overlay_config.proto
+gui.proto
+header.proto
+heightmapgeom.proto
+imagegeom.proto
+imu.proto
+inertial.proto
+joint_animation.proto
+joint.proto
+light.proto
+link_data.proto
+link.proto
+log_control.proto
+log_status.proto
+material.proto
+meshgeom.proto
+model_configuration.proto
+model.proto
+model_v.proto
+packet.proto
+physics.proto
+planegeom.proto
+plugin.proto
+pose_animation.proto
+projector.proto
+propagation_grid.proto
+propagation_particle.proto
+publishers.proto
+publish.proto
+raysensor.proto
+request.proto
+response.proto
+road.proto
+scene.proto
+selection.proto
+sensor.proto
+server_control.proto
+shadows.proto
+sky.proto
+spheregeom.proto
+subscribe.proto
+surface.proto
+tactile.proto
+test.proto
+topic_info.proto
+track_visual.proto
+visual.proto
+wireless_node.proto
+wireless_nodes.proto
+world_control.proto
+world_modify.proto
+world_reset.proto
+world_stats.proto
 )
 
 set (msgs_tests_sources
@@ -114,6 +87,8 @@ set (headers msgs.hh MsgFactory.hh)
 
 set(PROTO_SRCS)
 set(PROTO_HDRS)
+
+message (STATUS ${ROBOT_MSGS_PROTO_DIR})
 foreach(FIL ${msgs})
   get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
   get_filename_component(FIL_WE ${FIL} NAME_WE)
@@ -126,7 +101,7 @@ foreach(FIL ${msgs})
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} --proto_path ${ROBOT_MSGS_PROTO_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )

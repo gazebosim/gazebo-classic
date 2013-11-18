@@ -5,15 +5,15 @@ package gazebo.msgs;
 /// \brief Data from an IMU sensor
 
 
-import "time.proto";
-import "vector3d.proto";
-import "quaternion.proto";
+import "robot_msgs/time.proto";
+import "robot_msgs/vector3d.proto";
+import "robot_msgs/quaternion.proto";
 
 message IMU
 {
-  required Time stamp                   = 1;
-  required string entity_name           = 2;
-  required Quaternion orientation       = 3;
-  required Vector3d angular_velocity    = 4;
-  required Vector3d linear_acceleration = 5;
+  required robot_msgs.Time stamp                   = 1;
+  required string entity_name                      = 2;
+  required robot_msgs.Quaternion orientation       = 3;
+  required robot_msgs.Vector3d angular_velocity    = 4;
+  required robot_msgs.Vector3d linear_acceleration = 5;
 }

@@ -5,20 +5,20 @@ package gazebo.msgs;
 /// \brief Contact message for passing info between two entities
 
 
-import "vector3d.proto";
-import "time.proto";
-import "joint_wrench.proto";
+import "robot_msgs/vector3d.proto";
+import "robot_msgs/time.proto";
+import "robot_msgs/joint_wrench.proto";
 
 message Contact
 {
   required string collision1 = 1;
   required string collision2 = 2;
 
-  repeated Vector3d position  = 3;
-  repeated Vector3d normal    = 4;
-  repeated double depth       = 5;
-  repeated JointWrench wrench = 6;
+  repeated robot_msgs.Vector3d position  = 3;
+  repeated robot_msgs.Vector3d normal    = 4;
+  repeated double depth                  = 5;
+  repeated robot_msgs.JointWrench wrench = 6;
 
-  required Time time         = 7;
-  required string world      = 8;
+  required robot_msgs.Time time          = 7;
+  required string world                  = 8;
 }

@@ -5,13 +5,11 @@ package gazebo.msgs;
 /// \brief Message that encapsulates another message with a type description
 
 
-import "time.proto";
+import "robot_msgs/time.proto";
 
 message Packet
 {
-  required Time stamp            = 1;
-  required string type           = 2;
-  required bytes serialized_data = 3;
+  required robot_msgs.Time stamp   = 1;
+  required string type             = 2;
+  required bytes serialized_data   = 3;
 }
-
-
