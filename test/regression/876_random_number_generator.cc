@@ -17,6 +17,7 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/math/Rand.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 
 using namespace gazebo;
 

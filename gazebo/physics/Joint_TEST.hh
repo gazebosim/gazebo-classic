@@ -23,8 +23,10 @@
 
 #include "test/ServerFixture.hh"
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 

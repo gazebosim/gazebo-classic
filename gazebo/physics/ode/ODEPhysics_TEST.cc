@@ -17,10 +17,12 @@
 
 #include <gtest/gtest.h>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/transport/transport.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

@@ -14,8 +14,12 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;

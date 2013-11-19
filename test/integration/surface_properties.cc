@@ -16,8 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "helper_physics_generator.hh"
 
 const double g_physics_tol = 1e-2;

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/rendering/rendering.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 

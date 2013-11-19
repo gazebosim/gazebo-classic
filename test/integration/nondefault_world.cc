@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include "gazebo/physics/PhysicsIface.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 

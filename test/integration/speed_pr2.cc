@@ -15,6 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
+#include "gazebo/common/Console.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;

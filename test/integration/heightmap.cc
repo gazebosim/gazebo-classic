@@ -16,12 +16,16 @@
 */
 #include <string.h>
 
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/rendering/rendering.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 

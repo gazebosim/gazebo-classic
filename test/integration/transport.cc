@@ -16,6 +16,7 @@
 */
 
 #include <unistd.h>
+#include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

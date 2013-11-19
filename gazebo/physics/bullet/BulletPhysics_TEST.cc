@@ -22,6 +22,7 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/transport.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

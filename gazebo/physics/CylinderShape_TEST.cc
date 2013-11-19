@@ -16,6 +16,7 @@
 */
 
 #include "test/ServerFixture.hh"
+#include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
 

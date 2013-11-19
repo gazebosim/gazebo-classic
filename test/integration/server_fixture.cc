@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/physics.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 

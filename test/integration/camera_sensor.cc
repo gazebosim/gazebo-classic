@@ -20,6 +20,7 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/rendering.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
 #include "ServerFixture.hh"

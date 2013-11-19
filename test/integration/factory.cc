@@ -16,6 +16,7 @@
 */
 #include <string.h>
 #include "gazebo/math/Helpers.hh"
+#include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 

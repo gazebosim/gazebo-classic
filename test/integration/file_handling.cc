@@ -15,8 +15,10 @@
  *
 */
 
+#include <boost/filesystem.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 class FileHandling : public ServerFixture

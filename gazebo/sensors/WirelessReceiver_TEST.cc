@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/regex.hpp>
+#include "gazebo/sensors/sensors.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

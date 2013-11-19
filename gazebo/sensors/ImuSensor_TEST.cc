@@ -20,6 +20,7 @@
 
 #include "test/ServerFixture.hh"
 #include "gazebo/sensors/ImuSensor.hh"
+#include "gazebo/sensors/sensors.hh"
 
 #define TOL 1e-4
 

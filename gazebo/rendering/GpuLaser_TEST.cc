@@ -22,6 +22,8 @@
 #include "gazebo/rendering/GpuLaser.hh"
 #include "test/ServerFixture.hh"
 
+using namespace gazebo;
+
 class GpuLaser_TEST : public ServerFixture
 {
 };

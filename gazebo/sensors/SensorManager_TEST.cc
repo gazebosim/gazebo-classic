@@ -18,6 +18,8 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/transport/transport.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;

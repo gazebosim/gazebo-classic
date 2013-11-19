@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
