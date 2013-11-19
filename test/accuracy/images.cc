@@ -43,12 +43,12 @@ void OnNewCameraFrame(bool* _newImage, unsigned char* _imageDest,
 /////////////////////////////////////////////////
 TEST_F(ImageAccuracyTest, ZadeatDataset)
 {
-  /*gazebo::util::ZadeatImgParser *imgParser = new gazebo::util::ZadeatImgParser
-    ("/opt/naoDataset/run02/camera_2.strm", "/opt/naoDataset/run02/images/");
+  gazebo::util::ZadeatImgParser *imgParser = new gazebo::util::ZadeatImgParser
+    ("/data/naoDataset/run02/camera_2.strm.original", "/data/naoDataset/run02/images/");
 
   imgParser->Parse();
 
-  return;*/
+  return;
 
   Load("worlds/robocup09_spl_field.world");
 
@@ -67,7 +67,7 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
   double torsoX, torsoY, torsoZ;
 
   gazebo::util::ZadeatGTParser *gtParser = new gazebo::util::ZadeatGTParser(
-    "/opt/naoDataset/run02/ground_truth_2.csv");
+    "/data/naoDataset/run02/ground_truth_2.csv");
 
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
@@ -137,7 +137,7 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
     std::ostringstream ss;
     ss << std::setw(5) << std::setfill('0') << counter / 8;
     std::string s2(ss.str());
-    std::string filename = "/opt/naoDataset/run02/gazebo_images/" +
+    std::string filename = "/data/naoDataset/run02/gazebo_images/" +
                            ss.str() + ".ppm";
     if (counter % 8 == 0)
     {

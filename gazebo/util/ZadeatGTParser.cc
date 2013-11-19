@@ -58,28 +58,41 @@ std::istream & ZadeatGTParser::GetNextGT(double &_timestamp,
   std::vector<std::string> splitVec;
 
   if (this->logFile.is_open())
-  { 
-    getline(this->logFile, line);
-    //isComment = boost::starts_with(line, "#");
+  {
+    bool dataFound = false;
+    while (getline(this->logFile, line) && !dataFound)
+    {
+      // Get rid of the spaces
+      boost::erase_all(line, " ");
 
-    // Parse the line looking for the fields
-    boost::erase_all(line, " ");
-    boost::split(splitVec, line, boost::is_any_of(","));
+      // Skip this line if it's a comment
+      if (boost::starts_with(line, "#"))
+        continue;
 
-    std::vector<std::string>::iterator it = splitVec.begin();
-    _timestamp = boost::lexical_cast<double>(*it++);
-    _headRoll = boost::lexical_cast<double>(*it++);
-    _headPitch = boost::lexical_cast<double>(*it++);
-    _headYaw = boost::lexical_cast<double>(*it++);
-    _headX = boost::lexical_cast<double>(*it++);
-    _headY = boost::lexical_cast<double>(*it++);
-    _headZ = boost::lexical_cast<double>(*it++);
-    _torsoRoll = boost::lexical_cast<double>(*it++);
-    _torsoPitch = boost::lexical_cast<double>(*it++);
-    _torsoYaw = boost::lexical_cast<double>(*it++);
-    _torsoX = boost::lexical_cast<double>(*it++);
-    _torsoY = boost::lexical_cast<double>(*it++);
-    _torsoZ = boost::lexical_cast<double>(*it++);
+      // Split the line using the ',' as a delimiter
+      boost::split(splitVec, line, boost::is_any_of(","));
+
+      // Skip this line if the number of elements is wrong.
+      if (splitVec.size() != 13)
+        continue;
+
+      std::vector<std::string>::iterator it = splitVec.begin();
+      _timestamp = boost::lexical_cast<double>(*it++);
+      _headRoll = boost::lexical_cast<double>(*it++);
+      _headPitch = boost::lexical_cast<double>(*it++);
+      _headYaw = boost::lexical_cast<double>(*it++);
+      _headX = boost::lexical_cast<double>(*it++);
+      _headY = boost::lexical_cast<double>(*it++);
+      _headZ = boost::lexical_cast<double>(*it++);
+      _torsoRoll = boost::lexical_cast<double>(*it++);
+      _torsoPitch = boost::lexical_cast<double>(*it++);
+      _torsoYaw = boost::lexical_cast<double>(*it++);
+      _torsoX = boost::lexical_cast<double>(*it++);
+      _torsoY = boost::lexical_cast<double>(*it++);
+      _torsoZ = boost::lexical_cast<double>(*it++);
+
+      dataFound = true;
+    }
   }
 
   return this->logFile;

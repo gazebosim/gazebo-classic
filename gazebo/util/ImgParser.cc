@@ -68,9 +68,15 @@ void ImgParser::Parse()
   // Image counter
   int counter = 0;
 
-  this->logFile.open(this->logFilename.c_str(),
-      std::ios::in | std::ios::binary);
+  // Open the file
+  this->logFile.open(this->logFilename.c_str());
 
+  // Read the log description
+  std::string line;
+  getline(this->logFile, line);
+  getline(this->logFile, line);
+
+  // Read the images
   while (this->logFile)
   {
     this->GetNextImage(srcImage.get());
