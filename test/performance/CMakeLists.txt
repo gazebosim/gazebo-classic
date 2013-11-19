@@ -25,6 +25,5 @@ if (NOT APPLE)
     transport_stress.cc
   )
   
-  set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
   gz_build_tests(${tests})
 endif()
