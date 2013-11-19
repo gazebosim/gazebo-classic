@@ -35,7 +35,6 @@ class WirelessTransmitter_TEST : public ServerFixture
     private: bool receivedMsg;
     private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
-    private: sensors::WirelessTransmitterPtr txNoVisual;
 };
 
 static std::string transmitterSensorString =
@@ -171,12 +170,12 @@ void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 void WirelessTransmitter_TEST::TestUpdateImpl()
 {
   // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  transport::NodePtr localNode(new transport::Node());
+  localNode->Init("default");
 
   std::string txTopic =
       "/gazebo/default/tx/link/wirelessTransmitter/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(txTopic,
+  transport::SubscriberPtr sub = localNode->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
   // Make sure that the sensor is updated and some messages are published
@@ -212,12 +211,12 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
       sensors::SensorManager::Instance()->GetSensor(txNoVisualSensorName));
 
   // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  transport::NodePtr localNode(new transport::Node());
+  localNode->Init("default");
 
   std::string txTopic =
       "/gazebo/default/txNoVisual/link/wirelessTransmitter/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(txTopic,
+  transport::SubscriberPtr sub = localNode->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
   // Make sure that the sensor is updated and some messages are published

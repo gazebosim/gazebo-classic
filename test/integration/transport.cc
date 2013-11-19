@@ -68,10 +68,11 @@ TEST_F(TransportTest, PubSub)
 {
   Load("worlds/empty.world");
 
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
-  transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
-  transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
+  transport::NodePtr localNode = transport::NodePtr(new transport::Node());
+  localNode->Init();
+  transport::PublisherPtr scenePub =
+    localNode->Advertise<msgs::Scene>("~/scene");
+  transport::SubscriberPtr sceneSub = localNode->Subscribe("~/scene",
       &ReceiveSceneMsg);
 
   msgs::Scene msg;
@@ -85,8 +86,8 @@ TEST_F(TransportTest, PubSub)
 
   for (unsigned int i = 0; i < 10; ++i)
   {
-    pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
-    subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
+    pubs.push_back(localNode->Advertise<msgs::Scene>("~/scene"));
+    subs.push_back(localNode->Subscribe("~/scene", &ReceiveSceneMsg));
     scenePub->Publish(msg);
   }
 
@@ -101,9 +102,10 @@ TEST_F(TransportTest, Errors)
   testNode->Init("default");
   transport::PublisherPtr scenePub;
 
-  transport::SubscriberPtr statsSub =
+  transport::SubscriberPtr localStatsSub =
     testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
-  EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
+  EXPECT_STREQ("/gazebo/default/world_stats",
+               localStatsSub->GetTopic().c_str());
 
   // This generates a warning message
   // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
@@ -114,12 +116,12 @@ TEST_F(TransportTest, Errors)
                common::Exception);
   EXPECT_TRUE(scenePub->GetPrevMsg().empty());
 
-  transport::PublisherPtr factoryPub =
+  transport::PublisherPtr localFactoryPub =
     testNode->Advertise<msgs::Factory>("~/factory");
-  factoryPub->WaitForConnection();
-  EXPECT_EQ(static_cast<unsigned int>(0), factoryPub->GetOutgoingCount());
-  EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());
-  EXPECT_STREQ("gazebo.msgs.Factory", factoryPub->GetMsgType().c_str());
+  localFactoryPub->WaitForConnection();
+  EXPECT_EQ(static_cast<unsigned int>(0), localFactoryPub->GetOutgoingCount());
+  EXPECT_STREQ("/gazebo/default/factory", localFactoryPub->GetTopic().c_str());
+  EXPECT_STREQ("gazebo.msgs.Factory", localFactoryPub->GetMsgType().c_str());
 
   EXPECT_STREQ("default", testNode->GetTopicNamespace().c_str());
   EXPECT_STREQ("/gazebo/default/factory",
@@ -160,7 +162,7 @@ TEST_F(TransportTest, Errors)
   EXPECT_TRUE(transport::init(masterHost, masterPort));
 
   scenePub.reset();
-  statsSub.reset();
+  localStatsSub.reset();
   testNode.reset();
 }
 

@@ -195,10 +195,10 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   }
   EXPECT_LT(i, 300);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (i = 0; i < raySensor->GetRayCount(); ++i)
     EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (i = 0; i < raySensor->GetRayCount(); ++i)
     EXPECT_NEAR(raySensor2->GetRange(i), maxRange, LASER_TOL);
 
   raySensor->DisconnectNewLaserFrame(c);
@@ -260,7 +260,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   double maxRange = 10;
   EXPECT_NEAR(raySensor->GetRangeMax(), maxRange, LASER_TOL);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (i = 0; i < raySensor->GetRayCount(); ++i)
     EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
 
   // Move laser model very close to terrain, it should now returns range values
@@ -281,7 +281,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   }
   EXPECT_LT(i, 300);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (i = 0; i < raySensor->GetRayCount(); ++i)
     EXPECT_TRUE(raySensor->GetRange(i) < maxRange / 2.0);
 }
 

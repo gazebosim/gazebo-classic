@@ -16,6 +16,7 @@
 */
 
 #include <boost/thread.hpp>
+#include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "RAMLibrary.hh"
 

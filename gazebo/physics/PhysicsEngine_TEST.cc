@@ -56,7 +56,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   transport::PublisherPtr physicsPub
        = physicsNode->Advertise<msgs::Physics>("~/physics");
-  transport::PublisherPtr requestPub
+  transport::PublisherPtr localRequestPub
       = physicsNode->Advertise<msgs::Request>("~/request");
   transport::SubscriberPtr responsePub = physicsNode->Subscribe("~/response",
       &PhysicsEngineTest::OnPhysicsMsgResponse, this);
@@ -76,7 +76,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsPub->Publish(physicsPubMsg);
 
   msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
-  requestPub->Publish(*requestMsg);
+  localRequestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)

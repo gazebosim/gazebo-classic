@@ -50,8 +50,8 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
+  EXPECT_NEAR(g.x, 0, 1e-6);
+  EXPECT_NEAR(g.y, 0, 1e-6);
   EXPECT_LE(g.z, -9.8);
 
   // get physics time step

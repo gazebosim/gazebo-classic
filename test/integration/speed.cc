@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 

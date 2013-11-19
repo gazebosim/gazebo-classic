@@ -69,9 +69,9 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   g_hokuyoMsgCount = 0;
 
   // Subscribe to hokuyo laser scan messages
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sceneSub = node->Subscribe(
+  transport::NodePtr localNode = transport::NodePtr(new transport::Node());
+  localNode->Init();
+  transport::SubscriberPtr sceneSub = localNode->Subscribe(
       "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
 
   // Wait for messages to arrive
@@ -107,7 +107,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
+    localNode->Advertise<msgs::WorldControl>("~/world_control");
   {
     // Copied from MainWindow::OnResetWorld
     msgs::WorldControl msg;
@@ -182,9 +182,9 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
   g_hokuyoMsgCount = 0;
 
   // Subscribe to hokuyo laser scan messages
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sceneSub = node->Subscribe(
+  transport::NodePtr localNode = transport::NodePtr(new transport::Node());
+  localNode->Init();
+  transport::SubscriberPtr sceneSub = localNode->Subscribe(
       "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
 
   // Wait for messages to arrive
@@ -199,7 +199,7 @@ TEST_F(Sensor_TEST, ResetWorldStressTest)
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
+    localNode->Advertise<msgs::WorldControl>("~/world_control");
 
   // Copied from MainWindow::OnResetWorld
   msgs::WorldControl msg;

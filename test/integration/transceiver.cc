@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 
 #include <boost/foreach.hpp>
 #include "ServerFixture.hh"
@@ -123,11 +124,11 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   ASSERT_TRUE(rx);
 
   // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  transport::NodePtr localNode(new transport::Node());
+  localNode->Init("default");
 
   std::string rxTopic = "/gazebo/default/rx/link/wirelessReceiver/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(rxTopic,
+  transport::SubscriberPtr sub = localNode->Subscribe(rxTopic,
       &TransceiverTest::RxMsg, this);
   this->receivedMsg = false;
 
@@ -152,9 +153,9 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       gazebo::msgs::WirelessNodes txNodes;
       int numTxNodes = nodesMsg->node_size();
 
-      for (int i = 0; i < numTxNodes; ++i)
+      for (int j = 0; j < numTxNodes; ++j)
       {
-        gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
+        gazebo::msgs::WirelessNode txNode = nodesMsg->node(j);
         std::string essid = txNode.essid();
         EXPECT_EQ(transmitters[essid]->GetESSID(), essid);
         EXPECT_EQ(transmitters[essid]->GetFreq(), txNode.frequency());
@@ -219,11 +220,11 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   ASSERT_TRUE(rx);
 
   // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  transport::NodePtr localNode(new transport::Node());
+  localNode->Init("default");
 
   std::string rxTopic = "/gazebo/default/rx/link/wirelessReceiver/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(rxTopic,
+  transport::SubscriberPtr sub = localNode->Subscribe(rxTopic,
       &TransceiverTest::RxMsg, this);
   this->receivedMsg = false;
 
@@ -305,11 +306,11 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  transport::NodePtr localNode(new transport::Node());
+  localNode->Init("default");
 
   std::string rx1Topic = "/gazebo/default/rx1/link/wirelessRx1/transceiver";
-  transport::SubscriberPtr sub = node->Subscribe(rx1Topic,
+  transport::SubscriberPtr sub = localNode->Subscribe(rx1Topic,
       &TransceiverTest::RxMsg, this);
 
   this->receivedMsg = false;
@@ -347,7 +348,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   iters = 0;
 
   std::string rx2Topic = "/gazebo/default/rx2/link/wirelessRx2/transceiver";
-  sub = node->Subscribe(rx2Topic, &TransceiverTest::RxMsg, this);
+  sub = localNode->Subscribe(rx2Topic, &TransceiverTest::RxMsg, this);
 
   this->receivedMsg = false;
 

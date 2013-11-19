@@ -142,7 +142,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   {
     for (x = 0; x < shape->GetVertexCount().x; ++x)
     {
-      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+      EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-6);
     }
   }
 }

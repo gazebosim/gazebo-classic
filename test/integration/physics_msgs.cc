@@ -47,8 +47,8 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   math::Vector3 g = physics->GetGravity();
 
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
+  EXPECT_NEAR(g.x, 0, 1e-6);
+  EXPECT_NEAR(g.y, 0, 1e-6);
   EXPECT_LE(g.z, -9.8);
 
   // Set Gravity by publishing to "~/physics"
@@ -112,15 +112,15 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     this->node->Advertise<msgs::Model>("~/model/modify");
 
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<math::Pose> localPoses;
+  localPoses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
+  localPoses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
+  localPoses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
+  localPoses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
+  localPoses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  localPoses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  localPoses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  localPoses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->GetModel(name);
   ASSERT_TRUE(model != NULL);
@@ -135,8 +135,8 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    for (std::vector<math::Pose>::iterator iter = poses.begin();
-         iter != poses.end(); ++iter)
+    for (std::vector<math::Pose>::iterator iter = localPoses.begin();
+         iter != localPoses.end(); ++iter)
     {
       msgs::Set(msg.mutable_pose(), *iter);
       modelPub->Publish(msg);
@@ -171,8 +171,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
+  EXPECT_NEAR(g.x, 0, 1e-6);
+  EXPECT_NEAR(g.y, 0, 1e-6);
   EXPECT_LE(g.z, -9.8);
 
   // get physics time step

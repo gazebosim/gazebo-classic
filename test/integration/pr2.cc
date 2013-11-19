@@ -69,7 +69,7 @@ void PR2Test::Load(std::string _physicsEngine)
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
       math::Vector3(-0.5, 0, -0.1));
-  for (int i = 11; i < 200; i++)
+  for (i = 11; i < 200; i++)
   {
     std::ostringstream filename;
     filename << "/tmp/gazebo_test/frame_" << i << ".jpg";

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

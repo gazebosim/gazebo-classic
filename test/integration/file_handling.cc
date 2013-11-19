@@ -36,10 +36,6 @@ TEST_F(FileHandling, Save)
   transport::PublisherPtr serverControlPub =
     node->Advertise<msgs::ServerControl>("/gazebo/server/control");
 
-  transport::PublisherPtr requestPub =
-    node->Advertise<msgs::Request>("~/request");
-
-
   // Find a valid filename
   FILE *file = NULL;
   std::ostringstream filename;

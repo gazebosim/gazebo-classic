@@ -72,7 +72,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   for (int i = 0; i < laser->GetRangeCount(); ++i)
   {
-    EXPECT_EQ(10, laser->GetRange(i));
+    EXPECT_NEAR(10, laser->GetRange(i), DOUBLE_TOL);
   }
 
   // Spawn a box and test for proper laser scan

@@ -130,15 +130,15 @@ TEST_F(RenderingSensorTest, Timestamp)
   camSensor2->SetActive(true);
   gpuRaySensor->SetActive(true);
 
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
+  transport::NodePtr localNode = transport::NodePtr(new transport::Node());
+  localNode->Init();
 
-  transport::SubscriberPtr cam1Sub = node->Subscribe(camSensor1->GetTopic(),
-      &OnReceiveCamera1Msg);
-  transport::SubscriberPtr cam2Sub = node->Subscribe(camSensor2->GetTopic(),
-      &OnReceiveCamera2Msg);
-  transport::SubscriberPtr gpuRaySub = node->Subscribe(gpuRaySensor->GetTopic(),
-      &OnReceiveGpuRayMsg);
+  transport::SubscriberPtr cam1Sub =
+    localNode->Subscribe(camSensor1->GetTopic(), &OnReceiveCamera1Msg);
+  transport::SubscriberPtr cam2Sub =
+    localNode->Subscribe(camSensor2->GetTopic(), &OnReceiveCamera2Msg);
+  transport::SubscriberPtr gpuRaySub =
+    localNode->Subscribe(gpuRaySensor->GetTopic(), &OnReceiveGpuRayMsg);
 
   unsigned int numTimestamps = 100;
   // wait for a few laser scans
