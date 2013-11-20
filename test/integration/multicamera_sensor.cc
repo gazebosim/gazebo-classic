@@ -61,11 +61,8 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
   }
 
   // get two cameras, one with rotation and one without.
-  std::string modelUnrotated = "cam_x_rot_test_unrotated_cameras_1";
   std::string cameraUnrotated = "multicamera_sensor_unrotated";
-  std::string modelRotated1 = "cam_x_rot_test_rotated_cameras_1";
   std::string cameraRotated1 = "multicamera_sensor_rotated1";
-  std::string modelRotated2 = "cam_x_rot_test_rotated_cameras_2";
   std::string cameraRotated2 = "multicamera_sensor_rotated2";
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraUnrotated);
