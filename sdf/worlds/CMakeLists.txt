@@ -26,6 +26,7 @@ set (files
   ray_cpu.world
   rubble.world
   shapes.world
+  sphere_atlas_demo.world
   weshare2012.world
   willowgarage.world)
 
