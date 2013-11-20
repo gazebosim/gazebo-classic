@@ -71,7 +71,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
     return;
   }
 
-  this->wrenchPub = this->node->Advertise<msgs::WrenchStamped>(
+  this->wrenchPub = this->node->Advertise<robot_msgs::WrenchStamped>(
       this->GetTopic());
 }
 

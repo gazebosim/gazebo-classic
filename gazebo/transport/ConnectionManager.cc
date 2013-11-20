@@ -15,6 +15,8 @@
  *
 */
 
+#include <robot_msgs/MessageTypes.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -143,7 +145,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 
   if (packet.type() == "version_init")
   {
-    msgs::GzString msg;
+    robot_msgs::StringMsg msg;
     msg.ParseFromString(packet.serialized_data());
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
@@ -163,7 +165,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
   {
-    msgs::GzString_V result;
+    robot_msgs::StringMsg_V result;
     result.ParseFromString(packet.serialized_data());
     boost::mutex::scoped_lock lock(this->namespaceMutex);
 
@@ -373,7 +375,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "topic_namespace_add")
   {
-    msgs::GzString result;
+    robot_msgs::StringMsg result;
     result.ParseFromString(packet.serialized_data());
 
     boost::mutex::scoped_lock lock(this->namespaceMutex);
@@ -512,7 +514,7 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
   if (!this->initialized)
     return;
 
-  msgs::GzString msg;
+  robot_msgs::StringMsg msg;
   msg.set_data(_name);
   this->masterConn->EnqueueMsg(msgs::Package("register_topic_namespace", msg));
 }

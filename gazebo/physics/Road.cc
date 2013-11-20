@@ -60,7 +60,7 @@ void Road::Init()
     math::Vector3 point = pointElem->Get<math::Vector3>();
     pointElem = pointElem->GetNextElement("point");
 
-    msgs::Vector3d *ptMsg = msg.add_point();
+    robot_msgs::Vector3d *ptMsg = msg.add_point();
     msgs::Set(ptMsg, point);
   }
 

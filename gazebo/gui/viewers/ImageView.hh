@@ -18,6 +18,7 @@
 #define _IMAGEVIEW_HH_
 
 #include <string>
+#include <robot_msgs/MessageTypes.hh>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"

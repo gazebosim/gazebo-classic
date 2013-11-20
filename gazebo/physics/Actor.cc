@@ -551,7 +551,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       bonePose.Correct();
     }
 
-    msgs::Pose *bone_pose = msg.add_pose();
+    robot_msgs::Pose *bone_pose = msg.add_pose();
     bone_pose->set_name(bone->GetName());
 
     if (!parentBone)
@@ -572,7 +572,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       transform = parentTrans * transform;
     }
 
-    msgs::Pose *link_pose = msg.add_pose();
+    robot_msgs::Pose *link_pose = msg.add_pose();
     link_pose->set_name(currentLink->GetScopedName());
     math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
     link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
@@ -581,10 +581,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
-  msgs::Time *stamp = msg.add_time();
+  robot_msgs::Time *stamp = msg.add_time();
   stamp->CopyFrom(msgs::Convert(_time));
 
-  msgs::Pose *model_pose = msg.add_pose();
+  robot_msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
   model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
   model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));

@@ -94,9 +94,9 @@ namespace gazebo
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
-      private: void FillColorMsg(QtProperty *_item, msgs::Color *_msg);
+      private: void FillColorMsg(QtProperty *_item, robot_msgs::Color *_msg);
 
-      private: void FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg);
+      private: void FillVector3Msg(QtProperty *_item, robot_msgs::Vector3d *_msg);
 
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
@@ -154,10 +154,10 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Light &_msg,
                                        QtProperty * /*_parent*/);
 
-      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
+      private: void FillVector3dProperty(const robot_msgs::Vector3d &_msg,
                                          QtProperty *_parent);
 
-      private: void FillPoseProperty(const msgs::Pose &_msg,
+      private: void FillPoseProperty(const robot_msgs::Pose &_msg,
                                      QtProperty *_parent);
 
       private: void ProcessModelMsgs();

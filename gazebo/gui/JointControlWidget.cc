@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#include <robot_msgs/MessageTypes.hh>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -249,7 +251,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   // Only request info if the model has a name.
   if (!_modelName.empty())
   {
-    this->jointPub = this->node->Advertise<msgs::JointCmd>(
+    this->jointPub = this->node->Advertise<robot_msgs::JointCmd>(
         std::string("~/") + _modelName + "/joint_cmd");
 
     boost::shared_ptr<msgs::Response> response = transport::request(
@@ -330,7 +332,7 @@ void JointControlWidget::OnReset()
   for (std::map<std::string, JointForceControl*>::iterator iter =
        this->sliders.begin(); iter != this->sliders.end(); ++iter)
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
     this->jointPub->Publish(msg);
@@ -357,7 +359,7 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
   iter = this->sliders.find(_name);
   if (iter != this->sliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.set_force(_value);
     this->jointPub->Publish(msg);
@@ -372,7 +374,7 @@ void JointControlWidget::OnPIDPosChanged(double _value,
   iter = this->pidPosSliders.find(_name);
   if (iter != this->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_target(_value);
     this->jointPub->Publish(msg);
@@ -387,7 +389,7 @@ void JointControlWidget::OnPPosGainChanged(double _value,
   iter = this->pidPosSliders.find(_name);
   if (iter != this->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_p_gain(_value);
     this->jointPub->Publish(msg);
@@ -402,7 +404,7 @@ void JointControlWidget::OnDPosGainChanged(double _value,
   iter = this->pidPosSliders.find(_name);
   if (iter != this->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_d_gain(_value);
     this->jointPub->Publish(msg);
@@ -417,7 +419,7 @@ void JointControlWidget::OnIPosGainChanged(double _value,
   iter = this->pidPosSliders.find(_name);
   if (iter != this->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_i_gain(_value);
     this->jointPub->Publish(msg);
@@ -446,7 +448,7 @@ void JointControlWidget::OnPIDVelChanged(double _value,
   iter = this->pidVelSliders.find(_name);
   if (iter != this->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_target(_value);
     this->jointPub->Publish(msg);
@@ -461,7 +463,7 @@ void JointControlWidget::OnPVelGainChanged(double _value,
   iter = this->pidVelSliders.find(_name);
   if (iter != this->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_p_gain(_value);
     this->jointPub->Publish(msg);
@@ -476,7 +478,7 @@ void JointControlWidget::OnDVelGainChanged(double _value,
   iter = this->pidVelSliders.find(_name);
   if (iter != this->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_d_gain(_value);
     this->jointPub->Publish(msg);
@@ -491,7 +493,7 @@ void JointControlWidget::OnIVelGainChanged(double _value,
   iter = this->pidVelSliders.find(_name);
   if (iter != this->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    robot_msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_i_gain(_value);
     this->jointPub->Publish(msg);

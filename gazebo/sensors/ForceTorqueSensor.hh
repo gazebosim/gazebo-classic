@@ -87,13 +87,13 @@ namespace gazebo
       private: transport::PublisherPtr wrenchPub;
 
       /// \brief Message the store the current force torque info.
-      private: msgs::WrenchStamped wrenchMsg;
+      private: robot_msgs::WrenchStamped wrenchMsg;
 
       /// \brief Mutex to protect the wrench message
       private: boost::mutex mutex;
 
       /// \brief Update event.
-      protected: event::EventT<void(msgs::WrenchStamped)> update;
+      protected: event::EventT<void(robot_msgs::WrenchStamped)> update;
     };
     /// \}
   }

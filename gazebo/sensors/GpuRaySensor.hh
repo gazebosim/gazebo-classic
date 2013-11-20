@@ -291,7 +291,7 @@ namespace gazebo
       private: boost::mutex mutex;
 
       /// \brief Laser message to publish data.
-      private: msgs::LaserScanStamped laserMsg;
+      private: robot_msgs::LaserScanStamped laserMsg;
 
       /// \brief Parent entity of gpu ray sensor
       private: physics::EntityPtr parentEntity;

@@ -113,6 +113,7 @@ gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
+  ${ROBOT_MSGS_LIBRARIES} 
   ${PROTOBUF_LIBRARY}
 )
 

@@ -247,6 +247,10 @@ namespace gazebo
                                              unsigned int _height,
                                              const std::string &_format);
 
+      /// \brief Fill a commno::Image with data from the camera.
+      /// \param[in] _image Image object that will be populated.
+      public: void FillImage(common::Image &_image);
+
       /// \brief Get the Z-buffer value at the given image coordinate.
       /// \param[in] _x Image coordinate; (0, 0) specifies the top-left corner.
       /// \param[in] _y Image coordinate; (0, 0) specifies the top-left corner.

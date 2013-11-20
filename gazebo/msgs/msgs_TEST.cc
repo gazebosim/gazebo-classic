@@ -58,7 +58,7 @@ TEST(MsgsTest, Request)
 TEST(MsgsTest, Time)
 {
   common::Time t = common::Time::GetWallTime();
-  msgs::Time msg;
+  robot_msgs::Time msg;
   msgs::Stamp(&msg);
   EXPECT_EQ(t.sec, msg.sec());
   EXPECT_TRUE(t.nsec <= msg.nsec());
@@ -77,7 +77,7 @@ TEST(MsgsTest, TimeFromHeader)
 
 TEST(MsgsTest, Packet)
 {
-  msgs::GzString msg;
+  robot_msgs::StringMsg msg;
   msg.set_data("test_string");
   std::string data = msgs::Package("test_type", msg);
 
@@ -91,13 +91,13 @@ TEST(MsgsTest, Packet)
 
 TEST(MsgsTest, BadPackage)
 {
-  msgs::GzString msg;
+  robot_msgs::StringMsg msg;
   EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
 }
 
 TEST(MsgsTest, CovertMathVector3ToMsgs)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
+  robot_msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -105,7 +105,7 @@ TEST(MsgsTest, CovertMathVector3ToMsgs)
 
 TEST(MsgsTest, ConvertMsgsVector3dToMath)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
+  robot_msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
   math::Vector3 v    = msgs::Convert(msg);
   EXPECT_DOUBLE_EQ(1, v.x);
   EXPECT_DOUBLE_EQ(2, v.y);
@@ -114,7 +114,7 @@ TEST(MsgsTest, ConvertMsgsVector3dToMath)
 
 TEST(MsgsTest, ConvertMathQuaterionToMsgs)
 {
-  msgs::Quaternion msg =
+  robot_msgs::Quaternion msg =
     msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
 
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
@@ -125,7 +125,7 @@ TEST(MsgsTest, ConvertMathQuaterionToMsgs)
 
 TEST(MsgsTest, ConvertMsgsQuaterionToMath)
 {
-  msgs::Quaternion msg =
+  robot_msgs::Quaternion msg =
     msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
   math::Quaternion v = msgs::Convert(msg);
 
@@ -138,7 +138,7 @@ TEST(MsgsTest, ConvertMsgsQuaterionToMath)
 
 TEST(MsgsTest, ConvertPoseMathToMsgs)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
+  robot_msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
@@ -153,7 +153,7 @@ TEST(MsgsTest, ConvertPoseMathToMsgs)
 
 TEST(MsgsTest, ConvertMsgPoseToMath)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
+  robot_msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
   math::Pose v = msgs::Convert(msg);
 
@@ -168,7 +168,7 @@ TEST(MsgsTest, ConvertMsgPoseToMath)
 
 TEST(MsgsTest, ConvertCommonColorToMsgs)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
+  robot_msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
   EXPECT_TRUE(math::equal(0.1f, msg.r()));
   EXPECT_TRUE(math::equal(0.2f, msg.g()));
@@ -178,7 +178,7 @@ TEST(MsgsTest, ConvertCommonColorToMsgs)
 
 TEST(MsgsTest, ConvertMsgsColorToCommon)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
+  robot_msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
   common::Color v = msgs::Convert(msg);
 
   EXPECT_TRUE(math::equal(0.1f, v.r));
@@ -189,7 +189,7 @@ TEST(MsgsTest, ConvertMsgsColorToCommon)
 
 TEST(MsgsTest, ConvertCommonTimeToMsgs)
 {
-  msgs::Time msg = msgs::Convert(common::Time(2, 123));
+  robot_msgs::Time msg = msgs::Convert(common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
 
@@ -229,7 +229,7 @@ TEST(MsgsTest, ConvertMsgsPlaneToMath)
 
 TEST(MsgsTest, SetVector3)
 {
-  msgs::Vector3d msg;
+  robot_msgs::Vector3d msg;
   msgs::Set(&msg, math::Vector3(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
@@ -238,7 +238,7 @@ TEST(MsgsTest, SetVector3)
 
 TEST(MsgsTest, SetVector2d)
 {
-  msgs::Vector2d msg;
+  robot_msgs::Vector2d msg;
   msgs::Set(&msg, math::Vector2d(1, 2));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
@@ -246,7 +246,7 @@ TEST(MsgsTest, SetVector2d)
 
 TEST(MsgsTest, SetQuaternion)
 {
-  msgs::Quaternion msg;
+  robot_msgs::Quaternion msg;
   msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
@@ -256,7 +256,7 @@ TEST(MsgsTest, SetQuaternion)
 
 TEST(MsgsTest, SetPose)
 {
-  msgs::Pose msg;
+  robot_msgs::Pose msg;
   msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
@@ -272,7 +272,7 @@ TEST(MsgsTest, SetPose)
 
 TEST(MsgsTest, SetColor)
 {
-  msgs::Color msg;
+  robot_msgs::Color msg;
   msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
   EXPECT_TRUE(math::equal(0.1f, msg.r()));
   EXPECT_TRUE(math::equal(0.2f, msg.g()));
@@ -282,7 +282,7 @@ TEST(MsgsTest, SetColor)
 
 TEST(MsgsTest, SetTime)
 {
-  msgs::Time msg;
+  robot_msgs::Time msg;
   msgs::Set(&msg, common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());

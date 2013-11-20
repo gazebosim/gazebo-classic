@@ -77,7 +77,7 @@ namespace gazebo
       private: bool receivedMsg;
 
       /// \brief The current contact message.
-      private: boost::shared_ptr<msgs::LaserScanStamped const> laserMsg;
+      private: boost::shared_ptr<robot_msgs::LaserScanStamped const> laserMsg;
 
       /// \brief Pre render connection.
       private: event::ConnectionPtr connection;

@@ -70,7 +70,7 @@ namespace gazebo
       private: Ogre::SceneNode *coneNode;
 
       /// \brief The current sonar message.
-      private: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;
+      private: boost::shared_ptr<robot_msgs::SonarStamped const> sonarMsg;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;

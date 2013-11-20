@@ -24,8 +24,6 @@
 #include <google/protobuf/message.h>
 #include <boost/shared_ptr.hpp>
 
-#include <robot_msgs/MsgFactory.hh>
-
 namespace gazebo
 {
   namespace msgs
@@ -39,7 +37,7 @@ namespace gazebo
     /// \class MsgFactory MsgFactory.hh msgs/msgs.hh
     /// \brief A factory that generates protobuf message based on a string
     /// type.
-    class MsgFactory : public robot_msgs::MsgFactory
+    class MsgFactory
     {
       /// \brief Register a message.
       /// \param[in] _msgType Type of message to register.
@@ -61,7 +59,6 @@ namespace gazebo
       /// \brief A list of registered message types
       private: static std::map<std::string, MsgFactoryFn> *msgMap;
     };
-
 
     /// \brief Static message registration macro
     ///

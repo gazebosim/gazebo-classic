@@ -88,7 +88,7 @@ namespace gazebo
       Stamp(_hdr->mutable_stamp());
     }
 
-    void Stamp(msgs::Time *_time)
+    void Stamp(robot_msgs::Time *_time)
     {
       common::Time tm = common::Time::GetWallTime();
 
@@ -119,20 +119,20 @@ namespace gazebo
       return data;
     }
 
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
+    void Set(robot_msgs::Vector3d *_pt, const math::Vector3 &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
       _pt->set_z(_v.z);
     }
 
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
+    void Set(robot_msgs::Vector2d *_pt, const math::Vector2d &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
     }
 
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
+    void Set(robot_msgs::Quaternion *_q, const math::Quaternion &_v)
     {
       _q->set_x(_v.x);
       _q->set_y(_v.y);
@@ -140,13 +140,13 @@ namespace gazebo
       _q->set_w(_v.w);
     }
 
-    void Set(msgs::Pose *_p, const math::Pose &_v)
+    void Set(robot_msgs::Pose *_p, const math::Pose &_v)
     {
       Set(_p->mutable_position(), _v.pos);
       Set(_p->mutable_orientation(), _v.rot);
     }
 
-    void Set(msgs::Color *_c, const common::Color &_v)
+    void Set(robot_msgs::Color *_c, const common::Color &_v)
     {
       _c->set_r(_v.r);
       _c->set_g(_v.g);
@@ -154,7 +154,7 @@ namespace gazebo
       _c->set_a(_v.a);
     }
 
-    void Set(msgs::Time *_t, const common::Time &_v)
+    void Set(robot_msgs::Time *_t, const common::Time &_v)
     {
       _t->set_sec(_v.sec);
       _t->set_nsec(_v.nsec);
@@ -171,21 +171,157 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void Set(common::Image &_img, const msgs::Image &_msg)
+    robot_msgs::Image::Format Convert(common::Image::PixelFormat _fmt)
     {
-      _img.SetFromData(
-          (const unsigned char*)_msg.data().data(),
-          _msg.width(),
-          _msg.height(),
-          (common::Image::PixelFormat)(_msg.pixel_format()));
+      robot_msgs::Image::Format fmt = robot_msgs::Image::UNKNOWN_PIXEL_FORMAT;
+      switch(_fmt)
+      {
+        case common::Image::L_INT8:
+          fmt = robot_msgs::Image::L_INT8;
+          break;
+        case common::Image::L_INT16:
+          fmt = robot_msgs::Image::L_INT16;
+          break;
+        case common::Image::RGB_INT8:
+          fmt = robot_msgs::Image::RGB_INT8;
+          break;
+        case common::Image::RGBA_INT8:
+          fmt = robot_msgs::Image::RGBA_INT8;
+          break;
+        case common::Image::BGRA_INT8:
+          fmt = robot_msgs::Image::BGRA_INT8;
+          break;
+        case common::Image::RGB_INT16:
+          fmt = robot_msgs::Image::RGB_INT16;
+          break;
+        case common::Image::RGB_INT32:
+          fmt = robot_msgs::Image::RGB_INT32;
+          break;
+        case common::Image::BGR_INT8:
+          fmt = robot_msgs::Image::BGR_INT8;
+          break;
+        case common::Image::BGR_INT16:
+          fmt = robot_msgs::Image::BGR_INT16;
+          break;
+        case common::Image::BGR_INT32:
+          fmt = robot_msgs::Image::BGR_INT32;
+          break;
+        case common::Image::R_FLOAT16:
+          fmt = robot_msgs::Image::R_FLOAT16;
+          break;
+        case common::Image::RGB_FLOAT16:
+          fmt = robot_msgs::Image::RGB_FLOAT16;
+          break;
+        case common::Image::R_FLOAT32:
+          fmt = robot_msgs::Image::R_FLOAT32;
+          break;
+        case common::Image::RGB_FLOAT32:
+          fmt = robot_msgs::Image::RGB_FLOAT32;
+          break;
+        case common::Image::BAYER_RGGB8:
+          fmt = robot_msgs::Image::BAYER_RGGB8;
+          break;
+        case common::Image::BAYER_RGGR8:
+          fmt = robot_msgs::Image::BAYER_RGGR8;
+          break;
+        case common::Image::BAYER_GBRG8:
+          fmt = robot_msgs::Image::BAYER_GBRG8;
+          break;
+        case common::Image::BAYER_GRBG8:
+          fmt = robot_msgs::Image::BAYER_GRBG8;
+          break;
+        default:
+          gzerr << "Unable to handle format[" << _fmt << "]\n";
+          break;
+      };
+
+      return fmt;
     }
 
     /////////////////////////////////////////////////
-    void Set(msgs::Image *_msg, const common::Image &_i)
+    common::Image::PixelFormat Convert(robot_msgs::Image::Format _fmt)
+    {
+      common::Image::PixelFormat fmt = common::Image::UNKNOWN_PIXEL_FORMAT;
+
+      switch(_fmt)
+      {
+        case robot_msgs::Image::L_INT8:
+          fmt = common::Image::L_INT8;
+          break;
+        case robot_msgs::Image::L_INT16:
+          fmt = common::Image::L_INT16;
+          break;
+        case robot_msgs::Image::RGB_INT8:
+          fmt = common::Image::RGB_INT8;
+          break;
+        case robot_msgs::Image::RGBA_INT8:
+          fmt = common::Image::RGBA_INT8;
+          break;
+        case robot_msgs::Image::BGRA_INT8:
+          fmt = common::Image::BGRA_INT8;
+          break;
+        case robot_msgs::Image::RGB_INT16:
+          fmt = common::Image::RGB_INT16;
+          break;
+        case robot_msgs::Image::RGB_INT32:
+          fmt = common::Image::RGB_INT32;
+          break;
+        case robot_msgs::Image::BGR_INT8:
+          fmt = common::Image::BGR_INT8;
+          break;
+        case robot_msgs::Image::BGR_INT16:
+          fmt = common::Image::BGR_INT16;
+          break;
+        case robot_msgs::Image::BGR_INT32:
+          fmt = common::Image::BGR_INT32;
+          break;
+        case robot_msgs::Image::R_FLOAT16:
+          fmt = common::Image::R_FLOAT16;
+          break;
+        case robot_msgs::Image::RGB_FLOAT16:
+          fmt = common::Image::RGB_FLOAT16;
+          break;
+        case robot_msgs::Image::R_FLOAT32:
+          fmt = common::Image::R_FLOAT32;
+          break;
+        case robot_msgs::Image::RGB_FLOAT32:
+          fmt = common::Image::RGB_FLOAT32;
+          break;
+        case robot_msgs::Image::BAYER_RGGB8:
+          fmt = common::Image::BAYER_RGGB8;
+          break;
+        case robot_msgs::Image::BAYER_RGGR8:
+          fmt = common::Image::BAYER_RGGR8;
+          break;
+        case robot_msgs::Image::BAYER_GBRG8:
+          fmt = common::Image::BAYER_GBRG8;
+          break;
+        case robot_msgs::Image::BAYER_GRBG8:
+          fmt = common::Image::BAYER_GRBG8;
+          break;
+        case robot_msgs::Image::JPEG:
+          gzerr << "Unable to handle JPEG format\n";
+        default:
+          gzerr << "Unable to handle format[" << _fmt << "]\n";
+      };
+
+      return fmt;
+    }
+
+    /////////////////////////////////////////////////
+    void Set(common::Image &_img, const robot_msgs::Image &_msg)
+    {
+      _img.SetFromData(
+          (const unsigned char*)_msg.data().data(),
+          _msg.width(), _msg.height(), Convert(_msg.format()));
+    }
+
+    /////////////////////////////////////////////////
+    void Set(robot_msgs::Image *_msg, const common::Image &_i)
     {
       _msg->set_width(_i.GetWidth());
       _msg->set_height(_i.GetHeight());
-      _msg->set_pixel_format(_i.GetPixelFormat());
+      _msg->set_format(Convert(_i.GetPixelFormat()));
       _msg->set_step(_i.GetPitch());
 
       unsigned char *data = NULL;
@@ -195,18 +331,18 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
+    robot_msgs::Vector3d Convert(const math::Vector3 &_v)
     {
-      msgs::Vector3d result;
+      robot_msgs::Vector3d result;
       result.set_x(_v.x);
       result.set_y(_v.y);
       result.set_z(_v.z);
       return result;
     }
 
-    msgs::Quaternion Convert(const math::Quaternion &_q)
+    robot_msgs::Quaternion Convert(const math::Quaternion &_q)
     {
-      msgs::Quaternion result;
+      robot_msgs::Quaternion result;
       result.set_x(_q.x);
       result.set_y(_q.y);
       result.set_z(_q.z);
@@ -214,17 +350,17 @@ namespace gazebo
       return result;
     }
 
-    msgs::Pose Convert(const math::Pose &_p)
+    robot_msgs::Pose Convert(const math::Pose &_p)
     {
-      msgs::Pose result;
+      robot_msgs::Pose result;
       result.mutable_position()->CopyFrom(Convert(_p.pos));
       result.mutable_orientation()->CopyFrom(Convert(_p.rot));
       return result;
     }
 
-    msgs::Color Convert(const common::Color &_c)
+    robot_msgs::Color Convert(const common::Color &_c)
     {
-      msgs::Color result;
+      robot_msgs::Color result;
       result.set_r(_c.r);
       result.set_g(_c.g);
       result.set_b(_c.b);
@@ -232,9 +368,9 @@ namespace gazebo
       return result;
     }
 
-    msgs::Time Convert(const common::Time &_t)
+    robot_msgs::Time Convert(const common::Time &_t)
     {
-      msgs::Time result;
+      robot_msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
       return result;
@@ -250,28 +386,28 @@ namespace gazebo
       return result;
     }
 
-    math::Vector3 Convert(const msgs::Vector3d &_v)
+    math::Vector3 Convert(const robot_msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
     }
 
-    math::Quaternion Convert(const msgs::Quaternion &_q)
+    math::Quaternion Convert(const robot_msgs::Quaternion &_q)
     {
       return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
-    math::Pose Convert(const msgs::Pose &_p)
+    math::Pose Convert(const robot_msgs::Pose &_p)
     {
       return math::Pose(Convert(_p.position()),
           Convert(_p.orientation()));
     }
 
-    common::Color Convert(const msgs::Color &_c)
+    common::Color Convert(const robot_msgs::Color &_c)
     {
       return common::Color(_c.r(), _c.g(), _c.b(), _c.a());
     }
 
-    common::Time Convert(const msgs::Time &_t)
+    common::Time Convert(const robot_msgs::Time &_t)
     {
       return common::Time(_t.sec(), _t.nsec());
     }

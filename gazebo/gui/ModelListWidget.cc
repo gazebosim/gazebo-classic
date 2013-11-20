@@ -731,7 +731,7 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
+void ModelListWidget::FillColorMsg(QtProperty *_item, robot_msgs::Color *_msg)
 {
   _msg->set_r(this->variantManager->value(
       this->GetChildItem(_item, "Red")).toDouble() / 255.0);
@@ -744,7 +744,7 @@ void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg)
+void ModelListWidget::FillVector3Msg(QtProperty *_item, robot_msgs::Vector3d *_msg)
 {
   _msg->set_x(this->variantManager->value(
       this->GetChildItem(_item, "x")).toDouble());
@@ -1890,7 +1890,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
+void ModelListWidget::FillVector3dProperty(const robot_msgs::Vector3d &_msg,
                                            QtProperty *_parent)
 {
   if (!_parent)
@@ -1940,7 +1940,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
+void ModelListWidget::FillPoseProperty(const robot_msgs::Pose &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2280,7 +2280,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     this->FillVector3dProperty(_msg.gravity(), gravityItem);
   else
   {
-    msgs::Vector3d xyz;
+    robot_msgs::Vector3d xyz;
     xyz.set_x(0);
     xyz.set_y(0);
     xyz.set_z(-9.8);

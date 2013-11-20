@@ -3,10 +3,12 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
+  ${ROBOT_MSGS_INCLUDE_DIRS}
 )
 
 link_directories(
   ${SDF_LIBRARY_DIRS}
+  ${ROBOT_MSGS_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)

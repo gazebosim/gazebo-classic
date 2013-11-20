@@ -72,7 +72,7 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+  this->imagePub = this->node->Advertise<robot_msgs::ImageStamped>(
       this->GetTopic(), 50);
 }
 
@@ -170,12 +170,14 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
 
     if (this->imagePub->HasConnections())
     {
-      msgs::ImageStamped msg;
+      robot_msgs::ImageStamped msg;
       msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+
       msg.mutable_image()->set_width(this->camera->GetImageWidth());
       msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-            this->camera->GetImageFormat()));
+      msg.mutable_image()->set_format(
+          msgs::Convert(common::Image::ConvertPixelFormat(
+            this->camera->GetImageFormat())));
 
       msg.mutable_image()->set_step(this->camera->GetImageWidth() *
           this->camera->GetImageDepth());

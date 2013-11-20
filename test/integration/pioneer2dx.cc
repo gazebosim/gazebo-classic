@@ -37,7 +37,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
   }
 
   Load("worlds/pioneer2dx.world", false, _physicsEngine);
-  transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
+  transport::PublisherPtr velPub = this->node->Advertise<robot_msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
   int i = 0;
@@ -45,7 +45,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
     common::Time::MSleep(500);
   ASSERT_LT(i, 1000);
 
-  gazebo::msgs::Pose msg;
+  robot_msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
       gazebo::math::Vector3(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),

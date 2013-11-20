@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <robot_msgs/MessageTypes.hh>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"

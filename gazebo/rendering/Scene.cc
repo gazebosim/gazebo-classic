@@ -1783,7 +1783,7 @@ void Scene::PreRender()
       Visual_M::iterator iter = this->visuals.find((*spIter)->model_id());
       for (int i = 0; i < (*spIter)->pose_size(); i++)
       {
-        const msgs::Pose& pose_msg = (*spIter)->pose(i);
+        const robot_msgs::Pose& pose_msg = (*spIter)->pose(i);
         Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
         if (iter2 != this->visuals.end())
         {

@@ -175,7 +175,7 @@ namespace gazebo
 
       private: transport::PublisherPtr scanPub;
       private: boost::mutex mutex;
-      private: msgs::LaserScanStamped laserMsg;
+      private: robot_msgs::LaserScanStamped laserMsg;
 
       // Which noise type we support
       private: enum NoiseModelType

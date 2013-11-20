@@ -60,7 +60,7 @@ void RFIDTag::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->scanPub = this->node->Advertise<msgs::Pose>(
+    this->scanPub = this->node->Advertise<robot_msgs::Pose>(
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
@@ -95,12 +95,12 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
 {
   if (this->scanPub)
   {
-    msgs::Pose msg;
+    robot_msgs::Pose msg;
     msgs::Set(&msg, entity->GetWorldPose());
 
     // msg.set_position(link->GetWorldPose().pos);
     // msg.set_orientation(link->GetWorldPose().rot);
-    // msgs::LaserScan msg;
+    // robot_msgs::LaserScan msg;
 
     // msg.set_frame(this->link->GetScopedName());
     // msgs::Set(msg.mutable_offset(), this->GetPose());

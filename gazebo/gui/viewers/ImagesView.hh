@@ -23,6 +23,8 @@
 
 #include <boost/thread/mutex.hpp>
 
+#include <robot_msgs/MessageTypes.hh>
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 

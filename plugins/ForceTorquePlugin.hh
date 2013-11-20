@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
 #define _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
 
+#include <robot_msgs/MessageTypes.hh>
+
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
@@ -40,7 +42,7 @@ namespace gazebo
 
     /// \brief Update callback. Overload this function in a child class.
     /// \param[in] _msg The force torque message.
-    protected: virtual void OnUpdate(msgs::WrenchStamped _msg);
+    protected: virtual void OnUpdate(robot_msgs::WrenchStamped _msg);
 
     /// \brief The parent sensor
     protected: sensors::ForceTorqueSensorPtr parentSensor;

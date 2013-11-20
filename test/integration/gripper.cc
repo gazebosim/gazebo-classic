@@ -15,6 +15,8 @@
  *
 */
 
+#include <robot_msgs/MessageTypes.hh>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Gripper.hh"
@@ -53,10 +55,10 @@ TEST_F(GripperTest, Close)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
-        "~/simple_gripper/joint_cmd");
+  transport::PublisherPtr jointPub =
+    this->node->Advertise<robot_msgs::JointCmd>("~/simple_gripper/joint_cmd");
 
-  msgs::JointCmd msg;
+  robot_msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub->Publish(msg);
@@ -104,10 +106,10 @@ TEST_F(GripperTest, CloseOpen)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
-        "~/simple_gripper/joint_cmd");
+  transport::PublisherPtr jointPub =
+    this->node->Advertise<robot_msgs::JointCmd>("~/simple_gripper/joint_cmd");
 
-  msgs::JointCmd msg;
+  robot_msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub->Publish(msg);

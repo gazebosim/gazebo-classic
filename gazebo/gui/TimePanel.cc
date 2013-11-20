@@ -169,7 +169,7 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-std::string TimePanel::FormatTime(const msgs::Time &_msg)
+std::string TimePanel::FormatTime(const robot_msgs::Time &_msg)
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;

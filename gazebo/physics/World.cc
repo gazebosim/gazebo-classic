@@ -28,6 +28,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
+#include <robot_msgs/MessageTypes.hh>
 
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
@@ -188,12 +189,12 @@ void World::Load(sdf::ElementPtr _sdf)
   // pose pub for server side, mainly used for updating and timestamping
   // Scene, which in turn will be used by rendering sensors.
   // TODO: replace local communication with shared memory for efficiency.
-  this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
+  this->poseLocalPub = this->node->Advertise<robot_msgs::PosesStamped>(
     "~/pose/local/info", 10);
 
   // pose pub for client with a cap on publishing rate to reduce traffic
   // overhead
-  this->posePub = this->node->Advertise<msgs::PosesStamped>(
+  this->posePub = this->node->Advertise<robot_msgs::PosesStamped>(
     "~/pose/info", 10, 60);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
@@ -1422,7 +1423,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "world_sdf")
     {
-      msgs::GzString msg;
+      robot_msgs::StringMsg msg;
       this->UpdateStateSDF();
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
@@ -1853,7 +1854,7 @@ void World::ProcessMessages()
     if ((this->posePub && this->posePub->HasConnections()) ||
         (this->poseLocalPub && this->poseLocalPub->HasConnections()))
     {
-      msgs::PosesStamped msg;
+      robot_msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
@@ -1864,7 +1865,7 @@ void World::ProcessMessages()
             this->publishModelPoses.begin();
             iter != this->publishModelPoses.end(); ++iter)
         {
-          msgs::Pose *poseMsg = msg.add_pose();
+          robot_msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the model's relative pose
           poseMsg->set_name((*iter)->GetScopedName());

@@ -84,7 +84,7 @@ namespace gazebo
       private: DynamicLines *forceLine;
 
       /// \brief The current wrench message.
-      private: boost::shared_ptr<msgs::WrenchStamped const> wrenchMsg;
+      private: boost::shared_ptr<robot_msgs::WrenchStamped const> wrenchMsg;
 
       /// \brief True if we have received a message.
       private: bool receivedMsg;

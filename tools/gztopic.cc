@@ -185,7 +185,7 @@ transport::ConnectionPtr connect_to_master()
     packet.ParseFromString(data);
     if (packet.type() == "init")
     {
-      msgs::GzString msg;
+      robot_msgs::StringMsg msg;
       msg.ParseFromString(packet.serialized_data());
       if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
         std::cerr << "Conflicting gazebo versions\n";

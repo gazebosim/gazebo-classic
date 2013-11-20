@@ -1690,3 +1690,11 @@ bool Camera::GetInitialized() const
 {
   return this->initialized && this->scene->GetInitialized();
 }
+
+//////////////////////////////////////////////////
+void Camera::FillImage(common::Image &_image)
+{
+  _image.SetFromData(this->GetImageData(),
+      this->GetImageWidth(), this->GetImageHeight(),
+      common::Image::ConvertPixelFormat(this->GetImageFormat()));
+}

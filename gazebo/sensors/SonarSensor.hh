@@ -118,7 +118,7 @@ namespace gazebo
       private: transport::PublisherPtr sonarPub;
 
       /// \brief Store current sonar info
-      private: msgs::SonarStamped sonarMsg;
+      private: robot_msgs::SonarStamped sonarMsg;
 
       /// \brief Mutex used to protect reading/writing the sonar message.
       private: boost::mutex mutex;
@@ -142,7 +142,7 @@ namespace gazebo
       private: double radius;
 
       /// \brief Update event.
-      protected: event::EventT<void(msgs::SonarStamped)> update;
+      protected: event::EventT<void(robot_msgs::SonarStamped)> update;
     };
     /// \}
   }

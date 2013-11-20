@@ -160,13 +160,13 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     msgs::Set(_msg.add_position(), this->positions[j]);
     msgs::Set(_msg.add_normal(), this->normals[j]);
 
-    msgs::JointWrench *jntWrench = _msg.add_wrench();
+    robot_msgs::JointWrench *jntWrench = _msg.add_wrench();
     jntWrench->set_body_1_name(this->collision1->GetScopedName());
     jntWrench->set_body_1_id(this->collision1->GetId());
     jntWrench->set_body_2_name(this->collision2->GetScopedName());
     jntWrench->set_body_2_id(this->collision2->GetId());
 
-    msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
+    robot_msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
     msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
     msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
 

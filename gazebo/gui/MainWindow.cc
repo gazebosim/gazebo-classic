@@ -332,7 +332,7 @@ void MainWindow::Save()
   boost::shared_ptr<msgs::Response> response =
     transport::request(get_world(), "world_sdf");
 
-  msgs::GzString msg;
+  robot_msgs::StringMsg msg;
   std::string msgData;
 
   // Make sure the response is correct
@@ -1169,7 +1169,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_pose())
     {
-      const msgs::Pose &msg_pose = _msg->camera().pose();
+      const robot_msgs::Pose &msg_pose = _msg->camera().pose();
 
       math::Vector3 cam_pose_pos = math::Vector3(
         msg_pose.position().x(),

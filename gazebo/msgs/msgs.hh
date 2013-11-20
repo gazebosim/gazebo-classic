@@ -21,6 +21,7 @@
 
 #include <sdf/sdf.hh>
 
+#include <robot_msgs/MessageTypes.hh>
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/math/MathTypes.hh"
@@ -29,6 +30,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/common/Image.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Time.hh"
 
@@ -60,112 +62,124 @@ namespace gazebo
 
     /// \brief Set the time in a time message
     /// \param[in] _time A Time message
-    void Stamp(msgs::Time *_time);
+    void Stamp(robot_msgs::Time *_time);
 
     /// \cond
     std::string Package(const std::string &type,
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
+    /// \brief Convert a math::Vector3 to a robot_msgs::Vector3d
     /// \param[in] _v The vector to convert
-    /// \return A msgs::Vector3d object
-    msgs::Vector3d      Convert(const math::Vector3 &_v);
+    /// \return A robot_msgs::Vector3d object
+    robot_msgs::Vector3d      Convert(const math::Vector3 &_v);
 
-    /// \brief Convert a math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a math::Quaternion to a robot_msgs::Quaternion
     /// \param[in] _q The quaternion to convert
-    /// \return A msgs::Quaternion object
-    msgs::Quaternion Convert(const math::Quaternion &_q);
+    /// \return A robot_msgs::Quaternion object
+    robot_msgs::Quaternion Convert(const math::Quaternion &_q);
 
-    /// \brief Convert a math::Pose to a msgs::Pose
+    /// \brief Convert a math::Pose to a robot_msgs::Pose
     /// \param[in] _p The pose to convert
-    /// \return A msgs::Pose object
-    msgs::Pose       Convert(const math::Pose &_p);
+    /// \return A robot_msgs::Pose object
+    robot_msgs::Pose       Convert(const math::Pose &_p);
 
-    /// \brief Convert a common::Color to a msgs::Color
+    /// \brief Convert a common::Color to a robot_msgs::Color
     /// \param[in] _c The color to convert
-    /// \return A msgs::Color object
-    msgs::Color      Convert(const common::Color &_c);
+    /// \return A robot_msgs::Color object
+    robot_msgs::Color      Convert(const common::Color &_c);
 
-    /// \brief Convert a common::Time to a msgs::Time
+    /// \brief Convert a common::Time to a robot_msgs::Time
     /// \param[in] _t The time to convert
-    /// \return A msgs::Time object
-    msgs::Time       Convert(const common::Time &_t);
+    /// \return A robot_msgs::Time object
+    robot_msgs::Time       Convert(const common::Time &_t);
 
     /// \brief Convert a math::Plane to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
     /// \return A msgs::PlaneGeom object
     msgs::PlaneGeom Convert(const math::Plane &_p);
 
-    /// \brief Convert a msgs::Vector3d to a math::Vector
+    /// \brief Convert a robot_msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
     /// \return A math::Vector3 object
-    math::Vector3    Convert(const msgs::Vector3d &_v);
+    math::Vector3    Convert(const robot_msgs::Vector3d &_v);
 
-    /// \brief Convert a msgs::Quaternion to a math::Quaternion
+    /// \brief Convert a robot_msgs::Quaternion to a math::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A math::Quaternion object
-    math::Quaternion Convert(const msgs::Quaternion &_q);
+    math::Quaternion Convert(const robot_msgs::Quaternion &_q);
 
-    /// \brief Convert a msgs::Pose to a math::Pose
+    /// \brief Convert a robot_msgs::Pose to a math::Pose
     /// \param[in] _q The pose to convert
     /// \return A math::Pose object
-    math::Pose       Convert(const msgs::Pose &_p);
+    math::Pose       Convert(const robot_msgs::Pose &_p);
 
-    /// \brief Convert a msgs::Image to a common::Image
+    /// \brief Convert a robot_msgs::Image to a common::Image
     /// \param[out] _img The common::Image container
     /// \param[in] _msg The Image message to convert
-    void Set(common::Image &_img, const msgs::Image &_msg);
+    void Set(common::Image &_img, const robot_msgs::Image &_msg);
 
-    /// \brief Convert a msgs::Color to a common::Color
+    /// \brief Convert common::Image::PixelFormat to
+    /// robot_msgs::Image::Format
+    /// \param[in] _fmt common::Image::PixelFormat value
+    /// \return Equivalent robot_msgs::Image::Format.
+    robot_msgs::Image::Format Convert(common::Image::PixelFormat _fmt);
+
+    /// \brief Convert robot_msgs::Image::Format to 
+    /// common::Image::PixelFormat
+    /// \param[in] _fmt robot_msgs::Image::Format value
+    /// \return Equivalent common::Image::PixelFormat.
+    common::Image::PixelFormat Convert(robot_msgs::Image::Format _fmt);
+
+    /// \brief Convert a robot_msgs::Color to a common::Color
     /// \param[in] _c The color to convert
     /// \return A common::Color object
-    common::Color    Convert(const msgs::Color &_c);
+    common::Color    Convert(const robot_msgs::Color &_c);
 
-    /// \brief Convert a msgs::Time to a common::Time
+    /// \brief Convert a robot_msgs::Time to a common::Time
     /// \param[in] _t The time to convert
     /// \return A common::Time object
-    common::Time     Convert(const msgs::Time &_t);
+    common::Time     Convert(const robot_msgs::Time &_t);
 
     /// \brief Convert a msgs::PlaneGeom to a common::Plane
     /// \param[in] _p The plane to convert
     /// \return A common::Plane object
     math::Plane      Convert(const msgs::PlaneGeom &_p);
 
-    /// \brief Set a msgs::Image from a common::Image
-    /// \param[out] _msg A msgs::Image pointer
+    /// \brief Set a robot_msgs::Image from a common::Image
+    /// \param[out] _msg A robot_msgs::Image pointer
     /// \param[in] _i A common::Image reference
-    void Set(msgs::Image *_msg, const common::Image &_i);
+    void Set(robot_msgs::Image *_msg, const common::Image &_i);
 
-    /// \brief Set a msgs::Vector3d from a math::Vector3
-    /// \param[out] _pt A msgs::Vector3d pointer
+    /// \brief Set a robot_msgs::Vector3d from a math::Vector3
+    /// \param[out] _pt A robot_msgs::Vector3d pointer
     /// \param[in] _v A math::Vector3 reference
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v);
+    void Set(robot_msgs::Vector3d *_pt, const math::Vector3 &_v);
 
-    /// \brief Set a msgs::Vector2d from a math::Vector3
-    /// \param[out] _pt A msgs::Vector2d pointer
+    /// \brief Set a robot_msgs::Vector2d from a math::Vector3
+    /// \param[out] _pt A robot_msgs::Vector2d pointer
     /// \param[in] _v A math::Vector2d reference
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v);
+    void Set(robot_msgs::Vector2d *_pt, const math::Vector2d &_v);
 
-    /// \brief Set a msgs::Quaternion from a math::Quaternion
-    /// \param[out] _q A msgs::Quaternion pointer
+    /// \brief Set a robot_msgs::Quaternion from a math::Quaternion
+    /// \param[out] _q A robot_msgs::Quaternion pointer
     /// \param[in] _v A math::Quaternion reference
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v);
+    void Set(robot_msgs::Quaternion *_q, const math::Quaternion &_v);
 
-    /// \brief Set a msgs::Pose from a math::Pose
-    /// \param[out] _p A msgs::Pose pointer
+    /// \brief Set a robot_msgs::Pose from a math::Pose
+    /// \param[out] _p A robot_msgs::Pose pointer
     /// \param[in] _v A math::Pose reference
-    void Set(msgs::Pose *_p, const math::Pose &_v);
+    void Set(robot_msgs::Pose *_p, const math::Pose &_v);
 
-    /// \brief Set a msgs::Color from a common::Color
-    /// \param[out] _p A msgs::Color pointer
+    /// \brief Set a robot_msgs::Color from a common::Color
+    /// \param[out] _p A robot_msgs::Color pointer
     /// \param[in] _v A common::Color reference
-    void Set(msgs::Color *_c, const common::Color &_v);
+    void Set(robot_msgs::Color *_c, const common::Color &_v);
 
-    /// \brief Set a msgs::Time from a common::Time
-    /// \param[out] _p A msgs::Time pointer
+    /// \brief Set a robot_msgs::Time from a common::Time
+    /// \param[out] _p A robot_msgs::Time pointer
     /// \param[in] _v A common::Time reference
-    void Set(msgs::Time *_t, const common::Time &_v);
+    void Set(robot_msgs::Time *_t, const common::Time &_v);
 
     /// \brief Set a msgs::Plane from a math::Plane
     /// \param[out] _p A msgs::Plane pointer

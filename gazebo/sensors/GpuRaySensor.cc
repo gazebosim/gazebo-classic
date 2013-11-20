@@ -76,7 +76,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
+  this->scanPub = this->node->Advertise<robot_msgs::LaserScanStamped>(
       this->GetTopic(), 50);
 
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
@@ -562,7 +562,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
 
     msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
 
-    msgs::LaserScan *scan = this->laserMsg.mutable_scan();
+    robot_msgs::LaserScan *scan = this->laserMsg.mutable_scan();
 
     // Store the latest laser scans into laserMsg
     msgs::Set(scan->mutable_world_pose(),

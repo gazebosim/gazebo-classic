@@ -103,7 +103,7 @@ namespace gazebo
       /// \brief Mutex to protect the cameras list.
       private: mutable boost::mutex cameraMutex;
 
-      /// \brief Publishes messages of type msgs::ImagesStamped.
+      /// \brief Publishes messages of type robot_msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
 
       private: rendering::ScenePtr scene;

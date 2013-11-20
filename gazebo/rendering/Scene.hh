@@ -26,6 +26,8 @@
 #include <boost/unordered/unordered_map.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <robot_msgs/MessageTypes.hh>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -621,7 +623,7 @@ namespace gazebo
 
       /// \def PoseMsgs_L.
       /// \brief List of messages.
-      typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
+      typedef std::map<uint32_t, robot_msgs::Pose> PoseMsgs_M;
 
       /// \brief List of pose message to process.
       private: PoseMsgs_M poseMsgs;
@@ -683,7 +685,8 @@ namespace gazebo
       /// \def SkeletonPoseMsgs_L
       /// \brief List of skeleton messages.
       typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
-                                                          SkeletonPoseMsgs_L;
+        SkeletonPoseMsgs_L;
+
       /// \brief List of skeleton message to process.
       private: SkeletonPoseMsgs_L skeletonPoseMsgs;
 

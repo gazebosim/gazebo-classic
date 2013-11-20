@@ -55,12 +55,12 @@ void Master::Init(uint16_t _port)
 void Master::OnAccept(transport::ConnectionPtr _newConnection)
 {
   // Send the gazebo version string
-  msgs::GzString versionMsg;
+  robot_msgs::StringMsg versionMsg;
   versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
   _newConnection->EnqueueMsg(msgs::Package("version_init", versionMsg), true);
 
   // Send all the current topic namespaces
-  msgs::GzString_V namespacesMsg;
+  robot_msgs::StringMsg_V namespacesMsg;
   std::list<std::string>::iterator iter;
   for (iter = this->worldNames.begin();
        iter != this->worldNames.end(); ++iter)
@@ -141,7 +141,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
   if (packet.type() == "register_topic_namespace")
   {
-    msgs::GzString worldNameMsg;
+    robot_msgs::StringMsg worldNameMsg;
     worldNameMsg.ParseFromString(packet.serialized_data());
 
     std::list<std::string>::iterator iter;
@@ -271,7 +271,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     else if (req.request() == "get_topic_namespaces")
     {
-      msgs::GzString_V msg;
+      robot_msgs::StringMsg_V msg;
       std::list<std::string>::iterator iter;
       for (iter = this->worldNames.begin();
           iter != this->worldNames.end(); ++iter)

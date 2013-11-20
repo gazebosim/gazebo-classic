@@ -51,7 +51,7 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 }
 
 /////////////////////////////////////////////////
-void SonarPlugin::OnUpdate(msgs::SonarStamped /*_msg*/)
+void SonarPlugin::OnUpdate(robot_msgs::SonarStamped /*_msg*/)
 {
   // overload with useful callback here
 }

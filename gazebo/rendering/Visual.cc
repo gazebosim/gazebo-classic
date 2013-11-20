@@ -2387,7 +2387,7 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 
   for (int i = 0; i < _pose.pose_size(); i++)
   {
-    const msgs::Pose& bonePose = _pose.pose(i);
+    const robot_msgs::Pose& bonePose = _pose.pose(i);
     if (!this->skeleton->hasBone(bonePose.name()))
       continue;
     Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());

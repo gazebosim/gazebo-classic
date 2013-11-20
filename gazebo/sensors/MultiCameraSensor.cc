@@ -69,7 +69,7 @@ void MultiCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create the publisher of image data.
-  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(
+  this->imagePub = this->node->Advertise<robot_msgs::ImagesStamped>(
       this->GetTopic(), 50);
 }
 
@@ -193,7 +193,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
   this->lastMeasurementTime = this->scene->GetSimTime();
 
-  msgs::ImagesStamped msg;
+  robot_msgs::ImagesStamped msg;
   msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
 
   // Update all the cameras
@@ -205,11 +205,12 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
     if (publish)
     {
-      msgs::Image *image = msg.add_image();
+      robot_msgs::Image *image = msg.add_image();
       image->set_width((*iter)->GetImageWidth());
       image->set_height((*iter)->GetImageHeight());
-      image->set_pixel_format(common::Image::ConvertPixelFormat(
-            (*iter)->GetImageFormat()));
+      image->set_format(
+          msgs::Convert(common::Image::ConvertPixelFormat(
+            (*iter)->GetImageFormat())));
       image->set_step((*iter)->GetImageWidth() * (*iter)->GetImageDepth());
       image->set_data((*iter)->GetImageData(0),
           image->width() * (*iter)->GetImageDepth() * image->height());

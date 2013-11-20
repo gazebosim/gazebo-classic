@@ -87,11 +87,7 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
 
   // Convert the image data to RGB
   common::Image img;
-  img.SetFromData(
-      (unsigned char *)(_msg->image().data().c_str()),
-      _msg->image().width(),
-      _msg->image().height(),
-      (common::Image::PixelFormat)(_msg->image().pixel_format()));
+  msgs::Set(img, _msg->image());
 
   img.GetRGBData(&rgbData, rgbDataSize);
 

@@ -57,7 +57,7 @@ TEST(MsgFactory, BadMsgType)
 /// Check to make sure that NewMsg works properly
 TEST(MsgFactory, NewMsg)
 {
-  gazebo::msgs::Vector3d goodMsg;
+  robot_msgs::Vector3d goodMsg;
   goodMsg.set_x(1.1);
   goodMsg.set_y(2.2);
   goodMsg.set_z(3.3);
@@ -65,8 +65,8 @@ TEST(MsgFactory, NewMsg)
   std::string serializedData;
   goodMsg.SerializeToString(&serializedData);
 
-  gazebo::msgs::Vector3dPtr msg =
-    boost::dynamic_pointer_cast<gazebo::msgs::Vector3d>(
+  robot_msgs::Vector3dPtr msg =
+    boost::dynamic_pointer_cast<robot_msgs::Vector3d>(
         gazebo::msgs::MsgFactory::NewMsg("gazebo.msgs.Vector3d"));
 
   msg->ParseFromString(serializedData);

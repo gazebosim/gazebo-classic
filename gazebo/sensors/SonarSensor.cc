@@ -175,7 +175,7 @@ void SonarSensor::Load(const std::string &_worldName)
       &SonarSensor::OnContacts, this);
 
   // Advertise the sensor's topic on which we will output range data.
-  this->sonarPub = this->node->Advertise<msgs::SonarStamped>(this->GetTopic());
+  this->sonarPub = this->node->Advertise<robot_msgs::SonarStamped>(this->GetTopic());
 
   // Initialize the message that will be published on this->sonarPub.
   this->sonarMsg.mutable_sonar()->set_range_min(this->rangeMin);
