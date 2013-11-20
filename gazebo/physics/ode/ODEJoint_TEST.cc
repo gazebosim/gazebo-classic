@@ -90,7 +90,7 @@ TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
     if (i == 3387)
     {
       EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.y,     2.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
