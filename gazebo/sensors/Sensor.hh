@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Get fully scoped name of the sensor.
-      /// \return world_name::parent_name::sensor_name.
+      /// \return world_name::model_name::link_name::sensor_name.
       public: std::string GetScopedName() const;
 
       /// \brief Get the current pose.

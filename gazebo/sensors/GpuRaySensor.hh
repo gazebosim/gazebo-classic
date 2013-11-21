@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,10 @@ namespace gazebo
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block
       public: void SetVerticalAngleMax(double _angle);
+
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double GetVerticalAngleResolution() const;
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
