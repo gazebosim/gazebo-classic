@@ -115,6 +115,38 @@ TEST_F(TransportTest, PubSub)
   subs.clear();
 }
 
+TEST_F(TransportTest, DirectPublish)
+{
+  Load("worlds/empty.world");
+
+  g_sceneMsg = false;
+  
+  msgs::Scene msg;
+  msgs::Init(msg, "test");
+  msg.set_name("default");
+
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+ 
+  transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
+      &ReceiveSceneMsg);
+  transport::publish<msgs::Scene>("~/scene", msg);
+
+  // Not nice to time check here but 10 seconds should be 'safe' to check
+  // against
+  int timeout = 1000;
+  while (not g_sceneMsg)
+  {
+    usleep(10);
+
+    timeout--;
+    if (timeout == 0)
+      break;
+  }
+
+  ASSERT_GT(timeout, 0) << "Not received a message in 10 seconds";
+}
+
 /////////////////////////////////////////////////
 void SinglePub()
 {
@@ -300,6 +332,24 @@ TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
   EXPECT_TRUE(g_stringMsg2);
 
   thread->join();
+}
+
+TEST_F(TransportTest, PublicationTransport)
+{
+  Load("worlds/empty.world");
+
+  msgs::Scene msg;
+  msgs::Init(msg, "test");
+  msg.set_name("default");
+
+  transport::PublicationTransport pubTransport("~/scene", "msg::Scene");
+  transport::ConnectionPtr connection = pubTransport.GetConnection();
+  ASSERT_EQ("~/scene", pubTransport.GetTopic());
+  ASSERT_EQ("msg::Scene", pubTransport.GetMsgType());
+  // Call Fini without Init
+  ASSERT_NO_THROW(pubTransport.Fini());
+  // TODO: implement a proper init method to test functionality
+  // TODO: add callback method
 }
 
 /////////////////////////////////////////////////
