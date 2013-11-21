@@ -137,7 +137,7 @@ TEST_F(TransportTest, DirectPublish)
   int timeout = 1000;
   while (not g_sceneMsg)
   {
-    usleep(10);
+    common::Time::MSleep(10);
 
     timeout--;
     if (timeout == 0)
