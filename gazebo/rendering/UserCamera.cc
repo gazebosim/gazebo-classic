@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
   printf("constructed\n");
-  std::stringstream stream;
 
   this->gui = new GUIOverlay();
 
@@ -131,7 +130,7 @@ UserCamera::~UserCamera()
 //////////////////////////////////////////////////
 void UserCamera::Load(sdf::ElementPtr _sdf)
 {
-   Camera::Load(_sdf);
+  Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -156,6 +155,7 @@ void UserCamera::Init()
     this->leftCamera = this->scene->GetManager()->createCamera("UserLeft");
     this->leftCamera->pitch(Ogre::Degree(90));
 
+    // Don't yaw along variable axis, causes leaning
     this->leftCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
     this->leftCamera->setDirection(1, 0, 0);
 
@@ -166,6 +166,9 @@ void UserCamera::Init()
     this->leftCamera->setFarClipDistance(1000);
     this->leftCamera->setRenderingDistance(1000);
   }
+  // Orig
+  // this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  // this->camera->setDirection(1, 0, 0);
 
   this->SetHFOV(GZ_DTOR(60));
 
@@ -235,7 +238,6 @@ void UserCamera::Init()
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
   */
-
 }
 
 //////////////////////////////////////////////////
@@ -277,8 +279,8 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
   {
-    // if (this->selectionBuffer)
-    //  this->selectionBuffer->Update();
+    // Oculus if (this->selectionBuffer)
+    // Oculus this->selectionBuffer->Update();
 
     // DEBUG: this->selectionBuffer->ShowOverlay(true);
 
@@ -312,9 +314,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     math::Pose origPose = this->GetWorldPose();
-    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
-                       origPose.pos.y - _visual->GetWorldPose().pos.y);
-    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
     double pitch = 0;
@@ -524,7 +524,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   end = mid + dir*(dist - scale);
 
-  dist = start.Distance(end);
+  // dist = start.Distance(end);
   // double vel = 5.0;
   double time = 0.5;  // dist / vel;
 

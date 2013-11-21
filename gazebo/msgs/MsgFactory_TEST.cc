@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ TEST(MsgFactory, AllTypes)
   gazebo::msgs::MsgFactory::GetMsgTypes(types);
   std::string protoCount = custom_exec(std::string("ls ") +
       PROJECT_SOURCE_PATH + "/gazebo/msgs/*.proto | wc -l");
-  boost::trim_right(protoCount);
+  boost::trim(protoCount);
 
   EXPECT_EQ(boost::lexical_cast<size_t>(protoCount), types.size());
 }

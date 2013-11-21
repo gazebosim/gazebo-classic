@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,13 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(forceTorqueSensorString, sdf);
 
+  physics::WorldPtr world = physics::get_world("default");
+  physics::ModelPtr model = world->GetModel("pioneer2dx");
+  physics::JointPtr joint = model->GetJoint("left_wheel_hinge");
+
   // Create the Ray sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "pioneer2dx::left_wheel_hinge");
+      "pioneer2dx::left_wheel_hinge", joint->GetId());
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName,

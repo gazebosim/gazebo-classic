@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <math.h>
+#include <cmath>
 #include <stdio.h>
 
 #include "gazebo/math/Helpers.hh"
@@ -111,7 +112,7 @@ double PID::Update(double _error, common::Time _dt)
   double pTerm, dTerm, iTerm;
   this->pErr = _error;
 
-  if (_dt == common::Time(0, 0) || math::isnan(_error) || isinf(_error))
+  if (_dt == common::Time(0, 0) || math::isnan(_error) || std::isinf(_error))
     return 0.0;
 
   // Calculate proportional contribution to command

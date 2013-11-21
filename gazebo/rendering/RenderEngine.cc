@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,15 @@
  * Date: 13 Feb 2006
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
+#ifndef Q_OS_MAC  // Not Apple
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <GL/glx.h>
+#endif
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -34,11 +40,11 @@
 
 #include "gazebo/gazebo_config.h"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -113,6 +119,12 @@ void RenderEngine::Load()
     {
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+#endif
 
     // Load all the plugins
     this->LoadPlugins();
@@ -284,7 +296,11 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
-  this->scenes.clear();
+  // Deallocate memory for every scene
+  while (!this->scenes.empty())
+  {
+    this->RemoveScene(this->scenes.front()->GetName());
+  }
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
@@ -313,6 +329,7 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+#ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -322,6 +339,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
+#endif
 
   this->initialized = false;
 }
@@ -334,7 +352,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -348,25 +366,33 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL");
-    plugins.push_back(path+"/Plugin_ParticleFX");
-    plugins.push_back(path+"/Plugin_BSPSceneManager");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager");
+#ifdef __APPLE__
+    std::string prefix = "lib";
+    std::string extension = ".dylib";
+#else
+    std::string prefix = "";
+    std::string extension = ".so";
+#endif
+
+    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
+    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
+    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
     plugins.push_back(path+"/Plugin_CgProgramManager");
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter+".so");
+        this->root->loadPlugin(*piter+extension);
       }
       catch(Ogre::Exception &e)
       {
         try
         {
           // Load the debug plugin into OGRE
-          this->root->loadPlugin(*piter+"_d.so");
+          this->root->loadPlugin(*piter+"_d"+extension);
         }
         catch(Ogre::Exception &ed)
         {
@@ -408,7 +434,6 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
 
       // Parse all material files in the path if any exist
       boost::filesystem::path dir(path);
-      std::list<boost::filesystem::path> resultSet;
 
       if (boost::filesystem::exists(dir) &&
           boost::filesystem::is_directory(dir))
@@ -530,7 +555,7 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {
@@ -553,7 +578,7 @@ void RenderEngine::SetupRenderSystem()
   const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+#if  OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   rsList = this->root->getAvailableRenderers();
 #else
   rsList = &(this->root->getAvailableRenderers());
@@ -601,6 +626,9 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
+#ifdef Q_OS_MAC
+  this->dummyDisplay = 0;
+#else
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -647,6 +675,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
+#endif
 
   return result;
 }
@@ -710,3 +739,11 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
 {
   return this->windowManager;
 }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
+}
+#endif

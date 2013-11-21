@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 #include <iomanip>
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
@@ -60,10 +60,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_arrowAct);
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
+  actionGroup->addAction(g_scaleAct);
 
   this->toolbar->addAction(g_arrowAct);
   this->toolbar->addAction(g_translateAct);
   this->toolbar->addAction(g_rotateAct);
+  this->toolbar->addAction(g_scaleAct);
 
   this->toolbar->addSeparator();
   this->toolbar->addAction(g_boxCreateAct);

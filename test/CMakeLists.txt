@@ -16,6 +16,10 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build gtest
@@ -32,6 +36,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(TEST_TYPE "PERFORMANCE")
 add_subdirectory(performance)
 set(TEST_TYPE "INTEGRATION")
+add_subdirectory(integration)
+set(TEST_TYPE "REGRESSION")
 add_subdirectory(regression)
 add_subdirectory(cmake)
 add_subdirectory(pkgconfig)

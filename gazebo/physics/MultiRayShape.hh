@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,10 @@ namespace gazebo
 
       /// \brief Init the shape.
       public: virtual void Init();
+
+      /// \brief Set the scale of the multi ray shape.
+      /// \return _scale Scale to set the multi ray shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -105,7 +109,7 @@ namespace gazebo
       public: math::Angle GetVerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
-      /// \return Verticam max angle.
+      /// \return Vertical max angle.
       public: math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.

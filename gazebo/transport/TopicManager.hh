@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,13 +212,6 @@ namespace gazebo
       /// \brief Get all the topic namespaces
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
-
-      /// \brief Get a list of all the topics.
-      /// \return A map where keys are message types, and values are a list
-      /// of topic names.
-      /// \sa transport::GetAdvertisedTopics
-      public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Clear all buffers
       public: void ClearBuffers();

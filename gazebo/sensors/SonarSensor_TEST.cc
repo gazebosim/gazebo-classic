@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,13 @@ TEST_F(SonarSensor_TEST, CreateSonar)
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(sonarSensorString, sdf);
 
+  physics::WorldPtr world = physics::get_world("default");
+  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::LinkPtr link = model->GetLink("link");
+
   // Create the Ray sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link");
+      "ground_plane::link", link->GetId());
 
   // Make sure the returned sensor name is correct
   EXPECT_EQ(sensorName, std::string("default::ground_plane::link::sonar"));

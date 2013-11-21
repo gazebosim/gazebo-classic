@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
@@ -50,12 +50,6 @@ CameraSensor::CameraSensor()
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -134,8 +128,9 @@ void CameraSensor::Init()
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";
@@ -156,7 +151,9 @@ void CameraSensor::Fini()
   Sensor::Fini();
 
   if (this->camera)
+  {
     this->scene->RemoveCamera(this->camera->GetName());
+  }
 
   this->camera.reset();
   this->scene.reset();

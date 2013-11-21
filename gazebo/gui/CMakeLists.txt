@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -13,6 +14,7 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 add_subdirectory(building)
+add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
 
@@ -25,19 +27,21 @@ set (sources
   EntityMaker.cc
   RenderWidget.cc
   GLWidget.cc
-  Gui.cc
+  GuiIface.cc
   GuiEvents.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
+  SaveDialog.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -56,6 +60,7 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
+  SaveDialog.hh
   TimePanel.hh
   ToolsWidget.hh
   TopicSelector.hh
@@ -67,10 +72,11 @@ set (headers
   BoxMaker.hh
   CylinderMaker.hh
   EntityMaker.hh
-  Gui.hh
+  GuiIface.hh
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
+  ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
@@ -90,9 +96,13 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
-  MainWindow_TEST.cc
   TimePanel_TEST.cc
 )
+
+# MainWindow is using screen rendering
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
+endif()
 
 # Generate executables for each of the QT unit tests
 gz_build_qt_tests(${qt_tests})
@@ -115,6 +125,7 @@ target_link_libraries(gazebo_gui
   gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
+  gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
@@ -132,6 +143,7 @@ target_link_libraries(gzclient
   gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
+  gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser

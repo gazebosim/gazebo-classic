@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  if (this->nodes.empty() && this->callbacks.empty())
   {
     this->transports.clear();
   }
@@ -217,7 +217,7 @@ void Publication::RemoveSubscription(const std::string &_host,
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  if (this->nodes.empty() && this->callbacks.empty())
   {
     this->transports.clear();
   }
@@ -295,7 +295,7 @@ void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
   {
     boost::mutex::scoped_lock lock(this->callbackMutex);
 
-    if (this->callbacks.size() > 0)
+    if (!this->callbacks.empty())
     {
       std::string data;
       _msg->SerializeToString(&data);
@@ -444,7 +444,7 @@ void Publication::RemoveNodes()
   {
     boost::mutex::scoped_lock lock(this->nodeMutex);
     // If no more subscribers, then disconnect from all publishers
-    if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+    if (this->nodes.empty() && this->callbacks.empty())
     {
       this->transports.clear();
     }

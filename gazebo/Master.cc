@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,7 +314,7 @@ void Master::RunOnce()
   // Process the incoming message queue
   {
     boost::recursive_mutex::scoped_lock lock(this->msgsMutex);
-    while (this->msgs.size() > 0)
+    while (!this->msgs.empty())
     {
       this->ProcessMessage(this->msgs.front().first,
                            this->msgs.front().second);

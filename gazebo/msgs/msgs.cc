@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Rand.hh"
 
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -517,6 +517,11 @@ namespace gazebo
           blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
           blendElem = blendElem->GetNextElement("blend");
         }
+
+        // Set if the rendering engine uses terrain paging
+        bool useTerrainPaging =
+            geomElem->Get<bool>("use_terrain_paging");
+        result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);
       }
       else if (geomElem->GetName() == "mesh")
       {
