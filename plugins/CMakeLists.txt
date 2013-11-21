@@ -27,6 +27,7 @@ set (plugins
   SkidSteerDrivePlugin
   SonarPlugin
   SpringTestPlugin
+  SphereAtlasTestPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})
