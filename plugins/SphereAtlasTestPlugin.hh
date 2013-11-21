@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SPRING_TEST_PLUGIN_HH__
-#define __GAZEBO_SPRING_TEST_PLUGIN_HH__
+#ifndef __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
+#define __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
 
 #include <string>
 #include <vector>
