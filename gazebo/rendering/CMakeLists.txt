@@ -120,6 +120,9 @@ target_link_libraries( gazebo_rendering
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
   X11 
+  ovr
+  udev
+  Xinerama
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)

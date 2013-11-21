@@ -112,6 +112,7 @@ MainWindow::MainWindow()
   splitter->addWidget(this->leftColumn);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
+  splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -133,7 +134,6 @@ MainWindow::MainWindow()
   mainLayout->addLayout(centerLayout, 1);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
-
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -195,8 +195,8 @@ void MainWindow::Init()
   // Set the initial size of the window to 0.75 the desktop size,
   // with a minimum value of 1024x768.
   QSize winSize = QApplication::desktop()->size() * 0.75;
-  winSize.setWidth(std::max(1024, winSize.width()));
-  winSize.setHeight(std::max(768, winSize.height()));
+  winSize.setWidth(1280);//std::max(1024, winSize.width()));
+  winSize.setHeight(800);//std::max(768, winSize.height()));
 
   this->resize(winSize);
 
@@ -616,18 +616,19 @@ void MainWindow::OnFullScreen(bool _value)
   if (_value)
   {
     this->showFullScreen();
-    this->renderWidget->showFullScreen();
     this->leftColumn->hide();
     this->toolsWidget->hide();
     this->menuBar->hide();
+    this->setContentsMargins(0, 0, 0, 0);
+    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
     this->showNormal();
-    this->renderWidget->showNormal();
     this->leftColumn->show();
     this->toolsWidget->show();
     this->menuBar->show();
+    this->centralWidget()->layout()->setContentsMargins(10, 10, 10, 10);
   }
 }
 

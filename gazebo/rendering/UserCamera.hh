@@ -29,6 +29,23 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
+namespace OVR
+{
+class HMDDevice;
+class SensorFusion;
+class DeviceManager;
+class SensorDevice;
+
+namespace Util
+{
+namespace Render
+{
+class StereoConfig;
+}
+}
+}
+
+
 namespace gazebo
 {
   namespace rendering
@@ -235,6 +252,20 @@ namespace gazebo
 
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;
+
+      protected: Ogre::Camera *leftCamera;
+      protected: Ogre::Viewport *leftViewport;
+
+      private: void Oculus();
+      private: Ogre::CompositorInstance *compositors[2];
+
+                 OVR::DeviceManager *m_deviceManager;
+  OVR::HMDDevice *m_hmd;
+  OVR::Util::Render::StereoConfig *m_stereoConfig;
+  OVR::SensorDevice *m_sensor;
+  OVR::SensorFusion *m_sensorFusion;
+  bool m_oculusReady; /// Has the oculus rift been fully initialised?
+float m_centreOffset;
     };
     /// \}
   }

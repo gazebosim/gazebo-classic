@@ -126,6 +126,8 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
+      /// \brief Toggle full screen display.
+      /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 

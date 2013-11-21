@@ -67,6 +67,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
+  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);

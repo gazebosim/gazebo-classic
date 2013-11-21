@@ -43,13 +43,17 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
+#include "OVR.h"
+
 using namespace gazebo;
+using namespace OVR;
 using namespace rendering;
 
 //////////////////////////////////////////////////
 UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
+  printf("constructed\n");
   std::stringstream stream;
 
   this->gui = new GUIOverlay();
@@ -62,6 +66,54 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
+
+ /*m_deviceManager = DeviceManager::Create();
+  if (!m_deviceManager)
+  {
+    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create Device Manager");
+return;
+  }
+
+*/
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created Device Manager");
+  m_stereoConfig = new Util::Render::StereoConfig();
+  if (!m_stereoConfig)
+  {
+    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create StereoConfig");
+    return ;
+  }
+  m_centreOffset = m_stereoConfig->GetProjectionCenterOffset();
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created StereoConfig");
+  /*m_hmd = m_deviceManager->EnumerateDevices<HMDDevice>().CreateDevice();
+  if (!m_hmd)
+  {
+    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create HMD");
+    return ;
+  }
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created HMD");
+  HMDInfo devinfo;
+  m_hmd->GetDeviceInfo(&devinfo);
+  m_stereoConfig->SetHMDInfo(devinfo);
+  m_sensor = m_hmd->GetSensor();
+  if (!m_sensor)
+  {
+    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create sensor");
+    return ;
+  }
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created sensor");
+  m_sensorFusion = new SensorFusion();
+  if (!m_sensorFusion)
+  {
+    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create SensorFusion");
+    return ;
+  }
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created SensorFusion");
+  m_sensorFusion->AttachToSensor(m_sensor);
+*/
+  m_oculusReady = true;
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
+
+
 }
 
 //////////////////////////////////////////////////
@@ -79,7 +131,7 @@ UserCamera::~UserCamera()
 //////////////////////////////////////////////////
 void UserCamera::Load(sdf::ElementPtr _sdf)
 {
-  Camera::Load(_sdf);
+   Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +150,23 @@ void UserCamera::Init()
   this->viewController = this->orbitViewController;
 
   Camera::Init();
+
+  // Oculus
+  {
+    this->leftCamera = this->scene->GetManager()->createCamera("UserLeft");
+    this->leftCamera->pitch(Ogre::Degree(90));
+
+    this->leftCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->leftCamera->setDirection(1, 0, 0);
+
+    this->pitchNode->attachObject(this->leftCamera);
+    this->leftCamera->setAutoAspectRatio(true);
+
+    this->leftCamera->setNearClipDistance(this->GetNearClip());
+    this->leftCamera->setFarClipDistance(1000);
+    this->leftCamera->setRenderingDistance(1000);
+  }
+
   this->SetHFOV(GZ_DTOR(60));
 
   // Careful when setting this value.
@@ -166,6 +235,7 @@ void UserCamera::Init()
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
   */
+
 }
 
 //////////////////////////////////////////////////
@@ -207,8 +277,8 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
   {
-    if (this->selectionBuffer)
-      this->selectionBuffer->Update();
+    // if (this->selectionBuffer)
+    //  this->selectionBuffer->Update();
 
     // DEBUG: this->selectionBuffer->ShowOverlay(true);
 
@@ -334,19 +404,25 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
   if (this->viewport)
   {
-    this->viewport->setDimensions(0, 0, 1, 1);
+    this->viewport->setDimensions(0, 0, 0.5, 1);
+    this->leftViewport->setDimensions(0.5,0,0.5,1);
+
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
       this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
+    this->leftCamera->setAspectRatio(ratio);
+    this->leftCamera->setFOVy(Ogre::Radian(vfov));
+
     if (this->gui)
     {
-      this->gui->Resize(this->viewport->getActualWidth(),
+      this->gui->Resize(this->viewport->getActualWidth()*2,
                         this->viewport->getActualHeight());
     }
 
@@ -509,15 +585,27 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
+  this->leftViewport =
+    this->renderTarget->addViewport(this->leftCamera, 1,
+        0.5f, 0, 0.5f, 1.0f);
+  this->leftViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+
+  RTShaderSystem::AttachViewport(this->leftViewport, this->GetScene());
+
+  this->leftCamera->setAspectRatio(this->camera->getAspectRatio());
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->leftViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   if (this->gui)
     this->gui->Init(this->renderTarget);
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
-      this->scene->GetManager(), this->renderTarget);
+  // this->selectionBuffer = new SelectionBuffer(this->name,
+  //    this->scene->GetManager(), this->renderTarget);
+
+  this->Oculus();
 }
 
 //////////////////////////////////////////////////
@@ -538,6 +626,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 {
   VisualPtr result;
 
+  /*
   if (!this->selectionBuffer)
     return result;
 
@@ -581,6 +670,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
     }
   }
 
+  */
   return result;
 }
 
@@ -594,7 +684,7 @@ void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
 VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 {
   VisualPtr result;
-
+/*
   Ogre::Entity *entity =
     this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 
@@ -603,6 +693,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
     result = this->scene->GetVisual(
         Ogre::any_cast<std::string>(entity->getUserAny()));
   }
+  */
 
   return result;
 }
@@ -612,4 +703,100 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->viewController, "ViewController != NULL");
   return this->viewController->GetTypeString();
+}
+
+void UserCamera::Oculus()
+{
+  Ogre::MaterialPtr matLeft =
+    Ogre::MaterialManager::getSingleton().getByName("Ogre/Compositor/Oculus");
+  Ogre::MaterialPtr matRight = matLeft->clone("Ogre/Compositor/Oculus/Right");
+
+  Ogre::GpuProgramParametersSharedPtr pParamsLeft =
+    matLeft->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+  Ogre::GpuProgramParametersSharedPtr pParamsRight =
+    matRight->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+  Ogre::Vector4 hmdwarp;
+
+  if(m_stereoConfig)
+  {
+    hmdwarp = Ogre::Vector4(m_stereoConfig->GetDistortionK(0),
+        m_stereoConfig->GetDistortionK(1),
+        m_stereoConfig->GetDistortionK(2),
+        m_stereoConfig->GetDistortionK(3));
+  }
+  else
+  {
+    hmdwarp = Ogre::Vector4(1.0, 0.22, 0.24, 0);
+    /*hmdwarp = Ogre::Vector4(g_defaultDistortion[0],
+        g_defaultDistortion[1],
+        g_defaultDistortion[2],
+        g_defaultDistortion[3]);
+        */
+  }
+
+  float defaultProjCenterOffset = 0.14529906;
+
+  pParamsLeft->setNamedConstant("HmdWarpParam", hmdwarp);
+  pParamsRight->setNamedConstant("HmdWarpParam", hmdwarp);
+  pParamsLeft->setNamedConstant("LensCentre", 0.5f +
+      (m_stereoConfig->GetProjectionCenterOffset()/2.0f));
+
+  pParamsRight->setNamedConstant("LensCentre", 0.5f -
+      (m_stereoConfig->GetProjectionCenterOffset()/2.0f));
+
+  Ogre::CompositorPtr comp =
+    Ogre::CompositorManager::getSingleton().getByName("OculusRight");
+  comp->getTechnique(0)->getOutputTargetPass()->getPass(0)->setMaterialName(
+      "Ogre/Compositor/Oculus/Right");
+
+double g_defaultFarClip = 1000;
+  Ogre::Camera *cam;
+  for(int i=0;i<2;++i)
+  {
+    cam = i == 0 ? this->camera : this->leftCamera;
+
+    if(m_stereoConfig)
+    {
+      // Setup cameras.
+      cam->setNearClipDistance(m_stereoConfig->GetEyeToScreenDistance());
+      cam->setFarClipDistance(g_defaultFarClip);
+      cam->setPosition((i * 2 - 1) * m_stereoConfig->GetIPD() * 0.5f, 0, 0);
+      cam->setAspectRatio(m_stereoConfig->GetAspect());
+      cam->setFOVy(Ogre::Radian(m_stereoConfig->GetYFOVRadians()));
+
+      // Oculus requires offset projection, create a custom projection matrix
+      Ogre::Matrix4 proj = Ogre::Matrix4::IDENTITY;
+      float temp = m_stereoConfig->GetProjectionCenterOffset();
+      proj.setTrans(Ogre::Vector3(-m_stereoConfig->GetProjectionCenterOffset() * (2 * i - 1), 0, 0));
+      cam->setCustomProjectionMatrix(true, proj * cam->getProjectionMatrix());
+    }
+    else
+    {
+      /*cameras[i]->setNearClipDistance(g_defaultNearClip);
+      cameras[i]->setFarClipDistance(g_defaultFarClip);
+      cameras[i]->setPosition((i*2-1) * g_defaultIPD * 0.5f, 0, 0);
+      */
+      if (i == 0)
+        this->camera->setPosition(0,(i*2-1) * 0.064 * 0.5f, 0);
+      else
+        this->leftCamera->setPosition(0, (i*2-1) * 0.064 * 0.5f, 0);
+    }
+
+    if (i == 0)
+    {
+      this->compositors[i] =
+        Ogre::CompositorManager::getSingleton().addCompositor(
+            this->viewport, "OculusLeft");
+      if (!this->compositors[i])
+        gzerr << "Invalid compositor\n";
+      this->compositors[i]->setEnabled(true);
+    }
+    else
+    {
+      this->compositors[i] =
+        Ogre::CompositorManager::getSingleton().addCompositor(
+            this->leftViewport, "OculusRight");
+      this->compositors[i]->setEnabled(true);
+    }
+  }
 }
