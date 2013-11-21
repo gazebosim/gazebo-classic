@@ -192,9 +192,11 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
-  else if (this->childLink)
+
+  if (this->childLink)
     this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
-  else
+
+  if (!this->parentLink && !this->childLink)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
@@ -313,6 +315,18 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
+void Joint::SetEffortLimit(unsigned int _index, double _effort)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->effortLimit[_index] = _effort;
+    return;
+  }
+
+  gzerr << "SetEffortLimit index[" << _index << "] out of range" << std::endl;
+}
+
+//////////////////////////////////////////////////
 double Joint::GetEffortLimit(int _index)
 {
   if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
@@ -419,6 +433,12 @@ void Joint::FillMsg(msgs::Joint &_msg)
   {
     _msg.set_type(msgs::Joint::SCREW);
     _msg.add_angle(this->GetAngle(0).Radian());
+  }
+  else if (this->HasType(Base::GEARBOX_JOINT))
+  {
+    _msg.set_type(msgs::Joint::GEARBOX);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
   }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
@@ -856,4 +876,10 @@ double Joint::GetStopDissipation(unsigned int _index)
           << "] when trying to get joint stop dissipation.\n";
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetInitialAnchorPose()
+{
+  return this->anchorPose;
 }

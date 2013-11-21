@@ -58,6 +58,9 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+
   delete this->feedback;
   this->Detach();
 
