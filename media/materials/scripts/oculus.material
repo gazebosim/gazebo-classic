@@ -1,0 +1,55 @@
+fragment_program Ogre/Compositor/OculusFP_cg cg
+{
+	source oculus.cg
+	entry_point main_fp
+  profiles ps_4_0 ps_2_0 arbfp1
+	
+	default_params
+	{
+		param_named LensCentre float2 0.5 0.5
+		param_named Scale float2 0.3 0.3
+		param_named ScaleIn float2 2 2
+		param_named HmdWarpParam float4 1.0 0.22 0.24 0
+	}
+}
+
+vertex_program oculusBaseLightMap_vp cg
+{
+	source oculus.cg
+	entry_point oculusBaseLightMap_vp
+	profiles vs_4_0 vs_2_0 arbvp1
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+	}
+}
+
+fragment_program oculusBaseLightMap_fp cg
+{
+	source oculus.cg
+	entry_point oculusBaseLightMap_fp
+	profiles ps_4_0 ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/Oculus
+{
+	technique
+	{
+		pass
+		{
+			// depth_check off
+
+			vertex_program_ref Ogre/Compositor/StdQuad_vp { }
+			fragment_program_ref Ogre/Compositor/OculusFP_cg { }
+
+		  texture_unit RT
+			{
+				tex_coord_set 0
+				tex_address_mode border
+				tex_border_colour 0 0 0
+				filtering linear linear linear
+			}
+		}
+	}
+}
