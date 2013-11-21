@@ -1528,7 +1528,9 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->dataPtr->trackedVisual = _visual;
   }
   else
+  {
     this->dataPtr->trackedVisual.reset();
+  }
 
   return true;
 }
