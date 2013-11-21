@@ -25,7 +25,5 @@ if (NOT APPLE)
     transport_stress.cc
   )
   
-  set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
-    "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
   gz_build_tests(${tests})
 endif()
