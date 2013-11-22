@@ -74,8 +74,8 @@ TEST_F(CameraFollow, Follow)
   // Make sure the sensor is at the correct initial pose
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 9.9, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().pos.x, 4.6, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().pos.y, 4.6, 0.1);
 }
 
 /////////////////////////////////////////////////
