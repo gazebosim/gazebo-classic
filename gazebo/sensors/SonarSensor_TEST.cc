@@ -41,7 +41,7 @@ static std::string sonarSensorString =
 /// \brief Test Creation of a Sonar sensor
 TEST_F(SonarSensor_TEST, CreateSonar)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", true);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
