@@ -159,9 +159,11 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
-  else if (this->childLink)
+
+  if (this->childLink)
     this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
-  else
+
+  if (!this->parentLink && !this->childLink)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
@@ -277,6 +279,18 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
+}
+
+//////////////////////////////////////////////////
+void Joint::SetEffortLimit(unsigned int _index, double _effort)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->effortLimit[_index] = _effort;
+    return;
+  }
+
+  gzerr << "SetEffortLimit index[" << _index << "] out of range" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -657,4 +671,10 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 void Joint::SetProvideFeedback(bool _enable)
 {
   this->provideFeedback = _enable;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetInitialAnchorPose()
+{
+  return this->anchorPose;
 }
