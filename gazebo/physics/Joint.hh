@@ -264,6 +264,11 @@ namespace gazebo
       /// \return Effort limit specified in SDF
       public: virtual double GetEffortLimit(int _index);
 
+      /// \brief Set the effort limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _effort Effort limit for the axis.
+      public: virtual void SetEffortLimit(unsigned int _index, double _effort);
+
       /// \brief Get the velocity limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Velocity limit specified in SDF
