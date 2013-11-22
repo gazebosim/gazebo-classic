@@ -31,18 +31,19 @@
 
 namespace OVR
 {
-class HMDDevice;
-class SensorFusion;
-class DeviceManager;
-class SensorDevice;
+  class HMDDevice;
+  class SensorFusion;
+  class DeviceManager;
+  class SensorDevice;
 
-namespace Util
-{
-namespace Render
-{
-class StereoConfig;
-}
-}
+  namespace Util
+  {
+    class MagCalibration;
+    namespace Render
+    {
+      class StereoConfig;
+    }
+  }
 }
 
 
@@ -259,13 +260,14 @@ namespace gazebo
       private: void Oculus();
       private: Ogre::CompositorInstance *compositors[2];
 
-                 OVR::DeviceManager *m_deviceManager;
-  OVR::HMDDevice *m_hmd;
-  OVR::Util::Render::StereoConfig *m_stereoConfig;
-  OVR::SensorDevice *m_sensor;
-  OVR::SensorFusion *m_sensorFusion;
-  bool m_oculusReady; /// Has the oculus rift been fully initialised?
-float m_centreOffset;
+      private: OVR::DeviceManager *m_deviceManager;
+      private: OVR::HMDDevice *m_hmd;
+      private: OVR::Util::Render::StereoConfig *m_stereoConfig;
+      private: OVR::Util::MagCalibration *m_magCalibration;
+      private: OVR::SensorDevice *m_sensor;
+      private: OVR::SensorFusion *m_sensorFusion;
+      private: bool m_oculusReady; /// Has the oculus rift been fully initialised?
+      private: float m_centreOffset;
     };
     /// \}
   }

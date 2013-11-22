@@ -46,7 +46,6 @@
 #include "OVR.h"
 
 using namespace gazebo;
-using namespace OVR;
 using namespace rendering;
 
 //////////////////////////////////////////////////
@@ -66,41 +65,47 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
- /*m_deviceManager = DeviceManager::Create();
+  OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
+
+  m_deviceManager = OVR::DeviceManager::Create();
   if (!m_deviceManager)
   {
     Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create Device Manager");
-return;
+    return;
   }
 
-*/
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created Device Manager");
-  m_stereoConfig = new Util::Render::StereoConfig();
+  m_stereoConfig = new OVR::Util::Render::StereoConfig();
   if (!m_stereoConfig)
   {
     Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create StereoConfig");
-    return ;
+    return;
   }
   m_centreOffset = m_stereoConfig->GetProjectionCenterOffset();
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created StereoConfig");
-  /*m_hmd = m_deviceManager->EnumerateDevices<HMDDevice>().CreateDevice();
-  if (!m_hmd)
+
+  m_hmd = m_deviceManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
+  if (m_hmd)
+  {
+    OVR::HMDInfo devinfo;
+    m_hmd->GetDeviceInfo(&devinfo);
+    m_stereoConfig->SetHMDInfo(devinfo);
+    m_sensor = m_hmd->GetSensor();
+  }
+  else
   {
     Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create HMD");
-    return ;
+    m_sensor = m_deviceManager->EnumerateDevices<OVR::SensorDevice>().CreateDevice();
   }
+
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created HMD");
-  HMDInfo devinfo;
-  m_hmd->GetDeviceInfo(&devinfo);
-  m_stereoConfig->SetHMDInfo(devinfo);
-  m_sensor = m_hmd->GetSensor();
   if (!m_sensor)
   {
     Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create sensor");
     return ;
   }
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created sensor");
-  m_sensorFusion = new SensorFusion();
+  m_sensorFusion = new OVR::SensorFusion();
   if (!m_sensorFusion)
   {
     Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create SensorFusion");
@@ -108,10 +113,12 @@ return;
   }
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created SensorFusion");
   m_sensorFusion->AttachToSensor(m_sensor);
-*/
+
+  // m_magCalibration = new OVR::Util::MagCalibration();
+  // m_magCalibration->BeginAutoCalibration(*m_sensorFusion);
+
   m_oculusReady = true;
   Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
-
 
 }
 
@@ -142,6 +149,8 @@ void UserCamera::Load()
 //////////////////////////////////////////////////
 void UserCamera::Init()
 {
+
+
   this->orbitViewController = new OrbitViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->fpsViewController = new FPSViewController(
@@ -251,6 +260,11 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 void UserCamera::Update()
 {
   Camera::Update();
+
+  OVR::Quatf q = m_sensorFusion->GetPredictedOrientation();
+
+  // Set the orientation, and correct for the oculus coordinate system
+  this->SetWorldRotation(math::Quaternion(q.w, -q.z, -q.x, q.y));
 
   if (this->gui)
     this->gui->Update();

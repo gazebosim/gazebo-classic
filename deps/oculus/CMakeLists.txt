@@ -45,7 +45,7 @@ set (headers
 )
 
 gz_add_library(gazebo_ovr ${sources})
-target_link_libraries(gazebo_ovr ${tinyxml_libraries})
+target_link_libraries(gazebo_ovr udev ${tinyxml_libraries})
 
 gz_install_library(gazebo_ovr)
 gz_install_includes("ovr" ${headers})
