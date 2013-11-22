@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,12 @@ void RenderEngine::Load()
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+#endif
+
     // Load all the plugins
     this->LoadPlugins();
 
@@ -142,12 +148,13 @@ void RenderEngine::Load()
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
-                                   bool _enableVisualizations)
+                                   bool _enableVisualizations,
+                                   bool _isServer)
 {
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
   this->scenes.push_back(scene);
 
   scene->Load();
@@ -289,7 +296,11 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
-  this->scenes.clear();
+  // Deallocate memory for every scene
+  while (!this->scenes.empty())
+  {
+    this->RemoveScene(this->scenes.front()->GetName());
+  }
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
@@ -341,7 +352,7 @@ void RenderEngine::LoadPlugins()
     common::SystemPaths::Instance()->GetOgrePaths();
 
   for (iter = ogrePaths.begin();
-       iter!= ogrePaths.end(); ++iter)
+       iter != ogrePaths.end(); ++iter)
   {
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
@@ -368,7 +379,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
     plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
 
-    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
+    for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try
       {
@@ -422,7 +433,6 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
 
       // Parse all material files in the path if any exist
       boost::filesystem::path dir(path);
-      std::list<boost::filesystem::path> resultSet;
 
       if (boost::filesystem::exists(dir) &&
           boost::filesystem::is_directory(dir))
@@ -544,7 +554,7 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
+    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
     {
       try
       {
@@ -567,7 +577,7 @@ void RenderEngine::SetupRenderSystem()
   const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+#if  OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   rsList = this->root->getAvailableRenderers();
 #else
   rsList = &(this->root->getAvailableRenderers());
@@ -728,3 +738,11 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
 {
   return this->windowManager;
 }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
+}
+#endif

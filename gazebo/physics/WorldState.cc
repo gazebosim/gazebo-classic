@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,8 @@ WorldState::WorldState(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    if (!(*iter)->IsStatic())
-    {
-      this->modelStates.insert(std::make_pair((*iter)->GetName(),
-            ModelState(*iter, this->realTime, this->simTime)));
-    }
+    this->modelStates.insert(std::make_pair((*iter)->GetName(),
+          ModelState(*iter, this->realTime, this->simTime)));
   }
 }
 
@@ -80,11 +77,8 @@ void WorldState::Load(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    if (!(*iter)->IsStatic())
-    {
-      this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-          this->simTime);
-    }
+    this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
+        this->simTime);
   }
 
   // Remove models that no longer exist. We determine this by check the time
@@ -157,20 +151,6 @@ ModelState_M WorldState::GetModelStates(const boost::regex &_regex) const
 unsigned int WorldState::GetModelStateCount() const
 {
   return this->modelStates.size();
-}
-
-/////////////////////////////////////////////////
-ModelState WorldState::GetModelState(unsigned int _index) const
-{
-  if (_index < this->modelStates.size())
-  {
-    ModelState_M::const_iterator iter = this->modelStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Invalid model state index\n");
-  return ModelState();
 }
 
 /////////////////////////////////////////////////

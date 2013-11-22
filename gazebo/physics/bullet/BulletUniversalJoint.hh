@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,20 +45,17 @@ namespace gazebo
       /// \brief Destuctor
       public: virtual ~BulletUniversalJoint();
 
-      /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
       /// \brief Set the first axis of rotation
       public: void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Get the first axis of rotation
       public: virtual math::Vector3 GetAxis(int _index) const;
@@ -71,9 +68,6 @@ namespace gazebo
 
       /// \brief Get the angular rate of axis 1
       public: virtual double GetVelocity(int _index) const;
-
-      /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int _index, double _torque);
 
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
@@ -98,6 +92,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the torque of a joint.
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to bullet universal constraint
       private: btUniversalConstraint *bulletUniversal;

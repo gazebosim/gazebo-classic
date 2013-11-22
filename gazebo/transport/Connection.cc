@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -315,7 +315,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
 
   // async_write should only be called when the last async_write has
   // completed. therefore we have to check the writeCount attribute
-  if (this->writeQueue.size() == 0 || this->writeCount > 0)
+  if (this->writeQueue.empty() || this->writeCount > 0)
   {
     return;
   }

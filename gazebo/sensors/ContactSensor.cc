@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
   std::string collision1;
 
   // Don't do anything if there is no new data to process.
-  if (this->incomingContacts.size() == 0)
+  if (this->incomingContacts.empty())
     return;
 
   // Clear the outgoing contact message.

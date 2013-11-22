@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,6 @@ CameraSensor::~CameraSensor()
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
-}
-
-//////////////////////////////////////////////////
 void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
@@ -99,7 +93,7 @@ void CameraSensor::Init()
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
     {
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
       if (!this->scene)
@@ -134,8 +128,9 @@ void CameraSensor::Init()
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
   }
   else
     gzerr << "No world name\n";
@@ -156,7 +151,9 @@ void CameraSensor::Fini()
   Sensor::Fini();
 
   if (this->camera)
+  {
     this->scene->RemoveCamera(this->camera->GetName());
+  }
 
   this->camera.reset();
   this->scene.reset();

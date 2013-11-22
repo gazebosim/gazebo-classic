@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,15 +70,24 @@ bool transport::get_master_uri(std::string &_masterHost,
   }
   else
   {
-    _masterPort = boost::lexical_cast<unsigned int>(
-        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    try
+    {
+      _masterPort = boost::lexical_cast<unsigned int>(
+          masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    }
+    catch(...)
+    {
+      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+        << "Using the default port number of 11345.\n";
+    }
   }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
+    uint32_t _timeoutIterations)
 {
   std::string host = _masterHost;
   unsigned int port = _masterPort;
@@ -87,7 +96,9 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  if (!transport::ConnectionManager::Instance()->Init(host, port))
+
+  if (!transport::ConnectionManager::Instance()->Init(host, port,
+        _timeoutIterations))
     return false;
 
   return true;
@@ -139,9 +150,9 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  transport::stop();
   transport::TopicManager::Instance()->Fini();
 
+  transport::stop();
   if (g_runThread)
   {
     g_runThread->join();

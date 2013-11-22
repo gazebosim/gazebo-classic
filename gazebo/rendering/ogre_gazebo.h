@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@
 #include <OGRE/OgreColourValue.h>
 #include <OGRE/OgreQuaternion.h>
 #include <OGRE/OgreMesh.h>
-#include <OGRE/OgreFontManager.h>
 #include <OGRE/OgreHardwareBufferManager.h>
 #include <OGRE/OgreCamera.h>
 #include <OGRE/OgreNode.h>
@@ -45,10 +44,6 @@
 #include <OGRE/OgreFrameListener.h>
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreRenderObjectListener.h>
-
-#include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
-#include <OGRE/Terrain/OgreTerrain.h>
-#include <OGRE/Terrain/OgreTerrainGroup.h>
 #include <OGRE/OgreTechnique.h>
 #include <OGRE/OgrePass.h>
 #include <OGRE/OgreTextureUnitState.h>
@@ -56,9 +51,25 @@
 #include <OGRE/OgreHighLevelGpuProgramManager.h>
 #include <OGRE/OgreHardwarePixelBuffer.h>
 #include <OGRE/OgreShadowCameraSetupPSSM.h>
+#include <OGRE/Paging/OgrePageManager.h>
+#include <OGRE/Paging/OgrePagedWorld.h>
+#include <OGRE/Terrain/OgreTerrainPaging.h>
+#include <OGRE/Terrain/OgreTerrainMaterialGeneratorA.h>
+#include <OGRE/Terrain/OgreTerrain.h>
+#include <OGRE/Terrain/OgreTerrainGroup.h>
 
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#endif
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+#include <OGRE/Overlay/OgreOverlayManager.h>
+#include <OGRE/Overlay/OgreOverlayElement.h>
+#include <OGRE/Overlay/OgreOverlayContainer.h>
+#include <OGRE/Overlay/OgreFontManager.h>
+#include <OGRE/Overlay/OgreOverlaySystem.h>
+#else
+#include <OGRE/OgreFontManager.h>
 #endif
 
 #endif

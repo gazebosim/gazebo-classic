@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,20 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
 
   unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
+  now = world->GetSimTime().Double();
+
+  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+        << now << " seconds\n";
+
+  // Expect at least 50% of specified update rate
+  EXPECT_GT(static_cast<double>(hokuyoMsgCount),
+              updateRate*now * 0.5);
+
+  // Wait another 1.5 seconds
+  for (i = 0; i < 15; ++i)
+    common::Time::MSleep(100);
+
+  hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double();
 
   gzdbg << "counted " << hokuyoMsgCount << " messages in "

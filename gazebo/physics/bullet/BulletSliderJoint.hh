@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
+      // Documentation inherited.
       public: virtual void SetDamping(int _index, const double _damping);
 
       /// \brief Set the high stop of an axis(index).
@@ -76,9 +76,6 @@ namespace gazebo
        /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the slider force
-      public: virtual void SetForce(int _index, double _effort);
-
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _force);
 
@@ -90,6 +87,9 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      /// \brief Set the slider force
+      protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Pointer to bullet slider constraint
       private: btSliderConstraint *bulletSlider;

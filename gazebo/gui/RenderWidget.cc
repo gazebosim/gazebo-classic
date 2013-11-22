@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,10 +60,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_arrowAct);
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
+  actionGroup->addAction(g_scaleAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
   toolbar->addAction(g_rotateAct);
+  toolbar->addAction(g_scaleAct);
 
   toolbar->addSeparator();
   toolbar->addAction(g_boxCreateAct);

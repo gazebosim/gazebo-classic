@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,9 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      // since we're rotating a unit x vector, a pitch rotation will now be
+      // around the negative y axis
+      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
@@ -99,6 +101,20 @@ void MultiRayShape::Init()
 
       this->AddRay(start, end);
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  for (unsigned int i = 0; i < this->rays.size(); ++i)
+  {
+    this->rays[i]->SetScale(this->scale);
   }
 }
 

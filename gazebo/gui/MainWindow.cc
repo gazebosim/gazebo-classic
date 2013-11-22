@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/model/ModelEditor.hh"
 
 
 #ifdef HAVE_QWT
@@ -548,6 +549,12 @@ void MainWindow::Rotate()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Scale()
+{
+  gui::Events::manipMode("scale");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -828,6 +835,12 @@ void MainWindow::CreateActions()
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
 
+  g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
+  g_editModelAct->setShortcut(tr("Ctrl+M"));
+  g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
+  g_editModelAct->setCheckable(true);
+  g_editModelAct->setChecked(false);
+
   g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
@@ -853,10 +866,11 @@ void MainWindow::CreateActions()
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
-      tr("Translation Mode"), this);
+      tr("&Translation Mode"), this);
   g_translateAct->setStatusTip(tr("Translate an object"));
   g_translateAct->setCheckable(true);
   g_translateAct->setChecked(false);
+  g_translateAct->setToolTip(tr("Translation Mode (T)"));
   connect(g_translateAct, SIGNAL(triggered()), this, SLOT(Translate()));
   this->CreateDisabledIcon(":/images/translate.png", g_translateAct);
 
@@ -865,8 +879,17 @@ void MainWindow::CreateActions()
   g_rotateAct->setStatusTip(tr("Rotate an object"));
   g_rotateAct->setCheckable(true);
   g_rotateAct->setChecked(false);
+  g_rotateAct->setToolTip(tr("Rotation Mode (R)"));
   connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
   this->CreateDisabledIcon(":/images/rotate.png", g_rotateAct);
+
+  g_scaleAct = new QAction(QIcon(":/images/scale.png"),
+      tr("Scale Mode"), this);
+  g_scaleAct->setStatusTip(tr("Scale an object"));
+  g_scaleAct->setCheckable(true);
+  g_scaleAct->setChecked(false);
+  g_scaleAct->setToolTip(tr("Scale Mode (S)"));
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(Scale()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));
@@ -956,8 +979,8 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
@@ -1058,6 +1081,9 @@ void MainWindow::CreateMenuBar()
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
+
+  // \TODO: Add this back in when implementing the full Model Editor spec.
+  editMenu->addAction(g_editModelAct);
 
   QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1368,6 +1394,9 @@ void MainWindow::CreateEditors()
 
   // Create a Building Editor
   this->editors.push_back(new BuildingEditor(this));
+
+  // Create a Model Editor
+  this->editors.push_back(new ModelEditor(this));
 }
 
 /////////////////////////////////////////////////
