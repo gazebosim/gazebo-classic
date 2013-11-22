@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
 
-#ifndef _USERCAMERA_HH_
-#define _USERCAMERA_HH_
+#ifndef _GAZEBO_OCULUS_CAMERA_HH_
+#define _GAZEBO_OCULUS_CAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -29,6 +25,24 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
+namespace OVR
+{
+  class HMDDevice;
+  class SensorFusion;
+  class DeviceManager;
+  class SensorDevice;
+
+  namespace Util
+  {
+    class MagCalibration;
+    namespace Render
+    {
+      class StereoConfig;
+    }
+  }
+}
+
+
 namespace gazebo
 {
   namespace rendering
@@ -36,23 +50,22 @@ namespace gazebo
     class OrbitViewController;
     class FPSViewController;
     class Visual;
-    class GUIOverlay;
     class SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class UserCamera UserCamera.hh rendering/rendering.hh
+    /// \class OculusCamera OculusCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class UserCamera : public Camera
+    class OculusCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, ScenePtr _scene);
+      public: OculusCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
-      public: virtual ~UserCamera();
+      public: virtual ~OculusCamera();
 
       /// \brief Load the user camera.
       /// \param[in] _sdf Parameters for the camera.
@@ -142,12 +155,6 @@ namespace gazebo
       /// \param[in] _target The new rendering target.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
-      /// \brief Get the GUI overlay
-      ///
-      /// An overlay allows you to draw 2D elements on the viewport.
-      /// \return Pointer to the GUIOverlay.
-      public: GUIOverlay *GetGUIOverlay();
-
       /// \brief Set whether the view controller is enabled.
       ///
       /// The view controller is used to handle user camera movements.
@@ -192,16 +199,12 @@ namespace gazebo
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
 
-      // Documentation inherited.
-      protected: virtual void AnimationComplete();
-
       /// \brief Set the camera to track a scene node.
       ///
       /// Tracking just causes the camera to rotate to follow the visual.
       /// \param[in] _visual Visual to track.
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
-
 
       /// \brief Toggle whether to show the visual.
       private: void ToggleShowVisual();
@@ -215,26 +218,23 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
-      /// \brief The visual used to render the camera's appearance.
-      private: Visual *visual;
-
-      /// \brief The currently active view controller.
-      private: ViewController *viewController;
-
-      /// \brief An orbit view controller.
-      private: OrbitViewController *orbitViewController;
-
-      /// \brief A FPS view controller.
-      private: FPSViewController *fpsViewController;
-
-      /// \brief The GUI overlay.
-      private: GUIOverlay *gui;
-
-      /// \brief Draws a 3D axis in the viewport.
-      // private: Ogre::SceneNode *axisNode;
-
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;
+
+      protected: Ogre::Camera *leftCamera;
+      protected: Ogre::Viewport *leftViewport;
+
+      private: void Oculus();
+      private: Ogre::CompositorInstance *compositors[2];
+
+      private: OVR::DeviceManager *m_deviceManager;
+      private: OVR::HMDDevice *m_hmd;
+      private: OVR::Util::Render::StereoConfig *m_stereoConfig;
+      private: OVR::Util::MagCalibration *m_magCalibration;
+      private: OVR::SensorDevice *m_sensor;
+      private: OVR::SensorFusion *m_sensorFusion;
+      private: bool m_oculusReady; /// Has the oculus rift been fully initialised?
+      private: float m_centreOffset;
     };
     /// \}
   }

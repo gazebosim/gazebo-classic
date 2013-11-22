@@ -168,6 +168,7 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
+  std::cout << "Main OgreHandle[" << this->GetOgreHandle() << "]\n";
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(this->GetOgreHandle(), this->width(), this->height());
 

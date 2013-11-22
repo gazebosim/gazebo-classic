@@ -59,6 +59,7 @@ QAction *gazebo::gui::g_showJointsAct = 0;
 QAction *gazebo::gui::g_showCOMAct = 0;
 QAction *gazebo::gui::g_transparentAct = 0;
 QAction *gazebo::gui::g_viewWireframeAct = 0;
+QAction *gazebo::gui::g_viewOculusAct = 0;
 
 QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;

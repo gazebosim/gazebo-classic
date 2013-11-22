@@ -37,6 +37,7 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OculusCamera.cc
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
@@ -80,6 +81,7 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OculusCamera.hh
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh

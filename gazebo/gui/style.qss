@@ -594,6 +594,12 @@ QWidget#toolsWidget > QFrame
   background-color: #808080;
 }
 
+QWidget#oculusWindow
+{
+width: 1280px;
+height: 800px;
+}
+
 QWidget#renderWidget > QWidget
 {
   padding: 0px;

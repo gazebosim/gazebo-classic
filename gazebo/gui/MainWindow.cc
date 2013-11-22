@@ -20,6 +20,7 @@
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
@@ -196,8 +197,8 @@ void MainWindow::Init()
   // Set the initial size of the window to 0.75 the desktop size,
   // with a minimum value of 1024x768.
   QSize winSize = QApplication::desktop()->size() * 0.75;
-  winSize.setWidth(1280);//std::max(1024, winSize.width()));
-  winSize.setHeight(800);//std::max(768, winSize.height()));
+  winSize.setWidth(std::max(1024, winSize.width()));
+  winSize.setHeight(std::max(768, winSize.height()));
 
   this->resize(winSize);
 
@@ -748,6 +749,13 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewOculus()
+{
+  gui::OculusWindow *oculusWindow = new gui::OculusWindow();
+  oculusWindow->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
   gui::DataLogger *dataLogger = new gui::DataLogger(this);
@@ -1015,6 +1023,10 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_viewOculusAct = new QAction(tr("Oculus Window"), this);
+  g_viewOculusAct->setStatusTip(tr("Oculus Rift Window"));
+  connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
+
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
@@ -1104,11 +1116,13 @@ void MainWindow::CreateMenuBar()
   viewMenu->addSeparator();
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
+  viewMenu->addSeparator();
 
   QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
+  windowMenu->addAction(g_viewOculusAct);
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);

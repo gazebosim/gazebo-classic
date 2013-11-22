@@ -116,6 +116,7 @@ namespace gazebo
       private slots: void FullScreen();
       private slots: void FPS();
       private slots: void Orbit();
+      private slots: void ViewOculus();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();

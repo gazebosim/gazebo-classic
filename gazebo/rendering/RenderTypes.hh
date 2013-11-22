@@ -60,6 +60,7 @@ namespace gazebo
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class OculusCamera;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -144,6 +145,10 @@ namespace gazebo
     /// \def ContactVisualPtr
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def OculusCameraPtr
+    /// \brief Shared pointer to OculusCamera
+    typedef boost::shared_ptr<OculusCamera> OculusCameraPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

@@ -41,6 +41,7 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
+  OculusWindow.cc
   SaveDialog.cc
   SphereMaker.cc
   TimePanel.cc
@@ -59,6 +60,7 @@ set (qt_headers
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
+  OculusWindow.hh
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
