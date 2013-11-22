@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,9 @@
 using namespace gazebo;
 using namespace physics;
 
+/// \brief Flag used to say if/when to clear all models.
+/// This will be replaced with a class member variable in Gazebo 3.0
+bool g_clearModels;
 
 class ModelUpdate_TBB
 {
@@ -84,6 +87,7 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  g_clearModels = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
@@ -563,14 +567,23 @@ void World::Step()
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
+
+  if (g_clearModels)
+    this->ClearModels();
 }
 
 //////////////////////////////////////////////////
 void World::StepWorld(int _steps)
 {
+  this->Step(_steps);
+}
+
+//////////////////////////////////////////////////
+void World::Step(unsigned int _steps)
+{
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    gzwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
@@ -710,7 +723,27 @@ void World::Fini()
 //////////////////////////////////////////////////
 void World::Clear()
 {
-  // TODO: Implement this
+  g_clearModels = true;
+}
+
+//////////////////////////////////////////////////
+void World::ClearModels()
+{
+  g_clearModels = false;
+  bool pauseState = this->IsPaused();
+  this->SetPaused(true);
+
+  this->publishModelPoses.clear();
+
+  // Remove all models
+  for (Model_V::iterator iter = this->models.begin();
+       iter != this->models.end(); ++iter)
+  {
+    this->rootElement->RemoveChild((*iter)->GetId());
+  }
+  this->models.clear();
+
+  this->SetPaused(pauseState);
 }
 
 //////////////////////////////////////////////////
@@ -913,6 +946,9 @@ void World::Reset()
 
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
+
+    math::Rand::SetSeed(math::Rand::GetSeed());
+    this->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
@@ -1745,7 +1781,8 @@ void World::UpdateStateSDF()
   sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  this->prevStates[(this->stateToggle + 1) % 2].FillSDF(stateElem);
+  WorldState currentState(shared_from_this());
+  currentState.FillSDF(stateElem);
 }
 
 //////////////////////////////////////////////////
@@ -1942,6 +1979,12 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->logContinueCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+uint32_t World::GetIterations() const
+{
+  return this->iterations;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
 
 #include <dirent.h>
 #include <sstream>
@@ -144,8 +139,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   if (_autoRender)
   {
-    this->connections.push_back(
-        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
@@ -171,7 +166,7 @@ Camera::~Camera()
   this->renderTexture = NULL;
   this->renderTarget = NULL;
 
-  if (this->camera)
+  if (this->camera && this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
@@ -432,9 +427,15 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  if (this->initialized &&
-      common::Time::GetWallTime() - this->lastRenderWallTime >=
-      this->renderPeriod)
+  this->Render(false);
+}
+
+//////////////////////////////////////////////////
+void Camera::Render(bool _force)
+{
+  if (this->initialized && (_force ||
+       common::Time::GetWallTime() - this->lastRenderWallTime >=
+        this->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -541,14 +542,6 @@ math::Quaternion Camera::GetWorldRotation() const
   math::Vector3 sRot, pRot;
 
   sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
-
-  // As far as I can tell, OGRE is broken. It makes a strong assumption
-  // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
-  // out of the screen.
-  // This -1.0 multiplication is a hack to get back the correct orientation.
-  sRot.x *= -1.0;
-
   pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
 
   return math::Quaternion(sRot.x, pRot.y, sRot.z);
@@ -583,12 +576,8 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   math::Vector3 rpy = _quant.GetAsEuler();
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
 
-  // As far as I can tell, OGRE is broken. It makes a strong assumption
-  // that the camera is always oriented along its local -Z axis, and that
-  // the global coordinate frame is right-handed with +Y up, +X right, and +Z
-  // out of the screen.
-  // The -1.0 to Roll is a hack to set the correct orientation.
-  s.SetFromEuler(math::Vector3(-rpy.x, 0, rpy.z));
+  // Set the roll and yaw.
+  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
@@ -1233,7 +1222,10 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->GetImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+      Ogre::TU_RENDERTARGET,
+      0,
+      false,
+      4)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 

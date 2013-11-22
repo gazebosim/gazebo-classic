@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,6 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
-
-      /// \brief Set joint damping, not yet implemented
-      /// \sa Hinge2Joint::SetDamping
-      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
       public: virtual void Init();

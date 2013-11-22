@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+*/
 
-#include <gazebo/gazebo.hh>
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 
-namespace gazebo
-{
-  class WorldPluginTutorial : public WorldPlugin
-  {
-    public: WorldPluginTutorial() : WorldPlugin()
-            {
-              printf("Hello World!\n");
-            }
+using namespace gazebo;
+using namespace gui;
 
-    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
-            {
-            }
-  };
-  GZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)
-}
+event::EventT<void ()> model::Events::finishModel;

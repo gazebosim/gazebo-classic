@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_FFMPEG
@@ -25,6 +26,7 @@ extern "C" {
 }
 #endif
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/CommonIface.hh"
 

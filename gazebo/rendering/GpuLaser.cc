@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
   this->laserScan = NULL;
   this->matFirstPass = NULL;
   this->matSecondPass = NULL;
+  for (int i = 0; i < 3; ++i)
+    this->firstPassTextures[i] = NULL;
+  this->secondPassTexture = NULL;
+  this->orthoCam = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
   this->visual.reset();
@@ -63,6 +67,27 @@ GpuLaser::~GpuLaser()
 {
   delete [] this->laserBuffer;
   delete [] this->laserScan;
+
+  for (unsigned int i = 0; i < this->textureCount; ++i)
+  {
+    if (this->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->firstPassTextures[i]->getName());
+    }
+  }
+  if (this->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->secondPassTexture->getName());
+  }
+
+  if (this->scene && this->orthoCam)
+    this->scene->GetManager()->destroyCamera(this->orthoCam);
+
+  this->visual.reset();
+  this->texIdx.clear();
+  texCount = 0;
 }
 
 //////////////////////////////////////////////////
@@ -167,13 +192,16 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     Ogre::Pass *pass = technique->getPass(0);
     GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
 
-    texUnit = pass->createTextureUnitState(
-          this->firstPassTextures[i]->getName(), texIndex);
+    if (!pass->getTextureUnitState(this->firstPassTextures[i]->getName()))
+    {
+      texUnit = pass->createTextureUnitState(
+            this->firstPassTextures[i]->getName(), texIndex);
 
-    this->texIdx.push_back(texIndex);
+      this->texIdx.push_back(texIndex);
 
-    texUnit->setTextureFiltering(Ogre::TFO_NONE);
-    texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+      texUnit->setTextureFiltering(Ogre::TFO_NONE);
+      texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    }
   }
 
   this->CreateCanvas();

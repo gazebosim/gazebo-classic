@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,10 @@ namespace gazebo
       /// \brief Unadvertise a topic
       /// \param[in] _topic The topic to be unadvertised
       public: void Unadvertise(const std::string &_topic);
+
+      /// \brief Unadvertise a publisher.
+      /// \param[in] _pub Publisher to unadvertise.
+      public: void Unadvertise(PublisherPtr _pub);
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.

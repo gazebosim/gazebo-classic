@@ -68,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.7)
+  pkg_check_modules(SDF sdformat>=1.4.10)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -221,6 +221,16 @@ if (PKG_CONFIG_FOUND)
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
 
+  pkg_check_modules(OGRE-Overlay OGRE-Overlay)
+  if (OGRE-Overlay_FOUND)
+    set(ogre_ldflags ${ogre_ldflags} ${OGRE-Overlay_LDFLAGS})
+    set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Overlay_INCLUDE_DIRS})
+    set(ogre_libraries ${ogre_libraries};${OGRE-Overlay_LIBRARIES})
+    set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Overlay_LIBRARY_DIRS})
+    set(ogre_cflags ${ogre_cflags} ${OGRE-Overlay_CFLAGS})
+  endif()
+
+
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
        CACHE INTERNAL "Ogre include path")
 
@@ -302,7 +312,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet>=2.81)
+  # First and preferred option is to look for bullet standard pkgconfig, 
+  # so check it first. if it is not present, check for the OSRF 
+  # custom bullet2.82.pc file
+  pkg_check_modules(BULLET bullet>=2.82)
+  if (NOT BULLET_FOUND)
+     pkg_check_modules(BULLET bullet2.82>=2.82)
+  endif()
+
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
     add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )

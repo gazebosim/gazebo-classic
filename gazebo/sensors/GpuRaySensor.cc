@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -496,6 +496,13 @@ math::Angle GpuRaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
+double GpuRaySensor::GetVerticalAngleResolution() const
+{
+  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+    (this->GetVerticalRangeCount()-1);
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::SetVerticalAngleMax(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
@@ -563,6 +570,12 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     scan->set_angle_min(this->GetAngleMin().Radian());
     scan->set_angle_max(this->GetAngleMax().Radian());
     scan->set_angle_step(this->GetAngleResolution());
+    scan->set_count(this->GetRayCount());
+
+    scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+    scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+    scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+    scan->set_vertical_count(this->GetVerticalRayCount());
 
     scan->set_range_min(this->GetRangeMin());
     scan->set_range_max(this->GetRangeMax());
@@ -572,31 +585,33 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
 
     // todo: add loop for vertical range count
     for (int j = 0; j < this->GetVerticalRayCount(); ++j)
-    for (int i = 0; i < this->GetRayCount(); ++i)
     {
-      double range = this->laserCam->GetLaserData()[
+      for (int i = 0; i < this->GetRayCount(); ++i)
+      {
+        double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];
 
-      if (this->noiseActive)
-      {
-        switch (this->noiseType)
+        if (this->noiseActive)
         {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range += math::Rand::GetDblNormal(this->noiseMean,
-                this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range = math::clamp(range, this->GetRangeMin(),
-                this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
+          switch (this->noiseType)
+          {
+            case GAUSSIAN:
+              // Add independent (uncorrelated) Gaussian noise to each beam.
+              range += math::Rand::GetDblNormal(this->noiseMean,
+                  this->noiseStdDev);
+              // No real laser would return a range outside its stated limits.
+              range = math::clamp(range, this->GetRangeMin(),
+                  this->GetRangeMax());
+              break;
+            default:
+              GZ_ASSERT(false, "Invalid noise model type");
+          }
         }
-      }
 
-      scan->add_ranges(range);
-      scan->add_intensities(this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3 + 1]);
+        scan->add_ranges(range);
+        scan->add_intensities(this->laserCam->GetLaserData()[
+            (j * this->GetRayCount() + i) * 3 + 1]);
+      }
     }
 
     if (this->scanPub && this->scanPub->HasConnections())

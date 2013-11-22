@@ -2,12 +2,14 @@ set (files
   actor.world
   actor_demo.world
   actor_circle.world
+  blank.world
   two_actors.world
   camera.world
   gripper.world
   joint_damping_demo.world
   depth_camera.world
   empty.world
+  empty_sky.world
   force_torque_demo.world
   force_torque_demo2.world
   joints.world
@@ -27,6 +29,7 @@ set (files
   ray_cpu.world
   rubble.world
   shapes.world
+  sphere_atlas_demo.world
   weshare2012.world
   willowgarage.world)
 

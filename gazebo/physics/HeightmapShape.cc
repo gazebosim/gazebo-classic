@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,6 +253,7 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
+  _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 
 //////////////////////////////////////////////////
