@@ -1281,7 +1281,6 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
       if (z < 0.5) post_contact_correction = true;
     }
   }
-  Unload();
 }
 
 // This test doesn't pass yet in Bullet or Simbody
@@ -1407,7 +1406,6 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       x = x + dt * (v + vold) / 2.0;
     }
   }
-  Unload();
 }
 
 TEST_P(PhysicsTest, InelasticCollision)
@@ -1560,7 +1558,6 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
       }
     }
   }
-  Unload();
 }
 
 TEST_P(PhysicsTest, SimplePendulum)
