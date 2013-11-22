@@ -116,6 +116,39 @@ TEST_F(TransportTest, PubSub)
 }
 
 /////////////////////////////////////////////////
+TEST_F(TransportTest, DirectPublish)
+{
+  Load("worlds/empty.world");
+
+  g_sceneMsg = false;
+
+  msgs::Scene msg;
+  msgs::Init(msg, "test");
+  msg.set_name("default");
+
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+
+  transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
+      &ReceiveSceneMsg);
+  transport::publish<msgs::Scene>("~/scene", msg);
+
+  // Not nice to time check here but 10 seconds should be 'safe' to check
+  // against
+  int timeout = 1000;
+  while (not g_sceneMsg)
+  {
+    common::Time::MSleep(10);
+
+    timeout--;
+    if (timeout == 0)
+      break;
+  }
+
+  ASSERT_GT(timeout, 0) << "Not received a message in 10 seconds";
+}
+
+/////////////////////////////////////////////////
 void SinglePub()
 {
   transport::NodePtr node(new transport::Node());
@@ -300,6 +333,81 @@ TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
   EXPECT_TRUE(g_stringMsg2);
 
   thread->join();
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, PublicationTransportNoConnection)
+{
+  Load("worlds/empty.world");
+  transport::PublicationTransport pubTransport("~/no_topic", "msg::Scene");
+  ASSERT_EQ("~/no_topic", pubTransport.GetTopic());
+  ASSERT_EQ("msg::Scene", pubTransport.GetMsgType());
+
+  ASSERT_NO_THROW(pubTransport.Fini());
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, PublicationTransportFiniConnection)
+{
+  Load("worlds/empty.world");
+  transport::PublicationTransport pubTransport("~/no_topic", "msg::Scene");
+  ASSERT_EQ("~/no_topic", pubTransport.GetTopic());
+  ASSERT_EQ("msg::Scene", pubTransport.GetMsgType());
+
+  transport::ConnectionPtr conn(new transport::Connection);
+  ASSERT_NO_THROW(pubTransport.Init(conn, false));
+
+  ASSERT_NO_THROW(pubTransport.Fini());
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, IfaceGetMsgTyp)
+{
+  Load("worlds/empty.world");
+  std::string type;
+
+  type = transport::getTopicMsgType("/gazebo/default/world_stats");
+  EXPECT_EQ(type, "gazebo.msgs.WorldStatistics");
+
+  type = transport::getTopicMsgType("garbage");
+  EXPECT_TRUE(type.empty());
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, IfaceGetTopicNameSpaces)
+{
+  Load("worlds/empty.world");
+  std::list<std::string> ns;
+
+  transport::get_topic_namespaces(ns);
+  EXPECT_FALSE(ns.empty());
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, IfaceGetAdvertisedTopics)
+{
+  Load("worlds/empty.world");
+  std::list<std::string> topics;
+
+  topics = transport::getAdvertisedTopics("");
+  EXPECT_FALSE(topics.empty());
+
+  topics = transport::getAdvertisedTopics("no_msgs_of_this_type");
+  EXPECT_TRUE(topics.empty());
+
+  topics = transport::getAdvertisedTopics("gazebo.msgs.WorldStatistics");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), 1);
+
+  topics = transport::getAdvertisedTopics("gazebo.msgs.PosesStamped");
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), 2);
+
+  std::map<std::string, std::list<std::string> > topicMap =
+    transport::getAdvertisedTopics();
+
+  EXPECT_FALSE(topics.empty());
+  EXPECT_TRUE(topicMap.find("gazebo.msgs.PosesStamped") != topicMap.end());
 }
 
 /////////////////////////////////////////////////
