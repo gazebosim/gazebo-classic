@@ -473,18 +473,46 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::JointPtr joint;
-  gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
-  joint = SpawnJoint(_jointType, false, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
-  joint = SpawnJoint(_jointType, false, true);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, true);
+    ASSERT_TRUE(joint != NULL);
+    // Check child link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    EXPECT_TRUE(parent == NULL);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
-  joint = SpawnJoint(_jointType, true, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, true, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check parent link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    EXPECT_TRUE(child == NULL);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -512,13 +540,13 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
 
   gzdbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
-  EXPECT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != NULL);
 
   physics::LinkPtr parent, child;
   child = joint->GetChild();
   parent = joint->GetParent();
-  EXPECT_TRUE(child != NULL);
-  EXPECT_TRUE(parent != NULL);
+  ASSERT_TRUE(child != NULL);
+  ASSERT_TRUE(parent != NULL);
 
   math::Vector3 pos(10, 10, 10);
   math::Vector3 vel(10, 10, 10);
@@ -814,6 +842,159 @@ TEST_P(Joint_TEST, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
 }
+
+//////////////////////////////////////////////////
+void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
+{
+  // Load our inertial test world
+  Load("worlds/spring_damper_test.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // All models should oscillate with the same frequency
+  physics::ModelPtr modelPrismatic = world->GetModel("model_3_prismatic");
+  physics::ModelPtr modelRevolute = world->GetModel("model_3_revolute");
+  physics::ModelPtr modelPlugin = world->GetModel("model_4_prismatic_plugin");
+  physics::ModelPtr modelContact = world->GetModel("model_5_soft_contact");
+
+  ASSERT_TRUE(modelPrismatic != NULL);
+  ASSERT_TRUE(modelRevolute != NULL);
+  ASSERT_TRUE(modelPlugin != NULL);
+  ASSERT_TRUE(modelContact != NULL);
+
+  physics::LinkPtr linkPrismatic = modelPrismatic->GetLink("link_1");
+  physics::LinkPtr linkRevolute = modelRevolute->GetLink("link_1");
+  physics::LinkPtr linkPluginExplicit = modelPlugin->GetLink("link_1");
+  physics::LinkPtr linkPluginImplicit = modelPlugin->GetLink("link_2");
+  physics::LinkPtr linkContact = modelContact->GetLink("link_1");
+
+  ASSERT_TRUE(linkPrismatic != NULL);
+  ASSERT_TRUE(linkRevolute != NULL);
+  ASSERT_TRUE(linkPluginExplicit != NULL);
+  ASSERT_TRUE(linkPluginImplicit != NULL);
+  ASSERT_TRUE(linkContact != NULL);
+
+  int cyclesPrismatic = 0;
+  int cyclesRevolute = 0;
+  int cyclesPluginExplicit = 0;
+  int cyclesPluginImplicit = 0;
+  int cyclesContact = 0;
+
+  double velPrismatic = 1.0;
+  double velRevolute = 1.0;
+  double velPluginExplicit = 1.0;
+  double velPluginImplicit = 1.0;
+  double velContact = 1.0;
+  const double vT = 0.01;
+
+  // check number of oscillations for each of the setup.  They should all
+  // be the same.
+  // run 5000 steps, at which point, contact is the first one to damp out
+  // and lose it's oscillatory behavior due to larger dissipation in
+  // contact behavior.
+  for (int i = 0; i < 5000; ++i)
+  {
+    world->Step(1);
+
+    // count up and down cycles
+    if (linkPrismatic->GetWorldLinearVel().z > vT && velPrismatic < -vT)
+    {
+      cyclesPrismatic++;
+      velPrismatic = 1.0;
+    }
+    else if (linkPrismatic->GetWorldLinearVel().z < -vT && velPrismatic > vT)
+    {
+      cyclesPrismatic++;
+      velPrismatic = -1.0;
+    }
+    if (-linkRevolute->GetRelativeAngularVel().y > vT && velRevolute < -vT)
+    {
+      cyclesRevolute++;
+      velRevolute = 1.0;
+    }
+    else if (-linkRevolute->GetRelativeAngularVel().y < -vT && velRevolute > vT)
+    {
+      cyclesRevolute++;
+      velRevolute = -1.0;
+    }
+    if (linkPluginExplicit->GetWorldLinearVel().z > vT &&
+        velPluginExplicit < -vT)
+    {
+      cyclesPluginExplicit++;
+      velPluginExplicit = 1.0;
+    }
+    else if (linkPluginExplicit->GetWorldLinearVel().z < -vT &&
+             velPluginExplicit > vT)
+    {
+      cyclesPluginExplicit++;
+      velPluginExplicit = -1.0;
+    }
+    if (linkPluginImplicit->GetWorldLinearVel().z > vT &&
+             velPluginImplicit < -vT)
+    {
+      cyclesPluginImplicit++;
+      velPluginImplicit = 1.0;
+    }
+    else if (linkPluginImplicit->GetWorldLinearVel().z < -vT &&
+             velPluginImplicit > vT)
+    {
+      cyclesPluginImplicit++;
+      velPluginImplicit = -1.0;
+    }
+    if (linkContact->GetWorldLinearVel().z > vT && velContact < -vT)
+    {
+      cyclesContact++;
+      velContact = 1.0;
+    }
+    else if (linkContact->GetWorldLinearVel().z < -vT && velContact > vT)
+    {
+      cyclesContact++;
+      velContact = -1.0;
+    }
+
+    // gzdbg << i << "\n";
+    // gzdbg << cyclesPrismatic << " : "
+    //       << linkPrismatic->GetWorldLinearVel() << "\n";
+    // gzdbg << cyclesRevolute << " : "
+    //       << linkRevolute->GetRelativeAngularVel() << "\n";
+    // gzdbg << cyclesContact << " : "
+    //       << linkContact->GetWorldLinearVel() << "\n";
+  }
+  EXPECT_EQ(cyclesPrismatic,      17);
+  EXPECT_EQ(cyclesRevolute,       17);
+  EXPECT_EQ(cyclesPluginExplicit, 17);
+  EXPECT_EQ(cyclesPluginImplicit, 17);
+  EXPECT_EQ(cyclesContact,        17);
+}
+
+TEST_F(Joint_TEST, SpringDamperTestODE)
+{
+  SpringDamperTest("ode");
+}
+
+#ifdef HAVE_SIMBODY
+TEST_F(Joint_TEST, SpringDamperTestSimbody)
+{
+  gzerr << "SpringDampe unimplemented for Simbody, see issue #886.\n";
+  // SpringDamperTest("simbody");
+}
+#endif  // HAVE_SIMBODY
+
+#ifdef HAVE_BULLET
+/// bullet collision parameters needs tweaking
+TEST_F(Joint_TEST, SpringDamperTestBullet)
+{
+  gzerr << "SpringDamper unimplemented for Bullet, see issue #887.\n";
+  // SpringDamperTest("bullet");
+}
+#endif  // HAVE_BULLET
 
 TEST_F(Joint_TEST, joint_SDF14)
 {

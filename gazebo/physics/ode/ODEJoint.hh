@@ -35,14 +35,14 @@ namespace gazebo
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
-      /// \brief internal variables used for cfm damping
+      /// \brief internal variables used for implicit damping
       public:  enum CFMMode
       {
-        /// \brief cfm damping not active
+        /// \brief implicit damping not active
         NONE           = 0x00000000,
-        /// \brief cfm damping active, joints within limits
+        /// \brief implicit damping active, joints within limits
         DAMPING_ACTIVE = 0x00000001,
-        /// \brief cfm damping not active, enforcing joints limits
+        /// \brief implicit damping not active, enforcing joints limits
         JOINT_LIMIT    = 0x00000002
       };
 
@@ -85,6 +85,13 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual void SetStiffness(int _index, const double _stiffness);
+
+      // Documentation inherited.
+      public: virtual void SetStiffnessDamping(unsigned int _index,
+        double _stiffness, double _damping, double _reference = 0);
+
+      // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
       // Documentation inherited.
@@ -111,7 +118,15 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
 
       /// \brief simulating damping with CFM and meddling with Joint limits
-      public: void CFMDamping();
+      /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
+      public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
+
+      /// \brief simulate implicit spring and damper with CFM/ERP
+      /// and meddling with Joint limits.
+      public: void ApplyImplicitStiffnessDamping();
+
+      /// \brief simulating a joint spring and damper explicitly.
+      public: void ApplyExplicitStiffnessDamping();
 
       /// \brief Get access to stopCFM
       /// \return Returns joint's cfm for end stops
@@ -127,15 +142,52 @@ namespace gazebo
         return this->stopERP;
       }
 
-      /// \brief internal variable to keep track of cfm damping internals
-      private: int cfmDampingState[3];
+      /// \brief EXPERIMENTAL: If specified damping coefficient is negative,
+      /// apply adaptive damping.  What this means is that
+      /// if resulting acceleration is outside of stability region,
+      /// then increase damping using a limiter based on (f, v).
+      /// This approach safeguards dynamics against unstable joint behavior
+      /// at low speed (|v| < vThreshold) and
+      /// high force (|f| > fThreshold) scenarios.
+      /// Stability region is determined by:
+      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
+      private: double ApplyAdaptiveDamping(int _index, const double _damping);
 
-      /// \brief current cfm damping for stability reasons
-      private: double dStable[3];
+      /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
+      /// \param[in] _dt time step size
+      /// \param[in] _kp spring stiffness
+      /// \param[in] _kd spring damping
+      /// \param[out] _cfm equivalent constraint force mixing
+      /// \param[out] _erp equivalent error reduction parameter
+      private: void KpKdToCFMERP(const double _dt,
+                                 const double _kp, const double _kd,
+                                 double &_cfm, double &_erp);
+
+      /// \brief Helper funciton to convert CFM and ERP to Kp and Kd
+      /// \param[in] _dt time step size
+      /// \param[in] _cfm constraint force mixing
+      /// \param[in] _erp error reduction parameter
+      /// \param[out] _kp equivalent spring stiffness
+      /// \param[out] _kd equivalent spring damping
+      private: void CFMERPToKpKd(const double _dt,
+                                 const double _cfm, const double _erp,
+                                 double &_kp, double &_kd);
+
+      /// \brief internal variable to keep track of implicit damping internals
+      private: int implicitDampingState[MAX_JOINT_AXIS];
+
+      /// \brief save current implicit damping coefficient
+      private: double currentKd[MAX_JOINT_AXIS];
+
+      /// \brief save current implicit stiffness coefficient
+      private: double currentKp[MAX_JOINT_AXIS];
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
-      private: bool dampingInitialized;
+      private: bool stiffnessDampingInitialized;
+
+      /// \brief flag to use implicit joint stiffness damping if true.
+      private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
@@ -183,7 +235,7 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void ApplyDamping();
+      public: virtual void ApplyStiffnessDamping();
 
       // Documentation inherited.
       /// \brief Set the force applied to this physics::Joint.
