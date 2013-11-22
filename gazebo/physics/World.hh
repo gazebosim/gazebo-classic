@@ -40,7 +40,6 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/Timer.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
