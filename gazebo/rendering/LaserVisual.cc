@@ -131,5 +131,4 @@ void LaserVisual::Update()
 /////////////////////////////////////////////////
 void LaserVisual::SetEmissive(const common::Color &/*_color*/)
 {
-  /// \TODO: to be implemented
 }
