@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ Quaternion Quaternion::GetExp() const
 void Quaternion::Invert()
 {
   this->Normalize();
-  this->w = this->w;
+  // this->w = this->w;
   this->x = -this->x;
   this->y = -this->y;
   this->z = -this->z;

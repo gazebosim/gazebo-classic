@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/ConnectionManager.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace transport;
@@ -81,7 +81,8 @@ ConnectionManager::~ConnectionManager()
 
 //////////////////////////////////////////////////
 bool ConnectionManager::Init(const std::string &_masterHost,
-                             unsigned int master_port)
+                             unsigned int _masterPort,
+                             uint32_t _timeoutIterations)
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
@@ -95,23 +96,26 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   gzmsg << "Waiting for master";
   uint32_t timeoutCount = 0;
   uint32_t waitDurationMS = 1000;
-  uint32_t timeoutCountMax = 30;
 
-  while (!this->masterConn->Connect(_masterHost, master_port) &&
-      this->IsRunning() && timeoutCount < timeoutCountMax)
+  while (!this->masterConn->Connect(_masterHost, _masterPort) &&
+      this->IsRunning() && timeoutCount < _timeoutIterations)
   {
     if (!common::Console::Instance()->GetQuiet())
     {
       printf(".");
       fflush(stdout);
     }
-    common::Time::MSleep(waitDurationMS);
+
     ++timeoutCount;
+
+    if (timeoutCount < _timeoutIterations)
+      common::Time::MSleep(waitDurationMS);
   }
+
   if (!common::Console::Instance()->GetQuiet())
     printf("\n");
 
-  if (timeoutCount >= timeoutCountMax)
+  if (timeoutCount >= _timeoutIterations)
   {
     gzerr << "Failed to connect to master in "
           << (timeoutCount * waitDurationMS) / 1000.0 << " seconds.\n";
@@ -656,8 +660,6 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &_host,
       return ConnectionPtr();
     }
   }
-  // else
-  //  printf("Found Connections\n");
 
   return conn;
 }

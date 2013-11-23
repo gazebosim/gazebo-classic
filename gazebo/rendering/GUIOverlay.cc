@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/math/Vector2d.hh"
 
@@ -210,7 +210,6 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 
   press = false;
   release = false;
-  pos = false;
   scroll = false;
 
   CEGUI::System *system = CEGUI::System::getSingletonPtr();

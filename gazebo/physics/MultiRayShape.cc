@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,21 +62,21 @@ void MultiRayShape::Init()
   if (this->scanElem->HasElement("vertical"))
   {
     this->vertElem = this->scanElem->GetElement("vertical");
-    vertMinAngle = this->vertElem->GetValueDouble("min_angle");
-    vertMaxAngle = this->vertElem->GetValueDouble("max_angle");
-    vertSamples = this->vertElem->GetValueUInt("samples");
-    // vertResolution = this->vertElem->GetValueDouble("resolution");
+    vertMinAngle = this->vertElem->Get<double>("min_angle");
+    vertMaxAngle = this->vertElem->Get<double>("max_angle");
+    vertSamples = this->vertElem->Get<unsigned int>("samples");
+    // vertResolution = this->vertElem->Get<double>("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
-  horzMinAngle = this->horzElem->GetValueDouble("min_angle");
-  horzMaxAngle = this->horzElem->GetValueDouble("max_angle");
-  horzSamples = this->horzElem->GetValueUInt("samples");
-  // horzResolution = this->horzElem->GetValueDouble("resolution");
+  horzMinAngle = this->horzElem->Get<double>("min_angle");
+  horzMaxAngle = this->horzElem->Get<double>("max_angle");
+  horzSamples = this->horzElem->Get<unsigned int>("samples");
+  // horzResolution = this->horzElem->Get<double>("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = this->rangeElem->GetValueDouble("min");
-  maxRange = this->rangeElem->GetValueDouble("max");
+  minRange = this->rangeElem->Get<double>("min");
+  maxRange = this->rangeElem->Get<double>("max");
 
   this->offset = this->collisionParent->GetRelativePose();
 
@@ -91,7 +91,9 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      // since we're rotating a unit x vector, a pitch rotation will now be
+      // around the negative y axis
+      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
@@ -99,6 +101,20 @@ void MultiRayShape::Init()
 
       this->AddRay(start, end);
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  for (unsigned int i = 0; i < this->rays.size(); ++i)
+  {
+    this->rays[i]->SetScale(this->scale);
   }
 }
 
@@ -185,50 +201,50 @@ void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
 //////////////////////////////////////////////////
 double MultiRayShape::GetMinRange() const
 {
-  return this->rangeElem->GetValueDouble("min");
+  return this->rangeElem->Get<double>("min");
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
-  return this->rangeElem->GetValueDouble("max");
+  return this->rangeElem->Get<double>("max");
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetResRange() const
 {
-  return this->rangeElem->GetValueDouble("resolution");
+  return this->rangeElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 int MultiRayShape::GetSampleCount() const
 {
-  return this->horzElem->GetValueUInt("samples");
+  return this->horzElem->Get<unsigned int>("samples");
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetScanResolution() const
 {
-  return this->horzElem->GetValueDouble("resolution");
+  return this->horzElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMinAngle() const
 {
-  return this->horzElem->GetValueDouble("min_angle");
+  return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMaxAngle() const
 {
-  return this->horzElem->GetValueDouble("max_angle");
+  return this->horzElem->Get<double>("max_angle");
 }
 
 //////////////////////////////////////////////////
 int MultiRayShape::GetVerticalSampleCount() const
 {
   if (this->vertElem)
-    return this->vertElem->GetValueUInt("samples");
+    return this->vertElem->Get<unsigned int>("samples");
   else
     return 1;
 }
@@ -237,7 +253,7 @@ int MultiRayShape::GetVerticalSampleCount() const
 double MultiRayShape::GetVerticalScanResolution() const
 {
   if (this->vertElem)
-    return this->vertElem->GetValueDouble("resolution");
+    return this->vertElem->Get<double>("resolution");
   else
     return 1;
 }
@@ -246,7 +262,7 @@ double MultiRayShape::GetVerticalScanResolution() const
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
   if (this->vertElem)
-    return this->vertElem->GetValueDouble("min_angle");
+    return this->vertElem->Get<double>("min_angle");
   else
     return math::Angle(0);
 }
@@ -255,7 +271,7 @@ math::Angle MultiRayShape::GetVerticalMinAngle() const
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
   if (this->vertElem)
-    return this->vertElem->GetValueDouble("max_angle");
+    return this->vertElem->Get<double>("max_angle");
   else
     return math::Angle(0);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,13 @@ void MouseEventHandler::AddMoveFilter(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void MouseEventHandler::AddDoubleClickFilter(const std::string &_name,
+    MouseEventFilter _filter)
+{
+  this->Add(_name, _filter, this->doubleClickFilters);
+}
+
+/////////////////////////////////////////////////
 void MouseEventHandler::RemovePressFilter(const std::string &_name)
 {
   this->Remove(_name, this->pressFilters);
@@ -65,6 +72,12 @@ void MouseEventHandler::RemoveReleaseFilter(const std::string &_name)
 
 /////////////////////////////////////////////////
 void MouseEventHandler::RemoveMoveFilter(const std::string &_name)
+{
+  this->Remove(_name, this->moveFilters);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::RemoveDoubleClickFilter(const std::string &_name)
 {
   this->Remove(_name, this->moveFilters);
 }
@@ -88,6 +101,12 @@ void MouseEventHandler::HandleMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void MouseEventHandler::HandleDoubleClick(const common::MouseEvent &_event)
+{
+  this->Handle(_event, this->doubleClickFilters);
+}
+
+/////////////////////////////////////////////////
 void MouseEventHandler::Add(const std::string &_name,
     MouseEventFilter _filter, std::list<Filter> &_list)
 {
@@ -102,7 +121,7 @@ void MouseEventHandler::Add(const std::string &_name,
 void MouseEventHandler::Remove(const std::string &_name,
     std::list<Filter> &_list)
 {
-  std::remove(_list.begin(), _list.end(), _name);
+  _list.remove(Filter(_name, NULL));
 }
 
 /////////////////////////////////////////////////

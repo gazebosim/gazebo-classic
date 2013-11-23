@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PropagationParticle
+/// \brief Wireless strength signal in a point
+
+
+message PropagationParticle
+{
+  required double x = 1;
+  required double y = 2;
+  required double signal_level = 3;
+}

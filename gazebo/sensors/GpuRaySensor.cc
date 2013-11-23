@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
@@ -103,12 +103,12 @@ void GpuRaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->GetValueDouble("mean");
-      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseMean = noiseElem->Get<double>("mean");
+      this->noiseStdDev = noiseElem->Get<double>("stddev");
       this->noiseActive = true;
       gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
         " and stddev " << this->noiseStdDev << std::endl;
@@ -141,10 +141,10 @@ void GpuRaySensor::Init()
     this->scene = rendering::get_scene(worldName);
 
     if (!this->scene)
-      this->scene = rendering::create_scene(worldName, false);
+      this->scene = rendering::create_scene(worldName, false, true);
 
     this->laserCam = this->scene->CreateGpuLaser(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->laserCam)
     {
@@ -284,7 +284,7 @@ void GpuRaySensor::Init()
     this->laserCam->CreateRenderTexture(
         this->GetScopedName() + "_RttTex_Image");
     this->laserCam->SetWorldPose(this->pose);
-    this->laserCam->AttachToVisual(this->parentName, true);
+    this->laserCam->AttachToVisual(this->parentId, true);
 
     this->laserMsg.mutable_scan()->set_frame(this->parentName);
   }
@@ -386,7 +386,7 @@ double GpuRaySensor::GetRangeCountRatio() const
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMin() const
 {
-  return this->horzElem->GetValueDouble("min_angle");
+  return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
@@ -398,7 +398,7 @@ void GpuRaySensor::SetAngleMin(double _angle)
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMax() const
 {
-  return this->horzElem->GetValueDouble("max_angle");
+  return this->horzElem->Get<double>("max_angle");
 }
 
 //////////////////////////////////////////////////
@@ -410,13 +410,13 @@ void GpuRaySensor::SetAngleMax(double _angle)
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeMin() const
 {
-  return this->rangeElem->GetValueDouble("min");
+  return this->rangeElem->Get<double>("min");
 }
 
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeMax() const
 {
-  return this->rangeElem->GetValueDouble("max");
+  return this->rangeElem->Get<double>("max");
 }
 
 /////////////////////////////////////////////////
@@ -429,27 +429,27 @@ double GpuRaySensor::GetAngleResolution() const
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRangeResolution() const
 {
-  return this->rangeElem->GetValueDouble("resolution");
+  return this->rangeElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetRayCount() const
 {
-  return this->horzElem->GetValueUInt("samples");
+  return this->horzElem->Get<unsigned int>("samples");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetRangeCount() const
 {
   return this->GetRayCount() *
-        this->horzElem->GetValueDouble("resolution");
+        this->horzElem->Get<double>("resolution");
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetVerticalRayCount() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueUInt("samples");
+    return this->vertElem->Get<unsigned int>("samples");
   else
     return 1;
 }
@@ -460,7 +460,7 @@ int GpuRaySensor::GetVerticalRangeCount() const
   if (this->scanElem->HasElement("vertical"))
   {
     int rows =  (this->GetVerticalRayCount() *
-          this->vertElem->GetValueDouble("resolution"));
+          this->vertElem->Get<double>("resolution"));
     if (rows > 1)
       return rows;
     else
@@ -474,7 +474,7 @@ int GpuRaySensor::GetVerticalRangeCount() const
 math::Angle GpuRaySensor::GetVerticalAngleMin() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueDouble("min_angle");
+    return this->vertElem->Get<double>("min_angle");
   else
     return math::Angle(0);
 }
@@ -490,9 +490,16 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 math::Angle GpuRaySensor::GetVerticalAngleMax() const
 {
   if (this->scanElem->HasElement("vertical"))
-    return this->vertElem->GetValueDouble("max_angle");
+    return this->vertElem->Get<double>("max_angle");
   else
     return math::Angle(0);
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetVerticalAngleResolution() const
+{
+  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+    (this->GetVerticalRangeCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -563,6 +570,12 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
     scan->set_angle_min(this->GetAngleMin().Radian());
     scan->set_angle_max(this->GetAngleMax().Radian());
     scan->set_angle_step(this->GetAngleResolution());
+    scan->set_count(this->GetRayCount());
+
+    scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+    scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+    scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+    scan->set_vertical_count(this->GetVerticalRayCount());
 
     scan->set_range_min(this->GetRangeMin());
     scan->set_range_max(this->GetRangeMax());
@@ -572,31 +585,33 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
 
     // todo: add loop for vertical range count
     for (int j = 0; j < this->GetVerticalRayCount(); ++j)
-    for (int i = 0; i < this->GetRayCount(); ++i)
     {
-      double range = this->laserCam->GetLaserData()[
+      for (int i = 0; i < this->GetRayCount(); ++i)
+      {
+        double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];
 
-      if (this->noiseActive)
-      {
-        switch (this->noiseType)
+        if (this->noiseActive)
         {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range += math::Rand::GetDblNormal(this->noiseMean,
-                this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range = math::clamp(range, this->GetRangeMin(),
-                this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
+          switch (this->noiseType)
+          {
+            case GAUSSIAN:
+              // Add independent (uncorrelated) Gaussian noise to each beam.
+              range += math::Rand::GetDblNormal(this->noiseMean,
+                  this->noiseStdDev);
+              // No real laser would return a range outside its stated limits.
+              range = math::clamp(range, this->GetRangeMin(),
+                  this->GetRangeMax());
+              break;
+            default:
+              GZ_ASSERT(false, "Invalid noise model type");
+          }
         }
-      }
 
-      scan->add_ranges(range);
-      scan->add_intensities(this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3 + 1]);
+        scan->add_ranges(range);
+        scan->add_intensities(this->laserCam->GetLaserData()[
+            (j * this->GetRayCount() + i) * 3 + 1]);
+      }
     }
 
     if (this->scanPub && this->scanPub->HasConnections())

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
 {
-  // Initialize Conosol
+  // Initialize Console
   gazebo::common::Console::Instance()->Init("test.log");
 
   EXPECT_TRUE(getenv("HOME") != NULL);

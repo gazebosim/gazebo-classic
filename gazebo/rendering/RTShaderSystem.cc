@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,8 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  _viewport->setMaterialScheme(_scene->GetName());
+  if (_viewport && _scene && _scene->GetInitialized())
+    _viewport->setMaterialScheme(_scene->GetName());
 #endif
 }
 

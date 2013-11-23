@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Wrench 
+/// \brief Message for a wrench value
+
+
+import "vector3d.proto";
+
+message Wrench
+{
+  required Vector3d force  = 1;
+  required Vector3d torque = 2;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"
@@ -91,12 +93,6 @@ namespace gazebo
       /// \brief Return the database.config file as a string.
       /// \return The database config file from the model database.
       public: std::string GetDBConfig(const std::string &_uri);
-
-      /// \brief Deprecated.
-      /// \sa ModelDatabase::GetModelConfig
-      /// \sa ModelDatabase::GetDBConfig
-      public: std::string GetManifest(const std::string &_uri)
-              GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get the local path to a model.
       ///

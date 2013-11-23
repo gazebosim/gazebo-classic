@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include <gazebo/math/Rand.hh>
+#include <gazebo/physics/World.hh>
 #include "RubblePlugin.hh"
 
 using namespace gazebo;
@@ -32,16 +33,13 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->world = _world;
 
-  math::Vector3 bottomRight = _sdf->GetValueVector3("bottom_right");
-  math::Vector3 topLeft = _sdf->GetValueVector3("top_left");
-  math::Vector3 minSize = _sdf->GetValueVector3("min_size");
-  math::Vector3 maxSize = _sdf->GetValueVector3("max_size");
-  double minMass = _sdf->GetValueDouble("min_mass");
-  double maxMass = _sdf->GetValueDouble("max_mass");
-  unsigned int count = _sdf->GetValueUInt("count");
-
-  std::vector<CompoundObj> objects;
-  std::vector<CompoundObj>::iterator iter;
+  math::Vector3 bottomRight = _sdf->Get<math::Vector3>("bottom_right");
+  math::Vector3 topLeft = _sdf->Get<math::Vector3>("top_left");
+  math::Vector3 minSize = _sdf->Get<math::Vector3>("min_size");
+  math::Vector3 maxSize = _sdf->Get<math::Vector3>("max_size");
+  double minMass = _sdf->Get<double>("min_mass");
+  double maxMass = _sdf->Get<double>("max_mass");
+  unsigned int count = _sdf->Get<unsigned int>("count");
 
   for (unsigned int i = 0; i < count; ++i)
   {
@@ -108,7 +106,9 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     // Disable compound objects for now.
     // bool merged = false;
-    /*for (iter = objects.begin(); iter != objects.end(); ++iter)
+    /* std::vector<CompoundObj> objects;
+       std::vector<CompoundObj>::iterator iter;
+       for (iter = objects.begin(); iter != objects.end(); ++iter)
     {
       bool x = fabs(obj.pos.x - (*iter).pos.x) <=
         (*iter).size.x * 0.5 + obj.size.x * 0.5;

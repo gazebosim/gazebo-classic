@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Fini();
-
-      // Documentation inherited
-      public: virtual void Update();
 
       // Documentation inherited
       public: virtual void OnPoseChange();
@@ -164,6 +161,9 @@ namespace gazebo
       ///        propagates the chagnes in pose back to Gazebo
       /// \param[in] _id Id of the body.
       public: static void MoveCallback(dBodyID _id);
+
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
 
       /// \brief ODE link handle
       private: dBodyID linkId;

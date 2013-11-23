@@ -205,6 +205,9 @@ src/joints/plane2d.cpp
 src/joints/pr.cpp
 src/joints/pu.cpp
 src/joints/screw.cpp
+src/joints/dhinge.cpp
+src/joints/dball.cpp
+src/joints/gearbox.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
 )
@@ -243,7 +246,12 @@ endif()
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
 gz_add_library(gazebo_ode ${sources})
-target_link_libraries(gazebo_ode gazebo_opcode gazebo_gimpact gazebo_opende_ou ${CCD_LIBRARIES})
+target_link_libraries(gazebo_ode
+  gazebo_opcode
+  gazebo_gimpact
+  gazebo_opende_ou
+  ${CCD_LIBRARIES}
+  ${Boost_LIBRARIES})
 
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
