@@ -1023,8 +1023,8 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
-  g_viewOculusAct = new QAction(tr("Oculus Window"), this);
-  g_viewOculusAct->setStatusTip(tr("Oculus Rift Window"));
+  g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
+  g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
   connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
 
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
