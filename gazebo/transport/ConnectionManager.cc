@@ -81,7 +81,8 @@ ConnectionManager::~ConnectionManager()
 
 //////////////////////////////////////////////////
 bool ConnectionManager::Init(const std::string &_masterHost,
-                             unsigned int master_port)
+                             unsigned int _masterPort,
+                             uint32_t _timeoutIterations)
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
@@ -95,16 +96,19 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   gzmsg << "Waiting for master." << std::endl;
   uint32_t timeoutCount = 0;
   uint32_t waitDurationMS = 1000;
-  uint32_t timeoutCountMax = 30;
 
-  while (!this->masterConn->Connect(_masterHost, master_port) &&
-      this->IsRunning() && timeoutCount < timeoutCountMax)
+  while (!this->masterConn->Connect(_masterHost, _masterPort) &&
+      this->IsRunning() && timeoutCount < _timeoutIterations)
   {
-    common::Time::MSleep(waitDurationMS);
+
     ++timeoutCount;
+
+    if (timeoutCount < _timeoutIterations)
+      common::Time::MSleep(waitDurationMS);
   }
 
-  if (timeoutCount >= timeoutCountMax)
+
+  if (timeoutCount >= _timeoutIterations)
   {
     gzerr << "Failed to connect to master in "
           << (timeoutCount * waitDurationMS) / 1000.0 << " seconds."
@@ -650,8 +654,6 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &_host,
       return ConnectionPtr();
     }
   }
-  // else
-  //  printf("Found Connections\n");
 
   return conn;
 }
