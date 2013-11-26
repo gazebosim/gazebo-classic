@@ -281,7 +281,7 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRange(int _index)
+double RaySensor::GetRange(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -290,7 +290,7 @@ double RaySensor::GetRange(int _index)
     gzwarn << "ranges not constructed yet (zero sized)\n";
     return 0.0;
   }
-  if (_index < 0 || _index >= this->laserMsg.scan().ranges_size())
+  if (static_cast<int>(_index) >= this->laserMsg.scan().ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
@@ -300,7 +300,7 @@ double RaySensor::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRetro(int _index)
+double RaySensor::GetRetro(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -309,7 +309,7 @@ double RaySensor::GetRetro(int _index)
     gzwarn << "Intensities not constructed yet (zero size)\n";
     return 0.0;
   }
-  if (_index < 0 || _index >= this->laserMsg.scan().intensities_size())
+  if (static_cast<int>(_index) >= this->laserMsg.scan().intensities_size())
   {
     gzerr << "Invalid intensity index[" << _index << "]\n";
     return 0.0;
@@ -319,7 +319,7 @@ double RaySensor::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int RaySensor::GetFiducial(int _index)
+int RaySensor::GetFiducial(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -332,6 +332,12 @@ int RaySensor::GetFiducial(int _index)
   int hIdx = _index % this->GetRangeCount();
   hIdx = hIdx * this->GetRayCount() / this->GetRangeCount();
   int idx = vIdx * this->GetRayCount()  + hIdx;
+
+  if (idx >=  this->GetRayCount() * this->GetVerticalRayCount())
+  {
+    gzerr << "Invalid fiducial index[" << _index << "]\n";
+    return 0.0;
+  }
   return this->laserShape->GetFiducial(idx);
 }
 
