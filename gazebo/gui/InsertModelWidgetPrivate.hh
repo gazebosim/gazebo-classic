@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief A file/directory watcher.
       public: QFileSystemWatcher *watcher;
 
-      /// \brief Callback reference count for retreiving models.
+      /// \brief Callback reference count for retrieving models.
       public: event::ConnectionPtr getModelsConnection;
     };
   }
