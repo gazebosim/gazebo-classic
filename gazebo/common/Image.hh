@@ -178,7 +178,7 @@ namespace gazebo
       public: Color GetMaxColor() const;
 
       /// \brief Get the maximum elevation of one image using one component
-      /// \return The elevation of the image usging one image component
+      /// \return The elevation of the image using one image component
       public: float GetMaxElevation() const;
 
       /// \brief Rescale the image
