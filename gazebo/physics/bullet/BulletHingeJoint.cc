@@ -232,10 +232,10 @@ math::Angle BulletHingeJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
-  // this->bulletHinge->enableAngularMotor(true, -_angle,
-  // this->GetMaxForce(_index));
+  this->bulletHinge->enableAngularMotor(true, -_angle,
+    this->GetMaxForce(_index));
 }
 
 //////////////////////////////////////////////////
