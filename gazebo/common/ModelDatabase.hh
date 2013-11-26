@@ -35,7 +35,7 @@ namespace gazebo
 {
   namespace common
   {
-    /// \brief Forward declar private data class.
+    /// \brief Forward declare private data class.
     class ModelDatabasePrivate;
 
     /// \addtogroup gazebo_common Common
