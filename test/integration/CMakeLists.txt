@@ -30,6 +30,7 @@ set(tests
   gripper.cc
   imu.cc
   laser.cc
+  model_database.cc
   nondefault_world.cc
   physics.cc
   physics_msgs.cc
