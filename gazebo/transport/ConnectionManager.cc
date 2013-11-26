@@ -100,7 +100,6 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   while (!this->masterConn->Connect(_masterHost, _masterPort) &&
       this->IsRunning() && timeoutCount < _timeoutIterations)
   {
-
     ++timeoutCount;
 
     if (timeoutCount < _timeoutIterations)

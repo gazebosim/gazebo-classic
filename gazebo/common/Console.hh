@@ -55,6 +55,7 @@ namespace gazebo
 
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
+    /// \class FileLogger FileLogger.hh ignition/ignition
     /// \brief A logger that outputs messages to a file.
     class FileLogger : public std::ostream
     {
@@ -70,6 +71,19 @@ namespace gazebo
       /// \param[in] _filename Name and path of the log file to write output
       /// into.
       public: void Init(const std::string &_filename);
+
+      /// \brief Output a filename and line number, then return a reference
+      /// to the logger.
+      /// \return Reference to this logger.
+      public: virtual FileLogger &operator()();
+
+      /// \brief Output a filename and line number, then return a reference
+      /// to the logger.
+      /// \param[in] _file Filename to output.
+      /// \param[in] _line Line number in the _file.
+      /// \return Reference to this logger.
+      public: virtual FileLogger &operator()(
+                  const std::string &_file, int _line);
 
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf
@@ -90,6 +104,7 @@ namespace gazebo
                  };
     };
 
+    /// \class Logger Logger.hh ignition/ignition
     /// \brief Terminal logger.
     class Logger : public std::ostream
     {
@@ -112,6 +127,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Logger();
 
+      /// \brief Access operator.
+      /// \return Reference to this logger.
+      public: virtual Logger &operator()();
+
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.
       /// \param[in] _file Filename to output.
@@ -124,33 +143,31 @@ namespace gazebo
       protected: class Buffer : public std::stringbuf
                  {
                    /// \brief Constructor.
-                   /// \param[in] _prefix String to use as prefix when
-                   /// logging to file.
-                   /// \param[in] _color Color of the output stream.
                    /// \param[in] _type Output destination type
                    /// (STDOUT, or STDERR)
-                   public: Buffer(const std::string &_prefix,
-                               int _color, LogType _type);
+                   public: Buffer(LogType _type);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();
+
+                   public: int overflow(int _c);
 
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
                    public: virtual int sync();
 
-                   /// \brief Color for the output.
-                   public: int color;
-
                    /// \brief Destination type for the messages.
                    public: LogType type;
-
-                   /// \brief Prefix to use when logging to file.
-                   private: std::string prefix;
                  };
+
+      /// \brief Color for the output.
+      public: int color;
+
+      /// \brief Prefix to use when logging to file.
+      private: std::string prefix;
     };
 
-    /// \class Console Console.hh common/common.hh
+    /// \class Console Console.hh ignition/ignition
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
     class Console

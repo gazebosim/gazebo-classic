@@ -49,7 +49,7 @@ bool Console::GetQuiet()
 
 /////////////////////////////////////////////////
 Logger::Logger(const std::string &_prefix, int _color, LogType _type)
-  : std::ostream(new Buffer(_prefix, _color, _type))
+  : std::ostream(new Buffer(_type)), color(_color), prefix(_prefix)
 {
 }
 
@@ -60,19 +60,28 @@ Logger::~Logger()
 }
 
 /////////////////////////////////////////////////
+Logger &Logger::operator()()
+{
+  (*this) << "\033[1;" << this->color << "m" << this->prefix << "\033[0m ";
+
+  return (*this);
+}
+
+/////////////////////////////////////////////////
 Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
-  (*this) << "[" << _file.substr(index , _file.size() - index) << ":"
+
+  (*this) << "\033[1;" << this->color << "m" << this->prefix << "\033[0m "
+    << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "]";
 
   return (*this);
 }
 
 /////////////////////////////////////////////////
-Logger::Buffer::Buffer(const std::string &_prefix, int _color,
-    LogType _type)
-  : color(_color), type(_type), prefix(_prefix)
+Logger::Buffer::Buffer(LogType _type)
+  :  type(_type)
 {
 }
 
@@ -83,23 +92,33 @@ Logger::Buffer::~Buffer()
 }
 
 /////////////////////////////////////////////////
+int Logger::Buffer::overflow(int _c)
+{
+  Console::log.put(_c);
+  if (this->type == Logger::STDOUT)
+    std::cout.put(_c);
+  else
+    std::cerr.put(_c);
+
+  return _c;
+}
+
+/////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
   if (this->str().empty())
     return -1;
 
   // Log messages to disk
-  Console::log << this->prefix << " " << this->str() << std::endl;
+  Console::log() << this->str() << std::endl;
 
   // Output to terminal
   if (!Console::GetQuiet())
   {
     if (this->type == Logger::STDOUT)
-     std::cout << "\033[1;"
-       << this->color << "m" << this->prefix << "\033[0m" << this->str();
+     std::cout << this->str();
     else
-      std::cerr << "\033[1;"
-        << this->color << "m" << this->prefix << "\033[0m" << this->str();
+      std::cerr << this->str();
   }
 
   this->str("");
@@ -136,8 +155,25 @@ void FileLogger::Init(const std::string &_filename)
 
   buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
 
-  // Output the version of Gazebo.
+  // Output the version of gazebo.
   (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
+}
+
+/////////////////////////////////////////////////
+FileLogger &FileLogger::operator()()
+{
+  (*this) << "(" << Time::GetWallTime() << ") ";
+  return (*this);
+}
+
+/////////////////////////////////////////////////
+FileLogger &FileLogger::operator()(const std::string &_file, int _line)
+{
+  int index = _file.find_last_of("/") + 1;
+  (*this) << "(" << Time::GetWallTime() << ") ["
+    << _file.substr(index , _file.size() - index) << ":" << _line << "]";
+
+  return (*this);
 }
 
 /////////////////////////////////////////////////
@@ -163,7 +199,7 @@ int FileLogger::Buffer::sync()
   if (!this->stream)
     return -1;
 
-  *this->stream << "[" << common::Time::GetWallTime() << "] " << this->str();
+  *this->stream << this->str();
 
   this->stream->flush();
 
