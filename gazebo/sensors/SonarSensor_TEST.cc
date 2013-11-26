@@ -75,6 +75,46 @@ TEST_F(SonarSensor_TEST, CreateSonar)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Creation of a Sonar sensor with an unpaused world
+TEST_F(SonarSensor_TEST, CreateSonarUnpaused)
+{
+  Load("worlds/empty.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  sdf::ElementPtr sdf(new sdf::Element);
+  sdf::initFile("sensor.sdf", sdf);
+  sdf::readString(sonarSensorString, sdf);
+
+  // Create the Ray sensor
+  std::string sensorName = mgr->CreateSensor(sdf, "default",
+      "ground_plane::link");
+
+  // Make sure the returned sensor name is correct
+  EXPECT_EQ(sensorName, std::string("default::ground_plane::link::sonar"));
+
+  // Update the sensor manager so that it can process new sensors.
+  mgr->Update();
+
+  // Get a pointer to the sonar sensor
+  sensors::SonarSensorPtr sensor =
+    boost::dynamic_pointer_cast<sensors::SonarSensor>(
+        mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(sensor != NULL);
+
+  // Update the sensor
+  sensor->Update(true);
+
+  EXPECT_TRUE(sensor->IsActive());
+
+  EXPECT_DOUBLE_EQ(sensor->GetRangeMin(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 1.0);
+  EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
+  EXPECT_DOUBLE_EQ(sensor->GetRange(), 1.0);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
