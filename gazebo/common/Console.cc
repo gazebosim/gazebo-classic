@@ -163,7 +163,7 @@ int FileLogger::Buffer::sync()
   if (!this->stream)
     return -1;
 
-  *this->stream << "[" << common::Time::GetWallTime() << ") " << this->str();
+  *this->stream << "[" << common::Time::GetWallTime() << "] " << this->str();
 
   this->stream->flush();
 
