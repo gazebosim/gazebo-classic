@@ -8,7 +8,5 @@ import "pose.proto";
 
 message CameraCmd
 {
-  required string name           = 1;
-  optional string follow_model   = 2;
-  optional Pose move_to_position = 3;
+  optional string follow_model   = 1;
 }

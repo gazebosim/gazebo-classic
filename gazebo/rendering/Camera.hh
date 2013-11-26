@@ -350,7 +350,7 @@ namespace gazebo
       /// \return Pointer to the raw data, null if data is not available.
       public: virtual const unsigned char *GetImageData(unsigned int i = 0);
 
-      /// \brief Get the camera's short name
+      /// \brief Get the camera's unscoped name
       /// \return The name of the camera
       public: std::string GetName() const;
 
@@ -698,6 +698,8 @@ namespace gazebo
       /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
 
+      /// \internal
+      /// \brief Pointer to private data.
       private: CameraPrivate *dataPtr;
     };
     /// \}
