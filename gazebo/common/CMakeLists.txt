@@ -29,6 +29,7 @@ set (sources
   Events.cc
   Exception.cc
   Image.cc
+  ImageHeightmap.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -63,6 +64,7 @@ set (headers
   Exception.hh
   HeightmapData.hh
   Image.hh
+  ImageHeightmap.hh
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
@@ -107,6 +109,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  ImageHeightmap_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc

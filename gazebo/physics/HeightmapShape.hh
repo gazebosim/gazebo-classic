@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/Image.hh"
+#include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Vector3.hh"
@@ -138,7 +138,7 @@ namespace gazebo
       protected: std::vector<float> heights;
 
       /// \brief Image used to generate the heights.
-      protected: common::Image img;
+      protected: common::ImageHeightmap img;
 
       /// \brief HeightmapData used to generate the heights.
       protected: common::HeightmapData *heightmapData;
