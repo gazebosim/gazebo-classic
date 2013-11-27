@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DEM_HH_
-#define _DEM_HH_
+#ifndef _GAZEBO_DEM_HH_
+#define _GAZEBO_DEM_HH_
 
 #include <gazebo/gazebo_config.h>
 
@@ -47,8 +47,8 @@ namespace gazebo
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
-      /// \return 0 when the operation succeeds to open a file or -1 when fails.
-      public: int Load(const std::string &_filename="");
+      /// \return True when the operation succeeds to open a file.
+      public: bool Load(const std::string &_filename="");
 
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
@@ -56,11 +56,11 @@ namespace gazebo
       /// \return Terrain's elevation at (x,y) in meters.
       public: double GetElevation(double _x, double _y);
 
-      /// \brief Get the minimum terrain's elevation in meters.
+      /// \brief Get the terrain's minimum elevation in meters.
       /// \return The minimum elevation (meters).
       public: float GetMinElevation() const;
 
-      /// \brief Get the maximum terrain's elevation in meters.
+      /// \brief Get the terrain's maximum elevation in meters.
       /// \return The maximum elevation (meters).
       public: float GetMaxElevation() const;
 
