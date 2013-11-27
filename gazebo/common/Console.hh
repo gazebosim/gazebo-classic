@@ -46,7 +46,7 @@ namespace gazebo
     #define gzerr (gazebo::common::Console::err(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file
-    #define gzlog (gazebo::common::Console::log)
+    #define gzlog (gazebo::common::Console::log())
 
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
@@ -140,12 +140,10 @@ namespace gazebo
                    /// \brief Constructor.
                    /// \param[in] _type Output destination type
                    /// (STDOUT, or STDERR)
-                   public: Buffer(LogType _type);
+                   public: Buffer(LogType _type, int _color);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();
-
-                   public: int overflow(int _c);
 
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
@@ -153,6 +151,8 @@ namespace gazebo
 
                    /// \brief Destination type for the messages.
                    public: LogType type;
+
+                   public: int color;
                  };
 
       /// \brief Color for the output.

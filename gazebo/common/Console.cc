@@ -16,6 +16,7 @@
  */
 #include <string.h>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/regex.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -49,7 +50,7 @@ bool Console::GetQuiet()
 
 /////////////////////////////////////////////////
 Logger::Logger(const std::string &_prefix, int _color, LogType _type)
-  : std::ostream(new Buffer(_type)), color(_color), prefix(_prefix)
+  : std::ostream(new Buffer(_type, _color)), color(_color), prefix(_prefix)
 {
 }
 
@@ -62,7 +63,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
-  (*this) << "\033[1;" << this->color << "m" << this->prefix << "\033[0m ";
+  (*this) << this->prefix;
 
   return (*this);
 }
@@ -72,16 +73,16 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
-  (*this) << "\033[1;" << this->color << "m" << this->prefix << "\033[0m "
-    << "[" << _file.substr(index , _file.size() - index) << ":"
+  (*this) << this->prefix
+    << " [" << _file.substr(index , _file.size() - index) << ":"
     << _line << "]";
 
   return (*this);
 }
 
 /////////////////////////////////////////////////
-Logger::Buffer::Buffer(LogType _type)
-  :  type(_type)
+Logger::Buffer::Buffer(LogType _type, int _color)
+  :  type(_type), color(_color)
 {
 }
 
@@ -89,22 +90,6 @@ Logger::Buffer::Buffer(LogType _type)
 Logger::Buffer::~Buffer()
 {
   this->pubsync();
-}
-
-/////////////////////////////////////////////////
-int Logger::Buffer::overflow(int _c)
-{
-  Console::log.put(_c);
-
-  if (!Console::GetQuiet())
-  {
-    if (this->type == Logger::STDOUT)
-      std::cout.put(_c);
-    else
-      std::cerr.put(_c);
-  }
-
-  return _c;
 }
 
 /////////////////////////////////////////////////
@@ -120,9 +105,15 @@ int Logger::Buffer::sync()
   if (!Console::GetQuiet())
   {
     if (this->type == Logger::STDOUT)
-     std::cout << this->str();
+    {
+     std::cout << "\033[1;32m" << this->str() << "\033[0m";
+     std::cout.flush();
+    }
     else
-      std::cerr << this->str();
+    {
+     std::cerr << "\033[1;32m" << this->str() << "\033[0m";
+     std::cerr.flush();
+    }
   }
 
   this->str("");
