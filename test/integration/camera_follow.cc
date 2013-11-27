@@ -57,7 +57,6 @@ TEST_F(CameraFollow, Follow)
   // Tell the camera to follow the box. The camera should move toward the
   // box.
   msgs::CameraCmd msg;
-  msg.set_name("test_camera");
   msg.set_follow_model("box");
 
   transport::NodePtr node(new transport::Node());
