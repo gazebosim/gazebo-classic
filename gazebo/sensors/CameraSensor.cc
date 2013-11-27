@@ -184,7 +184,7 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
 
   this->camera->PostRender();
 
-  if (this->imagePub->HasConnections())
+  if (this->imagePub && this->imagePub->HasConnections())
   {
     msgs::ImageStamped msg;
     msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
@@ -199,8 +199,7 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
         msg.image().width() * this->camera->GetImageDepth() *
         msg.image().height());
 
-    if (this->imagePub && this->imagePub->HasConnections())
-      this->imagePub->Publish(msg);
+    this->imagePub->Publish(msg);
   }
 
   this->rendered = false;
