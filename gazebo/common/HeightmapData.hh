@@ -15,11 +15,11 @@
  *
 */
 
-#ifndef _HEIGHTMAPDATA_HH_
-#define _HEIGHTMAPDATA_HH_
+#ifndef _GAZEBO_HEIGHTMAPDATA_HH_
+#define _GAZEBO_HEIGHTMAPDATA_HH_
 
 #include <vector>
-#include "gazebo/common/Color.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -28,11 +28,11 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \class HeighmapData HeighmapData.hh common/common.hh
-    /// \brief Encapsulates a generic heightmap data file
+    /// \class HeightmapData HeightmapData.hh common/common.hh
+    /// \brief Encapsulates a generic heightmap data file.
     class HeightmapData
     {
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~HeightmapData() {}
 
       /// \brief Create a lookup table of the terrain's height.
@@ -65,5 +65,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

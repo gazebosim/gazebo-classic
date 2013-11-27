@@ -1,45 +1,10 @@
+<?xml version="1.0" ?>
 <sdf version='1.4'>
   <world name='default'>
-    <model name='ground_plane'>
-      <static>1</static>
-      <link name='link'>
-        <collision name='collision'>
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>100</mu>
-                <mu2>50</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='visual'>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <velocity_decay>
-          <linear>0</linear>
-          <angular>0</angular>
-        </velocity_decay>
-      </link>
-    </model>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
     <gui fullscreen='0'>
       <camera name='user_camera'>
         <pose>-25 -15 12.0539 7.08002e-18 0.2 0.352194</pose>
@@ -50,19 +15,7 @@
       <background>0.5 0.5 0.5 1</background>
       <shadows>0</shadows>
     </scene>
-    <light name='sun' type='directional'>
-      <cast_shadows>1</cast_shadows>
-      <pose>0 0 10 0 -0 0</pose>
-      <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
-      <attenuation>
-        <range>1000</range>
-        <constant>0.9</constant>
-        <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
-      </attenuation>
-      <direction>-0.5 0.1 -0.9</direction>
-    </light>
+    <include><uri>model://sun</uri></include>
     <physics type='ode'>
       <gravity>0 0 -9.81</gravity>
       <ode>
@@ -82,6 +35,9 @@
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>1000</real_time_update_rate>
     </physics>
+    <!-- A copy of atlas robot with all visual and
+         collision geoms replaced by spheres.
+    -->
     <model name='sphere_atlas'>
       <link name='pelvis'>
         <pose>0 0 0 0 -0 0</pose>
@@ -2507,6 +2463,7 @@
         </physics>
       </joint>
       <pose>0 0 1.1 0 -0 0</pose>
+      <!-- test pid controller joints -->
       <plugin name='sphere_atlas_pid' filename='libSphereAtlasTestPlugin.so'/>
     </model>
   </world>
