@@ -61,7 +61,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
-  this->SetCameraSetInWorldFile(false);
+  this->SetUseSDFPose(false);
 }
 
 //////////////////////////////////////////////////
@@ -246,7 +246,7 @@ bool UserCamera::IsCameraSetInWorldFile()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetCameraSetInWorldFile(bool _value)
+void UserCamera::SetUseSDFPose(bool _value)
 {
   this->isCameraSetInWorldFile = _value;
 }
