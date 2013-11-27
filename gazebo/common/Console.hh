@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Gazebo Message
- * Author: Nathan Koenig
- * Date: 09 June 2007
- */
 
 #ifndef _GAZEBO_CONSOLE_HH_
 #define _GAZEBO_CONSOLE_HH_
@@ -39,13 +34,13 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
     /// \brief Output a message
-    #define gzmsg (gazebo::common::Console::msg)
+    #define gzmsg (gazebo::common::Console::msg())
 
     /// \brief Output a debug message
     #define gzdbg (gazebo::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::warn)
+    #define gzwarn (gazebo::common::Console::warn())
 
     /// \brief Output an error message
     #define gzerr (gazebo::common::Console::err(__FILE__, __LINE__))
@@ -55,7 +50,7 @@ namespace gazebo
 
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
-    /// \class FileLogger FileLogger.hh ignition/ignition
+    /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
     class FileLogger : public std::ostream
     {
@@ -104,7 +99,7 @@ namespace gazebo
                  };
     };
 
-    /// \class Logger Logger.hh ignition/ignition
+    /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
     class Logger : public std::ostream
     {
@@ -167,7 +162,7 @@ namespace gazebo
       private: std::string prefix;
     };
 
-    /// \class Console Console.hh ignition/ignition
+    /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
     class Console

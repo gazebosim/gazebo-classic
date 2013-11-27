@@ -95,10 +95,14 @@ Logger::Buffer::~Buffer()
 int Logger::Buffer::overflow(int _c)
 {
   Console::log.put(_c);
-  if (this->type == Logger::STDOUT)
-    std::cout.put(_c);
-  else
-    std::cerr.put(_c);
+
+  if (!Console::GetQuiet())
+  {
+    if (this->type == Logger::STDOUT)
+      std::cout.put(_c);
+    else
+      std::cerr.put(_c);
+  }
 
   return _c;
 }
