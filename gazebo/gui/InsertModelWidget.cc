@@ -33,6 +33,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/gui/InsertModelWidgetPrivate.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
@@ -40,22 +41,23 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
-: QWidget(_parent)
+: QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
   this->setObjectName("insertModel");
-  this->modelDatabaseItem = NULL;
+  this->dataPtr->modelDatabaseItem = NULL;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  this->fileTreeWidget = new QTreeWidget();
-  this->fileTreeWidget->setColumnCount(1);
-  this->fileTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->fileTreeWidget->header()->hide();
-  connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+  this->dataPtr->fileTreeWidget = new QTreeWidget();
+  this->dataPtr->fileTreeWidget->setColumnCount(1);
+  this->dataPtr->fileTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->dataPtr->fileTreeWidget->header()->hide();
+  connect(this->dataPtr->fileTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->fileTreeWidget, 0);
+  frameLayout->addWidget(this->dataPtr->fileTreeWidget, 0);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -64,24 +66,26 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   // Create a system path watcher
-  this->watcher = new QFileSystemWatcher();
+  this->dataPtr->watcher = new QFileSystemWatcher();
 
   // Connect a callback that is triggered whenever a directory is changed.
-  connect(this->watcher, SIGNAL(directoryChanged(const QString &)),
+  connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
           this, SLOT(OnDirectoryChanged(const QString &)));
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
 
   // Create a top-level tree item for the path
-  this->modelDatabaseItem =
+  this->dataPtr->modelDatabaseItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Connecting to model database...")));
-    this->fileTreeWidget->addTopLevelItem(this->modelDatabaseItem);
+  this->dataPtr->fileTreeWidget->addTopLevelItem(
+      this->dataPtr->modelDatabaseItem);
 
   /// Non-blocking call to get all the models in the database.
-  common::ModelDatabase::Instance()->GetModels(
-      boost::bind(&InsertModelWidget::OnModels, this, _1));
+  this->dataPtr->getModelsConnection =
+    common::ModelDatabase::Instance()->GetModels(
+        boost::bind(&InsertModelWidget::OnModels, this, _1));
 
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
@@ -91,38 +95,41 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
-  delete this->watcher;
+  delete this->dataPtr->watcher;
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void InsertModelWidget::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   // If the model database has call the OnModels callback function, then
   // add all the models from the database.
-  if (!this->modelBuffer.empty())
+  if (!this->dataPtr->modelBuffer.empty())
   {
     std::string uri = common::ModelDatabase::Instance()->GetURI();
-    this->modelDatabaseItem->setText(0,
+    this->dataPtr->modelDatabaseItem->setText(0,
         QString("%1").arg(QString::fromStdString(uri)));
 
-    if (!this->modelBuffer.empty())
+    if (!this->dataPtr->modelBuffer.empty())
     {
       for (std::map<std::string, std::string>::const_iterator iter =
-          this->modelBuffer.begin(); iter != this->modelBuffer.end(); ++iter)
+          this->dataPtr->modelBuffer.begin();
+          iter != this->dataPtr->modelBuffer.end(); ++iter)
       {
         // Add a child item for the model
         QTreeWidgetItem *childItem = new QTreeWidgetItem(
-            this->modelDatabaseItem,
+            this->dataPtr->modelDatabaseItem,
             QStringList(QString("%1").arg(
                 QString::fromStdString(iter->second))));
         childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-        this->fileTreeWidget->addTopLevelItem(childItem);
+        this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
       }
     }
 
-    this->modelBuffer.clear();
+    this->dataPtr->modelBuffer.clear();
   }
   else
     QTimer::singleShot(1000, this, SLOT(Update()));
@@ -134,8 +141,9 @@ void InsertModelWidget::Update()
 void InsertModelWidget::OnModels(
     const std::map<std::string, std::string> &_models)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  this->modelBuffer = _models;
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  this->dataPtr->modelBuffer = _models;
+  this->dataPtr->getModelsConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -157,7 +165,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       filename = common::ModelDatabase::Instance()->GetModelFile(path);
       gui::Events::createEntity("model", filename);
 
-      this->fileTreeWidget->clearSelection();
+      this->dataPtr->fileTreeWidget->clearSelection();
       QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
   }
@@ -172,8 +180,8 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   QString qpath = QString::fromStdString(_path);
   QTreeWidgetItem *topItem = NULL;
 
-  QList<QTreeWidgetItem *> matchList = this->fileTreeWidget->findItems(qpath,
-      Qt::MatchExactly);
+  QList<QTreeWidgetItem *> matchList =
+    this->dataPtr->fileTreeWidget->findItems(qpath, Qt::MatchExactly);
 
   boost::filesystem::path dir(_path);
 
@@ -182,11 +190,11 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   {
     topItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0), QStringList(qpath));
-    this->fileTreeWidget->addTopLevelItem(topItem);
+    this->dataPtr->fileTreeWidget->addTopLevelItem(topItem);
 
     // Add the new path to the directory watcher
     if (boost::filesystem::exists(dir))
-      this->watcher->addPath(qpath);
+      this->dataPtr->watcher->addPath(qpath);
   }
   else
     topItem = matchList.first();
@@ -257,13 +265,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         childItem->setData(0, Qt::UserRole,
             QVariant((std::string("file://") + fullPath.string()).c_str()));
 
-        this->fileTreeWidget->addTopLevelItem(childItem);
+        this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
       }
     }
   }
 
   // Make all top-level items expanded. Trying to reduce mouse clicks.
-  this->fileTreeWidget->expandItem(topItem);
+  this->dataPtr->fileTreeWidget->expandItem(topItem);
 }
 
 /////////////////////////////////////////////////

@@ -119,9 +119,9 @@ void MultiRayShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRange(int _index)
+double MultiRayShape::GetRange(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -134,9 +134,9 @@ double MultiRayShape::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRetro(int _index)
+double MultiRayShape::GetRetro(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -148,9 +148,9 @@ double MultiRayShape::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int MultiRayShape::GetFiducial(int _index)
+int MultiRayShape::GetFiducial(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
