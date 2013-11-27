@@ -183,7 +183,7 @@ namespace gazebo
 
       /// brief Set if the user camera pose has changed in the world file.
       /// \param[in] _value True if the camera pose changed in the world file.
-      public: void SetCameraSetInWorldFile(bool _value);
+      public: void SetUseSDFPose(bool _value);
 
       /// \brief Set the camera to be attached to a visual.
       ///
