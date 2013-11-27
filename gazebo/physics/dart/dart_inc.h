@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DART_INC_H_
-#define _DART_INC_H_
+#ifndef _GAZEBO_DART_INC_H_
+#define _GAZEBO_DART_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header
