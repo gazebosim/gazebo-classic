@@ -52,7 +52,7 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
-bool Dem::Load(const std::string &_filename)
+int Dem::Load(const std::string &_filename)
 {
   unsigned int width;
   unsigned int height;
@@ -70,7 +70,7 @@ bool Dem::Load(const std::string &_filename)
   {
     gzerr << "Unable to open DEM file[" << _filename
           << "], check your GAZEBO_RESOURCE_PATH settings." << std::endl;
-    return false;
+    return -1;
   }
 
   this->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
@@ -80,7 +80,7 @@ bool Dem::Load(const std::string &_filename)
   {
     gzerr << "Unable to open DEM file[" << fullName
           << "]. Format not recognised as a supported dataset." << std::endl;
-    return false;
+    return -1;
   }
 
   int nBands = this->dataSet->GetRasterCount();
@@ -88,7 +88,7 @@ bool Dem::Load(const std::string &_filename)
   {
     gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
           << nBands << " but only 1 is a valid value." << std::endl;
-    return false;
+    return -1;
   }
 
   // Set the pointer to the band
@@ -141,7 +141,7 @@ bool Dem::Load(const std::string &_filename)
   this->maxElevation = *std::max_element(&this->demData[0],
       &this->demData[0] + this->side * this->side);
 
-  return true;
+  return 0;
 }
 
 //////////////////////////////////////////////////

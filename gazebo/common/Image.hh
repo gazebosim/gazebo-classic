@@ -27,7 +27,6 @@
 #endif
 #include <FreeImage.h>
 #include <string>
-#include <vector>
 
 #include "gazebo/common/Color.hh"
 

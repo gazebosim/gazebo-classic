@@ -32,7 +32,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
@@ -79,21 +78,29 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
+int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
 {
   if (this->img.Load(_filename) != 0)
-    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
+  {
+    gzerr << "Unable to load an image as a terrain [" << _filename << "]\n";
+    return -1;
+  }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
   this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+
+  return 0;
 }
 
 #ifdef HAVE_GDAL
 //////////////////////////////////////////////////
-void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
+int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
   if (this->dem.Load(_filename) != 0)
-    gzthrow("Gazebo is unable to load a terrain file. Exiting.\n");
+  {
+    gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
+    return -1;
+  }
 
   if (this->sdf->HasElement("size"))
   {
@@ -129,10 +136,12 @@ void HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
   }
   else
     gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+
+  return 0;
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::LoadTerrainFile(const std::string &_filename)
+int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
   // Register the GDAL drivers
   GDALAllRegister();
@@ -141,7 +150,10 @@ void HeightmapShape::LoadTerrainFile(const std::string &_filename)
       (GDALOpen(_filename.c_str(), GA_ReadOnly));
 
   if (!poDataset)
-    gzthrow("Unrecognized terrain format in file [" + _filename + "]\n");
+  {
+    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
+    return -1;
+  }
 
   this->fileFormat = poDataset->GetDriver()->GetDescription();
   GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
@@ -150,19 +162,19 @@ void HeightmapShape::LoadTerrainFile(const std::string &_filename)
   if (fileFormat == "JPEG" || fileFormat == "PNG")
   {
     // Load the terrain file as an image
-    this->LoadImageAsTerrain(_filename);
+    return this->LoadImageAsTerrain(_filename);
   }
   else
   {
     // Load the terrain file as a DEM
-    this->LoadDEMAsTerrain(_filename);
+    return this->LoadDEMAsTerrain(_filename);
   }
 }
 #else
-void HeightmapShape::LoadTerrainFile(const std::string &_filename)
+int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
   // Load the terrain file as an image
-  this->LoadImageAsTerrain(_filename);
+  return this->LoadImageAsTerrain(_filename);
 }
 #endif
 
@@ -174,17 +186,23 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
   if (filename.empty())
   {
-    gzthrow("Unable to find heightmap[" +
-            this->sdf->Get<std::string>("uri") + "]\n");
+    gzerr << "Unable to find heightmap[" +
+             this->sdf->Get<std::string>("uri") + "]\n";
+    return;
   }
 
-  LoadTerrainFile(filename);
+  if (LoadTerrainFile(filename) != 0)
+  {
+    gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
+    return;
+  }
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth()-1))
+      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
-    gzthrow("Heightmap data size must be square, with a size of 2^n+1\n");
+    gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
+    return;
   }
 }
 

@@ -118,17 +118,20 @@ namespace gazebo
       /// DEM support. For a list of all raster formats supported you can type
       /// the command "gdalinfo --formats".
       /// \param[in] _filename The path to the terrain file.
-      private: void LoadTerrainFile(const std::string &_filename);
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadTerrainFile(const std::string &_filename);
 
       #ifdef HAVE_GDAL
       /// \brief Load a DEM specified by _filename as a terrain file.
       /// \param[in] _filename The path to the terrain file.
-      private: void LoadDEMAsTerrain(const std::string &_filename);
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadDEMAsTerrain(const std::string &_filename);
       #endif
 
       /// \brief Load an image specified by _filename as a terrain file.
       /// \param[in] _filename The path to the terrain file.
-      private: void LoadImageAsTerrain(const std::string &_filename);
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadImageAsTerrain(const std::string &_filename);
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.

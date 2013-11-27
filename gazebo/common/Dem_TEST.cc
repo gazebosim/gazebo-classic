@@ -30,7 +30,7 @@ using namespace gazebo;
 TEST(DemTest, MisingFile)
 {
   common::Dem dem;
-  EXPECT_FALSE(dem.Load("/file/shouldn/never/exist.png"));
+  EXPECT_NE(dem.Load("/file/shouldn/never/exist.png"), 0);
 }
 
 /////////////////////////////////////////////////
@@ -40,7 +40,7 @@ TEST(DemTest, NotDem)
   boost::filesystem::path path;
 
   path = "file://media/materials/scripts/CMakeLists.txt";
-  EXPECT_FALSE(dem.Load(path.string()));
+  EXPECT_NE(dem.Load(path.string()), 0);
 }
 
 /////////////////////////////////////////////////
@@ -50,7 +50,7 @@ TEST(DemTest, UnsupportedDem)
   boost::filesystem::path path;
 
   path = "file://media/materials/textures/wood.jpg";
-  EXPECT_FALSE(dem.Load(path.string()));
+  EXPECT_NE(dem.Load(path.string()), 0);
 }
 
 /////////////////////////////////////////////////
@@ -60,7 +60,7 @@ TEST(DemTest, NonSquaredDemPortrait)
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_portrait.tif";
-  EXPECT_TRUE(dem.Load(path.string()));
+  EXPECT_EQ(dem.Load(path.string()), 0);
 }
 
 /////////////////////////////////////////////////
@@ -70,7 +70,7 @@ TEST(DemTest, NonSquaredDemLandscape)
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_landscape.tif";
-  EXPECT_TRUE(dem.Load(path.string()));
+  EXPECT_EQ(dem.Load(path.string()), 0);
 }
 
 /////////////////////////////////////////////////
@@ -80,7 +80,7 @@ TEST(DemTest, SquaredDem)
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";
-  EXPECT_TRUE(dem.Load(path.string()));
+  EXPECT_EQ(dem.Load(path.string()), 0);
 }
 
 /////////////////////////////////////////////////
@@ -90,7 +90,7 @@ TEST(DemTest, BasicAPI)
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";
-  EXPECT_TRUE(dem.Load(path.string()));
+  EXPECT_EQ(dem.Load(path.string()), 0);
 
   // Check the heights and widths
   EXPECT_EQ(129, static_cast<int>(dem.GetHeight()));
@@ -127,7 +127,7 @@ TEST(DemTest, FillHeightmap)
   boost::filesystem::path path = TEST_PATH;
 
   path /= "data/dem_squared.tif";
-  EXPECT_TRUE(dem.Load(path.string()));
+  EXPECT_EQ(dem.Load(path.string()), 0);
 
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
