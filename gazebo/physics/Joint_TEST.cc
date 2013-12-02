@@ -134,28 +134,6 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, ForceTorque1ODE)
-{
-  ForceTorque1("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque1Simbody)
-{
-  ForceTorque1("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-
-/// bullet collision parameters needs tweaking?
-TEST_F(Joint_TEST, ForceTorque1Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque1("bullet");
-}
-#endif  // HAVE_BULLET
-
 void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 {
   // Load our force torque test world
@@ -283,26 +261,6 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   gzdbg << "t after 20 steps : " << t << "\n";
 }
 
-TEST_F(Joint_TEST, ForceTorque2ODE)
-{
-  ForceTorque2("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque2Simbody)
-{
-  ForceTorque2("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-TEST_F(Joint_TEST, ForceTorque2Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque2("bullet");
-}
-#endif  // HAVE_BULLET
-
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
 {
@@ -419,27 +377,6 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
           << "]\n";
   }
 }
-
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)
-{
-  GetForceTorqueWithAppliedForce("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbody)
-{
-  GetForceTorqueWithAppliedForce("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
-{
-  // uncomment when bullet 2.82 is released
-  // GetForceTorqueWithAppliedForce("bullet");
-}
-#endif  // HAVE_BULLET
 
 // Fixture for testing all joint types.
 class Joint_TEST_All : public Joint_TEST {};
@@ -718,11 +655,6 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(Joint_TEST, JointTorqueTest)
-{
-  JointTorqueTest(this->physicsEngine);
-}
-
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   /// \TODO: Disable for now until functionality is implemented
@@ -838,14 +770,22 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(Joint_TEST, JointCreationDestructionTest)
-{
-  JointCreationDestructionTest(this->physicsEngine);
-}
-
 //////////////////////////////////////////////////
 void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
 {
+  /// SpringDamper unimplemented for simbody
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for simbody, see issue #886.\n";
+    return;
+  }
+  /// bullet collision parameters needs tweaking
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #887.\n";
+    return;
+  }
+
   // Load our inertial test world
   Load("worlds/spring_damper_test.world", true, _physicsEngine);
 
@@ -974,28 +914,6 @@ void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
   EXPECT_EQ(cyclesContact,        17);
 }
 
-TEST_F(Joint_TEST, SpringDamperTestODE)
-{
-  SpringDamperTest("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, SpringDamperTestSimbody)
-{
-  gzerr << "SpringDampe unimplemented for Simbody, see issue #886.\n";
-  // SpringDamperTest("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, SpringDamperTestBullet)
-{
-  gzerr << "SpringDamper unimplemented for Bullet, see issue #887.\n";
-  // SpringDamperTest("bullet");
-}
-#endif  // HAVE_BULLET
-
 TEST_F(Joint_TEST, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
@@ -1035,6 +953,36 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_TRUE(child);
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
+}
+
+TEST_P(Joint_TEST, ForceTorque1)
+{
+  ForceTorque1(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, ForceTorque2)
+{
+  ForceTorque2(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, GetForceTorqueWithAppliedForce)
+{
+  GetForceTorqueWithAppliedForce(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, JointTorqueTest)
+{
+  JointTorqueTest(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, JointCreationDestructionTest)
+{
+  JointCreationDestructionTest(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, SpringDamperTest)
+{
+  SpringDamperTest(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,
