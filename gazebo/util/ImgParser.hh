@@ -97,7 +97,9 @@ namespace gazebo
       public: static void ProcessImage(const HSVClrParams &_green,
         const HSVClrParams &_orange, const HSVClrParams &_yellow,
         const HSVClrParams &_blue, const HSVClrParams &_white,
-        const std::string &_filename, const std::string &_filenameDst);
+        const std::string &_filename, const std::string &_filenameDst,
+        int &_numGreen, int &_numOrange, int &_numYellow, int &_numBlue,
+        int &_numWhite);
 
       /// \brief Save an image into disk.
       /// \param[in] _filename the path to the image to be saved.

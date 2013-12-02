@@ -35,6 +35,8 @@ using namespace util;
 // The destination image is RGB888.
 const unsigned int ImgParser::BppDst = 3;
 
+
+
 //////////////////////////////////////////////////
 HSVClrParams::HSVClrParams(float _hmin, float _smin, float _vmin, float _hmax,
                            float _smax, float _vmax)
@@ -103,9 +105,15 @@ void ImgParser::Parse()
   getline(this->logFile, line);
   getline(this->logFile, line);
 
+  std::ofstream statsFile;
+  std::string statsFilename = this->imgDstDir + "../stats.csv";
+  statsFile.open(statsFilename.c_str());
+
   // Read the images
   while (this->logFile)
   {
+    int numGreen, numOrange, numYellow, numBlue, numWhite;
+
     this->GetNextImage(srcImage.get());
     this->ToRGB(srcImage.get(), dstImage.get());
     std::ostringstream ss;
@@ -114,9 +122,17 @@ void ImgParser::Parse()
     this->SaveImage(imgName.c_str(), dstImage.get());
     std::string imgProcessedName = this->imgDstDir + ss.str() + "_p.ppm";
     ProcessImage(*this->green, *this->orange, *this->yellow, *this->blue,
-                 *this->white, imgName.c_str(), imgProcessedName.c_str());
+                 *this->white, imgName.c_str(), imgProcessedName.c_str(),
+                 numGreen, numOrange, numYellow, numBlue, numWhite);
+
+    // Write CSV line for this image
+    statsFile << imgName << "," << numGreen << "," << numOrange << ","
+              << numYellow << "," << numBlue << "," << numWhite << std::endl;
+
     ++counter;
   }
+
+  statsFile.close();
 
   this->logFile.close();
 }
@@ -145,7 +161,9 @@ void ImgParser::SaveImage(const std::string &_filename,
 void ImgParser::ProcessImage(const HSVClrParams &_green,
         const HSVClrParams &_orange, const HSVClrParams &_yellow,
         const HSVClrParams &_blue, const HSVClrParams &_white,
-        const std::string &_filename, const std::string &_filenameDst)
+        const std::string &_filename, const std::string &_filenameDst,
+        int &_numGreen, int &_numOrange, int &_numYellow, int &_numBlue,
+        int &_numWhite)
 {
   //RNG rng(12345);
 
@@ -161,13 +179,15 @@ void ImgParser::ProcessImage(const HSVClrParams &_green,
     greenCh);
   cv::Mat green_image(result.size(), CV_8UC3, cv::Scalar(0, 255, 0));
   green_image.copyTo(result, greenCh);
+  _numGreen = cv::countNonZero(greenCh);
 
   inRange(hsvImage,
     cv::Scalar(_orange.hmin, _orange.smin, _orange.vmin),
     cv::Scalar(_orange.hmax, _orange.smax, _orange.vmax),
     orangeCh);
   cv::Mat orange_image(result.size(), CV_8UC3, cv::Scalar(0, 168, 255));
-  orange_image.copyTo(result, orangeCh);
+  orange_image.copyTo(result, orangeCh);\
+  _numOrange = cv::countNonZero(orangeCh);
 
   inRange(hsvImage,
     cv::Scalar(_yellow.hmin, _yellow.smin, _yellow.vmin),
@@ -175,6 +195,7 @@ void ImgParser::ProcessImage(const HSVClrParams &_green,
     yellowCh);
   cv::Mat yellow_image(result.size(), CV_8UC3, cv::Scalar(0, 255, 255));
   yellow_image.copyTo(result, yellowCh);
+  _numYellow = cv::countNonZero(yellowCh);
 
   inRange(hsvImage,
     cv::Scalar(_blue.hmin, _blue.smin, _blue.vmin),
@@ -182,6 +203,7 @@ void ImgParser::ProcessImage(const HSVClrParams &_green,
     blueCh);
   cv::Mat blue_image(result.size(), CV_8UC3, cv::Scalar(255, 0, 0));
   blue_image.copyTo(result, blueCh);
+  _numBlue = cv::countNonZero(blueCh);
 
   inRange(hsvImage,
     cv::Scalar(_white.hmin, _white.smin, _white.vmin),
@@ -189,6 +211,7 @@ void ImgParser::ProcessImage(const HSVClrParams &_green,
     whiteCh);
   cv::Mat white_image(result.size(), CV_8UC3, cv::Scalar(255, 255, 255));
   white_image.copyTo(result, whiteCh);
+  _numWhite = cv::countNonZero(whiteCh);
 
   // Color segmentation
   /*std::vector<vector<Point> > contours;
@@ -201,8 +224,20 @@ void ImgParser::ProcessImage(const HSVClrParams &_green,
   {
     Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
     drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
-  }
+  } */
 
+  // CalcHists
+  /*int channels[] = {0};
+  cv::MatND hist;
+  int hbins = 1, vbins = 320 * 240;
+  int histSize[] = {hbins, vbins};
+  float hranges[] = {0, 0};
+  float vranges[] = {0, 320 * 240};
+  const float* ranges[] = {hranges, vranges};
+  cv::calcHist(&greenCh, 1, channels, cv::Mat(), // do not use mask
+           hist, 2, histSize, ranges,
+           true, // the histogram is uniform
+           false);*/
 
-  imwrite(_filenameDst, result);*/
+  imwrite(_filenameDst, result);
 }
