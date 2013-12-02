@@ -22,6 +22,7 @@
 #include "ServerFixture.hh"
 
 using namespace gazebo;
+using namespace util;
 
 class ImageAccuracyTest : public ServerFixture
 {
@@ -44,11 +45,9 @@ void OnNewCameraFrame(bool* _newImage, unsigned char* _imageDest,
 TEST_F(ImageAccuracyTest, ZadeatDataset)
 {
   gazebo::util::ZadeatImgParser *imgParser = new gazebo::util::ZadeatImgParser
-    ("/data/naoDataset/run02/camera_2.strm.original", "/data/naoDataset/run02/images/");
+    ("/opt/naoDataset/run02/camera_2.strm", "/opt/naoDataset/run02/images/");
 
   imgParser->Parse();
-
-  return;
 
   Load("worlds/robocup09_spl_field.world");
 
@@ -67,7 +66,7 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
   double torsoX, torsoY, torsoZ;
 
   gazebo::util::ZadeatGTParser *gtParser = new gazebo::util::ZadeatGTParser(
-    "/data/naoDataset/run02/ground_truth_2.csv");
+    "/opt/naoDataset/run02/ground_truth_2.csv");
 
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
@@ -91,6 +90,13 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &newImage, img,
           _1, _2, _3, _4, _5));
+
+  // Create the color filter parameters (H:0-360, S:0-100, V:0-100)
+  HSVClrParams *green = new HSVClrParams(80, 65, 5, 100, 90, 70);
+  HSVClrParams *orange = new HSVClrParams(0, 0, 0, 0, 0, 0);
+  HSVClrParams *yellow = new HSVClrParams(55, 75, 65, 60, 80, 93);
+  HSVClrParams *blue = new HSVClrParams(0, 0, 0, 0, 0, 0);
+  HSVClrParams *white = new HSVClrParams(0, 0, 50, 20, 20, 100);
 
   while (gtParser->GetNextGT(timestamp, headRoll, headPitch, headYaw,
                               headX, headY, headZ,
@@ -137,7 +143,7 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
     std::ostringstream ss;
     ss << std::setw(5) << std::setfill('0') << counter / 8;
     std::string s2(ss.str());
-    std::string filename = "/data/naoDataset/run02/gazebo_images/" +
+    std::string filename = "/opt/naoDataset/run02/gazebo_images/" +
                            ss.str() + ".ppm";
     if (counter % 8 == 0)
     {
@@ -146,6 +152,12 @@ TEST_F(ImageAccuracyTest, ZadeatDataset)
     }
     ++counter;
     //camSensor->SaveFrame("/tmp/image.ppm");
+
+    std::string filename_filtered = "/opt/naoDataset/run02/gazebo_images/" +
+                           ss.str() + "_p.ppm";
+
+    ImgParser::ProcessImage(*green, *orange, *yellow, *blue, *white,
+      filename, filename_filtered);
   }
 
 }

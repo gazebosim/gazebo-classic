@@ -56,22 +56,6 @@ int ZadeatImgParser::GetWidth()
   return this->Width;
 }
 
-// double
-static void swap8(void *v)
-{
-    char    in[8], out[8];
-    memcpy(in, v, 8);
-    out[0] = in[7];
-    out[1] = in[6];
-    out[2] = in[5];
-    out[3] = in[4];
-    out[4] = in[3];
-    out[5] = in[2];
-    out[6] = in[1];
-    out[7] = in[0];
-    memcpy(v, out, 8);
-}
-
 double ReverseDouble(const double _inDouble)
 {
    double retVal;
@@ -95,13 +79,13 @@ double ReverseDouble(const double _inDouble)
 void ZadeatImgParser::GetNextImage(unsigned char *_img)
 {
   // Timestamp included in every image.
-  unsigned char imgTimestamp[this->TimestampLength];
+  //unsigned char imgTimestamp[this->TimestampLength];
 
   double timeStamp = 0.0;
 
   this->logFile.read(reinterpret_cast<char *>(&timeStamp),
       this->TimestampLength);
-  std::cout << "Timestamp: " << ReverseDouble(timeStamp) << std::endl;
+  //std::cout << "Timestamp: " << ReverseDouble(timeStamp) << std::endl;
   uint32_t size = this->GetWidth() * this->GetHeight() * this->GetBpp();
   this->logFile.read(reinterpret_cast<char *>(_img), size);
 }

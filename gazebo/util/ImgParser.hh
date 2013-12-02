@@ -19,12 +19,25 @@
 #define _ImgParser_HH_
 
 #include <fstream>
+#include <opencv2/opencv.hpp>
 #include <string>
 
 namespace gazebo
 {
   namespace util
   {
+    class HSVClrParams
+    {
+      public: HSVClrParams(float _hmin, float _smin, float _vmin, float _hmax,
+                           float _smax, float _vmax);
+      public: float hmin;
+      public: float hmax;
+      public: float smin;
+      public: float smax;
+      public: float vmin;
+      public: float vmax;
+    };
+
     /// addtogroup gazebo_util
     /// \{
 
@@ -78,6 +91,14 @@ namespace gazebo
       /// \brief Parse the image dataset and save the RGB images on disk.
       public: void Parse();
 
+      /// \brief Filter and segment the image.
+      /// \param[in] _src Source image in RGB888.
+      /// \param[out] _dst Debug image after the processing in RGB888.
+      public: static void ProcessImage(const HSVClrParams &_green,
+        const HSVClrParams &_orange, const HSVClrParams &_yellow,
+        const HSVClrParams &_blue, const HSVClrParams &_white,
+        const std::string &_filename, const std::string &_filenameDst);
+
       /// \brief Save an image into disk.
       /// \param[in] _filename the path to the image to be saved.
       /// \param[in] _img Image data.
@@ -92,6 +113,8 @@ namespace gazebo
 
       /// \brief Destination directory where the RGB images will be saved.
       private: std::string imgDstDir;
+
+      private: HSVClrParams *orange, *blue, *yellow, *green, *white;
     };
     /// \}
   }

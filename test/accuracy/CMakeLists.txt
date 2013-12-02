@@ -38,4 +38,4 @@ images.cc
 
 set (GZ_BUILD_TESTS_EXTRA_EXE_SRCS
     "${PROJECT_SOURCE_DIR}/gazebo/Server.cc;${PROJECT_SOURCE_DIR}/gazebo/Master.cc;${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc;${PROJECT_SOURCE_DIR}/test/ServerFixture.cc")
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} ${OpenCV_LIBS})

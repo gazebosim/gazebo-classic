@@ -1,10 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+find_package(OpenCV REQUIRED)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-set (sources 
+set (sources
   Diagnostics.cc
   ImgParser.cc
   LogPlay.cc
@@ -14,7 +16,7 @@ set (sources
   ZadeatImgParser.cc
 )
 
-set (headers 
+set (headers
   Diagnostics.hh
   ImgParser.hh
   LogPlay.hh
@@ -54,6 +56,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_math
   gazebo_msgs
+  ${OpenCV_LIBS}
 )
 
 gz_install_library(gazebo_util)
