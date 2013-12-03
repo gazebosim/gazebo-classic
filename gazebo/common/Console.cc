@@ -29,10 +29,10 @@ using namespace gazebo;
 using namespace common;
 
 FileLogger gazebo::common::Console::log("");
-Logger Console::msg("[Msg]", 32, Logger::STDOUT);
-Logger Console::err("[Err]", 31, Logger::STDERR);
-Logger Console::dbg("[Dbg]", 36, Logger::STDOUT);
-Logger Console::warn("[Wrn]", 33, Logger::STDERR);
+Logger Console::msg("[Msg] ", 32, Logger::STDOUT);
+Logger Console::err("[Err] ", 31, Logger::STDERR);
+Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT);
+Logger Console::warn("[Wrn] ", 33, Logger::STDERR);
 
 bool Console::quiet = true;
 
@@ -74,8 +74,8 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   int index = _file.find_last_of("/") + 1;
 
   (*this) << this->prefix
-    << " [" << _file.substr(index , _file.size() - index) << ":"
-    << _line << "]";
+    << "[" << _file.substr(index , _file.size() - index) << ":"
+    << _line << "] ";
 
   return (*this);
 }

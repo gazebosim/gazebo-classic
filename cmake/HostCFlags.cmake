@@ -1,6 +1,5 @@
 include (${gazebo_cmake_dir}/FindSSE.cmake)
 
-set (CMAKE_C_FLAGS_ALL "-Wno-overloaded-virtual ${CMAKE_C_FLAGS_ALL}")
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "-msse -msse2 ${CMAKE_C_FLAGS_ALL}")
   if (NOT APPLE)

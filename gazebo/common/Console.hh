@@ -48,6 +48,8 @@ namespace gazebo
     /// \brief Output a message to a log file
     #define gzlog (gazebo::common::Console::log())
 
+    /// \brief Initialize log file with filename given by _str.
+    /// \param[in] _str Name of log file for gzlog messages.
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
     /// \class FileLogger FileLogger.hh common/common.hh
@@ -152,6 +154,9 @@ namespace gazebo
                    /// \brief Destination type for the messages.
                    public: LogType type;
 
+                   /// \brief ANSI color code using Select Graphic Rendition
+                   /// parameters (SGR). See
+                   /// http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
                    public: int color;
                  };
 
