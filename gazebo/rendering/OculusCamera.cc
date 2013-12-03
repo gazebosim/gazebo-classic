@@ -146,9 +146,9 @@ void OculusCamera::Init()
     this->pitchNode->attachObject(this->leftCamera);
     this->leftCamera->setAutoAspectRatio(true);
 
-    this->leftCamera->setNearClipDistance(this->GetNearClip());
-    this->leftCamera->setFarClipDistance(1000);
-    this->leftCamera->setRenderingDistance(1000);
+    this->leftCamera->setNearClipDistance(0.1);
+    this->leftCamera->setFarClipDistance(200);
+    this->leftCamera->setRenderingDistance(200);
   }
   // Orig
   // this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
@@ -611,7 +611,7 @@ void OculusCamera::Oculus()
   comp->getTechnique(0)->getOutputTargetPass()->getPass(0)->setMaterialName(
       "Ogre/Compositor/Oculus/Right");
 
-double g_defaultFarClip = 1000;
+  double g_defaultFarClip = 200;
   Ogre::Camera *cam;
   for(int i=0;i<2;++i)
   {
