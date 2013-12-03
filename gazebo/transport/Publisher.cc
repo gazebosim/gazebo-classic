@@ -257,3 +257,26 @@ void Publisher::Fini()
 
   this->node.reset();
 }
+
+//////////////////////////////////////////////////
+std::string Publisher::GetPrevMsg() const
+{
+  std::string result;
+  if (this->publication)
+  {
+    MessagePtr msg = this->publication->GetPrevMsg(this->id);
+    if (msg)
+      msg->SerializeToString(&result);
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+MessagePtr Publisher::GetPrevMsgPtr() const
+{
+  if (this->publication)
+    return this->publication->GetPrevMsg(this->id);
+  else
+    return MessagePtr();
+}

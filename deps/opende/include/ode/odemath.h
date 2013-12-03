@@ -278,6 +278,7 @@ PURE_INLINE dReal dCalcPointsDistance3(const dReal *a, const dReal *b)
  * special case matrix multiplication, with operator selection
  */
 
+/// res(3X1) = a(3X3) * b(3X1)
 PURE_INLINE void dMultiplyHelper0_331(dReal *res, const dReal *a, const dReal *b)
 {
   dReal res_0, res_1, res_2;
@@ -288,6 +289,7 @@ PURE_INLINE void dMultiplyHelper0_331(dReal *res, const dReal *a, const dReal *b
   res[0] = res_0; res[1] = res_1; res[2] = res_2;
 }
 
+/// res(3X1) = a'(3X3) * b(3X1)
 PURE_INLINE void dMultiplyHelper1_331(dReal *res, const dReal *a, const dReal *b)
 {
   dReal res_0, res_1, res_2;
@@ -298,11 +300,13 @@ PURE_INLINE void dMultiplyHelper1_331(dReal *res, const dReal *a, const dReal *b
   res[0] = res_0; res[1] = res_1; res[2] = res_2;
 }
 
+/// res(1X3) = a(1X3) * b(3X3)
 PURE_INLINE void dMultiplyHelper0_133(dReal *res, const dReal *a, const dReal *b)
 {
   dMultiplyHelper1_331(res, b, a);
 }
 
+/// res(1X3) = a'(3X3) * b(first column from a 3X3 matrix)
 PURE_INLINE void dMultiplyHelper1_133(dReal *res, const dReal *a, const dReal *b)
 {
   dReal res_0, res_1, res_2;
@@ -333,6 +337,7 @@ PURE_INLINE void dMultiply0_133(dReal *res, const dReal *a, const dReal *b)
   dMultiplyHelper0_133(res, a, b);
 }
 
+/// res(3X3) = a(3X3) * b(3X3)
 PURE_INLINE void dMultiply0_333(dReal *res, const dReal *a, const dReal *b)
 {
   dMultiplyHelper0_133(res + 0, a + 0, b);
@@ -340,6 +345,7 @@ PURE_INLINE void dMultiply0_333(dReal *res, const dReal *a, const dReal *b)
   dMultiplyHelper0_133(res + 8, a + 8, b);
 }
 
+/// res(3X3) = a'(3X3) * b(3X3)
 PURE_INLINE void dMultiply1_333(dReal *res, const dReal *a, const dReal *b)
 {
   dMultiplyHelper1_133(res + 0, b, a + 0);
@@ -347,6 +353,7 @@ PURE_INLINE void dMultiply1_333(dReal *res, const dReal *a, const dReal *b)
   dMultiplyHelper1_133(res + 8, b, a + 2);
 }
 
+/// res(3X3) = a(3X3) * b'(3X3)
 PURE_INLINE void dMultiply2_333(dReal *res, const dReal *a, const dReal *b)
 {
   dMultiplyHelper0_331(res + 0, b, a + 0);

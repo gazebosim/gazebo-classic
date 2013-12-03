@@ -46,27 +46,25 @@ void Publication::AddSubscription(const NodePtr &_node)
 
   {
     boost::mutex::scoped_lock lock(this->nodeMutex);
-
     endIter = this->nodes.end();
     iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
   }
 
   if (iter == endIter)
   {
-    {
-      boost::mutex::scoped_lock lock(this->nodeMutex);
-      this->nodes.push_back(_node);
-    }
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+    this->nodes.push_back(_node);
+  }
 
-    boost::mutex::scoped_lock lock(this->callbackMutex);
+  boost::mutex::scoped_lock lock(this->callbackMutex);
 
-    for (std::map<uint32_t, MessagePtr>::iterator pubIter =
-        this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
+  // Send latched messages to the subscription.
+  for (std::map<uint32_t, MessagePtr>::iterator pubIter =
+      this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
+  {
+    if (pubIter->second)
     {
-      if (pubIter->second)
-      {
-        _node->InsertLatchedMsg(this->topic, pubIter->second);
-      }
+      _node->InsertLatchedMsg(this->topic, pubIter->second);
     }
   }
 }
@@ -85,6 +83,7 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
     if (_callback->GetLatching())
     {
+      // Send latched messages to the subscription.
       for (std::map<uint32_t, MessagePtr>::iterator pubIter =
           this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
       {
@@ -93,6 +92,7 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
           _callback->HandleMessage(pubIter->second);
         }
       }
+      _callback->SetLatching(false);
     }
   }
 }
@@ -100,6 +100,7 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 //////////////////////////////////////////////////
 void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   this->prevMsgs[_pubId] = _msg;
 }
 
@@ -481,4 +482,13 @@ void Publication::RemoveNodes()
       this->transports.clear();
     }
   }
+}
+
+//////////////////////////////////////////////////
+MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
+{
+  if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
+    return this->prevMsgs[_pubId];
+  else
+    return MessagePtr();
 }

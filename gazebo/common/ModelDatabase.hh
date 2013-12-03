@@ -19,11 +19,9 @@
 
 #include <string>
 #include <map>
-#include <list>
 #include <utility>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -37,6 +35,9 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Forward declare private data class.
+    class ModelDatabasePrivate;
+
     /// \addtogroup gazebo_common Common
     /// \{
 
@@ -77,7 +78,7 @@ namespace gazebo
       /// models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: boost::shared_ptr<bool> GetModels(boost::function<
+      public: event::ConnectionPtr  GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.
@@ -144,43 +145,15 @@ namespace gazebo
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
 
-      /// \brief Thread to update the model cache.
-      private: boost::thread *updateCacheThread;
+      /// \brief Private data.
+      private: ModelDatabasePrivate *dataPtr;
 
-      /// \brief A dictionary of all model names indexed by their uri.
-      private: std::map<std::string, std::string> modelCache;
-
-      /// \brief True to stop the background thread
-      private: bool stop;
-
-      /// \brief Cache update mutex
-      private: boost::mutex updateMutex;
-
-      /// \brief Mutex to protect cache thread status checks.
-      private: boost::recursive_mutex startCacheMutex;
-
-      /// \brief Condition variable for the updateCacheThread.
-      private: boost::condition_variable updateCacheCondition;
-
-      /// \brief Condition variable for completion of one cache update.
-      private: boost::condition_variable updateCacheCompleteCondition;
-
-      /// \def CallbackFunc
-      /// \brief Boost function that is used to passback the model cache.
-      private: typedef boost::function<
-               void (const std::map<std::string, std::string> &)> CallbackFunc;
-
-      /// \brief List of all callbacks set from the
-      /// ModelDatabase::GetModels function.
-      private: std::list<
-               std::pair<boost::shared_ptr<bool>, CallbackFunc> > callbacks;
+      /// \brief Singleton implementation
+      private: friend class SingletonT<ModelDatabase>;
 
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.
       private: static ModelDatabase *myself;
-
-      /// \brief Singleton implementation
-      private: friend class SingletonT<ModelDatabase>;
     };
   }
 }
