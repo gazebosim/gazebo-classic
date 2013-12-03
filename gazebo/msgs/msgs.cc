@@ -195,6 +195,30 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Wrench Convert(const physics::Wrench &_w)
+    {
+      msgs::Wrench result;
+      result.mutable_force()->set_x(_w.force.x);
+      result.mutable_force()->set_y(_w.force.y);
+      result.mutable_force()->set_z(_w.force.z);
+      result.mutable_torque()->set_x(_w.torque.x);
+      result.mutable_torque()->set_y(_w.torque.y);
+      result.mutable_torque()->set_z(_w.torque.z);
+      return result;
+    }
+
+    physics::Wrench Convert(const msgs::Wrench &_w)
+    {
+      physics::Wrench result;
+      result.force.x = _w.force().x( );
+      result.force.y = _w.force().y( );
+      result.force.z = _w.force().z( );
+      result.torque.x = _w.torque().x();
+      result.torque.y = _w.torque().y();
+      result.torque.z = _w.torque().z();
+      return result;
+    }
+
     msgs::Vector3d Convert(const math::Vector3 &_v)
     {
       msgs::Vector3d result;

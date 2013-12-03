@@ -23,6 +23,8 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Wrench.hh"
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
@@ -67,10 +69,15 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
-    /// \param[in] _v The vector to convert
-    /// \return A msgs::Vector3d object
-    msgs::Vector3d      Convert(const math::Vector3 &_v);
+    /// \brief Convert a physics::Wrench to a msgs::Wrench
+    /// \param[in] _w The Wrench to convert
+    /// \return A msgs::Wrench object
+    msgs::Wrench      Convert(const physics::Wrench &_w);
+
+    /// \brief Convert a msgs::Wrench to a physics::Wrench
+    /// \param[in] _w The Wrench to convert
+    /// \return A physics::Wrench object
+    physics::Wrench      Convert(const msgs::Wrench &_w);
 
     /// \brief Convert a math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
