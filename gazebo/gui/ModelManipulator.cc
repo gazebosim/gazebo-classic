@@ -448,7 +448,9 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   {
     if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
     {
-      vis = vis->GetRootVisual();
+      // Switch from selecting Model to selecting Link
+      // vis = vis->GetRootVisual();
+      vis = vis->GetParent();  // parent of visual should be link
     }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
@@ -516,6 +518,10 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
         }
         else
           this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 1, 0));
+
+        // publish whenever cursor moves
+        this->PublishVisualPose(this->mouseMoveVis);
+        QApplication::setOverrideCursor(Qt::OpenHandCursor);
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::ROT)
       {

@@ -1464,6 +1464,10 @@ void World::ProcessModelMsgs()
   std::list<msgs::Model>::iterator iter;
   for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
+    gzerr << "find model["
+          << (*iter).name() << "] Id[" << (*iter).id()
+          << "]\n";
+
     ModelPtr model;
     if ((*iter).has_id())
       model = this->GetModelById((*iter).id());
@@ -1473,12 +1477,13 @@ void World::ProcessModelMsgs()
     if (!model)
     {
       gzerr << "Unable to find model["
-            << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+            << (*iter).name() << "] Id[" << (*iter).id()
+            << "] try link names next\n";
 
       // look for link in all models
-      Model_V models = this->GetModels();
-      for (Model_V::iterator miter = models.begin();
-                             miter != models.end(); ++miter)
+      Model_V localModels = this->GetModels();
+      for (Model_V::iterator miter = localModels.begin();
+                             miter != localModels.end(); ++miter)
       {
         LinkPtr link = (*miter)->GetLink((*iter).name());
 
@@ -1486,7 +1491,14 @@ void World::ProcessModelMsgs()
         {
           // gzdbg << "set link " << link->GetName()
           //       << " pose " << msgs::Convert((*iter).pose()) << "\n";
-          link->SetWorldPose(msgs::Convert((*iter).pose()));
+
+          // link->SetWorldPose(msgs::Convert((*iter).pose()));
+
+          // produce a vector from current pose to new pose, use that as force
+          math::Vector3 oldPos = link->GetWorldPose().pos;
+          math::Vector3 newPos = msgs::Convert((*iter).pose()).pos;
+          math::Vector3 force = newPos - oldPos;
+          link->SetForce(force);  // use LinkController instead
         }
       }
     }
