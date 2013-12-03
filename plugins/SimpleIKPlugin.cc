@@ -162,7 +162,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
-  double diff = 0.001;
+  double diff = 0.003;
   KDL::Frame cartpos;
 
   math::Vector3 pos, delta;

@@ -205,6 +205,8 @@ namespace gazebo
     private: bool Poll(const common::Time &_timeToWait,
                       float lowPassCornerHz = 5.0);
 
+    private: void Run();
+
     /// \brief Update the hydra.
     private: void Update(const common::UpdateInfo &_info);
 
@@ -250,7 +252,17 @@ namespace gazebo
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
-    private: physics::ModelPtr boxModel;
+    private: physics::ModelPtr rightModel;
+    private: physics::ModelPtr leftModel;
+
+    private: math::Pose basePoseRight, resetPoseRight;
+    private: math::Pose basePoseLeft, resetPoseLeft;
+
+    private: boost::mutex mutex;
+    private: boost::thread *pollThread;
+    private: bool stop;
+
+    private: uint8_t prevState;
   };
 }
 #endif

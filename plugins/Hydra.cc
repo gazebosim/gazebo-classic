@@ -65,6 +65,7 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 RazerHydra::RazerHydra()
 : hidrawFd(0)
 {
+  this->stop = false;
   this->lastCycleStart = common::Time::GetWallTime();
 
   // magic number for 50% mix at each step
@@ -78,34 +79,93 @@ RazerHydra::~RazerHydra()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 
-  if (this->hidrawFd >= 0)
-  {
-    uint8_t buf[256];
-    memset(buf, 0, sizeof(buf));
-    buf[6] = 1;
-    buf[8] = 4;
-    buf[89] = 5;
-    int res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
-
-    if (res < 0)
-    {
-      gzerr << "unable to stop streaming\n";
-      perror("HIDIOCSFEATURE");
-    }
-
-    close(this->hidrawFd);
-  }
+  this->stop = true;
+  this->pollThread->join();
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&RazerHydra::Update, this, _1));
+
+  this->rightModel = _world->GetModel("right_arm_goal");
+  this->leftModel = _world->GetModel("left_arm_goal");
+
+  this->basePoseRight = this->rightModel->GetWorldPose();
+  this->basePoseLeft = this->leftModel->GetWorldPose();
+
+  this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
+
+  this->prevState = this->buttons[0];
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+{
+  /*common::Time pollTime(1, 50000000);
+  double cornerHz = 2.5;
+
+  uint8_t state = this->buttons[0];
+
+  this->Poll(pollTime, cornerHz);
+  */
+
+  boost::mutex::scoped_lock lock(this->mutex);
+  math::Pose origRight(this->pos[0], this->quat[0]);
+
+  math::Pose pivotRight = origRight;
+  math::Pose grabRight = origRight;
+
+  pivotRight.pos += origRight.rot * math::Vector3(0.04, 0, 0);
+  grabRight.pos += origRight.rot * math::Vector3(0.12, 0, 0);
+
+  math::Pose origLeft(this->pos[1], this->quat[1]);
+
+  math::Pose pivotLeft = origLeft;
+  math::Pose grabLeft = origLeft;
+
+  pivotLeft.pos += origLeft.rot * math::Vector3(0.04, 0, 0);
+  grabLeft.pos += origLeft.rot * math::Vector3(0.12, 0, 0);
+
+  if (this->buttons[0])
+  {
+    if (this->prevState != this->buttons[0])
+    {
+      this->resetPoseRight = grabRight;
+      this->resetPoseLeft = grabLeft;
+    }
+
+   this->rightModel->SetWorldPose(
+        math::Pose(grabRight.pos - this->resetPoseRight.pos,
+          grabRight.rot * this->resetPoseRight.rot.GetInverse()) + this->basePoseRight);
+
+    this->leftModel->SetWorldPose(
+        math::Pose(grabLeft.pos - this->resetPoseLeft.pos,
+          grabLeft.rot * this->resetPoseLeft.rot.GetInverse()) + this->basePoseLeft);
+  }
+  else
+  {
+    this->rightModel->SetWorldPose(this->basePoseRight);
+    this->leftModel->SetWorldPose(this->basePoseLeft);
+  }
+
+  this->prevState = this->buttons[0];
+}
+
+/////////////////////////////////////////////////
+void RazerHydra::Run()
+{
+  common::Time pollTime(0, 5000);
+  double cornerHz = 2.5;
+
   int res;
   uint8_t buf[256];
   struct hidraw_report_descriptor rptDesc;
   struct hidraw_devinfo info;
 
-  std::string device = _sdf->Get<std::string>("device");
+  //std::string device = _sdf->Get<std::string>("device");
+  std::string device = "/dev/hidraw4";
 
   this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
   if (this->hidrawFd < 0)
@@ -147,31 +207,34 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   }
 
   if (attempt >= 60)
+  {
     gzerr << "Failed to load hydra\n";
-  else
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&RazerHydra::Update, this, _1));
+    return;
+  }
 
-  this->boxModel = _world->GetModel("box");
-}
 
-/////////////////////////////////////////////////
-void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
-{
-  common::Time pollTime(0, 5000000);
-  double cornerHz = 2.5;
+  while(!this->stop)
+  {
+    this->Poll(pollTime, cornerHz);
+  }
 
-  this->Poll(pollTime, cornerHz);
+  if (this->hidrawFd >= 0)
+  {
+    uint8_t buf[256];
+    memset(buf, 0, sizeof(buf));
+    buf[6] = 1;
+    buf[8] = 4;
+    buf[89] = 5;
+    int res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
 
-  math::Pose orig(this->pos[0], this->quat[0]);
+    if (res < 0)
+    {
+      gzerr << "unable to stop streaming\n";
+      perror("HIDIOCSFEATURE");
+    }
 
-  math::Pose pivot = orig;
-  math::Pose grab = orig;
-
-  pivot.pos += orig.rot * math::Vector3(0.04, 0, 0);
-  grab.pos += orig.rot * math::Vector3(0.12, 0, 0);
-
-  this->boxModel->SetWorldPose(pivot);
+    close(this->hidrawFd);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -199,8 +262,8 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
   common::Time deadline = common::Time::GetWallTime() + _timeToWait;
 
   uint8_t buf[64];
-  while (common::Time::GetWallTime() < deadline)
-  {
+  //while (common::Time::GetWallTime() < deadline)
+  //{
     ssize_t nread = read(this->hidrawFd, buf, sizeof(buf));
 
     if (nread > 0)
@@ -254,6 +317,7 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
       this->rawAnalog[4] = *((int16_t *)(buf+47));
       this->rawAnalog[5] = buf[49];
 
+      boost::mutex::scoped_lock lock(this->mutex);
       // Put the raw position and orientation into Gazebo coordinate frame
       for (int i = 0; i < 2; i++)
       {
@@ -266,6 +330,7 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
         this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
         this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
       }
+
 
       // Apply filters
       for (int i = 0; i < 2; i++)
@@ -296,6 +361,11 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
     }
     else
     {
+      common::Time::NSleep(250000);
+      // gzerr << "Read failed\n";
+    }
+    /*else
+    {
       common::Time toSleep =
         this->lastCycleStart +
         common::Time(this->periodEstimate.GetValue() * 0.95);
@@ -306,8 +376,8 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
         common::Time::Sleep(sleepDuration);
       else
         common::Time::NSleep(250000);
-    }
-  }
+    }*/
+  //}
 
   return false;
 }
