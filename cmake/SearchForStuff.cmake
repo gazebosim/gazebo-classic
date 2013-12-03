@@ -319,7 +319,6 @@ if (PKG_CONFIG_FOUND)
   if (NOT BULLET_FOUND)
      pkg_check_modules(BULLET bullet2.82>=2.82)
   endif()
-
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
     add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )
