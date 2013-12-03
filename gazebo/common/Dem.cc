@@ -235,47 +235,38 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
                         const math::Vector3 &_size, const math::Vector3 &_scale,
                         bool _flipY, std::vector<float> &_heights)
 {
-  unsigned int x, y;
-  float h = 0;
-  float h1 = 0;
-  float h2 = 0;
-
   // Resize the vector to match the size of the vertices.
   _heights.resize(_vertSize * _vertSize);
 
-  double yf, xf, dy, dx;
-  unsigned int y1, y2, x1, x2;
-  double px1, px2, px3, px4;
-
   // Iterate over all the vertices
-  for (y = 0; y < _vertSize; ++y)
+  for (unsigned int y = 0; y < _vertSize; ++y)
   {
-    yf = y / static_cast<double>(_subSampling);
-    y1 = floor(yf);
-    y2 = ceil(yf);
+    double yf = y / static_cast<double>(_subSampling);
+    unsigned int y1 = floor(yf);
+    unsigned int y2 = ceil(yf);
     if (y2 >= this->side)
       y2 = this->side - 1;
-    dy = yf - y1;
+    double dy = yf - y1;
 
-    for (x = 0; x < _vertSize; ++x)
+    for (unsigned int x = 0; x < _vertSize; ++x)
     {
-      xf = x / static_cast<double>(_subSampling);
-      x1 = floor(xf);
-      x2 = ceil(xf);
+      double xf = x / static_cast<double>(_subSampling);
+      unsigned int x1 = floor(xf);
+      unsigned int x2 = ceil(xf);
       if (x2 >= this->side)
         x2 = this->side - 1;
-      dx = xf - x1;
+      double dx = xf - x1;
 
-      px1 = this->demData[y1 * this->side + x1];
-      px2 = this->demData[y1 * this->side + x2];
-      h1 = (px1 - ((px1 - px2) * dx));
+      double px1 = this->demData[y1 * this->side + x1];
+      double px2 = this->demData[y1 * this->side + x2];
+      float h1 = (px1 - ((px1 - px2) * dx));
 
-      px3 = this->demData[y2 * this->side + x1];
-      px4 = this->demData[y2 * this->side + x2];
-      h2 = (px3 - ((px3 - px4) * dx));
+      double px3 = this->demData[y2 * this->side + x1];
+      double px4 = this->demData[y2 * this->side + x2];
+      float h2 = (px3 - ((px3 - px4) * dx));
 
-      h = (h1 - ((h1 - h2) * dy) - std::max(0.0f, this->GetMinElevation())) *
-          _scale.z;
+      float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
+          this->GetMinElevation())) * _scale.z;
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component

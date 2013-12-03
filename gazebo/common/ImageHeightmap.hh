@@ -34,16 +34,25 @@ namespace gazebo
     /// \class ImageHeightmap ImageHeightmap.hh common/common.hh
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
     class ImageHeightmap
-      : public gazebo::common::Image, public gazebo::common::HeightmapData
+      : public gazebo::common::HeightmapData
     {
       /// \brief Constructor
       /// \param[in] _filename the path to the image
-      public: ImageHeightmap(const std::string &_filename="");
+      public: ImageHeightmap();
+
+      /// \brief Load an image file as a heightmap.
+      /// \param[in] _filename the path to the image file.
+      /// \return True when the operation succeeds to open a file.
+      public: int Load(const std::string &_filename="");
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
           std::vector<float> &_heights);
+
+      /// \brief Get the full filename of the image
+      /// \return The filename used to load the image
+      public: std::string GetFilename() const;
 
       // Documentation inherited.
       public: unsigned int GetHeight() const;
@@ -53,6 +62,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: float GetMaxElevation() const;
+
+      /// \brief Image containing the heightmap data.
+      private: gazebo::common::Image img;
     };
     /// \}
   }
