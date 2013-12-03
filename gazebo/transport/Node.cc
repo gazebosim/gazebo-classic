@@ -46,6 +46,14 @@ void Node::Fini()
   if (!this->initialized)
     return;
 
+  // Unadvertise all the publishers.
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    (*iter)->Fini();
+    TopicManager::Instance()->Unadvertise(*iter);
+  }
+
   this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 
@@ -260,7 +268,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -278,7 +289,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleMessage(_msg);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }

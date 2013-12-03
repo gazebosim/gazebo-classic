@@ -120,6 +120,10 @@ namespace gazebo
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
 
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double GetVerticalAngleResolution() const;
+
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of

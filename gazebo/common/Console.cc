@@ -16,6 +16,7 @@
  */
 #include <string.h>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/regex.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -28,10 +29,10 @@ using namespace gazebo;
 using namespace common;
 
 FileLogger gazebo::common::Console::log("");
-Logger Console::msg("{Msg}", 32, &std::cout);
-Logger Console::err("{Err}", 31, &std::cerr);
-Logger Console::dbg("{Dbg}", 36, &std::cout);
-Logger Console::warn("{Wrn}", 33, &std::cerr);
+Logger Console::msg("[Msg]", 32, Logger::STDOUT);
+Logger Console::err("[Err]", 31, Logger::STDERR);
+Logger Console::dbg("[Dbg]", 36, Logger::STDOUT);
+Logger Console::warn("[Wrn]", 33, Logger::STDERR);
 
 bool Console::quiet = true;
 
@@ -48,8 +49,8 @@ bool Console::GetQuiet()
 }
 
 /////////////////////////////////////////////////
-Logger::Logger(const std::string &_prefix, int _color, std::ostream *_stream)
-  : std::ostream(new Buffer(_prefix, _color, _stream))
+Logger::Logger(const std::string &_prefix, int _color, LogType _type)
+  : std::ostream(new Buffer(_type, _color)), color(_color), prefix(_prefix)
 {
 }
 
@@ -60,19 +61,28 @@ Logger::~Logger()
 }
 
 /////////////////////////////////////////////////
+Logger &Logger::operator()()
+{
+  (*this) << this->prefix;
+
+  return (*this);
+}
+
+/////////////////////////////////////////////////
 Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
-  (*this) << "[" << _file.substr(index , _file.size() - index) << ":"
+
+  (*this) << this->prefix
+    << " [" << _file.substr(index , _file.size() - index) << ":"
     << _line << "]";
 
   return (*this);
 }
 
 /////////////////////////////////////////////////
-Logger::Buffer::Buffer(const std::string &_prefix, int _color,
-    std::ostream *_stream)
-  : color(_color), stream(_stream), prefix(_prefix)
+Logger::Buffer::Buffer(LogType _type, int _color)
+  :  type(_type), color(_color)
 {
 }
 
@@ -85,18 +95,29 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
+  if (this->str().empty())
+    return -1;
+
   // Log messages to disk
-  Console::log << this->prefix << " " << this->str() << std::endl;
+  Console::log() << this->str() << std::endl;
 
   // Output to terminal
   if (!Console::GetQuiet())
   {
-    (*this->stream) << "\033[1;"
-      << this->color << "m" << this->str() << "\033[0m";
+    if (this->type == Logger::STDOUT)
+    {
+     std::cout << "\033[1;32m" << this->str() << "\033[0m";
+     std::cout.flush();
+    }
+    else
+    {
+     std::cerr << "\033[1;32m" << this->str() << "\033[0m";
+     std::cerr.flush();
+    }
   }
 
   this->str("");
-  return !(*this->stream);
+  return 0;
 }
 
 /////////////////////////////////////////////////
@@ -129,8 +150,25 @@ void FileLogger::Init(const std::string &_filename)
 
   buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
 
-  // Output the version of Gazebo.
+  // Output the version of gazebo.
   (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
+}
+
+/////////////////////////////////////////////////
+FileLogger &FileLogger::operator()()
+{
+  (*this) << "(" << Time::GetWallTime() << ") ";
+  return (*this);
+}
+
+/////////////////////////////////////////////////
+FileLogger &FileLogger::operator()(const std::string &_file, int _line)
+{
+  int index = _file.find_last_of("/") + 1;
+  (*this) << "(" << Time::GetWallTime() << ") ["
+    << _file.substr(index , _file.size() - index) << ":" << _line << "]";
+
+  return (*this);
 }
 
 /////////////////////////////////////////////////
@@ -156,7 +194,7 @@ int FileLogger::Buffer::sync()
   if (!this->stream)
     return -1;
 
-  *this->stream << "(" << common::Time::GetWallTime() << ") " << this->str();
+  *this->stream << this->str();
 
   this->stream->flush();
 
