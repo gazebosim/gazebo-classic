@@ -59,12 +59,12 @@ namespace gazebo
       /// \brief Drive the positions of a Link towards a target by wrench
       /// \param[in] _link Link to drive.
       /// \param[in] _position Target position of the link.
-      public: void ForceLinkToPos(LinkPtr _link, math::Vector3 _pos);
+      public: void PushLinkToPos(LinkPtr _link, math::Vector3 _pos);
 
       /// \brief Drive the orientation of a Link towards a target by wrench
       /// \param[in] _link Link to drive.
       /// \param[in] _rot Target orientation of the link.
-      public: void ForceLinkToRot(LinkPtr _link, math::Quaternion _rot);
+      public: void PushLinkToRot(LinkPtr _link, math::Quaternion _rot);
 
       /// \brief Model to control.
       private: ModelPtr model;
@@ -73,16 +73,16 @@ namespace gazebo
       private: std::map<std::string, LinkPtr> links;
 
       /// \brief Position PID controllers, one for each axis.
-      private: std::map<std::string, common::PID[3]> posPids;
+      private: std::map<std::string, std::vector<common::PID> > posPids;
 
       /// \brief Orientation PID controllers, one for each axis.
-      private: std::map<std::string, common::PID[3]> rotPids;
+      private: std::map<std::string, std::vector<common::PID> > rotPids;
 
       /// \brief Wrenches applied to links.
       private: std::map<std::string, physics::Wrench> wrenches;
 
       /// \brief target link poses
-      private: std::map<std::string, math::Pose> poses;
+      private: std::map<std::string, math::Pose> targetPoses;
 
       /// \brief Node for communication.
       private: transport::NodePtr node;
