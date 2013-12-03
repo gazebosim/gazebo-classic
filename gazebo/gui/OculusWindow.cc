@@ -57,7 +57,6 @@ OculusWindow::OculusWindow(QWidget *_parent)
 /////////////////////////////////////////////////
 OculusWindow::~OculusWindow()
 {
-  printf("Destroy Oculus window\n");
 }
 
 /////////////////////////////////////////////////
@@ -94,8 +93,8 @@ void OculusWindow::showEvent(QShowEvent *_event)
 {
   this->scene = rendering::get_scene();
 
-  std::cout << "Creat Oculus camera\n";
   this->oculusCamera = this->scene->CreateOculusCamera("gzclient_camera");
+  this->oculusCamera->AttachToVisual("unit_box_1", true);
 
   math::Vector3 camPos(5, -5, 2);
   math::Vector3 lookAt(0, 0, 0);
