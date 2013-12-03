@@ -106,12 +106,12 @@ int Logger::Buffer::sync()
   {
     if (this->type == Logger::STDOUT)
     {
-     std::cout << "\033[1;32m" << this->str() << "\033[0m";
+     std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
      std::cout.flush();
     }
     else
     {
-     std::cerr << "\033[1;32m" << this->str() << "\033[0m";
+     std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
      std::cerr.flush();
     }
   }
