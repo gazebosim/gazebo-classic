@@ -296,6 +296,10 @@ namespace gazebo
       /// \return A handle to the Controller for the joints in this model.
       public: JointControllerPtr GetJointController();
 
+      /// \brief Get a handle to the Controller for the links in this model.
+      /// \return A handle to the Controller for the links in this model.
+      public: LinkControllerPtr GetLinkController();
+
       /// \brief Get a gripper based on an index.
       /// \return A pointer to a Gripper. Null if the _index is invalid.
       public: GripperPtr GetGripper(size_t _index) const;
@@ -367,6 +371,9 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
+
+      /// \brief Controller for the joints.
+      private: LinkControllerPtr linkController;
 
       /// \brief True if plugins have been loaded.
       private: bool pluginsLoaded;

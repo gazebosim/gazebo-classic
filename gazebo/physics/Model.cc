@@ -38,6 +38,7 @@
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
+#include "gazebo/physics/LinkController.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -116,6 +117,12 @@ void Model::LoadLinks()
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
       this->links.push_back(link);
+
+      // add link to linkController
+      if (!this->linkController)
+        this->linkController.reset(new LinkController(
+            boost::dynamic_pointer_cast<Model>(shared_from_this())));
+      this->linkController->AddLink(link);
     }
   }
 }
@@ -219,6 +226,9 @@ void Model::Update()
 
   if (this->jointController)
     this->jointController->Update();
+
+  if (this->linkController)
+    this->linkController->Update();
 
   if (!this->jointAnimations.empty())
   {

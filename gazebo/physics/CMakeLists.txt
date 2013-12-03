@@ -26,6 +26,7 @@ set (sources
   JointController.cc
   JointState.cc
   Link.cc
+  LinkController.cc
   LinkState.cc
   MapShape.cc
   Model.cc
@@ -68,6 +69,7 @@ set (headers
   JointWrench.hh
   JointState.hh
   Link.hh
+  LinkController.hh
   LinkState.hh
   MapShape.hh
   Model.hh
@@ -89,7 +91,9 @@ set (headers
   MeshShape.hh
   UniversalJoint.hh
   World.hh
-  WorldState.hh)
+  WorldState.hh
+  Wrench.hh
+)
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})

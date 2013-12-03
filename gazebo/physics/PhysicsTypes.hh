@@ -40,6 +40,7 @@ namespace gazebo
     class Gripper;
     class Joint;
     class JointController;
+    class LinkController;
     class Contact;
     class PhysicsEngine;
     class Mass;
@@ -58,6 +59,7 @@ namespace gazebo
     class ModelState;
     class LinkState;
     class JointState;
+    class Wrench;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -87,6 +89,10 @@ namespace gazebo
     /// \brief Boost shared pointer to a Link object
     typedef boost::shared_ptr<Link> LinkPtr;
 
+    /// \def WrenchPtr
+    /// \brief Boost shared pointer to a Wrench object
+    typedef boost::shared_ptr<Wrench> WrenchPtr;
+
     /// \def CollisionPtr
     /// \brief Boost shared pointer to a Collision object
     typedef boost::shared_ptr<Collision> CollisionPtr;
@@ -98,6 +104,10 @@ namespace gazebo
     /// \def JointControllerPtr
     /// \brief Boost shared pointer to a JointController object
     typedef boost::shared_ptr<JointController> JointControllerPtr;
+
+    /// \def LinkControllerPtr
+    /// \brief Boost shared pointer to a LinkController object
+    typedef boost::shared_ptr<LinkController> LinkControllerPtr;
 
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
@@ -174,6 +184,10 @@ namespace gazebo
     /// \def Link_V
     /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;
+
+    /// \def Wrench_V
+    /// \brief Vector of WrenchPtr
+    typedef std::vector<WrenchPtr>  Wrench_V;
 
     /// \def Collision_V
     /// \brief Vector of CollisionPtr

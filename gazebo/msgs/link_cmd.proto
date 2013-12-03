@@ -1,0 +1,26 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LinkCmd
+/// \brief Message for link command, used by physics::LinkController
+
+
+import "wrench.proto";
+import "pose.proto";
+import "pid.proto";
+
+message LinkCmd
+{
+  required string name     = 1;
+  optional Wrench wrench   = 2;
+  optional Pose pose       = 3;
+
+  // one for each axis
+  repeated PID pos         = 4;
+
+  // one for each axis
+  repeated PID rot         = 5;
+
+  optional bool reset      = 6;
+}
+

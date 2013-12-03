@@ -72,6 +72,11 @@ namespace gazebo
     /// \return A msgs::Vector3d object
     msgs::Vector3d      Convert(const math::Vector3 &_v);
 
+    /// \brief Convert a math::Vector3 to a msgs::Vector3d
+    /// \param[in] _v The vector to convert
+    /// \return A msgs::Vector3d object
+    msgs::Vector3d      Convert(const math::Vector3 &_v);
+
     /// \brief Convert a math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
