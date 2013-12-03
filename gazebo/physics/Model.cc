@@ -38,8 +38,8 @@
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
-#include "gazebo/physics/LinkController.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/LinkController.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Model.hh"
@@ -1047,6 +1047,12 @@ void Model::RemoveLink(const std::string &_name)
 JointControllerPtr Model::GetJointController()
 {
   return this->jointController;
+}
+
+/////////////////////////////////////////////////
+LinkControllerPtr Model::GetLinkController()
+{
+  return this->linkController;
 }
 
 /////////////////////////////////////////////////
