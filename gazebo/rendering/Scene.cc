@@ -493,8 +493,7 @@ uint32_t Scene::GetGridCount() const
 //////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera(new Camera(this->name + "::" + _name,
-        shared_from_this(), _autoRender));
+  CameraPtr camera(new Camera(_name, shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
@@ -556,8 +555,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 //////////////////////////////////////////////////
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
-  OculusCameraPtr camera(new OculusCamera(this->GetName() + "::" + _name,
-                       shared_from_this()));
+  OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
   camera->Load();
   camera->Init();
   this->oculusCameras.push_back(camera);
@@ -568,8 +566,7 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
 {
-  UserCameraPtr camera(new UserCamera(this->GetName() + "::" + _name,
-                       shared_from_this()));
+  UserCameraPtr camera(new UserCamera(_name, shared_from_this()));
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);

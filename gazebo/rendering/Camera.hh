@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective OGRE Camera
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
 
-#ifndef _RENDERING_CAMERA_HH_
-#define _RENDERING_CAMERA_HH_
+#ifndef _GAZEBO_RENDERING_CAMERA_HH_
+#define _GAZEBO_RENDERING_CAMERA_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -29,6 +25,11 @@
 #include <vector>
 #include <deque>
 #include <sdf/sdf.hh>
+
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/PID.hh"
@@ -51,7 +52,6 @@ namespace Ogre
   class Viewport;
   class SceneNode;
   class AnimationState;
-  class CompositorInstance;
 }
 
 namespace gazebo
@@ -64,6 +64,7 @@ namespace gazebo
     class ViewController;
     class Scene;
     class GaussianNoiseCompositorListener;
+    class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -109,6 +110,13 @@ namespace gazebo
       // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
       // and change Render(bool _force) to have a default value of false.
       public: void Render();
+
+      /// \brief Render the camera.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
+      public: void Render(bool _force);
 
       /// \brief Post render
       ///
@@ -159,6 +167,10 @@ namespace gazebo
       /// \brief Set the global pose of the camera
       /// \param[in] _pose The new math::Pose of the camera
       public: virtual void SetWorldPose(const math::Pose &_pose);
+
+      /// \brief Get the world pose.
+      /// \return The pose of the camera in the world coordinate frame.
+      public: math::Pose GetWorldPose() const;
 
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
@@ -338,9 +350,13 @@ namespace gazebo
       /// \return Pointer to the raw data, null if data is not available.
       public: virtual const unsigned char *GetImageData(unsigned int i = 0);
 
-      /// \brief Get the camera's name
+      /// \brief Get the camera's unscoped name
       /// \return The name of the camera
       public: std::string GetName() const;
+
+      /// \brief Get the camera's scoped name (scene_name::camera_name)
+      /// \return The name of the camera
+      public: std::string GetScopedName() const;
 
       /// \brief Set the camera's name
       /// \param[in] _name New name for the camera
@@ -577,12 +593,21 @@ namespace gazebo
       /// \return Integer representation of the Ogre image format
       private: static int GetOgrePixelFormat(const std::string &_format);
 
+      /// \brief Receive command message.
+      /// \param[in] _msg Camera Command message.
+      private: void OnCmdMsg(ConstCameraCmdPtr &_msg);
 
       /// \brief Create the ogre camera.
       private: void CreateCamera();
 
       /// \brief Name of the camera.
       protected: std::string name;
+
+      /// \brief Scene scoped name of the camera.
+      protected: std::string scopedName;
+
+      /// \brief Scene scoped name of the camera with a unique ID.
+      protected: std::string scopedUniqueName;
 
       /// \brief Camera's SDF values.
       protected: sdf::ElementPtr sdf;
@@ -673,82 +698,9 @@ namespace gazebo
       /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
 
-      /// \brief Pointer to image SDF element.
-      private: sdf::ElementPtr imageElem;
-
-      /// \brief Visual that the camera is tracking.
-      private: VisualPtr trackedVisual;
-
-      /// \brief Counter used to create unique camera names.
-      private: static unsigned int cameraCounter;
-
-      /// \brief Deferred shading geometry buffer.
-      private: Ogre::CompositorInstance *dsGBufferInstance;
-
-      /// \brief Deferred shading merge compositor.
-      private: Ogre::CompositorInstance *dsMergeInstance;
-
-      /// \brief Deferred lighting geometry buffer.
-      private: Ogre::CompositorInstance *dlGBufferInstance;
-
-      /// \brief Deferred lighting merge compositor.
-      private: Ogre::CompositorInstance *dlMergeInstance;
-
-      /// \brief Screen space ambient occlusion compositor.
-      private: Ogre::CompositorInstance *ssaoInstance;
-
-      /// \brief Gaussian noise compositor
-      private: Ogre::CompositorInstance *gaussianNoiseInstance;
-
-      /// \brief Gaussian noise compositor listener
-      private: boost::shared_ptr<GaussianNoiseCompositorListener>
-        gaussianNoiseCompositorListener;
-
-      /// \brief Queue of move positions.
-      private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
-
-      /// \brief Render period.
-      private: common::Time renderPeriod;
-
-      /// \brief Position PID used to track a visual smoothly.
-      private: common::PID trackVisualPID;
-
-      /// \brief Pitch PID used to track a visual smoothly.
-      private: common::PID trackVisualPitchPID;
-
-      /// \brief Yaw PID used to track a visual smoothly.
-      private: common::PID trackVisualYawPID;
-
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other
-      /// noise parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
-      /// distibution from which we sample
-      private: double noiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
-      /// devation of the distibution from which we sample
-      private: double noiseStdDev;
-
-      // \todo Move this back up to public section in Gazebo 3.0. It is here
-      // for ABI compatibility.
-      /// \brief Render the camera.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images.
-      /// \param[in] _force Force camera to render. Ignore camera update
-      /// rate.
-      public: void Render(bool _force);
+      /// \internal
+      /// \brief Pointer to private data.
+      private: CameraPrivate *dataPtr;
     };
     /// \}
   }
