@@ -43,6 +43,12 @@ if (NOT PROTOBUF_PROTOC_LIBRARY)
 endif()
 
 ########################################
+find_package(orocos-KDL)
+if (NOT Orocos-KDL_FOUND)
+  BUILD_ERROR ("Missing: Orocos-KDL")
+endif()
+
+########################################
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
