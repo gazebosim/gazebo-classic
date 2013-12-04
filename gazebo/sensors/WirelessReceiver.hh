@@ -50,7 +50,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      private: virtual void UpdateImpl(bool _force);
+      private: virtual bool UpdateImpl(bool _force);
 
       /// \brief Returns the minimum frequency filtered (MHz).
       /// \return Reception frequency (MHz).

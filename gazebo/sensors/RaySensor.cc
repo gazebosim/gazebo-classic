@@ -342,7 +342,7 @@ int RaySensor::GetFiducial(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
@@ -398,9 +398,9 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   //       hja: is the previous index of ray in horizontal direction
   //       hjb: is the next index of ray in horizontal direction
   unsigned int hja, hjb;
-  unsigned int vja=0, vjb=0;
+  unsigned int vja = 0, vjb = 0;
   // percentage of interpolation between rays
-  double vb=0, hb;
+  double vb = 0, hb;
   // indices of ray samples
   int j1, j2, j3, j4;
   // range values of ray samples
@@ -425,12 +425,12 @@ void RaySensor::UpdateImpl(bool /*_force*/)
       vja = static_cast<int>(floor(vb));
       vjb = std::min(vja + 1, verticalRayCount - 1);
       vb = vb - floor(vb);
-  
+
       GZ_ASSERT(vja < verticalRayCount,
           "Invalid vertical ray index used for interpolation");
       GZ_ASSERT(vjb < verticalRayCount,
           "Invalid vertical ray index used for interpolation");
-    } 
+    }
     // interpolate in horizontal direction
     for (unsigned int i = 0; i < rangeCount; ++i)
     {
@@ -442,18 +442,18 @@ void RaySensor::UpdateImpl(bool /*_force*/)
         hja = static_cast<int>(floor(hb));
         hjb = std::min(hja + 1, rayCount - 1);
         hb = hb - floor(hb);
-  
+
         GZ_ASSERT(hja < rayCount,
             "Invalid horizontal ray index used for interpolation");
         GZ_ASSERT(hjb < rayCount,
             "Invalid horizontal ray index used for interpolation");
-  
+
         // indices of 4 corners
         j1 = hja + vja * rayCount;
         j2 = hjb + vja * rayCount;
         j3 = hja + vjb * rayCount;
         j4 = hjb + vjb * rayCount;
-  
+
         // range readings of 4 corners
         r1 = this->GetLaserShape()->GetRange(j1);
         r2 = this->GetLaserShape()->GetRange(j2);
@@ -461,7 +461,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
         r4 = this->GetLaserShape()->GetRange(j4);
         range = (1-vb)*((1 - hb) * r1 + hb * r2)
             + vb *((1 - hb) * r3 + hb * r4);
-  
+
         // intensity is averaged
         intensity = 0.25 * (this->GetLaserShape()->GetRetro(j1)
             + this->GetLaserShape()->GetRetro(j2)
@@ -497,6 +497,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   if (this->scanPub && this->scanPub->HasConnections())
     this->scanPub->Publish(this->laserMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
