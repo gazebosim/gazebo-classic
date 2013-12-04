@@ -53,6 +53,7 @@
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/LinkController.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/Model.hh"
@@ -1464,10 +1465,6 @@ void World::ProcessModelMsgs()
   std::list<msgs::Model>::iterator iter;
   for (iter = this->modelMsgs.begin(); iter != this->modelMsgs.end(); ++iter)
   {
-    gzerr << "find model["
-          << (*iter).name() << "] Id[" << (*iter).id()
-          << "]\n";
-
     ModelPtr model;
     if ((*iter).has_id())
       model = this->GetModelById((*iter).id());
@@ -1476,7 +1473,7 @@ void World::ProcessModelMsgs()
 
     if (!model)
     {
-      gzerr << "Unable to find model["
+      gzdbg << "Unable to find model["
             << (*iter).name() << "] Id[" << (*iter).id()
             << "] try link names next\n";
 
@@ -1489,22 +1486,24 @@ void World::ProcessModelMsgs()
 
         if (link && (*iter).has_pose())
         {
-          // gzdbg << "set link " << link->GetName()
-          //       << " pose " << msgs::Convert((*iter).pose()) << "\n";
-
-          // link->SetWorldPose(msgs::Convert((*iter).pose()));
-
-          // produce a vector from current pose to new pose, use that as force
-          math::Vector3 oldPos = link->GetWorldPose().pos;
-          math::Vector3 newPos = msgs::Convert((*iter).pose()).pos;
-          math::Vector3 force = newPos - oldPos;
-          link->SetForce(force);  // use LinkController instead
+          /// pid control canonical link of model to new pose
+          link->GetModel()->GetLinkController()->AddLink(link,
+            msgs::Convert((*iter).pose()));
         }
+        else
+          gzerr << "Unable to find model or link matching ["
+                << (*iter).name() << "] with Id[" << (*iter).id()
+                << "]\n";
       }
     }
     else
     {
-      model->ProcessMsg(*iter);
+      /// pid control canonical link of model to new pose
+      math::Pose offset = model->GetLink("canonical")->GetRelativePose();
+      model->GetLinkController()->AddLink(model->GetLink("canonical"),
+        offset + msgs::Convert((*iter).pose()));
+
+      // model->ProcessMsg(*iter);
 
       // May 30, 2013: The following code was removed because it has a
       // major performance impact when dragging complex object via the GUI.
@@ -1527,7 +1526,7 @@ void World::ProcessModelMsgs()
       //   }
       // }
 
-      this->modelPub->Publish(*iter);
+      // this->modelPub->Publish(*iter);
     }
   }
   if (this->modelMsgs.size())

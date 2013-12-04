@@ -122,7 +122,7 @@ void Model::LoadLinks()
       if (!this->linkController)
         this->linkController.reset(new LinkController(
             boost::dynamic_pointer_cast<Model>(shared_from_this())));
-      this->linkController->AddLink(link);
+      // this->linkController->AddLink(link);
     }
   }
 }

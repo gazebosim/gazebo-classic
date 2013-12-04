@@ -40,7 +40,7 @@ LinkController::LinkController(ModelPtr _model)
 }
 
 /////////////////////////////////////////////////
-void LinkController::AddLink(LinkPtr _link)
+void LinkController::AddLink(LinkPtr _link, math::Pose _pose)
 {
   this->links[_link->GetScopedName()] = _link;
 
@@ -53,7 +53,7 @@ void LinkController::AddLink(LinkPtr _link)
     posPid->resize(3);
   for (unsigned int i = 0; i < posPid->size(); ++i)
   {
-    common::PID pid(10.0, 0, 0.0, 0, 0, 1e16, -1e16);
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e16, -1e16);
     (*posPid)[i] = pid;
   }
 
@@ -63,15 +63,18 @@ void LinkController::AddLink(LinkPtr _link)
     rotPid->resize(3);
   for (unsigned int i = 0; i < rotPid->size(); ++i)
   {
-    common::PID pid(10.0, 0, 0.0, 0, 0, 1e16, -1e16);
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e16, -1e16);
     (*rotPid)[i] = pid;
   }
 
   // initialize target pose as link's current pose
-  this->targetPoses[_link->GetScopedName()] = _link->GetWorldPose();
+  this->targetPoses[_link->GetScopedName()] = _pose;
 
   // initialize command wrench for link to zeros
   this->wrenches[_link->GetScopedName()] = physics::Wrench();
+
+  // Reset Time
+  this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
 }
 
 /////////////////////////////////////////////////

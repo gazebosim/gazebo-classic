@@ -44,7 +44,8 @@ namespace gazebo
 
       /// \brief Add a link to control.
       /// \param[in] _link Link to control.
-      public: void AddLink(LinkPtr _link);
+      /// \param[in] _pose Target pose for the link
+      public: void AddLink(LinkPtr _link, math::Pose _pose);
 
       /// \brief Update the link control forces.
       public: void Update();
