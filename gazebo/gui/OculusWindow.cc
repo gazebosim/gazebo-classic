@@ -94,9 +94,9 @@ void OculusWindow::showEvent(QShowEvent *_event)
   this->scene = rendering::get_scene();
 
   this->oculusCamera = this->scene->CreateOculusCamera("gzclient_camera");
-  this->oculusCamera->AttachToVisual("unit_box_1", true);
+  this->oculusCamera->AttachToVisual("atlas::head", true);
 
-  math::Vector3 camPos(5, -5, 2);
+  math::Vector3 camPos(0, 0, 0);
   math::Vector3 lookAt(0, 0, 0);
   math::Vector3 delta = lookAt - camPos;
 
