@@ -63,7 +63,7 @@ void LinkController::AddLink(LinkPtr _link, math::Pose _pose)
     rotPid->resize(3);
   for (unsigned int i = 0; i < rotPid->size(); ++i)
   {
-    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
+    common::PID pid(50.0, 0, 1.0, 0, 0, 1e4, -1e4);
     (*rotPid)[i] = pid;
   }
 
@@ -102,7 +102,7 @@ void LinkController::SetLink(LinkPtr _link, math::Pose _pose)
     rotPid->resize(3);
   for (unsigned int i = 0; i < rotPid->size(); ++i)
   {
-    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
+    common::PID pid(50.0, 0, 1.0, 0, 0, 1e4, -1e4);
     (*rotPid)[i] = pid;
   }
 
@@ -151,11 +151,10 @@ void LinkController::Update()
     {
       math::Pose currentPose = this->links[piter->first]->GetWorldPose();
       math::Pose targetPose = piter->second;
-      // errorPose is in the currentPose frame of reference
-      math::Pose errorPose = targetPose - currentPose;
       math::Vector3 errorPos = currentPose.pos - targetPose.pos;
+
       math::Vector3 errorRot =
-        currentPose.rot.GetAsEuler() - targetPose.rot.GetAsEuler();
+        (currentPose.rot * targetPose.rot.GetInverse()).GetAsEuler();
 
       physics::Wrench *commandWrench = &this->wrenches[piter->first];
 
