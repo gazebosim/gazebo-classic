@@ -48,23 +48,23 @@ void LinkController::AddLink(LinkPtr _link)
   // initialized internal control variables for each link.
 
   // setup pid for controlling link position
-  std::vector<common::PID> posPid = this->posPids[_link->GetScopedName()];
-  if (posPid.size() != 3)  // resize one for each axis
-    posPid.resize(3);
-  for (unsigned int i = 0; i < posPid.size(); ++i)
+  std::vector<common::PID> *posPid = &this->posPids[_link->GetScopedName()];
+  if (posPid->size() != 3)  // resize one for each axis
+    posPid->resize(3);
+  for (unsigned int i = 0; i < posPid->size(); ++i)
   {
-    common::PID pid(1.0, 0, 0.0, 0, 0, 1e16, -1e16);
-    posPid[i] = pid;
+    common::PID pid(10.0, 0, 0.0, 0, 0, 1e16, -1e16);
+    (*posPid)[i] = pid;
   }
 
   // setup pid for controlling link orientation
-  std::vector<common::PID> rotPid = this->rotPids[_link->GetScopedName()];
-  if (rotPid.size() != 3)  // resize one for each axis
-    rotPid.resize(3);
-  for (unsigned int i = 0; i < rotPid.size(); ++i)
+  std::vector<common::PID> *rotPid = &this->rotPids[_link->GetScopedName()];
+  if (rotPid->size() != 3)  // resize one for each axis
+    rotPid->resize(3);
+  for (unsigned int i = 0; i < rotPid->size(); ++i)
   {
-    common::PID pid(1.0, 0, 0.0, 0, 0, 1e16, -1e16);
-    rotPid[i] = pid;
+    common::PID pid(10.0, 0, 0.0, 0, 0, 1e16, -1e16);
+    (*rotPid)[i] = pid;
   }
 
   // initialize target pose as link's current pose
@@ -82,7 +82,11 @@ void LinkController::Reset()
   this->posPids.clear();
   this->rotPids.clear();
   this->wrenches.clear();
-  // Should the PID's be reset as well?
+
+  // Reset Time
+  this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
+
+  // \TODO: Should the PID's be reset as well?
 }
 
 /////////////////////////////////////////////////
@@ -99,25 +103,28 @@ void LinkController::Update()
   if (stepTime > 0)
   {
     // compute wrench command updates
-    std::map<std::string, std::vector<common::PID> >::iterator piter;
-    for (piter = this->posPids.begin(); piter != this->posPids.end(); ++piter)
+    std::map<std::string, math::Pose>::iterator piter;
+    for (piter = this->targetPoses.begin(); piter != this->targetPoses.end();
+      ++piter)
     {
       math::Pose currentPose = this->links[piter->first]->GetWorldPose();
-      math::Pose targetPose = this->targetPoses[piter->first];
+      math::Pose targetPose = piter->second;
+      // errorPose is in the currentPose frame of reference
       math::Pose errorPose = targetPose - currentPose;
-      math::Vector3 errorPos = errorPose.pos;
-      math::Vector3 errorRot = errorPose.rot.GetAsEuler();
+      math::Vector3 errorPos = currentPose.pos - targetPose.pos;
+      math::Vector3 errorRot =
+        currentPose.rot.GetAsEuler() - targetPose.rot.GetAsEuler();
 
       physics::Wrench *commandWrench = &this->wrenches[piter->first];
 
-      std::vector<common::PID> posPid = this->posPids[piter->first];
-      commandWrench->force.x = posPid[0].Update(errorPos.x, stepTime);
-      commandWrench->force.y = posPid[1].Update(errorPos.y, stepTime);
-      commandWrench->force.z = posPid[2].Update(errorPos.z, stepTime);
-      std::vector<common::PID> rotPid = this->rotPids[piter->first];
-      commandWrench->torque.x = rotPid[0].Update(errorRot.x, stepTime);
-      commandWrench->torque.y = rotPid[1].Update(errorRot.y, stepTime);
-      commandWrench->torque.z = rotPid[2].Update(errorRot.z, stepTime);
+      std::vector<common::PID> *posPid = &this->posPids[piter->first];
+      commandWrench->force.x = (*posPid)[0].Update(errorPos.x, stepTime);
+      commandWrench->force.y = (*posPid)[1].Update(errorPos.y, stepTime);
+      commandWrench->force.z = (*posPid)[2].Update(errorPos.z, stepTime);
+      std::vector<common::PID> *rotPid = &this->rotPids[piter->first];
+      commandWrench->torque.x = (*rotPid)[0].Update(errorRot.x, stepTime);
+      commandWrench->torque.y = (*rotPid)[1].Update(errorRot.y, stepTime);
+      commandWrench->torque.z = (*rotPid)[2].Update(errorRot.z, stepTime);
     }
 
     // apply wrench commands to links
@@ -126,11 +133,17 @@ void LinkController::Update()
       std::map<std::string, physics::Wrench>::iterator iter;
       for (iter = this->wrenches.begin(); iter != this->wrenches.end(); ++iter)
       {
-        this->links[iter->first]->SetForce(iter->second.force);
-        this->links[iter->first]->SetTorque(iter->second.torque);
+        LinkPtr link = this->links[iter->first];
+        if (link)
+        {
+          link->SetForce(iter->second.force);
+          link->SetTorque(iter->second.torque);
+        }
       }
     }
   }
+  else
+    gzwarn << "time step <= 0 in LinkController, Reset simulation?\n";
 }
 
 /////////////////////////////////////////////////
@@ -150,7 +163,7 @@ void LinkController::OnLinkCmd(ConstLinkCmdPtr &_msg)
     // if (_msg->has_wrench())
     //   this->wrenches[_msg->name()] = _msg->wrench();
 
-/*  deal with arrays in proto
+    /*  deal with arrays in proto
     if (_msg->has_pos())
     {
       for (int i = 0; i < 3; ++i)
@@ -188,20 +201,9 @@ void LinkController::OnLinkCmd(ConstLinkCmdPtr &_msg)
           this->rotPids[_msg->name()].SetIMax(_msg->rot()[i].i_min());
       }
     }
-*/
+    */
   }
   else
     gzerr << "Unable to find link[" << _msg->name() << "]\n";
 
-}
-
-//////////////////////////////////////////////////
-void LinkController::PushLinkToPos(LinkPtr _link, math::Vector3 _pos)
-{
-
-}
-
-//////////////////////////////////////////////////
-void LinkController::PushLinkToRot(LinkPtr _link, math::Quaternion _rot)
-{
 }

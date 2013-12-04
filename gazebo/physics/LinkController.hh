@@ -56,16 +56,6 @@ namespace gazebo
       /// \param[in] _msg The received message.
       private: void OnLinkCmd(ConstLinkCmdPtr &_msg);
 
-      /// \brief Drive the positions of a Link towards a target by wrench
-      /// \param[in] _link Link to drive.
-      /// \param[in] _position Target position of the link.
-      public: void PushLinkToPos(LinkPtr _link, math::Vector3 _pos);
-
-      /// \brief Drive the orientation of a Link towards a target by wrench
-      /// \param[in] _link Link to drive.
-      /// \param[in] _rot Target orientation of the link.
-      public: void PushLinkToRot(LinkPtr _link, math::Quaternion _rot);
-
       /// \brief Model to control.
       private: ModelPtr model;
 
