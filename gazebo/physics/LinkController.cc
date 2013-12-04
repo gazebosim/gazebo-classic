@@ -246,5 +246,4 @@ void LinkController::OnLinkCmd(ConstLinkCmdPtr &_msg)
   }
   else
     gzerr << "Unable to find link[" << _msg->name() << "]\n";
-
 }

@@ -210,9 +210,9 @@ namespace gazebo
     physics::Wrench Convert(const msgs::Wrench &_w)
     {
       physics::Wrench result;
-      result.force.x = _w.force().x( );
-      result.force.y = _w.force().y( );
-      result.force.z = _w.force().z( );
+      result.force.x = _w.force().x();
+      result.force.y = _w.force().y();
+      result.force.z = _w.force().z();
       result.torque.x = _w.torque().x();
       result.torque.y = _w.torque().y();
       result.torque.z = _w.torque().z();
