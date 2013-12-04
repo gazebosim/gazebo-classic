@@ -457,6 +457,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
 
+    // Create visual axis or orbs for manipulation
     this->SetMouseMoveVisual(vis);
 
     event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
@@ -501,19 +502,22 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
           this->TranslateEntity(this->mouseMoveVis, axis, false);
         }
         else if (this->selectionObj->GetState()
-            == rendering::SelectionObj::TRANS_X)
+            == rendering::SelectionObj::TRANS_X
+            || this->keyEvent.key == Qt::Key_X)
         {
           this->TranslateEntity(this->mouseMoveVis,
               math::Vector3::UnitX, !this->globalManip);
         }
         else if (this->selectionObj->GetState()
-            == rendering::SelectionObj::TRANS_Y)
+            == rendering::SelectionObj::TRANS_Y
+            || this->keyEvent.key == Qt::Key_Y)
         {
           this->TranslateEntity(this->mouseMoveVis,
               math::Vector3::UnitY, !this->globalManip);
         }
         else if (this->selectionObj->GetState()
-            == rendering::SelectionObj::TRANS_Z)
+            == rendering::SelectionObj::TRANS_Z
+            || this->keyEvent.key == Qt::Key_Z)
         {
           this->TranslateEntity(this->mouseMoveVis,
             math::Vector3::UnitZ, !this->globalManip);
@@ -552,6 +556,10 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
           this->RotateEntity(this->mouseMoveVis, math::Vector3::UnitZ,
               !this->globalManip);
         }
+
+        // publish whenever cursor moves
+        this->PublishVisualPose(this->mouseMoveVis);
+        QApplication::setOverrideCursor(Qt::OpenHandCursor);
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::SCALE)
       {
@@ -661,10 +669,11 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  if (gui::get_entity_id(vis->GetParent()->GetName()))
-    vis = vis->GetParent();
+  // Switch from selecting Model to selecting Link
   // if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
   //   vis = vis->GetRootVisual();
+  if (gui::get_entity_id(vis->GetParent()->GetName()))
+    vis = vis->GetParent();
 
   this->mouseMoveVisStartPose = vis->GetWorldPose();
 

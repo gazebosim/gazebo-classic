@@ -1473,10 +1473,6 @@ void World::ProcessModelMsgs()
 
     if (!model)
     {
-      gzdbg << "Unable to find model["
-            << (*iter).name() << "] Id[" << (*iter).id()
-            << "] try link names next\n";
-
       // look for link in all models
       Model_V localModels = this->GetModels();
       for (Model_V::iterator miter = localModels.begin();
@@ -1490,10 +1486,6 @@ void World::ProcessModelMsgs()
           link->GetModel()->GetLinkController()->AddLink(link,
             msgs::Convert((*iter).pose()));
         }
-        else
-          gzerr << "Unable to find model or link matching ["
-                << (*iter).name() << "] with Id[" << (*iter).id()
-                << "]\n";
       }
     }
     else
