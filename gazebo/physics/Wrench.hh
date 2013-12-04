@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Specification of a contact
- * Author: Nate Koenig
- * Date: 10 Nov 2009
- */
 
-#ifndef _WRENCH_HH_
-#define _WRENCH_HH_
+#ifndef _GAZEBO_WRENCH_HH_
+#define _GAZEBO_WRENCH_HH_
 
 #include "gazebo/math/Vector3.hh"
 
@@ -33,7 +29,7 @@ namespace gazebo
 
     /// \class Wrench Wrench.hh physics/physics.hh
     /// \brief Wrench information.  These are
-    /// forces and torques relative some reference frame.
+    /// forces and torques relative to a reference frame.
     class Wrench
     {
       /// \brief Operator =
