@@ -1483,7 +1483,7 @@ void World::ProcessModelMsgs()
         if (link && (*iter).has_pose())
         {
           /// pid control canonical link of model to new pose
-          link->GetModel()->GetLinkController()->AddLink(link,
+          link->GetModel()->GetLinkController()->SetLink(link,
             msgs::Convert((*iter).pose()));
         }
       }
@@ -1492,7 +1492,7 @@ void World::ProcessModelMsgs()
     {
       /// pid control canonical link of model to new pose
       math::Pose offset = model->GetLink("canonical")->GetRelativePose();
-      model->GetLinkController()->AddLink(model->GetLink("canonical"),
+      model->GetLinkController()->SetLink(model->GetLink("canonical"),
         offset + msgs::Convert((*iter).pose()));
 
       // model->ProcessMsg(*iter);

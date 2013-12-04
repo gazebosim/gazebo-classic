@@ -446,13 +446,12 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // Switch from selecting Model to selecting Link
-    // if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    // GetParent of visual should be Link
     if (gui::get_entity_id(vis->GetParent()->GetName()))
     {
-      // Switch from selecting Model to selecting Link
-      // vis = vis->GetRootVisual();
-      vis = vis->GetParent();  // parent of visual should be link
+      // check and skip so clicking on axis or orb doesn't revert to model
+      if (vis != this->selectionObj->GetParent())
+        vis = vis->GetParent();  // parent of visual should be link
     }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
@@ -669,9 +668,7 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  // Switch from selecting Model to selecting Link
-  // if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
-  //   vis = vis->GetRootVisual();
+  // GetParent of visual should be Link
   if (gui::get_entity_id(vis->GetParent()->GetName()))
     vis = vis->GetParent();
 

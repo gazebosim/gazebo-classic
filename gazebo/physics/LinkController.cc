@@ -53,7 +53,7 @@ void LinkController::AddLink(LinkPtr _link, math::Pose _pose)
     posPid->resize(3);
   for (unsigned int i = 0; i < posPid->size(); ++i)
   {
-    common::PID pid(500.0, 0, 10.0, 0, 0, 1e16, -1e16);
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
     (*posPid)[i] = pid;
   }
 
@@ -63,7 +63,46 @@ void LinkController::AddLink(LinkPtr _link, math::Pose _pose)
     rotPid->resize(3);
   for (unsigned int i = 0; i < rotPid->size(); ++i)
   {
-    common::PID pid(500.0, 0, 10.0, 0, 0, 1e16, -1e16);
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
+    (*rotPid)[i] = pid;
+  }
+
+  // initialize target pose as link's current pose
+  this->targetPoses[_link->GetScopedName()] = _pose;
+
+  // initialize command wrench for link to zeros
+  this->wrenches[_link->GetScopedName()] = physics::Wrench();
+
+  // Reset Time
+  this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
+}
+
+/////////////////////////////////////////////////
+void LinkController::SetLink(LinkPtr _link, math::Pose _pose)
+{
+  this->Reset();
+  this->links[_link->GetScopedName()] = _link;
+
+  // add _link to list of controlled links,
+  // initialized internal control variables for each link.
+
+  // setup pid for controlling link position
+  std::vector<common::PID> *posPid = &this->posPids[_link->GetScopedName()];
+  if (posPid->size() != 3)  // resize one for each axis
+    posPid->resize(3);
+  for (unsigned int i = 0; i < posPid->size(); ++i)
+  {
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
+    (*posPid)[i] = pid;
+  }
+
+  // setup pid for controlling link orientation
+  std::vector<common::PID> *rotPid = &this->rotPids[_link->GetScopedName()];
+  if (rotPid->size() != 3)  // resize one for each axis
+    rotPid->resize(3);
+  for (unsigned int i = 0; i < rotPid->size(); ++i)
+  {
+    common::PID pid(500.0, 0, 10.0, 0, 0, 1e4, -1e4);
     (*rotPid)[i] = pid;
   }
 
