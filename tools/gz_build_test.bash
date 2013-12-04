@@ -15,6 +15,7 @@ logfileSummary="/tmp/gazebo_test-$timestamp-summary.txt"
 logfileVerbose="/tmp/gazebo_test-$timestamp-verbose.txt"
 BUILD_ROOT=/tmp/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
+testCount=40
 
 # Create working directory
 cd 
@@ -80,15 +81,16 @@ do
   sh tools/code_check.sh >> $logfile
 
   # Run make test many times, only capture failures
-  for i in {1..100}
+
+  for i in {1..$testCount}
   do
-    echo "Test results try $i of 100" >> $logfile
+    echo "Test results try $i of $testCount" >> $logfile
     cd $BUILD_ROOT/source/build
 
     # make test with verbose output
     make test ARGS="-VV" &> $logfileRaw
     grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw >> $logfile
-    echo make test try $i of 100, \
+    echo make test try $i of $testCount, \
       `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | wc -l` \
       tests failed
 
@@ -97,7 +99,7 @@ do
       sed -e 's@^ *\([0-9]*\)/.*@\1@'`
     do
       # output some brief info
-      echo Branch "$branch" try $i of 100, failed test $f >> $logfileVerbose
+      echo Branch "$branch" try $i of $testCount, failed test $f >> $logfileVerbose
       # then send the raw output of both the test and its companion test_ran
       # to the logfile for perusal
       grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
