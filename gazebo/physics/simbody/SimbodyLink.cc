@@ -374,18 +374,31 @@ void SimbodyLink::SetForce(const math::Vector3 &_force)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldForce() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+  SimTK::Vec3 f = sv[1];  // get translational component
+
+  return SimbodyPhysics::Vec3ToVector3(f);
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetTorque(const math::Vector3 &/*_torque*/)
+void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 {
+  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod, SimTK::SpatialVec(t, SimTK::Vec3(0)));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldTorque() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+  SimTK::Vec3 t = sv[0];  // get rotational component
+
+  return SimbodyPhysics::Vec3ToVector3(t);
 }
 
 //////////////////////////////////////////////////
