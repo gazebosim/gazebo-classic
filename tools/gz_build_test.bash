@@ -82,7 +82,7 @@ do
 
   # Run make test many times, only capture failures
 
-  for i in {1..$testCount}
+  for i in `seq $testCount`
   do
     echo "Test results try $i of $testCount" >> $logfile
     cd $BUILD_ROOT/source/build
