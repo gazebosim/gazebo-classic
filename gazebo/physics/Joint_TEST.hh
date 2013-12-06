@@ -73,7 +73,8 @@ class Joint_TEST : public ServerFixture,
             if (test_info->value_param())
             {
               gzdbg << "Params: " << test_info->value_param() << std::endl;
-              std::tr1::tie(this->physicsEngine, this->jointType) = GetParam();
+              this->physicsEngine = std::tr1::get<0>(GetParam());
+              this->jointType = std::tr1::get<1>(GetParam());
             }
           }
 
