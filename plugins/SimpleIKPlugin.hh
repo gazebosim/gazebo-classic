@@ -50,6 +50,8 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
+    public: virtual void Reset();
+
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
     private: physics::ModelPtr goalModel;
@@ -66,10 +68,14 @@ namespace gazebo
     private: math::Vector3 goalPos;
 
     private: KDL::ChainFkSolverPos_recursive *fkSolver;
+    private: KDL::ChainIkSolverVel_wdls *iksolverVel;
     private: KDL::Chain chain;
     private: KDL::JntArray *jointpositions;
 
     private: physics::Joint_V joints;
+
+    private: common::Time updateRate, lastUpdateTime;
+    private: double vels[6];
   };
 }
 #endif

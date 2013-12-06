@@ -28,6 +28,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/physics/physics.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
@@ -50,11 +51,19 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
-    private: void IK();
+    private: void OnHydra(ConstHydraPtr &_msg);
+
+    private: void SetRightFingers(double _angle);
+    private: void SetLeftFingers(double _angle);
+
+    private: void Restart();
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
     private: physics::ModelPtr boxModel;
+
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr hydraSub;
 
     private: boost::mutex update_mutex;
 
@@ -72,6 +81,18 @@ namespace gazebo
     private: KDL::ChainFkSolverPos_recursive *rFkSolver;
     private: KDL::Chain rChain;
     private: KDL::JntArray *rJointpositions;
+
+    private: bool rightBumper, leftBumper;
+
+    private: physics::ModelPtr rightModel, leftModel;
+
+    private: math::Pose rightStartPose;
+    private: math::Pose leftStartPose;
+
+    private: math::Pose basePoseRight;
+    private: math::Pose basePoseLeft;
+    private: math::Pose resetPoseRight;
+    private: math::Pose resetPoseLeft;
   };
 }
 #endif

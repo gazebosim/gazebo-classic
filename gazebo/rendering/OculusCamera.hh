@@ -42,6 +42,10 @@ namespace OVR
   }
 }
 
+namespace Ogre
+{
+  class CompositorInstance;
+}
 
 namespace gazebo
 {

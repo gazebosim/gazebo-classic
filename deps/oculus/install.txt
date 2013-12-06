@@ -1,0 +1,3 @@
+do cp 99-oculus.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+

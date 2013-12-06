@@ -1,32 +1,3 @@
-/*********************************************************************
- *
- * This is free and unencumbered software released into the public domain.
- *
- * Anyone is free to copy, modify, publish, use, compile, sell, or
- * distribute this software, either in source code form or as a compiled
- * binary, for any purpose, commercial or non-commercial, and by any
- * means.
- *
- * In jurisdictions that recognize copyright laws, the author or authors
- * of this software dedicate any and all copyright interest in the
- * software to the public domain. We make this dedication for the benefit
- * of the public at large and to the detriment of our heirs and
- * successors. We intend this dedication to be an overt act of
- * relinquishment in perpetuity of all present and future rights to this
- * software under copyright law.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
- * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
- * For more information, please refer to <http://unlicense.org/>
- *
- **********************************************************************/
-
 #include <errno.h>
 #include <libusb-1.0/libusb.h>
 #include <linux/types.h>
@@ -34,16 +5,13 @@
 #include <linux/hidraw.h>
 #include <cstring>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/physics/physics.hh"
 
 #include "Hydra.hh"
 
 // loosely adapted from the following
-// https://github.com/rpavlik/vrpn/blob/razer-hydra/vrpn_Tracker_RazerHydra.C
-
-// and with reference to
-// http://lxr.free-electrons.com/source/samples/hidraw/hid-example.c
-
+// https://github.com/ros-drivers/razer_hydra/blob/groovy-devel/src/hydra.cpp
 
 // Ugly hack to work around failing compilation on systems that don't
 // yet populate new version of hidraw.h to userspace.
@@ -60,6 +28,22 @@
 
 using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
+
+#define HYDRA_RIGHT_BUMPER 0
+#define HYDRA_RIGHT_1 1
+#define HYDRA_RIGHT_2 2
+#define HYDRA_RIGHT_3 3
+#define HYDRA_RIGHT_4 4
+#define HYDRA_RIGHT_CENTER 5
+#define HYDRA_RIGHT_JOY 6
+
+#define HYDRA_LEFT_LB 7
+#define HYDRA_LEFT_1 8
+#define HYDRA_LEFT_2 9
+#define HYDRA_LEFT_3 10
+#define HYDRA_LEFT_4 11
+#define HYDRA_LEFT_CENTER 12
+#define HYDRA_LEFT_JOY 13
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
@@ -86,49 +70,76 @@ RazerHydra::~RazerHydra()
 /////////////////////////////////////////////////
 void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&RazerHydra::Update, this, _1));
-
-  this->rightModel = _world->GetModel("right_arm_goal");
-  this->leftModel = _world->GetModel("left_arm_goal");
-
-  this->basePoseRight = this->rightModel->GetWorldPose();
-  this->basePoseLeft = this->leftModel->GetWorldPose();
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&RazerHydra::Update, this, _1));
 
   this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
 
-  this->prevState = this->buttons[0];
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_world->GetName());
+  this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
 }
 
 /////////////////////////////////////////////////
 void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
 {
-  /*common::Time pollTime(1, 50000000);
-  double cornerHz = 2.5;
-
-  uint8_t state = this->buttons[0];
-
-  this->Poll(pollTime, cornerHz);
-  */
-
   boost::mutex::scoped_lock lock(this->mutex);
   math::Pose origRight(this->pos[0], this->quat[0]);
 
   math::Pose pivotRight = origRight;
   math::Pose grabRight = origRight;
 
-  pivotRight.pos += origRight.rot * math::Vector3(0.04, 0, 0);
-  grabRight.pos += origRight.rot * math::Vector3(0.12, 0, 0);
+  pivotRight.pos += origRight.rot * math::Vector3(-0.04, 0, 0);
+  grabRight.pos += origRight.rot * math::Vector3(-0.12, 0, 0);
 
   math::Pose origLeft(this->pos[1], this->quat[1]);
 
   math::Pose pivotLeft = origLeft;
   math::Pose grabLeft = origLeft;
 
-  pivotLeft.pos += origLeft.rot * math::Vector3(0.04, 0, 0);
-  grabLeft.pos += origLeft.rot * math::Vector3(0.12, 0, 0);
+  pivotLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.04, 0, 0));
+  grabLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.12, 0, 0));
 
-  if (this->buttons[0])
+  msgs::Hydra msg;
+  msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
+  msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
+
+  // Analog 0: Right right(+) left(-)
+  // Analog 1: Right forward(+) back(-)
+  // Analog 2: Right trigger(0-1)
+  // Analog 3: Left right(+) left(-)
+  // Analog 4: Left forward(+) back(-)
+  // Analog 5: Left trigger(0-1)
+  rightPaddle->set_joy_y(this->analog[0]);
+  rightPaddle->set_joy_x(this->analog[1]);
+  rightPaddle->set_trigger(this->analog[2]);
+
+  leftPaddle->set_joy_y(this->analog[3]);
+  leftPaddle->set_joy_x(this->analog[4]);
+  leftPaddle->set_trigger(this->analog[5]);
+
+  rightPaddle->set_button_bumper(this->buttons[0]);
+  rightPaddle->set_button_1(this->buttons[1]);
+  rightPaddle->set_button_2(this->buttons[2]);
+  rightPaddle->set_button_3(this->buttons[3]);
+  rightPaddle->set_button_4(this->buttons[4]);
+  rightPaddle->set_button_center(this->buttons[5]);
+  rightPaddle->set_button_joy(this->buttons[6]);
+
+  leftPaddle->set_button_bumper(this->buttons[7]);
+  leftPaddle->set_button_1(this->buttons[8]);
+  leftPaddle->set_button_2(this->buttons[9]);
+  leftPaddle->set_button_3(this->buttons[10]);
+  leftPaddle->set_button_4(this->buttons[11]);
+  leftPaddle->set_button_center(this->buttons[12]);
+  leftPaddle->set_button_joy(this->buttons[13]);
+
+  msgs::Set(rightPaddle->mutable_pose(), grabRight);
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+
+  this->pub->Publish(msg);
+
+  /*if (this->buttons[0])
   {
     if (this->prevState != this->buttons[0])
     {
@@ -137,20 +148,22 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
     }
 
    this->rightModel->SetWorldPose(
-        math::Pose(grabRight.pos - this->resetPoseRight.pos,
-          grabRight.rot * this->resetPoseRight.rot.GetInverse()) + this->basePoseRight);
+        math::Pose(grabRight.pos - this->resetPoseRight.pos +
+          this->basePoseRight.pos,
+          grabRight.rot * this->resetPoseRight.rot.GetInverse()*
+          this->basePoseRight.rot));
 
     this->leftModel->SetWorldPose(
-        math::Pose(grabLeft.pos - this->resetPoseLeft.pos,
-          grabLeft.rot * this->resetPoseLeft.rot.GetInverse()) + this->basePoseLeft);
+        math::Pose(grabLeft.pos - this->resetPoseLeft.pos +
+          this->basePoseLeft.pos,
+          grabLeft.rot * this->resetPoseLeft.rot.GetInverse() *
+          this->basePoseLeft.rot ));
   }
   else
   {
     this->rightModel->SetWorldPose(this->basePoseRight);
     this->leftModel->SetWorldPose(this->basePoseLeft);
-  }
-
-  this->prevState = this->buttons[0];
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -220,14 +233,12 @@ void RazerHydra::Run()
 
   if (this->hidrawFd >= 0)
   {
-    uint8_t buf[256];
     memset(buf, 0, sizeof(buf));
     buf[6] = 1;
     buf[8] = 4;
     buf[89] = 5;
-    int res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
 
-    if (res < 0)
+    if (ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf) < 0)
     {
       gzerr << "unable to stop streaming\n";
       perror("HIDIOCSFEATURE");

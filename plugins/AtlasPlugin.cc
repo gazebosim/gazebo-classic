@@ -19,6 +19,7 @@
 #include <kdl/chainiksolvervel_pinv.hpp>
 #include <kdl/chainiksolverpos_nr.hpp>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Joint.hh"
 #include "AtlasPlugin.hh"
@@ -39,13 +40,162 @@ AtlasPlugin::~AtlasPlugin()
 }
 
 /////////////////////////////////////////////////
+void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
+{
+  if (_msg->right().button_center() &&_msg->left().button_center())
+  {
+    this->Restart();
+    return;
+  }
+
+  math::Pose rightAdjust, leftAdjust;
+
+  rightAdjust = this->rightModel->GetWorldPose();
+  leftAdjust = this->leftModel->GetWorldPose();
+
+  if (_msg->right().button_bumper())
+  {
+    math::Pose rightPose = msgs::Convert(_msg->right().pose());
+
+    if (this->rightBumper != _msg->right().button_bumper())
+    {
+      this->resetPoseRight = rightPose;
+    }
+
+    rightAdjust = math::Pose(rightPose.pos - this->resetPoseRight.pos +
+        this->basePoseRight.pos,
+        rightPose.rot * this->resetPoseRight.rot.GetInverse() *
+        this->basePoseRight.rot);
+  }
+  else
+  {
+    this->basePoseRight = rightAdjust;
+  }
+
+  if (_msg->left().button_bumper())
+  {
+    math::Pose leftPose = msgs::Convert(_msg->left().pose());
+
+    if (this->leftBumper != _msg->left().button_bumper())
+    {
+      this->resetPoseLeft = leftPose;
+    }
+
+    leftAdjust = math::Pose(leftPose.pos - this->resetPoseLeft.pos +
+          this->basePoseLeft.pos,
+          leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
+          this->basePoseLeft.rot);
+  }
+  else
+  {
+    this->basePoseLeft = leftAdjust;
+  }
+
+  if (_msg->right().button_1())
+    this->SetRightFingers(1.5707);
+  else if (_msg->right().button_2())
+    this->SetRightFingers(0);
+  else if (_msg->right().button_4())
+    this->SetRightFingers(-1.5707);
+
+  if (_msg->left().button_1())
+    this->SetLeftFingers(0);
+  else if (_msg->left().button_2())
+    this->SetLeftFingers(1.5707);
+  else if (_msg->left().button_3())
+    this->SetLeftFingers(-1.5707);
+
+
+  double dx = _msg->right().joy_x() * 0.02;
+  double dy = _msg->right().joy_y() * -0.02;
+
+  math::Pose dPose(dx, dy, 0, 0, 0, 0);
+  this->pinJoint->Detach();
+  this->model->SetWorldPose(this->model->GetWorldPose() + dPose);
+  this->pinJoint->Attach(physics::LinkPtr(), this->model->GetLink("utorso"));
+
+  rightAdjust += dPose;
+  leftAdjust += dPose;
+
+  this->rightModel->SetWorldPose(rightAdjust);
+  this->leftModel->SetWorldPose(leftAdjust);
+
+  this->basePoseRight += dPose;
+  this->basePoseLeft += dPose;
+
+  this->rightBumper = _msg->right().button_bumper();
+  this->leftBumper = _msg->left().button_bumper();
+}
+
+void AtlasPlugin::Restart()
+{
+  this->rightModel->SetWorldPose(this->rightStartPose);
+  this->leftModel->SetWorldPose(this->leftStartPose);
+  this->rightBumper = false;
+  this->leftBumper = false;
+
+  this->world->Reset();
+}
+
+/////////////////////////////////////////////////
+void AtlasPlugin::SetRightFingers(double _angle)
+{
+  this->jointController->SetPositionTarget("atlas::right_f0_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::right_f0_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::right_f1_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::right_f1_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::right_f2_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::right_f2_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::right_f3_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::right_f3_j2", _angle);
+}
+
+/////////////////////////////////////////////////
+void AtlasPlugin::SetLeftFingers(double _angle)
+{
+  this->jointController->SetPositionTarget("atlas::left_f0_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::left_f0_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::left_f1_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::left_f1_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::left_f2_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::left_f2_j2", _angle);
+
+  this->jointController->SetPositionTarget("atlas::left_f3_j1", _angle);
+  this->jointController->SetPositionTarget("atlas::left_f3_j2", _angle);
+}
+
+/////////////////////////////////////////////////
 void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
   // Get the world name.
   this->model = _parent;
   this->world = this->model->GetWorld();
 
-  this->boxModel = this->world->GetModel("box_goal");
+  this->rightModel = this->world->GetModel("right_arm_goal");
+  this->leftModel = this->world->GetModel("left_arm_goal");
+
+  this->rightModel->SetWorldPose(this->model->GetWorldPose() +
+      math::Pose(0.013, -.294, 0.622, 1.5707, 0, 3.141));
+  this->leftModel->SetWorldPose(this->model->GetWorldPose() +
+      math::Pose(0.013, .294, 0.622, -1.5707, 0, -3.1415));
+
+  this->basePoseRight = this->rightModel->GetWorldPose();
+  this->basePoseLeft = this->leftModel->GetWorldPose();
+
+  this->rightStartPose = this->basePoseRight;
+  this->leftStartPose = this->basePoseLeft;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->world->GetName());
+  this->hydraSub = this->node->Subscribe("~/hydra",
+      &AtlasPlugin::OnHydra, this);
+
+  this->jointController = this->model->GetJointController();
 
   this->pinJoint = this->world->GetPhysicsEngine()->CreateJoint(
       "revolute", this->model);
@@ -57,350 +207,60 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   this->pinJoint->SetLowerLimit(0,0);
   this->pinJoint->Init();
 
-  this->rightHand = this->model->GetLink("r_hand");
-  if (!this->rightHand)
-    gzerr << "Unable to get right hand\n";
+  std::vector<std::string> rightHandJoints;
+  rightHandJoints.push_back("right_f0_j0");
+  rightHandJoints.push_back("right_f0_j1");
+  rightHandJoints.push_back("right_f0_j2");
+  rightHandJoints.push_back("right_f1_j0");
+  rightHandJoints.push_back("right_f1_j1");
+  rightHandJoints.push_back("right_f1_j2");
+  rightHandJoints.push_back("right_f2_j0");
+  rightHandJoints.push_back("right_f2_j1");
+  rightHandJoints.push_back("right_f2_j2");
+  rightHandJoints.push_back("right_f3_j0");
+  rightHandJoints.push_back("right_f3_j1");
+  rightHandJoints.push_back("right_f3_j2");
 
-  physics::JointPtr backJoint = this->model->GetJoint("back_bkz");
-  std::cout << "BackBKZ[" << backJoint->GetAngle(0) << "]\n";
+  std::vector<std::string> leftHandJoints;
+  leftHandJoints.push_back("left_f0_j0");
+  leftHandJoints.push_back("left_f0_j1");
+  leftHandJoints.push_back("left_f0_j2");
+  leftHandJoints.push_back("left_f1_j0");
+  leftHandJoints.push_back("left_f1_j1");
+  leftHandJoints.push_back("left_f1_j2");
+  leftHandJoints.push_back("left_f2_j0");
+  leftHandJoints.push_back("left_f2_j1");
+  leftHandJoints.push_back("left_f2_j2");
+  leftHandJoints.push_back("left_f3_j0");
+  leftHandJoints.push_back("left_f3_j1");
+  leftHandJoints.push_back("left_f3_j2");
 
-  // this->jointController = this->model->GetJointController();
+  for (std::vector<std::string>::iterator iter = rightHandJoints.begin();
+      iter != rightHandJoints.end(); ++iter)
+  {
+    this->jointController->SetPositionPID("atlas::" + *iter,
+        common::PID(10.5, 0.1, 1.1));
 
-  return;
+    this->jointController->SetPositionTarget("atlas::" + *iter, 0);
+  }
+
+  for (std::vector<std::string>::iterator iter = leftHandJoints.begin();
+      iter != leftHandJoints.end(); ++iter)
+  {
+    this->jointController->SetPositionPID("atlas::" + *iter,
+        common::PID(10.5, 0.1, 1.1));
+
+    this->jointController->SetPositionTarget("atlas::" + *iter, 0);
+  }
+
+  this->rightBumper = false;
+  this->leftBumper = false;
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&AtlasPlugin::Update, this, _1));
-
-
-  // r_arm_shy: utorso -> r_clav
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY),
-       KDL::Frame(KDL::Vector(0.06441, -0.13866, 0.10718))));
-
-  // r_arm_shx: rclav -> r_scap
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),
-        KDL::Frame(KDL::Vector(0, -0.14035, 0.19609))));
-
-  // r_arm_ely: r_scap -> r_uarm
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY),
-        KDL::Frame(KDL::Vector(0, -0.187, 0.016))));
-
-  // r_arm_elx: r_uarm -> r_larm
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),
-        KDL::Frame(KDL::Vector(0, -0.119, 0.00921))));
-
-  // r_arm_wry: r_larm -> r_farm
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY),
-        KDL::Frame(KDL::Vector(0, -0.187, -0.00921))));
-
-  // r_arm_wrx: r_farm -> r_hand
-  this->rChain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),
-        KDL::Frame(KDL::Vector(0, -0.119, 0.00921))));
-
-  this->rFkSolver = new KDL::ChainFkSolverPos_recursive(
-      KDL::ChainFkSolverPos_recursive(this->rChain));
-
-  // Create joint array
-  unsigned int nj = this->rChain.getNrOfJoints();
-  this->rJointpositions = new KDL::JntArray(nj);
-
-  for(unsigned int i = 0; i < nj; ++i)
-  {
-    (*this->rJointpositions)(i) = 0.0;
-  }
-
-  // Create the frame that will contain the results
-  KDL::Frame cartpos;
-
-  // Calculate forward position kinematics
-  bool kinematics_status;
-  kinematics_status =
-    this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-
-  KDL::ChainIkSolverVel_pinv iksolverVel(this->rChain);
-  KDL::ChainIkSolverPos_NR iksolverPos(this->rChain, *this->rFkSolver, iksolverVel);
-
-  math::Vector3 result(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-  //result += this->model->GetLink("utorso")->GetWorldPose().pos;
-  std::cout << "RESULT[" << result << "]\n";
-
-  this->goalPos.x = 0.7;//0.7;
-  this->goalPos.y = -1.2;
-  this->goalPos.z = 1.0;
-
-  this->IK();
-
-  /*this->goalPos.x = 0.06;
-  this->goalPos.y = -0.8;
-  this->goalPos.z = -0.3;
-
-  this->goalPos.x = 0.31191 * -1.0;
-  this->goalPos.y = -0.4;
-  this->goalPos.z = 1.2;
-  */
-
-  std::cout << "UTorsoPos[" << this->model->GetLink("utorso")->GetWorldPose().pos << "]\n";
-  std::cout << "RCLAV[" << this->model->GetLink("r_clav")->GetWorldPose().pos << "]\n";
-
-  /*this->goalPos = this->goalPos -
-    this->model->GetLink("r_clav")->GetWorldPose().pos +
-    math::Vector3(0.06441, -0.13866, 0.10718);
-    */
-
-  /*std::cout << "Goal Pos Global[" << this->goalPos << "]\n";
-  this->goalPos -= this->model->GetLink("r_clav")->GetWorldPose().pos;
-
-  std::cout << "Goal Pos[" << this->goalPos << "]\n";
-
-
-  if (kinematics_status>=0)
-  {
-    std::cout << cartpos << std::endl;
-    printf("%s \n","Succes, thanks KDL!");
-  }
-  else
-  {
-    printf("%s \n","Error: could not calculate forward kinematics :(");
-  }
-
-  KDL::JntArray qResult(this->rChain.getNrOfJoints());
-  KDL::Frame destFrame(KDL::Vector(this->goalPos.x, this->goalPos.y, this->goalPos.z));
-  int ikResult = iksolverPos.CartToJnt(*this->rJointpositions, destFrame,
-      qResult);
-
-  std::cout << "IKResult[" << ikResult << "]\n";
-  if (ikResult < 0)
-    std::cerr << "Maximum number of iterations reached.";
-
-  for(unsigned int i = 0; i < nj; ++i)
-  {
-    std::cout << qResult(i) << std::endl;
-  }
-  for(unsigned int i = 0; i < nj; ++i)
-  {
-    std::cout << (*this->rJointpositions)(i) << std::endl;
-  }
-  */
-
-  std::vector<std::string> joints;
-  joints.push_back("r_arm_shy");
-  joints.push_back("r_arm_shx");
-  joints.push_back("r_arm_ely");
-  joints.push_back("r_arm_elx");
-  joints.push_back("r_arm_wry");
-  joints.push_back("r_arm_wrx");
-
-  int i = 0;
-  for (std::vector<std::string>::iterator iter = joints.begin();
-      iter != joints.end(); ++iter, ++i)
-  {
-    /*this->jointController->SetPositionPID("atlas::" + *iter,
-        common::PID(580, 0.5, 5.2));
-    if (ikResult >= 0)
-      this->jointController->SetPositionTarget("atlas::" + *iter,
-          qResult(i));
-    else
-      this->jointController->SetPositionTarget("atlas::" + *iter, 0);
-      */
-
-    //this->jointController->SetJointPosition("atlas::" + *iter, (*this->rJointpositions)(i));
-  }
 }
 
 /////////////////////////////////////////////////
 void AtlasPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
-  std::vector<std::string> joints;
-  joints.push_back("r_arm_shy");
-  joints.push_back("r_arm_shx");
-  joints.push_back("r_arm_ely");
-  joints.push_back("r_arm_elx");
-  joints.push_back("r_arm_wry");
-  joints.push_back("r_arm_wrx");
-
-  double diff = 0.001;
-    int maxI = 0;
-  KDL::Frame cartpos;
-
-  math::Vector3 rPos, plusDelta, minusDelta;
-  math::Vector3 basePos = this->model->GetLink("r_clav")->GetWorldPose().pos;
-
-  this->goalPos = this->boxModel->GetWorldPose().pos - basePos;
-
-    for (int i = 5; i >= 0; --i)
-    {
-      double finalDelta = 0;
-      double maxDiff = GZ_DBL_MAX;
-      double origAngle = (*this->rJointpositions)(i);
-
-      (*this->rJointpositions)(i) = origAngle+diff;
-      this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-      rPos.Set(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-      plusDelta =  rPos - this->goalPos;
-      double plusLength = plusDelta.GetLength();
-      if (plusLength < maxDiff)
-      {
-        maxDiff = plusLength;
-        maxI = i;
-        finalDelta = diff;
-      }
-
-      (*this->rJointpositions)(i) = origAngle-diff;
-      this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-      rPos.Set(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-      minusDelta =  rPos - this->goalPos;
-      double minusLength = minusDelta.GetLength();
-      if (minusLength < maxDiff)
-      {
-        maxDiff = minusLength;
-        maxI = i;
-        finalDelta = -diff;
-      }
-
-      std::cout << "Joint[" << i << "] Plus[" << plusLength << "] Minus[" << minusLength << "]\n";
-      //(*this->rJointpositions)(i) = origAngle;
-      (*this->rJointpositions)(i) = origAngle + finalDelta;
-      this->jointController->SetJointPosition("atlas::" + joints[i], (*this->rJointpositions)(i));
-    }
-
-  return;
-/*
-  bool kinematics_status;
-
-
-
-  unsigned int i = 0;
-
-
-  printf("Process\n");
-  // Calculate the current delta to the goal
-  this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-  math::Vector3 rPos(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-  math::Vector3 currentDelta = this->goalPos - rPos;
-
-  i = 0;
-  for (std::vector<std::string>::iterator iter = joints.begin();
-      iter != joints.end(); ++iter, ++i)
-  {
-    this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-    math::Vector3 rPos(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-    math::Vector3 currentDelta = this->goalPos - rPos;
-
-    (*this->rJointpositions)(i) =
-      this->model->GetJoint(*iter)->GetAngle(0).Radian() + diff;
-    this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-    math::Vector3 rPosPlus(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-
-    (*this->rJointpositions)(i) =
-      this->model->GetJoint(*iter)->GetAngle(0).Radian() - diff;
-    this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-    math::Vector3 rPosMinus(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-
-    math::Vector3 deltaPlus = this->goalPos - rPosPlus;
-    math::Vector3 deltaMinus = this->goalPos - rPosMinus;
-
-    if (deltaPlus.GetLength() < currentDelta.GetLength())
-    {
-      this->jointController->SetPositionTarget("atlas::" + *iter,
-          this->model->GetJoint(*iter)->GetAngle(0).Radian() + diff);
-
-      std::cout << "Plus\n";
-      (*this->rJointpositions)(i) =
-        this->model->GetJoint(*iter)->GetAngle(0).Radian() + diff;
-    }
-    else if (deltaMinus.GetLength() < currentDelta.GetLength())
-    {
-      this->jointController->SetPositionTarget("atlas::" + *iter,
-          this->model->GetJoint(*iter)->GetAngle(0).Radian() - diff);
-      std::cout << "Minus\n";
-
-      (*this->rJointpositions)(i) =
-        this->model->GetJoint(*iter)->GetAngle(0).Radian() - diff;
-    }
-  }
-  */
-}
-
-void AtlasPlugin::IK()
-{
-  std::vector<std::string> joints;
-  joints.push_back("r_arm_shy");
-  joints.push_back("r_arm_shx");
-  joints.push_back("r_arm_ely");
-  joints.push_back("r_arm_elx");
-  joints.push_back("r_arm_wry");
-  joints.push_back("r_arm_wrx");
-
-  std::cout << "---------- IK START ------------\n";
-  KDL::Frame cartpos;
-
-  // Get the current end effector position
-  this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-  math::Vector3 rPos(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-
-  math::Vector3 basePos = this->model->GetLink("r_clav")->GetWorldPose().pos;
-
-  // COmpute the delta
-  math::Vector3 currentDelta = this->goalPos - (rPos+basePos);
-
-  std::cout << "Goal Pos[" << this->goalPos << "]\n";
-  std::cout << "Current EPos[" << rPos << "]\n";
-  std::cout << "Delta[" << currentDelta << "]\n";
-
-
-  math::Vector3 plusDelta, minusDelta;
-  double diff = 0.001;
-  double origLength = currentDelta.GetLength();
-
-  int iters = 0;
-  while (origLength > 0.03 && iters < 1000)
-  {
-    int maxI = 0;
-    double finalDelta = 0;
-
-    for (int i = 5; i >= 0; --i)
-    {
-      double maxDiff = GZ_DBL_MAX;
-      double origAngle = (*this->rJointpositions)(i);
-
-      (*this->rJointpositions)(i) = origAngle+diff;
-      this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-      rPos.Set(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-      plusDelta =  this->goalPos - (rPos+basePos);
-      double plusLength = plusDelta.GetLength();
-      if (plusLength < maxDiff)
-      {
-        maxDiff = plusLength;
-        maxI = i;
-        finalDelta = diff;
-      }
-
-      (*this->rJointpositions)(i) = origAngle-diff;
-      this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-      rPos.Set(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-      minusDelta =  this->goalPos - (rPos+basePos);
-      double minusLength = minusDelta.GetLength();
-      if (minusLength < maxDiff)
-      {
-        maxDiff = minusLength;
-        maxI = i;
-        finalDelta = -diff;
-      }
-
-      std::cout << "Joint[" << i << "] Plus[" << plusLength << "] Minus[" << minusLength << "]\n";
-      //(*this->rJointpositions)(i) = origAngle;
-      (*this->rJointpositions)(maxI) = origAngle + finalDelta;
-    }
-    //(*this->rJointpositions)(maxI) += finalDelta;
-    this->rFkSolver->JntToCart(*this->rJointpositions, cartpos);
-    rPos.Set(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
-    currentDelta = this->goalPos - (rPos+basePos);
-
-
-    origLength = currentDelta.GetLength();
-
-    std::cout << "Final Delta[" << finalDelta << "] I[" << maxI << "] Length[" << origLength << "] RPos[" << rPos << " Global[" << rPos + this->model->GetLink("r_clav")->GetWorldPose().pos << "]\n";
-    iters++;
-  }
-
-  std::cout << "---------- IK END ------------\n";
 }
