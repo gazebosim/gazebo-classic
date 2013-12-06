@@ -75,7 +75,7 @@ namespace gazebo
               {update.Disconnect(_conn);}
 
       // Documentation inherited.
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
