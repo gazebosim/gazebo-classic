@@ -1,0 +1,203 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="trials_task_3">
+    <physics type="ode">
+      <gravity>0 0 -9.81</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>50</iters>
+          <sor>1.4</sor>
+        </solver>
+        <constraints>
+          <cfm>0.0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>100.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+    </physics>
+
+    <!--A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+    <!-- Base -->
+  <model name="static_models">
+      <pose>1 0 0 0 0 -1.5707</pose>
+    <include>
+      <uri>model://drc_practice_base_4x8</uri>
+    </include>
+
+    <include>
+      <name>Doorway</name>
+      <uri>model://drc_practice_door_4x8</uri>
+      <pose>0 1.2192 1.22 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>SideWall_1</name>
+      <uri>model://drc_practice_block_wall</uri>
+      <pose>-0.54158 0.560356 0.33464 0 0 1.5707</pose>
+    </include>
+
+    <include>
+      <name>SideWall_2</name>
+      <uri>model://drc_practice_block_wall</uri>
+      <pose>0.54158 0.560356 0.33464 0 0 1.5707</pose>
+    </include>
+  </model>
+
+
+    <model name="debris">
+      <static>false</static>
+      <pose>1 0 0 0 0 -1.5707</pose>
+
+    <include>
+      <name>2x4_1</name>
+      <uri>model://drc_practice_2x4</uri>
+      <pose>0.071296 1.14241 0.55 0 0.95 0</pose>
+    </include>
+
+    <include>
+      <name>2x4_2</name>
+      <uri>model://drc_practice_2x4</uri>
+      <pose>-0.071296 1.14241 0.55 0 0.95 3.1415</pose>
+    </include>
+    <include>
+      <name>2x4_3</name>
+      <uri>model://drc_practice_2x4</uri>
+      <pose>0.0 0.76 0.63 1.57 0 0</pose>
+    </include>
+
+    <include>
+      <name>2x4_4</name>
+      <uri>model://drc_practice_2x4</uri>
+      <pose>0.0 0.35 0.63 1.57 0 0</pose>
+    </include>
+
+    <!--
+    <include>
+      <name>4x4x20_1</name>
+      <uri>model://drc_practice_4x4x20</uri>
+      <pose>-0.017436 0.209403 0.279366 0 1.5707 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x20_2</name>
+      <uri>model://drc_practice_4x4x20</uri>
+      <pose>0.031356 0.4436 0.279366 0 1.5707 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x20_3</name>
+      <uri>model://drc_practice_4x4x20</uri>
+      <pose>0.332 0.169429 0.47 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x20_4</name>
+      <uri>model://drc_practice_4x4x20</uri>
+      <pose>-0.331 0.169429 0.47 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x40_1</name>
+      <uri>model://drc_practice_4x4x40</uri>
+      <pose>-0.074179 0.66 0.445 0 -0.79 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x40_2</name>
+      <uri>model://drc_practice_4x4x40</uri>
+      <pose>0.074179 0.55 0.475 0 0.95 0</pose>
+    </include>
+
+    <include>
+      <name>4x4x40_3</name>
+      <uri>model://drc_practice_4x4x40</uri>
+      <pose>0.2236 0.041327 0.5333 0 1.5707 0</pose>
+    </include>    
+
+    <include>
+      <name>4x4x40_4</name>
+      <uri>model://drc_practice_4x4x40</uri>
+      <pose>-0.2236 0.041327 0.5333 0 1.5707 0</pose>
+    </include>
+
+    <include>
+      <name>2x6_2</name>
+      <uri>model://drc_practice_2x6</uri>
+      <pose>0.378209 -0.019775 0.413006 1.57 -0.65 1.57</pose>
+    </include>
+
+    <include>
+      <name>2x6_3</name>
+      <uri>model://drc_practice_2x6</uri>
+      <pose>-0.378418 -0.019758 0.413029 1.57 -0.65 1.57</pose>
+    </include>
+
+    <include>
+      <name>2x6_1</name>
+      <uri>model://drc_practice_2x6</uri>
+      <pose>0.0 -0.124239 0.430557 1.57 0 0</pose>
+    </include>
+
+    <include>
+      <name>2x6_4</name>
+      <uri>model://drc_practice_2x6</uri>
+      <pose>0.0 -0.46 0.2 1.57 0 0</pose>
+    </include>
+-->
+  </model>
+
+    <include>
+      <uri>model://atlas</uri>
+    </include>
+
+    <plugin filename="libHydra.so" name="hydra">
+      <device>/dev/hidraw4</device>
+      <pivot>0.04 0 0</pivot>
+      <grab>0.12 0 0</grab>
+    </plugin>
+
+    <model name="right_arm_goal">
+      <static>true</static>
+      <pose>0.013 -.294 0.622 1.5707 0 3.1415</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.05 .2 .05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="left_arm_goal">
+      <static>true</static>
+      <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.05 .2 .05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+
+  </world>
+</sdf>

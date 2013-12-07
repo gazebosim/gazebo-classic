@@ -111,8 +111,15 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   math::Vector3 result(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
 
+
+//);
   math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
-  this->goalPos = this->goalModel->GetWorldPose().pos - basePos;
+
+  this->goalPos = this->goalModel->GetWorldPose().pos;
+
+  this->goalPos = this->goalPos - basePos;
+
+  std::cout << "Diff[" <<  this->goalPos << "]\n";
 
   this->iksolverVel = new KDL::ChainIkSolverVel_wdls(this->chain, 0.00001, 200);
 
@@ -177,7 +184,6 @@ void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
 
   math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
   this->goalPos = this->goalModel->GetWorldPose().pos - basePos;
-
   KDL::JntArray qResult(this->chain.getNrOfJoints());
 
   math::Quaternion rot = this->goalModel->GetWorldPose().rot;
