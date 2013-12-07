@@ -239,6 +239,8 @@ namespace gazebo
       private: OVR::SensorFusion *m_sensorFusion;
       private: bool m_oculusReady; /// Has the oculus rift been fully initialised?
       private: float m_centreOffset;
+
+      private: math::Quaternion orientReset;
     };
     /// \}
   }

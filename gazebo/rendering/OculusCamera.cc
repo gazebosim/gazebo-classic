@@ -130,6 +130,7 @@ void OculusCamera::Init()
 {
   Camera::Init();
 
+
   // Oculus
   {
     this->leftCamera = this->scene->GetManager()->createCamera("UserLeft");
@@ -218,6 +219,9 @@ void OculusCamera::Init()
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
   */
+  OVR::Quatf q = m_sensorFusion->GetPredictedOrientation();
+  this->orientReset.Set(q.w, -q.z, -q.x, q.y);
+  std::cout << "Reset[" << this->orientReset << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -232,9 +236,13 @@ void OculusCamera::Update()
   Camera::Update();
 
   OVR::Quatf q = m_sensorFusion->GetPredictedOrientation();
+  math::Quaternion quat(q.w, -q.z, -q.x, q.y);
+  std::cout << "Q[" << quat << "]\n";
+
+  math::Quaternion qDiff = quat * this->orientReset.GetInverse();
 
   // Set the orientation, and correct for the oculus coordinate system
-  this->SetWorldRotation(math::Quaternion(q.w, -q.z, -q.x, q.y));
+  this->SetWorldRotation( qDiff);
 }
 
 //////////////////////////////////////////////////

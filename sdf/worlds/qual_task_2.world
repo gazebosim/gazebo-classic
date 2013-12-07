@@ -207,7 +207,7 @@
     </include>
 
     <plugin filename="libHydra.so" name="hydra">
-      <device>/dev/hidraw4</device>
+      <device>/dev/hidraw0</device>
       <pivot>0.04 0 0</pivot>
       <grab>0.12 0 0</grab>
     </plugin>
@@ -216,6 +216,7 @@
     <static>true</static>
     <pose>0.013 -.294 0.622 1.5707 0 3.1415</pose>
     <link name="link">
+      <!--
       <visual name="visual">
         <geometry>
           <box>
@@ -223,6 +224,7 @@
           </box>
         </geometry>
       </visual>
+-->
     </link>
   </model>
 
@@ -230,6 +232,7 @@
     <static>true</static>
     <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
     <link name="link">
+      <!--
       <visual name="visual">
         <geometry>
           <box>
@@ -237,13 +240,9 @@
           </box>
         </geometry>
       </visual>
+-->
     </link>
   </model>
-
-
-
-
-
 
   </world>
 </sdf>
