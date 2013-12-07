@@ -31,6 +31,13 @@ class Issue978Test : public Joint_TEST
 // \brief Test for issue #asdf
 void Issue978Test::JointAnchor(const std::string &_physicsEngine)
 {
+  // Abort test for simbody, since SimbodyJoint::GetAnchor isn't implemented
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #979.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
