@@ -96,7 +96,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
       this->worldPose = this->sdf->Get<math::Pose>("pose") +
