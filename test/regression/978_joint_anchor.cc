@@ -74,7 +74,6 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
     // Check anchor location
     EXPECT_EQ(joint->GetAnchor(0), opt.modelPose.pos);
   }
-
 }
 
 TEST_P(Issue978Test, JointAnchor)
