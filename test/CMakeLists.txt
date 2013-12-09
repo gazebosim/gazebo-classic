@@ -51,6 +51,7 @@ add_subdirectory(integration)
 set(TEST_TYPE "REGRESSION")
 add_subdirectory(regression)
 add_subdirectory(cmake)
+add_subdirectory(examples)
 add_subdirectory(pkgconfig)
 
 set(headers ServerFixture.hh)
