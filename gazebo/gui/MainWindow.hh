@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,15 @@ namespace gazebo
       private slots: void Step();
       private slots: void NewModel();
       private slots: void Arrow();
+
+      /// \brief Qt callback when the translate mode is triggered.
       private slots: void Translate();
+
+      /// \brief Qt callback when the rotate mode is triggered.
       private slots: void Rotate();
+
+      /// \brief Qt callback when the scale mode is triggered.
+      private slots: void Scale();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,15 @@ void HeightmapShape::Init()
 }
 
 //////////////////////////////////////////////////
+void HeightmapShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::FillHeightMap()
 {
   unsigned int x, y;
@@ -244,6 +253,7 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
+  _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 
 //////////////////////////////////////////////////
@@ -262,10 +272,7 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
   if (_x < 0 || _y < 0)
-  {
-    printf("Less than zero\n\n");
     return 0.0;
-  }
 
   return this->heights[_y * this->vertSize + _x];
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,19 @@ namespace gazebo
     /// \return True if successfully loaded, false if not.
     bool load();
 
+    /// \brief Deprecated.
+    std::string create_sensor(sdf::ElementPtr _elem,
+        const std::string &_worldName,
+        const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
+
     /// \brief Create a sensor using SDF.
     /// \param[in] _elem The SDF element that describes the sensor.
     /// \param[in] _worldName Name of the world in which to create the sensor.
     /// \param[in] _parentName The fully scoped parent name (model::link).
     /// \return The name of the new sensor.
     std::string create_sensor(sdf::ElementPtr _elem,
-                              const std::string &_worldName,
-                              const std::string &_parentName);
+        const std::string &_worldName, const std::string &_parentName,
+        uint32_t _parentId);
 
     /// \brief Remove a sensor by name
     /// \param[in] _sensorName Name of sensor to remove
@@ -49,10 +54,6 @@ namespace gazebo
     /// \param _force: If true, all sensors are forced to update. Otherwise
     ///        a sensor will update based on it's Hz rate.
     void run_once(bool _force = false);
-
-    /// \brief Deprecated
-    /// \sa run_threads
-    void run() GAZEBO_DEPRECATED(1.5);
 
     /// \brief Run sensors in a threads. This is a non-blocking call.
     void run_threads();
@@ -85,6 +86,11 @@ namespace gazebo
     /// found.
     SensorPtr get_sensor(const std::string &_name);
 
+    /// \brief Disable sensors.
+    void disable();
+
+    /// \brief Enable sensors.
+    void enable();
     /// \}
   }
 }

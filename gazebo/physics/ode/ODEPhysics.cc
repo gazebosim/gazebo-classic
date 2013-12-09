@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODEScrewJoint.hh"
 #include "gazebo/physics/ode/ODEHingeJoint.hh"
+#include "gazebo/physics/ode/ODEGearboxJoint.hh"
 #include "gazebo/physics/ode/ODEHinge2Joint.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
@@ -318,21 +319,10 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
   }
-  else if (_msg->has_update_rate())
-  {
-    this->SetRealTimeUpdateRate(_msg->update_rate());
-    gzwarn <<
-        "Physics update rate is deprecated by real time update rate\n";
-  }
 
   if (_msg->has_max_step_size())
   {
     this->SetMaxStepSize(_msg->max_step_size());
-  }
-  else if (_msg->has_dt())
-  {
-    this->SetMaxStepSize(_msg->dt());
-    gzwarn << "Physics dt is deprecated by max step size\n";
   }
 
   /// Make sure all models get at least on update cycle.
@@ -698,6 +688,8 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new ODEScrewJoint(this->worldId, _parent));
   else if (_type == "revolute")
     joint.reset(new ODEHingeJoint(this->worldId, _parent));
+  else if (_type == "gearbox")
+    joint.reset(new ODEGearboxJoint(this->worldId, _parent));
   else if (_type == "revolute2")
     joint.reset(new ODEHinge2Joint(this->worldId, _parent));
   else if (_type == "ball")

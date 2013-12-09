@@ -5,6 +5,10 @@ if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
 
+if (HAVE_SIMBODY)
+  add_subdirectory(simbody)
+endif()
+
 set (sources
   Actor.cc
   Base.cc
@@ -56,6 +60,7 @@ set (headers
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh
+  GearboxJoint.hh
   Inertial.hh
   Gripper.hh
   Joint.hh
@@ -106,27 +111,19 @@ if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
 
-gz_add_executable(gzphysics server.cc)
+if (HAVE_SIMBODY)
+  target_link_libraries(gazebo_physics gazebo_physics_simbody)
+endif()
 
-target_link_libraries(gzphysics
-  gazebo_common
-  gazebo_util
-  gazebo_transport
-  gazebo_physics
-  gazebo_sensors
-  gazebo_msgs
-  )
-
-gz_install_executable( gzphysics )
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
-# Deprecated Physics.hh
-gz_issue_775("Physics")
-
 # unit tests
 set (gtest_sources
-  PhysicsEngine_TEST.cc
+  BoxShape_TEST.cc
+  CylinderShape_TEST.cc
   Inertial_TEST.cc
-  Joint_TEST.cc)
+  Joint_TEST.cc
+  PhysicsEngine_TEST.cc
+  SphereShape_TEST.cc)
 gz_build_tests(${gtest_sources})

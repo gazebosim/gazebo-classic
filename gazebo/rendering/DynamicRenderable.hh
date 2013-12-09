@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _DYNAMICRENDERABLE_HH_
 #define _DYNAMICRENDERABLE_HH_
 
+#include <string>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -65,6 +66,10 @@ namespace gazebo
       /// \return The squared depth in the Camera's view
       public: virtual Ogre::Real getSquaredViewDepth(
                   const Ogre::Camera *_cam) const;
+
+      /// \brief Get type of movable
+      /// \return This returns "gazebo::DynamicRenderable"
+      public: std::string GetMovableType() const;
 
       /// \brief Creates the vertex declaration.  @remarks Override and set
       /// mRenderOp.vertexData->vertexDeclaration here.  mRenderOp.vertexData

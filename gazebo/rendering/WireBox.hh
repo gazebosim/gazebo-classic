@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,14 @@ namespace gazebo
       /// \brief Set the visibility of the box.
       /// \param[in] _visible True to make the box visible, False to hide.
       public: void SetVisible(bool _visible);
+
+      /// \brief Get the visibility of the box.
+      /// \return True if the box is visual.
+      public: bool GetVisible() const;
+
+      /// \brief Get the wireframe box.
+      /// \return The wireframe box.
+      public: math::Box GetBox() const;
 
       /// \brief The lines which outline the box.
       private: DynamicLines *lines;

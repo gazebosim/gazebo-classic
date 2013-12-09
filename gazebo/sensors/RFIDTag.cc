@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-void RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(bool /*_force*/)
 {
   if (this->scanPub)
   {
@@ -111,7 +111,7 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     // msg.set_range_min( this->GetRangeMin() );
     // msg.set_range_max( this->GetRangeMax() );
 
-    // for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    // for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
     // {
     //   msg.add_ranges(this->laserShape->GetRange(i));
     //   msg.add_intensities(0);
@@ -120,4 +120,6 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     this->scanPub->Publish(msg);
     // std::cout << "update impl for rfidtag called" << std::endl;
   }
+
+  return true;
 }

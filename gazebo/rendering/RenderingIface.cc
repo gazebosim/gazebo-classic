@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ rendering::ScenePtr rendering::get_scene(const std::string &_name)
 
 //////////////////////////////////////////////////
 rendering::ScenePtr rendering::create_scene(const std::string &_name,
-                                            bool _enableVisualizations)
+                                            bool _enableVisualizations,
+                                            bool _isServer)
 {
   ScenePtr scene = get_scene(_name);
 
@@ -85,7 +86,7 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
     try
     {
       scene = rendering::RenderEngine::Instance()->CreateScene(_name,
-          _enableVisualizations);
+          _enableVisualizations, _isServer);
     }
     catch(common::Exception &e)
     {

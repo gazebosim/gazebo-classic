@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,8 @@ namespace gazebo
     /// \param[in] _enableVisualizations True enables visualization
     /// elements such as laser lines.
     rendering::ScenePtr create_scene(const std::string &_name,
-                                     bool _enableVisualizations);
+                                     bool _enableVisualizations,
+                                     bool _isServer = false);
 
     /// \brief remove a rendering::Scene by name
     /// \param[in] _name The name of the scene to remove.

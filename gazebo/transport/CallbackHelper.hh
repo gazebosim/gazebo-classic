@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,11 @@ namespace gazebo
       /// \brief Is the callback latching?
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const;
+
+      /// \brief Set whether this callback is latching.
+      /// This function should only be used by the Transport library.
+      /// \param[in] _latch False to turn off latching.
+      public: void SetLatching(bool _latch);
 
       /// \brief Get the unique ID of this callback.
       /// \return The unique ID of this callback.

@@ -165,6 +165,19 @@ void SphereAtlasTestPlugin::Init()
 }
 
 /////////////////////////////////////////////////
+void SphereAtlasTestPlugin::Reset()
+{
+  gzlog << "SphereAtlasTestPlugin: \n"
+        << "  This is not a typical usage of plugin Reset function,\n"
+        << "  we are doing this just for testing purposes.\n";
+  if (this->updateConnection)
+  {
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+    this->updateConnection.reset();
+  }
+}
+
+/////////////////////////////////////////////////
 void SphereAtlasTestPlugin::OnUpdate()
 {
   common::Time currTime = this->model->GetWorld()->GetSimTime();

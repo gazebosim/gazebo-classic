@@ -1,6 +1,0 @@
-<element name="sphere" required="0">
-  <description>Sphere shape</description>
-  <element name="radius" type="double" default="1" required="1">
-    <description>radius of the sphere</description>
-  </element>
-</element>
