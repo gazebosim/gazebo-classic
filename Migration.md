@@ -39,6 +39,9 @@
 
 ### Deletions
 
+1. **gazebo/physics/Base.hh**
+    + protected: Base_V::iterator childrenEnd
+
 ## Gazebo 1.9 to 2.0
 
 ### New Deprecations
