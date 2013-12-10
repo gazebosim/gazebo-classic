@@ -70,9 +70,6 @@ RazerHydra::~RazerHydra()
 /////////////////////////////////////////////////
 void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RazerHydra::Update, this, _1));
-
   int res;
   uint8_t buf[256];
   struct hidraw_report_descriptor rptDesc;
@@ -125,7 +122,8 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     return;
   }
 
-
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&RazerHydra::Update, this, _1));
 
   this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
 

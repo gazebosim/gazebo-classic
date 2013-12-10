@@ -166,6 +166,8 @@ namespace gazebo
       /// disable.
       public: void EnableViewController(bool _value) const;
 
+      public: void AdjustAspect(double _v);
+
       /// \brief Get an entity at a pixel location using a camera. Used for
       /// mouse picking.
       /// \param[in] _mousePos The position of the mouse in screen coordinates
@@ -225,22 +227,18 @@ namespace gazebo
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;
 
-      protected: Ogre::Camera *leftCamera;
-      protected: Ogre::Viewport *leftViewport;
+      protected: Ogre::Camera *rightCamera;
+      protected: Ogre::Viewport *rightViewport;
 
       private: void Oculus();
       private: Ogre::CompositorInstance *compositors[2];
 
-      private: OVR::DeviceManager *m_deviceManager;
-      private: OVR::HMDDevice *m_hmd;
-      private: OVR::Util::Render::StereoConfig *m_stereoConfig;
-      private: OVR::Util::MagCalibration *m_magCalibration;
-      private: OVR::SensorDevice *m_sensor;
-      private: OVR::SensorFusion *m_sensorFusion;
-      private: bool m_oculusReady; /// Has the oculus rift been fully initialised?
-      private: float m_centreOffset;
-
-      private: math::Quaternion orientReset;
+      private: OVR::DeviceManager *deviceManager;
+      private: OVR::HMDDevice *hmd;
+      private: OVR::Util::Render::StereoConfig *stereoConfig;
+      private: OVR::SensorDevice *sensor;
+      private: OVR::SensorFusion *sensorFusion;
+      private: float centerOffset;
     };
     /// \}
   }

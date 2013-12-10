@@ -11,7 +11,8 @@ set (files
   kitchen.material
   noise.compositor
   oculus.compositor
-  oculus.material
+  warp.material
+  glsl120.program
   perpixel.program
   picker.material
   ShadowCaster.material
