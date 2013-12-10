@@ -14,6 +14,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  BreakableJointPlugin
   CameraPlugin
   CartTestPlugin
   ContactPlugin
@@ -40,3 +41,5 @@ foreach (src ${plugins})
   install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
+
+target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
