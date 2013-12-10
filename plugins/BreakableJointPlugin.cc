@@ -66,5 +66,6 @@ void BreakableJointPlugin::OnWorldUpdate()
 {
   this->parentSensor->SetActive(false);
   this->parentJoint->Detach();
+  this->parentJoint->SetProvideFeedback(false);
   event::Events::DisconnectWorldUpdateBegin(this->worldConnection);
 }
