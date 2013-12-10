@@ -68,60 +68,8 @@ RazerHydra::~RazerHydra()
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
-  int res;
-  uint8_t buf[256];
-  struct hidraw_report_descriptor rptDesc;
-  struct hidraw_devinfo info;
-
-  std::string device = _sdf->Get<std::string>("device");
-
-  this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
-  if (this->hidrawFd < 0)
-  {
-    gzerr << "couldn't open hidraw device[" << device << "]\n";
-    return;
-  }
-
-  memset(&rptDesc, 0x0, sizeof(rptDesc));
-  memset(&info, 0x0, sizeof(info));
-  memset(buf, 0x0, sizeof(buf));
-
-  // Get Raw Name
-  res = ioctl(this->hidrawFd, HIDIOCGRAWNAME(256), buf);
-  if (res < 0)
-    perror("HIDIOCGRAWNAME");
-
-  // set feature to start it streaming
-  memset(buf, 0x0, sizeof(buf));
-  buf[6] = 1;
-  buf[8] = 4;
-  buf[9] = 3;
-  buf[89] = 6;
-
-  int attempt = 0;
-  for (attempt = 0; attempt < 50; ++attempt)
-  {
-    res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
-    if (res < 0)
-    {
-      gzerr << "unable to start streaming\n";
-      perror("HIDIOCSFEATURE");
-      common::Time::MSleep(500);
-    }
-    else
-    {
-      break;
-    }
-  }
-
-  if (attempt >= 60)
-  {
-    gzerr << "Failed to load hydra\n";
-    return;
-  }
-
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&RazerHydra::Update, this, _1));
 
@@ -224,6 +172,60 @@ void RazerHydra::Run()
   common::Time pollTime(0, 5000);
   double cornerHz = 2.5;
 
+  int res;
+  uint8_t buf[256];
+  struct hidraw_report_descriptor rptDesc;
+  struct hidraw_devinfo info;
+
+  //std::string device = _sdf->Get<std::string>("device");
+  std::string device = "/dev/hidraw4";
+
+  this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
+  if (this->hidrawFd < 0)
+  {
+    gzerr << "couldn't open hidraw device[" << device << "]\n";
+    return;
+  }
+
+  memset(&rptDesc, 0x0, sizeof(rptDesc));
+  memset(&info, 0x0, sizeof(info));
+  memset(buf, 0x0, sizeof(buf));
+
+  // Get Raw Name
+  res = ioctl(this->hidrawFd, HIDIOCGRAWNAME(256), buf);
+  if (res < 0)
+    perror("HIDIOCGRAWNAME");
+
+  // set feature to start it streaming
+  memset(buf, 0x0, sizeof(buf));
+  buf[6] = 1;
+  buf[8] = 4;
+  buf[9] = 3;
+  buf[89] = 6;
+
+  int attempt = 0;
+  for (attempt = 0; attempt < 50; ++attempt)
+  {
+    res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
+    if (res < 0)
+    {
+      gzerr << "unable to start streaming\n";
+      perror("HIDIOCSFEATURE");
+      common::Time::MSleep(500);
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  if (attempt >= 60)
+  {
+    gzerr << "Failed to load hydra\n";
+    return;
+  }
+
+
   while(!this->stop)
   {
     this->Poll(pollTime, cornerHz);
@@ -231,7 +233,6 @@ void RazerHydra::Run()
 
   if (this->hidrawFd >= 0)
   {
-    uint8_t buf[256];
     memset(buf, 0, sizeof(buf));
     buf[6] = 1;
     buf[8] = 4;
