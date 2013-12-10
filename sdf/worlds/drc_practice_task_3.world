@@ -56,6 +56,30 @@
       </include>
     </model>
 
+    <model name="sidewall_extension">
+      <static>true</static>
+      <pose>1.4 0.560356 0.15 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box><size>1.5875 0.14288 0.3</size></box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sidewall_extension2">
+      <static>true</static>
+      <pose>1.4 -0.560356 0.15 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box><size>1.5875 0.14288 0.3</size></box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
     <model name="debris">
       <static>false</static>
       <pose>1 0 0.3 0 0 -1.5707</pose>
@@ -75,7 +99,7 @@
 
     <include>
       <uri>model://atlas</uri>
-      <pose>0 0 0.95 0 0 0</pose>
+      <pose>0 0 0.96 0 0 0</pose>
     </include>
 
     <plugin filename="libHydra.so" name="hydra">
