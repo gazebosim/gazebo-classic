@@ -33,6 +33,7 @@ class PhysicsTest : public ServerFixture,
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void SphereAtlasLargeError(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
@@ -1610,6 +1611,201 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 TEST_P(PhysicsTest, SimplePendulum)
 {
   SimplePendulum(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// SphereAtlasLargeError:
+// Check algorithm's ability to re-converge after a large LCP error is
+// introduced.
+// In this test, a model with similar dynamics properties to Atlas V3
+// is pinned to the world by both feet.  Robot is moved by a large
+// distance, violating the joints between world and feet temporarily.
+// Robot is then allowed to settle.  Check to see that the LCP solution
+// does not become unstable.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Skipping SphereAtlasLargeError for physics engine ["
+          << _physicsEngine
+          << "] as this test only works for ODE for now.\n";
+    return;
+  }
+
+  Load("worlds/sphere_atlas_demo.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics->SetGravity(math::Vector3(0, 0, 0));
+
+  int i = 0;
+  while (!this->HasEntity("sphere_atlas") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get sphere_atlas");
+
+  physics::ModelPtr model = world->GetModel("sphere_atlas");
+  EXPECT_TRUE(model);
+  physics::LinkPtr head = model->GetLink("head");
+  EXPECT_TRUE(head);
+
+  {
+    gzdbg << "Testing large perturbation with PID controller active.\n";
+    // Test:  With Robot PID controller active, introduce a large
+    //        constraint error by breaking some model joints to the world
+    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+
+    // let model settle
+    world->StepWorld(1000);
+
+    for (unsigned int n = 0; n < 10; ++n)
+    {
+      world->StepWorld(1);
+      // manually check joint constraint violation for each joint
+      physics::Link_V links = model->GetLinks();
+      for (unsigned int i = 0; i < links.size(); ++i)
+      {
+        math::Pose childInWorld = links[i]->GetWorldPose();
+
+        physics::Joint_V parentJoints = links[i]->GetParentJoints();
+        for (unsigned int j = 0; j < parentJoints.size(); ++j)
+        {
+          // anchor position in world frame
+          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+
+          // anchor pose in child link frame
+          math::Pose anchorInChild =
+            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+
+          // initial anchor pose in child link frame
+          math::Pose anchorInitialInChild =
+            parentJoints[j]->GetInitialAnchorPose();
+
+          physics::LinkPtr parent = parentJoints[j]->GetParent();
+          if (parent)
+          {
+            // compare everything in the parent frame
+            math::Pose childInitialInParent =
+              links[i]->GetInitialRelativePose() -  // rel to model
+              parent->GetInitialRelativePose();  // rel to model
+
+            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose childInParent = childInWorld - parentInWorld;
+            math::Pose anchorInParent = anchorInChild + childInParent;
+            math::Pose anchorInitialInParent =
+              anchorInitialInChild + childInitialInParent;
+            math::Pose jointError = anchorInParent - anchorInitialInParent;
+
+            // joint constraint violation must be less than...
+            EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
+
+            // debug
+            if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
+              gzdbg << "i [" << n
+                    << "] link [" << links[i]->GetName()
+                    // << "] parent[" << parent->GetName()
+                    << "] error[" << jointError.pos.GetSquaredLength()
+                    // << "] pose[" << childInWorld
+                    << "] anchor[" << anchorInChild
+                    << "] cinp[" << childInParent
+                    << "] ainp0[" << anchorInitialInParent
+                    << "] ainp[" << anchorInParent
+                    << "] diff[" << jointError
+                    << "]\n";
+          }
+        }
+      }
+    }
+  }
+
+  {
+    gzdbg << "Testing large perturbation with PID controller disabled.\n";
+    // Test:  Turn off Robot PID controller, then introduce a large
+    //        constraint error by breaking some model joints to the world
+
+    // special hook in SphereAtlasTestPlugin disconnects
+    // PID controller on Reset.
+    world->Reset();
+    world->StepWorld(1);
+
+    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+
+    // let model settle
+    world->StepWorld(1000);
+
+    for (unsigned int n = 0; n < 10; ++n)
+    {
+      world->StepWorld(1);
+      // manually check joint constraint violation for each joint
+      physics::Link_V links = model->GetLinks();
+      for (unsigned int i = 0; i < links.size(); ++i)
+      {
+        math::Pose childInWorld = links[i]->GetWorldPose();
+
+        physics::Joint_V parentJoints = links[i]->GetParentJoints();
+        for (unsigned int j = 0; j < parentJoints.size(); ++j)
+        {
+          // anchor position in world frame
+          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+
+          // anchor pose in child link frame
+          math::Pose anchorInChild =
+            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+
+          // initial anchor pose in child link frame
+          math::Pose anchorInitialInChild =
+            parentJoints[j]->GetInitialAnchorPose();
+
+          physics::LinkPtr parent = parentJoints[j]->GetParent();
+          if (parent)
+          {
+            // compare everything in the parent frame
+            math::Pose childInitialInParent =
+              links[i]->GetInitialRelativePose() -  // rel to model
+              parent->GetInitialRelativePose();  // rel to model
+
+            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose childInParent = childInWorld - parentInWorld;
+            math::Pose anchorInParent = anchorInChild + childInParent;
+            math::Pose anchorInitialInParent =
+              anchorInitialInChild + childInitialInParent;
+            math::Pose jointError = anchorInParent - anchorInitialInParent;
+
+            // joint constraint violation must be less than...
+            EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
+
+            // debug
+            if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
+              gzdbg << "i [" << n
+                    << "] link [" << links[i]->GetName()
+                    // << "] parent[" << parent->GetName()
+                    << "] error[" << jointError.pos.GetSquaredLength()
+                    // << "] pose[" << childInWorld
+                    << "] anchor[" << anchorInChild
+                    << "] cinp[" << childInParent
+                    << "] ainp0[" << anchorInitialInParent
+                    << "] ainp[" << anchorInParent
+                    << "] diff[" << jointError
+                    << "]\n";
+          }
+        }
+      }
+    }
+  }
+}
+
+TEST_P(PhysicsTest, SphereAtlasLargeError)
+{
+  SphereAtlasLargeError(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,10 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 set (plugins
   CameraPlugin
   CartTestPlugin
@@ -27,6 +31,7 @@ set (plugins
   SkidSteerDrivePlugin
   SonarPlugin
   SpringTestPlugin
+  SphereAtlasTestPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})

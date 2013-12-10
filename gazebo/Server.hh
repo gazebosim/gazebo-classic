@@ -18,16 +18,19 @@
 #define _SERVER_HH_
 
 #include <string>
+#include <vector>
 #include <list>
+#include <map>
 
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
-#include <sdf/sdf.hh>
-
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/World.hh"
+
+namespace po = boost::program_options;
 
 namespace boost
 {
@@ -125,6 +128,9 @@ namespace gazebo
     /// \brief Pointer to the master.
     private: Master *master;
 
+    /// \brief Pointer to the master thread.
+    private: boost::thread *masterThread;
+
     /// \brief Communication node.
     private: transport::NodePtr node;
 
@@ -135,7 +141,7 @@ namespace gazebo
     private: transport::PublisherPtr worldModPub;
 
     /// \brief Mutex to protect controlMsgs.
-    private: boost::mutex receiveMutex;
+    private: boost::mutex *receiveMutex;
 
     /// \brief List of received control messages.
     private: std::list<msgs::ServerControl> controlMsgs;
@@ -144,13 +150,13 @@ namespace gazebo
     private: gazebo::common::StrStr_M params;
 
     /// \brief Boost program options variable map.
-    private: boost::program_options::variables_map vm;
+    private: po::variables_map vm;
 
     /// \brief Save argc for access by system plugins.
-    private: int systemPluginsArgc;
+    public: int systemPluginsArgc;
 
     /// \brief Save argv for access by system plugins.
-    private: char **systemPluginsArgv;
+    public: char** systemPluginsArgv;
   };
 }
 

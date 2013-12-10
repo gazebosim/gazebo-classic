@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _DARTPLANESHAPE_HH_
-#define _DARTPLANESHAPE_HH_
+#ifndef _GAZEBO_DARTPLANESHAPE_HH_
+#define _GAZEBO_DARTPLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
