@@ -33,9 +33,6 @@
     <!-- Base -->
     <model name="static_models">
       <pose>1 0 0 0 0 -1.5707</pose>
-      <include>
-        <uri>model://drc_practice_base_4x8</uri>
-      </include>
 
       <include>
         <name>Doorway</name>
@@ -58,7 +55,7 @@
 
     <model name="sidewall_extension">
       <static>true</static>
-      <pose>1.4 0.560356 0.15 0 0 0</pose>
+      <pose>1.413350 0.542197 0.175772 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry>
@@ -70,7 +67,7 @@
 
     <model name="sidewall_extension2">
       <static>true</static>
-      <pose>1.4 -0.560356 0.15 0 0 0</pose>
+      <pose>1.413350 -0.542197 0.175772 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry>
@@ -99,7 +96,7 @@
 
     <include>
       <uri>model://atlas</uri>
-      <pose>0 0 0.96 0 0 0</pose>
+      <pose>0 0 0.94 0 0 0</pose>
     </include>
 
     <plugin filename="libHydra.so" name="hydra">
@@ -108,17 +105,15 @@
       <grab>0.12 0 0</grab>
     </plugin>
 
+    <include>
+      <uri>model://starting_pen</uri>
+      <pose>-5.688061 -0.096423 0 0 0 -1.570796</pose>
+    </include>
+
     <model name="right_arm_goal">
       <static>true</static>
       <pose>0.013 -.294 0.622 1.5707 0 3.1415</pose>
       <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.05 .2 .05</size>
-            </box>
-          </geometry>
-        </visual>
       </link>
     </model>
 
@@ -126,13 +121,6 @@
       <static>true</static>
       <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
       <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>.05 .2 .05</size>
-            </box>
-          </geometry>
-        </visual>
       </link>
     </model>
 
