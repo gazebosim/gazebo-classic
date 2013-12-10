@@ -32,26 +32,27 @@
     + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
 
 1. **gazebo/physics/MultiRayShape.hh** `API change`
-    + ***Removed:*** void MultiRayShape::GetRange(int _index)
-    + ***Replacement:*** void MultiRayShape::GetRange(unsigned int _index)
-    + ***Removed:*** void MultiRayShape::GetRetro(int _index)
-    + ***Replacement:*** void MultiRayShape::GetRetro(unsigned int _index)
-    + ***Removed:*** void MultiRayShape::GetFiducial(int _index)
-    + ***Replacement:*** void MultiRayShape::GetFiducial(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetRange(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRange(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetRetro(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRetro(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetFiducial(int _index)
+    + ***Replacement:*** double MultiRayShape::GetFiducial(unsigned int _index)
     + ***Note:*** Changed argument type from int to unsigned int.
 
 1. **gazebo/sensors/RaySensor.hh** `API change`
-    + ***Removed:*** void RaySensor::GetRange(int _index)
-    + ***Replacement:*** void RaySensor::GetRange(unsigned int _index)
-    + ***Removed:*** void RaySensor::GetRetro(int _index)
-    + ***Replacement:*** void RaySensor::GetRetro(unsigned int _index)
-    + ***Removed:*** void RaySensor::GetFiducial(int _index)
-    + ***Replacement:*** void RaySensor::GetFiducial(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetRange(int _index)
+    + ***Replacement:*** double RaySensor::GetRange(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetRetro(int _index)
+    + ***Replacement:*** double RaySensor::GetRetro(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetFiducial(int _index)
+    + ***Replacement:*** double RaySensor::GetFiducial(unsigned int _index)
     + ***Note:*** Changed argument type from int to unsigned int.
 
 ### Additions
 
 1. **gazebo/physics/Joint.hh**
+    + virtual void SetEffortLimit(unsigned _index, double _stiffness) = 0
     + virtual void SetStiffness(int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
 
