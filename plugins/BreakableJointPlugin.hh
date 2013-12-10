@@ -51,6 +51,9 @@ namespace gazebo
 
     /// \brief Pointer to the world update event connection
     private: event::ConnectionPtr worldConnection;
+
+    /// \brief Breaking force threshold (N).
+    private: double breakingForce;
   };
 }
 #endif

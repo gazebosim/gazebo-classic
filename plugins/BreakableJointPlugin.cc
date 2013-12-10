@@ -25,6 +25,7 @@ GZ_REGISTER_SENSOR_PLUGIN(BreakableJointPlugin)
 
 /////////////////////////////////////////////////
 BreakableJointPlugin::BreakableJointPlugin()
+  : breakingForce(1.0)
 {
 }
 
@@ -39,6 +40,10 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
 {
   ForceTorquePlugin::Load(_parent, _sdf);
 
+  std::string paramName = "breaking_force_N";
+  if (_sdf->HasElement(paramName))
+    this->breakingForce = _sdf->Get<double>(paramName);
+
   this->parentJoint = this->parentSensor->GetJoint();
 }
 
@@ -48,7 +53,7 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
   if (this->parentJoint)
   {
     math::Vector3 force = msgs::Convert(_msg.wrench().force());
-    if (force.GetLength() > 999)
+    if (force.GetLength() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));
