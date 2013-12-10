@@ -13,7 +13,7 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
-1. **gazebo/transport/ConnectionManager.hh** 
+1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
@@ -30,6 +30,32 @@
     + ***Removed:*** void ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
     + ***Replacement:*** event::ConnectionPtr ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
     + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
+
+1. **gazebo/physics/MultiRayShape.hh** `API change`
+    + ***Removed:*** void MultiRayShape::GetRange(int _index)
+    + ***Replacement:*** void MultiRayShape::GetRange(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+    + ***Removed:*** void MultiRayShape::GetRetro(int _index)
+    + ***Replacement:*** void MultiRayShape::GetRetro(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+    + ***Removed:*** void MultiRayShape::GetFiducial(int _index)
+    + ***Replacement:*** void MultiRayShape::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+1. **gazebo/physics/RaySensor.hh** `API change`
+    + ***Removed:*** void RaySensor::GetRange(int _index)
+    + ***Replacement:*** void RaySensor::GetRange(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+    + ***Removed:*** void RaySensor::GetRetro(int _index)
+    + ***Replacement:*** void RaySensor::GetRetro(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+    + ***Removed:*** void RaySensor::GetFiducial(int _index)
+    + ***Replacement:*** void RaySensor::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
 
 ### Additions
 
