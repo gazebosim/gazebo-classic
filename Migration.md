@@ -40,7 +40,7 @@
     + ***Replacement:*** void MultiRayShape::GetFiducial(unsigned int _index)
     + ***Note:*** Changed argument type from int to unsigned int.
 
-1. **gazebo/physics/RaySensor.hh** `API change`
+1. **gazebo/sensors/RaySensor.hh** `API change`
     + ***Removed:*** void RaySensor::GetRange(int _index)
     + ***Replacement:*** void RaySensor::GetRange(unsigned int _index)
     + ***Removed:*** void RaySensor::GetRetro(int _index)
