@@ -907,3 +907,9 @@ std::string SubMesh::GetName() const
 {
   return this->name;
 }
+
+//////////////////////////////////////////////////
+NodeAssignment::NodeAssignment()
+  : vertexIndex(0), nodeIndex(0), weight(0.0)
+{
+}

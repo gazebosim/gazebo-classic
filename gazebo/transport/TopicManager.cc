@@ -355,7 +355,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
   this->ConnectSubscribers(_pub.topic());
 }
 
-
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType)
@@ -392,6 +391,21 @@ void TopicManager::Unadvertise(const std::string &_topic)
   {
     publication->SetLocallyAdvertised(false);
     ConnectionManager::Instance()->Unadvertise(t);
+  }
+}
+
+//////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  if (_pub)
+  {
+    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+    if (publication)
+      publication->RemovePublisher(_pub);
+
+    this->Unadvertise(_pub->GetTopic());
   }
 }
 

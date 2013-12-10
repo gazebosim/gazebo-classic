@@ -91,7 +91,9 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      // since we're rotating a unit x vector, a pitch rotation will now be
+      // around the negative y axis
+      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
@@ -117,9 +119,9 @@ void MultiRayShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRange(int _index)
+double MultiRayShape::GetRange(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -132,9 +134,9 @@ double MultiRayShape::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRetro(int _index)
+double MultiRayShape::GetRetro(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -146,9 +148,9 @@ double MultiRayShape::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int MultiRayShape::GetFiducial(int _index)
+int MultiRayShape::GetFiducial(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"

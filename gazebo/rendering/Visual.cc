@@ -1253,6 +1253,16 @@ void Visual::SetHighlighted(bool _highlighted)
 }
 
 //////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -1566,6 +1576,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }

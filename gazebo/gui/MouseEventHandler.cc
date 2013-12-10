@@ -52,6 +52,13 @@ void MouseEventHandler::AddMoveFilter(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void MouseEventHandler::AddDoubleClickFilter(const std::string &_name,
+    MouseEventFilter _filter)
+{
+  this->Add(_name, _filter, this->doubleClickFilters);
+}
+
+/////////////////////////////////////////////////
 void MouseEventHandler::RemovePressFilter(const std::string &_name)
 {
   this->Remove(_name, this->pressFilters);
@@ -65,6 +72,12 @@ void MouseEventHandler::RemoveReleaseFilter(const std::string &_name)
 
 /////////////////////////////////////////////////
 void MouseEventHandler::RemoveMoveFilter(const std::string &_name)
+{
+  this->Remove(_name, this->moveFilters);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::RemoveDoubleClickFilter(const std::string &_name)
 {
   this->Remove(_name, this->moveFilters);
 }
@@ -85,6 +98,12 @@ void MouseEventHandler::HandleRelease(const common::MouseEvent &_event)
 void MouseEventHandler::HandleMove(const common::MouseEvent &_event)
 {
   this->Handle(_event, this->moveFilters);
+}
+
+/////////////////////////////////////////////////
+void MouseEventHandler::HandleDoubleClick(const common::MouseEvent &_event)
+{
+  this->Handle(_event, this->doubleClickFilters);
 }
 
 /////////////////////////////////////////////////

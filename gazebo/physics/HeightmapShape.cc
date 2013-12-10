@@ -253,9 +253,7 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
-#if GAZEBO_MAJOR_VERSION >= 3
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
-#endif
 }
 
 //////////////////////////////////////////////////

@@ -242,10 +242,6 @@ namespace gazebo
       private: bool PrepareTerrainPaging(
         const boost::filesystem::path &_terrainDirPath);
 
-      /// \brief DO NOT USE THIS. This is here for ABI compatibilty reasons.
-      // \todo Deprecated. Remove this in Gazebo 3.0
-      public: static const unsigned int NumTerrainSubdivisions;
-
       /// \brief Number of pieces in which a terrain is subdivided for paging.
       private: static const unsigned int numTerrainSubdivisions;
 
