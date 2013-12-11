@@ -59,3 +59,16 @@ math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
 
   return DARTTypes::ConvVec3(worldOrigin);
 }
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetStiffnessDamping(unsigned int /*_index*/,
+  double /*_stiffness*/, double /*_damping*/, double /*_reference*/)
+{
+  // joint spring damper element not yet implemented, issue #975
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetStiffness(int /*_index*/, double /*_stiffness*/)
+{
+  // joint spring damper element not yet implemented, issue #975
+}

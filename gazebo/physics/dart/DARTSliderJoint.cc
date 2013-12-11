@@ -174,3 +174,16 @@ void DARTSliderJoint::SetForceImpl(int _index, double _effort)
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
+
+//////////////////////////////////////////////////
+void DARTSliderJoint::SetStiffnessDamping(unsigned int /*_index*/,
+  double /*_stiffness*/, double /*_damping*/, double /*_reference*/)
+{
+  // joint spring damper element not yet implemented, issue #975
+}
+
+//////////////////////////////////////////////////
+void DARTSliderJoint::SetStiffness(int /*_index*/, double /*_stiffness*/)
+{
+  // joint spring damper element not yet implemented, issue #975
+}

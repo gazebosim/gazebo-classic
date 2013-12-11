@@ -69,6 +69,13 @@ namespace gazebo
       public: virtual double GetMaxForce(int _index);
 
       // Documentation inherited.
+      public: virtual void SetStiffnessDamping(unsigned int _index,
+        double _stiffness, double _damping, double _reference = 0);
+
+      // Documentation inherited.
+      public: virtual void SetStiffness(int _index, double _stiffness);
+
+      // Documentation inherited.
       protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Universal joint of DART
