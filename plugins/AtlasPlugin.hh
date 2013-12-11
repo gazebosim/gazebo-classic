@@ -93,6 +93,9 @@ namespace gazebo
     private: math::Pose basePoseLeft;
     private: math::Pose resetPoseRight;
     private: math::Pose resetPoseLeft;
+    private: math::Pose modelStartPose;
+
+    private: bool activated;
   };
 }
 #endif

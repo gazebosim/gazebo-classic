@@ -31,12 +31,12 @@ GZ_REGISTER_MODEL_PLUGIN(AtlasPlugin)
 /////////////////////////////////////////////////
 AtlasPlugin::AtlasPlugin()
 {
+  this->activated = false;
 }
 
 /////////////////////////////////////////////////
 AtlasPlugin::~AtlasPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 /////////////////////////////////////////////////
@@ -48,12 +48,20 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
     return;
   }
 
+  if (!this->activated)
+  {
+    if (_msg->right().button_bumper() && _msg->left().button_bumper())
+      this->activated = true;
+    else
+      return;
+  }
+
   math::Pose rightAdjust, leftAdjust;
 
   rightAdjust = this->rightModel->GetWorldPose();
   leftAdjust = this->leftModel->GetWorldPose();
 
-  if (_msg->right().button_bumper())
+  //if (_msg->right().button_bumper())
   {
     math::Pose rightPose = msgs::Convert(_msg->right().pose());
 
@@ -67,12 +75,13 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
         rightPose.rot * this->resetPoseRight.rot.GetInverse() *
         this->basePoseRight.rot);
   }
-  else
+  /*else
   {
     this->basePoseRight = rightAdjust;
   }
 
   if (_msg->left().button_bumper())
+  */
   {
     math::Pose leftPose = msgs::Convert(_msg->left().pose());
 
@@ -86,11 +95,15 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
           leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
           this->basePoseLeft.rot);
   }
-  else
+  /*else
   {
     this->basePoseLeft = leftAdjust;
-  }
+  }*/
 
+  this->SetRightFingers(_msg->right().trigger()*1.5707);
+  this->SetLeftFingers(_msg->left().trigger()*1.5707);
+
+  /*
   if (_msg->right().button_1())
     this->SetRightFingers(1.5707);
   else if (_msg->right().button_2())
@@ -104,10 +117,11 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
     this->SetLeftFingers(1.5707);
   else if (_msg->left().button_3())
     this->SetLeftFingers(-1.5707);
+  */
 
 
-  double dx = _msg->right().joy_x() * 0.02;
-  double dy = _msg->right().joy_y() * -0.02;
+  double dx = _msg->right().joy_x() * 0.002;
+  double dy = _msg->right().joy_y() * -0.002;
 
   math::Pose dPose(dx, dy, 0, 0, 0, 0);
   this->pinJoint->Detach();
@@ -131,8 +145,15 @@ void AtlasPlugin::Restart()
 {
   this->rightModel->SetWorldPose(this->rightStartPose);
   this->leftModel->SetWorldPose(this->leftStartPose);
+  this->basePoseRight = this->rightStartPose;
+  this->basePoseLeft = this->leftStartPose;
   this->rightBumper = false;
   this->leftBumper = false;
+  this->activated = false;
+
+  this->pinJoint->Detach();
+  this->model->SetWorldPose(this->modelStartPose);
+  this->pinJoint->Attach(physics::LinkPtr(), this->model->GetLink("utorso"));
 
   this->world->Reset();
 }
@@ -179,32 +200,12 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   this->rightModel = this->world->GetModel("right_arm_goal");
   this->leftModel = this->world->GetModel("left_arm_goal");
 
-  math::Quaternion modelRot = this->model->GetWorldPose().rot;
-
-  math::Quaternion rightRot(1.5707, 0, 3.1415);
-  math::Quaternion leftRot(-1.5707, 0, -3.1415);
-
-  /*this->rightStartPose = math::Pose(this->model->GetWorldPose().pos +
-      modelRot.RotateVector(math::Vector3(0.013, -.294, -0.308)),
-      modelRot * rightRot);
-
-  this->leftStartPose = math::Pose(this->model->GetWorldPose().pos +
-      modelRot.RotateVector(math::Vector3(0.013, .294, -0.308)),
-                 modelRot * leftRot);
-
-  std::cout << "Right[" << this->rightStartPose << "]\n";
-  std::cout << "Left[" << this->leftStartPose << "]\n";
-
-  this->rightModel->SetWorldPose(this->rightStartPose);
-  this->leftModel->SetWorldPose(this->leftStartPose);
-  */
-
   this->basePoseRight = this->rightModel->GetWorldPose();
   this->basePoseLeft = this->leftModel->GetWorldPose();
 
   this->rightStartPose = this->basePoseRight;
   this->leftStartPose = this->basePoseLeft;
-
+  this->modelStartPose = this->model->GetWorldPose();
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
@@ -255,7 +256,7 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
       iter != rightHandJoints.end(); ++iter)
   {
     this->jointController->SetPositionPID("atlas::" + *iter,
-        common::PID(10.5, 0.1, 1.1));
+        common::PID(80.5, 0.1, 2.1));
 
     this->jointController->SetPositionTarget("atlas::" + *iter, 0);
   }
@@ -264,19 +265,11 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
       iter != leftHandJoints.end(); ++iter)
   {
     this->jointController->SetPositionPID("atlas::" + *iter,
-        common::PID(10.5, 0.1, 1.1));
+        common::PID(80.5, 0.1, 2.1));
 
     this->jointController->SetPositionTarget("atlas::" + *iter, 0);
   }
 
   this->rightBumper = false;
   this->leftBumper = false;
-
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&AtlasPlugin::Update, this, _1));
-}
-
-/////////////////////////////////////////////////
-void AtlasPlugin::Update(const common::UpdateInfo & /*_info*/)
-{
 }

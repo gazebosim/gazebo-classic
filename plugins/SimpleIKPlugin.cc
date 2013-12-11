@@ -44,6 +44,8 @@ SimpleIKPlugin::~SimpleIKPlugin()
 /////////////////////////////////////////////////
 void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
+  this->restart = false;
+
   // Get the world name.
   this->model = _parent;
   this->world = this->model->GetWorld();
@@ -111,15 +113,12 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   math::Vector3 result(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
 
-
-//);
   math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
 
   this->goalPos = this->goalModel->GetWorldPose().pos;
 
   this->goalPos = this->goalPos - basePos;
 
-  std::cout << "Diff[" <<  this->goalPos << "]\n";
 
   this->iksolverVel = new KDL::ChainIkSolverVel_wdls(this->chain, 0.00001, 200);
 
@@ -152,7 +151,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimpleIKPlugin::Reset()
 {
-  this->jointController->SetJointPosition("atlas::r_arm_shy", 1.6896);
+  /*this->jointController->SetJointPosition("atlas::r_arm_shy", 1.6896);
   this->jointController->SetJointPosition("atlas::r_arm_shx", 0.0803817);
   this->jointController->SetJointPosition("atlas::r_arm_ely", -0.0821502);
   this->jointController->SetJointPosition("atlas::r_arm_elx", -0.0392042);
@@ -163,11 +162,48 @@ void SimpleIKPlugin::Reset()
   this->jointController->SetJointPosition("atlas::l_arm_ely", 0.0821502);
   this->jointController->SetJointPosition("atlas::l_arm_elx", -0.0392042);
   this->jointController->SetJointPosition("atlas::l_arm_wry", 0.128001);
+  */
+  this->restart = true;
 }
 
 /////////////////////////////////////////////////
 void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
+  if (this->restart)
+  {
+    math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
+    this->goalPos = this->goalModel->GetWorldPose().pos;
+    this->goalPos = this->goalPos - basePos;
+
+    Eigen::Matrix<double,6,1> L;
+    L(0)=1;L(1)=1;L(2)=1;
+    L(3)=0.01;L(4)=0.01;L(5)=0.01;
+
+    for(unsigned int i = 0; i < 6; ++i)
+    {
+      (*this->jointpositions)(i) = 0;
+    }
+
+    KDL::ChainIkSolverPos_LMA iksolverPos(this->chain, L);
+
+    KDL::JntArray qResult(this->chain.getNrOfJoints());
+    KDL::Frame destFrame(KDL::Vector(this->goalPos.x,
+          this->goalPos.y, this->goalPos.z));
+    int ikResult = iksolverPos.CartToJnt(*this->jointpositions, destFrame,
+        qResult);
+
+    this->jointController->Reset();
+
+    for(unsigned int i = 0; i < 6; ++i)
+    {
+      this->jointController->SetJointPosition(
+          this->joints[i]->GetScopedName(), qResult(i));
+    }
+
+    this->restart = false;
+    return;
+  }
+
   int nj = 6;
 
   for(unsigned int i = 0; i < nj; ++i)
