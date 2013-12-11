@@ -187,6 +187,9 @@ MainWindow::~MainWindow()
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
+
+  gui::OculusWindow *oculusWindow = new gui::OculusWindow();
+  oculusWindow->show();
 }
 
 /////////////////////////////////////////////////
