@@ -76,6 +76,8 @@ namespace gazebo
 
     private: common::Time updateRate, lastUpdateTime;
     private: double vels[6];
+
+    private: bool restart;
   };
 }
 #endif

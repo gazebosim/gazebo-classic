@@ -1,6 +1,12 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="trials_task_3">
+    <gui>
+      <camera name="user_camera">
+        <pose>-2 -2 2 0 .3 0.4</pose>
+      </camera>
+    </gui>
+
     <physics type="ode">
       <gravity>0 0 -9.81</gravity>
       <ode>
@@ -96,7 +102,7 @@
 
     <include>
       <uri>model://atlas</uri>
-      <pose>0 0 0.94 0 0 0</pose>
+      <pose>0 0 0.96 0 0 0</pose>
     </include>
 
     <plugin filename="libHydra.so" name="hydra">
