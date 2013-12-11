@@ -68,14 +68,34 @@ RazerHydra::~RazerHydra()
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
   int res;
   uint8_t buf[256];
   struct hidraw_report_descriptor rptDesc;
   struct hidraw_devinfo info;
 
-  std::string device = _sdf->Get<std::string>("device");
+  // Find the Razer device.
+  std::string device;
+  for (int i = 0; i < 5 && device.empty(); ++i)
+  {
+    std::ostringstream stream;
+    stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
+    std::ifstream fileIn(stream.str().c_str());
+    if (fileIn.is_open())
+    {
+      std::string line;
+      while (std::getline(fileIn, line) && device.empty())
+        if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
+          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+    }
+  }
+
+  if (device.empty())
+  {
+    gzerr << "Unable to find Razer device\n";
+    return;
+  }
 
   this->hidrawFd = open(device.c_str(), O_RDWR | O_NONBLOCK);
   if (this->hidrawFd < 0)
