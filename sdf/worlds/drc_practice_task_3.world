@@ -100,7 +100,6 @@
     </include>
 
     <plugin filename="libHydra.so" name="hydra">
-      <device>/dev/hidraw5</device>
       <pivot>0.04 0 0</pivot>
       <grab>0.12 0 0</grab>
     </plugin>

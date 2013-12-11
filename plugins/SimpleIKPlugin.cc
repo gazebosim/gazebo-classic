@@ -108,18 +108,15 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   // Calculate forward position kinematics
   this->fkSolver->JntToCart(*this->jointpositions, cartpos);
-
   math::Vector3 result(cartpos.p.x(), cartpos.p.y(), cartpos.p.z());
 
 
-//);
   math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
 
+  std::cout << "RESULT[" << result+basePos << "]\n";
   this->goalPos = this->goalModel->GetWorldPose().pos;
 
   this->goalPos = this->goalPos - basePos;
-
-  std::cout << "Diff[" <<  this->goalPos << "]\n";
 
   this->iksolverVel = new KDL::ChainIkSolverVel_wdls(this->chain, 0.00001, 200);
 

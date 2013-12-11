@@ -106,13 +106,13 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
     this->SetLeftFingers(-1.5707);
 
 
-  double dx = _msg->right().joy_x() * 0.02;
-  double dy = _msg->right().joy_y() * -0.02;
+  double dx = _msg->right().joy_x() * 0.005;
+  double dy = _msg->right().joy_y() * -0.005;
 
   math::Pose dPose(dx, dy, 0, 0, 0, 0);
   this->pinJoint->Detach();
   this->model->SetWorldPose(this->model->GetWorldPose() + dPose);
-  this->pinJoint->Attach(physics::LinkPtr(), this->model->GetLink("utorso"));
+  this->pinJoint->Attach(this->pinLink, this->model->GetLink("utorso"));
 
   rightAdjust += dPose;
   leftAdjust += dPose;
@@ -170,7 +170,7 @@ void AtlasPlugin::SetLeftFingers(double _angle)
 }
 
 /////////////////////////////////////////////////
-void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
+void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get the world name.
   this->model = _parent;
@@ -216,8 +216,27 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   this->pinJoint = this->world->GetPhysicsEngine()->CreateJoint(
       "revolute", this->model);
 
+  if (_sdf->HasElement("pin_link"))
+  {
+    std::string pinModelStr =_sdf->Get<std::string>("pin_model");
+    std::string pinLinkStr =_sdf->Get<std::string>("pin_link");
+
+    physics::ModelPtr pinModel = this->world->GetModel(pinModelStr);
+
+    if (!pinModel)
+      gzerr << "Unable to get pin model[" << pinModelStr << "]\n";
+    else
+    {
+      this->pinLink = pinModel->GetLink(pinLinkStr);
+
+      if (!this->pinLink)
+        gzerr << "Unable to get pin link[" << pinLinkStr << "]\n";
+    }
+  }
+
   this->pinJoint->SetModel(this->model);
-  this->pinJoint->Load(physics::LinkPtr(), this->model->GetLink("utorso"),
+
+  this->pinJoint->Load(this->pinLink, this->model->GetLink("utorso"),
       math::Pose());
   this->pinJoint->SetUpperLimit(0,0);
   this->pinJoint->SetLowerLimit(0,0);

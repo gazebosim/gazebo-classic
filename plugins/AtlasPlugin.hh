@@ -93,6 +93,8 @@ namespace gazebo
     private: math::Pose basePoseLeft;
     private: math::Pose resetPoseRight;
     private: math::Pose resetPoseLeft;
+
+    private: physics::LinkPtr pinLink;
   };
 }
 #endif
