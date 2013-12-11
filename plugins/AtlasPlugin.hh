@@ -96,6 +96,7 @@ namespace gazebo
     private: math::Pose modelStartPose;
 
     private: bool activated;
+    private: physics::LinkPtr pinLink;
   };
 }
 #endif

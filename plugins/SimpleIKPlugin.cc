@@ -115,10 +115,10 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   math::Vector3 basePos = this->baseLink->GetWorldPose().pos;
 
+  std::cout << "RESULT[" << result+basePos << "]\n";
   this->goalPos = this->goalModel->GetWorldPose().pos;
 
   this->goalPos = this->goalPos - basePos;
-
 
   this->iksolverVel = new KDL::ChainIkSolverVel_wdls(this->chain, 0.00001, 200);
 

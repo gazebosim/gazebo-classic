@@ -21,6 +21,7 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  DRCVehiclePlugin
   ForceTorquePlugin
   GpuRayPlugin
   Hydra
