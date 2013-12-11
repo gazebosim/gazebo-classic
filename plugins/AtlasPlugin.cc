@@ -197,28 +197,12 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->model = _parent;
   this->world = this->model->GetWorld();
 
+  this->dolly = this->world->GetModel("dolly");
+
   this->rightModel = this->world->GetModel("right_arm_goal");
   this->leftModel = this->world->GetModel("left_arm_goal");
 
   math::Quaternion modelRot = this->model->GetWorldPose().rot;
-
-  math::Quaternion rightRot(1.5707, 0, 3.1415);
-  math::Quaternion leftRot(-1.5707, 0, -3.1415);
-
-  /*this->rightStartPose = math::Pose(this->model->GetWorldPose().pos +
-      modelRot.RotateVector(math::Vector3(0.013, -.294, -0.308)),
-      modelRot * rightRot);
-
-  this->leftStartPose = math::Pose(this->model->GetWorldPose().pos +
-      modelRot.RotateVector(math::Vector3(0.013, .294, -0.308)),
-                 modelRot * leftRot);
-
-  std::cout << "Right[" << this->rightStartPose << "]\n";
-  std::cout << "Left[" << this->leftStartPose << "]\n";
-
-  this->rightModel->SetWorldPose(this->rightStartPose);
-  this->leftModel->SetWorldPose(this->leftStartPose);
-  */
 
   this->basePoseRight = this->rightModel->GetWorldPose();
   this->basePoseLeft = this->leftModel->GetWorldPose();

@@ -97,6 +97,8 @@ namespace gazebo
 
     private: bool activated;
     private: physics::LinkPtr pinLink;
+
+    private: physics::ModelPtr dolly;
   };
 }
 #endif

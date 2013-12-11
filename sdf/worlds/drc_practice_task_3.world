@@ -132,10 +132,13 @@
     <model name="dolly">
       <pose>0 0 0 0 0 0</pose>
       <link name="link">
-        <visual>
-          <box><size>1 1 0.2</size></box>
+        <visual name="visual">
+          <geometry>
+            <box><size>1 1 0.2</size></box>
+          </geometry>
         </visual>
       </link>
     </model>
+
   </world>
 </sdf>
