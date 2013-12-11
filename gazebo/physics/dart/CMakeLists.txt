@@ -5,45 +5,45 @@ include_directories(${DARTCore_INCLUDE_DIRS})
 link_directories(${DARTCore_LIBRARY_DIRS})
 
 set (sources
-    DARTPhysics.cc
+    DARTBallJoint.cc
     DARTCollision.cc
     DARTLink.cc
-    DARTJoint.cc
-    DARTSliderJoint.cc
+    DARTHeightmapShape.cc
     DARTHingeJoint.cc
     DARTHinge2Joint.cc
-    DARTUniversalJoint.cc
-    DARTBallJoint.cc
+    DARTJoint.cc
     DARTMeshShape.cc
-    DARTRayShape.cc
-    DARTMultiRayShape.cc
-    DARTHeightmapShape.cc
-    DARTScrewJoint.cc
     DARTModel.cc
+    DARTMultiRayShape.cc
+    DARTPhysics.cc
+    DARTRayShape.cc
+    DARTScrewJoint.cc
+    DARTSliderJoint.cc
+    DARTUniversalJoint.cc
 )
 
 SET (headers
-    dart_inc.h
-    DARTPhysics.hh
+    DARTBallJoint.hh
+    DARTBoxShape.hh
     DARTCollision.hh
-    DARTLink.hh
-    DARTJoint.hh
-    DARTSliderJoint.hh
+    DARTCylinderShape.hh
+    DARTHeightmapShape.hh
     DARTHingeJoint.hh
     DARTHinge2Joint.hh
-    DARTUniversalJoint.hh
-    DARTBallJoint.hh
+    DARTJoint.hh
+    DARTLink.hh
     DARTMeshShape.hh
-    DARTRayShape.hh
-    DARTMultiRayShape.hh
-    DARTHeightmapShape.hh
-    DARTSphereShape.hh
-    DARTBoxShape.hh
-    DARTPlaneShape.hh
-    DARTCylinderShape.hh
-    DARTTypes.hh
-    DARTScrewJoint.hh
     DARTModel.hh
+    DARTMultiRayShape.hh
+    DARTPhysics.hh
+    DARTPlaneShape.hh
+    DARTRayShape.hh
+    DARTScrewJoint.hh
+    DARTSliderJoint.hh
+    DARTSphereShape.hh
+    DARTTypes.hh
+    DARTUniversalJoint.hh
+    dart_inc.h
 )
 
 set (gtest_sources

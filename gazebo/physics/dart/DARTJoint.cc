@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -293,6 +293,54 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
                << "] or child[" << childStatic << "] is static.\n";
       }
     }
+  }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetStiffness(int _index, const double _stiffness)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
+      _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "DARTJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetStiffnessDamping(unsigned int _index,
+  double _stiffness, double _damping, double _reference)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dissipationCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// \TODO: set joint stiffness coefficient
+
+    /// setting joint damping
+    bool parentStatic = this->GetParent() ?
+      this->GetParent()->IsStatic() : false;
+    bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!parentStatic && !childStatic)
+    {
+      this->dtJoint->setDampingCoefficient(_index, _damping);
+    }
+
+    /// \TODO: add spring force element
+    gzdbg << "Joint [" << this->GetName()
+           << "] stiffness not implement in DART\n";
   }
   else
     gzerr << "SetStiffnessDamping _index too large.\n";

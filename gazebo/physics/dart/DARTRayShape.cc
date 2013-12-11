@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,7 @@ void DARTRayShape::GetIntersection(double& _dist, std::string& _entity)
   {
   }
 
-  gzerr << "Not implemented yet."
-        << "Please see issue #911.\n";
+  // Not implemented yet, please see issue #911
 }
 
 //////////////////////////////////////////////////

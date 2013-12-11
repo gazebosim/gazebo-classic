@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DARTCOLLISION_HH_
-#define _DARTCOLLISION_HH_
+#ifndef _GAZEBO_DARTCOLLISION_HH_
+#define _GAZEBO_DARTCOLLISION_HH_
 
 #include "gazebo/common/CommonTypes.hh"
 
@@ -68,22 +68,22 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Box GetBoundingBox() const;
 
-      /// @brief Get DART body node.
+      /// \brief Get DART body node.
       public: dart::dynamics::BodyNode* GetDARTBodyNode() const;
 
-      /// @brief Set DART collision shape.
+      /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
       public: void SetDARTCollisionShape(dart::dynamics::Shape* _shape,
                                          bool _placeable = true);
 
-      /// @brief Get DART collision shape.
+      /// \brief Get DART collision shape.
       public: dart::dynamics::Shape* GetDARTCollisionShape() const;
 
-      /// @brief DART body node associated with this collision.
+      /// \brief DART body node associated with this collision.
       private: dart::dynamics::BodyNode* dtBodyNode;
 
-      /// @brief DART collision shape associated with this collision.
+      /// \brief DART collision shape associated with this collision.
       private: dart::dynamics::Shape* dtCollisionShape;
 
       /// \brief Category bits for collision detection

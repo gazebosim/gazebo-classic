@@ -463,6 +463,18 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_TRUE(parent == NULL);
   }
 
+  if (_physicsEngine == "dart")
+  {
+    // DART assumes that: (i) every link has its parent joint (ii) root link
+    // is the only link that doesn't have parent link.
+    // Child world link breaks dart for now. Do we need to support it?
+    gzerr << "Skip tests for child world link cases "
+          << "since DART does not allow joint with world as child. "
+          << "Please see issue #914. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+    return;
+  }
+
   {
     if (_physicsEngine == "dart")
     {

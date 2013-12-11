@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _DARTBOXSHAPE_HH_
-#define _DARTBOXSHAPE_HH_
+#ifndef _GAZEBO_DARTBOXSHAPE_HH_
+#define _GAZEBO_DARTBOXSHAPE_HH_
 
 #include "gazebo/common/Console.hh"
 

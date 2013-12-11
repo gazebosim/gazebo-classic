@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DART_INC_H_
-#define _DART_INC_H_
+#ifndef _GAZEBO_DART_INC_H_
+#define _GAZEBO_DART_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header
