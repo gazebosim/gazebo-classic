@@ -39,7 +39,6 @@ RTShaderSystem::RTShaderSystem()
   this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
-//  this->pssmSetup = NULL;
   this->pssmSetup.setNull();
 }
 
