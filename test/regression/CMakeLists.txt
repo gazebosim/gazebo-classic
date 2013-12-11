@@ -22,7 +22,6 @@ if(HAVE_DART)
 endif()
 
 set(tests
-  846_typo_in_camera.cc
   876_random_number_generator.cc
 )
 
@@ -35,6 +34,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  846_typo_in_camera.cc
 )
 
 gz_build_dri_tests(${dri_tests})
