@@ -150,7 +150,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       // Take a few steps to verify the correct model pose.
       // dart has a failure mode that was not exposed without
       // this change to the test.
-      world->StepWorld(10);
+      world->Step(10);
 
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
