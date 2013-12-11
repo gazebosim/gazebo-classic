@@ -50,7 +50,7 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf)
               {T::Load(_sdf);}
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 1;}
 

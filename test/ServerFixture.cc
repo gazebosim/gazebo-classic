@@ -515,8 +515,11 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
     double _hMinAngle, double _hMaxAngle,
+    double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -542,10 +545,16 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
+    << "        <vertical>"
+    << "          <samples>" << _vSamples << "</samples>"
+    << "          <resolution>" << _vResolution << "</resolution>"
+    << "          <min_angle>" << _vMinAngle << "</min_angle>"
+    << "          <max_angle>" << _vMaxAngle << "</max_angle>"
+    << "        </vertical>"
     << "      </scan>"
     << "      <range>"
     << "        <min>" << _minRange << "</min>"
@@ -561,6 +570,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      </noise>";
 
   newModelStr << "    </ray>"
+    << "    <visualize>true</visualize>"
     << "  </sensor>"
     << "</link>"
     << "</model>"

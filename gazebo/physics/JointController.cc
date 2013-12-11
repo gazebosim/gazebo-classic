@@ -43,8 +43,8 @@ JointController::JointController(ModelPtr _model)
 void JointController::AddJoint(JointPtr _joint)
 {
   this->joints[_joint->GetScopedName()] = _joint;
-  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
-  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
+  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1, 1000, -1000);
+  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1, 1000, -1000);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +141,6 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 
     if (_msg->has_force())
       this->forces[_msg->name()] = _msg->force();
-
 
     if (_msg->has_position())
     {

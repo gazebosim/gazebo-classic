@@ -68,15 +68,6 @@ echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
-# False positives, "struct or union member ... is never used"
-echo "*:gazebo/common/Mesh.hh:190" >> $SUPPRESS  
-echo "*:gazebo/common/Mesh.hh:193" >> $SUPPRESS  
-echo "*:gazebo/common/Mesh.hh:196" >> $SUPPRESS  
-echo "*:gazebo/physics/Actor.hh:41" >> $SUPPRESS  
-echo "*:gazebo/physics/Actor.hh:43" >> $SUPPRESS  
-echo "*:gazebo/physics/Actor.hh:44" >> $SUPPRESS  
-echo "*:gazebo/physics/Actor.hh:45" >> $SUPPRESS  
-echo "*:gazebo/physics/Actor.hh:46" >> $SUPPRESS  
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
