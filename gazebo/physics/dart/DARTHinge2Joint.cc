@@ -208,16 +208,3 @@ void DARTHinge2Joint::SetForceImpl(int _index, double _effort)
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
-
-//////////////////////////////////////////////////
-void DARTHinge2Joint::SetStiffnessDamping(unsigned int /*_index*/,
-  double /*_stiffness*/, double /*_damping*/, double /*_reference*/)
-{
-  // joint spring damper element not yet implemented, issue #975
-}
-
-//////////////////////////////////////////////////
-void DARTHinge2Joint::SetStiffness(int /*_index*/, double /*_stiffness*/)
-{
-  // joint spring damper element not yet implemented, issue #975
-}

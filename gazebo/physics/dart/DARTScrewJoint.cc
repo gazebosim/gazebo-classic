@@ -188,15 +188,7 @@ void DARTScrewJoint::SetForceImpl(int _index, double _effort)
     gzerr << "Invalid index[" << _index << "]\n";
 }
 
-//////////////////////////////////////////////////
-void DARTScrewJoint::SetStiffnessDamping(unsigned int /*_index*/,
-  double /*_stiffness*/, double /*_damping*/, double /*_reference*/)
-{
-  // joint spring damper element not yet implemented, issue #975
-}
 
-//////////////////////////////////////////////////
-void DARTScrewJoint::SetStiffness(int /*_index*/, double /*_stiffness*/)
-{
-  // joint spring damper element not yet implemented, issue #975
-}
+
+
+
