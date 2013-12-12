@@ -56,6 +56,9 @@
     + virtual void SetStiffness(int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
 
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + physics::JointPtr GetJoint() const
+
 ### Deletions
 
 ## Gazebo 1.9 to 2.0
