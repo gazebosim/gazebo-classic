@@ -121,44 +121,18 @@ namespace gazebo
       public: virtual void SetCustomNoiseCallback(
           boost::function<double(double)> _cb);
 
-/*      /// \brief Accessor for mean.
-      /// \return Mean of Gaussian noise.
-      public: double GetMean() const;
-
-      /// \brief Accessor for stddev.
-      /// \return Standard deviation of Gaussian noise.
-      public: double GetStdDev() const;
-
-      /// \brief Accessor for bias.
-      /// \return Bias on output.
-      public: double GetBias() const;*/
-
       /// \brief sdf data.
       private: sdf::ElementPtr sdf;
 
       /// \brief Which type of noise we're applying
       private: NoiseType type;
 
-     // template <typename Type>
+      /// \brief Noise model that will be applied to input data.
+      private: NoiseModel *noiseModel;
+
       /// \brief Apply noise to sensor data.
       /// \param[in] _subscriber Event callback.
       private: boost::function<double(double)> customNoiseCallback;
-
-/*      /// \brief If type starts with GAUSSIAN, the mean of the distribution
-      /// from which we sample when adding noise.
-      private: double mean;
-
-      /// \brief If type starts with GAUSSIAN, the standard deviation of the
-      /// distribution from which we sample when adding noise.
-      private: double stdDev;
-
-      /// \brief If type starts with GAUSSIAN, the bias we'll add.
-      private: double bias;
-
-      /// \brief If type==GAUSSIAN_QUANTIZED, the precision to which
-      /// the output signal is rounded.
-      private: double precision;*/
-      private: NoiseModel *noiseModel;
     };
     /// \}
   }

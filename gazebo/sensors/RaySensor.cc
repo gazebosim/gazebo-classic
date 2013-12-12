@@ -38,6 +38,7 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
+#include "gazebo/sensors/Noise.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -48,11 +49,13 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor(sensors::RAY)
 {
+  this->noise = NULL;
 }
 
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
+  delete this->noise;
 }
 
 //////////////////////////////////////////////////
@@ -104,20 +107,9 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->noiseActive = true;
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
-        " and stddev " << this->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+    this->noiseActive = true;
+    this->noise = new Noise();
+    this->noise->Load(rayElem->GetElement("noise"));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -476,7 +468,9 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 
       if (this->noiseActive)
       {
-        switch (this->noiseType)
+        range = this->noise->Apply(range);
+        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        /*switch (this->noiseType)
         {
           case GAUSSIAN:
             // Add independent (uncorrelated) Gaussian noise to each beam.
@@ -488,7 +482,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
             break;
           default:
             GZ_ASSERT(false, "Invalid noise model type");
-        }
+        }*/
       }
       scan->add_ranges(range);
       scan->add_intensities(intensity);

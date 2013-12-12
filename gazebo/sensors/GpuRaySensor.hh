@@ -34,6 +34,8 @@
 
 namespace gazebo
 {
+  class Noise;
+
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace
   namespace sensors
@@ -301,26 +303,11 @@ namespace gazebo
       /// \brief Publisher to publish ray sensor data
       private: transport::PublisherPtr scanPub;
 
-      // Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
       // If true, apply the noise model specified by other noise parameters
       private: bool noiseActive;
 
-      // Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
-      // from which we sample
-      private: double noiseMean;
-
-      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
-      // the distibution from which we sample
-      private: double noiseStdDev;
+      /// \brief Noise applied to input data.
+      private: Noise *noise;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

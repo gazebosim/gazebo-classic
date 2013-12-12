@@ -31,13 +31,15 @@ using namespace sensors;
 //////////////////////////////////////////////////
 Noise::Noise()
   : type(NONE),
-    noiseModel(NULL)
+    noiseModel(NULL),
+    customNoiseCallback(NULL)
 {
 }
 
 //////////////////////////////////////////////////
 Noise::~Noise()
 {
+  delete this->noiseModel;
 }
 
 //////////////////////////////////////////////////
@@ -134,8 +136,12 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   this->mean = _sdf->Get<double>("mean");
   this->stdDev = _sdf->Get<double>("stddev");
   // Sample the bias
-  double biasMean = _sdf->Get<double>("bias_mean");
-  double biasStdDev = _sdf->Get<double>("bias_stddev");
+  double biasMean = 0;
+  double biasStdDev = 0;
+  if (_sdf->HasElement("bias_mean"))
+    biasMean = _sdf->Get<double>("bias_mean");
+  if (_sdf->HasElement("bias_stddev"))
+    biasStdDev = _sdf->Get<double>("bias_stddev");
   this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
   // With equal probability, we pick a negative bias (by convention,
   // rateBiasMean should be positive, though it would work fine if
