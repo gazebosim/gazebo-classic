@@ -476,8 +476,8 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   // shadow camera setup
 
-  // issue #925 workaround for gazebo 1.9 branch. DO NOT merge back to newer
-  // gazebo versions as there is a better fix in place (pull request #867).
+  // issue #925 workaround for gazebo 1.9 branch. DO NOT merge back to
+  // gazebo 3.0 as there is a better fix in place (pull request #867).
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
   double shadowFarDistance = 200;
