@@ -35,10 +35,9 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
-#include "gazebo/sensors/Noise.hh"
-
 
 using namespace gazebo;
 using namespace sensors;
@@ -54,13 +53,11 @@ GpuRaySensor::GpuRaySensor()
   this->connections.push_back(
       event::Events::ConnectRender(
         boost::bind(&GpuRaySensor::Render, this)));
-  this->noise = NULL;
 }
 
 //////////////////////////////////////////////////
 GpuRaySensor::~GpuRaySensor()
 {
-  delete this->noise;
 }
 
 //////////////////////////////////////////////////

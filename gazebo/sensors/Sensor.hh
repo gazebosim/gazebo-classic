@@ -42,6 +42,8 @@ namespace gazebo
 {
   namespace sensors
   {
+    class Noise;
+
     /// \brief SensorClass is used to categorize sensors. This is used to
     /// put sensors into different threads.
     enum SensorCategory
@@ -258,6 +260,12 @@ namespace gazebo
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
+
+      /// \brief Noise added to sensor data
+      protected: Noise *noise;
+
+      /// \brief If true, apply the noise model specified by noise parameters.
+      protected: bool noiseActive;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

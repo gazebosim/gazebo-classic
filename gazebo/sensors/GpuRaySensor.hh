@@ -34,8 +34,6 @@
 
 namespace gazebo
 {
-  class Noise;
-
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace
   namespace sensors
@@ -302,12 +300,6 @@ namespace gazebo
 
       /// \brief Publisher to publish ray sensor data
       private: transport::PublisherPtr scanPub;
-
-      // If true, apply the noise model specified by other noise parameters
-      private: bool noiseActive;
-
-      /// \brief Noise applied to input data.
-      private: Noise *noise;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

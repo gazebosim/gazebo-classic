@@ -50,13 +50,11 @@ CameraSensor::CameraSensor()
   this->connections.push_back(
       event::Events::ConnectRender(
         boost::bind(&CameraSensor::Render, this)));
-  this->noise = NULL;
 }
 
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-  delete this->noise;
 }
 
 //////////////////////////////////////////////////
@@ -182,11 +180,6 @@ void CameraSensor::Fini()
 
   this->camera.reset();
   this->scene.reset();
-
-  if (this->noise)
-  {
-    this->noise->Fini();
-  }
 }
 
 //////////////////////////////////////////////////

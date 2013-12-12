@@ -35,6 +35,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -64,6 +65,9 @@ Sensor::Sensor(SensorCategory _cat)
   this->updatePeriod = common::Time(0.0);
 
   this->id = physics::getUniqueId();
+
+  this->noise = NULL;
+  this->noiseActive = false;
 }
 
 //////////////////////////////////////////////////
@@ -77,6 +81,8 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
+
+  delete this->noise;
 }
 
 //////////////////////////////////////////////////
@@ -230,6 +236,9 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  if (this->noise)
+    this->noise->Fini();
+
   this->active = false;
   this->plugins.clear();
 }

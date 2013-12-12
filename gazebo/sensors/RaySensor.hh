@@ -35,7 +35,6 @@ namespace gazebo
   class OgreDynamicLines;
   class Collision;
   class MultiRayShape;
-  class Noise;
 
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace
@@ -177,12 +176,6 @@ namespace gazebo
       private: transport::PublisherPtr scanPub;
       private: boost::mutex mutex;
       private: msgs::LaserScanStamped laserMsg;
-
-      // If true, apply the noise model specified by other noise parameters
-      private: bool noiseActive;
-
-      /// \brief Noise applied to input data.
-      private: Noise *noise;
     };
     /// \}
   }

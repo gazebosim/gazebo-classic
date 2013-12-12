@@ -49,13 +49,11 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor(sensors::RAY)
 {
-  this->noise = NULL;
 }
 
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
-  delete this->noise;
 }
 
 //////////////////////////////////////////////////
@@ -103,7 +101,6 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserShape->Init();
 
   // Handle noise model settings.
-  this->noiseActive = false;
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {

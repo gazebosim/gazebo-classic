@@ -10,6 +10,7 @@ set (sources
   ImuSensor.cc
   MultiCameraSensor.cc
   Noise.cc
+  NoiseModel.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -33,6 +34,7 @@ set (headers
   ImuSensor.hh
   MultiCameraSensor.hh
   Noise.hh
+  NoiseModel.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
