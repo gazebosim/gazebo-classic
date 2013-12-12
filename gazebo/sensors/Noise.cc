@@ -31,10 +31,7 @@ using namespace sensors;
 //////////////////////////////////////////////////
 Noise::Noise()
   : type(NONE),
-    mean(0.0),
-    stdDev(0.0),
-    bias(0.0),
-    precision(0.0)
+    noiseModel(NULL)
 {
 }
 
@@ -55,6 +52,8 @@ void Noise::Load(sdf::ElementPtr _sdf)
     this->type = GAUSSIAN;
   else if (typeString == "gaussian_quantized")
     this->type = GAUSSIAN_QUANTIZED;
+  else if (typeString == "custom")
+    this->type = CUSTOM;
   else
   {
     gzerr << "Unrecognized noise type: [" << typeString << "]"
@@ -65,47 +64,20 @@ void Noise::Load(sdf::ElementPtr _sdf)
   if (this->type == GAUSSIAN ||
       this->type == GAUSSIAN_QUANTIZED)
   {
-    this->mean = this->sdf->Get<double>("mean");
-    this->stdDev = this->sdf->Get<double>("stddev");
-    // Sample the bias
-    double biasMean = this->sdf->Get<double>("bias_mean");
-    double biasStdDev = this->sdf->Get<double>("bias_stddev");
-    this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
-    // With equal probability, we pick a negative bias (by convention,
-    // rateBiasMean should be positive, though it would work fine if
-    // negative).
-    if (math::Rand::GetDblUniform() < 0.5)
-      this->bias = -this->bias;
-    gzlog << "applying Gaussian noise model with mean " << this->mean
-      << ", stddev " << this->stdDev
-      << ", bias " << this->bias << std::endl;
+    this->noiseModel = new GaussianNoiseModel();
+    this->noiseModel->Load(this->sdf);
   }
-
-  if (this->type == GAUSSIAN_QUANTIZED)
-    this->precision = this->sdf->Get<double>("precision");
 }
 
 //////////////////////////////////////////////////
 double Noise::Apply(double _in) const
 {
-  double output = 0.0;
   if (this->type == NONE)
-    output = _in;
-  else if (this->type == GAUSSIAN ||
-           this->type == GAUSSIAN_QUANTIZED)
-  {
-    double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
-    output = _in + this->bias + whiteNoise;
-    if (this->type == GAUSSIAN_QUANTIZED)
-    {
-      // Apply this->precision
-      if (!math::equal(this->precision, 0.0, 1e-6))
-      {
-        output = boost::math::round(output / this->precision) * this->precision;
-      }
-    }
-  }
-  return output;
+    return _in;
+  else if (this->type == CUSTOM)
+    return this->customNoiseCallback(_in);
+  else
+    return this->noiseModel->Apply(_in);
 }
 
 //////////////////////////////////////////////////
@@ -115,19 +87,106 @@ Noise::NoiseType Noise::GetNoiseType() const
 }
 
 //////////////////////////////////////////////////
-double Noise::GetMean() const
+void Noise::SetCustomNoiseCallback(
+    boost::function<double(double)> _cb)
+
+{
+  this->customNoiseCallback = _cb;
+}
+
+
+//////////////////////////////////////////////////
+NoiseModel *Noise::GetNoiseModel() const
+{
+  return this->noiseModel;
+}
+
+
+//////////////////////////////////////////////////
+NoiseModel::NoiseModel()
+{
+}
+
+//////////////////////////////////////////////////
+void NoiseModel::Load(sdf::ElementPtr /*_sdf*/)
+{
+}
+
+//////////////////////////////////////////////////
+double NoiseModel::Apply(double _in) const
+{
+  return _in;
+}
+
+//////////////////////////////////////////////////
+GaussianNoiseModel::GaussianNoiseModel()
+  : NoiseModel(),
+    mean(0.0),
+    stdDev(0.0),
+    bias(0.0),
+    precision(0.0)
+{
+}
+
+//////////////////////////////////////////////////
+void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
+{
+  this->mean = _sdf->Get<double>("mean");
+  this->stdDev = _sdf->Get<double>("stddev");
+  // Sample the bias
+  double biasMean = _sdf->Get<double>("bias_mean");
+  double biasStdDev = _sdf->Get<double>("bias_stddev");
+  this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
+  // With equal probability, we pick a negative bias (by convention,
+  // rateBiasMean should be positive, though it would work fine if
+  // negative).
+  if (math::Rand::GetDblUniform() < 0.5)
+    this->bias = -this->bias;
+  gzlog << "applying Gaussian noise model with mean " << this->mean
+    << ", stddev " << this->stdDev
+    << ", bias " << this->bias << std::endl;
+
+  this->quantized = false;
+  if (_sdf->HasElement("precision"))
+  {
+    this->precision = _sdf->Get<double>("precision");
+    this->quantized = true;
+  }
+}
+
+//////////////////////////////////////////////////
+double GaussianNoiseModel::Apply(double _in) const
+{
+  double output = 0.0;
+
+  double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
+  output = _in + this->bias + whiteNoise;
+  if (this->quantized)
+  {
+    // Apply this->precision
+    if (!math::equal(this->precision, 0.0, 1e-6))
+    {
+      output = boost::math::round(output / this->precision) * this->precision;
+    }
+  }
+
+  return output;
+}
+
+//////////////////////////////////////////////////
+double GaussianNoiseModel::GetMean() const
 {
   return this->mean;
 }
 
 //////////////////////////////////////////////////
-double Noise::GetStdDev() const
+double GaussianNoiseModel::GetStdDev() const
 {
   return this->stdDev;
 }
 
 //////////////////////////////////////////////////
-double Noise::GetBias() const
+double GaussianNoiseModel::GetBias() const
 {
   return this->bias;
 }

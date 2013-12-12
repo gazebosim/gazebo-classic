@@ -113,6 +113,11 @@ void NoNoise(const sensors::Noise &_noise, unsigned int _count)
 // Helper function for testing Gaussian noise
 void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
 {
+  sensors::GaussianNoiseModel *noiseModel =
+      dynamic_cast<sensors::GaussianNoiseModel *>(_noise.GetNoiseModel());
+
+  ASSERT_TRUE(noiseModel);
+
   // Use constant input and repeatedly add noise to it.
   double x = 42.0;
 
@@ -131,8 +136,8 @@ void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
   // stddev / sqrt(_count)
   // https://onlinecourses.science.psu.edu/stat414/node/167
   // We will use 5 sigma (4e-5 chance of failure)
-  double mean = _noise.GetMean() + _noise.GetBias();
-  double stddev = _noise.GetStdDev();
+  double mean = noiseModel->GetMean() + noiseModel->GetBias();
+  double stddev = noiseModel->GetStdDev();
   double sampleStdDev = g_sigma*stddev / sqrt(_count);
   EXPECT_NEAR(boost::accumulators::mean(acc), x+mean, sampleStdDev);
 
@@ -181,7 +186,9 @@ TEST(NoiseTest, ApplyGaussian)
   {
     sensors::Noise noise;
     noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
+    sensors::GaussianNoiseModel *noiseModel =
+        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+    EXPECT_NEAR(noiseModel->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(noise, g_applyCount);
   }
@@ -212,8 +219,9 @@ TEST(NoiseTest, ApplyGaussian)
     {
       sensors::Noise noise;
       noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-
-      acc(noise.GetBias());
+      sensors::GaussianNoiseModel *noiseModel =
+          dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+      acc(noiseModel->GetBias());
     }
 
     // See comments in GaussianNoise function to explain these calculations.
@@ -257,7 +265,9 @@ TEST(NoiseTest, ApplyGaussianQuantized)
     sensors::Noise noise;
     noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
                         biasStddev, precision));
-    EXPECT_NEAR(noise.GetBias(), 0.0, 1e-6);
+    sensors::GaussianNoiseModel *noiseModel =
+        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+    EXPECT_NEAR(noiseModel->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(noise, g_applyCount);
   }
@@ -293,8 +303,9 @@ TEST(NoiseTest, ApplyGaussianQuantized)
       sensors::Noise noise;
       noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
                           biasStddev, precision));
-
-      acc(noise.GetBias());
+    sensors::GaussianNoiseModel *noiseModel =
+        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+      acc(noiseModel->GetBias());
     }
 
     // See comments in GaussianNoise function to explain these calculations.
