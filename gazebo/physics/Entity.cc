@@ -69,8 +69,6 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
   // TODO: put this back in
   // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
@@ -144,7 +142,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
@@ -276,7 +274,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; ++iter)
+            iter != this->children.end(); ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -310,7 +308,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   // update all children pose, moving them with the model.
   // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->childrenEnd; ++iter)
+      iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
@@ -422,7 +420,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(LINK))
       {
@@ -438,7 +436,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (this->IsStatic())
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
