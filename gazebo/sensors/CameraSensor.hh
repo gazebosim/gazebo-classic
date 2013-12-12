@@ -33,6 +33,8 @@ namespace gazebo
 {
   namespace sensors
   {
+    class Noise;
+
     /// \addtogroup gazebo_sensors Sensors
     /// \{
 
@@ -111,6 +113,9 @@ namespace gazebo
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;
+
+      /// \brief Noise added to camera image data.
+      private: Noise *noise;
     };
     /// \}
   }

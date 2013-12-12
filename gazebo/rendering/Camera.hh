@@ -63,7 +63,6 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class GaussianNoiseCompositorListener;
     class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering

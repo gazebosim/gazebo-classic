@@ -23,8 +23,14 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+
 namespace gazebo
 {
+
+  class GaussianNoiseCompositorListener;
+
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
@@ -32,9 +38,20 @@ namespace gazebo
 
     class NoiseModel
     {
+      /// \brief Constructor.
       public: NoiseModel();
+
+      /// \brief Load noise model with SDF parameters.
+      /// \param[in] _sdf SDF Noise model parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Apply noise model to a single input value.
+      /// \param[in] _in Input value.
+      /// \return Data with noise added.
       public: virtual double Apply(double _in) const;
+
+      /// \brief Finalize noise model.
+      public: virtual void Fini();
     };
 
     class GaussianNoiseModel : public NoiseModel
@@ -42,10 +59,17 @@ namespace gazebo
         /// \brief Constructor.
         public: GaussianNoiseModel();
 
-        /// \brief Apply noise to single input datum.
-        public: double Apply(double _in) const;
+        /// \brief Destructor.
+        public: virtual ~GaussianNoiseModel();
 
-        public: void Load(sdf::ElementPtr _sdf);
+        // Documentation inherited.
+        public: virtual void Load(sdf::ElementPtr _sdf);
+
+        // Documentation inherited.
+        public: virtual void Fini();
+
+        // Documentation inherited.
+        public: double Apply(double _in) const;
 
         /// \brief Accessor for mean.
         /// \return Mean of Gaussian noise.
@@ -61,21 +85,50 @@ namespace gazebo
 
         /// \brief If type starts with GAUSSIAN, the mean of the distribution
         /// from which we sample when adding noise.
-        private: double mean;
+        protected: double mean;
 
         /// \brief If type starts with GAUSSIAN, the standard deviation of the
         /// distribution from which we sample when adding noise.
-        private: double stdDev;
+        protected: double stdDev;
 
         /// \brief If type starts with GAUSSIAN, the bias we'll add.
-        private: double bias;
+        protected: double bias;
 
         /// \brief If type==GAUSSIAN_QUANTIZED, the precision to which
         /// the output signal is rounded.
-        private: double precision;
+        protected: double precision;
 
         /// \brief True if the type is GAUSSIAN_QUANTIZED
-        private: bool quantized;
+        protected: bool quantized;
+    };
+
+    class ImageGaussianNoiseModel : public GaussianNoiseModel
+    {
+      /// \brief Constructor.
+      public: ImageGaussianNoiseModel();
+
+        /// \brief Destructor.
+        public: virtual ~ImageGaussianNoiseModel();
+
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Fini();
+
+      /// \brief Set which camera to apply the noise to.
+      /// \param[in] _camera Rendering camera
+      public: virtual void Init(rendering::Camera *_camera);
+
+      /// \brief Gaussian noise compositor
+      public: Ogre::CompositorInstance *gaussianNoiseInstance;
+
+      /// \brief Gaussian noise compositor listener
+      public: boost::shared_ptr<GaussianNoiseCompositorListener>
+        gaussianNoiseCompositorListener;
+
+      /// \brief Camera to which the noise is applied
+      private: rendering::Camera *camera;
     };
 
     /// \class Noise Noise.hh sensors/sensors.hh
@@ -97,14 +150,19 @@ namespace gazebo
       /// \brief Destructor.
       public: ~Noise();
 
-      /// \brief Load parameters from sdf.
+      /// \brief Load noise parameters from sdf.
       /// \param[in] _sdf SDF parameters.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _sensor Type of sensor.
+      public: void Load(sdf::ElementPtr _sdf,
+          const std::string &_sensorType = "");
 
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
       public: double Apply(double _in) const;
+
+      /// \brief Finalize the noise model
+      public: void Fini();
 
       /// \brief Accessor for NoiseType.
       /// \return Type of noise currently in use.

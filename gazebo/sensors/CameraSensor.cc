@@ -35,6 +35,7 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -49,11 +50,13 @@ CameraSensor::CameraSensor()
   this->connections.push_back(
       event::Events::ConnectRender(
         boost::bind(&CameraSensor::Render, this)));
+  this->noise = NULL;
 }
 
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
+  delete this->noise;
 }
 
 //////////////////////////////////////////////////
@@ -78,6 +81,15 @@ void CameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->GetTopic(), 50);
+
+
+ // Handle noise model settings.
+  sdf::ElementPtr cameraElem = this->sdf->GetElement("camera");
+  if (cameraElem->HasElement("noise"))
+  {
+    this->noise = new Noise();
+    this->noise->Load(cameraElem->GetElement("noise"), this->GetType());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -135,6 +147,15 @@ void CameraSensor::Init()
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
+
+    if (this->noise)
+    {
+      ImageGaussianNoiseModel *noiseModel =
+          dynamic_cast<ImageGaussianNoiseModel *>(this->noise->GetNoiseModel());
+
+      GZ_ASSERT(noiseModel, "ImageGaussianNoiseModel is NULL");
+      noiseModel->Init(this->camera.get());
+    }
   }
   else
     gzerr << "No world name\n";
@@ -161,6 +182,11 @@ void CameraSensor::Fini()
 
   this->camera.reset();
   this->scene.reset();
+
+  if (this->noise)
+  {
+    this->noise->Fini();
+  }
 }
 
 //////////////////////////////////////////////////
