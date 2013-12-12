@@ -107,8 +107,8 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->noiseActive = false;
   if (rayElem->HasElement("noise"))
   {
-    this->noise = new Noise();
-    this->noise->Load(rayElem->GetElement("noise"));
+    this->noise = NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);

@@ -23,7 +23,7 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/NoiseModel.hh"
 
 namespace gazebo
 {
@@ -76,30 +76,10 @@ class GaussianNoiseCompositorListener
 using namespace gazebo;
 using namespace sensors;
 
-//////////////////////////////////////////////////
-NoiseModel::NoiseModel()
-{
-}
-
-//////////////////////////////////////////////////
-void NoiseModel::Load(sdf::ElementPtr /*_sdf*/)
-{
-}
-
-//////////////////////////////////////////////////
-void NoiseModel::Fini()
-{
-}
-
-//////////////////////////////////////////////////
-double NoiseModel::Apply(double _in) const
-{
-  return _in;
-}
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::GaussianNoiseModel()
-  : NoiseModel(),
+  : Noise(),
     mean(0.0),
     stdDev(0.0),
     bias(0.0),
@@ -117,6 +97,8 @@ GaussianNoiseModel::~GaussianNoiseModel()
 //////////////////////////////////////////////////
 void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 {
+  Noise::Load(_sdf);
+
   this->mean = _sdf->Get<double>("mean");
   this->stdDev = _sdf->Get<double>("stddev");
   // Sample the bias
@@ -149,7 +131,7 @@ void GaussianNoiseModel::Fini()
 }
 
 //////////////////////////////////////////////////
-double GaussianNoiseModel::Apply(double _in) const
+double GaussianNoiseModel::ApplyImpl(double _in) const
 {
   double output = 0.0;
 

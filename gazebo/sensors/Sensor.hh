@@ -31,6 +31,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
@@ -42,8 +43,6 @@ namespace gazebo
 {
   namespace sensors
   {
-    class Noise;
-
     /// \brief SensorClass is used to categorize sensors. This is used to
     /// put sensors into different threads.
     enum SensorCategory
@@ -262,7 +261,7 @@ namespace gazebo
       protected: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      protected: Noise *noise;
+      protected: NoisePtr noise;
 
       /// \brief If true, apply the noise model specified by noise parameters.
       protected: bool noiseActive;

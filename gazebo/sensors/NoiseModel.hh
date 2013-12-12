@@ -26,38 +26,17 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/sensors/Noise.hh"
+
 namespace gazebo
 {
   class GaussianNoiseCompositorListener;
 
   namespace sensors
   {
-    /// \addtogroup gazebo_sensors
-    /// \{
-
-    /// \class NoiseModel
-    /// \brief Base noise model class
-    class NoiseModel
-    {
-      /// \brief Constructor.
-      public: NoiseModel();
-
-      /// \brief Load noise model with SDF parameters.
-      /// \param[in] _sdf SDF Noise model parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
-
-      /// \brief Apply noise model to a single input value.
-      /// \param[in] _in Input value.
-      /// \return Data with noise added.
-      public: virtual double Apply(double _in) const;
-
-      /// \brief Finalize noise model.
-      public: virtual void Fini();
-    };
-
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class
-    class GaussianNoiseModel : public NoiseModel
+    class GaussianNoiseModel : public Noise
     {
         /// \brief Constructor.
         public: GaussianNoiseModel();
@@ -72,7 +51,7 @@ namespace gazebo
         public: virtual void Fini();
 
         // Documentation inherited.
-        public: double Apply(double _in) const;
+        public: double ApplyImpl(double _in) const;
 
         /// \brief Accessor for mean.
         /// \return Mean of Gaussian noise.

@@ -17,15 +17,58 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/sensors/NoiseModel.hh"
 #include "gazebo/sensors/Noise.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
+NoisePtr NoiseManager::LoadNoiseModel(sdf::ElementPtr _sdf,
+    const std::string &_sensorType)
+{
+  GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");
+  std::string typeString = _sdf->Get<std::string>("type");
+/*  if (typeString == "none")
+    this->type = NONE;
+  else if (typeString == "gaussian")
+    this->type = GAUSSIAN;
+  else if (typeString == "gaussian_quantized")
+    this->type = GAUSSIAN_QUANTIZED;
+  else if (typeString == "custom")
+    this->type = CUSTOM;
+  else
+  {
+    gzerr << "Unrecognized noise type: [" << typeString << "]"
+          << ", using default [none]" << std::endl;
+    this->type = NONE;
+  }*/
+
+  NoisePtr noise;
+  if (typeString == "gaussian" ||
+      typeString == "gaussian_quantized")
+  {
+    if (_sensorType == "camera" || _sensorType == "depth" ||
+      _sensorType == "multicamera")
+    {
+      noise.reset(new ImageGaussianNoiseModel());
+    }
+    else
+      noise.reset(new GaussianNoiseModel());
+
+    noise->Load(_sdf);
+  }
+  else
+  {
+    gzerr << "Unrecognized noise type: [" << typeString << "]"
+          << ", using default [none]" << std::endl;
+  }
+  return noise;
+}
+
+//////////////////////////////////////////////////
 Noise::Noise()
   : type(NONE),
-    noiseModel(NULL),
     customNoiseCallback(NULL)
 {
 }
@@ -33,11 +76,10 @@ Noise::Noise()
 //////////////////////////////////////////////////
 Noise::~Noise()
 {
-  delete this->noiseModel;
 }
 
 //////////////////////////////////////////////////
-void Noise::Load(sdf::ElementPtr _sdf, const std::string &_sensorType)
+void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
@@ -56,20 +98,6 @@ void Noise::Load(sdf::ElementPtr _sdf, const std::string &_sensorType)
           << ", using default [none]" << std::endl;
     this->type = NONE;
   }
-
-  if (this->type == GAUSSIAN ||
-      this->type == GAUSSIAN_QUANTIZED)
-  {
-    if (_sensorType == "camera" || _sensorType == "depth" ||
-      _sensorType == "multicamera")
-    {
-      this->noiseModel = new ImageGaussianNoiseModel();
-    }
-    else
-      this->noiseModel = new GaussianNoiseModel();
-
-    this->noiseModel->Load(this->sdf);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -80,7 +108,13 @@ double Noise::Apply(double _in) const
   else if (this->type == CUSTOM)
     return this->customNoiseCallback(_in);
   else
-    return this->noiseModel->Apply(_in);
+    return this->ApplyImpl(_in);
+}
+
+//////////////////////////////////////////////////
+double Noise::ApplyImpl(double _in) const
+{
+  return _in;
 }
 
 //////////////////////////////////////////////////
@@ -100,12 +134,5 @@ void Noise::SetCustomNoiseCallback(
 //////////////////////////////////////////////////
 void Noise::Fini()
 {
-  if (this->noiseModel)
-    this->noiseModel->Fini();
-}
-
-//////////////////////////////////////////////////
-NoiseModel *Noise::GetNoiseModel() const
-{
-  return this->noiseModel;
+  this->customNoiseCallback = NULL;
 }

@@ -23,17 +23,20 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/sensors/NoiseModel.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
 {
-
-  class GaussianNoiseCompositorListener;
-
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
+    class NoiseManager
+    {
+      public: static NoisePtr LoadNoiseModel(sdf::ElementPtr _sdf,
+          const std::string &_sensorType = "");
+    };
 
     /// \class Noise Noise.hh sensors/sensors.hh
     /// \brief Noise models for sensor output signals.
@@ -57,16 +60,21 @@ namespace gazebo
       /// \brief Load noise parameters from sdf.
       /// \param[in] _sdf SDF parameters.
       /// \param[in] _sensor Type of sensor.
-      public: void Load(sdf::ElementPtr _sdf,
-          const std::string &_sensorType = "");
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
       public: double Apply(double _in) const;
 
+      /// \brief Apply noise to input data value. This gets overriden by
+      /// derived classes, and called by Apply.
+      /// \param[in] _in Input data value.
+      /// \return Data with noise applied.
+      public: virtual double ApplyImpl(double _in) const;
+
       /// \brief Finalize the noise model
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Accessor for NoiseType.
       /// \return Type of noise currently in use.
@@ -74,7 +82,7 @@ namespace gazebo
 
       /// \brief Accessor for NoiseModel.
       /// \return Noise model currently in use.
-      public: NoiseModel *GetNoiseModel() const;
+      //public: NoiseModel *GetNoiseModel() const;
 
       /// \brief Set noise callback
       /// \param[in] Register a callback for applying a custom noise model.
@@ -90,7 +98,7 @@ namespace gazebo
       private: NoiseType type;
 
       /// \brief Noise model that will be applied to input data.
-      private: NoiseModel *noiseModel;
+      //private: NoiseModel *noiseModel;
 
       /// \brief Apply noise to sensor data.
       /// \param[in] _subscriber Event callback.

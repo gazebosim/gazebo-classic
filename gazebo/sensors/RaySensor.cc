@@ -105,8 +105,8 @@ void RaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     this->noiseActive = true;
-    this->noise = new Noise();
-    this->noise->Load(rayElem->GetElement("noise"));
+    this->noise = NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);

@@ -111,10 +111,10 @@ void NoNoise(const sensors::Noise &_noise, unsigned int _count)
 
 //////////////////////////////////////////////////
 // Helper function for testing Gaussian noise
-void GaussianNoise(const sensors::Noise &_noise, unsigned int _count)
+void GaussianNoise(sensors::Noise &_noise, unsigned int _count)
 {
   sensors::GaussianNoiseModel *noiseModel =
-      dynamic_cast<sensors::GaussianNoiseModel *>(_noise.GetNoiseModel());
+      dynamic_cast<sensors::GaussianNoiseModel *>(&_noise);
 
   ASSERT_TRUE(noiseModel);
 
@@ -184,13 +184,11 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 0.0;
   biasStddev = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
-    sensors::GaussianNoiseModel *noiseModel =
-        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
-    EXPECT_NEAR(noiseModel->GetBias(), 0.0, 1e-6);
+    sensors::GaussianNoiseModel *noise = new sensors::GaussianNoiseModel();
+    noise->Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+    EXPECT_NEAR(noise->GetBias(), 0.0, 1e-6);
 
-    GaussianNoise(noise, g_applyCount);
+    GaussianNoise(*noise, g_applyCount);
   }
 
   // GAUSSIAN with non-zero mean, exact bias, and standard deviations
@@ -199,10 +197,10 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 100.0;
   biasStddev = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+        NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
 
-    GaussianNoise(noise, g_applyCount);
+    GaussianNoise(*(noise.get()), g_applyCount);
   }
 
   // Test bias generation
@@ -217,10 +215,10 @@ TEST(NoiseTest, ApplyGaussian)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::Noise noise;
-      noise.Load(NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
+      sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+          NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
       sensors::GaussianNoiseModel *noiseModel =
-          dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+          dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
       acc(noiseModel->GetBias());
     }
 
@@ -247,11 +245,11 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
-    NoNoise(noise, g_applyCount);
+    NoNoise(*noise.get(), g_applyCount);
   }
 
   // GAUSSIAN_QUANTIZED with non-zero means and standard deviations,
@@ -262,14 +260,14 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
     sensors::GaussianNoiseModel *noiseModel =
-        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+        dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
     EXPECT_NEAR(noiseModel->GetBias(), 0.0, 1e-6);
 
-    GaussianNoise(noise, g_applyCount);
+    GaussianNoise(*noise.get(), g_applyCount);
   }
 
   // GAUSSIAN with non-zero mean, exact bias, and standard deviations
@@ -280,11 +278,11 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
-    GaussianNoise(noise, g_applyCount);
+    GaussianNoise(*noise.get(), g_applyCount);
   }
 
   // Test bias generation
@@ -300,11 +298,11 @@ TEST(NoiseTest, ApplyGaussianQuantized)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::Noise noise;
-      noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                          biasStddev, precision));
-    sensors::GaussianNoiseModel *noiseModel =
-        dynamic_cast<sensors::GaussianNoiseModel *>(noise.GetNoiseModel());
+      sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+          NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+          biasStddev, precision));
+      sensors::GaussianNoiseModel *noiseModel =
+          dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
       acc(noiseModel->GetBias());
     }
 
@@ -325,21 +323,21 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.3;
   {
-    sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
-                        biasStddev, precision));
+    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        biasStddev, precision));
 
-    EXPECT_NEAR(noise.Apply(0.32), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.31), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.30), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.29), 0.3, 1e-6);
-    EXPECT_NEAR(noise.Apply(0.28), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.32), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.31), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.30), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.29), 0.3, 1e-6);
+    EXPECT_NEAR(noise->Apply(0.28), 0.3, 1e-6);
 
-    EXPECT_NEAR(noise.Apply(-12.92), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.91), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.90), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.89), -12.9, 1e-6);
-    EXPECT_NEAR(noise.Apply(-12.88), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.92), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.91), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.90), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.89), -12.9, 1e-6);
+    EXPECT_NEAR(noise->Apply(-12.88), -12.9, 1e-6);
   }
 }
 

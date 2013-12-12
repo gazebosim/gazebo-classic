@@ -66,7 +66,7 @@ Sensor::Sensor(SensorCategory _cat)
 
   this->id = physics::getUniqueId();
 
-  this->noise = NULL;
+  this->noise.reset();
   this->noiseActive = false;
 }
 
@@ -82,7 +82,7 @@ Sensor::~Sensor()
   this->sdf.reset();
   this->connections.clear();
 
-  delete this->noise;
+  this->noise.reset();
 }
 
 //////////////////////////////////////////////////

@@ -35,7 +35,9 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/NoiseModel.hh"
 #include "gazebo/sensors/Noise.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
@@ -85,8 +87,8 @@ void CameraSensor::Load(const std::string &_worldName)
   sdf::ElementPtr cameraElem = this->sdf->GetElement("camera");
   if (cameraElem->HasElement("noise"))
   {
-    this->noise = new Noise();
-    this->noise->Load(cameraElem->GetElement("noise"), this->GetType());
+    this->noise = NoiseManager::LoadNoiseModel(cameraElem->GetElement("noise"),
+        this->GetType());
   }
 }
 
@@ -149,7 +151,7 @@ void CameraSensor::Init()
     if (this->noise)
     {
       ImageGaussianNoiseModel *noiseModel =
-          dynamic_cast<ImageGaussianNoiseModel *>(this->noise->GetNoiseModel());
+          dynamic_cast<ImageGaussianNoiseModel *>(this->noise.get());
 
       GZ_ASSERT(noiseModel, "ImageGaussianNoiseModel is NULL");
       noiseModel->Init(this->camera.get());
