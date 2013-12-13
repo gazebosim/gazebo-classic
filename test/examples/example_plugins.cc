@@ -18,7 +18,22 @@
 #include <stdio.h>
 
 const std::string cmakeSourceDir = CMAKE_SOURCE_DIR;
+const std::string helloWorldPath = "examples/plugins/hello_world";
 const std::string worldEditPath = "examples/plugins/world_edit";
+
+///////////////////////////////////////////////////////////////////
+// This test verifies that the HelloWorld plugin builds successfully
+// It doesn't try to execute the plugin.
+TEST(ExamplePlugins, HelloWorld)
+{
+  char cmd[1024];
+
+  snprintf(cmd, sizeof(cmd), "cmake %s",
+    std::string(cmakeSourceDir + '/' + helloWorldPath).c_str());
+  ASSERT_EQ(system(cmd), 0);
+  snprintf(cmd, sizeof(cmd), "make");
+  ASSERT_EQ(system(cmd), 0);
+}
 
 ///////////////////////////////////////////////////////////////////
 // This test verifies that the WorldEdit plugin builds successfully
