@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Ray Plugin
- * Author: Nate Koenig mod by John Hsu
- */
 
-#ifndef _GAZEBO_RAY_PLUGIN_HH_
-#define _GAZEBO_RAY_PLUGIN_HH_
+#ifndef _GAZEBO_RAY_SENSOR_NOISE_PLUGIN_HH_
+#define _GAZEBO_RAY_SENSOR_NOISE_PLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"
@@ -29,30 +25,30 @@
 
 namespace gazebo
 {
-  /// \brief A Ray Sensor Plugin
-  class RayPlugin : public SensorPlugin
+  /// \brief A Ray Sensor Noise Plugin
+  class RaySensorNoisePlugin : public SensorPlugin
   {
     /// \brief Constructor
-    public: RayPlugin();
+    public: RaySensorNoisePlugin();
 
     /// \brief Destructor
-    public: virtual ~RayPlugin();
+    public: virtual ~RaySensorNoisePlugin();
 
-    /// \brief Update callback
-    public: virtual void OnNewLaserScans();
+    /// \brief Callback for applying noise to a single sensor beam.
+    /// \param[in] _in Input range value.
+    /// \return Range value with noise added.
+    public: virtual double OnApplyNoise(double _in);
 
     /// \brief Load the plugin
-    /// \param take in SDF root element
+    /// \param[in] _parent Parent sensor
+    /// \param[in] _sdf Parent sensor's sdf element.
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
-
-    /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
 
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
-    private: event::ConnectionPtr newLaserScansConnection;
+    /// \brief Fixed noise added to each sensor range value.
+    private: double fixedNoise;
   };
 }
 #endif

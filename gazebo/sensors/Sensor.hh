@@ -208,6 +208,10 @@ namespace gazebo
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
 
+      /// \brief Get the sensor's noise model.
+      /// \return The sensor's noise model.
+      public: NoisePtr GetNoise() const;
+
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
       protected: bool NeedsUpdate();
@@ -262,9 +266,6 @@ namespace gazebo
 
       /// \brief Noise added to sensor data
       protected: NoisePtr noise;
-
-      /// \brief If true, apply the noise model specified by noise parameters.
-      protected: bool noiseActive;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

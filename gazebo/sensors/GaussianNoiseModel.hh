@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_NOISE_MODEL_HH_
-#define _GAZEBO_NOISE_MODEL_HH_
+#ifndef _GAZEBO_GAUSSIAN_NOISE_MODEL_HH_
+#define _GAZEBO_GAUSSIAN_NOISE_MODEL_HH_
 
 #include <vector>
 #include <string>

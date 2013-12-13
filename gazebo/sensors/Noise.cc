@@ -17,7 +17,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/sensors/NoiseModel.hh"
+
+#include "gazebo/sensors/GaussianNoiseModel.hh"
 #include "gazebo/sensors/Noise.hh"
 
 using namespace gazebo;
@@ -29,20 +30,6 @@ NoisePtr NoiseManager::LoadNoiseModel(sdf::ElementPtr _sdf,
 {
   GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");
   std::string typeString = _sdf->Get<std::string>("type");
-/*  if (typeString == "none")
-    this->type = NONE;
-  else if (typeString == "gaussian")
-    this->type = GAUSSIAN;
-  else if (typeString == "gaussian_quantized")
-    this->type = GAUSSIAN_QUANTIZED;
-  else if (typeString == "custom")
-    this->type = CUSTOM;
-  else
-  {
-    gzerr << "Unrecognized noise type: [" << typeString << "]"
-          << ", using default [none]" << std::endl;
-    this->type = NONE;
-  }*/
 
   NoisePtr noise;
   if (typeString == "gaussian" ||
@@ -55,14 +42,13 @@ NoisePtr NoiseManager::LoadNoiseModel(sdf::ElementPtr _sdf,
     }
     else
       noise.reset(new GaussianNoiseModel());
-
-    noise->Load(_sdf);
   }
   else
   {
-    gzerr << "Unrecognized noise type: [" << typeString << "]"
-          << ", using default [none]" << std::endl;
+    noise.reset(new Noise());
   }
+  noise->Load(_sdf);
+
   return noise;
 }
 
@@ -103,6 +89,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 double Noise::Apply(double _in) const
 {
+  gzerr <<  "tyhpe " << this->type << std::endl;;
   if (this->type == NONE)
     return _in;
   else if (this->type == CUSTOM)
@@ -128,6 +115,7 @@ void Noise::SetCustomNoiseCallback(
     boost::function<double(double)> _cb)
 
 {
+  this->type = CUSTOM;
   this->customNoiseCallback = _cb;
 }
 

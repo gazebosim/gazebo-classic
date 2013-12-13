@@ -15,7 +15,6 @@
  *
 */
 
-
 #include <boost/math/special_functions/round.hpp>
 
 #include "gazebo/common/Assert.hh"
@@ -23,54 +22,53 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/sensors/NoiseModel.hh"
+#include "gazebo/sensors/GaussianNoiseModel.hh"
 
 namespace gazebo
 {
-
-// We'll create an instance of this class for each camera, to be used to inject
-// random values on each render call.
-class GaussianNoiseCompositorListener
-  : public Ogre::CompositorInstance::Listener
-{
-  /// \brief Constructor, setting mean and standard deviation.
-  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
-      mean(_mean), stddev(_stddev) {}
-
-  /// \brief Callback that OGRE will invoke for us on each render call
-  public: virtual void notifyMaterialRender(unsigned int _pass_id,
-                                            Ogre::MaterialPtr & _mat)
+  // We'll create an instance of this class for each camera, to be used to
+  // inject random values on each render call.
+  class GaussianNoiseCompositorListener
+    : public Ogre::CompositorInstance::Listener
   {
-    // modify material here (wont alter the base material!), called for
-    // every drawn geometry instance (i.e. compositor render_quad)
+    /// \brief Constructor, setting mean and standard deviation.
+    public: GaussianNoiseCompositorListener(double _mean, double _stddev):
+        mean(_mean), stddev(_stddev) {}
 
-    // Sample three values within the range [0,1.0] and set them for use in
-    // the fragment shader, which will interpret them as offsets from (0,0)
-    // to use when computing pseudo-random values.
-    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0));
-    // These calls are setting parameters that are declared in two places:
-    // 1. media/materials/scripts/gazebo.material, in
-    //    fragment_program Gazebo/GaussianCameraNoiseFS
-    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("offsets", offsets);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("mean", (Ogre::Real)this->mean);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("stddev", (Ogre::Real)this->stddev);
-  }
+    /// \brief Callback that OGRE will invoke for us on each render call
+    public: virtual void notifyMaterialRender(unsigned int _pass_id,
+                                              Ogre::MaterialPtr & _mat)
+    {
+      // modify material here (wont alter the base material!), called for
+      // every drawn geometry instance (i.e. compositor render_quad)
 
-  /// \brief Mean that we'll pass down to the GLSL fragment shader.
-  private: double mean;
-  /// \brief Standard deviation that we'll pass down to the GLSL fragment
-  /// shader.
-  private: double stddev;
-};
+      // Sample three values within the range [0,1.0] and set them for use in
+      // the fragment shader, which will interpret them as offsets from (0,0)
+      // to use when computing pseudo-random values.
+      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
+                            math::Rand::GetDblUniform(0.0, 1.0),
+                            math::Rand::GetDblUniform(0.0, 1.0));
+      // These calls are setting parameters that are declared in two places:
+      // 1. media/materials/scripts/gazebo.material, in
+      //    fragment_program Gazebo/GaussianCameraNoiseFS
+      // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
+      _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->
+        setNamedConstant("offsets", offsets);
+      _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->
+        setNamedConstant("mean", (Ogre::Real)this->mean);
+      _mat->getTechnique(0)->getPass(_pass_id)->
+        getFragmentProgramParameters()->
+        setNamedConstant("stddev", (Ogre::Real)this->stddev);
+    }
+
+    /// \brief Mean that we'll pass down to the GLSL fragment shader.
+    private: double mean;
+    /// \brief Standard deviation that we'll pass down to the GLSL fragment
+    /// shader.
+    private: double stddev;
+  };
 }  // namespace gazebo
 
 using namespace gazebo;
@@ -92,7 +90,6 @@ GaussianNoiseModel::GaussianNoiseModel()
 GaussianNoiseModel::~GaussianNoiseModel()
 {
 }
-
 
 //////////////////////////////////////////////////
 void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
@@ -135,6 +132,7 @@ double GaussianNoiseModel::ApplyImpl(double _in) const
 {
   double output = 0.0;
 
+  // Add independent (uncorrelated) Gaussian noise to each input value.
   double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
   output = _in + this->bias + whiteNoise;
   if (this->quantized)
@@ -145,7 +143,6 @@ double GaussianNoiseModel::ApplyImpl(double _in) const
       output = boost::math::round(output / this->precision) * this->precision;
     }
   }
-
   return output;
 }
 

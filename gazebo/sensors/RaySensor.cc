@@ -104,7 +104,6 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noiseActive = true;
     this->noise = NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
         this->GetType());
   }
@@ -463,24 +462,12 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
-      if (this->noiseActive)
+      if (this->noise)
       {
         range = this->noise->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
-        /*switch (this->noiseType)
-        {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range +=
-                math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range =
-                math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
-        }*/
       }
+
       scan->add_ranges(range);
       scan->add_intensities(intensity);
     }

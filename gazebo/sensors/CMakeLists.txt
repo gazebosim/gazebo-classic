@@ -5,12 +5,12 @@ set (sources
   ContactSensor.cc
   DepthCameraSensor.cc
   ForceTorqueSensor.cc
+  GaussianNoiseModel.cc
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
   Noise.cc
-  NoiseModel.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -29,12 +29,12 @@ set (headers
   ContactSensor.hh
   DepthCameraSensor.hh
   ForceTorqueSensor.hh
+  GaussianNoiseModel.hh
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
   Noise.hh
-  NoiseModel.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh

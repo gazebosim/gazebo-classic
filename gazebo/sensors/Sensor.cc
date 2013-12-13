@@ -67,7 +67,6 @@ Sensor::Sensor(SensorCategory _cat)
   this->id = physics::getUniqueId();
 
   this->noise.reset();
-  this->noiseActive = false;
 }
 
 //////////////////////////////////////////////////
@@ -382,6 +381,12 @@ std::string Sensor::GetWorldName() const
 SensorCategory Sensor::GetCategory() const
 {
   return this->category;
+}
+
+//////////////////////////////////////////////////
+NoisePtr Sensor::GetNoise() const
+{
+  return this->noise;
 }
 
 //////////////////////////////////////////////////
