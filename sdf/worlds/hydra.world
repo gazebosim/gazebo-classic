@@ -38,6 +38,7 @@
     <static>true</static>
     <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
     <link name="link">
+      <!--
       <visual name="visual">
         <geometry>
           <box>
@@ -45,6 +46,7 @@
           </box>
         </geometry>
       </visual>
+-->
     </link>
   </model>
 

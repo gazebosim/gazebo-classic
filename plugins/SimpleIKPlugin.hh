@@ -54,7 +54,7 @@ namespace gazebo
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
-    private: physics::ModelPtr goalModel;
+    private: physics::LinkPtr goalModel;
 
     private: boost::mutex update_mutex;
 
@@ -78,6 +78,7 @@ namespace gazebo
     private: double vels[6];
 
     private: bool restart;
+    private: KDL::ChainIkSolverPos_LMA *iksolverPos;
   };
 }
 #endif

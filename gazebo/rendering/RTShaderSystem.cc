@@ -478,7 +478,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   if (!this->pssmSetup)
     this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 200;
+  double shadowFarDistance = 300;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 

@@ -27,9 +27,24 @@
     </physics>
 
     <!--A global light source -->
-    <include>
-      <uri>model://sun</uri>
-    </include>
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+
+      <direction>0.5 0.1 -0.9</direction>
+    </light>
+
+
 
     <!-- A ground plane -->
     <include>
@@ -83,22 +98,17 @@
       </link>
     </model>
 
-    <model name="debris">
-      <static>false</static>
-      <pose>1 0 0.3 0 0 -1.5707</pose>
+   <include>
+     <name>2x4_3</name>
+     <uri>model://drc_practice_2x4</uri>
+     <pose>1.7 0 0.93 1.57 0 -1.5707</pose>
+   </include>
 
-      <include>
-        <name>2x4_3</name>
-        <uri>model://drc_practice_2x4</uri>
-        <pose>0.0 0.76 0.63 1.57 0 0</pose>
-      </include>
-
-      <include>
-        <name>2x4_4</name>
-        <uri>model://drc_practice_2x4</uri>
-        <pose>0.0 0.35 0.63 1.57 0 0</pose>
-      </include>
-    </model>
+   <include>
+     <name>2x4_4</name>
+     <uri>model://drc_practice_2x4</uri>
+     <pose>1.35 0 0.93 1.57 0 -1.5707</pose>
+   </include>
 
     <include>
       <uri>model://atlas</uri>
@@ -115,29 +125,56 @@
       <pose>-5.688061 -0.096423 0 0 0 -1.570796</pose>
     </include>
 
-    <model name="right_arm_goal">
-      <static>true</static>
-      <pose>0.013 -.294 0.622 1.5707 0 3.1415</pose>
-      <link name="link">
-      </link>
-    </model>
+    <include>
+      <uri>model://bin</uri>
+      <pose>1 4 1 0 0 0</pose>
+    </include>
 
-    <model name="left_arm_goal">
-      <static>true</static>
-      <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
-      <link name="link">
-      </link>
-    </model>
+    <include>
+      <uri>model://bin</uri>
+      <pose>1 -4 1 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://table</uri>
+      <pose>-1.820696 -4.330842 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://cordless_drill</uri>
+      <pose>-1.538798 -4.15959 1.0  0 0 3.1415</pose>
+    </include>
+
+    <include>
+      <uri>model://table</uri>
+      <pose>-1.820696 4.330842 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://coke_can</uri>
+      <pose>-1.538798 4.15959 1.0  0 0 3.1415</pose>
+    </include>
 
     <model name="dolly">
-      <pose>0 0 0 0 0 0</pose>
+      <static>false</static>
+      <pose>0 0 2 0 0 0</pose>
       <link name="link">
-        <visual name="visual">
+        <gravity>false</gravity>
+        <collision name="collision">
           <geometry>
-            <box><size>1 1 0.2</size></box>
+            <box><size>1 1 0.1</size></box>
           </geometry>
-        </visual>
+        </collision>
       </link>
+      <joint name="world_joint" type="revolute">
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0</upper>
+            <lower>0</lower>
+          </limit>
+        </axis>
+      </joint>
     </model>
 
   </world>

@@ -32,6 +32,7 @@ GZ_REGISTER_MODEL_PLUGIN(AtlasPlugin)
 AtlasPlugin::AtlasPlugin()
 {
   this->activated = false;
+  this->yaw = 0;
 }
 
 /////////////////////////////////////////////////
@@ -48,94 +49,59 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
     return;
   }
 
+  math::Pose rightPose = msgs::Convert(_msg->right().pose());
+  math::Pose leftPose = msgs::Convert(_msg->left().pose());
+
   if (!this->activated)
   {
+
     if (_msg->right().button_bumper() && _msg->left().button_bumper())
+    {
       this->activated = true;
+      this->resetPoseRight = rightPose;
+      this->resetPoseLeft = leftPose;
+    }
     else
       return;
   }
 
   math::Pose rightAdjust, leftAdjust;
 
-  rightAdjust = this->rightModel->GetWorldPose();
-  leftAdjust = this->leftModel->GetWorldPose();
+  rightAdjust = math::Pose(rightPose.pos - this->resetPoseRight.pos +
+      this->basePoseRight.pos,
+      rightPose.rot * this->resetPoseRight.rot.GetInverse() *
+      this->basePoseRight.rot);
 
-  //if (_msg->right().button_bumper())
-  {
-    math::Pose rightPose = msgs::Convert(_msg->right().pose());
-
-    if (this->rightBumper != _msg->right().button_bumper())
-    {
-      this->resetPoseRight = rightPose;
-    }
-
-    rightAdjust = math::Pose(rightPose.pos - this->resetPoseRight.pos +
-        this->basePoseRight.pos,
-        rightPose.rot * this->resetPoseRight.rot.GetInverse() *
-        this->basePoseRight.rot);
-  }
-  /*else
-  {
-    this->basePoseRight = rightAdjust;
-  }
-
-  if (_msg->left().button_bumper())
-  */
-  {
-    math::Pose leftPose = msgs::Convert(_msg->left().pose());
-
-    if (this->leftBumper != _msg->left().button_bumper())
-    {
-      this->resetPoseLeft = leftPose;
-    }
-
-    leftAdjust = math::Pose(leftPose.pos - this->resetPoseLeft.pos +
-          this->basePoseLeft.pos,
-          leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
-          this->basePoseLeft.rot);
-  }
-  /*else
-  {
-    this->basePoseLeft = leftAdjust;
-  }*/
+  leftAdjust = math::Pose(leftPose.pos - this->resetPoseLeft.pos +
+      this->basePoseLeft.pos,
+      leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
+      this->basePoseLeft.rot);
 
   this->SetRightFingers(_msg->right().trigger()*1.5707);
   this->SetLeftFingers(_msg->left().trigger()*1.5707);
 
-  /*
-  if (_msg->right().button_1())
-    this->SetRightFingers(1.5707);
-  else if (_msg->right().button_2())
-    this->SetRightFingers(0);
-  else if (_msg->right().button_4())
-    this->SetRightFingers(-1.5707);
 
-  if (_msg->left().button_1())
-    this->SetLeftFingers(0);
-  else if (_msg->left().button_2())
-    this->SetLeftFingers(1.5707);
-  else if (_msg->left().button_3())
-    this->SetLeftFingers(-1.5707);
-  */
+  double rx = _msg->right().joy_x() * .002;
+  double ry = _msg->right().joy_y() * -.002;
 
 
-  double dx = _msg->right().joy_x() * 0.002;
-  double dy = _msg->right().joy_y() * -0.002;
+  this->yaw += _msg->left().joy_y() * -.002;
+  double dx = rx * cos(this->yaw) + ry*sin(this->yaw*-1);
+  double dy = rx * sin(this->yaw) + ry*cos(this->yaw*-1);
+  math::Pose dPose(dx, dy, 0, 0, 0, _msg->left().joy_y() * -.002);
 
-  math::Pose dPose(dx, dy, 0, 0, 0, 0);
-  this->pinJoint->Detach();
-  this->model->SetWorldPose(this->model->GetWorldPose() + dPose);
-  this->pinJoint->Attach(this->pinLink, this->model->GetLink("utorso"));
+  math::Vector3 rpy = this->dolly->GetWorldPose().rot.GetAsEuler();
+  rpy.z = yaw;
 
-  rightAdjust += dPose;
-  leftAdjust += dPose;
+  this->dollyPinJoint->Detach();
+  math::Vector3 dollyPos = this->dolly->GetWorldPose().pos + dPose.pos;
+  dollyPos.z = this->dollyStartPose.pos.z;
+  this->dolly->SetWorldPose(math::Pose(dollyPos, math::Quaternion(rpy)));
 
-  this->rightModel->SetWorldPose(rightAdjust);
-  this->leftModel->SetWorldPose(leftAdjust);
+  this->dollyPinJoint->Attach(physics::LinkPtr(), this->dolly->GetLink("link"));
 
-  this->basePoseRight += dPose;
-  this->basePoseLeft += dPose;
+  this->rightModel->SetRelativePose(rightAdjust);
+  this->leftModel->SetRelativePose(leftAdjust);
 
   this->rightBumper = _msg->right().button_bumper();
   this->leftBumper = _msg->left().button_bumper();
@@ -143,17 +109,20 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
 
 void AtlasPlugin::Restart()
 {
-  this->rightModel->SetWorldPose(this->rightStartPose);
-  this->leftModel->SetWorldPose(this->leftStartPose);
+  this->rightModel->SetRelativePose(this->rightStartPose);
+  this->leftModel->SetRelativePose(this->leftStartPose);
   this->basePoseRight = this->rightStartPose;
   this->basePoseLeft = this->leftStartPose;
   this->rightBumper = false;
   this->leftBumper = false;
   this->activated = false;
+  this->yaw = 0;
+  this->prevModelPose = this->modelStartPose;
+  this->pelvisTarget = this->pelvisStartPose;
 
-  this->pinJoint->Detach();
-  this->model->SetWorldPose(this->modelStartPose);
-  this->pinJoint->Attach(physics::LinkPtr(), this->model->GetLink("utorso"));
+  this->dollyPinJoint->Detach();
+  this->dolly->SetWorldPose(this->dollyStartPose);
+  this->dollyPinJoint->Attach(physics::LinkPtr(), this->dolly->GetLink("link"));
 
   this->world->Reset();
 }
@@ -197,15 +166,19 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->model = _parent;
   this->world = this->model->GetWorld();
 
-  this->dolly = this->world->GetModel("dolly");
+  this->rightModel = this->model->GetLink("right_arm_goal_link");
+  this->leftModel = this->model->GetLink("left_arm_goal_link");
 
-  this->rightModel = this->world->GetModel("right_arm_goal");
-  this->leftModel = this->world->GetModel("left_arm_goal");
+  if (!this->rightModel)
+    gzerr << "Unable to get right arm goal link\n";
+
+  if (!this->leftModel)
+    gzerr << "Unable to get left arm goal link\n";
 
   math::Quaternion modelRot = this->model->GetWorldPose().rot;
 
-  this->basePoseRight = this->rightModel->GetWorldPose();
-  this->basePoseLeft = this->leftModel->GetWorldPose();
+  this->basePoseRight = this->rightModel->GetRelativePose();
+  this->basePoseLeft = this->leftModel->GetRelativePose();
 
   this->rightStartPose = this->basePoseRight;
   this->leftStartPose = this->basePoseLeft;
@@ -226,22 +199,25 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     std::string pinModelStr =_sdf->Get<std::string>("pin_model");
     std::string pinLinkStr =_sdf->Get<std::string>("pin_link");
 
-    physics::ModelPtr pinModel = this->world->GetModel(pinModelStr);
+    this->dolly = this->world->GetModel(pinModelStr);
+    this->dollyStartPose = this->dolly->GetWorldPose();
 
-    if (!pinModel)
+    if (!this->dolly)
       gzerr << "Unable to get pin model[" << pinModelStr << "]\n";
     else
     {
-      this->pinLink = pinModel->GetLink(pinLinkStr);
+      this->pinLink = this->dolly->GetLink(pinLinkStr);
 
       if (!this->pinLink)
         gzerr << "Unable to get pin link[" << pinLinkStr << "]\n";
     }
+
+    this->dollyPinJoint = this->dolly->GetJoint("world_joint");
   }
 
   this->pinJoint->SetModel(this->model);
 
-  this->pinJoint->Load(this->pinLink, this->model->GetLink("utorso"),
+  this->pinJoint->Load(this->pinLink, this->model->GetLink("pelvis"),
       math::Pose());
   this->pinJoint->SetUpperLimit(0,0);
   this->pinJoint->SetLowerLimit(0,0);
@@ -296,11 +272,51 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->rightBumper = false;
   this->leftBumper = false;
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  /*this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&AtlasPlugin::Update, this, _1));
+
+  this->model->GetLink("pelvis")->SetForce(math::Vector3(0, 0, 9.8));
+  this->xPosPID.Init(1, 0, .10);
+  this->yPosPID.Init(1, 0, .10);
+  this->zPosPID.Init(10000, 0, 10);
+
+  this->rollPID.Init(100, 0, 1);
+  this->pitchPID.Init(100, 0, 1);
+  this->yawPID.Init(50, 0, .1);
+
+  this->pelvisTarget = this->model->GetLink("pelvis")->GetWorldPose();
+  this->pelvisStartPose = this->pelvisTarget;
+
+  this->prevModelPose = this->model->GetWorldPose();
+  */
 }
 
 /////////////////////////////////////////////////
-void AtlasPlugin::Update(const common::UpdateInfo & /*_info*/)
+void AtlasPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
+  math::Pose currentModelPose = this->model->GetWorldPose();
+
+  math::Pose pelvisCurrent = this->model->GetLink("pelvis")->GetWorldPose();
+  math::Vector3 rpy = pelvisCurrent.rot.GetAsEuler();
+  math::Vector3 targetRPY = this->pelvisTarget.rot.GetAsEuler();
+
+  math::Vector3 err = pelvisCurrent.pos - this->pelvisTarget.pos;
+  math::Vector3 rpyErr = math::Vector3(rpy.x, rpy.y, rpy.z - targetRPY.z);
+  math::Vector3 force, torque;
+
+  force.x = this->xPosPID.Update(err.x, common::Time(0, 100000));
+  force.y = this->yPosPID.Update(err.y, common::Time(0, 100000));
+  force.z = this->zPosPID.Update(err.z, common::Time(0, 100000));
+
+  torque.x = this->rollPID.Update(rpyErr.x, common::Time(0, 100000));
+  torque.y = this->pitchPID.Update(rpyErr.y, common::Time(0, 100000));
+  torque.z = this->yawPID.Update(rpyErr.z, common::Time(0, 100000));
+
+  /*std::cout << "Err[" << rpyErr << "] Torque[" << torque << "]\n";
+
+  this->model->GetLink("pelvis")->SetForce(force);
+  this->model->GetLink("pelvis")->SetTorque(torque);
+  */
+
+  this->prevModelPose = this->model->GetWorldPose();
 }

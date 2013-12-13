@@ -84,7 +84,7 @@ namespace gazebo
 
     private: bool rightBumper, leftBumper;
 
-    private: physics::ModelPtr rightModel, leftModel;
+    private: physics::LinkPtr rightModel, leftModel;
 
     private: math::Pose rightStartPose;
     private: math::Pose leftStartPose;
@@ -99,6 +99,16 @@ namespace gazebo
     private: physics::LinkPtr pinLink;
 
     private: physics::ModelPtr dolly;
+    private: physics::JointPtr dollyPinJoint;
+
+    private: common::PID xPosPID, yPosPID, zPosPID;
+    private: common::PID rollPID, pitchPID, yawPID;
+    private: math::Pose pelvisTarget, pelvisStartPose;
+    private: math::Pose prevModelPose;
+
+    private: math::Pose dollyStartPose;
+    private: double yaw;
+
   };
 }
 #endif
