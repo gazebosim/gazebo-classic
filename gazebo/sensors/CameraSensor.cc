@@ -81,14 +81,6 @@ void CameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->GetTopic(), 50);
-
-  // Handle noise model settings.
-  sdf::ElementPtr cameraElem = this->sdf->GetElement("camera");
-  if (cameraElem->HasElement("noise"))
-  {
-    this->noise = NoiseManager::LoadNoiseModel(cameraElem->GetElement("noise"),
-        this->GetType());
-  }
 }
 
 //////////////////////////////////////////////////
@@ -147,13 +139,13 @@ void CameraSensor::Init()
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
 
-    if (this->noise)
+    if (cameraSdf->HasElement("noise"))
     {
-      ImageGaussianNoiseModel *noiseModel =
-          dynamic_cast<ImageGaussianNoiseModel *>(this->noise.get());
-
-      GZ_ASSERT(noiseModel, "ImageGaussianNoiseModel is NULL");
-      noiseModel->Init(this->camera);
+      NoisePtr noise =
+          NoiseManager::LoadNoiseModel(cameraSdf->GetElement("noise"),
+        this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(this->camera);
     }
   }
   else

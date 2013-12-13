@@ -100,9 +100,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Set which camera to apply the noise to.
-      /// \param[in] _camera Rendering camera
-      public: virtual void Init(rendering::CameraPtr _camera);
+      // Documentation inherited.
+      public: virtual void SetCamera(rendering::CameraPtr _camera);
 
       /// \brief Gaussian noise compositor.
       public: Ogre::CompositorInstance *gaussianNoiseInstance;

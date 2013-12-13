@@ -209,8 +209,10 @@ namespace gazebo
       public: uint32_t GetParentId() const;
 
       /// \brief Get the sensor's noise model.
+      /// \param[in] _index Index of the noise model. For most sensors this
+      /// will be 0. For a multi camera sensor the index can be >=0.
       /// \return The sensor's noise model.
-      public: NoisePtr GetNoise() const;
+      public: NoisePtr GetNoise(unsigned int _index = 0) const;
 
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
@@ -265,7 +267,7 @@ namespace gazebo
       protected: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      protected: NoisePtr noise;
+      protected: std::vector<NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

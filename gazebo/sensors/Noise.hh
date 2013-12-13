@@ -23,6 +23,7 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
@@ -95,6 +96,12 @@ namespace gazebo
       /// sensor plugin.
       public: virtual void SetCustomNoiseCallback(
           boost::function<double (double)> _cb);
+
+      /// \brief Set camera needed to create image noise. This is only needed
+      /// for image sensors, i.e. camera/multicamera/depth sensors, which use
+      /// shaders for more efficient noise generation.
+      /// \param[in] _camera Camera associated to an image sensor
+      public: virtual void SetCamera(rendering::CameraPtr _camera);
 
       /// \brief Noise sdf element.
       private: sdf::ElementPtr sdf;

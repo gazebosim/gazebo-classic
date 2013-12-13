@@ -51,7 +51,7 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
   }
   else
   {
-    gzerr << "No noise found. Please add noise element to you ray sensor sdf "
+    gzwarn << "No noise found. Please add noise element to you ray sensor sdf "
         << "and set noise type to \"custom\"" << std::endl;
   }
 }

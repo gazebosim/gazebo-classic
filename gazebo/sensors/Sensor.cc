@@ -65,8 +65,6 @@ Sensor::Sensor(SensorCategory _cat)
   this->updatePeriod = common::Time(0.0);
 
   this->id = physics::getUniqueId();
-
-  this->noise.reset();
 }
 
 //////////////////////////////////////////////////
@@ -81,7 +79,8 @@ Sensor::~Sensor()
   this->sdf.reset();
   this->connections.clear();
 
-  this->noise.reset();
+  for (unsigned int i = 0; i < this->noises.size(); ++i)
+    this->noises[i].reset();
 }
 
 //////////////////////////////////////////////////
@@ -235,8 +234,8 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  if (this->noise)
-    this->noise->Fini();
+  for (unsigned int i= 0; i < this->noises.size(); ++i)
+    this->noises[i]->Fini();
 
   this->active = false;
   this->plugins.clear();
@@ -384,9 +383,14 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise() const
+NoisePtr Sensor::GetNoise(unsigned int _index) const
 {
-  return this->noise;
+  if (_index >= this->noises.size())
+  {
+    gzerr << "Get noise index out of range" << std::endl;
+    return NoisePtr();
+  }
+  return this->noises[_index];
 }
 
 //////////////////////////////////////////////////

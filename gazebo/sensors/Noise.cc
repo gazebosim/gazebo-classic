@@ -87,6 +87,12 @@ void Noise::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
+{
+  gzerr << "Ignoring SetCamera: Not attached to an image sensor" << std::endl;
+}
+
+//////////////////////////////////////////////////
 double Noise::Apply(double _in) const
 {
   if (this->type == NONE)

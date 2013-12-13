@@ -104,8 +104,9 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noise = NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
-        this->GetType());
+    this->noises.push_back(
+        NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
+        this->GetType()));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -462,9 +463,9 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
-      if (this->noise)
+      if (!this->noises.empty())
       {
-        range = this->noise->Apply(range);
+        range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

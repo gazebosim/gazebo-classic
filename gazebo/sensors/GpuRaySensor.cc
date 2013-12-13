@@ -106,8 +106,9 @@ void GpuRaySensor::Load(const std::string &_worldName)
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
-    this->noise = NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
-        this->GetType());
+    this->noises.push_back(
+        NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
+        this->GetType()));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -593,9 +594,9 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       int index = j * this->GetRayCount() + i;
       double range = this->laserCam->GetLaserData()[index * 3];
 
-      if (this->noise)
+      if (!this->noises.empty())
       {
-        range = this->noise->Apply(range);
+        range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

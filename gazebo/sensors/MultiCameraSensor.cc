@@ -28,6 +28,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
@@ -138,6 +139,20 @@ void MultiCameraSensor::Init()
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
+
+    // Handle noise model settings.
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseManager::LoadNoiseModel(cameraSdf->GetElement("noise"),
+          this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(camera);
+    }
+    else
+    {
+      this->noises.push_back(NoisePtr(new Noise()));
+    }
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);

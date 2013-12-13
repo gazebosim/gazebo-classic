@@ -124,6 +124,7 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void GaussianNoiseModel::Fini()
 {
+  Noise::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -181,7 +182,7 @@ void ImageGaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ImageGaussianNoiseModel::Init(rendering::CameraPtr _camera)
+void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 {
   GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
 
@@ -192,7 +193,6 @@ void ImageGaussianNoiseModel::Init(rendering::CameraPtr _camera)
     Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->GetViewport(), "CameraNoise/Gaussian");
   this->gaussianNoiseInstance->setEnabled(true);
-  // gaussianNoiseCompositorListener was allocated in Load()
   this->gaussianNoiseInstance->addListener(
     this->gaussianNoiseCompositorListener.get());
 }
@@ -200,6 +200,7 @@ void ImageGaussianNoiseModel::Init(rendering::CameraPtr _camera)
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::Fini()
 {
+  GaussianNoiseModel::Fini();
   if (this->gaussianNoiseCompositorListener)
   {
     this->gaussianNoiseInstance->removeListener(
