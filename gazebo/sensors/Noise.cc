@@ -92,7 +92,17 @@ double Noise::Apply(double _in) const
   if (this->type == NONE)
     return _in;
   else if (this->type == CUSTOM)
-    return this->customNoiseCallback(_in);
+  {
+    if (this->customNoiseCallback)
+      return this->customNoiseCallback(_in);
+    else
+    {
+      gzerr << "Custom noise callback function not set!"
+          << " Please call SetCustomNoiseCallback within a sensor plugin."
+          << std::endl;
+      return _in;
+    }
+  }
   else
     return this->ApplyImpl(_in);
 }
