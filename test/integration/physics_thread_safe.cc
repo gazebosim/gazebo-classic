@@ -58,11 +58,14 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   world->SetPaused(false);
 
   // Run for 20 seconds of sim time
-  while (world->GetSimTime().sec < 20)
+  while (world->GetSimTime().sec < 5)
   {
     // Call these functions repeatedly
     // Test passes if it doesn't abort early
     math::Vector3 vel = link->GetWorldLinearVel();
+    vel += link->GetWorldLinearVel(math::Vector3());
+    vel += link->GetWorldLinearVel(math::Vector3(), math::Quaternion());
+    vel += link->GetWorldCoGLinearVel();
     vel += link->GetWorldAngularVel();
   }
 }
