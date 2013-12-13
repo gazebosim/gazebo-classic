@@ -26,7 +26,8 @@ GZ_REGISTER_SENSOR_PLUGIN(RaySensorNoisePlugin)
 /////////////////////////////////////////////////
 RaySensorNoisePlugin::RaySensorNoisePlugin()
 {
-  this->fixedNoise = 0.2;
+  this->fixedNoiseRate = 0.005;
+  this->sign = 1;
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +65,6 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
 double RaySensorNoisePlugin::OnApplyNoise(double _in)
 {
   // Apply alternating noise.
-  this->fixedNoise *= -1;
-  return this->fixedNoise + _in;
+  this->sign *= -1;
+  return _in + this->sign*this->fixedNoiseRate*_in;
 }

@@ -89,7 +89,6 @@ void Noise::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 double Noise::Apply(double _in) const
 {
-  gzerr <<  "tyhpe " << this->type << std::endl;;
   if (this->type == NONE)
     return _in;
   else if (this->type == CUSTOM)

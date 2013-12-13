@@ -47,8 +47,11 @@ namespace gazebo
     /// \brief The parent sensor
     private: sensors::RaySensorPtr parentSensor;
 
-    /// \brief Fixed noise added to each sensor range value.
-    private: double fixedNoise;
+    /// \brief Apply fixed noise rate to each sensor beam.
+    private: double fixedNoiseRate;
+
+    /// \brief Sign of the noise value.
+    private: int sign;
   };
 }
 #endif
