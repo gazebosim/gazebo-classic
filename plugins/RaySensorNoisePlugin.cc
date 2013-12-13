@@ -33,7 +33,6 @@ RaySensorNoisePlugin::RaySensorNoisePlugin()
 /////////////////////////////////////////////////
 RaySensorNoisePlugin::~RaySensorNoisePlugin()
 {
-  this->parentSensor.reset();
 }
 
 /////////////////////////////////////////////////

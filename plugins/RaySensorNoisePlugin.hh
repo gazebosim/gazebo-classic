@@ -44,9 +44,6 @@ namespace gazebo
     /// \param[in] _sdf Parent sensor's sdf element.
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
-    /// \brief The parent sensor
-    private: sensors::RaySensorPtr parentSensor;
-
     /// \brief Apply fixed noise rate to each sensor beam.
     private: double fixedNoiseRate;
 
