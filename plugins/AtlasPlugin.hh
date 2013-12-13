@@ -64,6 +64,7 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr hydraSub;
+    private: transport::PublisherPtr worldControlPub;
 
     private: boost::mutex update_mutex;
 

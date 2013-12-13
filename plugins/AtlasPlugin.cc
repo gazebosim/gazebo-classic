@@ -71,7 +71,11 @@ void AtlasPlugin::Restart()
   this->dolly->SetWorldPose(this->dollyStartPose);
   this->dollyPinJoint->Attach(physics::LinkPtr(), this->dolly->GetLink("link"));
 
-  this->world->Reset();
+  msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(true);
+  this->worldControlPub->Publish(msg);
+
+  //this->world->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -135,6 +139,9 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->node->Init(this->world->GetName());
   this->hydraSub = this->node->Subscribe("~/hydra",
       &AtlasPlugin::OnHydra, this);
+
+  this->worldControlPub =
+    this->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->jointController = this->model->GetJointController();
 

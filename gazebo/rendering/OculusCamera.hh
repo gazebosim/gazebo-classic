@@ -190,6 +190,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual unsigned int GetImageHeight() const;
 
+      /// \brief Reset the Oculus Rift sensor orientation.
+      public: void ResetSensor();
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -220,6 +223,10 @@ namespace gazebo
       /// camera. Currently disabled.
       private: void ShowVisual(bool _show);
 
+      /// \brief Receive world control messages. Used to reset the oculus
+      /// sensor.
+      private: void OnControl(ConstWorldControlPtr &_data);
+
       /// \brief Callback used when the camera has finished moving to
       /// a visual.
       private: void OnMoveToVisualComplete();
@@ -239,6 +246,9 @@ namespace gazebo
       private: OVR::SensorDevice *sensor;
       private: OVR::SensorFusion *sensorFusion;
       private: float centerOffset;
+
+      private: transport::NodePtr node;
+      private: transport::SubscriberPtr controlSub;
     };
     /// \}
   }

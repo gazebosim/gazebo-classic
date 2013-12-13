@@ -111,6 +111,12 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   this->sensorFusion->SetPredictionEnabled(true);
 
   gzlog << "Oculus: Oculus setup completed successfully\n";
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->controlSub = this->node->Subscribe("~/world_control",
+                                           &OculusCamera::OnControl, this);
 }
 
 //////////////////////////////////////////////////
@@ -123,6 +129,16 @@ OculusCamera::~OculusCamera()
 void OculusCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
+
+}
+
+//////////////////////////////////////////////////
+void OculusCamera::OnControl(ConstWorldControlPtr &_data)
+{
+  if (_data->has_reset() && _data->reset().has_all() && _data->reset().all())
+  {
+    this->ResetSensor();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -197,11 +213,12 @@ void OculusCamera::Update()
 
   // Set the orientation, and correct for the oculus coordinate system
   this->SetWorldRotation(quat);
-/*
-  math::Vector3 right = Conversions::Convert(this->rightCamera->getDerivedPosition());
-  math::Vector3 left = Conversions::Convert(this->camera->getDerivedPosition());
-  std::cout << "Left[" << left << "] Right[" << right << "]\n";
-  */
+}
+
+//////////////////////////////////////////////////
+void OculusCamera::ResetSensor()
+{
+  this->sensorFusion->Reset();
 }
 
 //////////////////////////////////////////////////
@@ -636,7 +653,6 @@ void OculusCamera::Oculus()
 /////////////////////////////////////////////////
 void OculusCamera::AdjustAspect(double _v)
 {
-  std::cout << "SetAspect[" << _v << "]\n";
   Ogre::Camera *cam;
   for(int i=0;i<2;++i)
   {
