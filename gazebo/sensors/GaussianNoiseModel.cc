@@ -57,10 +57,10 @@ namespace gazebo
         setNamedConstant("offsets", offsets);
       _mat->getTechnique(0)->getPass(_pass_id)->
         getFragmentProgramParameters()->
-        setNamedConstant("mean", (Ogre::Real)this->mean);
+        setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
       _mat->getTechnique(0)->getPass(_pass_id)->
         getFragmentProgramParameters()->
-        setNamedConstant("stddev", (Ogre::Real)this->stddev);
+        setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
     }
 
     /// \brief Mean that we'll pass down to the GLSL fragment shader.
@@ -73,7 +73,6 @@ namespace gazebo
 
 using namespace gazebo;
 using namespace sensors;
-
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::GaussianNoiseModel()
@@ -182,21 +181,20 @@ void ImageGaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ImageGaussianNoiseModel::Init(rendering::Camera *_camera)
+void ImageGaussianNoiseModel::Init(rendering::CameraPtr _camera)
 {
-  this->camera = _camera;
+  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
 
   this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->mean, this->stdDev));
 
   this->gaussianNoiseInstance =
     Ogre::CompositorManager::getSingleton().addCompositor(
-      this->camera->GetViewport(), "CameraNoise/Gaussian");
+      _camera->GetViewport(), "CameraNoise/Gaussian");
   this->gaussianNoiseInstance->setEnabled(true);
   // gaussianNoiseCompositorListener was allocated in Load()
   this->gaussianNoiseInstance->addListener(
     this->gaussianNoiseCompositorListener.get());
-
 }
 
 //////////////////////////////////////////////////

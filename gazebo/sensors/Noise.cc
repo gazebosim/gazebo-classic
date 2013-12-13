@@ -120,9 +120,7 @@ Noise::NoiseType Noise::GetNoiseType() const
 }
 
 //////////////////////////////////////////////////
-void Noise::SetCustomNoiseCallback(
-    boost::function<double(double)> _cb)
-
+void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
 {
   this->type = CUSTOM;
   this->customNoiseCallback = _cb;

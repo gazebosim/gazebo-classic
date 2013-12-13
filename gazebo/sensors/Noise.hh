@@ -64,7 +64,7 @@ namespace gazebo
       public: Noise();
 
       /// \brief Destructor.
-      public: ~Noise();
+      public: virtual ~Noise();
 
       /// \brief Load noise parameters from sdf.
       /// \param[in] _sdf SDF parameters.
@@ -94,7 +94,7 @@ namespace gazebo
       /// This is useful if users want to use their own noise model from a
       /// sensor plugin.
       public: virtual void SetCustomNoiseCallback(
-          boost::function<double(double)> _cb);
+          boost::function<double (double)> _cb);
 
       /// \brief Noise sdf element.
       private: sdf::ElementPtr sdf;
@@ -103,7 +103,7 @@ namespace gazebo
       private: NoiseType type;
 
       /// \brief Callback function for applying custom noise to sensor data.
-      private: boost::function<double(double)> customNoiseCallback;
+      private: boost::function<double (double)> customNoiseCallback;
     };
     /// \}
   }

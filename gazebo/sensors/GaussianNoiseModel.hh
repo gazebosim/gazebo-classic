@@ -102,7 +102,7 @@ namespace gazebo
 
       /// \brief Set which camera to apply the noise to.
       /// \param[in] _camera Rendering camera
-      public: virtual void Init(rendering::Camera *_camera);
+      public: virtual void Init(rendering::CameraPtr _camera);
 
       /// \brief Gaussian noise compositor.
       public: Ogre::CompositorInstance *gaussianNoiseInstance;
@@ -110,13 +110,9 @@ namespace gazebo
       /// \brief Gaussian noise compositor listener
       public: boost::shared_ptr<GaussianNoiseCompositorListener>
         gaussianNoiseCompositorListener;
-
-      /// \brief Camera which the noise is applied to.
-      private: rendering::Camera *camera;
     };
     /// \}
   }
-
-
 }
+
 #endif
