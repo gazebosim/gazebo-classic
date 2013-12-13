@@ -40,14 +40,11 @@ RaySensorNoisePlugin::~RaySensorNoisePlugin()
 void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr /*_sdf*/)
 {
-  // Get then name of the parent sensor
-  this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
-  if (!this->parentSensor)
-    gzthrow("RaySensorNoisePlugin requires a Ray Sensor as its parent");
+  if (!_parent)
+    gzthrow("RaySensorNoisePlugin requires a ray sensor as its parent");
 
-  sensors::NoisePtr noise = this->parentSensor->GetNoise();
+  sensors::NoisePtr noise = _parent->GetNoise();
 
   if (noise)
   {
@@ -64,7 +61,8 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
 /////////////////////////////////////////////////
 double RaySensorNoisePlugin::OnApplyNoise(double _in)
 {
-  // Apply alternating noise.
+  // Apply alternating random noise.
+  double randNoise = math::Rand::GetDblNormal(0, this->fixedNoiseRate);
   this->sign *= -1;
-  return _in + this->sign*this->fixedNoiseRate*_in;
+  return _in + this->sign*randNoise*_in;
 }
