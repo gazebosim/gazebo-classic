@@ -136,7 +136,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         this->joints[i]->GetScopedName(), qResult(i));
 
     this->jointController->SetPositionPID(this->joints[i]->GetScopedName(),
-        common::PID(185, 0.1, 5.0));
+        common::PID(100, 0.01, 10.0));
   }
   this->fkSolver->JntToCart(qResult, cartpos);
 
@@ -159,16 +159,10 @@ void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
     this->goalPos = this->goalModel->GetRelativePose().pos;
     this->goalPos = this->goalPos - basePos;
 
-    //Eigen::Matrix<double,6,1> L;
-    //L(0)=1;L(1)=1;L(2)=1;
-    //L(3)=0.01;L(4)=0.01;L(5)=0.01;
-
     for(unsigned int i = 0; i < 6; ++i)
     {
       (*this->jointpositions)(i) = 0;
     }
-
-    //KDL::ChainIkSolverPos_LMA iksolverPos(this->chain, L);
 
     KDL::JntArray qResult(this->chain.getNrOfJoints());
     KDL::Frame destFrame(KDL::Vector(this->goalPos.x,
@@ -194,12 +188,6 @@ void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
   {
     (*jointpositions)(i) =  this->joints[i]->GetAngle(0).Radian();
   }
-
-  // Eigen::Matrix<double,6,1> L;
-  // L(0)=1;L(1)=1;L(2)=1;
-  // L(3)=0.01;L(4)=0.01;L(5)=0.01;
-
-  //KDL::ChainIkSolverPos_LMA iksolverPos(this->chain, L);
 
   this->goalPos = this->goalModel->GetRelativePose().pos -
     this->baseLink->GetRelativePose().pos;

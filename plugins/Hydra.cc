@@ -29,21 +29,21 @@
 using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 
-#define HYDRA_RIGHT_BUMPER 0
-#define HYDRA_RIGHT_1 1
-#define HYDRA_RIGHT_2 2
-#define HYDRA_RIGHT_3 3
-#define HYDRA_RIGHT_4 4
-#define HYDRA_RIGHT_CENTER 5
-#define HYDRA_RIGHT_JOY 6
+#define HYDRA_RIGHT_BUMPER 7
+#define HYDRA_RIGHT_1 8
+#define HYDRA_RIGHT_2 9
+#define HYDRA_RIGHT_3 10
+#define HYDRA_RIGHT_4 11
+#define HYDRA_RIGHT_CENTER 12
+#define HYDRA_RIGHT_JOY 13
 
-#define HYDRA_LEFT_LB 7
-#define HYDRA_LEFT_1 8
-#define HYDRA_LEFT_2 9
-#define HYDRA_LEFT_3 10
-#define HYDRA_LEFT_4 11
-#define HYDRA_LEFT_CENTER 12
-#define HYDRA_LEFT_JOY 13
+#define HYDRA_LEFT_LB 0
+#define HYDRA_LEFT_1 1
+#define HYDRA_LEFT_2 2
+#define HYDRA_LEFT_3 3
+#define HYDRA_LEFT_4 4
+#define HYDRA_LEFT_CENTER 5
+#define HYDRA_LEFT_JOY 6
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
@@ -77,7 +77,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 
   // Find the Razer device.
   std::string device;
-  for (int i = 0; i < 5 && device.empty(); ++i)
+  for (int i = 0; i < 6 && device.empty(); ++i)
   {
     std::ostringstream stream;
     stream << "/sys/class/hidraw/hidraw" << i << "/device/uevent";
@@ -157,7 +157,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  math::Pose origRight(this->pos[0], this->quat[0]);
+  math::Pose origRight(this->pos[1], this->quat[1]);
 
   math::Pose pivotRight = origRight;
   math::Pose grabRight = origRight;
@@ -165,7 +165,7 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   pivotRight.pos += origRight.rot * math::Vector3(-0.04, 0, 0);
   grabRight.pos += origRight.rot * math::Vector3(-0.12, 0, 0);
 
-  math::Pose origLeft(this->pos[1], this->quat[1]);
+  math::Pose origLeft(this->pos[0], this->quat[0]);
 
   math::Pose pivotLeft = origLeft;
   math::Pose grabLeft = origLeft;
@@ -177,66 +177,40 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
   msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
 
-  // Analog 0: Right right(+) left(-)
-  // Analog 1: Right forward(+) back(-)
-  // Analog 2: Right trigger(0-1)
-  // Analog 3: Left right(+) left(-)
-  // Analog 4: Left forward(+) back(-)
-  // Analog 5: Left trigger(0-1)
-  rightPaddle->set_joy_y(this->analog[0]);
-  rightPaddle->set_joy_x(this->analog[1]);
-  rightPaddle->set_trigger(this->analog[2]);
+  // Analog 0: Left right(+) left(-)
+  // Analog 1: Left forward(+) back(-)
+  // Analog 2: Left trigger(0-1)
+  // Analog 3: Right right(+) left(-)
+  // Analog 4: Right forward(+) back(-)
+  // Analog 5: Right trigger(0-1)
+  rightPaddle->set_joy_y(this->analog[3]);
+  rightPaddle->set_joy_x(this->analog[4]);
+  rightPaddle->set_trigger(this->analog[5]);
 
-  leftPaddle->set_joy_y(this->analog[3]);
-  leftPaddle->set_joy_x(this->analog[4]);
-  leftPaddle->set_trigger(this->analog[5]);
+  leftPaddle->set_joy_y(this->analog[0]);
+  leftPaddle->set_joy_x(this->analog[1]);
+  leftPaddle->set_trigger(this->analog[2]);
 
-  rightPaddle->set_button_bumper(this->buttons[0]);
-  rightPaddle->set_button_1(this->buttons[1]);
-  rightPaddle->set_button_2(this->buttons[2]);
-  rightPaddle->set_button_3(this->buttons[3]);
-  rightPaddle->set_button_4(this->buttons[4]);
-  rightPaddle->set_button_center(this->buttons[5]);
-  rightPaddle->set_button_joy(this->buttons[6]);
+  leftPaddle->set_button_bumper(this->buttons[0]);
+  leftPaddle->set_button_1(this->buttons[1]);
+  leftPaddle->set_button_2(this->buttons[2]);
+  leftPaddle->set_button_3(this->buttons[3]);
+  leftPaddle->set_button_4(this->buttons[4]);
+  leftPaddle->set_button_center(this->buttons[5]);
+  leftPaddle->set_button_joy(this->buttons[6]);
 
-  leftPaddle->set_button_bumper(this->buttons[7]);
-  leftPaddle->set_button_1(this->buttons[8]);
-  leftPaddle->set_button_2(this->buttons[9]);
-  leftPaddle->set_button_3(this->buttons[10]);
-  leftPaddle->set_button_4(this->buttons[11]);
-  leftPaddle->set_button_center(this->buttons[12]);
-  leftPaddle->set_button_joy(this->buttons[13]);
+  rightPaddle->set_button_bumper(this->buttons[7]);
+  rightPaddle->set_button_1(this->buttons[8]);
+  rightPaddle->set_button_2(this->buttons[9]);
+  rightPaddle->set_button_3(this->buttons[10]);
+  rightPaddle->set_button_4(this->buttons[11]);
+  rightPaddle->set_button_center(this->buttons[12]);
+  rightPaddle->set_button_joy(this->buttons[13]);
 
   msgs::Set(rightPaddle->mutable_pose(), grabRight);
   msgs::Set(leftPaddle->mutable_pose(), grabLeft);
 
   this->pub->Publish(msg);
-
-  /*if (this->buttons[0])
-  {
-    if (this->prevState != this->buttons[0])
-    {
-      this->resetPoseRight = grabRight;
-      this->resetPoseLeft = grabLeft;
-    }
-
-   this->rightModel->SetWorldPose(
-        math::Pose(grabRight.pos - this->resetPoseRight.pos +
-          this->basePoseRight.pos,
-          grabRight.rot * this->resetPoseRight.rot.GetInverse()*
-          this->basePoseRight.rot));
-
-    this->leftModel->SetWorldPose(
-        math::Pose(grabLeft.pos - this->resetPoseLeft.pos +
-          this->basePoseLeft.pos,
-          grabLeft.rot * this->resetPoseLeft.rot.GetInverse() *
-          this->basePoseLeft.rot ));
-  }
-  else
-  {
-    this->rightModel->SetWorldPose(this->basePoseRight);
-    this->leftModel->SetWorldPose(this->basePoseLeft);
-  }*/
 }
 
 /////////////////////////////////////////////////

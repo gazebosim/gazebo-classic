@@ -108,7 +108,10 @@ namespace gazebo
 
     private: math::Pose dollyStartPose;
     private: double yaw;
+    private: common::Time prevTime;
 
+    private: boost::mutex msgMutex;
+    private: std::list<boost::shared_ptr<msgs::Hydra const> > hydraMsgs;
   };
 }
 #endif

@@ -49,64 +49,11 @@ void AtlasPlugin::OnHydra(ConstHydraPtr &_msg)
     return;
   }
 
-  math::Pose rightPose = msgs::Convert(_msg->right().pose());
-  math::Pose leftPose = msgs::Convert(_msg->left().pose());
-
-  if (!this->activated)
-  {
-
-    if (_msg->right().button_bumper() && _msg->left().button_bumper())
-    {
-      this->activated = true;
-      this->resetPoseRight = rightPose;
-      this->resetPoseLeft = leftPose;
-    }
-    else
-      return;
-  }
-
-  math::Pose rightAdjust, leftAdjust;
-
-  rightAdjust = math::Pose(rightPose.pos - this->resetPoseRight.pos +
-      this->basePoseRight.pos,
-      rightPose.rot * this->resetPoseRight.rot.GetInverse() *
-      this->basePoseRight.rot);
-
-  leftAdjust = math::Pose(leftPose.pos - this->resetPoseLeft.pos +
-      this->basePoseLeft.pos,
-      leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
-      this->basePoseLeft.rot);
-
-  this->SetRightFingers(_msg->right().trigger()*1.5707);
-  this->SetLeftFingers(_msg->left().trigger()*1.5707);
-
-
-  double rx = _msg->right().joy_x() * .002;
-  double ry = _msg->right().joy_y() * -.002;
-
-
-  this->yaw += _msg->left().joy_y() * -.002;
-  double dx = rx * cos(this->yaw) + ry*sin(this->yaw*-1);
-  double dy = rx * sin(this->yaw) + ry*cos(this->yaw*-1);
-  math::Pose dPose(dx, dy, 0, 0, 0, _msg->left().joy_y() * -.002);
-
-  math::Vector3 rpy = this->dolly->GetWorldPose().rot.GetAsEuler();
-  rpy.z = yaw;
-
-  this->dollyPinJoint->Detach();
-  math::Vector3 dollyPos = this->dolly->GetWorldPose().pos + dPose.pos;
-  dollyPos.z = this->dollyStartPose.pos.z;
-  this->dolly->SetWorldPose(math::Pose(dollyPos, math::Quaternion(rpy)));
-
-  this->dollyPinJoint->Attach(physics::LinkPtr(), this->dolly->GetLink("link"));
-
-  this->rightModel->SetRelativePose(rightAdjust);
-  this->leftModel->SetRelativePose(leftAdjust);
-
-  this->rightBumper = _msg->right().button_bumper();
-  this->leftBumper = _msg->left().button_bumper();
+  boost::mutex::scoped_lock lock(this->msgMutex);
+  this->hydraMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void AtlasPlugin::Restart()
 {
   this->rightModel->SetRelativePose(this->rightStartPose);
@@ -272,51 +219,88 @@ void AtlasPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->rightBumper = false;
   this->leftBumper = false;
 
-  /*this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&AtlasPlugin::Update, this, _1));
-
-  this->model->GetLink("pelvis")->SetForce(math::Vector3(0, 0, 9.8));
-  this->xPosPID.Init(1, 0, .10);
-  this->yPosPID.Init(1, 0, .10);
-  this->zPosPID.Init(10000, 0, 10);
-
-  this->rollPID.Init(100, 0, 1);
-  this->pitchPID.Init(100, 0, 1);
-  this->yawPID.Init(50, 0, .1);
-
-  this->pelvisTarget = this->model->GetLink("pelvis")->GetWorldPose();
-  this->pelvisStartPose = this->pelvisTarget;
-
-  this->prevModelPose = this->model->GetWorldPose();
-  */
 }
 
 /////////////////////////////////////////////////
-void AtlasPlugin::Update(const common::UpdateInfo &/*_info*/)
+void AtlasPlugin::Update(const common::UpdateInfo & /*_info*/)
 {
-  math::Pose currentModelPose = this->model->GetWorldPose();
+  boost::mutex::scoped_lock lock(this->msgMutex);
 
-  math::Pose pelvisCurrent = this->model->GetLink("pelvis")->GetWorldPose();
-  math::Vector3 rpy = pelvisCurrent.rot.GetAsEuler();
-  math::Vector3 targetRPY = this->pelvisTarget.rot.GetAsEuler();
+  if (this->hydraMsgs.empty())
+    return;
 
-  math::Vector3 err = pelvisCurrent.pos - this->pelvisTarget.pos;
-  math::Vector3 rpyErr = math::Vector3(rpy.x, rpy.y, rpy.z - targetRPY.z);
-  math::Vector3 force, torque;
+  if (!this->activated)
+  {
+    for (std::list<boost::shared_ptr<msgs::Hydra const> >::iterator iter =
+        this->hydraMsgs.begin(); iter != this->hydraMsgs.end(); ++iter)
+    {
+      if ((*iter)->right().button_bumper() && (*iter)->left().button_bumper())
+      {
+        this->activated = true;
+        this->resetPoseRight = msgs::Convert((*iter)->right().pose());
+        this->resetPoseLeft = msgs::Convert((*iter)->left().pose());
+        break;
+      }
+    }
+  }
 
-  force.x = this->xPosPID.Update(err.x, common::Time(0, 100000));
-  force.y = this->yPosPID.Update(err.y, common::Time(0, 100000));
-  force.z = this->zPosPID.Update(err.z, common::Time(0, 100000));
+  if (this->activated)
+  {
+    boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgs.back();
 
-  torque.x = this->rollPID.Update(rpyErr.x, common::Time(0, 100000));
-  torque.y = this->pitchPID.Update(rpyErr.y, common::Time(0, 100000));
-  torque.z = this->yawPID.Update(rpyErr.z, common::Time(0, 100000));
+    math::Pose rightPose;
+    math::Pose leftPose;
 
-  /*std::cout << "Err[" << rpyErr << "] Torque[" << torque << "]\n";
+    math::Pose rightAdjust, leftAdjust;
 
-  this->model->GetLink("pelvis")->SetForce(force);
-  this->model->GetLink("pelvis")->SetTorque(torque);
-  */
+    rightPose = msgs::Convert(msg->right().pose());
+    leftPose = msgs::Convert(msg->left().pose());
 
-  this->prevModelPose = this->model->GetWorldPose();
+    rightAdjust = math::Pose(rightPose.pos - this->resetPoseRight.pos +
+        this->basePoseRight.pos,
+        rightPose.rot * this->resetPoseRight.rot.GetInverse() *
+        this->basePoseRight.rot);
+
+    leftAdjust = math::Pose(leftPose.pos - this->resetPoseLeft.pos +
+        this->basePoseLeft.pos,
+        leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
+        this->basePoseLeft.rot);
+
+    this->SetRightFingers(msg->right().trigger()*1.5707);
+    this->SetLeftFingers(msg->left().trigger()*1.5707);
+
+    common::Time curTime = common::Time::GetWallTime();
+    double dt = (curTime - this->prevTime).Double();
+
+    double rx = msg->right().joy_x() * 0.5 * dt;
+    double ry = msg->right().joy_y() * -0.5 * dt;
+
+    this->yaw += msg->left().joy_y() * -.5 * dt;
+    double dx = rx * cos(this->yaw) + ry*sin(this->yaw*-1);
+    double dy = rx * sin(this->yaw) + ry*cos(this->yaw*-1);
+    math::Pose dPose(dx, dy, 0, 0, 0, msg->left().joy_y() * -.5 * dt);
+
+    math::Vector3 rpy = this->dolly->GetWorldPose().rot.GetAsEuler();
+    rpy.z = yaw;
+
+    this->dollyPinJoint->Detach();
+    math::Vector3 dollyPos = this->dolly->GetWorldPose().pos + dPose.pos;
+    dollyPos.z = this->dollyStartPose.pos.z;
+    this->dolly->SetWorldPose(math::Pose(dollyPos, math::Quaternion(rpy)));
+
+    this->dollyPinJoint->Attach(physics::LinkPtr(),
+        this->dolly->GetLink("link"));
+
+    this->rightModel->SetRelativePose(rightAdjust);
+    this->leftModel->SetRelativePose(leftAdjust);
+
+    this->rightBumper = msg->right().button_bumper();
+    this->leftBumper = msg->left().button_bumper();
+
+    this->prevTime = curTime;
+  }
+
+  this->hydraMsgs.clear();
 }
