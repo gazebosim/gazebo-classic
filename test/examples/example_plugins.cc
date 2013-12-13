@@ -20,6 +20,9 @@
 const std::string cmakeSourceDir = CMAKE_SOURCE_DIR;
 const std::string worldEditPath = "examples/plugins/world_edit";
 
+///////////////////////////////////////////////////////////////////
+// This test verifies that the WorldEdit plugin builds successfully
+// It doesn't try to execute the plugin.
 TEST(ExamplePlugins, WorldEdit)
 {
   char cmd[1024];
@@ -29,8 +32,6 @@ TEST(ExamplePlugins, WorldEdit)
   ASSERT_EQ(system(cmd), 0);
   snprintf(cmd, sizeof(cmd), "make");
   ASSERT_EQ(system(cmd), 0);
-
-  // Should also try to run it
 }
 
 int main(int argc, char **argv)
