@@ -413,7 +413,7 @@
     </include>
 
     <include>
-      <static>false</statis>
+      <static>false</static>
       <uri>model://hammer</uri>
       <pose>-2.0 4.25 1.04 0 -0 0</pose>
     </include>
