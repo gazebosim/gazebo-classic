@@ -137,7 +137,7 @@ void ODELink::Init()
       }
     }
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to place collision bodies"
@@ -152,7 +152,7 @@ void ODELink::Init()
     dBodySetMovedCallback(this->linkId, MoveCallback);
     dBodySetDisabledCallback(this->linkId, DisabledCallback);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to set callbacks in ODELink::Init"
@@ -226,7 +226,7 @@ bool ODELink::GetGravityMode() const
   {
     mode = dBodyGetGravityMode(this->linkId);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetGravityMode returns default of "
@@ -310,7 +310,7 @@ bool ODELink::GetEnabled() const
 
   if (this->linkId)
     result = dBodyIsEnabled(this->linkId);
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetEnabled returns default of "
@@ -399,7 +399,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -426,7 +426,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -447,7 +447,7 @@ math::Vector3 ODELink::GetWorldCoGLinearVel() const
     dvel = dBodyGetLinearVel(this->linkId);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldCoGLinearVel returns default of "
@@ -482,7 +482,7 @@ math::Vector3 ODELink::GetWorldAngularVel() const
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldAngularVel returns default of "
@@ -621,7 +621,7 @@ math::Vector3 ODELink::GetWorldForce() const
     force.y = dforce[1];
     force.z = dforce[2];
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldForce returns default of "
@@ -646,7 +646,7 @@ math::Vector3 ODELink::GetWorldTorque() const
     torque.y = dtorque[1];
     torque.z = dtorque[2];
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldTorque returns default of "
@@ -711,7 +711,7 @@ bool ODELink::GetKinematic() const
 
   if (this->linkId)
     result = dBodyIsKinematic(this->linkId);
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetKinematic returns default of "
