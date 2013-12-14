@@ -148,7 +148,8 @@ void DepthCameraSensor::Render()
     return;
 
   // Update all the cameras
-  this->Render();
+  this->camera->Render();
+  this->camera->PostRender();
 
   this->rendered = true;
   this->lastMeasurementTime = this->scene->GetSimTime();
@@ -160,8 +161,6 @@ bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
   // Sensor::Update(force);
   if (!this->rendered)
     return false;
-
-  this->camera->PostRender();
 
   this->rendered = false;
   return true;
