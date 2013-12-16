@@ -500,7 +500,6 @@ TEST(gz, Camera)
     waitForMsg("gz camera -w default -c user -f box");
 
     gazebo::msgs::CameraCmd msg;
-    msg.set_name("user");
     msg.set_follow_model("box");
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());

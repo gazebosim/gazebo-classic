@@ -689,7 +689,6 @@ bool CameraCommand::RunImpl()
   }
 
   msgs::CameraCmd msg;
-  msg.set_name(cameraName);
   if (this->vm.count("follow"))
     msg.set_follow_model(this->vm["follow"].as<std::string>());
 
