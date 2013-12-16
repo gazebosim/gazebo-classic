@@ -26,7 +26,6 @@
 
 namespace gazebo
 {
-
   /// \brief This plugin drives a four wheeled cart model forward and back
   /// by applying a small wheel torque.  Steering is controlled via
   /// a position pid.
