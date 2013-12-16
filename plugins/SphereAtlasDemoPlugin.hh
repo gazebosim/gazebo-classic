@@ -14,38 +14,38 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_CART_TEST_PLUGIN_HH__
-#define __GAZEBO_CART_TEST_PLUGIN_HH__
+#ifndef _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
+#define _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
+
+#include <string>
+#include <vector>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
 
-#define NUM_JOINTS 3
 namespace gazebo
 {
-  class CartTestPlugin : public ModelPlugin
+  class SphereAtlasDemoPlugin : public ModelPlugin
   {
-    public: CartTestPlugin();
+    public: SphereAtlasDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
+    public: virtual void Reset();
 
     private: void OnUpdate();
-
-    private: transport::NodePtr node;
 
     private: event::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
-
-    private: physics::JointPtr joints[NUM_JOINTS];
-    private: common::PID jointPIDs[NUM_JOINTS];
-    private: double jointPositions[NUM_JOINTS];
-    private: double jointVelocities[NUM_JOINTS];
-    private: double jointMaxEfforts[NUM_JOINTS];
+    private: std::vector<std::string> jointNames;
+    private: physics::Joint_V joints;
 
     private: common::Time prevUpdateTime;
+
+    private: std::vector<double> qp;
+    private: std::vector<double> jointKp;
+    private: std::vector<double> jointKd;
   };
 }
 #endif

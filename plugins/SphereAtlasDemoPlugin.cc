@@ -16,19 +16,19 @@
 */
 
 #include "gazebo/physics/physics.hh"
-#include "plugins/SphereAtlasTestPlugin.hh"
+#include "plugins/SphereAtlasDemoPlugin.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_MODEL_PLUGIN(SphereAtlasTestPlugin)
+GZ_REGISTER_MODEL_PLUGIN(SphereAtlasDemoPlugin)
 
 /////////////////////////////////////////////////
-SphereAtlasTestPlugin::SphereAtlasTestPlugin()
+SphereAtlasDemoPlugin::SphereAtlasDemoPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-void SphereAtlasTestPlugin::Load(physics::ModelPtr _model,
+void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
@@ -156,18 +156,18 @@ void SphereAtlasTestPlugin::Load(physics::ModelPtr _model,
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&SphereAtlasTestPlugin::OnUpdate, this));
+          boost::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
-void SphereAtlasTestPlugin::Init()
+void SphereAtlasDemoPlugin::Init()
 {
 }
 
 /////////////////////////////////////////////////
-void SphereAtlasTestPlugin::Reset()
+void SphereAtlasDemoPlugin::Reset()
 {
-  gzlog << "SphereAtlasTestPlugin: \n"
+  gzlog << "SphereAtlasDemoPlugin: \n"
         << "  This is not a typical usage of plugin Reset function,\n"
         << "  we are doing this just for testing purposes.\n";
   if (this->updateConnection)
@@ -178,7 +178,7 @@ void SphereAtlasTestPlugin::Reset()
 }
 
 /////////////////////////////////////////////////
-void SphereAtlasTestPlugin::OnUpdate()
+void SphereAtlasDemoPlugin::OnUpdate()
 {
   common::Time currTime = this->model->GetWorld()->GetSimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;

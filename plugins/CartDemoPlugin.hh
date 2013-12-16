@@ -13,39 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
-#define __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
-
-#include <string>
-#include <vector>
+ */
+#ifndef _GAZEBO_CART_DEMO_PLUGIN_HH_
+#define _GAZEBO_CART_DEMO_PLUGIN_HH_
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
+
+#define NUM_JOINTS 3
 
 namespace gazebo
 {
-  class SphereAtlasTestPlugin : public ModelPlugin
+
+  /// \brief This plugin drives a four wheeled cart model forward and back
+  /// by applying a small wheel torque.  Steering is controlled via
+  /// a position pid.
+  /// this is a test for general rolling contact stability.
+  /// should refine the test to be more specific in the future.
+  class CartDemoPlugin : public ModelPlugin
   {
-    public: SphereAtlasTestPlugin();
+    public: CartDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
-    public: virtual void Reset();
 
     private: void OnUpdate();
+
+    private: transport::NodePtr node;
 
     private: event::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
-    private: std::vector<std::string> jointNames;
-    private: physics::Joint_V joints;
+
+    private: physics::JointPtr joints[NUM_JOINTS];
+    private: common::PID jointPIDs[NUM_JOINTS];
+    private: double jointPositions[NUM_JOINTS];
+    private: double jointVelocities[NUM_JOINTS];
+    private: double jointMaxEfforts[NUM_JOINTS];
 
     private: common::Time prevUpdateTime;
-
-    private: std::vector<double> qp;
-    private: std::vector<double> jointKp;
-    private: std::vector<double> jointKd;
   };
 }
 #endif
