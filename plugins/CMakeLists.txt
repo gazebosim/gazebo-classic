@@ -14,6 +14,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  BreakableJointPlugin
   CameraPlugin
   CartTestPlugin
   ContactPlugin
@@ -34,9 +35,17 @@ set (plugins
   SphereAtlasTestPlugin
   VehiclePlugin)
 
+set(GAZEBO_PLUGIN_INSTALL_DIR
+  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
+)
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
-  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
+
+target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
+set_target_properties(BreakableJointPlugin PROPERTIES
+  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
+)

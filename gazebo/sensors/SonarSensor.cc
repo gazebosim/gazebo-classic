@@ -232,7 +232,7 @@ double SonarSensor::GetRange()
 }
 
 //////////////////////////////////////////////////
-void SonarSensor::UpdateImpl(bool /*_force*/)
+bool SonarSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -283,6 +283,8 @@ void SonarSensor::UpdateImpl(bool /*_force*/)
 
   if (this->sonarPub)
     this->sonarPub->Publish(this->sonarMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
