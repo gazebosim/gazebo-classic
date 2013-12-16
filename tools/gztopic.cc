@@ -268,7 +268,10 @@ void hzCB(const std::string &/*_data*/)
   common::Time cur_time = common::Time::GetWallTime();
 
   if (hz_prev_time != common::Time(0, 0))
-    printf("Hz: %6.2f\n", 1.0 / (cur_time - hz_prev_time).Double());
+  {
+    std::cout << "Hz: " << std::setw(6) << std::fixed << std::setprecision(2)
+              << 1.0 / (cur_time - hz_prev_time).Double() << std::endl;
+  }
 
   hz_prev_time = cur_time;
 }

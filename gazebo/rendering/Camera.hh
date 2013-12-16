@@ -152,10 +152,6 @@ namespace gazebo
       /// \param[in] _scene Pointer to the scene
       public: void SetScene(ScenePtr _scene);
 
-      /// \brief Get the global pose of the camera
-      /// \return Pose of the camera in the world coordinate frame
-      public: math::Pose GetWorldPose();
-
       /// \brief Get the camera position in the world
       /// \return The world position of the camera
       public: math::Vector3 GetWorldPosition() const;
