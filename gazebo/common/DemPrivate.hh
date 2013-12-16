@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DEM_public_HH_
-#define _GAZEBO_DEM_public_HH_
+#ifndef _GAZEBO_DEM_PRIVATE_HH_
+#define _GAZEBO_DEM_PRIVATE_HH_
 
 #include <gazebo/gazebo_config.h>
 
