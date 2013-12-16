@@ -222,9 +222,9 @@ bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
   msgs::Set(this->msg.mutable_time(), this->lastMeasurementTime);
 
-  int index = 0;
   if (publish)
   {
+    int index = 0;
     for (std::vector<rendering::CameraPtr>::iterator iter
         = this->cameras.begin(); iter != this->cameras.end(); ++iter, ++index)
     {
