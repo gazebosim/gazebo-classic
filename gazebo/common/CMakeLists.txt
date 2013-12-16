@@ -59,6 +59,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh

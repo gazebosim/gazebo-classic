@@ -25,6 +25,7 @@
 # include <string>
 # include <vector>
 
+# include "gazebo/common/DemPrivate.hh"
 # include "gazebo/common/HeightmapData.hh"
 # include "gazebo/math/Angle.hh"
 
@@ -126,29 +127,9 @@ namespace gazebo
       /// a squared terrain with padding.
       private: void LoadData();
 
-      /// \brief A set of associated raster bands.
-      private: GDALDataset *dataSet;
-
-      /// \brief A pointer to the band.
-      private: GDALRasterBand *band;
-
-      /// \brief Real width of the world in meters.
-      private: double worldWidth;
-
-      /// \brief Real height of the world in meters.
-      private: double worldHeight;
-
-      /// \brief Terrain's side (after the padding).
-      private: unsigned int side;
-
-      /// \brief Minimum elevation in meters.
-      private: double minElevation;
-
-      /// \brief Maximum elevation in meters.
-      private: double maxElevation;
-
-      /// \brief DEM data converted to be OGRE-compatible.
-      private: std::vector<float> demData;
+      /// internal
+      /// \brief Pointer to the private data.
+      private: DemPrivate *dataPtr;
     };
     /// \}
   }

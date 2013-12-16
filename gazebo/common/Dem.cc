@@ -26,6 +26,7 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Dem.hh"
+#include "gazebo/common/DemPrivate.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/Angle.hh"
@@ -37,18 +38,19 @@ using namespace common;
 
 //////////////////////////////////////////////////
 Dem::Dem()
+  : dataPtr(new DemPrivate)
 {
-  this->dataSet = NULL;
+  this->dataPtr->dataSet = NULL;
   GDALAllRegister();
 }
 
 //////////////////////////////////////////////////
 Dem::~Dem()
 {
-  this->demData.clear();
+  this->dataPtr->demData.clear();
 
-  if (this->dataSet)
-    GDALClose(reinterpret_cast<GDALDataset *>(this->dataSet));
+  if (this->dataPtr->dataSet)
+    GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
 }
 
 //////////////////////////////////////////////////
@@ -73,17 +75,17 @@ int Dem::Load(const std::string &_filename)
     return -1;
   }
 
-  this->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
+  this->dataPtr->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
     fullName.c_str(), GA_ReadOnly));
 
-  if (this->dataSet == NULL)
+  if (this->dataPtr->dataSet == NULL)
   {
     gzerr << "Unable to open DEM file[" << fullName
           << "]. Format not recognised as a supported dataset." << std::endl;
     return -1;
   }
 
-  int nBands = this->dataSet->GetRasterCount();
+  int nBands = this->dataPtr->dataSet->GetRasterCount();
   if (nBands != 1)
   {
     gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
@@ -92,11 +94,11 @@ int Dem::Load(const std::string &_filename)
   }
 
   // Set the pointer to the band
-  this->band = this->dataSet->GetRasterBand(1);
+  this->dataPtr->band = this->dataPtr->dataSet->GetRasterBand(1);
 
   // Raster width and height
-  xSize = this->dataSet->GetRasterXSize();
-  ySize = this->dataSet->GetRasterYSize();
+  xSize = this->dataPtr->dataSet->GetRasterXSize();
+  ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
   upLeftX = 0.0;
@@ -112,10 +114,10 @@ int Dem::Load(const std::string &_filename)
   this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
   // Set the world width and height
-  this->worldWidth =
+  this->dataPtr->worldWidth =
      common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
                                             upRightLat, upRightLong);
-  this->worldHeight =
+  this->dataPtr->worldHeight =
      common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
                                             lowLeftLat, lowLeftLong);
 
@@ -130,16 +132,16 @@ int Dem::Load(const std::string &_filename)
   else
     width = math::roundUpPowerOfTwo(xSize) + 1;
 
-  this->side = std::max(width, height);
+  this->dataPtr->side = std::max(width, height);
 
   // Preload the DEM's data
   this->LoadData();
 
   // Set the min/max heights
-  this->minElevation = *std::min_element(&this->demData[0],
-      &this->demData[0] + this->side * this->side);
-  this->maxElevation = *std::max_element(&this->demData[0],
-      &this->demData[0] + this->side * this->side);
+  this->dataPtr->minElevation = *std::min_element(&this->dataPtr->demData[0],
+      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
+  this->dataPtr->maxElevation = *std::max_element(&this->dataPtr->demData[0],
+      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
 
   return 0;
 }
@@ -154,19 +156,19 @@ double Dem::GetElevation(double _x, double _y)
            " x " << this->GetHeight() << "]\n");
   }
 
-  return this->demData.at(_y * this->GetWidth() + _x);
+  return this->dataPtr->demData.at(_y * this->GetWidth() + _x);
 }
 
 //////////////////////////////////////////////////
 float Dem::GetMinElevation() const
 {
-  return minElevation;
+  return this->dataPtr->minElevation;
 }
 
 //////////////////////////////////////////////////
 float Dem::GetMaxElevation() const
 {
-  return maxElevation;
+  return this->dataPtr->maxElevation;
 }
 
 //////////////////////////////////////////////////
@@ -174,7 +176,7 @@ void Dem::GetGeoReference(double _x, double _y,
                           math::Angle &_latitude, math::Angle &_longitude)
 {
   double geoTransf[6];
-  if (this->dataSet->GetGeoTransform(geoTransf) == CE_None)
+  if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
   {
     OGRSpatialReference sourceCs;
     OGRSpatialReference targetCs;
@@ -182,7 +184,7 @@ void Dem::GetGeoReference(double _x, double _y,
     double xGeoDeg, yGeoDeg;
 
     // Transform the terrain's coordinate system to WGS84
-    char *importString = strdup(this->dataSet->GetProjectionRef());
+    char *importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
@@ -209,25 +211,25 @@ void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
 //////////////////////////////////////////////////
 unsigned int Dem::GetHeight() const
 {
-  return this->side;
+  return this->dataPtr->side;
 }
 
 //////////////////////////////////////////////////
 unsigned int Dem::GetWidth() const
 {
-  return this->side;
+  return this->dataPtr->side;
 }
 
 //////////////////////////////////////////////////
 double Dem::GetWorldWidth() const
 {
-  return this->worldWidth;
+  return this->dataPtr->worldWidth;
 }
 
 //////////////////////////////////////////////////
 double Dem::GetWorldHeight() const
 {
-  return this->worldHeight;
+  return this->dataPtr->worldHeight;
 }
 
 //////////////////////////////////////////////////
@@ -244,8 +246,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
     double yf = y / static_cast<double>(_subSampling);
     unsigned int y1 = floor(yf);
     unsigned int y2 = ceil(yf);
-    if (y2 >= this->side)
-      y2 = this->side - 1;
+    if (y2 >= this->dataPtr->side)
+      y2 = this->dataPtr->side - 1;
     double dy = yf - y1;
 
     for (unsigned int x = 0; x < _vertSize; ++x)
@@ -253,16 +255,16 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       double xf = x / static_cast<double>(_subSampling);
       unsigned int x1 = floor(xf);
       unsigned int x2 = ceil(xf);
-      if (x2 >= this->side)
-        x2 = this->side - 1;
+      if (x2 >= this->dataPtr->side)
+        x2 = this->dataPtr->side - 1;
       double dx = xf - x1;
 
-      double px1 = this->demData[y1 * this->side + x1];
-      double px2 = this->demData[y1 * this->side + x2];
+      double px1 = this->dataPtr->demData[y1 * this->dataPtr->side + x1];
+      double px2 = this->dataPtr->demData[y1 * this->dataPtr->side + x2];
       float h1 = (px1 - ((px1 - px2) * dx));
 
-      double px3 = this->demData[y2 * this->side + x1];
-      double px4 = this->demData[y2 * this->side + x2];
+      double px3 = this->dataPtr->demData[y2 * this->dataPtr->side + x1];
+      double px4 = this->dataPtr->demData[y2 * this->dataPtr->side + x2];
       float h2 = (px3 - ((px3 - px4) * dx));
 
       float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
@@ -292,8 +294,8 @@ void Dem::LoadData()
 {
     unsigned int destWidth;
     unsigned int destHeight;
-    unsigned int nXSize = this->dataSet->GetRasterXSize();
-    unsigned int nYSize = this->dataSet->GetRasterYSize();
+    unsigned int nXSize = this->dataPtr->dataSet->GetRasterXSize();
+    unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
     float ratio;
     std::vector<float> buffer;
 
@@ -301,30 +303,30 @@ void Dem::LoadData()
     if (nXSize > nYSize)
     {
       ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
-      destWidth = this->side;
+      destWidth = this->dataPtr->side;
       destHeight = static_cast<float>(destWidth) / static_cast<float>(ratio);
     }
     else
     {
       ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
-      destHeight = this->side;
+      destHeight = this->dataPtr->side;
       destWidth = static_cast<float>(destHeight) / static_cast<float>(ratio);
     }
 
     // Read the whole raster data and convert it to a GDT_Float32 array.
     // In this step the DEM is scaled to destWidth x destHeight
     buffer.resize(destWidth * destHeight);
-    this->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
+    this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
                          destWidth, destHeight, GDT_Float32, 0, 0);
 
     // Copy and align 'buffer' into the target vector. The destination vector is
     // initialized to 0, so all the points not contained in 'buffer' will be
     // padding
-    this->demData.resize(this->GetWidth() * this->GetHeight());
+    this->dataPtr->demData.resize(this->GetWidth() * this->GetHeight());
     for (unsigned int y = 0; y < destHeight; ++y)
     {
         std::copy(&buffer[destWidth * y], &buffer[destWidth * y] + destWidth,
-                  this->demData.begin() + this->GetWidth() * y);
+                  this->dataPtr->demData.begin() + this->GetWidth() * y);
     }
     buffer.clear();
 }
