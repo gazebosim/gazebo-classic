@@ -376,7 +376,7 @@ math::Vector3 SimbodyLink::GetWorldForce() const
 {
   SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
     this->simbodyPhysics->integ->getState(), this->masterMobod);
-    
+
   // get translational component
   SimTK::Vec3 f = sv[1];
 
@@ -398,7 +398,7 @@ math::Vector3 SimbodyLink::GetWorldTorque() const
 {
   SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
     this->simbodyPhysics->integ->getState(), this->masterMobod);
-    
+
   // get rotational component
   SimTK::Vec3 t = sv[0];
 
