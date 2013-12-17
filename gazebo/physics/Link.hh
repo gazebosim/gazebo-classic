@@ -539,6 +539,9 @@ namespace gazebo
       /// playback.
       private: transport::SubscriberPtr audioContactsSub;
 #endif
+
+      /// \brief This flag is set to true when the link is initialized.
+      protected: bool initialized;
     };
     /// \}
   }
