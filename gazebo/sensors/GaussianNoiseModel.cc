@@ -130,11 +130,9 @@ void GaussianNoiseModel::Fini()
 //////////////////////////////////////////////////
 double GaussianNoiseModel::ApplyImpl(double _in) const
 {
-  double output = 0.0;
-
   // Add independent (uncorrelated) Gaussian noise to each input value.
   double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
-  output = _in + this->bias + whiteNoise;
+  double output = _in + this->bias + whiteNoise;
   if (this->quantized)
   {
     // Apply this->precision
