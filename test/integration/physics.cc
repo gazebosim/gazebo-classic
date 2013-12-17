@@ -1413,7 +1413,7 @@ TEST_P(PhysicsTest, InelasticCollision)
 
 void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 {
-  Load("worlds/simple_pendulums_test.world", true, _physicsEngine);
+  Load("worlds/simple_pendulums.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
