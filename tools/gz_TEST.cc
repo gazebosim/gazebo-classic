@@ -113,7 +113,7 @@ void fini()
   if (p1 != g_pid)
   {
     kill(g_pid, SIGKILL);
-    p1 = waitpid(g_pid, &status, 0);
+    waitpid(g_pid, &status, 0);
   }
 
   g_pid = -1;

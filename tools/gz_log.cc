@@ -389,7 +389,7 @@ void ModelFilter::Init(const std::string &_filter)
   {
     boost::split(this->parts, mainParts.front(),
         boost::is_any_of("."));
-    if (this->parts.size() == 0 && !mainParts.front().empty())
+    if (this->parts.empty() && !mainParts.front().empty())
       this->parts.push_back(mainParts.front());
   }
 

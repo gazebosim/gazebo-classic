@@ -73,7 +73,7 @@ TEST_F(SonarSensor_TEST, CreateSonar)
   EXPECT_DOUBLE_EQ(sensor->GetRangeMin(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 1.0);
   EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
-  EXPECT_DOUBLE_EQ(sensor->GetRange(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->GetRange(), 1.0);
 
   EXPECT_TRUE(sensor->IsActive());
 }

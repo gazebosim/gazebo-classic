@@ -193,6 +193,7 @@ void SonarSensor::Init()
   Sensor::Init();
   this->sonarMsg.mutable_sonar()->set_frame(this->parentName);
   msgs::Set(this->sonarMsg.mutable_time(), this->world->GetSimTime());
+  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
   if (this->sonarPub)
     this->sonarPub->Publish(this->sonarMsg);
