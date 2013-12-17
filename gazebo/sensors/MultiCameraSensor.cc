@@ -203,7 +203,6 @@ void MultiCameraSensor::Render()
       iter != this->cameras.end(); ++iter)
   {
     (*iter)->Render();
-    (*iter)->PostRender();
   }
 
   this->rendered = true;
@@ -222,18 +221,22 @@ bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
 
   msgs::Set(this->msg.mutable_time(), this->lastMeasurementTime);
 
-  if (publish)
+  int index = 0;
+  for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter, ++index)
   {
-    int index = 0;
-    for (std::vector<rendering::CameraPtr>::iterator iter
-        = this->cameras.begin(); iter != this->cameras.end(); ++iter, ++index)
+    (*iter)->PostRender();
+
+    if (publish)
     {
       msgs::Image *image = this->msg.mutable_image(index);
       image->set_data((*iter)->GetImageData(0),
           image->width() * (*iter)->GetImageDepth() * image->height());
     }
-    this->imagePub->Publish(this->msg);
   }
+
+  if (publish)
+    this->imagePub->Publish(this->msg);
 
   this->rendered = false;
   return true;

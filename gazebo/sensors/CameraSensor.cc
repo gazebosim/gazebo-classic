@@ -171,7 +171,6 @@ void CameraSensor::Render()
 
   // Update all the cameras
   this->camera->Render();
-  this->camera->PostRender();
 
   this->rendered = true;
   this->lastMeasurementTime = this->scene->GetSimTime();
@@ -182,6 +181,8 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (!this->rendered)
     return false;
+
+  this->camera->PostRender();
 
   if (this->imagePub && this->imagePub->HasConnections())
   {
