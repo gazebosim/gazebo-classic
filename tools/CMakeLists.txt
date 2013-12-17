@@ -42,9 +42,9 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-if (${GAZEBO_VERSION} VERSION_GREATER 2.0)
+if (${GAZEBO_VERSION} VERSION_GREATER 3.0)
   message (WARNING
-    "Installing deprecated manpages. This should be removed after Gazebo 1.9")
+    "Installing deprecated manpages. This should be removed after Gazebo 3.0")
   manpage(gzfactory 1)
   manpage(gzlog 1)
   manpage(gzsdf 1)
