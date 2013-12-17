@@ -1,0 +1,85 @@
+<sdf version='1.4'>
+  <world name='default'>
+    <!-- include sun and ground plane -->
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+    <model name="test_model">
+      <static>true</static>
+      <link name="link">
+        <visual name="visual_00">
+          <pose>0 0 0.5  0 0 0</pose>
+          <transparency>0.0</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <visual name="visual_02">
+          <pose>2 0 0.5  0 0 0</pose>
+          <transparency>0.2</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <visual name="visual_04">
+          <pose>4 0 0.5  0 0 0</pose>
+          <transparency>0.4</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <visual name="visual_06">
+          <pose>6 0 0.5  0 0 0</pose>
+          <transparency>0.8</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <visual name="visual_08">
+          <pose>8 0 0.5  0 0 0</pose>
+          <transparency>0.8</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+        <visual name="visual_10">
+          <pose>10 0 0.5  0 0 0</pose>
+          <transparency>1.0</transparency>
+          <geometry>
+            <sphere><radius>0.5</radius></sphere>
+          </geometry>
+          <material><script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script></material>
+        </visual>
+      </link>
+    </model>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>5.0 -10.0 1.5  0.0 0.0 1.57079</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

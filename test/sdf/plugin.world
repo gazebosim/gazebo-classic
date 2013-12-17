@@ -1,0 +1,131 @@
+<gazebo version="1.0">
+  <world name="world_1">
+    <scene>
+      <ambient rgba="0.5 0.5 0.5 1.0"/>
+      <background rgba="0.5 0.5 0.5 1.0">
+        <sky material="Gazebo/Sky"/>
+      </background>
+      <shadows enabled="true" rgba="0.0 0.0 0.5 0.5" type="texture_gpu"/>
+      <fog rgba="0.0 0.0 0.5 0.5" type="linear" start="2.0" end="10.0" density="0.5"/>
+    </scene>
+
+    <physics type="ode">
+      <ode>
+        <max_contacts>250</max_contacts>
+        <solver type="quick" dt="0.001" iters="20" sor="1.3"/>
+        <constraints cfm="0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.0"/>
+      </ode>
+      <gravity xyz="0.0 0.0 -9.81"/>
+    </physics>
+
+    <model name="model_1" static="false">
+
+      <origin pose="0.0 0.0 1.0 0.0 0.0 0.0"/>
+
+      <link name="link_1" self_collide="true" gravity="false" kinematic="false">
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+        <inertial mass="10.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <damping linear="0.0" angular="0.0" />
+          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                   iyy="1.0" iyz="0.0"
+                   izz="1.0"/>
+        </inertial>
+
+        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <geometry>
+            <box size="1.0 1.0 2.0"/>
+          </geometry>
+          <material script="Gazebo/Green" normal_map="normal_map.png">
+            <color rgba="0.03 0.5 0.5 1.0"/>
+          </material>
+        </visual>
+
+        <collision name="collision_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box size="1.0 1.0 2.0"/>
+          </geometry>
+          <surface>
+            <friction>
+              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+            </friction>
+            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <contact>
+              <ode soft_cfm="0" soft_erp="0.2" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+            </contact>
+          </surface>
+        </collision>
+
+        <sensor name="sensor_camera" always_on="true" update_rate="2.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <camera>
+            <horizontal_fov angle="1.57"/>
+            <image width="2560" height="1600" format="BAYER_BGGR8"/>
+            <clip near="0.01" far="100.0"/>
+            <save enable="false" path="/tmp"/>
+          </camera>
+        </sensor>
+
+        <sensor name="sensor_ray" always_on="true" update_rate="2.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <ray>
+            <scan display="true">
+              <horizontal samples="500" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+              <vertical samples="300" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+            </scan>
+            <range min="0.01" max="30.0"/>
+          </ray>
+        </sensor>
+
+        <sensor name="sensor_contact" always_on="true" update_rate="2.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <collision name="collision_box"/> <!-- necessary because there might be multiple collisions -->
+        </sensor>
+
+      </link>
+
+    </model>
+
+    <plugin name="plugin_1" filename="libgazebo_ros_camera.so">
+      <data name="sensor" value="model_1::sensor_camera" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="25.0" />
+      <data name="imageTopicName" value="narrow_stereo/left/image_raw" />
+      <data name="cameraInfoTopicName" value="narrow_stereo/left/camera_info" />
+      <data name="frameName" value="narrow_stereo_optical_frame" />
+      <data name="hackBaseline" value="0" />
+      <data name="CxPrime" value="320.5" />
+      <data name="Cx" value="320.5" />
+      <data name="Cy" value="240.5" />
+      <!-- image_width / (2*tan(hfov_radian /2)) -->
+      <!-- 320 for wide and 772.55 for narrow stereo camera -->
+      <data name="focal_length" value="772.55" />
+      <data name="distortion_k1" value="0.0" />
+      <data name="distortion_k2" value="0.0" />
+      <data name="distortion_k3" value="0.0" />
+      <data name="distortion_t1" value="0.0" />
+      <data name="distortion_t2" value="0.0" />
+    </plugin>
+
+    <plugin name="plugin_2" filename="libgazebo_ros_laser.so">
+      <data name="sensor" value="model_1::sensor_ray" />
+      <data name="gaussianNoise" value="0.005" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="20" />
+      <data name="topicName" value="base_scan" />
+      <data name="frameName" value="base_laser_link" />
+    </plugin>
+
+    <plugin name="plugin_3" filename="libgazebo_ros_bumper.so">
+      <data name="sensor" value="model_1::sensor_contact" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="100.0" />
+      <data name="frameName" value="r_gripper_palm_link" />
+      <data name="bumperTopicName" value="r_gripper_palm_bumper" />
+    </plugin>
+
+  </world>
+</gazebo>
