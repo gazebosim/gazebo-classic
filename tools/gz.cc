@@ -490,7 +490,6 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    std::cout << sdfString << std::endl;
     if (!sdf::readString(sdfString, sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
@@ -673,7 +672,6 @@ void CameraCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool CameraCommand::RunImpl()
 {
-  std::cout << "Run camera\n";
   std::string cameraName, worldName;
 
   if (this->vm.count("world-name"))
@@ -802,8 +800,8 @@ void StatsCommand::CB(ConstWorldStatisticsPtr &_msg)
     static bool first = true;
     if (first)
     {
-      printf("# real-time factor (percent), simtime (sec), realtime (sec), "
-             "paused (T or F)\n");
+      std::cout << "# real-time factor (percent), simtime (sec), "
+        << "realtime (sec), paused (T or F)\n";
       first = false;
     }
     printf("%4.2f, %16.6f, %16.6f, %c\n",
@@ -899,8 +897,6 @@ bool SDFCommand::RunImpl()
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
-
-    std::cout << "Check complete\n";
   }
   else if (this->vm.count("describe"))
   {
@@ -931,7 +927,6 @@ bool SDFCommand::RunImpl()
         std::ofstream stream(path.string().c_str(), std::ios_base::out);
         stream << printer.Str();
         stream.close();
-        std::cout << "Success\n";
       }
     }
     else
