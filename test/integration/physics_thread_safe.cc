@@ -57,7 +57,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   // Start the simulation
   world->SetPaused(false);
 
-  // Run for 20 seconds of sim time
+  // Run for 5 seconds of sim time
   while (world->GetSimTime().sec < 5)
   {
     // Call these functions repeatedly
