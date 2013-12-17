@@ -13,7 +13,7 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
-1. **gazebo/transport/ConnectionManager.hh** 
+1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
@@ -31,11 +31,33 @@
     + ***Replacement:*** event::ConnectionPtr ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
     + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
 
+1. **gazebo/physics/MultiRayShape.hh** `API change`
+    + ***Removed:*** double MultiRayShape::GetRange(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRange(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetRetro(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRetro(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetFiducial(int _index)
+    + ***Replacement:*** double MultiRayShape::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+1. **gazebo/sensors/RaySensor.hh** `API change`
+    + ***Removed:*** double RaySensor::GetRange(int _index)
+    + ***Replacement:*** double RaySensor::GetRange(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetRetro(int _index)
+    + ***Replacement:*** double RaySensor::GetRetro(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetFiducial(int _index)
+    + ***Replacement:*** double RaySensor::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
 ### Additions
 
 1. **gazebo/physics/Joint.hh**
+    + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + physics::JointPtr GetJoint() const
 
 ### Deletions
 
