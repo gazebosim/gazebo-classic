@@ -572,31 +572,33 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
 
     // todo: add loop for vertical range count
     for (int j = 0; j < this->GetVerticalRayCount(); ++j)
-    for (int i = 0; i < this->GetRayCount(); ++i)
     {
-      double range = this->laserCam->GetLaserData()[
+      for (int i = 0; i < this->GetRayCount(); ++i)
+      {
+        double range = this->laserCam->GetLaserData()[
           (j * this->GetRayCount() + i) * 3];
 
-      if (this->noiseActive)
-      {
-        switch (this->noiseType)
+        if (this->noiseActive)
         {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range += math::Rand::GetDblNormal(this->noiseMean,
-                this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range = math::clamp(range, this->GetRangeMin(),
-                this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
+          switch (this->noiseType)
+          {
+            case GAUSSIAN:
+              // Add independent (uncorrelated) Gaussian noise to each beam.
+              range += math::Rand::GetDblNormal(this->noiseMean,
+                  this->noiseStdDev);
+              // No real laser would return a range outside its stated limits.
+              range = math::clamp(range, this->GetRangeMin(),
+                  this->GetRangeMax());
+              break;
+            default:
+              GZ_ASSERT(false, "Invalid noise model type");
+          }
         }
-      }
 
-      scan->add_ranges(range);
-      scan->add_intensities(this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3 + 1]);
+        scan->add_ranges(range);
+        scan->add_intensities(this->laserCam->GetLaserData()[
+            (j * this->GetRayCount() + i) * 3 + 1]);
+      }
     }
 
     if (this->scanPub && this->scanPub->HasConnections())

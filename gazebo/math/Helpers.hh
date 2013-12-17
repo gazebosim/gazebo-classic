@@ -91,7 +91,7 @@ namespace gazebo
     /// \return 0 if _v is NaN, _v otherwise.
     inline float fixnan(float _v)
     {
-      return isnan(_v) || isinf(_v) ? 0.0f : _v;
+      return isnan(_v) || std::isinf(_v) ? 0.0f : _v;
     }
 
     /// \brief Fix a nan value.
@@ -99,7 +99,7 @@ namespace gazebo
     /// \return 0 if _v is NaN, _v otherwise.
     inline double fixnan(double _v)
     {
-      return isnan(_v) || isinf(_v) ? 0.0 : _v;
+      return isnan(_v) || std::isinf(_v) ? 0.0 : _v;
     }
 
     /// \brief get mean of vector of values

@@ -473,18 +473,46 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::JointPtr joint;
-  gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
-  joint = SpawnJoint(_jointType, false, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
-  joint = SpawnJoint(_jointType, false, true);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, false, true);
+    ASSERT_TRUE(joint != NULL);
+    // Check child link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != NULL);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    EXPECT_TRUE(parent == NULL);
+  }
 
-  gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
-  joint = SpawnJoint(_jointType, true, false);
-  EXPECT_TRUE(joint != NULL);
+  {
+    gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
+    physics::JointPtr joint = SpawnJoint(_jointType, true, false);
+    ASSERT_TRUE(joint != NULL);
+    // Check parent link
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    EXPECT_TRUE(child == NULL);
+    ASSERT_TRUE(parent != NULL);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -512,13 +540,13 @@ void Joint_TEST::SpawnJointRotational(const std::string &_physicsEngine,
 
   gzdbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
-  EXPECT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != NULL);
 
   physics::LinkPtr parent, child;
   child = joint->GetChild();
   parent = joint->GetParent();
-  EXPECT_TRUE(child != NULL);
-  EXPECT_TRUE(parent != NULL);
+  ASSERT_TRUE(child != NULL);
+  ASSERT_TRUE(parent != NULL);
 
   math::Vector3 pos(10, 10, 10);
   math::Vector3 vel(10, 10, 10);
@@ -631,10 +659,6 @@ INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_RotationalWorld,
 ////////////////////////////////////////////////////////////////////////
 void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 {
-  /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
-    return;
-
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
 
@@ -647,41 +671,13 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // create some fake links
-  physics::ModelPtr model = world->GetModel("model_1");
-  ASSERT_TRUE(model != NULL);
-  physics::LinkPtr link = model->GetLink("link_1");
-  ASSERT_TRUE(link != NULL);
-
-  physics::LinkPtr parentLink;
-  physics::LinkPtr childLink(link);
-  physics::JointPtr joint;
-  math::Pose anchor;
-  double upper = M_PI;
-  double lower = -M_PI;
-
   {
-    // create a joint
-    {
-      joint = world->GetPhysicsEngine()->CreateJoint(
-        "revolute", model);
-      joint->Attach(parentLink, childLink);
-      // load adds the joint to a vector of shared pointers kept
-      // in parent and child links, preventing joint from being destroyed.
-      joint->Load(parentLink, childLink, anchor);
-      // joint->SetAnchor(0, anchor);
-      joint->SetAxis(0, math::Vector3(1, 0, 0));
-      joint->SetHighStop(0, upper);
-      joint->SetLowStop(0, lower);
-
-      if (parentLink)
-        joint->SetName(parentLink->GetName() + std::string("_") +
-                       childLink->GetName() + std::string("_joint"));
-      else
-        joint->SetName(std::string("world_") +
-                       childLink->GetName() + std::string("_joint"));
-      joint->Init();
-    }
+    // get model
+    physics::ModelPtr model = world->GetModel("model_1");
+    ASSERT_TRUE(model != NULL);
+    physics::LinkPtr link = model->GetLink("link_1");
+    ASSERT_TRUE(link != NULL);
+    physics::JointPtr joint = model->GetJoint("joint_01");
 
     double lastV = 0;
     double dt = world->GetPhysicsEngine()->GetMaxStepSize();
@@ -696,50 +692,15 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
       lastV = curV;
       EXPECT_NEAR(accel, torque / link->GetInertial()->GetIXX(), TOL);
     }
-
-    // remove the joint
-    {
-      bool paused = world->IsPaused();
-      world->SetPaused(true);
-      if (joint)
-      {
-        // reenable collision between the link pair
-        physics::LinkPtr parent = joint->GetParent();
-        physics::LinkPtr child = joint->GetChild();
-        if (parent)
-          parent->SetCollideMode("all");
-        if (child)
-          child->SetCollideMode("all");
-
-        joint->Detach();
-        joint.reset();
-      }
-      world->SetPaused(paused);
-    }
   }
 
   {
-    // create a joint
-    {
-      joint = world->GetPhysicsEngine()->CreateJoint(
-        "revolute", model);
-      joint->Attach(parentLink, childLink);
-      // load adds the joint to a vector of shared pointers kept
-      // in parent and child links, preventing joint from being destroyed.
-      joint->Load(parentLink, childLink, anchor);
-      // joint->SetAnchor(0, anchor);
-      joint->SetAxis(0, math::Vector3(0, 0, 1));
-      joint->SetHighStop(0, upper);
-      joint->SetLowStop(0, lower);
-
-      if (parentLink)
-        joint->SetName(parentLink->GetName() + std::string("_") +
-                       childLink->GetName() + std::string("_joint"));
-      else
-        joint->SetName(std::string("world_") +
-                       childLink->GetName() + std::string("_joint"));
-      joint->Init();
-    }
+    // get model
+    physics::ModelPtr model = world->GetModel("model_2");
+    ASSERT_TRUE(model != NULL);
+    physics::LinkPtr link = model->GetLink("link_1");
+    ASSERT_TRUE(link != NULL);
+    physics::JointPtr joint = model->GetJoint("joint_01");
 
     double lastV = 0;
     double dt = world->GetPhysicsEngine()->GetMaxStepSize();
@@ -754,50 +715,13 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
       lastV = curV;
       EXPECT_NEAR(accel, torque / link->GetInertial()->GetIZZ(), TOL);
     }
-
-    // remove the joint
-    {
-      bool paused = world->IsPaused();
-      world->SetPaused(true);
-      if (joint)
-      {
-        // reenable collision between the link pair
-        physics::LinkPtr parent = joint->GetParent();
-        physics::LinkPtr child = joint->GetChild();
-        if (parent)
-          parent->SetCollideMode("all");
-        if (child)
-          child->SetCollideMode("all");
-
-        joint->Detach();
-        joint.reset();
-      }
-      world->SetPaused(paused);
-    }
   }
 }
 
-TEST_F(Joint_TEST, JointTorqueTestODE)
+TEST_P(Joint_TEST, JointTorqueTest)
 {
-  JointTorqueTest("ode");
+  JointTorqueTest(this->physicsEngine);
 }
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, JointTorqueTestSimbody)
-{
-  JointTorqueTest("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, JointTorqueTestBullet)
-{
-  gzerr << "JointTorqueTestBullet fails because dynamic joint manipulation "
-        << "is not yet working\n";
-  // JointTorqueTest("bullet");
-}
-#endif  // HAVE_BULLET
 
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
