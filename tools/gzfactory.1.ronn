@@ -1,4 +1,4 @@
-gzfactory -- DEPRECATED(see 'gz help model')  simulation
+gzfactory -- DEPRECATED(see 'gz help model')
 =============================================
 
 ## SYNOPSIS

@@ -112,9 +112,6 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::cout << "gzstats is deprecated. Use the gz "
-    << "command line: gz help stats.\n";
-
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;

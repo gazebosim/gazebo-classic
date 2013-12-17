@@ -979,9 +979,6 @@ void record(bool _start)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::cout << "gzlog is deprecated. Use the gz "
-    << "command line: gz help log.\n";
-
   // Hidden options
   po::options_description hiddenOptions("hidden options");
   hiddenOptions.add_options()

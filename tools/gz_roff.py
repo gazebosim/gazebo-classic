@@ -44,10 +44,9 @@ def outputCommand(_command):
     line = line.replace(" arg\n","\\fR=\\fIarg\\fR\n")
     line = line.replace("-","\\-")
   
-    i = i + 1
-    while i < len(lines) and len(lines[i]) > 0 and lines[i][0] == " " and re.match(r'^   ', lines[i]):
-      line += " " + lines[i].strip()
+    while i+1 < len(lines) and len(lines[i+1]) > 0 and lines[i+1][0] == " " and re.match(r'^   ', lines[i+1]):
       i = i + 1
+      line += " " + lines[i].strip()
  
     if len(line) > 0:
       f.write(".TP\n")
@@ -67,9 +66,9 @@ f.write('.\n')
 f.write('.UNINDENT\n')
 f.write('.SH COMMANDS\n')
 
-process = subprocess.Popen(['gz', 'debug'], stderr=subprocess.PIPE)
+process = subprocess.Popen(['gz', 'debug'], stdout=subprocess.PIPE)
 stdout, stderr = process.communicate()
-helpTxt = stderr
+helpTxt = stdout
   
 commands = helpTxt.splitlines()
 

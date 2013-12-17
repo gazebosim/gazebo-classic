@@ -31,9 +31,17 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-c, \-\-camera\-name\fR=\fIarg\fR
 .
 Camera name.
+.TP
+.B \-f, \-\-follow\fR=\fIarg\fR
+.
+Model to follow.
 .UNINDENT
 .SS debug
 .sp
@@ -54,6 +62,10 @@ Options:
 .B \-h, \-\-help
 .
 Print this help message
+.TP
+.B \-o, \-\-option\fR=\fIarg\fR
+.
+Show the command options.
 .UNINDENT
 .SS help
 .sp
@@ -96,7 +108,15 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-m, \-\-model\-name\fR=\fIarg\fR
+.
+Model name.
+.TP
+.B \-j, \-\-joint\-name\fR=\fIarg\fR
 .
 Model name.
 .TP
@@ -104,21 +124,41 @@ Model name.
 .
 Delete a model.
 .TP
+.B \-f, \-\-force\fR=\fIarg\fR
+.
+Force to apply to a joint.
+.TP
 .B \-\-pos\-t\fR=\fIarg\fR
 .
 Target angle.
+.TP
+.B \-\-pos\-p\fR=\fIarg\fR
+.
+Position proportional gain.
 .TP
 .B \-\-pos\-i\fR=\fIarg\fR
 .
 Position integral gain.
 .TP
+.B \-\-pos\-d\fR=\fIarg\fR
+.
+Position differential gain.
+.TP
 .B \-\-vel\-t\fR=\fIarg\fR
 .
 Target speed.
 .TP
+.B \-\-vel\-p\fR=\fIarg\fR
+.
+Velocity proportional gain.
+.TP
 .B \-\-vel\-i\fR=\fIarg\fR
 .
 Velocity integral gain.
+.TP
+.B \-\-vel\-d\fR=\fIarg\fR
+.
+Velocity differential gain.
 .UNINDENT
 .SS log
 .sp
@@ -141,21 +181,41 @@ Options:
 .
 Print this help message
 .TP
+.B \-i, \-\-info
+.
+Output information about a log file.
+.TP
 .B \-e, \-\-echo
 .
 Output the contents of a log file to screen.
 .TP
-.B \-r, \-\-record\fR=\fIarg\fR
+.B \-s, \-\-step
+.
+Step through the contents of a log file.
+.TP
+.B \-d, \-\-record\fR=\fIarg\fR
 .
 Start/stop recording a log file from an active Gazebo server.
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name, used when starting or stopping recording.
 .TP
 .B \-r, \-\-raw
 .
 Output the data from echo and step without XML formatting.
 .TP
-.B are (sim,real,wall)
+.B \-\-stamp\fR=\fIarg\fR
+.
+Add a timestamp to each line of output. Valid values are (sim,real,wall)
 .TP
-.B valid for echo and step commands.
+.B \-z, \-\-hz\fR=\fIarg\fR
+.
+Filter output to the specified Hz rate.Only valid for echo and step commands.
+.TP
+.B \-f, \-\-file\fR=\fIarg\fR
+.
+Path to a log file.
 .TP
 .B \-\-filter\fR=\fIarg\fR
 .
@@ -183,17 +243,35 @@ Options:
 .
 Print this help message
 .TP
+.B \-m, \-\-model\-name\fR=\fIarg\fR
+.
+Model name.
+.TP
 .B \-w, \-\-world\-name\fR=\fIarg\fR
 .
 World name.
 .TP
-.B \-f, \-\-spawn\-sdf\fR=\fIarg\fR
+.B \-d, \-\-delete
+.
+Delete a model.
+.TP
+.B \-f, \-\-spawn\-file\fR=\fIarg\fR
 .
 Spawn model from SDF file.
 .TP
+.B \-s, \-\-spawn\-string
+.
+Spawn model from SDF string, pass by a pipe.
+.TP
+.B \-x, \-\-pose\-x arg x value
+.TP
 .B \-y, \-\-pose\-y arg y value
 .TP
+.B \-z, \-\-pose\-z arg z value
+.TP
 .B \-R, \-\-pose\-R arg roll in radians.
+.TP
+.B \-P, \-\-pose\-P arg pitch in radians.
 .TP
 .B \-Y, \-\-pose\-Y arg yaw in radians.
 .UNINDENT
@@ -218,13 +296,25 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-g, \-\-gravity\fR=\fIarg\fR
 .
 Gravity vector. Comma separated 3\-tuple.
 .TP
+.B \-s, \-\-step\-size\fR=\fIarg\fR
+.
+Maximum step size (seconds).
+.TP
 .B \-i, \-\-iters\fR=\fIarg\fR
 .
 Number of iterations.
+.TP
+.B \-u, \-\-update\-rate\fR=\fIarg\fR
+.
+Target real\-time update rate.
 .UNINDENT
 .SS sdf
 .sp
@@ -247,13 +337,25 @@ Options:
 .
 Print this help message
 .TP
+.B \-d, \-\-describe
+.
+Print SDF format for given version(\-v).
+.TP
 .B \-c, \-\-convert\fR=\fIarg\fR
 .
 In place conversion of,arg] to the latest SDF version.
 .TP
+.B \-o, \-\-doc
+.
+Print HTML SDF. Use \-v to specify version.
+.TP
 .B \-k, \-\-check\fR=\fIarg\fR
 .
 Validate,arg].
+.TP
+.B \-v, \-\-version\fR=\fIarg\fR
+.
+Version of SDF to use with other options.
 .TP
 .B \-p, \-\-print\fR=\fIarg\fR
 .
@@ -280,11 +382,17 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-d, \-\-duration\fR=\fIarg\fR
 .
 Duration (seconds) to run.
 .TP
-.B and plotting.
+.B \-p, \-\-plot
+.
+Output comma\-separated values, useful for processing and plotting.
 .UNINDENT
 .SS topic
 .sp
@@ -307,17 +415,37 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-l, \-\-list
 .
 List all topics.
+.TP
+.B \-i, \-\-info\fR=\fIarg\fR
+.
+Get information about a topic.
 .TP
 .B \-e, \-\-echo\fR=\fIarg\fR
 .
 Output topic data to screen.
 .TP
+.B \-v, \-\-view\fR=\fIarg\fR
+.
+View topic data using a QT widget.
+.TP
 .B \-z, \-\-hz\fR=\fIarg\fR
 .
 Get publish frequency.
+.TP
+.B \-b, \-\-bw\fR=\fIarg\fR
+.
+Get topic bandwidth.
+.TP
+.B \-u, \-\-unformatted
+.
+Output data from echo without formatting.
 .TP
 .B \-d, \-\-duration\fR=\fIarg\fR
 .
@@ -344,14 +472,30 @@ Options:
 .
 Print this help message
 .TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
 .B \-p, \-\-pause\fR=\fIarg\fR
 .
 Pause/unpause simulation.
+.TP
+.B \-s, \-\-step
+.
+Step simulation one iteration.
 .TP
 .B \-m, \-\-multi\-step\fR=\fIarg\fR
 .
 Step simulation mulitple iteration.
 .TP
+.B \-r, \-\-reset\-all
+.
+Reset time and model poses
+.TP
 .B \-t, \-\-reset\-time
 .
 Reset time
+.TP
+.B \-o, \-\-reset\-models
+.
+Reset models

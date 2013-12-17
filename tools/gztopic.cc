@@ -556,9 +556,6 @@ void view(int _argc, char **_argv)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::cout << "gztopic is deprecated. Use the gz command "
-    << "line: gz help topic.\n";
-
   if (!parse(argc, argv))
     return 0;
 
