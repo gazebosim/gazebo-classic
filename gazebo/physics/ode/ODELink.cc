@@ -211,7 +211,7 @@ void ODELink::SetGravityMode(bool _mode)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
   }
-  else
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetGravityMode" << std::endl;
@@ -251,9 +251,10 @@ void ODELink::OnPoseChange()
 
   if (!this->linkId)
   {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, unable to respond to OnPoseChange"
-          << std::endl;
+    if (!this->IsStatic() && this->initialized)
+      gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+            << " does not exist, unable to respond to OnPoseChange"
+            << std::endl;
     return;
   }
 
@@ -292,8 +293,9 @@ void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
   {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, unable to SetEnabled" << std::endl;
+    if (!this->IsStatic() && this->initialized)
+      gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+            << " does not exist, unable to SetEnabled" << std::endl;
     return;
   }
 
@@ -344,8 +346,9 @@ void ODELink::UpdateMass()
 {
   if (!this->linkId)
   {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, unable to UpdateMass" << std::endl;
+    if (!this->IsStatic() && this->initialized)
+      gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+            << " does not exist, unable to UpdateMass" << std::endl;
     return;
   }
 
@@ -673,7 +676,7 @@ void ODELink::SetLinearDamping(double _damping)
 {
   if (this->GetODEId())
     dBodySetLinearDamping(this->GetODEId(), _damping);
-  else
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetLinearDamping" << std::endl;
 }
@@ -683,7 +686,7 @@ void ODELink::SetAngularDamping(double _damping)
 {
   if (this->GetODEId())
     dBodySetAngularDamping(this->GetODEId(), _damping);
-  else
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetAngularDamping" << std::endl;
 }
@@ -699,7 +702,7 @@ void ODELink::SetKinematic(const bool &_state)
     else if (dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
-  else
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetKinematic" << std::endl;
 }
