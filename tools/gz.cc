@@ -897,6 +897,8 @@ bool SDFCommand::RunImpl()
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
     }
+
+    std::cout << "Success\n";
   }
   else if (this->vm.count("describe"))
   {
