@@ -637,10 +637,7 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
-  math::Pose pose;
-  pose.pos = Conversions::Convert(this->camera->getDerivedPosition());
-  pose.rot = Conversions::Convert(this->camera->getDerivedOrientation());
-  return pose;
+  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
