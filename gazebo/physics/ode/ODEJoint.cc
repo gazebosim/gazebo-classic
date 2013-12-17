@@ -1052,8 +1052,8 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
       if (!this->childLink)
       {
-        gzlog << "Joint [" << this->GetName()
-              << "] with parent Link [" << this->parentLink->GetName()
+        gzlog << "Joint [" << this->GetScopedName()
+              << "] with parent Link [" << this->parentLink->GetScopedName()
               << "] but no child Link.  Child Link must be world.\n";
         // if child link does not exist, use equal and opposite
         this->wrench.body2Force = -this->wrench.body1Force;
@@ -1079,8 +1079,8 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       }
       else
       {
-        gzlog << "Joint [" << this->GetName()
-              << "] with child Link [" << this->childLink->GetName()
+        gzlog << "Joint [" << this->GetScopedName()
+              << "] with child Link [" << this->childLink->GetScopedName()
               << "] but no parent Link.  Parent Link must be world.\n";
         // if parentLink does not exist, use equal opposite body1 wrench
         this->wrench.body1Force = -this->wrench.body2Force;
@@ -1282,7 +1282,7 @@ void ODEJoint::SaveForce(int _index, double _force)
     this->forceApplied[_index] += _force;
   }
   else
-    gzerr << "Something's wrong, joint [" << this->GetName()
+    gzerr << "Something's wrong, joint [" << this->GetScopedName()
           << "] index [" << _index
           << "] out of range.\n";
 }
