@@ -166,9 +166,9 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           //        << ", " << contact.pos[1]
           //        << ", " << contact.pos[2]
           //        << ", " << "]"
-          //      << " ray[" << rayCollision->GetName() << "]"
+          //      << " ray[" << rayCollision->GetScopedName() << "]"
           //      << " pose[" << rayCollision->GetWorldPose() << "]"
-          //      << " hit[" << hitCollision->GetName() << "]"
+          //      << " hit[" << hitCollision->GetScopedName() << "]"
           //      << " pose[" << hitCollision->GetWorldPose() << "]"
           //      << "\n";
           shape->SetLength(contact.depth);
