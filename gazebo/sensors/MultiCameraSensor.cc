@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
@@ -69,7 +69,8 @@ void MultiCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create the publisher of image data.
-  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -94,7 +95,7 @@ void MultiCameraSensor::Init()
 
   if (!this->scene)
   {
-    this->scene = rendering::create_scene(worldName, false);
+    this->scene = rendering::create_scene(worldName, false, true);
 
     // This usually means rendering is not available
     if (!this->scene)
@@ -108,13 +109,13 @@ void MultiCameraSensor::Init()
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = this->scene->CreateCamera(
-          cameraSdf->GetValueString("name"), false);
+    rendering::CameraPtr camera = scene->CreateCamera(
+          cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
     {
       gzthrow("Unable to create multicamera sensor[" +
-              cameraSdf->GetValueString("name"));
+              cameraSdf->Get<std::string>("name"));
       return;
     }
 
@@ -130,9 +131,9 @@ void MultiCameraSensor::Init()
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentName, true);
+    camera->AttachToVisual(this->parentId, true);
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);
@@ -141,6 +142,12 @@ void MultiCameraSensor::Init()
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -179,7 +186,7 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
-  if (this->cameras.size() == 0)
+  if (this->cameras.empty())
     return;
 
   bool publish = this->imagePub->HasConnections();
@@ -266,5 +273,6 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 //////////////////////////////////////////////////
 bool MultiCameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

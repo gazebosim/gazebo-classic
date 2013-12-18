@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/RTShaderSystem.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -36,7 +34,6 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/math/Pose.hh"
 
-#include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -56,6 +53,10 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
   this->laserScan = NULL;
   this->matFirstPass = NULL;
   this->matSecondPass = NULL;
+  for (int i = 0; i < 3; ++i)
+    this->firstPassTextures[i] = NULL;
+  this->secondPassTexture = NULL;
+  this->orthoCam = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
   this->visual.reset();
@@ -66,6 +67,27 @@ GpuLaser::~GpuLaser()
 {
   delete [] this->laserBuffer;
   delete [] this->laserScan;
+
+  for (unsigned int i = 0; i < this->textureCount; ++i)
+  {
+    if (this->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->firstPassTextures[i]->getName());
+    }
+  }
+  if (this->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->secondPassTexture->getName());
+  }
+
+  if (this->scene && this->orthoCam)
+    this->scene->GetManager()->destroyCamera(this->orthoCam);
+
+  this->visual.reset();
+  this->texIdx.clear();
+  texCount = 0;
 }
 
 //////////////////////////////////////////////////
@@ -134,8 +156,6 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     this->Set1stPassTarget(
         this->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
-    RTShaderSystem::AttachViewport(this->firstPassViewports[i],
-                                   this->GetScene());
     this->firstPassTargets[i]->setAutoUpdated(false);
   }
 
@@ -154,7 +174,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->Set2ndPassTarget(
       this->secondPassTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->secondPassViewport, this->GetScene());
+
   this->secondPassTarget->setAutoUpdated(false);
 
   this->matSecondPass = (Ogre::Material*)(
@@ -172,13 +192,16 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     Ogre::Pass *pass = technique->getPass(0);
     GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
 
-    texUnit = pass->createTextureUnitState(
-          this->firstPassTextures[i]->getName(), texIndex);
+    if (!pass->getTextureUnitState(this->firstPassTextures[i]->getName()))
+    {
+      texUnit = pass->createTextureUnitState(
+            this->firstPassTextures[i]->getName(), texIndex);
 
-    this->texIdx.push_back(texIndex);
+      this->texIdx.push_back(texIndex);
 
-    texUnit->setTextureFiltering(Ogre::TFO_NONE);
-    texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+      texUnit->setTextureFiltering(Ogre::TFO_NONE);
+      texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    }
   }
 
   this->CreateCanvas();
@@ -389,8 +412,6 @@ void GpuLaser::RenderImpl()
 
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
-
   sceneMgr->_suppressRenderStateChanges(true);
   sceneMgr->addRenderObjectListener(this);
 
@@ -428,7 +449,6 @@ void GpuLaser::RenderImpl()
   this->visual->SetVisible(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->lastRenderDuration = firstPassDur + secondPassDur;
@@ -504,10 +524,12 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
       this->firstPassTargets[_index]->addViewport(this->camera);
     this->firstPassViewports[_index]->setClearEveryFrame(true);
     this->firstPassViewports[_index]->setOverlaysEnabled(false);
+    this->firstPassViewports[_index]->setShadowsEnabled(false);
+    this->firstPassViewports[_index]->setSkiesEnabled(false);
     this->firstPassViewports[_index]->setBackgroundColour(
         Ogre::ColourValue(this->far, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   if (_index == 0)
   {
@@ -527,10 +549,13 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
     this->secondPassViewport =
         this->secondPassTarget->addViewport(this->orthoCam);
     this->secondPassViewport->setClearEveryFrame(true);
+    this->secondPassViewport->setOverlaysEnabled(false);
+    this->secondPassViewport->setShadowsEnabled(false);
+    this->secondPassViewport->setSkiesEnabled(false);
     this->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
     this->secondPassViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
       0, static_cast<float>(this->GetImageWidth() / 10.0),
@@ -660,7 +685,8 @@ void GpuLaser::CreateCanvas()
         meshName));
 
   this->visual->AttachObject(this->object);
-  this->object->setVisibilityFlags(GZ_VISIBILITY_ALL);
+  this->object->setVisibilityFlags(GZ_VISIBILITY_ALL
+      & ~GZ_VISIBILITY_SELECTABLE);
 
   math::Pose pose;
   pose.pos = math::Vector3(0.01, 0, 0);

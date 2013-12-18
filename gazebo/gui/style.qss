@@ -87,6 +87,11 @@ QMenuBar::item:selected
   color: #f58113;
 }
 
+QMenuBar::item:disabled
+{
+  color: #5f5f5f;
+}
+
 QMenu
 {
   color: #d0d0d0;

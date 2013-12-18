@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ void MouseEventHandler::Add(const std::string &_name,
 void MouseEventHandler::Remove(const std::string &_name,
     std::list<Filter> &_list)
 {
-  std::remove(_list.begin(), _list.end(), _name);
+  _list.remove(Filter(_name, NULL));
 }
 
 /////////////////////////////////////////////////

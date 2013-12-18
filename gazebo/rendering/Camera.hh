@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,18 +28,19 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -102,10 +103,11 @@ namespace gazebo
       /// \return The Hz rate
       public: double GetRenderRate() const;
 
-      /// \brief Render the camera
-      ///
+      /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
-      /// camera images
+      /// camera images.
+      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
+      // and change Render(bool _force) to have a default value of false.
       public: void Render();
 
       /// \brief Post render
@@ -124,10 +126,6 @@ namespace gazebo
       ///
       /// This function is called before the camera is destructed
       public: virtual void Fini();
-
-      /// Deprecated.
-      /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
@@ -268,6 +266,10 @@ namespace gazebo
       /// \param[in] _enable Set to True to enable saving of frames
       public: void EnableSaveFrame(bool _enable);
 
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      public: bool GetCaptureData() const;
+
       /// \brief Set the save frame pathname
       /// \param[in] _pathname Directory in which to store saved image frames
       public: void SetSaveFramePathname(const std::string &_pathname);
@@ -402,6 +404,18 @@ namespace gazebo
                   bool _inheritOrientation,
                   double _minDist = 0.0, double _maxDist = 0.0);
 
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      public: void AttachToVisual(uint32_t _id,
+                  bool _inheritOrientation,
+                  double _minDist = 0.0, double _maxDist = 0.0);
+
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
       public: void TrackVisual(const std::string &_visualName);
@@ -508,6 +522,19 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
+                     bool _inheritOrientation,
+                     double _minDist = 0, double _maxDist = 0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      /// \return True on success
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 
@@ -683,6 +710,15 @@ namespace gazebo
       /// \brief Render period.
       private: common::Time renderPeriod;
 
+      /// \brief Position PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
+      private: common::PID trackVisualYawPID;
+
       /// \brief Which noise type we support
       private: enum NoiseModelType
       {
@@ -705,8 +741,14 @@ namespace gazebo
       /// devation of the distibution from which we sample
       private: double noiseStdDev;
 
-      /// \brief store option to turn off cloud
-      private: bool displayClouds;
+      // \todo Move this back up to public section in Gazebo 3.0. It is here
+      // for ABI compatibility.
+      /// \brief Render the camera.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
+      public: void Render(bool _force);
     };
     /// \}
   }

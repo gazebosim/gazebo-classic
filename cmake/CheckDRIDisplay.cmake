@@ -2,6 +2,14 @@
 # Check for existance of glxinfo application
 # Check for existance of support for pyopengl
 MESSAGE(STATUS "Looking for display capabilities")
+
+IF ((DEFINED FORCE_GRAPHIC_TESTS_COMPILATION) AND (${FORCE_GRAPHIC_TESTS_COMPILATION}))
+  SET (VALID_DISPLAY TRUE)
+  SET (VALID_DRI_DISPLAY TRUE)
+  MESSAGE(STATUS " + Force requested. All capabilities on without checking")
+  RETURN()
+ENDIF()
+
 SET (VALID_DISPLAY FALSE)
 SET (VALID_DRI_DISPLAY FALSE)
 SET (CHECKER_ERROR "(no glxinfo or pyopengl)")

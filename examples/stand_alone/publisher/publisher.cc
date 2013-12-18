@@ -1,6 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
- * Copyright 2013 Dereck Wonnacott
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <math/gzmath.hh>
+#include <gazebo/math/gzmath.hh>
 
 #include <iostream>
 

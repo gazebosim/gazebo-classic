@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,13 +137,13 @@ namespace gazebo
 
       /// \brief Callback function called when a connection is accepted
       /// \param[in] _newConnection Pointer to the new connection
-      private: void OnAccept(const ConnectionPtr &_newConnection);
+      private: void OnAccept(ConnectionPtr _newConnection);
 
       /// \brief Callback function called when a connection is read
       /// \param[in] _newConnection Pointer to new connection
       /// \param[in] _data Data that has been read.
-      private: void OnRead(const ConnectionPtr &_newConnection,
-                            const std::string &_data);
+      private: void OnRead(ConnectionPtr _newConnection,
+                           const std::string &_data);
 
       /// \brief Process a raw message.
       /// \param[in] _packet The raw message data.
