@@ -74,7 +74,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
         Ogre::Technique *newTechnique =
             static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
         #else
-        Ogre::Technique *newTechnique = 
+        Ogre::Technique *newTechnique =
             res.staticCast<Ogre::Material>()->getTechnique(0);
         #endif
 
