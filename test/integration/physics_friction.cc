@@ -30,8 +30,8 @@ class PhysicsFrictionTest : public ServerFixture,
 {
   class FrictionBox
   {
-    public: FrictionBox(physics::WorldPtr _world, std::string _name)
-            : world(_world), modelName(_name), friction(0.0)
+    public: FrictionBox(physics::WorldPtr _world, const std::string &_name)
+            : modelName(_name), world(_world), friction(0.0)
             {
               model = world->GetModel(modelName);
             }
@@ -73,7 +73,7 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
 
   for (box = boxes.begin(); box != boxes.end(); ++box)
   {
-    ASSERT_TRUE(box.model != NULL);
+    ASSERT_TRUE(box->model != NULL);
   }
 }
 
