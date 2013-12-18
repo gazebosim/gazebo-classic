@@ -101,6 +101,7 @@ void RTShaderSystem::Fini()
     this->shaderGenerator = NULL;
   }
 
+  this->pssmSetup.setNull();
   this->entities.clear();
   this->scenes.clear();
   this->initialized = false;

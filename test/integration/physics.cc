@@ -1339,12 +1339,6 @@ TEST_F(PhysicsTest, DropStuffDART)
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Skipping InelasticCollision for bullet per #864" << std::endl;
-    return;
-  }
-
   // check conservation of mementum for linear inelastic collision
   Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -1393,7 +1387,11 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           //      << "]\n";
 
           if (i == 0)
+          {
             box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+            EXPECT_TRUE(box_model->GetLink("link")->GetWorldForce() ==
+              math::Vector3(f, 0, 0));
+          }
 
           if (t > 1.000 && t < 1.01)
           {
