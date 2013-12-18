@@ -67,11 +67,16 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           Ogre::MaterialManager::getSingleton().load("gazebo/plain_color",
               Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+        // OGRE 1.9 changes the shared pointer definition
+        #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
         // Make sure we keep the same depth properties so that
         // certain overlay objects can be picked by the mouse.
         Ogre::Technique *newTechnique =
             static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
-
+        #else
+        Ogre::Technique *newTechnique = 
+            res.staticCast<Ogre::Material>()->getTechnique(0);
+        #endif
 
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)
