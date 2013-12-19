@@ -898,7 +898,7 @@ bool SDFCommand::RunImpl()
       return -1;
     }
 
-    std::cout << "Success\n";
+    std::cout << "Check complete\n";
   }
   else if (this->vm.count("describe"))
   {
@@ -929,6 +929,8 @@ bool SDFCommand::RunImpl()
         std::ofstream stream(path.string().c_str(), std::ios_base::out);
         stream << printer.Str();
         stream.close();
+
+        std::cout << "Success\n";
       }
     }
     else
