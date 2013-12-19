@@ -135,7 +135,8 @@ int Dem::Load(const std::string &_filename)
   this->dataPtr->side = std::max(width, height);
 
   // Preload the DEM's data
-  this->LoadData();
+  if (this->LoadData() != 0)
+    return -1;
 
   // Set the min/max heights
   this->dataPtr->minElevation = *std::min_element(&this->dataPtr->demData[0],
@@ -296,7 +297,7 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
 }
 
 //////////////////////////////////////////////////
-void Dem::LoadData()
+int Dem::LoadData()
 {
     unsigned int destWidth;
     unsigned int destHeight;
@@ -304,6 +305,13 @@ void Dem::LoadData()
     unsigned int nYSize = this->dataPtr->dataSet->GetRasterYSize();
     float ratio;
     std::vector<float> buffer;
+
+    if (nXSize == 0 || nYSize == 0)
+    {
+      gzerr << "Illegal size loading a DEM file (" << nXSize << ","
+            << nYSize << ")\n";
+      return -1;
+    }
 
     // Scale the terrain keeping the same ratio between width and height
     if (nXSize > nYSize)
@@ -327,7 +335,7 @@ void Dem::LoadData()
 
     // Copy and align 'buffer' into the target vector. The destination vector is
     // initialized to 0, so all the points not contained in 'buffer' will be
-    // padding
+    // extra padding
     this->dataPtr->demData.resize(this->GetWidth() * this->GetHeight());
     for (unsigned int y = 0; y < destHeight; ++y)
     {
@@ -335,6 +343,8 @@ void Dem::LoadData()
                   this->dataPtr->demData.begin() + this->GetWidth() * y);
     }
     buffer.clear();
+
+    return 0;
 }
 
 #endif

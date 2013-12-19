@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
-      /// \return True when the operation succeeds to open a file.
+      /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename="");
 
       /// \brief Get the elevation of a terrain's point in meters.
@@ -125,7 +125,8 @@ namespace gazebo
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
       /// a squared terrain with padding.
-      private: void LoadData();
+      /// \return 0 when the operation succeeds to open a file.
+      private: int LoadData();
 
       /// internal
       /// \brief Pointer to the private data.
