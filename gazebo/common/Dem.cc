@@ -237,6 +237,12 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
                         const math::Vector3 &_size, const math::Vector3 &_scale,
                         bool _flipY, std::vector<float> &_heights)
 {
+  if (_subSampling <= 0)
+  {
+    gzerr << "Illegal subsampling value (" << _subSampling << ")\n";
+    return;
+  }
+
   // Resize the vector to match the size of the vertices.
   _heights.resize(_vertSize * _vertSize);
 
