@@ -341,6 +341,37 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   }
 }
 
+//////////////////////////////////////////////////
+// Callback function for applying custom noise
+double OnApplyCustomNoise(double _in)
+{
+  return _in*2;
+}
+
+TEST(NoiseTest, OnApplyNoise)
+{
+  // Verify that the custom callback function is called if noise type is
+  // set to CUSTOM
+  sensors::NoisePtr noise;
+  noise.reset(new sensors::Noise());
+
+  ASSERT_TRUE(noise);
+
+  EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::NONE);
+
+  noise->SetCustomNoiseCallback(
+    boost::bind(&OnApplyCustomNoise, _1));
+
+
+  EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
+
+  for (double i = 0; i < 100; i += 1)
+  {
+    double value = noise->Apply(i);
+    EXPECT_DOUBLE_EQ(value, i*2);
+  }
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
