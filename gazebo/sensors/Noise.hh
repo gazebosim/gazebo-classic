@@ -56,9 +56,9 @@ namespace gazebo
       public: enum NoiseType
       {
         NONE,
+        CUSTOM,
         GAUSSIAN,
-        GAUSSIAN_QUANTIZED,
-        CUSTOM
+        GAUSSIAN_QUANTIZED
       };
 
       /// \brief Constructor.
