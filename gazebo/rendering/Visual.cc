@@ -63,6 +63,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->sceneNode = NULL;
   this->animState = NULL;
   this->initialized = false;
+  this->lighting = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -355,6 +356,12 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetElement("emissive")->Set(
           msgs::Convert(_msg->material().emissive()));
     }
+
+    if (_msg->material().has_lighting())
+    {
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("lighting")->Set(_msg->material().lighting());
+    }
   }
 
   if (_msg->has_cast_shadows())
@@ -501,6 +508,12 @@ void Visual::Load()
       if (!matName.empty())
         this->SetMaterial(matName);
     }
+
+    if (matElem->HasElement("lighting"))
+    {
+      this->SetLighting(matElem->Get<bool>("lighting"));
+    }
+
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->Get<common::Color>("ambient"));
     else if (matElem->HasElement("diffuse"))
@@ -785,6 +798,77 @@ math::Vector3 Visual::GetScale()
   return result;*/
 }
 
+//////////////////////////////////////////////////
+void Visual::SetLighting(bool _lighting)
+{
+  if (this->lighting == _lighting)
+    return;
+
+  this->lighting = _lighting;
+
+  if (this->useRTShader)
+  {
+    RTShaderSystem::Instance()->DetachEntity(this);
+  }
+
+  try
+  {
+    for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+    {
+      Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+      Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
+      if (entity)
+      {
+        for (unsigned j = 0; j < entity->getNumSubEntities(); ++j)
+        {
+          Ogre::MaterialPtr mat = entity->getSubEntity(j)->getMaterial();
+          if (!mat.isNull())
+          {
+            mat->setLightingEnabled(this->lighting);
+          }
+        }
+      }
+    }
+
+    // Apply lighting to all child scene nodes
+    for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+    {
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
+          this->sceneNode->getChild(i));
+      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      {
+        Ogre::MovableObject *obj = sn->getAttachedObject(j);
+
+        Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
+        if (entity)
+        {
+          for (unsigned k = 0; k < entity->getNumSubEntities(); ++k)
+          {
+            Ogre::MaterialPtr mat = entity->getSubEntity(k)->getMaterial();
+            if (!mat.isNull())
+            {
+              mat->setLightingEnabled(this->lighting);
+            }
+          }
+        }
+      }
+    }
+  }
+  catch(Ogre::Exception &e)
+  {
+    gzwarn << "Unable to set lighting to Geometry["
+           << this->sceneNode->getName() << ".\n";
+  }
+
+  // Apply lighting to all child visuals
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetLighting(this->lighting);
+  }
+}
+
 
 //////////////////////////////////////////////////
 void Visual::SetMaterial(const std::string &_materialName, bool _unique)
@@ -889,7 +973,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  if (this->useRTShader && this->scene->GetInitialized() &&
+  if (this->useRTShader && this->scene->GetInitialized() && !this->lighting &&
     this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
@@ -899,6 +983,9 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 /////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -956,6 +1043,9 @@ void Visual::SetAmbient(const common::Color &_color)
 /// Set the diffuse color of the visual
 void Visual::SetDiffuse(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -1010,6 +1100,9 @@ void Visual::SetDiffuse(const common::Color &_color)
 /// Set the specular color of the visual
 void Visual::SetSpecular(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -1968,6 +2061,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
+    if (_msg->material().has_lighting())
+    {
+      this->SetLighting(_msg->material().lighting());
+    }
+
     if (_msg->material().has_script())
     {
       for (int i = 0; i < _msg->material().script().uri_size(); ++i)

@@ -581,6 +581,11 @@ namespace gazebo
           }
         }
 
+        if (elem->HasElement("lighting"))
+        {
+          matMsg->set_lighting(elem->Get<bool>("lighting"));
+        }
+
         if (elem->HasElement("shader"))
         {
           sdf::ElementPtr shaderElem = elem->GetElement("shader");
