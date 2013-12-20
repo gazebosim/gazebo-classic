@@ -60,7 +60,7 @@ TEST_F(GzCamera, Follow)
   custom_exec("gz camera -c test_camera -f box");
   world->Step(1000);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
   EXPECT_NEAR(camera->GetWorldPose().pos.x, 9.9, 0.1);
