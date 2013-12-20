@@ -808,6 +808,8 @@ void Visual::SetLighting(bool _lighting)
 
   if (this->useRTShader)
   {
+    // Detach from RTShaderSystem otherwise setting lighting here will have
+    // no effect if shaders are used.
     RTShaderSystem::Instance()->DetachEntity(this);
   }
 
