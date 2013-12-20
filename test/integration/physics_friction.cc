@@ -74,7 +74,6 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
           << " parameters (#989)"
           << std::endl;
     return;
-
   }
 
   Load("worlds/test_friction.world", true, _physicsEngine);
@@ -117,21 +116,21 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
       math::Vector3 vel = box->model->GetWorldLinearVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance );
-      EXPECT_NEAR(vel.z, 0, g_friction_tolerance );
+      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, g_friction_tolerance );
+        EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
       }
       else
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
         EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    g_friction_tolerance );
+                    g_friction_tolerance);
       }
     }
   }
