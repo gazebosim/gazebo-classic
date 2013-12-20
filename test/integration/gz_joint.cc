@@ -40,13 +40,12 @@ TEST_F(GzJoint, Force)
   physics::JointPtr joint = model->GetJoint("joint");
   ASSERT_TRUE(joint);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
 
-  // Tell the camera to follow the box. The camera should move toward the
-  // box.
+  // Move the joint
   custom_exec("gz joint -w default -m model -j joint -f 10.0");
 
   world->Step(100);
@@ -73,7 +72,7 @@ TEST_F(GzJoint, PositionPID)
   physics::JointPtr joint = model->GetJoint("joint");
   ASSERT_TRUE(joint);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
@@ -84,7 +83,7 @@ TEST_F(GzJoint, PositionPID)
 
   world->Step(1000);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the joint is at the specified pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 3.1415, 0.2);
 }
 
@@ -106,7 +105,7 @@ TEST_F(GzJoint, VelocityPID)
   physics::JointPtr joint = model->GetJoint("joint");
   ASSERT_TRUE(joint);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
@@ -117,7 +116,7 @@ TEST_F(GzJoint, VelocityPID)
 
   world->Step(800);
 
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the joint has the specified velocity
   EXPECT_NEAR(joint->GetVelocity(0), 0.5, 0.1);
 }
 
