@@ -21,6 +21,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -44,10 +45,13 @@
 using namespace gazebo;
 using namespace rendering;
 
+// Note: The value of GZ_UINT32_MAX is reserved as a flag.
+uint32_t Visual::visualIdCount = GZ_UINT32_MAX - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
   this->scale = math::Vector3::One;
@@ -93,6 +97,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
@@ -157,6 +162,7 @@ Visual::~Visual()
 void Visual::Fini()
 {
   this->plugins.clear();
+
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -204,7 +210,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 }
 
 /////////////////////////////////////////////////
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 {
   if (!_sceneNode)
     return;
@@ -621,7 +627,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
 
-  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -1119,13 +1125,15 @@ void Visual::SetWireframe(bool _show)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
+      if (material.isNull())
+        continue;
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
@@ -2461,4 +2469,16 @@ void Visual::LoadPlugin(sdf::ElementPtr _sdf)
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetId(uint32_t _id)
+{
+  this->id = _id;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ namespace gazebo
   {
     class JointMaker;
 
+    /// \class JointInspector gui/JointInspector.hh
+    /// \brief A class to inspect and modify joints.
     class JointInspector : public QDialog
     {
       Q_OBJECT
@@ -47,22 +49,22 @@ namespace gazebo
       /// \brief Get anchor position.
       /// \param[in] _index Index of anchor
       /// \return Anchor position.
-      public: math::Vector3 GetAnchor(int _index) const;
+      public: math::Vector3 GetAnchor(unsigned int _index) const;
 
       /// \brief Get axis.
       /// \param[in] _index Index of axis
       /// \return Axis direction.
-      public: math::Vector3 GetAxis(int _index) const;
+      public: math::Vector3 GetAxis(unsigned int _index) const;
 
       /// \brief Get axis lower limit.
       /// \param[in] _index Index of axis
       /// \return Lower limit.
-      public: double GetLowerLimit(int _index) const;
+      public: double GetLowerLimit(unsigned int _index) const;
 
       /// \brief Get axis upper limit.
       /// \param[in] _index Index of axis
       /// \return Upper limit.
-      public: double GetUpperLimit(int _index) const;
+      public: double GetUpperLimit(unsigned int _index) const;
 
       /// \brief Get joint type.
       /// \return Joint type.
@@ -75,22 +77,22 @@ namespace gazebo
       /// \brief Set anchor position.
       /// \param[in] _index Index of anchor.
       /// \param[in] _anchor Anchor position.
-      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: void SetAnchor(unsigned int _index, const math::Vector3 &_anchor);
 
       /// \brief Set axis.
       /// \param[in] _index Index of axis.
       /// \param[in] _axis Axis direction.
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
 
       /// \brief Set axis lower limit.
       /// \param[in] _index Index of axis.
       /// \param[in] _lower Lower limit.
-      public: void SetLowerLimit(int _index, double _lower);
+      public: void SetLowerLimit(unsigned int _index, double _lower);
 
       /// \brief Set axis upper limit.
       /// \param[in] _index Index of axis.
       /// \param[in] _upper Upper limit.
-      public: void SetUpperLimit(int _index, double _upper);
+      public: void SetUpperLimit(unsigned int _index, double _upper);
 
       /// \brief Set joint type.
       /// \param[in] _type joint type.

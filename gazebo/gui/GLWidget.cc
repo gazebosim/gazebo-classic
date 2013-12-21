@@ -636,7 +636,7 @@ void GLWidget::OnMouseReleaseNormal()
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera("rc_camera");
+    this->userCamera = _scene->CreateUserCamera("gzclient_camera");
   else
     this->userCamera = _scene->GetUserCamera(0);
 
@@ -864,7 +864,8 @@ void GLWidget::Paste(const std::string &_object)
     if (this->entityMaker)
       this->entityMaker->Stop();
 
-    this->modelMaker.InitFromModel(_object);
+    // \todo Put this back in when pasting is enabled again
+    // this->modelMaker.InitFromModel(_object);
     this->entityMaker = &this->modelMaker;
     this->entityMaker->Start(this->userCamera);
     gui::Events::manipMode("make_entity");
@@ -944,6 +945,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
   {
     if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
     {
+      this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
     }
   }

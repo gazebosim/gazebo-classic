@@ -151,6 +151,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);
 
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
       private: btCollisionShape *compoundShape;

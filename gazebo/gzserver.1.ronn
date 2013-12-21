@@ -18,7 +18,7 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * -u, --pause :
  Start the server in a paused state.
 * -e, --physics arg :
- Specify a physics engine (ode|bullet).
+ Specify a physics engine (ode|bullet|simbody).
 * -p, --play arg :
  Play a log file.
 * -r, --record :
@@ -31,6 +31,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Start with a given random number seed.
 * --iters arg :
  Number of iterations to simulate.
+* --minimal_comms :
+ Reduce the messages output by gzserver
 * -s, --server-plugin arg :
  Load a plugin.
 

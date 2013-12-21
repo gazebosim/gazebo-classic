@@ -47,8 +47,8 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       const Ogre::SubEntity *subEntity =
         static_cast<const Ogre::SubEntity *>(_rend);
 
-      if (subEntity->getParent()->getVisibilityFlags() &
-          GZ_VISIBILITY_NOT_SELECTABLE)
+      if (!(subEntity->getParent()->getVisibilityFlags() &
+          GZ_VISIBILITY_SELECTABLE))
       {
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
             Ogre::Vector4(0, 0, 0, 0));
@@ -71,6 +71,8 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
         // certain overlay objects can be picked by the mouse.
         Ogre::Technique *newTechnique =
             static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
+
+
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)
         {

@@ -1,9 +1,5 @@
-#!/bin/bash
-lower=`echo $1 | tr '[:upper:]' '[:lower:]'`
-guard=_GAZEBO_`echo $1 | tr '[:lower:]' '[:upper:]'`_HH_
-cat <<END
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +14,15 @@ cat <<END
  * limitations under the License.
  *
 */
-#ifndef $guard
-#define $guard
 
-// Deprecated header file for case-sensitive filesystems
-#warning The gazebo/$lower/$1.hh header file is deprecated \\
-  as of gazebo 1.9 and will be removed in the next release. \\
-  Please include gazebo/$lower/$1Iface.hh instead.
-#include "gazebo/$lower/$1Iface.hh"
+#ifndef _SIMBODY_INC_H_
+#define _SIMBODY_INC_H_
+
+#pragma GCC system_header
+#include <Simbody.h>
+// #include <SimTKcommon.h>
+// #include <SimTKsimbody.h>
+// #include <SimTKmath.h>
+// using namespace SimTK;
 
 #endif
-
-END
-

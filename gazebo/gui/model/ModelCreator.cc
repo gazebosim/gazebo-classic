@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ModelManipulator.hh"
 
 #include "gazebo/gui/model/PartGeneralTab.hh"
 #include "gazebo/gui/model/PartVisualTab.hh"
@@ -312,6 +313,9 @@ void ModelCreator::RemovePart(const std::string &_partName)
     return;
   }
 
+  if (this->allParts.find(_partName) == this->allParts.end())
+    return;
+
   PartData *part = this->allParts[_partName];
   if (!part)
     return;
@@ -411,8 +415,16 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
   boost::filesystem::path path;
   path = boost::filesystem::operator/(_savePath, this->modelName + ".sdf");
   savefile.open(path.string().c_str());
-  savefile << this->modelSDF->ToString();
-  savefile.close();
+  if (savefile.is_open())
+  {
+    savefile << this->modelSDF->ToString();
+    savefile.close();
+  }
+  else
+  {
+    gzerr << "Unable to open file for writing: '" << path.string().c_str()
+        << "'. Possibly a permission issue." << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -487,7 +499,11 @@ void ModelCreator::AddPart(PartType _type)
         break;
       }
       default:
+      {
+        gzwarn << "Unknown part type '" << _type << "'. " <<
+            "Part not added" << std::endl;
         break;
+      }
     }
   }
 }
@@ -592,35 +608,12 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
     return false;
 
   math::Pose pose = this->mouseVisual->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  gui::get_active_camera()->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-      origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
+  pose.pos = ModelManipulator::GetMousePositionOnPlane(
+      gui::get_active_camera(), _event);
 
   if (!_event.shift)
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
+    pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
 
@@ -632,7 +625,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
 {
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+ rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {
     if (this->allParts.find(vis->GetName()) !=
@@ -655,6 +648,7 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     }
   }
   return false;
+
 }
 
 /////////////////////////////////////////////////

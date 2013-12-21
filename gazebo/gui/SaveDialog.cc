@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/filesystem.hpp>
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
 using namespace gazebo;
@@ -24,6 +26,7 @@ using namespace gui;
 SaveDialog::SaveDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("saveDialog");
+  this->fileExtension = "";
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
@@ -126,7 +129,47 @@ void SaveDialog::OnCancel()
 /////////////////////////////////////////////////
 void SaveDialog::OnSave()
 {
-  this->accept();
+  boost::filesystem::path savePath(this->GetSaveLocation());
+  savePath /= this->GetSaveName() + "." + this->fileExtension;
+
+  try
+  {
+    if (boost::filesystem::exists(savePath.string()))
+    {
+      std::string msg = "A file named " + savePath.string() +
+          " already exists.\nDo you wish to overwrite the existing file?";
+      int ret = QMessageBox::warning(0, QString("File Exists"),
+          QString(msg.c_str()), QMessageBox::Save | QMessageBox::Cancel,
+          QMessageBox::Cancel);
+
+      switch (ret)
+      {
+        case QMessageBox::Save:
+          this->accept();
+          break;
+        case QMessageBox::Cancel:
+          // Do nothing
+          break;
+        default:
+          break;
+      }
+    }
+    else
+    {
+      this->accept();
+    }
+  }
+  catch(const boost::filesystem::filesystem_error &ex)
+  {
+    gzerr << ex.what() << std::endl;
+  }
+}
+
+
+/////////////////////////////////////////////////
+void SaveDialog::SetFileExtension(const std::string &_extension)
+{
+  this->fileExtension = _extension;
 }
 
 /////////////////////////////////////////////////

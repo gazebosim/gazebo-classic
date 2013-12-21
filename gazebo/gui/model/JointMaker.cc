@@ -55,6 +55,11 @@ JointMaker::JointMaker()
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
+
+
+  this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
+  connect(this->inspectAct, SIGNAL(triggered()), this,
+      SLOT(OnOpenInspector()));
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +86,7 @@ void JointMaker::Reset()
   this->selectedVis.reset();
   this->hoverVis.reset();
   this->prevHoverVis.reset();
+  this->inspectVis.reset();
 
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
@@ -90,9 +96,9 @@ void JointMaker::Reset()
 /////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointName)
 {
-  JointData *joint = this->joints[_jointName];
-  if (joint)
+  if (this->joints.find(_jointName) != this->joints.end())
   {
+    JointData *joint = this->joints[_jointName];
     rendering::ScenePtr scene = joint->hotspot->GetScene();
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
@@ -127,15 +133,59 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   toDelete.clear();
 }
 
+
 /////////////////////////////////////////////////
-bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
+bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
+  if (this->jointType != JointMaker::JOINT_NONE)
+    return false;
+
+  // intercept mouse press events when user clicks on the joint hotspot visual
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  rendering::ScenePtr scene = camera->GetScene();
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (this->joints.find(vis->GetName()) != this->joints.end())
+    {
+      // stop event propagation as we don't want users to manipulate the
+      // hotspot for now.
+      return true;
+    }
+    return false;
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
+{
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+
+  if (_event.button == common::MouseEvent::RIGHT)
+  {
+    if (vis)
+    {
+      if (this->joints.find(vis->GetName()) != this->joints.end())
+      {
+        this->inspectVis = vis;
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+        return true;
+      }
+    }
+  }
+
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
 
   if (this->hoverVis)
   {
@@ -204,6 +254,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       emit JointAdded();
     }
   }
+
   return true;
 }
 
@@ -216,15 +267,22 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     // Add an event filter, which allows the JointMaker to capture mouse events.
     MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
         boost::bind(&JointMaker::OnMouseRelease, this, _1));
-
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
         boost::bind(&JointMaker::OnMouseMove, this, _1));
   }
   else
   {
     // Remove the event filters.
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+
+    // Press event added only after a joint is created. Needs to be added here
+    // instead of in the constructor otherwise GLWidget would get the event
+    // first and JoinMaker would not receive it.
+    MouseEventHandler::Instance()->AddPressFilter("model_joint",
+        boost::bind(&JointMaker::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
   }
 }
 
@@ -315,6 +373,31 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void JointMaker::OnOpenInspector()
+{
+  this->OpenInspector(this->inspectVis->GetName());
+  this->inspectVis.reset();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OpenInspector(const std::string &_name)
+{
+  JointData *joint = this->joints[_name];
+  joint->inspector->SetType(joint->type);
+  joint->inspector->SetName(joint->visual->GetName());
+  joint->inspector->SetAnchor(0, joint->anchor);
+  int axisCount = JointMaker::GetJointAxisCount(joint->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    joint->inspector->SetAxis(i, joint->axis[i]);
+    joint->inspector->SetAxis(i, joint->axis[i]);
+    joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
+    joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
+  }
+  joint->inspector->show();
+}
+
+/////////////////////////////////////////////////
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
@@ -322,21 +405,9 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    JointData *joint = this->joints[vis->GetName()];
-    if (joint)
+    if (this->joints.find(vis->GetName()) != this->joints.end())
     {
-      joint->inspector->SetType(joint->type);
-      joint->inspector->SetName(joint->visual->GetName());
-      joint->inspector->SetAnchor(0, joint->anchor);
-      int axisCount = JointMaker::GetJointAxisCount(joint->type);
-      for (int i = 0; i < axisCount; ++i)
-      {
-        joint->inspector->SetAxis(i, joint->axis[i]);
-        joint->inspector->SetAxis(i, joint->axis[i]);
-        joint->inspector->SetLowerLimit(i, joint->lowerLimit[i]);
-        joint->inspector->SetUpperLimit(i, joint->upperLimit[i]);
-      }
-      joint->inspector->show();
+      this->OpenInspector(vis->GetName());
       return true;
     }
   }
@@ -371,7 +442,8 @@ void JointMaker::CreateHotSpot()
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
   hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
 
-  hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
+      GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   this->joints[hotSpotName] = joint;
@@ -498,19 +570,33 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
 int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
+  {
     return 0;
+  }
   else if (_type == JOINT_HINGE)
+  {
     return 1;
+  }
   else if (_type == JOINT_HINGE2)
+  {
     return 2;
+  }
   else if (_type == JOINT_SLIDER)
+  {
     return 1;
+  }
   else if (_type == JOINT_SCREW)
+  {
     return 1;
+  }
   else if (_type == JOINT_UNIVERSAL)
+  {
     return 2;
+  }
   else if (_type == JOINT_BALL)
+  {
     return 0;
+  }
 
   return 0;
 }

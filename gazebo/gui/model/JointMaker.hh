@@ -69,8 +69,6 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      /// \param[in] _name Name of the joint visual
-      /// \param[in] _vis Pointer to the parent visual
       public: JointMaker();
 
       /// \brief Destructor
@@ -117,6 +115,11 @@ namespace gazebo
       /// \brief Stop the process of adding joint to the model.
       public: void Stop();
 
+      /// \brief Mouse event filter callback when mouse button is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
       /// \brief Mouse event filter callback when mouse button is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -135,8 +138,15 @@ namespace gazebo
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
 
+      /// \brief Open joint inspector.
+      /// \param[in] _name Name of joint.
+      private: void OpenInspector(const std::string &_name);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
+
+      /// \brief Qt Callback to open joint inspector
+      private slots: void OnOpenInspector();
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
@@ -149,6 +159,9 @@ namespace gazebo
 
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
+
+      /// \brief Visual that is currently being inspected.
+      private: rendering::VisualPtr inspectVis;
 
       /// \brief All joints created by joint maker.
       private: boost::unordered_map<std::string, JointData *> joints;
@@ -171,6 +184,9 @@ namespace gazebo
 
       /// \brief Counter for the number of joints in the model.
       private: int jointCounter;
+
+      /// \brief Qt action for opening the joint inspector.
+      private: QAction *inspectAct;
     };
     /// \}
 

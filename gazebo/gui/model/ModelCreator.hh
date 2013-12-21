@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ namespace gazebo
         PART_SPHERE,
         /// \brief Cylinder
         PART_CYLINDER,
-        /// \brief Cylinder
+        /// \brief Custom
         PART_CUSTOM
       };
 
@@ -81,6 +81,7 @@ namespace gazebo
       public: void SetModelName(const std::string &_modelName);
 
       /// \brief Get the name of the model.
+      /// \return Name of model.
       public: std::string GetModelName() const;
 
       /// \brief Finish the model and create the entity on the gzserver.
@@ -95,14 +96,15 @@ namespace gazebo
           const math::Pose &_pose = math::Pose::Zero);
 
       /// \brief Add a sphere to the model.
-      /// \param[in] _size Size of the sphere.
+      /// \param[in] _radius Radius of the sphere.
       /// \param[in] _pose Pose of the sphere.
       /// \return Name of the sphere that has been added.
       public: std::string AddSphere(double _radius = 0.5,
           const math::Pose &_pose = math::Pose::Zero);
 
       /// \brief Add a cylinder to the model.
-      /// \param[in] _size Size of the cylinder.
+      /// \param[in] _radius Radius of the cylinder.
+      /// \param[in] _length Length of the cylinder.
       /// \param[in] _pose Pose of the cylinder.
       /// \return Name of the cylinder that has been added.
       public: std::string AddCylinder(double _radius = 0.5,
@@ -190,6 +192,7 @@ namespace gazebo
       private: std::string CreateModel();
 
       /// \brief Get a template SDF string of a simple model.
+      /// \return Template SDF string of a simple model.
       private: std::string GetTemplateSDFString();
 
       /// \brief Qt callback when a delete signal has been emitted.
@@ -198,9 +201,6 @@ namespace gazebo
 
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
-
-      /// \brief Callback received when exiting the editor mode.
-//      private: void OnExit();
 
       /// \brief The model in SDF format.
       private: sdf::SDFPtr modelSDF;
@@ -329,12 +329,13 @@ namespace gazebo
       public: SensorData *sensorData;
 
       /// \brief Inspector for configuring part properties.
-      public: PartInspector *inspector;
-
+      public: PartInspector *inspector; 
+      
       /// \brief Qt Callback when part inspector configurations are to be
       /// applied.
-      private slots: void OnApply();
+      private slots: void OnApply(); 
     };
   }
 }
+
 #endif

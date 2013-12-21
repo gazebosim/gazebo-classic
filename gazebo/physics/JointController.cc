@@ -309,7 +309,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       /// \TODO: ideally we want to set this according to
       /// Joint Trajectory velocity and use time step since last update.
       /// double dt =
-      /// this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      /// this->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
       /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updatedLinks.push_back(_link);
@@ -334,7 +334,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       /// \TODO: ideally we want to set this according to Joint Trajectory
       /// velocity and use time step since last update.
       /// double dt = this->model->GetWorld()->GetPhysicsEngine()->
-      /// GetStepTime();
+      /// GetMaxStepTime();
       /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updatedLinks.push_back(_link);

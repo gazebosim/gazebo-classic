@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,17 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class SaveDialog SaveDialog.hh
+    /// \class SaveDialog SaveDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
     class SaveDialog : public QDialog
     {
       Q_OBJECT
 
-      /// \brief Constructor
+      /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
       public: SaveDialog(QWidget *_parent = 0);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: ~SaveDialog();
 
       /// \brief Get name of file.
@@ -65,8 +65,12 @@ namespace gazebo
       /// \param[in] _title Title of dialog.
       public: void SetTitle(const std::string &_title);
 
+      /// \brief Set the file extension.
+      /// \param[in] _extension File extension.
+      public: void SetFileExtension(const std::string &_extension);
+
       /// \brief Qt event emitted showing the dialog
-      protected: virtual void showEvent(QShowEvent *event);
+      protected: virtual void showEvent(QShowEvent *_event);
 
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
@@ -78,13 +82,16 @@ namespace gazebo
       private slots: void OnSave();
 
       /// \brief Editable line that holds the name.
-      private: QLineEdit* nameLineEdit;
+      private: QLineEdit *nameLineEdit;
 
       /// \brief Editable line that holds the save location.
-      private: QLineEdit* locationLineEdit;
+      private: QLineEdit *locationLineEdit;
 
       /// \brief Message displayed in the dialog.
       private: QLabel *messageLabel;
+
+      /// \brief File extension.
+      private: std::string fileExtension;
     };
     /// \}
   }
