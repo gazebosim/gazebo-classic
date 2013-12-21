@@ -51,7 +51,7 @@ namespace gazebo
         public: virtual void Fini();
 
         // Documentation inherited.
-        public: double ApplyImpl(double _in) const;
+        public: double ApplyImpl(double _in);
 
         /// \brief Accessor for mean.
         /// \return Mean of Gaussian noise.

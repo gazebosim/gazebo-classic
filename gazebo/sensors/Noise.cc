@@ -93,7 +93,7 @@ void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
 }
 
 //////////////////////////////////////////////////
-double Noise::Apply(double _in) const
+double Noise::Apply(double _in)
 {
   if (this->type == NONE)
     return _in;
@@ -114,7 +114,7 @@ double Noise::Apply(double _in) const
 }
 
 //////////////////////////////////////////////////
-double Noise::ApplyImpl(double _in) const
+double Noise::ApplyImpl(double _in)
 {
   return _in;
 }

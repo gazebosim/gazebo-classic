@@ -99,7 +99,7 @@ TEST(NoiseTest, Types)
 
 //////////////////////////////////////////////////
 // Helper function for testing no noise
-void NoNoise(const sensors::Noise &_noise, unsigned int _count)
+void NoNoise(sensors::Noise &_noise, unsigned int _count)
 {
   // Expect no change in input value
   for (unsigned int i = 0; i < _count; ++i)
