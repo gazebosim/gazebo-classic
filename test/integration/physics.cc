@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ class PhysicsTest : public ServerFixture,
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
   public: void RevoluteJoint(const std::string &_physicsEngine);
   public: void SimplePendulum(const std::string &_physicsEngine);
+  public: void SphereAtlasLargeError(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
@@ -56,14 +57,14 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
-  world->StepWorld(1);
+  world->Step(1);
   double t = world->GetSimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
-  world->StepWorld(steps);
+  world->Step(steps);
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   t = world->GetSimTime().Double();
@@ -183,21 +184,21 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     {
       gzdbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
-      world->StepWorld(1);
+      world->Step(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
-      world->StepWorld(steps - 1);
+      world->Step(steps - 1);
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
       EXPECT_NEAR(pose1.pos.z, z0 + g.z/2*t*t, (z0+g.z/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
-      world->StepWorld(steps);
+      world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->GetWorldPose();
       EXPECT_LT(vel2.z, vel1.z);
@@ -229,12 +230,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
 
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // debug
   // for (int i = 0; i < steps; ++i)
   // {
-  //   world->StepWorld(1);
+  //   world->Step(1);
   //   if (physics->GetType()  == "bullet")
   //   {
   //     model = world->GetModel("link_offset_box");
@@ -328,7 +329,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
     EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
     EXPECT_NEAR(pose2.pos.z, 0.5, PHYSICS_TOL);
-    world->StepWorld(1);
+    world->Step(1);
   }
 }
 
@@ -472,14 +473,14 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
     {
       gzdbg << "Check freefall of model " << modelNames[i] << '\n';
       // Step once and check downward z velocity
-      world->StepWorld(1);
+      world->Step(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
       EXPECT_NEAR(vel1.x, 0, 1e-16);
       EXPECT_NEAR(vel1.y, 0, 1e-16);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
-      world->StepWorld(steps - 1);
+      world->Step(steps - 1);
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
@@ -487,7 +488,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
                   (z0+radius+g.z/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
-      world->StepWorld(steps);
+      world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->GetWorldPose();
       EXPECT_LT(vel2.z, vel1.z);
@@ -507,7 +508,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. Except for sphere5,
@@ -714,7 +715,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   int steps = ceil(0.75 / dt);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Get global angular velocity of each link
   math::Vector3 angVel;
@@ -796,7 +797,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_GT(fabs(jointVel1), 1e-1);
 
           // Take 1 step and measure again
-          world->StepWorld(1);
+          world->Step(1);
 
           // Expect angle change in direction of joint velocity
           angle2 = joint->GetAngle(0).Radian();
@@ -807,7 +808,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           EXPECT_GT(fabs(jointVel2), 1e-1);
 
           // Take 1 step and measure the last angle, expect decrease
-          world->StepWorld(1);
+          world->Step(1);
           angle3 = joint->GetAngle(0).Radian();
           EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
                     , 0);
@@ -864,7 +865,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 
   // Step forward again for 0.75 seconds and check that joint angles
   // are within limits
-  world->StepWorld(steps);
+  world->Step(steps);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -950,7 +951,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       }
 
       // Step forward and let things settle a bit.
-      world->StepWorld(100);
+      world->Step(100);
 
       joint = model->GetJoint("lower_joint");
       if (joint)
@@ -963,11 +964,11 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           newVel = joint->GetVelocity(0);
 
           // gzdbg << "model " << *modelIter
@@ -999,11 +1000,11 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         for (int i = 0; i < 10; ++i)
         {
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           joint->SetForce(0, force);
-          world->StepWorld(1);
+          world->Step(1);
           newVel = joint->GetVelocity(0);
 
           // gzdbg << "model " << *modelIter
@@ -1141,7 +1142,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     for (int i = 0; i < steps; ++i)
     {
-      world->StepWorld(1);  // theoretical contact, but
+      world->Step(1);  // theoretical contact, but
       // gzdbg << "box time [" << world->GetSimTime().Double()
       //       << "] vel [" << model->GetWorldLinearVel()
       //       << "] pose [" << model->GetWorldPose()
@@ -1197,8 +1198,8 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
     double g = -10.0;
     double dt = world->GetPhysicsEngine()->GetMaxStepSize();
 
-    // world->StepWorld(1428);  // theoretical contact, but
-    // world->StepWorld(100);  // integration error requires few more steps
+    // world->Step(1428);  // theoretical contact, but
+    // world->Step(100);  // integration error requires few more steps
 
     int steps = test_duration/dt;
     bool post_contact_correction = false;
@@ -1209,7 +1210,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
       v = v + dt * g;
       z = z + dt * v;
 
-      world->StepWorld(1);  // theoretical contact, but
+      world->Step(1);  // theoretical contact, but
       {
         physics::ModelPtr box_model = world->GetModel("box");
         if (box_model)
@@ -1290,12 +1291,6 @@ TEST_F(PhysicsTest, DropStuffODE)
 
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Skipping InelasticCollision for bullet per #864" << std::endl;
-    return;
-  }
-
   // check conservation of mementum for linear inelastic collision
   Load("worlds/collision_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -1329,7 +1324,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
     {
       double t = world->GetSimTime().Double();
 
-      world->StepWorld(1);  // theoretical contact, but
+      world->Step(1);  // theoretical contact, but
       {
         if (box_model)
         {
@@ -1344,7 +1339,11 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           //      << "]\n";
 
           if (i == 0)
+          {
             box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+            EXPECT_TRUE(box_model->GetLink("link")->GetWorldForce() ==
+              math::Vector3(f, 0, 0));
+          }
 
           if (t > 1.000 && t < 1.01)
           {
@@ -1469,7 +1468,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
     {
-      world->StepWorld(2000);
+      world->Step(2000);
       {
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
@@ -1519,7 +1518,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
     {
-      world->StepWorld(2000);
+      world->Step(2000);
       {
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
@@ -1562,6 +1561,201 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 TEST_P(PhysicsTest, SimplePendulum)
 {
   SimplePendulum(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// SphereAtlasLargeError:
+// Check algorithm's ability to re-converge after a large LCP error is
+// introduced.
+// In this test, a model with similar dynamics properties to Atlas V3
+// is pinned to the world by both feet.  Robot is moved by a large
+// distance, violating the joints between world and feet temporarily.
+// Robot is then allowed to settle.  Check to see that the LCP solution
+// does not become unstable.
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Skipping SphereAtlasLargeError for physics engine ["
+          << _physicsEngine
+          << "] as this test only works for ODE for now.\n";
+    return;
+  }
+
+  Load("worlds/sphere_atlas_demo.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics->SetGravity(math::Vector3(0, 0, 0));
+
+  int i = 0;
+  while (!this->HasEntity("sphere_atlas") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get sphere_atlas");
+
+  physics::ModelPtr model = world->GetModel("sphere_atlas");
+  EXPECT_TRUE(model);
+  physics::LinkPtr head = model->GetLink("head");
+  EXPECT_TRUE(head);
+
+  {
+    gzdbg << "Testing large perturbation with PID controller active.\n";
+    // Test:  With Robot PID controller active, introduce a large
+    //        constraint error by breaking some model joints to the world
+    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+
+    // let model settle
+    world->Step(1000);
+
+    for (unsigned int n = 0; n < 10; ++n)
+    {
+      world->Step(1);
+      // manually check joint constraint violation for each joint
+      physics::Link_V links = model->GetLinks();
+      for (unsigned int i = 0; i < links.size(); ++i)
+      {
+        math::Pose childInWorld = links[i]->GetWorldPose();
+
+        physics::Joint_V parentJoints = links[i]->GetParentJoints();
+        for (unsigned int j = 0; j < parentJoints.size(); ++j)
+        {
+          // anchor position in world frame
+          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+
+          // anchor pose in child link frame
+          math::Pose anchorInChild =
+            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+
+          // initial anchor pose in child link frame
+          math::Pose anchorInitialInChild =
+            parentJoints[j]->GetInitialAnchorPose();
+
+          physics::LinkPtr parent = parentJoints[j]->GetParent();
+          if (parent)
+          {
+            // compare everything in the parent frame
+            math::Pose childInitialInParent =
+              links[i]->GetInitialRelativePose() -  // rel to model
+              parent->GetInitialRelativePose();  // rel to model
+
+            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose childInParent = childInWorld - parentInWorld;
+            math::Pose anchorInParent = anchorInChild + childInParent;
+            math::Pose anchorInitialInParent =
+              anchorInitialInChild + childInitialInParent;
+            math::Pose jointError = anchorInParent - anchorInitialInParent;
+
+            // joint constraint violation must be less than...
+            EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
+
+            // debug
+            if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
+              gzdbg << "i [" << n
+                    << "] link [" << links[i]->GetName()
+                    // << "] parent[" << parent->GetName()
+                    << "] error[" << jointError.pos.GetSquaredLength()
+                    // << "] pose[" << childInWorld
+                    << "] anchor[" << anchorInChild
+                    << "] cinp[" << childInParent
+                    << "] ainp0[" << anchorInitialInParent
+                    << "] ainp[" << anchorInParent
+                    << "] diff[" << jointError
+                    << "]\n";
+          }
+        }
+      }
+    }
+  }
+
+  {
+    gzdbg << "Testing large perturbation with PID controller disabled.\n";
+    // Test:  Turn off Robot PID controller, then introduce a large
+    //        constraint error by breaking some model joints to the world
+
+    // special hook in SphereAtlasTestPlugin disconnects
+    // PID controller on Reset.
+    world->Reset();
+    world->Step(1);
+
+    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+
+    // let model settle
+    world->Step(1000);
+
+    for (unsigned int n = 0; n < 10; ++n)
+    {
+      world->Step(1);
+      // manually check joint constraint violation for each joint
+      physics::Link_V links = model->GetLinks();
+      for (unsigned int i = 0; i < links.size(); ++i)
+      {
+        math::Pose childInWorld = links[i]->GetWorldPose();
+
+        physics::Joint_V parentJoints = links[i]->GetParentJoints();
+        for (unsigned int j = 0; j < parentJoints.size(); ++j)
+        {
+          // anchor position in world frame
+          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+
+          // anchor pose in child link frame
+          math::Pose anchorInChild =
+            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+
+          // initial anchor pose in child link frame
+          math::Pose anchorInitialInChild =
+            parentJoints[j]->GetInitialAnchorPose();
+
+          physics::LinkPtr parent = parentJoints[j]->GetParent();
+          if (parent)
+          {
+            // compare everything in the parent frame
+            math::Pose childInitialInParent =
+              links[i]->GetInitialRelativePose() -  // rel to model
+              parent->GetInitialRelativePose();  // rel to model
+
+            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose childInParent = childInWorld - parentInWorld;
+            math::Pose anchorInParent = anchorInChild + childInParent;
+            math::Pose anchorInitialInParent =
+              anchorInitialInChild + childInitialInParent;
+            math::Pose jointError = anchorInParent - anchorInitialInParent;
+
+            // joint constraint violation must be less than...
+            EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
+
+            // debug
+            if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
+              gzdbg << "i [" << n
+                    << "] link [" << links[i]->GetName()
+                    // << "] parent[" << parent->GetName()
+                    << "] error[" << jointError.pos.GetSquaredLength()
+                    // << "] pose[" << childInWorld
+                    << "] anchor[" << anchorInChild
+                    << "] cinp[" << childInParent
+                    << "] ainp0[" << anchorInitialInParent
+                    << "] ainp[" << anchorInParent
+                    << "] diff[" << jointError
+                    << "]\n";
+          }
+        }
+      }
+    }
+  }
+}
+
+TEST_P(PhysicsTest, SphereAtlasLargeError)
+{
+  SphereAtlasLargeError(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1644,7 +1838,7 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to spawn model");
 
-  world->StepWorld(5);
+  world->Step(5);
   physics::ModelPtr model = world->GetModel(modelName);
 
   math::Vector3 vel;

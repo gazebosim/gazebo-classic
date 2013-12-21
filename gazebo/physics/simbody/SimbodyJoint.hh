@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,13 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetDamping(int _index, const double _damping);
+
+      // Documentation inherited.
+      public: virtual void SetStiffness(int _index, const double _stiffness);
+
+      // Documentation inherited.
+      public: virtual void SetStiffnessDamping(unsigned int _index,
+        double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(int _index) const;

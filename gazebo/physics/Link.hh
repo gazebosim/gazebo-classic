@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -491,6 +491,9 @@ namespace gazebo
 
       /// \brief Offsets for the attached models.
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief This flag is set to true when the link is initialized.
+      protected: bool initialized;
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;

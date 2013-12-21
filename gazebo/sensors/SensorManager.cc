@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -647,7 +647,7 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   event::Events::preRender();
 
   // Tell all the cameras to render
-  // event::Events::render();
+  event::Events::render();
 
   event::Events::postRender();
 

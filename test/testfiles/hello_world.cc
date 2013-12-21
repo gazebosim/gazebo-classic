@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/math/Vector3.hh>
+#include <gazebo/common/Color.hh>
 
 namespace gazebo
 {
@@ -23,6 +25,8 @@ namespace gazebo
   {
     public: WorldPluginTutorial() : WorldPlugin()
             {
+              common::Color c(0, 0, 0);
+              math::Vector3 v;
               printf("Hello World!\n");
             }
 
