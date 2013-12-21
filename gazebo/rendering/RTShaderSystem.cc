@@ -480,7 +480,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // gazebo 3.0 as there is a better fix in place (pull request #867).
   this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 1000;
+  double shadowFarDistance = 500;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
