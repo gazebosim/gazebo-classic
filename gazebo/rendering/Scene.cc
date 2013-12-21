@@ -150,7 +150,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   // scene_info
   // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, true);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->sdf.reset(new sdf::Element);
@@ -298,8 +298,9 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  if (this->sdf->HasElement("sky"))
-    this->SetSky();
+  // Create Sky. This initializes SkyX, and makes it invisible. A Sky
+  // message must be received (via a scene message or on the ~/sky topic).
+  this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -491,8 +492,7 @@ uint32_t Scene::GetGridCount() const
 //////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera(new Camera(this->name + "::" + _name,
-        shared_from_this(), _autoRender));
+  CameraPtr camera(new Camera(_name, shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
@@ -552,10 +552,9 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
+UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
 {
-  UserCameraPtr camera(new UserCamera(this->GetName() + "::" + name_,
-                       shared_from_this()));
+  UserCameraPtr camera(new UserCamera(_name, shared_from_this()));
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
@@ -1389,6 +1388,13 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
+
+  // Process the sky message.
+  if (_msg->has_sky())
+  {
+    boost::shared_ptr<msgs::Sky> sm(new msgs::Sky(_msg->sky()));
+    this->OnSkyMsg(sm);
+  }
 
   if (_msg->has_fog())
   {
@@ -2447,6 +2453,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->skyx)
     return;
+
+  this->skyx->setVisible(true);
+
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
@@ -2583,6 +2592,7 @@ void Scene::SetSky()
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 
   this->skyx->update(0);
+  this->skyx->setVisible(false);
 }
 
 /////////////////////////////////////////////////

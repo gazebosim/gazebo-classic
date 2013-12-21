@@ -45,6 +45,10 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -160,33 +164,46 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::UpdateImpl(bool /*_force*/)
+void CameraSensor::Render()
 {
-  if (this->camera)
+  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  // Update all the cameras
+  this->camera->Render();
+
+  this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::UpdateImpl(bool /*_force*/)
+{
+  if (!this->rendered)
+    return false;
+
+  this->camera->PostRender();
+
+  if (this->imagePub && this->imagePub->HasConnections())
   {
-    this->camera->Render();
-    this->camera->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
+    msgs::ImageStamped msg;
+    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+    msg.mutable_image()->set_width(this->camera->GetImageWidth());
+    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+          this->camera->GetImageFormat()));
 
-    if (this->imagePub->HasConnections())
-    {
-      msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
-      msg.mutable_image()->set_width(this->camera->GetImageWidth());
-      msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-            this->camera->GetImageFormat()));
+    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+        this->camera->GetImageDepth());
+    msg.mutable_image()->set_data(this->camera->GetImageData(),
+        msg.image().width() * this->camera->GetImageDepth() *
+        msg.image().height());
 
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-          this->camera->GetImageDepth());
-      msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * this->camera->GetImageDepth() *
-          msg.image().height());
-
-      if (this->imagePub && this->imagePub->HasConnections())
-        this->imagePub->Publish(msg);
-    }
+    this->imagePub->Publish(msg);
   }
+
+  this->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////

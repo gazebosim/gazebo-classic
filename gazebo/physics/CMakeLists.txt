@@ -60,6 +60,7 @@ set (headers
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh
+  GearboxJoint.hh
   Inertial.hh
   Gripper.hh
   Joint.hh

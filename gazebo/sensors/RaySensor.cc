@@ -281,7 +281,7 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRange(int _index)
+double RaySensor::GetRange(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -290,7 +290,7 @@ double RaySensor::GetRange(int _index)
     gzwarn << "ranges not constructed yet (zero sized)\n";
     return 0.0;
   }
-  if (_index < 0 || _index >= this->laserMsg.scan().ranges_size())
+  if (static_cast<int>(_index) >= this->laserMsg.scan().ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
@@ -300,7 +300,7 @@ double RaySensor::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRetro(int _index)
+double RaySensor::GetRetro(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -309,7 +309,7 @@ double RaySensor::GetRetro(int _index)
     gzwarn << "Intensities not constructed yet (zero size)\n";
     return 0.0;
   }
-  if (_index < 0 || _index >= this->laserMsg.scan().intensities_size())
+  if (static_cast<int>(_index) >= this->laserMsg.scan().intensities_size())
   {
     gzerr << "Invalid intensity index[" << _index << "]\n";
     return 0.0;
@@ -319,7 +319,7 @@ double RaySensor::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int RaySensor::GetFiducial(int _index)
+int RaySensor::GetFiducial(unsigned int _index)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -332,11 +332,17 @@ int RaySensor::GetFiducial(int _index)
   int hIdx = _index % this->GetRangeCount();
   hIdx = hIdx * this->GetRayCount() / this->GetRangeCount();
   int idx = vIdx * this->GetRayCount()  + hIdx;
+
+  if (idx >=  this->GetRayCount() * this->GetVerticalRayCount())
+  {
+    gzerr << "Invalid fiducial index[" << _index << "]\n";
+    return 0.0;
+  }
   return this->laserShape->GetFiducial(idx);
 }
 
 //////////////////////////////////////////////////
-void RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
@@ -392,62 +398,81 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   //       hja: is the previous index of ray in horizontal direction
   //       hjb: is the next index of ray in horizontal direction
   unsigned int hja, hjb;
-  unsigned int vja, vjb;
+  unsigned int vja = 0, vjb = 0;
   // percentage of interpolation between rays
-  double vb, hb;
+  double vb = 0, hb;
   // indices of ray samples
   int j1, j2, j3, j4;
   // range values of ray samples
   double r1, r2, r3, r4;
 
+  // Check for the common case of vertical and horizontal resolution being 1,
+  // which means that ray count == range count and we can do simple lookup
+  // of ranges and intensity data, skipping interpolation.  We could do this
+  // check independently for vertical and horizontal, but that's more
+  // complexity for an unlikely use case.
+  bool interp =
+    ((rayCount != rangeCount) || (verticalRayCount != verticalRangeCount));
+
   // interpolate in vertical direction
   for (unsigned int j = 0; j < verticalRangeCount; ++j)
   {
-    vb = (verticalRangeCount == 1) ? 0 :
-        static_cast<double>(j * (verticalRayCount - 1))
-        / (verticalRangeCount - 1);
-    vja = static_cast<int>(floor(vb));
-    vjb = std::min(vja + 1, verticalRayCount - 1);
-    vb = vb - floor(vb);
+    if (interp)
+    {
+      vb = (verticalRangeCount == 1) ? 0 :
+          static_cast<double>(j * (verticalRayCount - 1))
+          / (verticalRangeCount - 1);
+      vja = static_cast<int>(floor(vb));
+      vjb = std::min(vja + 1, verticalRayCount - 1);
+      vb = vb - floor(vb);
 
-    GZ_ASSERT(vja < verticalRayCount,
-        "Invalid vertical ray index used for interpolation");
-    GZ_ASSERT(vjb < verticalRayCount,
-        "Invalid vertical ray index used for interpolation");
-
+      GZ_ASSERT(vja < verticalRayCount,
+          "Invalid vertical ray index used for interpolation");
+      GZ_ASSERT(vjb < verticalRayCount,
+          "Invalid vertical ray index used for interpolation");
+    }
     // interpolate in horizontal direction
     for (unsigned int i = 0; i < rangeCount; ++i)
     {
-      hb = (rangeCount == 1)? 0 : static_cast<double>(i * (rayCount - 1))
-          / (rangeCount - 1);
-      hja = static_cast<int>(floor(hb));
-      hjb = std::min(hja + 1, rayCount - 1);
-      hb = hb - floor(hb);
+      double range, intensity;
+      if (interp)
+      {
+        hb = (rangeCount == 1)? 0 : static_cast<double>(i * (rayCount - 1))
+            / (rangeCount - 1);
+        hja = static_cast<int>(floor(hb));
+        hjb = std::min(hja + 1, rayCount - 1);
+        hb = hb - floor(hb);
 
-      GZ_ASSERT(hja < rayCount,
-          "Invalid horizontal ray index used for interpolation");
-      GZ_ASSERT(hjb < rayCount,
-          "Invalid horizontal ray index used for interpolation");
+        GZ_ASSERT(hja < rayCount,
+            "Invalid horizontal ray index used for interpolation");
+        GZ_ASSERT(hjb < rayCount,
+            "Invalid horizontal ray index used for interpolation");
 
-      // indices of 4 corners
-      j1 = hja + vja * rayCount;
-      j2 = hjb + vja * rayCount;
-      j3 = hja + vjb * rayCount;
-      j4 = hjb + vjb * rayCount;
+        // indices of 4 corners
+        j1 = hja + vja * rayCount;
+        j2 = hjb + vja * rayCount;
+        j3 = hja + vjb * rayCount;
+        j4 = hjb + vjb * rayCount;
 
-      // range readings of 4 corners
-      r1 = this->GetLaserShape()->GetRange(j1);
-      r2 = this->GetLaserShape()->GetRange(j2);
-      r3 = this->GetLaserShape()->GetRange(j3);
-      r4 = this->GetLaserShape()->GetRange(j4);
-      double range = (1-vb)*((1 - hb) * r1 + hb * r2)
-          + vb *((1 - hb) * r3 + hb * r4);
+        // range readings of 4 corners
+        r1 = this->GetLaserShape()->GetRange(j1);
+        r2 = this->GetLaserShape()->GetRange(j2);
+        r3 = this->GetLaserShape()->GetRange(j3);
+        r4 = this->GetLaserShape()->GetRange(j4);
+        range = (1-vb)*((1 - hb) * r1 + hb * r2)
+            + vb *((1 - hb) * r3 + hb * r4);
 
-      // intensity is averaged
-      double intensity = 0.25 * (this->GetLaserShape()->GetRetro(j1)
-          + this->GetLaserShape()->GetRetro(j2)
-          + this->GetLaserShape()->GetRetro(j3)
-          + this->GetLaserShape()->GetRetro(j4));
+        // intensity is averaged
+        intensity = 0.25 * (this->GetLaserShape()->GetRetro(j1)
+            + this->GetLaserShape()->GetRetro(j2)
+            + this->GetLaserShape()->GetRetro(j3)
+            + this->GetLaserShape()->GetRetro(j4));
+      }
+      else
+      {
+        range = this->laserShape->GetRange(j * this->GetRayCount() + i);
+        intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
+      }
 
       if (this->noiseActive)
       {
@@ -472,6 +497,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   if (this->scanPub && this->scanPub->HasConnections())
     this->scanPub->Publish(this->laserMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
