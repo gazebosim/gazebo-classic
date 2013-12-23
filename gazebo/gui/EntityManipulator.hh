@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIPULATOR_HH_
-#define _MODEL_MANIPULATOR_HH_
+#ifndef _ENTITY_MANIPULATOR_HH_
+#define _ENTITY_MANIPULATOR_HH_
 
 #include <string>
 
@@ -32,16 +32,16 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
+    /// \class EntityManipulator EntityManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class EntityManipulator : public SingletonT<EntityManipulator>
     {
       /// \brief Constructor
-      private: ModelManipulator();
+      private: EntityManipulator();
 
       /// \brief Destructor
-      private: virtual ~ModelManipulator();
+      private: virtual ~EntityManipulator();
 
       /// \brief Initialize the model manipulator.
       public: void Init();
@@ -202,7 +202,7 @@ namespace gazebo
       private: bool globalManip;
 
       /// \brief This is a singleton class.
-      private: friend class SingletonT<ModelManipulator>;
+      private: friend class SingletonT<EntityManipulator>;
     };
   }
 }

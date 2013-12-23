@@ -31,7 +31,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/EntityManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelMaker.hh"
@@ -280,11 +280,11 @@ void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   math::Pose pose = this->modelVisual->GetWorldPose();
-  pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
+  pose.pos = EntityManipulator::GetMousePositionOnPlane(this->camera, _event);
 
   if (!_event.shift)
   {
-    pose.pos = ModelManipulator::SnapPoint(pose.pos);
+    pose.pos = EntityManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 

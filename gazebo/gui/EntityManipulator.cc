@@ -29,13 +29,13 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 
-#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/EntityManipulator.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelManipulator::ModelManipulator()
+EntityManipulator::EntityManipulator()
 {
   this->initialized = false;
   this->selectionObj.reset();
@@ -46,14 +46,14 @@ ModelManipulator::ModelManipulator()
 }
 
 /////////////////////////////////////////////////
-ModelManipulator::~ModelManipulator()
+EntityManipulator::~EntityManipulator()
 {
   this->modelPub.reset();
   this->selectionObj.reset();
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::Init()
+void EntityManipulator::Init()
 {
   if (this->initialized)
     return;
@@ -81,7 +81,7 @@ void ModelManipulator::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
+void EntityManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
   math::Vector3 normal;
@@ -132,7 +132,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMousePositionOnPlane(
+math::Vector3 EntityManipulator::GetMousePositionOnPlane(
     rendering::CameraPtr _camera,
     const common::MouseEvent &_event)
 {
@@ -152,7 +152,7 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
+math::Vector3 EntityManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)
 {
   if (_interval < 0)
@@ -196,7 +196,7 @@ math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMouseMoveDistance(
+math::Vector3 EntityManipulator::GetMouseMoveDistance(
     rendering::CameraPtr _camera,
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
@@ -282,7 +282,7 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
+math::Vector3 EntityManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
 {
   return GetMouseMoveDistance(this->userCamera, this->mouseStart,
@@ -291,7 +291,7 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
+void EntityManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
   math::Box bbox = this->mouseVisualBbox;
@@ -356,7 +356,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
+void EntityManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
   math::Pose pose = _vis->GetWorldPose();
@@ -376,7 +376,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
+void EntityManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 {
   if (_vis)
   {
@@ -402,7 +402,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
+void EntityManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 {
   if (_vis)
   {
@@ -421,7 +421,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
+void EntityManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
   this->mouseStart = _event.pressPos;
@@ -478,7 +478,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
+void EntityManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
   if (this->mouseEvent.dragging)
@@ -612,7 +612,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
+void EntityManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
   if (this->mouseEvent.dragging)
@@ -650,7 +650,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelManipulator::SetManipulationMode(const std::string &_mode)
+void EntityManipulator::SetManipulationMode(const std::string &_mode)
 {
   this->manipMode = _mode;
   if (this->selectionObj->GetMode() != rendering::SelectionObj::SELECTION_NONE
@@ -664,7 +664,7 @@ void ModelManipulator::SetManipulationMode(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
+void EntityManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
@@ -681,7 +681,7 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
+void EntityManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->mouseMoveVis = _vis;
   if (_vis)
@@ -694,7 +694,7 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
 }
 
 //////////////////////////////////////////////////
-void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
+void EntityManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
 {
   this->keyEvent = _event;
   // reset mouseMoveVisStartPose if in manipulation mode.
@@ -719,7 +719,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
+void EntityManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
 {
   this->keyEvent = _event;
   // reset mouseMoveVisStartPose if in manipulation mode.

@@ -34,7 +34,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
-#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/EntityManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
@@ -274,7 +274,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
-  ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
+  EntityManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
 
@@ -320,7 +320,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::AltModifier ? true : false;
 
 
-  ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
+  EntityManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
@@ -404,7 +404,7 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
     this->OnMousePressNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
-    ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
+    EntityManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -418,7 +418,7 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
-    ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+    EntityManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -433,7 +433,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
     this->OnMouseMoveNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
-    ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
+    EntityManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -725,7 +725,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
 
   this->ViewScene(rendering::get_scene(_name));
 
-  ModelManipulator::Instance()->Init();
+  EntityManipulator::Instance()->Init();
 
   this->sceneCreated = true;
 }
@@ -850,9 +850,9 @@ void GLWidget::OnManipMode(const std::string &_mode)
   this->state = _mode;
 
   if (this->selectedVis)
-    ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
+    EntityManipulator::Instance()->SetAttachedVisual(this->selectedVis);
 
-  ModelManipulator::Instance()->SetManipulationMode(_mode);
+  EntityManipulator::Instance()->SetManipulationMode(_mode);
 }
 
 /////////////////////////////////////////////////

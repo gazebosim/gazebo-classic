@@ -37,7 +37,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/EntityManipulator.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -599,12 +599,12 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
     return false;
 
   math::Pose pose = this->mouseVisual->GetWorldPose();
-  pose.pos = ModelManipulator::GetMousePositionOnPlane(
+  pose.pos = EntityManipulator::GetMousePositionOnPlane(
       gui::get_active_camera(), _event);
 
   if (!_event.shift)
   {
-    pose.pos = ModelManipulator::SnapPoint(pose.pos);
+    pose.pos = EntityManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
 
