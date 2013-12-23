@@ -514,13 +514,13 @@ void Visual::Load()
       this->SetLighting(matElem->Get<bool>("lighting"));
     }
 
-    else if (matElem->HasElement("ambient"))
+    if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->Get<common::Color>("ambient"));
-    else if (matElem->HasElement("diffuse"))
+    if (matElem->HasElement("diffuse"))
       this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
-    else if (matElem->HasElement("specular"))
+    if (matElem->HasElement("specular"))
       this->SetSpecular(matElem->Get<common::Color>("specular"));
-    else if (matElem->HasElement("emissive"))
+    if (matElem->HasElement("emissive"))
       this->SetEmissive(matElem->Get<common::Color>("emissive"));
   }
 
