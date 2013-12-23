@@ -118,10 +118,11 @@ void Model::LoadLinks()
       linkElem = linkElem->GetNextElement("link");
       this->links.push_back(link);
 
-      // add link to linkController
+      // create a link controller for this model
       if (!this->linkController)
         this->linkController.reset(new LinkController(
             boost::dynamic_pointer_cast<Model>(shared_from_this())));
+      // add link to linkController
       // this->linkController->AddLink(link);
     }
   }
