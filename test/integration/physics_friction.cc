@@ -110,7 +110,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
   common::Time t = world->GetSimTime();
   while (t.sec < 10)
   {
-    world->StepWorld(500);
+    world->Step(500);
     t = world->GetSimTime();
 
     for (box = boxes.begin(); box != boxes.end(); ++box)

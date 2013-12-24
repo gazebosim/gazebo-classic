@@ -57,10 +57,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
     GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
     {
+      double frictionMagnitude = frictionElem->Get<double>("magnitude");
+
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
       GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
-      this->mu1 = frictionOdeElem->Get<double>("mu");
-      this->mu2 = frictionOdeElem->Get<double>("mu2");
+      this->mu1 = frictionMagnitude * frictionOdeElem->Get<double>("mu1_ratio");
+      this->mu2 = frictionMagnitude * frictionOdeElem->Get<double>("mu2_ratio");
 
       if (this->mu1 < 0)
         this->mu1 = FLT_MAX;

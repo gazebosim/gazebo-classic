@@ -37,9 +37,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>50.0</magnitude>
               <ode>
-                <mu>50.000000</mu>
-                <mu2>50.000000</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -94,9 +95,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>0.998</magnitude>
               <ode>
-                <mu>0.998000</mu>
-                <mu2>0.998000</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -165,9 +167,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>0.9985</magnitude>
               <ode>
-                <mu>0.998500</mu>
-                <mu2>0.998500</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -236,9 +239,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>0.999</magnitude>
               <ode>
-                <mu>0.999000</mu>
-                <mu2>0.999000</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -307,9 +311,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>0.9995</magnitude>
               <ode>
-                <mu>0.999500</mu>
-                <mu2>0.999500</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -378,9 +383,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>1.0</magnitude>
               <ode>
-                <mu>1.000000</mu>
-                <mu2>1.000000</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
@@ -449,9 +455,10 @@
           </geometry>
           <surface>
             <friction>
+              <magnitude>1.01</magnitude>
               <ode>
-                <mu>1.010000</mu>
-                <mu2>1.010000</mu2>
+                <mu1_ratio>1.0</mu1_ratio>
+                <mu2_ratio>1.0</mu2_ratio>
                 <fdir1>0.000000 0.000000 0.000000</fdir1>
                 <slip1>0.000000</slip1>
                 <slip2>0.000000</slip2>
