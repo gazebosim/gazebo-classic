@@ -43,6 +43,7 @@ EntityManipulator::EntityManipulator()
 
   this->manipMode = "";
   this->globalManip = false;
+  this->controlLink = false;
 }
 
 /////////////////////////////////////////////////
@@ -432,6 +433,7 @@ void EntityManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       = this->userCamera->GetVisual(this->mouseEvent.pos);
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
+  // if (!this->keyEvent.key && (this->selectionObj->GetMode() ==
   if (!this->keyEvent.key && (this->selectionObj->GetMode() ==
        rendering::SelectionObj::SELECTION_NONE
       || (mouseVis && mouseVis != this->selectionObj->GetParent())))
@@ -446,12 +448,20 @@ void EntityManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // GetParent of visual should be Link
-    if (gui::get_entity_id(vis->GetParent()->GetName()))
+    if (this->controlLink)
     {
-      // check and skip so clicking on axis or orb doesn't revert to model
-      if (vis != this->selectionObj->GetParent())
-        vis = vis->GetParent();  // parent of visual should be link
+      // GetParent of visual should be Link
+      if (gui::get_entity_id(vis->GetParent()->GetName()))
+      {
+        // check and skip so clicking on axis or orb doesn't revert to model
+        if (vis != this->selectionObj->GetParent())
+          vis = vis->GetParent();  // parent of visual should be link
+      }
+    }
+    else
+    {
+      if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+        vis = vis->GetRootVisual();
     }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
@@ -524,9 +534,12 @@ void EntityManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
         else
           this->TranslateEntity(this->mouseMoveVis, math::Vector3(1, 1, 0));
 
-        // publish whenever cursor moves
-        this->PublishVisualPose(this->mouseMoveVis);
-        QApplication::setOverrideCursor(Qt::OpenHandCursor);
+        if (this->controlLink)
+        {
+          // publish whenever cursor moves
+          this->PublishVisualPose(this->mouseMoveVis);
+          QApplication::setOverrideCursor(Qt::OpenHandCursor);
+        }
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::ROT)
       {
@@ -556,9 +569,12 @@ void EntityManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
               !this->globalManip);
         }
 
-        // publish whenever cursor moves
-        this->PublishVisualPose(this->mouseMoveVis);
-        QApplication::setOverrideCursor(Qt::OpenHandCursor);
+        if (this->controlLink)
+        {
+          // publish whenever cursor moves
+          this->PublishVisualPose(this->mouseMoveVis);
+          QApplication::setOverrideCursor(Qt::OpenHandCursor);
+        }
       }
       else if (this->selectionObj->GetMode() == rendering::SelectionObj::SCALE)
       {
@@ -668,9 +684,17 @@ void EntityManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  // GetParent of visual should be Link
-  if (gui::get_entity_id(vis->GetParent()->GetName()))
-    vis = vis->GetParent();
+  if (this->controlLink)
+  {
+    // GetParent of visual should be Link
+    if (gui::get_entity_id(vis->GetParent()->GetName()))
+      vis = vis->GetParent();
+  }
+  else
+  {
+    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+      vis = vis->GetRootVisual();
+  }
 
   this->mouseMoveVisStartPose = vis->GetWorldPose();
 
@@ -715,6 +739,17 @@ void EntityManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
       this->globalManip = true;
       this->selectionObj->SetGlobal(this->globalManip);
     }
+    else if (this->keyEvent.key == Qt::Key_L)
+    {
+      // TODO: add a button that sets controlLink to true
+      this->controlLink = true;
+    }
+    else if (this->keyEvent.key == Qt::Key_M)
+    {
+      // TODO: add a button that sets controlLink to true
+      this->controlLink = false;
+    }
+
   }
 }
 

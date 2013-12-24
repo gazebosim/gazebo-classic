@@ -201,6 +201,9 @@ namespace gazebo
       /// \brief True to manipulate model in global frame.
       private: bool globalManip;
 
+      /// \brief True to manipulate model, false manipulates link
+      private: bool controlLink;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<EntityManipulator>;
     };

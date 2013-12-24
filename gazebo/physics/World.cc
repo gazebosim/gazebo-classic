@@ -1490,12 +1490,12 @@ void World::ProcessModelMsgs()
     }
     else
     {
-      /// pid control canonical link of model to new pose
-      math::Pose offset = model->GetLink("canonical")->GetRelativePose();
-      model->GetLinkController()->SetLink(model->GetLink("canonical"),
-        offset + msgs::Convert((*iter).pose()));
+      // /// pid control canonical link of model to new pose
+      // math::Pose offset = model->GetLink("canonical")->GetRelativePose();
+      // model->GetLinkController()->SetLink(model->GetLink("canonical"),
+      //   offset + msgs::Convert((*iter).pose()));
 
-      // model->ProcessMsg(*iter);
+      model->ProcessMsg(*iter);
 
       // May 30, 2013: The following code was removed because it has a
       // major performance impact when dragging complex object via the GUI.
@@ -1518,7 +1518,7 @@ void World::ProcessModelMsgs()
       //   }
       // }
 
-      // this->modelPub->Publish(*iter);
+      this->modelPub->Publish(*iter);
     }
   }
   if (this->modelMsgs.size())
