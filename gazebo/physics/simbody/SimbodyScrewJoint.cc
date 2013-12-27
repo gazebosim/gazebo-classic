@@ -47,12 +47,6 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::Init()
-{
-  gzerr << "Not implemented in simbody\n";
-}
-
-//////////////////////////////////////////////////
 double SimbodyScrewJoint::GetVelocity(int /*_index*/) const
 {
   gzerr << "Not implemented in simbody\n";

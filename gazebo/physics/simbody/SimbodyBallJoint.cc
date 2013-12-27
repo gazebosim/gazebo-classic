@@ -52,12 +52,6 @@ math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
-/////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";

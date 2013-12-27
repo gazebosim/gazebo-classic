@@ -103,7 +103,7 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 
   if (this->jointId)
   {
-    if (_index == 0)
+    if (_index == 1)
       dJointSetUniversalAxis1(this->jointId,
         globalAxis.x, globalAxis.y, globalAxis.z);
     else

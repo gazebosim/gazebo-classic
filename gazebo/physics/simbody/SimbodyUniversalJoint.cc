@@ -45,12 +45,6 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::Init()
-{
-  gzerr << "Not implemented in simbody\n";
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*_index*/) const
 {
   return this->anchorPos;
@@ -66,6 +60,12 @@ math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
 void SimbodyUniversalJoint::SetAxis(int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
+  /// Universal Joint are built in SimbodyPhysics.cc, so this init block
+  /// actually does nothing.
+  gzdbg << "SimbodyUniversalJoint::SetAxis: setting axis is "
+        << "not yet implemented.  The axis are set during joint construction "
+        << "in SimbodyPhyiscs.cc for now.\n";
+
   /// \TODO:  Better document this
   /// Flip order of axis1 and axis2 because ODE/Gazebo currently uses
   /// space-fixed axis for a universal joint, whereas Simbody uses
@@ -73,8 +73,6 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
   /// Simbody implements a x-y body-fixed (first rotate about x-axis then
   /// moving y-axis).  This is equivalent to y-x space-fixed (first rotate
   /// aobut y-axis then around the original x-axis).
-  gzerr << "Not implemented, if this functionality is needed, please "
-        << "file a feature request.\n";
 }
 
 
@@ -152,10 +150,6 @@ void SimbodyUniversalJoint::SetHighStop(int _index,
         this->limitForce[_index].getLowerBound(
           this->simbodyPhysics->integ->updAdvancedState()),
         _angle.Radian());
-
-      gzerr << "set bounds to [" << this->limitForce[_index].getLowerBound(
-          this->simbodyPhysics->integ->updAdvancedState())
-          << ", " << _angle.Radian() << "\n";
     }
     else
     {
@@ -181,12 +175,6 @@ void SimbodyUniversalJoint::SetLowStop(int _index,
         _angle.Radian(),
         this->limitForce[_index].getUpperBound(
           this->simbodyPhysics->integ->updAdvancedState()));
-
-      gzerr << "set bounds to ["
-          << _angle.Radian() 
-          << ", " << this->limitForce[_index].getUpperBound(
-          this->simbodyPhysics->integ->updAdvancedState())
-          << "\n";
     }
     else
     {

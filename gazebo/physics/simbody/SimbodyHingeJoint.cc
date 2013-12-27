@@ -51,7 +51,9 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  gzdbg << "SimbodyHingeJoint::SetAxis Not implemented...\n";
+  gzdbg << "SimbodyHingeJoint::SetAxis: setting axis is "
+        << "not yet implemented.  The axis are set during joint construction "
+        << "in SimbodyPhyiscs.cc for now.\n";
 }
 
 //////////////////////////////////////////////////

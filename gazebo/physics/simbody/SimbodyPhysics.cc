@@ -836,8 +836,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         for (unsigned int nj = 0; nj < 2; ++nj)
         {
-          gzdbg << "Setting limitForce[" << nj
-                << "] for [" << gzJoint->GetName() << "]\n";
           double low = gzJoint->GetLowerLimit(nj).Radian();
           double high = gzJoint->GetUpperLimit(nj).Radian();
 
@@ -847,10 +845,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
             gzJoint->GetStopDissipation(nj), low, high);
 
-          gzerr << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
-                << "] low [" << low
-                << "] high [" << high
-                << "]\n";
+          // gzdbg << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
+          //       << "] low [" << low
+          //       << "] high [" << high
+          //       << "]\n";
 
           // gzdbg << "SimbodyPhysics SetDamping ("
           //       << gzJoint->GetDampingCoefficient()

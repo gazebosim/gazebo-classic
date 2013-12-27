@@ -45,9 +45,6 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
-
-      // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.

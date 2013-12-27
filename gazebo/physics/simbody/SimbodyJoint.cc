@@ -358,7 +358,8 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 void SimbodyJoint::SetAnchor(int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+        << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
 //////////////////////////////////////////////////
