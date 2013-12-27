@@ -176,9 +176,16 @@ void SimbodyLink::OnPoseChange()
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
   }
-  // else
-  //   gzdbg << "Joint [" << this->GetScopedName()
-  //         << "] P[" << this->GetWorldPose() << "]\n";
+  else
+  {
+    /// \TODO: get parent link from parent joint, set relative pose
+    // this->masterMobod.setQToFitTransform(
+    //    this->simbodyPhysics->integ->updAdvancedState(),
+    //    SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+
+    gzdbg << "Joint [" << this->GetScopedName()
+          << "] P[" << this->GetWorldPose() << "]\n";
+  }
 
 
   /*

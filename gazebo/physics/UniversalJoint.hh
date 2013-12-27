@@ -34,6 +34,9 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
+    /// \TODO: Document that axis1 and axis2 are space-fixed, i.e.
+    /// moving about axis1 does not change axis2, both axis are fixed
+    /// in inertial space.
     template<class T>
     class UniversalJoint : public T
     {

@@ -58,7 +58,7 @@ namespace gazebo
       public: virtual math::Vector3 GetAxis(int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(int _index, double _rate);
 
       // Documentation inherited.
       public: virtual double GetVelocity(int _index) const;

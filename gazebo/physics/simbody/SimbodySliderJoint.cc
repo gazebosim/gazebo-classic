@@ -120,9 +120,9 @@ void SimbodySliderJoint::SetHighStop(int _index,
     Joint::SetHighStop(_index, _angle);
     if (this->physicsInitialized)
     {
-      this->limitForce.setBounds(
+      this->limitForce[_index].setBounds(
         this->simbodyPhysics->integ->updAdvancedState(),
-        this->limitForce.getLowerBound(
+        this->limitForce[_index].getLowerBound(
           this->simbodyPhysics->integ->updAdvancedState()),
         _angle.Radian());
     }
@@ -144,10 +144,10 @@ void SimbodySliderJoint::SetLowStop(int _index,
     Joint::SetLowStop(_index, _angle);
     if (this->physicsInitialized)
     {
-      this->limitForce.setBounds(
+      this->limitForce[_index].setBounds(
         this->simbodyPhysics->integ->updAdvancedState(),
         _angle.Radian(),
-        this->limitForce.getUpperBound(
+        this->limitForce[_index].getUpperBound(
           this->simbodyPhysics->integ->updAdvancedState()));
     }
     else

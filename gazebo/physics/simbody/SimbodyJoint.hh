@@ -143,19 +143,24 @@ namespace gazebo
       /// \brief default mobilizer pose
       public: SimTK::Transform defxAB;
 
+      /// \brief: for enforcing joint spring stiffness forces.
+      /// Set when we build the Simbody model.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom springs for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearSpring spring[MAX_JOINT_AXIS];
+
       /// \brief: for enforcing joint damping forces.
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearDamper damper;
+      public: SimTK::Force::MobilityLinearDamper damper[MAX_JOINT_AXIS];
 
       /// \brief: for enforcing joint stops
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearStop limitForce;
+      /// Assuming this is not used for BallJoints it's ok here for now.
+      public: SimTK::Force::MobilityLinearStop limitForce[MAX_JOINT_AXIS];
 
       /// \brief Use isValid() if we used a mobilizer
       /// Set when we build the Simbody model.
@@ -189,6 +194,9 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       /// This is used by Bullet to store external force applied by the user.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom dampers for special joints like ball joints.
+      /// Assuming this is not used for BallJoints it's ok here for now.
       private: double forceApplied[MAX_JOINT_AXIS];
 
       /// \brief Save time at which force is applied by user

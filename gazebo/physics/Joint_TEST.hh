@@ -40,6 +40,11 @@ class Joint_TEST : public ServerFixture,
   /// \brief Load example world with a few joints
   /// Measure / verify static force torques against analytical answers.
   /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void UniversalJoint1(const std::string &_physicsEngine);
+
+  /// \brief Load example world with a few joints
+  /// Measure / verify static force torques against analytical answers.
+  /// \param[in] _physicsEngine Type of physics engine to use.
   public: void ForceTorque1(const std::string &_physicsEngine);
 
   /// \brief Load example world with a few joints
