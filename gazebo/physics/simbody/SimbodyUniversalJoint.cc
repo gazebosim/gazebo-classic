@@ -152,6 +152,10 @@ void SimbodyUniversalJoint::SetHighStop(int _index,
         this->limitForce[_index].getLowerBound(
           this->simbodyPhysics->integ->updAdvancedState()),
         _angle.Radian());
+
+      gzerr << "set bounds to [" << this->limitForce[_index].getLowerBound(
+          this->simbodyPhysics->integ->updAdvancedState())
+          << ", " << _angle.Radian() << "\n";
     }
     else
     {
@@ -177,6 +181,12 @@ void SimbodyUniversalJoint::SetLowStop(int _index,
         _angle.Radian(),
         this->limitForce[_index].getUpperBound(
           this->simbodyPhysics->integ->updAdvancedState()));
+
+      gzerr << "set bounds to ["
+          << _angle.Radian() 
+          << ", " << this->limitForce[_index].getUpperBound(
+          this->simbodyPhysics->integ->updAdvancedState())
+          << "\n";
     }
     else
     {
@@ -249,9 +259,6 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(int _index) const
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < static_cast<int>(this->GetAngleCount()))
   {
-    this->simbodyPhysics->system.realize(
-      this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
-
     // gzerr << "state: [" <<
     //     this->simbodyPhysics->integ->getState().getQ() << "]\n";
 

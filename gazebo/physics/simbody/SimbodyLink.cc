@@ -175,6 +175,10 @@ void SimbodyLink::OnPoseChange()
     this->masterMobod.setQToFitTransform(
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+
+    // realize system after updating Q's
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
   }
   else
   {

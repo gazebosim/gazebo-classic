@@ -847,6 +847,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
             gzJoint->GetStopDissipation(nj), low, high);
 
+          gzerr << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
+                << "] low [" << low
+                << "] high [" << high
+                << "]\n";
+
           // gzdbg << "SimbodyPhysics SetDamping ("
           //       << gzJoint->GetDampingCoefficient()
           //       << ")\n";

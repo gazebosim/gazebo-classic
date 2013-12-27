@@ -66,6 +66,12 @@ namespace gazebo
                     this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
                     */
               }
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
   }
