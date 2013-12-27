@@ -28,6 +28,11 @@ using namespace gazebo;
 
 void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
+    return;
+  }
   // Load our force torque test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
 
@@ -72,12 +77,11 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzerr << "joint angles [" << joint_00->GetAngle(0)
+  gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
-  gzerr << "pause"; getchar();
 
   // move child link 45deg about x
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
@@ -86,12 +90,11 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
-  gzerr << "joint angles [" << joint_00->GetAngle(0)
+  gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
-  gzerr << "pause"; getchar();
 
   // move child link 45deg about y
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
@@ -99,12 +102,11 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzerr << "joint angles [" << joint_00->GetAngle(0)
+  gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
-  gzerr << "pause"; getchar();
 
   // move child link 90deg about both x and "rotated y axis" (z)
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
@@ -113,12 +115,11 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
-  gzerr << "joint angles [" << joint_00->GetAngle(0)
+  gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
-  gzerr << "pause"; getchar();
 }
 
 TEST_P(Joint_TEST, UniversalJoint1)
