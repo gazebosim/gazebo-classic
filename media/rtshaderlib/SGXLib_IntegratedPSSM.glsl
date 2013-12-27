@@ -55,39 +55,39 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float texture2DCompare(sampler2D depths, float2 uv, float compare)
+float texture2DCompare(sampler2D depths, vec2 uv, float compare)
 {
-  float depth = tex2D(depths, uv).r;
-  return (step(compare, depth) == 0) ? 0.4 : 1.0;
+  float depth = texture2D(depths, uv).r;
+  return (step(compare, depth) >= 1.0) ? 1.0 : 0.4;
 }
 
 //-----------------------------------------------------------------------------
 float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
 {
   // Interpolated 3x3 PCF
-  // Taken from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
+  // Adapted from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
   shadowMapPos = shadowMapPos / shadowMapPos.w;
-  float2 uv = shadowMapPos.xy;
+  vec2 uv = shadowMapPos.xy;
 
-  float2 texelSize = offset;
-  float2 size = 1 / offset;
-  float2 centroidUV = floor(uv * size + 0.5) / size;
-  float2 f = frac(uv * size + 0.5);
+  vec2 texelSize = offset;
+  vec2 size = 1.0 / offset;
+  vec2 centroidUV = floor(uv * size + 0.5) / size;
+  vec2 f = fract(uv * size + 0.5);
 
   // 3 x 3 kernel
   const int   X = 3;
 
-  float2 topLeft = centroidUV - texelSize * 1.5;
+  vec2 topLeft = centroidUV - texelSize * 1.5;
 
   // load all pixels needed for the computation
   // this way a pixel won't be loaded twice
   float kernel[9];
-  for(float i = 0; i < X; i++)
+  for (int i = 0; i < X; i++)
   {
-    for(float j = 0; j < X; j++)
+    for (int j = 0; j < X; j++)
     {
        kernel[i * X + j] = texture2DCompare(shadowMap,
-          topLeft + float2(i, j) * texelSize, shadowMapPos.z);
+          topLeft + vec2(i, j) * texelSize, shadowMapPos.z);
     }
   }
 
@@ -102,9 +102,9 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
   kernel_interpolated[3] = kernel[4] + kernel[5] + kernel[7] + kernel[8];
   kernel_interpolated[3] /= 4.0;
 
-  float a = lerp(kernel_interpolated[0], kernel_interpolated[1], f.y);
-  float b = lerp(kernel_interpolated[2], kernel_interpolated[3], f.y);
-  float c = lerp(a, b, f.x);
+  float a = mix(kernel_interpolated[0], kernel_interpolated[1], f.y);
+  float b = mix(kernel_interpolated[2], kernel_interpolated[3], f.y);
+  float c = mix(a, b, f.x);
   return c;
 }
 
