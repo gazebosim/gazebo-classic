@@ -795,11 +795,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       const Transform& X_IF0 = isReversed ? gzJoint->xCB : gzJoint->xPA;
       const Transform& X_OM0 = isReversed ? gzJoint->xPA : gzJoint->xCB;
 
+      const MobilizedBody::Direction direction =
+        isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
+
       if (type == "free")
       {
-        const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
-
         MobilizedBody::Free freeJoint(
             parentMobod,  X_IF0,
             massProps,          X_OM0,
@@ -811,11 +811,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "universal")
       {
-        // For universal joint, because Simbody uses body-fixed and Gazebo
-        // uses space-fixed rotations, we are reversing direction here.
-        const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Forward : MobilizedBody::Reverse;
-
         UnitVec3 axis1(
           SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
         UnitVec3 axis2(
@@ -868,9 +863,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "revolute")
       {
-        const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
-
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
 
@@ -913,9 +905,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "prismatic")
       {
-        const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
-
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
 
@@ -953,9 +942,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "ball")
       {
-        const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
-
         MobilizedBody::Ball ballJoint(
             parentMobod,  X_IF0,
             massProps,          X_OM0,

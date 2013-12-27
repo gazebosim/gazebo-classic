@@ -247,32 +247,27 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(int _index) const
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < static_cast<int>(this->GetAngleCount()))
   {
-    // gzerr << "state: [" <<
-    //     this->simbodyPhysics->integ->getState().getQ() << "]\n";
-
     if (_index == 0)
     {
-      // express Y-axis of X_OM in world frame
-      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+      // express X-axis of X_IF in world frame
+      const SimTK::Transform &X_IF = this->mobod.getInboardFrame(
         this->simbodyPhysics->integ->getState());
-      // gzerr << "X_OM: " << X_OM << "\n";
 
       SimTK::Vec3 x_W(
-        this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.x()));
+        this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_IF.x()));
 
       return SimbodyPhysics::Vec3ToVector3(x_W);
     }
     else if (_index == 1)
     {
-      // express X-axis of X_IF in world frame
-      const SimTK::Transform &X_IF = this->mobod.getInboardFrame(
+      // express Y-axis of X_OM in world frame
+      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
         this->simbodyPhysics->integ->getState());
-      // gzerr << "X_IF: " << X_IF << "\n";
 
       SimTK::Vec3 y_W(
-        this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_IF.y()));
+        this->mobod.expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_OM.y()));
 
       return SimbodyPhysics::Vec3ToVector3(y_W);
     }
