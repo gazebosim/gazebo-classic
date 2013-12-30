@@ -103,6 +103,11 @@ void LiftDragPlugin::OnUpdate()
   // get linear velocity at cp in inertial frame
   math::Vector3 vel = this->link->GetWorldLinearVel(this->cp);
 
+  // smoothing
+  // double e = 0.8;
+  // this->velSmooth = e*vel + (1.0 - e)*velSmooth;
+  // vel = this->velSmooth;
+
   if (vel.GetLength() <= 0.01)
     return;
 
@@ -134,15 +139,39 @@ void LiftDragPlugin::OnUpdate()
   // velocity in lift-drag plane (expressed in inertial frame) is:
   math::Vector3 velInLDPlane = normal.Cross(vel.Cross(normal));
 
-  double cosAngleOfAttack = 
-    forwardI.Dot(velInLDPlane) /
-    (forwardI.GetLength() * vel.GetLength());
+  // get direction of drag
+  math::Vector3 dragDirection = -velInLDPlane;
+  dragDirection.Normalize();
 
-  // double sinAngleOfAttack = sqrt(1.0 - cosAngleOfAttack * cosAngleOfAttack);
-  this->alpha = acos(cosAngleOfAttack);
+  // get direction of lift
+  math::Vector3 liftDirection = normal.Cross(velInLDPlane);
+  liftDirection.Normalize();
+
+  // get direction of moment
+  math::Vector3 momentDirection = normal;
+
+  double cosAlpha = math::clamp(
+    forwardI.Dot(velInLDPlane) /
+    (forwardI.GetLength() * velInLDPlane.GetLength()), -1.0, 1.0);
+  // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
+  //   (forwardI.GetLength() * velInLDPlane.GetLength()) << "\n";
+
+  // get sign of alpha
+  // take upwards component of velocity in lift-drag plane.
+  // if sign == upward, then alpha is negative
+  double alphaSign = -upwardI.Dot(velInLDPlane)/
+    (upwardI.GetLength() + velInLDPlane.GetLength());
+
+  // double sinAlpha = sqrt(1.0 - cosAlpha * cosAlpha);
+  this->alpha = (alphaSign > 0.0) ? acos(cosAlpha) : -acos(cosAlpha);
+
+  // normalize to within +/-90 deg
+  while (abs(this->alpha) > 0.5 * M_PI)
+    this->alpha = this->alpha > 0 ? this->alpha - M_PI
+                                  : this->alpha + M_PI;
 
   // HACK: get back magnitude for now
-  velInLDPlane *= vel.GetLength();
+  // velInLDPlane *= vel.GetLength();
 
   // compute dynamic pressure
   double speedInLDPlane = velInLDPlane.GetLength();
@@ -150,15 +179,15 @@ void LiftDragPlugin::OnUpdate()
 
   // lift at cp
   double cl = this->cla * (this->a0 + this->alpha) / cosSweepAngle2;
-  math::Vector3 lift = cl * q * normal.Cross(velInLDPlane).Normalize();
+  math::Vector3 lift = cl * q * liftDirection;
 
   // drag at cp
   double cd = this->cda * (this->a0 + this->alpha) / cosSweepAngle2;
-  math::Vector3 drag = -cd * q * velInLDPlane.Normalize();
+  math::Vector3 drag = cd * q * dragDirection;
 
   // moment about cp
   double cm = this->cma * (this->a0 + this->alpha) / cosSweepAngle2;
-  math::Vector3 moment = cm * q * normal.Normalize();  // check sign
+  math::Vector3 moment = cm * q * momentDirection;
 
   // moment arm from cg to cp in inertial plane
   math::Vector3 momentArm = pose.rot.RotateVector(this->cp);
@@ -181,7 +210,7 @@ void LiftDragPlugin::OnUpdate()
   // gzerr << "sin(sweep): " << sinSweepAngle << "\n";
   // gzerr << "cos(sweep): " << sqrt(cosSweepAngle2) << "\n";
   // gzerr << "|forward|: " << forwardI.GetLength() << "\n";
-  // gzerr << "cos(alpha): " << cosAngleOfAttack << "\n";
+  // gzerr << "cos(alpha): " << cosAlpha << "\n";
   gzerr << "alpha: " << this->alpha << "\n";
   gzerr << "lift: " << lift << "\n";
   gzerr << "drag: " << drag << "\n";

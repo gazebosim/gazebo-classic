@@ -98,6 +98,9 @@ namespace gazebo
     /// is considered wing sweep.
     private: math::Vector3 upward;
 
+    /// \brief Smooth velocity
+    private: math::Vector3 velSmooth;
+
     /// \brief Names of allowed target links, specified in sdf parameters.
     private: std::string linkName;
 
