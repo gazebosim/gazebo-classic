@@ -240,9 +240,9 @@
       </joint>
       -->
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
-        <a0>1.0</a0>
-        <cla>0.005</cla>
-        <cda>0.0001</cda>
+        <a0>0.0</a0>
+        <cla>0.010</cla>
+        <cda>0.001</cda>
         <cma>0.00</cma>
         <cp>0.05 0.5 0</cp>
         <area>0.2</area>
@@ -252,9 +252,211 @@
         <link_name>lift_drag_demo_model::blade_1</link_name>
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
-        <a0>1.0</a0>
-        <cla>0.005</cla>
-        <cda>0.0001</cda>
+        <a0>0.0</a0>
+        <cla>0.010</cla>
+        <cda>0.001</cda>
+        <cma>0.00</cma>
+        <cp>0.05 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_2</link_name>
+      </plugin>
+
+
+      <link name="rod_2">
+        <pose>0 0 1.25 0 0 0</pose>
+        <inertial>
+          <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>0.012</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.012</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.0012</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.02 0.02 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.02 0.02 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1.0</ambient>
+            <diffuse>.421 0.225 0.0 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <joint name="rod_2_joint" type="revolute">
+        <parent>body</parent>
+        <child>rod_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-1e16</lower>
+            <upper>1e16</upper>
+          </limit>
+          <xyz>0.0 0.0 1.0</xyz>
+          <dynamics>
+            <damping>0.0001</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+      <link name="blade_3">
+        <pose>0 0 1.7 0 0 0</pose>
+        <inertial>
+          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>0.000465</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.000006</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.000470</izz>
+          </inertia>
+          <mass>0.01</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>0.2 1.0 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>0.2 1.0 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.2 0.2 1.0</ambient>
+            <diffuse>.421 0.225 0.0 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <link name="blade_4">
+        <pose>0 0 1.7 0 0 3.141593</pose>
+        <inertial>
+          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>0.000465</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.000006</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.000470</izz>
+          </inertia>
+          <mass>0.01</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>0.2 1.0 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.0 0.5 0 0.0 0.0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 1.0 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.5 0.2 1.0</ambient>
+            <diffuse>.421 0.225 0.0 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <joint name="blade_3_joint" type="revolute">
+        <parent>rod_2</parent>
+        <child>blade_3</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+          </limit>
+          <xyz>0.0 1.0 0.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="blade_4_joint" type="revolute">
+        <parent>rod_2</parent>
+        <child>blade_4</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+          </limit>
+          <xyz>0.0 -1.0 0.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+      <!-- -->
+      <joint name="gear_joint" type="gearbox">
+          <parent>rod</parent>
+          <child>rod_2</child>
+          <gearbox_ratio>-1.0</gearbox_ratio>
+          <gearbox_reference_body>body</gearbox_reference_body>
+          <axis>
+            <xyz>0.000000 0.000000 -1.000000</xyz>
+          </axis>
+          <axis2>
+            <xyz>0.000000 0.000000 1.000000</xyz>
+          </axis2>
+      </joint>
+      <plugin name="gazebo_blade_3" filename="libLiftDragPlugin.so">
+        <a0>0.0</a0>
+        <cla>0.000</cla>
+        <cda>0.000</cda>
+        <cma>0.00</cma>
+        <cp>0.05 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_4</link_name>
+      </plugin>
+      <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
+        <a0>0.0</a0>
+        <cla>0.000</cla>
+        <cda>0.000</cda>
         <cma>0.00</cma>
         <cp>0.05 0.5 0</cp>
         <area>0.2</area>
