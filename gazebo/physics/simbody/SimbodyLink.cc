@@ -19,6 +19,8 @@
  * Date: 13 Feb 2006
  */
 
+#include <boost/thread.hpp>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -291,9 +293,14 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
   math::Vector3 v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     v = SimbodyPhysics::Vec3ToVector3(
       this->masterMobod.findStationVelocityInGround(
       this->simbodyPhysics->integ->getState(), station));
+  }
   else
     gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
            << " not yet initialized\n";
@@ -313,6 +320,11 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
     SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
     SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
     SimTK::Vec3 p_W(R_WF * p_F);
+
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
     const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
       this->simbodyPhysics->integ->getState());
     SimTK::Vec3 p_B(~R_WL * p_W);
@@ -334,6 +346,9 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
        this->simbodyPhysics->integ->getState());
     v = SimbodyPhysics::Vec3ToVector3(
@@ -355,6 +370,9 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
+  // lock physics update mutex to ensure thread safety
+  boost::recursive_mutex::scoped_lock lock(
+    *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
   SimTK::Vec3 w =
     this->masterMobod.getBodyAngularVelocity(
     this->simbodyPhysics->integ->getState());
@@ -374,18 +392,35 @@ void SimbodyLink::SetForce(const math::Vector3 &_force)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldForce() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+
+  // get translational component
+  SimTK::Vec3 f = sv[1];
+
+  return SimbodyPhysics::Vec3ToVector3(f);
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetTorque(const math::Vector3 &/*_torque*/)
+void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 {
+  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod, SimTK::SpatialVec(t, SimTK::Vec3(0)));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldTorque() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+
+  // get rotational component
+  SimTK::Vec3 t = sv[0];
+
+  return SimbodyPhysics::Vec3ToVector3(t);
 }
 
 //////////////////////////////////////////////////

@@ -420,31 +420,26 @@ math::Vector3 BulletLink::GetWorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetForce(const math::Vector3 &/*_force*/)
+void BulletLink::SetForce(const math::Vector3 &_force)
 {
-  /*
   if (!this->rigidLink)
     return;
 
   this->rigidLink->applyCentralForce(
-      btmath::Vector3(_force.x, _force.y, _force.z));
-      */
+    btVector3(_force.x, _force.y, _force.z));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldForce() const
 {
-  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btmath::Vector3 btVec;
+  btVector3 btVec;
 
   btVec = this->rigidLink->getTotalForce();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-  */
-  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
