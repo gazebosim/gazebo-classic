@@ -6,12 +6,12 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>100</iters>
-          <sor>1.3</sor>
+          <iters>500</iters>
+          <sor>0.8</sor>
         </solver>
         <constraints>
           <cfm>0.0</cfm>
-          <erp>1.0</erp>
+          <erp>0.2</erp>
           <contact_max_correcting_vel>10000.0</contact_max_correcting_vel>
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
@@ -34,10 +34,10 @@
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1.8</ixx>
+            <ixx>10.8</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1.8</iyy>
+            <iyy>10.8</iyy>
             <iyz>0.0</iyz>
             <izz>10.8</izz>
           </inertia>
@@ -67,14 +67,14 @@
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0012</ixx>
+            <ixx>0.012</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0012</iyy>
+            <iyy>0.012</iyy>
             <iyz>0.0</iyz>
             <izz>0.0012</izz>
           </inertia>
-          <mass>0.1</mass>
+          <mass>1.0</mass>
         </inertial>
         <collision name="collision">
           <geometry>
@@ -100,20 +100,20 @@
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0026</ixx>
+            <ixx>0.000465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.00015</iyy>
+            <iyy>0.000006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0027</izz>
+            <izz>0.000470</izz>
           </inertia>
-          <mass>0.1</mass>
+          <mass>0.01</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <geometry>
             <box>
-              <size>0.2 1.0 0.05</size>
+              <size>0.2 1.0 0.01</size>
             </box>
           </geometry>
         </collision>
@@ -121,7 +121,7 @@
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <geometry>
             <box>
-              <size>0.2 1.0 0.05</size>
+              <size>0.2 1.0 0.01</size>
             </box>
           </geometry>
           <material>
@@ -135,20 +135,20 @@
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0026</ixx>
+            <ixx>0.000465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.00015</iyy>
+            <iyy>0.000006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0027</izz>
+            <izz>0.000470</izz>
           </inertia>
-          <mass>0.1</mass>
+          <mass>0.01</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <geometry>
             <box>
-              <size>0.2 1.0 0.05</size>
+              <size>0.2 1.0 0.01</size>
             </box>
           </geometry>
         </collision>
@@ -156,7 +156,7 @@
           <pose>0.0 0.5 0 0.0 0.0 0</pose>
           <geometry>
             <box>
-              <size>0.2 1.0 0.05</size>
+              <size>0.2 1.0 0.01</size>
             </box>
           </geometry>
           <material>
@@ -176,7 +176,7 @@
           </limit>
           <xyz>0.0 0.0 -1.0</xyz>
           <dynamics>
-            <damping>0.01</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis>
         <physics>
@@ -241,9 +241,9 @@
       -->
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>1.0</a0>
-        <cl>0.1</cl>
-        <cd>0.01</cd>
-        <cm>0.01</cm>
+        <cla>0.005</cla>
+        <cda>0.0001</cda>
+        <cma>0.00</cma>
         <cp>0.05 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -253,9 +253,9 @@
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>1.0</a0>
-        <cl>0.1</cl>
-        <cd>0.01</cd>
-        <cm>0.01</cm>
+        <cla>0.005</cla>
+        <cda>0.0001</cda>
+        <cma>0.00</cma>
         <cp>0.05 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
