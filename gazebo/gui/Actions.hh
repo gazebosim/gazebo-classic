@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gui/qt.h"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
@@ -41,6 +41,7 @@ namespace gazebo
     extern QAction *g_resetWorldAct;
     extern QAction *g_editBuildingAct;
     extern QAction *g_editTerrainAct;
+    extern QAction *g_editModelAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -71,6 +72,7 @@ namespace gazebo
     extern QAction *g_arrowAct;
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
+    extern QAction *g_scaleAct;
 
     extern QAction *g_topicVisAct;
 

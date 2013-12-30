@@ -1,4 +1,3 @@
-
 ################################################################################
 #APPEND_TO_CACHED_STRING(_string _cacheDesc [items...])
 # Appends items to a cached list.
@@ -8,7 +7,7 @@ MACRO (APPEND_TO_CACHED_STRING _string _cacheDesc)
   ENDFOREACH (newItem ${ARGN})
   #STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (APPEND_TO_CACHED_STRING)
-                 
+
 ################################################################################
 # APPEND_TO_CACHED_LIST (_list _cacheDesc [items...]
 # Appends items to a cached list.
@@ -24,8 +23,8 @@ ENDMACRO(APPEND_TO_CACHED_LIST)
 # Append sources to the server sources list
 MACRO (APPEND_TO_SERVER_SOURCES)
   FOREACH (src ${ARGN})
-    APPEND_TO_CACHED_LIST(gazeboserver_sources 
-                          ${gazeboserver_sources_desc}                   
+    APPEND_TO_CACHED_LIST(gazeboserver_sources
+                          ${gazeboserver_sources_desc}
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_SERVER_SOURCES)
@@ -35,10 +34,10 @@ ENDMACRO (APPEND_TO_SERVER_SOURCES)
 MACRO (APPEND_TO_SERVER_HEADERS)
   FOREACH (src ${ARGN})
     APPEND_TO_CACHED_LIST(gazeboserver_headers
-                          ${gazeboserver_headers_desc}                   
+                          ${gazeboserver_headers_desc}
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
     APPEND_TO_CACHED_LIST(gazeboserver_headers_nopath
-                          "gazeboserver_headers_nopath"                   
+                          "gazeboserver_headers_nopath"
                           ${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_SERVER_HEADERS)
@@ -47,8 +46,8 @@ ENDMACRO (APPEND_TO_SERVER_HEADERS)
 # Append sources to the sensor sources list
 MACRO (APPEND_TO_SENSOR_SOURCES)
   FOREACH (src ${ARGN})
-    APPEND_TO_CACHED_LIST(gazebosensor_sources 
-                          ${gazebosensor_sources_desc}                   
+    APPEND_TO_CACHED_LIST(gazebosensor_sources
+                          ${gazebosensor_sources_desc}
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_SENSOR_SOURCES)
@@ -57,8 +56,8 @@ ENDMACRO (APPEND_TO_SENSOR_SOURCES)
 # Append sources to the controller sources list
 MACRO (APPEND_TO_CONTROLLER_SOURCES)
   FOREACH (src ${ARGN})
-    APPEND_TO_CACHED_LIST(gazebocontroller_sources 
-                          ${gazebocontroller_sources_desc}                   
+    APPEND_TO_CACHED_LIST(gazebocontroller_sources
+                          ${gazebocontroller_sources_desc}
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_CONTROLLER_SOURCES)
@@ -122,6 +121,7 @@ endmacro ()
 macro (gz_install_executable _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION_FULL})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+  manpage(${_name} 1)
 endmacro ()
 
 #################################################
@@ -134,69 +134,42 @@ endmacro()
 
 #################################################
 macro (gz_setup_apple)
+  # NOTE MacOSX provides different system versions than CMake is parsing.
+  #      The following table lists the most recent OSX versions
+  #     9.x.x = Mac OSX Leopard (10.5)
+  #    10.x.x = Mac OSX Snow Leopard (10.6)
+  #    11.x.x = Mac OSX Lion (10.7)
+  #    12.x.x = Mac OSX Mountain Lion (10.8)
+  if (${CMAKE_SYSTEM_VERSION} LESS 10)
+    add_definitions(-DMAC_OS_X_VERSION=1050)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 10 AND ${CMAKE_SYSTEM_VERSION} LESS 11)
+    add_definitions(-DMAC_OS_X_VERSION=1060)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 11 AND ${CMAKE_SYSTEM_VERSION} LESS 12)
+    add_definitions(-DMAC_OS_X_VERSION=1070)
+  elseif (${CMAKE_SYSTEM_VERSION} GREATER 12 OR ${CMAKE_SYSTEM_VERSION} EQUAL 12)
+    add_definitions(-DMAC_OS_X_VERSION=1080)
+  else ()
+    add_definitions(-DMAC_OS_X_VERSION=0)
+  endif ()
+
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
 endmacro()
 
 # This should be migrated to more fine control solution based on set_property APPEND
-# directories. It's present on cmake 2.8.8 while precise version is 2.8.7  
+# directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
 include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 
 #################################################
-# Hack: extra sources to build binaries can be supplied to gz_build_tests in the variable
-#       GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up at the end of the function
+# Enable tests compilation by default
+if (NOT DEFINED ENABLE_TESTS_COMPILATION)
+  set (ENABLE_TESTS_COMPILATION True)
+endif()
+
+# Define testing macros as empty and redefine them if support is found and 
+# ENABLE_TESTS_COMPILATION is set to true
 macro (gz_build_tests)
-  # Build all the tests
-  foreach(GTEST_SOURCE_file ${ARGN})
-    string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
-    if(USE_LOW_MEMORY_TESTS)
-      add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
-    endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
-
-    add_dependencies(${BINARY_NAME}
-      gtest gtest_main
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport)
-  
-    target_link_libraries(${BINARY_NAME}
-      libgtest.a
-      libgtest_main.a
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      libgazebo
-      pthread
-      )
-  
-    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
-  
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
-  
-    # Check that the test produced a result and create a failure if it didn't.
-    # Guards against crashed and timed out tests.
-    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
-  endforeach()
-
-  set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
 endmacro()
-
-#################################################
-
-# Define GUI testing macros as empty and redefine them if support is found
 macro (gz_build_qt_tests)
 endmacro()
 macro (gz_build_display_tests)
@@ -204,67 +177,20 @@ endmacro()
 macro (gz_build_dri_tests)
 endmacro()
 
-if (VALID_DISPLAY)
-  # Redefine build display tests
-  macro (gz_build_display_tests)
-    gz_build_tests(${ARGV})
-  endmacro()
-
-  # Redefine build qt tests
-  macro (gz_build_qt_tests)
-   # Build all the tests
-   foreach(QTEST_SOURCE_file ${ARGN})
-     string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
-     string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
-     QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
-
-     add_executable(${BINARY_NAME}
-      ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
-
-    add_dependencies(${BINARY_NAME}
-      gazebo_gui
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport)
-
-    target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_sdf_interface
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
-      libgazebo
-      pthread
-      ${QT_QTTEST_LIBRARY}
-      ${QT_LIBRARIES}
-      )
-
-    # QTest need and extra -o parameter to write logging information to a file
-    add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	-xml -o ${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
-
-
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
-
-    # Check that the test produced a result and create a failure if it didn't.
-    # Guards against crashed and timed out tests.
-    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	${CMAKE_BINARY_DIR}/test_results/${TEST_TYPE}_${BINARY_NAME}.xml)
-    endforeach()
-  endmacro()
+if (ENABLE_TESTS_COMPILATION)
+  include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
 endif()
 
-if (VALID_DRI_DISPLAY)
-  macro (gz_build_dri_tests)
-    gz_build_tests(${ARGV})
-  endmacro()
-endif()
+#################################################
+# Macro to setup supported compiler warnings
+# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
+include(CheckCXXCompilerFlag)
+
+macro(filter_valid_compiler_warnings) 
+  foreach(flag ${ARGN})
+    CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
+    if(${R${flag}})
+      set(WARNING_CXX_FLAGS "${WARNING_CXX_FLAGS} ${flag}")
+    endif()
+  endforeach()
+endmacro()

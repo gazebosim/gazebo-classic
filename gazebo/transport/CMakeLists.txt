@@ -12,7 +12,7 @@ set (sources
   Subscriber.cc
   SubscriptionTransport.cc
   TopicManager.cc
-  Transport.cc
+  TransportIface.cc
 ) 
 
 set (headers
@@ -28,17 +28,24 @@ set (headers
   Subscriber.hh
   SubscriptionTransport.hh
   TopicManager.hh
-  Transport.hh
+  TransportIface.hh
   TransportTypes.hh
 )
 
 set (transport_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(transport_headers "Transport Headers"
-    "#include \"transport/${hdr}\"\n")
+    "#include \"gazebo/transport/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/transport.hh )
+
+set_property(
+  SOURCE TransportIface.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_DEFAULT_MASTER_HOST="${GAZEBO_DEFAULT_MASTER_HOST}"
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+)
 
 
 gz_add_library(gazebo_transport ${sources})

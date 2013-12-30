@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -28,21 +30,21 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "gazebo/sdf/sdf.hh"
-
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
@@ -50,78 +52,75 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
-  this->receiveMutex = new boost::mutex();
-
-  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
 
 /////////////////////////////////////////////////
 Server::~Server()
 {
   fflush(stdout);
-  delete this->receiveMutex;
   delete this->master;
 }
 
 /////////////////////////////////////////////////
 void Server::PrintUsage()
 {
-  std::cerr << "Run the Gazebo server.\n\n"
-    << "Usage: gzserver [options] <world_file>\n\n";
+  std::cerr << "gzserver -- Run the Gazebo server.\n\n";
+  std::cerr << "`gzserver` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops.\n\n";
 }
 
 /////////////////////////////////////////////////
-bool Server::ParseArgs(int argc, char **argv)
+bool Server::ParseArgs(int _argc, char **_argv)
 {
-  // save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = argc;
-  this->systemPluginsArgv = new char*[argc];
-  for (int i = 0; i < argc; ++i)
+  // Save a copy of argc and argv for consumption by system plugins
+  this->systemPluginsArgc = _argc;
+  this->systemPluginsArgv = new char*[_argc];
+  for (int i = 0; i < _argc; ++i)
   {
-    int argvLen = strlen(argv[i]) + 1;
+    int argvLen = strlen(_argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
   }
 
-  po::options_description v_desc("Allowed options");
-  v_desc.add_options()
+  po::options_description visibleDesc("Options");
+  visibleDesc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet).")
+     "Specify a physics engine (ode|bullet|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
-     "Compression encoding format for log data.")
+     "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
-     "Aboslute path in which to store state data")
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
+    ("minimal_comms", "Reduce the messages output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
-  po::options_description h_desc("Hidden options");
-  h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  h_desc.add_options()
+  po::options_description hiddenDesc("Hidden options");
+  hiddenDesc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
-  po::options_description desc("Allowed options");
-  desc.add(v_desc).add(h_desc);
+  po::options_description desc("Options");
+  desc.add(visibleDesc).add(hiddenDesc);
 
-  po::positional_options_description p_desc;
-  p_desc.add("world_file", 1).add("pass_through", -1);
+  po::positional_options_description positionalDesc;
+  positionalDesc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), this->vm);
+    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
+          positionalDesc).allow_unregistered().run(), this->vm);
 
     po::notify(this->vm);
   }
@@ -133,11 +132,22 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << visibleDesc << "\n";
+    return false;
+  }
+
   if (this->vm.count("quiet"))
     gazebo::common::Console::Instance()->SetQuiet(true);
   else
     gazebo::print_version();
 
+  if (this->vm.count("minimal_comms"))
+    gazebo::transport::setMinimalComms(true);
+  else
+    gazebo::transport::setMinimalComms(false);
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
@@ -150,13 +160,6 @@ bool Server::ParseArgs(int argc, char **argv)
     {
       gzerr << "Unable to set random number seed. Must supply a number.\n";
     }
-  }
-
-  if (this->vm.count("help"))
-  {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
-    return false;
   }
 
   /// Load all the plugins specified on the command line
@@ -199,6 +202,12 @@ bool Server::ParseArgs(int argc, char **argv)
     this->params["pause"] = "true";
   else
     this->params["pause"] = "false";
+
+  if (!this->PreLoad())
+  {
+    gzerr << "Unable to load gazebo\n";
+    return false;
+  }
 
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
@@ -279,7 +288,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
@@ -309,8 +318,7 @@ bool Server::LoadString(const std::string &_sdfString)
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics)
+bool Server::PreLoad()
 {
   std::string host = "";
   unsigned int port = 0;
@@ -321,10 +329,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->master->Init(port);
   this->master->RunThread();
 
-
   // Load gazebo
-  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+}
 
+/////////////////////////////////////////////////
+bool Server::LoadImpl(sdf::ElementPtr _elem,
+                      const std::string &_physics)
+{
   /// Load the sensors library
   sensors::load();
 
@@ -402,6 +414,9 @@ void Server::Init()
 void Server::SigInt(int)
 {
   stop = true;
+
+  // Signal to plugins/etc that a shutdown event has occured
+  event::Events::sigInt();
 }
 
 /////////////////////////////////////////////////
@@ -433,6 +448,13 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = Server::SigInt;
+  if (sigaction(SIGINT, &sigact, NULL))
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
   if (this->stop)
     return;
 
@@ -531,7 +553,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 
@@ -557,6 +579,10 @@ void Server::ProcessControlMsgs()
     else if ((*iter).has_open_filename())
     {
       this->OpenWorld((*iter).open_filename());
+    }
+    else if ((*iter).has_stop() && (*iter).stop())
+    {
+      this->Stop();
     }
   }
   this->controlMsgs.clear();

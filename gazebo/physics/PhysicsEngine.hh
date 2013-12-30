@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \brief Return the type of the physics engine (ode|bullet|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 
@@ -76,29 +76,9 @@ namespace gazebo
       /// \param[in] _seed The random number seed.
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
-      /// \brief Set the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
-      /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
-      /// \return Update rate.
-      public: double GetUpdateRate() GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
-
-      /// \brief Set the simulation step time.
-      /// This funciton is deprecated, use World::SetMaxStepSize.
-      /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation step time.
-      /// This funciton is deprecated, use World::GetMaxStepSize.
-      /// \return Simulation step time.
-      public: virtual double GetStepTime() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get target real time factor
       /// \return Target real time factor
@@ -126,6 +106,10 @@ namespace gazebo
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
+
+      /// \brief Create a new model.
+      /// \param[in] _base Boost shared pointer to a new model.
+      public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.

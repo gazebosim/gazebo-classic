@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-#include "rendering/ogre_gazebo.h"
-#include "gazebo_config.h"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/gazebo_config.h"
 
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/Camera.hh"
 #include "gazebo/common/SingletonT.hh"
 
 namespace gazebo
@@ -161,7 +161,8 @@ namespace gazebo
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;
 
-      private: Ogre::PSSMShadowCameraSetup *pssmSetup;
+      /// \brief Parallel Split Shadow Map (PSSM) camera setup
+      private: Ogre::ShadowCameraSetupPtr pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;
