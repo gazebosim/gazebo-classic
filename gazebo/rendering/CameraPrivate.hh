@@ -94,6 +94,7 @@ namespace gazebo
         NONE,
         GAUSSIAN
       };
+
       /// \brief If true, apply the noise model specified by other
       /// noise parameters
       public: bool noiseActive;
@@ -108,6 +109,24 @@ namespace gazebo
       /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
       /// devation of the distibution from which we sample
       public: double noiseStdDev;
+
+      /// \brief Which noise type we support
+      public: enum DistortionModelType
+      {
+        BROWN
+      };
+
+      /// \brief Type of lens distortion we're applying
+      public: DistortionModelType distortionType;
+
+      /// \brief Radial distortion coefficients.
+      public: math::Vector3 radialCoeff;
+
+      /// \brief Tangential distortion coefficients.
+      public: math::Vector2d tangentialCoeff;
+
+      /// \brief Lens center used for distortion
+      public: math::Vector2d lensCenter;
 
       /// \brief Communication Node
       public: transport::NodePtr node;

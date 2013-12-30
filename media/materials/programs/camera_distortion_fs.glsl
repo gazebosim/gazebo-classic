@@ -1,19 +1,33 @@
 // The input texture, which is set up by the Ogre Compositor infrastructure.
 uniform sampler2D RT;
 
-// Other parameters are set in C++, via
-// Ogre::GpuProgramParameters::setNamedConstant()
+// distortion coefficients
+uniform vec3 radial;
+uniform vec3 tangential;
+uniform vec3 center;
 
-uniform float k1;
-uniform float k2;
-uniform float k3;
-uniform float p1;
-uniform float p2;
+vec2 warp(vec2 texCoord)
+{
+  vec2 normalized = (texCoord - center.xy);
+  float rSq = normalized.x * normalized.x + normalized.y * normalized.y;
 
-#define PI 3.14159265358979323846264
+  // radial distortion: k1, k2, k3
+  vec2 dist = normalized * ( 1.0 +
+      radial.x * rSq +
+      radial.y * rSq * rSq +
+      radial.z * rSq * rSq * rSq);
+
+  // tangential distortion: p1, p2
+  dist.x += tangential.x * (rSq + 2 * (normalized.x*normalized.x)) +
+      2 * tangential.y * normalized.x * normalized.y;
+  dist.y += tangential.y * (rSq + 2 * (normalized.y*normalized.y)) +
+      2 * tangential.x * normalized.x * normalized.y;
+
+  return center.xy + dist;
+}
 
 void main()
 {
-  // gl_FragColor = texture2D(RT, gl_TexCoord[0].xy);
-  gl_FragColor = vec(1, 0, 0, 1)
+  vec2 uv = warp(gl_TexCoord[0].xy);
+  gl_FragColor = texture2D(RT, uv);
 }
