@@ -190,12 +190,15 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 moment = cm * q * momentDirection;
 
   // moment arm from cg to cp in inertial plane
-  math::Vector3 momentArm = pose.rot.RotateVector(this->cp);
+  math::Vector3 momentArm = pose.rot.RotateVector(
+    this->link->GetInertial()->GetCoG() - this->cp);
+  // gzerr << this->cp << " : " << this->link->GetInertial()->GetCoG() << "\n";
 
   // force an torque about cg in inertial frame
   math::Vector3 force = lift + drag + moment.Cross(momentArm);
   math::Vector3 torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
+  /* debug
   gzerr << "=============================\n";
   gzerr << "Link: " << this->link->GetName() << "\n";
   gzerr << "pose: [" << pose << "]\n";
@@ -218,8 +221,9 @@ void LiftDragPlugin::OnUpdate()
   gzerr << "momentArm: " << momentArm << "\n";
   gzerr << "force: " << force << "\n";
   gzerr << "torque: " << torque << "\n";
+  */
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
-  // this->link->AddTorque(torque);
+  this->link->AddTorque(torque);
 }

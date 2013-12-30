@@ -30,7 +30,7 @@
       <pose>0 0 0 0 0 0</pose>
       <static>false</static>
       <link name="body">
-        <pose>0 0 0.5 0 0 0</pose>
+        <pose>1.0 0 0.5 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
@@ -46,7 +46,7 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>1 1 1</size>
+              <size>3 1 1</size>
             </box>
           </geometry>
           <surface>
@@ -61,7 +61,7 @@
         <visual name="visual">
           <geometry>
             <box>
-              <size>1 1 1</size>
+              <size>3 1 1</size>
             </box>
           </geometry>
           <material>
@@ -173,7 +173,7 @@
           </material>
         </visual>
       </link>
-      <joint name="rod_joint" type="revolute">
+      <joint name="rod_1_joint" type="revolute">
         <parent>body</parent>
         <child>rod_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
@@ -250,7 +250,7 @@
 
 
       <link name="rod_2">
-        <pose>0 0 1.25 0 0 0</pose>
+        <pose>2 0 1.25 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -303,7 +303,7 @@
         </physics>
       </joint>
       <link name="blade_3">
-        <pose>0 0 1.7 0 0 0</pose>
+        <pose>2 0 1.5 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -338,7 +338,7 @@
         </visual>
       </link>
       <link name="blade_4">
-        <pose>0 0 1.7 0 0 3.141593</pose>
+        <pose>2 0 1.5 0 0 3.141593</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -431,7 +431,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <cp>0.05 0.5 0</cp>
+        <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
         <forward>1 0 0</forward>
@@ -443,7 +443,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <cp>0.05 0.5 0</cp>
+        <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
         <forward>1 0 0</forward>
@@ -455,7 +455,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <cp>0.05 0.5 0</cp>
+        <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
@@ -467,7 +467,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <cp>0.05 0.5 0</cp>
+        <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
