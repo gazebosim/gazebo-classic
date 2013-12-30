@@ -173,7 +173,7 @@
           </material>
         </visual>
       </link>
-      <joint name="rod_joint" type="revolute">
+      <joint name="rod_1_joint" type="revolute">
         <parent>body</parent>
         <child>rod_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
