@@ -6,7 +6,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>500</iters>
+          <iters>100</iters>
           <sor>0.8</sor>
         </solver>
         <constraints>
@@ -32,14 +32,14 @@
       <link name="body">
         <pose>0 0 0.5 0 0 0</pose>
         <inertial>
-          <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
+          <pose>0.0001 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>10.8</ixx>
+            <ixx>1.8</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>10.8</iyy>
+            <iyy>1.8</iyy>
             <iyz>0.0</iyz>
-            <izz>10.8</izz>
+            <izz>1.8</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>
@@ -239,30 +239,6 @@
           </axis2>
       </joint>
       -->
-      <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <cla>0.010</cla>
-        <cda>0.000</cda>
-        <cma>0.00</cma>
-        <cp>0.0 0.5 0</cp>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <forward>1 0 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::blade_1</link_name>
-      </plugin>
-      <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <cla>0.010</cla>
-        <cda>0.000</cda>
-        <cma>0.00</cma>
-        <cp>0.0 0.5 0</cp>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <forward>1 0 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::blade_2</link_name>
-      </plugin>
 
 
       <link name="rod_2">
@@ -441,10 +417,35 @@
             <xyz>0.000000 0.000000 1.000000</xyz>
           </axis2>
       </joint>
+
+      <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
+        <a0>0.1</a0>
+        <cla>0.100</cla>
+        <cda>0.010</cda>
+        <cma>0.00</cma>
+        <cp>0.0 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_1</link_name>
+      </plugin>
+      <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
+        <a0>0.1</a0>
+        <cla>0.100</cla>
+        <cda>0.010</cda>
+        <cma>0.00</cma>
+        <cp>0.0 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_2</link_name>
+      </plugin>
       <plugin name="gazebo_blade_3" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <cla>0.010</cla>
-        <cda>0.000</cda>
+        <cla>0.100</cla>
+        <cda>0.010</cda>
         <cma>0.00</cma>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
@@ -455,8 +456,8 @@
       </plugin>
       <plugin name="gazebo_blade_4" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <cla>0.010</cla>
-        <cda>0.000</cda>
+        <cla>0.100</cla>
+        <cda>0.010</cda>
         <cma>0.00</cma>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
