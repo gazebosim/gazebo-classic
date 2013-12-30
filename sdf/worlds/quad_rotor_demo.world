@@ -106,7 +106,7 @@
       <link name="blade_1">
         <pose>0 0 0.28 0 0 0</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -141,7 +141,7 @@
       <link name="blade_2">
         <pose>0 0 0.28 0 0 3.141593</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -270,7 +270,7 @@
       <link name="blade_3">
         <pose>3.5 0 0.28 0 0 0</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -305,7 +305,7 @@
       <link name="blade_4">
         <pose>3.5 0 0.28 0 0 3.141593</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -539,7 +539,7 @@
       <link name="blade_5">
         <pose>1.75 -1.75 0.28 0 0 0</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -574,7 +574,7 @@
       <link name="blade_6">
         <pose>1.75 -1.75 0.28 0 0 3.141593</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -703,7 +703,7 @@
       <link name="blade_7">
         <pose>1.75 1.75 0.28 0 0 0</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
@@ -738,7 +738,7 @@
       <link name="blade_8">
         <pose>1.75 1.75 0.28 0 0 3.141593</pose>
         <inertial>
-          <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.25 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0000465</ixx>
             <ixy>0.0</ixy>
