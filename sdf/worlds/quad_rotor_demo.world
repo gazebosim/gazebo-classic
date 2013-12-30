@@ -30,7 +30,7 @@
       <pose>0 0 0 0 0 0</pose>
       <static>false</static>
       <link name="body_1">
-        <pose>1.0 0 0.1 0 0 0</pose>
+        <pose>1.75 0 0.1 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
@@ -46,7 +46,7 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>2.6 0.2 0.2</size>
+              <size>3.6 0.2 0.2</size>
             </box>
           </geometry>
           <surface>
@@ -61,7 +61,7 @@
         <visual name="visual">
           <geometry>
             <box>
-              <size>2.6 0.2 0.2</size>
+              <size>3.6 0.2 0.2</size>
             </box>
           </geometry>
           <material>
@@ -235,7 +235,7 @@
       </joint>
 
       <link name="rod_2">
-        <pose>2 0 0.24 0 0 0</pose>
+        <pose>3.5 0 0.24 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -268,7 +268,7 @@
         </visual>
       </link>
       <link name="blade_3">
-        <pose>2 0 0.28 0 0 0</pose>
+        <pose>3.5 0 0.28 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -303,7 +303,7 @@
         </visual>
       </link>
       <link name="blade_4">
-        <pose>2 0 0.28 0 0 3.141593</pose>
+        <pose>3.5 0 0.28 0 0 3.141593</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -463,7 +463,7 @@
 
 
       <link name="body_2">
-        <pose>1.0 0 0.1 0 0 0</pose>
+        <pose>1.75 0 0.1 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
@@ -479,7 +479,7 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.2 2.6 0.2</size>
+              <size>0.2 3.6 0.2</size>
             </box>
           </geometry>
           <surface>
@@ -494,7 +494,7 @@
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.2 2.6 0.2</size>
+              <size>0.2 3.6 0.2</size>
             </box>
           </geometry>
           <material>
@@ -504,7 +504,7 @@
         </visual>
       </link>
       <link name="rod_3">
-        <pose>1 -1 0.24 0 0 0</pose>
+        <pose>1.75 -1.75 0.24 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -537,7 +537,7 @@
         </visual>
       </link>
       <link name="blade_5">
-        <pose>1 -1 0.28 0 0 0</pose>
+        <pose>1.75 -1.75 0.28 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -572,7 +572,7 @@
         </visual>
       </link>
       <link name="blade_6">
-        <pose>1 -1 0.28 0 0 3.141593</pose>
+        <pose>1.75 -1.75 0.28 0 0 3.141593</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -668,7 +668,7 @@
       </joint>
 
       <link name="rod_4">
-        <pose>1 1 0.24 0 0 0</pose>
+        <pose>1.75 1.75 0.24 0 0 0</pose>
         <inertial>
           <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -701,7 +701,7 @@
         </visual>
       </link>
       <link name="blade_7">
-        <pose>1 1 0.28 0 0 0</pose>
+        <pose>1.75 1.75 0.28 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -736,7 +736,7 @@
         </visual>
       </link>
       <link name="blade_8">
-        <pose>1 1 0.28 0 0 3.141593</pose>
+        <pose>1.75 1.75 0.28 0 0 3.141593</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
