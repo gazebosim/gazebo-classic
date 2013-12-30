@@ -6,7 +6,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>100</iters>
+          <iters>500</iters>
           <sor>0.8</sor>
         </solver>
         <constraints>
@@ -32,7 +32,7 @@
       <link name="body">
         <pose>0 0 0.5 0 0 0</pose>
         <inertial>
-          <pose>0.0001 0.0 0.0 0.0 0.0 0.0</pose>
+          <pose>0.0001 0.0 0.5 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>1.8</ixx>
             <ixy>0.0</ixy>
@@ -466,6 +466,32 @@
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::blade_4</link_name>
       </plugin>
+      <!-- drag for body
+      <plugin name="gazebo_body_1" filename="libLiftDragPlugin.so">
+        <a0>0.0</a0>
+        <cla>0.000</cla>
+        <cda>1.000</cda>
+        <cma>0.00</cma>
+        <cp>0.0 0 0</cp>
+        <area>1.0</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_4</link_name>
+      </plugin>
+      <plugin name="gazebo_body_2" filename="libLiftDragPlugin.so">
+        <a0>0.0</a0>
+        <cla>0.000</cla>
+        <cda>1.000</cda>
+        <cma>0.00</cma>
+        <cp>0.0 0 0</cp>
+        <area>1.0</area>
+        <air_density>1.2041</air_density>
+        <forward>0 1 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>lift_drag_demo_model::blade_4</link_name>
+      </plugin>
+      -->
     </model>
   </world>
 </sdf>
