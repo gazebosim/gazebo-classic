@@ -71,6 +71,18 @@ namespace gazebo
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     private: double cma;
 
+    /// \brief angle of attach when airfoil stalls
+    private: double alphaStall;
+
+    /// \brief Cl-alpha rate after stall
+    private: double claStall;
+
+    /// \brief Cd-alpha rate after stall
+    private: double cdaStall;
+
+    /// \brief Cm-alpha rate after stall
+    private: double cmaStall;
+
     /// \brief air density
     /// at 25 deg C it's about 1.1839 kg/m^3
     /// At 20 °C and 101.325 kPa, dry air has a density of 1.2041 kg/m3.
@@ -83,7 +95,7 @@ namespace gazebo
     private: double sweep;
 
     /// \brief initial angle of attack
-    private: double a0;
+    private: double alpha0;
 
     /// \brief angle of attack
     private: double alpha;

@@ -22,9 +22,43 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1000 1000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1000 1000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
 
     <model name="lift_drag_demo_model">
       <pose>0 0 0 0 0 0</pose>
@@ -37,9 +71,9 @@
             <ixx>1.8</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1.8</iyy>
+            <iyy>10.8</iyy>
             <iyz>0.0</iyz>
-            <izz>1.8</izz>
+            <izz>10.8</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>
@@ -416,6 +450,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -428,6 +466,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -440,6 +482,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -452,6 +498,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -467,12 +517,12 @@
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1.8</ixx>
+            <ixx>10.8</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyy>1.8</iyy>
             <iyz>0.0</iyz>
-            <izz>1.8</izz>
+            <izz>10.8</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>
@@ -869,6 +919,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -881,6 +935,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -893,6 +951,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -905,6 +967,10 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
+        <alpha_stall>1.0</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
@@ -913,36 +979,6 @@
         <link_name>lift_drag_demo_model::blade_8</link_name>
       </plugin>
 
-
-
-
-
-      <!-- drag for body_1
-      <plugin name="gazebo_body_1" filename="libLiftDragPlugin.so">
-        <a0>0.0</a0>
-        <cla>0.000</cla>
-        <cda>1.000</cda>
-        <cma>0.00</cma>
-        <cp>0.0 0 0</cp>
-        <area>1.0</area>
-        <air_density>1.2041</air_density>
-        <forward>1 0 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::blade_4</link_name>
-      </plugin>
-      <plugin name="gazebo_body_2" filename="libLiftDragPlugin.so">
-        <a0>0.0</a0>
-        <cla>0.000</cla>
-        <cda>1.000</cda>
-        <cma>0.00</cma>
-        <cp>0.0 0 0</cp>
-        <area>1.0</area>
-        <air_density>1.2041</air_density>
-        <forward>0 1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::blade_4</link_name>
-      </plugin>
-      -->
     </model>
   </world>
 </sdf>

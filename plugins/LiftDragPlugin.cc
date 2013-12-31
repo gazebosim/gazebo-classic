@@ -35,7 +35,11 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   this->forward = math::Vector3(1, 0, 0);
   this->upward = math::Vector3(0, 0, 1);
   this->area = 1.0;
-  this->a0 = 0.0;
+  this->alpha0 = 0.0;
+  this->alphaStall = 0.5*M_PI;  // 90 deg stall
+  this->claStall = 0.0;
+  this->cdaStall = 1.0;  /// \TODO: what's flat plate drag?
+  this->cmaStall = 0.0;
 }
 
 /////////////////////////////////////////////////
@@ -56,7 +60,7 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
 
   if (_sdf->HasElement("a0"))
-    this->a0 = _sdf->Get<double>("a0");
+    this->alpha0 = _sdf->Get<double>("a0");
 
   if (_sdf->HasElement("cla"))
     this->cla = _sdf->Get<double>("cla");
@@ -66,6 +70,18 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("cma"))
     this->cma = _sdf->Get<double>("cma");
+
+  if (_sdf->HasElement("alpha_stall"))
+    this->alphaStall = _sdf->Get<double>("alpha_stall");
+
+  if (_sdf->HasElement("cla_stall"))
+    this->claStall = _sdf->Get<double>("cla_stall");
+
+  if (_sdf->HasElement("cda_stall"))
+    this->cdaStall = _sdf->Get<double>("cda_stall");
+
+  if (_sdf->HasElement("cma_stall"))
+    this->cmaStall = _sdf->Get<double>("cma_stall");
 
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<math::Vector3>("cp");
@@ -163,30 +179,85 @@ void LiftDragPlugin::OnUpdate()
     (upwardI.GetLength() + velInLDPlane.GetLength());
 
   // double sinAlpha = sqrt(1.0 - cosAlpha * cosAlpha);
-  this->alpha = (alphaSign > 0.0) ? acos(cosAlpha) : -acos(cosAlpha);
+  if (alphaSign > 0.0)
+    this->alpha = this->alpha0 + acos(cosAlpha);
+  else
+    this->alpha = this->alpha0 - acos(cosAlpha);
 
   // normalize to within +/-90 deg
   while (abs(this->alpha) > 0.5 * M_PI)
     this->alpha = this->alpha > 0 ? this->alpha - M_PI
                                   : this->alpha + M_PI;
 
-  // HACK: get back magnitude for now
-  // velInLDPlane *= vel.GetLength();
-
   // compute dynamic pressure
   double speedInLDPlane = velInLDPlane.GetLength();
   double q = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
 
-  // lift at cp
-  double cl = this->cla * (this->a0 + this->alpha) / cosSweepAngle2;
+  // compute cl at cp, check for stall, correct for sweep
+  double cl;
+  if (this->alpha > this->alphaStall)
+  {
+    cl = (this->cla * this->alphaStall +
+          this->claStall * (this->alpha - this->alphaStall))
+         / cosSweepAngle2;
+    // make sure cl is staill great than 0
+    cl = std::max(0.0, cl);
+  }
+  else if (this->alpha < -this->alphaStall)
+  {
+    cl = (-this->cla * this->alphaStall +
+          this->claStall * (this->alpha + this->alphaStall))
+         / cosSweepAngle2;
+    // make sure cl is staill less than 0
+    cl = std::min(0.0, cl);
+  }
+  else
+    cl = this->cla * this->alpha / cosSweepAngle2;
+
+  // compute lift force at cp
   math::Vector3 lift = cl * q * liftDirection;
 
+  // compute cd at cp, check for stall, correct for sweep
+  double cd;
+  if (this->alpha > this->alphaStall)
+  {
+    cd = abs(this->cda * this->alphaStall +
+             this->cdaStall * (this->alpha - this->alphaStall))
+         / cosSweepAngle2;
+  }
+  else if (this->alpha < -this->alphaStall)
+  {
+    cd = abs(-this->cda * this->alphaStall +
+             this->cdaStall * (this->alpha + this->alphaStall))
+         / cosSweepAngle2;
+  }
+  else
+    cd = abs(this->cda * this->alpha) / cosSweepAngle2;
+
+  // make sure drag is positive
+  cd = std::max(0.0, cd);
+
   // drag at cp
-  double cd = this->cda * (this->a0 + this->alpha) / cosSweepAngle2;
   math::Vector3 drag = cd * q * dragDirection;
 
-  // moment about cp
-  double cm = this->cma * (this->a0 + this->alpha) / cosSweepAngle2;
+  // compute cm at cp, check for stall, correct for sweep
+  double cm;
+  if (this->alpha > this->alphaStall)
+  {
+    cm = (this->cma * this->alphaStall +
+          this->cmaStall * (this->alpha - this->alphaStall))
+         / cosSweepAngle2;
+  }
+  else if (this->alpha < -this->alphaStall)
+  {
+    cm = (-this->cma * this->alphaStall +
+          this->cmaStall * (this->alpha + this->alphaStall))
+         / cosSweepAngle2;
+  }
+  else
+    cm = this->cma * this->alpha / cosSweepAngle2;
+
+  // compute moment (torque) at cp
   math::Vector3 moment = cm * q * momentDirection;
 
   // moment arm from cg to cp in inertial plane
@@ -202,10 +273,10 @@ void LiftDragPlugin::OnUpdate()
   gzerr << "=============================\n";
   gzerr << "Link: " << this->link->GetName() << "\n";
   gzerr << "pose: [" << pose << "]\n";
-  gzerr << "q: [" << q << "]\n";
-  gzerr << "vel: [" << vel << "] |vel|: " << vel.GetLength() << "\n";
+  gzerr << "dynamic pressure: [" << q << "]\n";
+  gzerr << "vel: [" << vel << "] cp speed: " << vel.GetLength() << "\n";
   gzerr << "velInPlane: [" << velInLDPlane
-        << "] |vel|: " << velInLDPlane.GetLength() << "\n";
+        << "] cp speed: " << velInLDPlane.GetLength() << "\n";
   gzerr << "forward: " << forwardI << "\n";
   gzerr << "upward: " << upwardI << "\n";
   gzerr << "normal: " << normal << "\n";
