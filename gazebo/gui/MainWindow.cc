@@ -856,6 +856,7 @@ void MainWindow::CreateActions()
   g_arrowAct->setStatusTip(tr("Move camera"));
   g_arrowAct->setCheckable(true);
   g_arrowAct->setChecked(true);
+  g_arrowAct->setToolTip(tr("Selection Mode (Esc)"));
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
