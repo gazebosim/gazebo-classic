@@ -1026,8 +1026,9 @@ fragment_program Gazebo/CameraDistortionFS glsl
   {
     param_named RT int 0
     param_named radial float3 0.0 0.0 0.0
-    param_named tangential float3 0.0 0.0 0.0    
-    param_named lensCenter float3 0.5 0.5 1.0
+    param_named tangential float3 0.0 0.0 0.0
+    param_named center float3 0.5 0.5 1.0
+    param_named scale float 1.0
   }
 }
 
@@ -1043,7 +1044,7 @@ material Gazebo/CameraDistortion
       texture_unit RT
       {
         tex_coord_set 0
-        tex_address_mode clamp
+        tex_address_mode border
         filtering linear linear linear
       }
     }

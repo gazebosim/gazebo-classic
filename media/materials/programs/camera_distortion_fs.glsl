@@ -5,6 +5,7 @@ uniform sampler2D RT;
 uniform vec3 radial;
 uniform vec3 tangential;
 uniform vec3 center;
+uniform float scale;
 
 vec2 warp(vec2 texCoord)
 {
@@ -23,7 +24,7 @@ vec2 warp(vec2 texCoord)
   dist.y += tangential.y * (rSq + 2 * (normalized.y*normalized.y)) +
       2 * tangential.x * normalized.x * normalized.y;
 
-  return center.xy + dist;
+  return center.xy + scale * dist;
 }
 
 void main()

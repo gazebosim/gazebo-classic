@@ -128,6 +128,10 @@ namespace gazebo
       /// \brief Lens center used for distortion
       public: math::Vector2d lensCenter;
 
+      /// \brief Scale applied to distorted image in order to remove black
+      /// region at the border.
+      public: float distortUVScale;
+
       /// \brief Communication Node
       public: transport::NodePtr node;
 

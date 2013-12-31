@@ -1469,6 +1469,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     // Distortion
     if (this->dataPtr->distortionActive)
     {
+      this->dataPtr->distortUVScale = 1.0;
+
       Ogre::MaterialPtr distMat =
           Ogre::MaterialManager::getSingleton().getByName(
           "Gazebo/CameraDistortion");
@@ -1485,6 +1487,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
           static_cast<Ogre::Vector3>(
           Ogre::Vector3(this->dataPtr->lensCenter.x,
           this->dataPtr->lensCenter.y, 0.0)));
+      params->setNamedConstant("scale",
+          static_cast<Ogre::Real>(this->dataPtr->distortUVScale));
       this->dataPtr->lensDistortionInstance =
           Ogre::CompositorManager::getSingleton().addCompositor(
           this->viewport, "CameraDistortion/Default");
