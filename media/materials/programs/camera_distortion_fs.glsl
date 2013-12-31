@@ -25,7 +25,7 @@ vec2 warp(vec2 texCoord)
   dist.y += tangential.y * (rSq + 2 * (normalized.y*normalized.y)) +
       2 * tangential.x * normalized.x * normalized.y;
 
-  return center + scale.xy * dist;
+  return center.xy + scale.xy * dist;
 }
 
 void main()
