@@ -185,7 +185,7 @@ void LiftDragPlugin::OnUpdate()
     this->alpha = this->alpha0 - acos(cosAlpha);
 
   // normalize to within +/-90 deg
-  while (abs(this->alpha) > 0.5 * M_PI)
+  while (fabs(this->alpha) > 0.5 * M_PI)
     this->alpha = this->alpha > 0 ? this->alpha - M_PI
                                   : this->alpha + M_PI;
 
@@ -235,7 +235,7 @@ void LiftDragPlugin::OnUpdate()
     cd = (this->cda * this->alpha) / cosSweepAngle2;
 
   // make sure drag is positive
-  cd = abs(cd);
+  cd = fabs(cd);
 
   // drag at cp
   math::Vector3 drag = cd * q * dragDirection;
@@ -283,7 +283,7 @@ void LiftDragPlugin::OnUpdate()
   gzerr << "sweep: " << this->sweep << "\n";
   gzerr << "alpha: " << this->alpha << "\n";
   gzerr << "lift: " << lift << "\n";
-  gzerr << "drag: " << drag << "\n";
+  gzerr << "drag: " << drag << " cd: " << cd << " cda: " << this->cda << "\n";
   gzerr << "moment: " << moment << "\n";
   // gzerr << "momentArm: " << momentArm << "\n";
   gzerr << "force: " << force << "\n";
