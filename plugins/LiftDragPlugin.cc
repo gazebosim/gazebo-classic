@@ -144,6 +144,11 @@ void LiftDragPlugin::OnUpdate()
   double cosSweepAngle2 = (1.0 - sinSweepAngle * sinSweepAngle);
   this->sweep = asin(sinSweepAngle);
 
+  // truncate sweep to within +/-90 deg
+  while (fabs(this->sweep) > 0.5 * M_PI)
+    this->sweep = this->sweep > 0 ? this->sweep - M_PI
+                                  : this->sweep + M_PI;
+
   // angle of attack is the angle between
   // vel projected into lift-drag plane
   //  and
