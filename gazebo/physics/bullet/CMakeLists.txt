@@ -22,6 +22,7 @@ set (sources
   BulletRayShape.cc
   BulletMultiRayShape.cc
   BulletHeightmapShape.cc
+  BulletSurfaceParams.cc
 )
 
 set (headers
@@ -36,6 +37,7 @@ set (headers
   BulletHingeJoint.hh
   BulletJoint.hh
   BulletLink.hh
+  BulletMeshShape.hh
   BulletMotionState.hh
   BulletMultiRayShape.hh
   BulletPhysics.hh
@@ -45,7 +47,7 @@ set (headers
   BulletScrewJoint.hh
   BulletSliderJoint.hh
   BulletSphereShape.hh
-  BulletMeshShape.hh
+  BulletSurfaceParams.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
 )
