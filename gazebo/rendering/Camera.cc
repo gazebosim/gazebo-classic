@@ -1469,7 +1469,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     // Distortion
     if (this->dataPtr->distortionActive)
     {
-      this->dataPtr->distortUVScale = 1.0;
+      this->dataPtr->distortUVScale.x = 1.0;
+      this->dataPtr->distortUVScale.y = 1.0;
 
       Ogre::MaterialPtr distMat =
           Ogre::MaterialManager::getSingleton().getByName(
@@ -1488,7 +1489,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
           Ogre::Vector3(this->dataPtr->lensCenter.x,
           this->dataPtr->lensCenter.y, 0.0)));
       params->setNamedConstant("scale",
-          static_cast<Ogre::Real>(this->dataPtr->distortUVScale));
+          static_cast<Ogre::Vector3>(
+          Ogre::Vector3(this->dataPtr->distortUVScale.x,
+          this->dataPtr->distortUVScale.y, 0.0)));
       this->dataPtr->lensDistortionInstance =
           Ogre::CompositorManager::getSingleton().addCompositor(
           this->viewport, "CameraDistortion/Default");

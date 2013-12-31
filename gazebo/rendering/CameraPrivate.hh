@@ -130,7 +130,7 @@ namespace gazebo
 
       /// \brief Scale applied to distorted image in order to remove black
       /// region at the border.
-      public: float distortUVScale;
+      public: math::Vector2d distortUVScale;
 
       /// \brief Communication Node
       public: transport::NodePtr node;
