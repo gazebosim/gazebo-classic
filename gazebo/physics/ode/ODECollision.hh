@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
 
 namespace gazebo
 {
@@ -81,6 +82,11 @@ namespace gazebo
       /// \brief Set the collision's space ID
       /// \param[in] _spaceid ID of an ODE collision space.
       public: void SetSpaceId(dSpaceID _spaceid);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to ODESurfaceParams.
+      /// \return Dynamically casted pointer to ODESurfaceParams.
+      public: ODESurfaceParamsPtr GetODESurface() const;
 
       /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();

@@ -54,7 +54,6 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
 
   this->collisionVisualId = physics::getUniqueId();
@@ -105,13 +104,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
-  }
-
-  // Force max correcting velocity to zero for certain collision entities
-  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->shape->HasType(Base::MAP_SHAPE))
-  {
-    this->surface->maxVel = 0.0;
   }
 }
 

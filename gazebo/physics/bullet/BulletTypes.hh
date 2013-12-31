@@ -34,15 +34,17 @@ namespace gazebo
   {
     class BulletCollision;
     class BulletLink;
+    class BulletMotionState;
     class BulletPhysics;
     class BulletRayShape;
-    class BulletMotionState;
+    class BulletSurfaceParams;
 
-    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
     typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
-    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
     typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
+    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef boost::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{

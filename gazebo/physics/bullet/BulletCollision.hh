@@ -33,6 +33,7 @@
 #include "gazebo/physics/Collision.hh"
 */
 
+#include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 
@@ -91,6 +92,11 @@ namespace gazebo
 
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int _index);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to BulletSurfaceParams.
+      /// \return Dynamically casted pointer to BulletSurfaceParams.
+      public: BulletSurfaceParamsPtr GetBulletSurface() const;
 
       protected: btCollisionShape *collisionShape;
 

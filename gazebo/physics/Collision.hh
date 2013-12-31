@@ -213,7 +213,7 @@ namespace gazebo
       protected: ShapePtr shape;
 
       /// \brief The surface parameters.
-      private: SurfaceParamsPtr surface;
+      protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
