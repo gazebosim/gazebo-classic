@@ -83,6 +83,9 @@ namespace gazebo
     /// \brief Cm-alpha rate after stall
     private: double cmaStall;
 
+    /// \brief: \TODO: make a stall velocity curve
+    private: double velocityStall;
+
     /// \brief air density
     /// at 25 deg C it's about 1.1839 kg/m^3
     /// At 20 °C and 101.325 kPa, dry air has a density of 1.2041 kg/m3.

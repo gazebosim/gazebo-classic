@@ -450,7 +450,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -466,7 +466,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -482,7 +482,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -498,7 +498,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -919,7 +919,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -935,7 +935,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -951,7 +951,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -967,7 +967,7 @@
         <cla>0.100</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>1.0</alpha_stall>
+        <alpha_stall>0.28</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
