@@ -21,15 +21,15 @@
 
 using namespace gazebo;
 
-class Issue978Test : public Joint_TEST
+class Issue624Test : public Joint_TEST
 {
   public: void CollisionWorldPose(const std::string &_physicsEngine);
 };
 
 
 /////////////////////////////////////////////////
-// \brief Test for issue #asdf
-void Issue978Test::CollisionWorldPose(const std::string &_physicsEngine)
+// \brief Test for issue #624
+void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -43,10 +43,54 @@ void Issue978Test::CollisionWorldPose(const std::string &_physicsEngine)
 
   // add a link with a collision body in it
 
-  // Create a new link
-  SpawnBox("box_1", math::Vector3(1, 1, 1), math::Vector3(0, 0, 1),
-    math::Vector3(0.5, 0.5, 0.5));
+  // Spawn some custom model
+  {
+    msgs::Factory msg;
+    std::ostringstream newModelStr;
 
+    std::string name = "box_1";
+
+    newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+      << "<model name ='" << name << "'>"
+      << "<static>false</static>"
+      << "<pose>1 2 3 0.5 0.5 0.5</pose>"
+      << "<link name ='body'>"
+      << "  <pose>2 3 4 0.6 0.6 0.6</pose>"
+      << "  <collision name ='col1'>"
+      << "    <pose>3 4 5 0.7 0.7 0.7</pose>"
+      << "    <geometry>"
+      << "      <box><size>1 1 1</size></box>"
+      << "    </geometry>"
+      << "  </collision>"
+      << "  <visual name ='vis1'>"
+      << "    <pose>3 4 5 0.7 0.7 0.7</pose>"
+      << "    <geometry>"
+      << "      <box><size>1 1 1</size></box>"
+      << "    </geometry>"
+      << "  </visual>"
+      << "  <collision name ='col2'>"
+      << "    <pose>6 7 8 0.8 0.8 0.8</pose>"
+      << "    <geometry>"
+      << "      <box><size>1 1 1</size></box>"
+      << "    </geometry>"
+      << "  </collision>"
+      << "  <visual name ='vis2'>"
+      << "    <pose>6 7 8 0.8 0.8 0.8</pose>"
+      << "    <geometry>"
+      << "      <box><size>1 1 1</size></box>"
+      << "    </geometry>"
+      << "  </visual>"
+      << "</link>"
+      << "</model>"
+      << "</sdf>";
+
+    msg.set_sdf(newModelStr.str());
+    this->factoryPub->Publish(msg);
+
+    // Wait for the entity to spawn
+    while (!this->HasEntity(name))
+      common::Time::MSleep(100);
+  }
   physics::ModelPtr model = world->GetModel("box_1");
 
   physics::Link_V links = model->GetLinks();
@@ -57,21 +101,37 @@ void Issue978Test::CollisionWorldPose(const std::string &_physicsEngine)
     for (physics::Collision_V::iterator ci = collisions.begin();
        ci != collisions.end(); ++ci)
     {
-      gzdbg << "abs pose [" << (*ci)->GetWorldPose()
+      gzdbg << "name [" << (*ci)->GetName()
+            << "] abs pose [" << (*ci)->GetWorldPose()
             << "] rel pose [" << (*ci)->GetRelativePose() << "]\n";
-      EXPECT_EQ((*ci)->GetWorldPose().pos, math::Vector3(0, 0, 1));
-      EXPECT_EQ((*ci)->GetWorldPose().rot.GetAsEuler(),
-        math::Vector3(0.5, 0.5, 0.5));
+      if ((*ci)->GetName() == "col1")
+      {
+        EXPECT_EQ((*ci)->GetWorldPose(),
+          math::Pose(3, 4, 5, 0.7, 0.7, 0.7) +
+          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
+          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
+        EXPECT_EQ((*ci)->GetRelativePose(),
+          math::Pose(3, 4, 5, 0.7, 0.7, 0.7));
+      }
+      else if ((*ci)->GetName() == "col2")
+      {
+        EXPECT_EQ((*ci)->GetWorldPose(),
+          math::Pose(6, 7, 8, 0.8, 0.8, 0.8) +
+          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
+          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
+        EXPECT_EQ((*ci)->GetRelativePose(),
+          math::Pose(6, 7, 8, 0.8, 0.8, 0.8));
+      }
     }
   }
 }
 
-TEST_P(Issue978Test, CollisionWorldPose)
+TEST_P(Issue624Test, CollisionWorldPose)
 {
   CollisionWorldPose(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue978Test,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue624Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("")));
 
