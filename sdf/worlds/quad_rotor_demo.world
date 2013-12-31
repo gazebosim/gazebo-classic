@@ -103,6 +103,28 @@
             <diffuse>.421 0.225 0.0 1.0</diffuse>
           </material>
         </visual>
+        <sensor name='imu_sensor' type='imu'>
+          <always_on>1</always_on>
+          <update_rate>1000</update_rate>
+          <imu>
+            <noise>
+              <type>gaussian</type>
+              <rate>
+                <mean>0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>7.5e-06</bias_mean>
+                <bias_stddev>8e-07</bias_stddev>
+              </rate>
+              <accel>
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </accel>
+            </noise>
+          </imu>
+          <pose>0 0 0 0 0 0</pose>
+        </sensor>
       </link>
       <link name="rod_1">
         <pose>0 0 0.24 0 0 0</pose>
@@ -448,9 +470,9 @@
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -464,9 +486,9 @@
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -480,9 +502,9 @@
       <plugin name="gazebo_blade_3" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -496,9 +518,9 @@
       <plugin name="gazebo_blade_4" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -917,9 +939,9 @@
       <plugin name="gazebo_blade_5" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -933,9 +955,9 @@
       <plugin name="gazebo_blade_6" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -949,9 +971,9 @@
       <plugin name="gazebo_blade_7" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
@@ -965,9 +987,9 @@
       <plugin name="gazebo_blade_8" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>0.100</cla>
-        <cda>0.001</cda>
+        <cda>0.01</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.28</alpha_stall>
+        <alpha_stall>0.2</alpha_stall>
         <cla_stall>-0.2</cla_stall>
         <cda_stall>1.0</cda_stall>
         <cma_stall>0.0</cma_stall>
