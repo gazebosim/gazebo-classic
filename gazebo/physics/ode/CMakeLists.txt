@@ -10,12 +10,12 @@ link_directories(
 set (sources
   ODEBallJoint.cc
   ODECollision.cc
-  ODELink.cc
   ODEGearboxJoint.cc
   ODEHeightmapShape.cc
   ODEHinge2Joint.cc
   ODEHingeJoint.cc
   ODEJoint.cc
+  ODELink.cc
   ODEMeshShape.cc
   ODEMultiRayShape.cc
   ODEPhysics.cc
@@ -32,12 +32,12 @@ SET (headers
   ODEBoxShape.hh
   ODECollision.hh
   ODECylinderShape.hh
-  ODELink.hh
   ODEGearboxJoint.hh
   ODEHeightmapShape.hh
   ODEHinge2Joint.hh
   ODEHingeJoint.hh
   ODEJoint.hh
+  ODELink.hh
   ODEMeshShape.hh
   ODEMultiRayShape.hh
   ODEPhysics.hh
