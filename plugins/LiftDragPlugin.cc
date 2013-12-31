@@ -200,7 +200,7 @@ void LiftDragPlugin::OnUpdate()
     cl = (this->cla * this->alphaStall +
           this->claStall * (this->alpha - this->alphaStall))
          / cosSweepAngle2;
-    // make sure cl is staill great than 0
+    // make sure cl is still great than 0
     cl = std::max(0.0, cl);
   }
   else if (this->alpha < -this->alphaStall)
@@ -208,7 +208,7 @@ void LiftDragPlugin::OnUpdate()
     cl = (-this->cla * this->alphaStall +
           this->claStall * (this->alpha + this->alphaStall))
          / cosSweepAngle2;
-    // make sure cl is staill less than 0
+    // make sure cl is still less than 0
     cl = std::min(0.0, cl);
   }
   else
@@ -247,15 +247,22 @@ void LiftDragPlugin::OnUpdate()
     cm = (this->cma * this->alphaStall +
           this->cmaStall * (this->alpha - this->alphaStall))
          / cosSweepAngle2;
+    // make sure cm is still great than 0
+    cm = std::max(0.0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cm = (-this->cma * this->alphaStall +
           this->cmaStall * (this->alpha + this->alphaStall))
          / cosSweepAngle2;
+    // make sure cm is still less than 0
+    cm = std::min(0.0, cm);
   }
   else
     cm = this->cma * this->alpha / cosSweepAngle2;
+
+  // reset cm to zero, as cm needs testing
+  cm = 0.0;
 
   // compute moment (torque) at cp
   math::Vector3 moment = cm * q * momentDirection;
