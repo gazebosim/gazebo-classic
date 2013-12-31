@@ -49,7 +49,7 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
       // Update this when sdformat has bullet friction parameters
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
       GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
-      this->mu1 = frictionOdeElem->Get<double>("mu1");
+      this->mu1 = frictionOdeElem->Get<double>("mu");
       this->mu2 = frictionOdeElem->Get<double>("mu2");
 
       if (this->mu1 < 0)
