@@ -281,26 +281,28 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 force = lift + drag + moment.Cross(momentArm);
   math::Vector3 torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
-  /* debug
-  gzerr << "=============================\n";
-  gzerr << "Link: [" << this->link->GetName()
-        << "] pose: [" << pose
-        << "] dynamic pressure: [" << q << "]\n";
-  gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
-  gzerr << "spd sweep: [" << velInLDPlane.GetLength()
-        << "] vel: [" << velInLDPlane << "]\n";
-  // gzerr << "forward: " << forwardI << "\n";
-  // gzerr << "upward: " << upwardI << "\n";
-  gzerr << "normal: " << normal << "\n";
-  gzerr << "sweep: " << this->sweep << "\n";
-  gzerr << "alpha: " << this->alpha << "\n";
-  gzerr << "lift: " << lift << "\n";
-  gzerr << "drag: " << drag << " cd: " << cd << " cda: " << this->cda << "\n";
-  gzerr << "moment: " << moment << "\n";
-  gzerr << "cp momentArm: " << momentArm << "\n";
-  gzerr << "force: " << force << "\n";
-  gzerr << "torque: " << torque << "\n";
-  */
+  /* debug */
+  if (true)
+  {
+    gzerr << "=============================\n";
+    gzerr << "Link: [" << this->link->GetName()
+          << "] pose: [" << pose
+          << "] dynamic pressure: [" << q << "]\n";
+    gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
+    gzerr << "spd sweep: [" << velInLDPlane.GetLength()
+          << "] vel: [" << velInLDPlane << "]\n";
+    // gzerr << "forward: " << forwardI << "\n";
+    // gzerr << "upward: " << upwardI << "\n";
+    gzerr << "normal: " << normal << "\n";
+    gzerr << "sweep: " << this->sweep << "\n";
+    gzerr << "alpha: " << this->alpha << "\n";
+    gzerr << "lift: " << lift << "\n";
+    gzerr << "drag: " << drag << " cd: " << cd << " cda: " << this->cda << "\n";
+    gzerr << "moment: " << moment << "\n";
+    gzerr << "cp momentArm: " << momentArm << "\n";
+    gzerr << "force: " << force << "\n";
+    gzerr << "torque: " << torque << "\n";
+  }
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);

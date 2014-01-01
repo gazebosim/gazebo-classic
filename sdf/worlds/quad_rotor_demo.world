@@ -258,13 +258,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 1.0 0.0</xyz>
+          <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -278,13 +282,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 -1.0 0.0</xyz>
+          <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -422,13 +430,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 1.0 0.0</xyz>
+          <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -442,13 +454,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 -1.0 0.0</xyz>
+          <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -707,13 +723,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 1.0 0.0</xyz>
+          <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -727,13 +747,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 -1.0 0.0</xyz>
+          <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -891,13 +915,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 1.0 0.0</xyz>
+          <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
@@ -911,13 +939,17 @@
             <lower>-0.0</lower>
             <upper>0.0</upper>
           </limit>
-          <xyz>0.0 -1.0 0.0</xyz>
+          <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
+            <limit>
+              <cfm>0.004</cfm>
+              <erp>0.2</erp>
+            </limit>
             <cfm_damping>1</cfm_damping>
           </ode>
         </physics>
