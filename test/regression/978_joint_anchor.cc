@@ -28,7 +28,7 @@ class Issue978Test : public Joint_TEST
 
 
 /////////////////////////////////////////////////
-// \brief Test for issue #asdf
+// \brief Test for issue #978
 void Issue978Test::JointAnchor(const std::string &_physicsEngine)
 {
   // Abort test for simbody, since SimbodyJoint::GetAnchor isn't implemented
