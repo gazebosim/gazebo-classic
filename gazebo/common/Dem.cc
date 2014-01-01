@@ -318,12 +318,14 @@ int Dem::LoadData()
     {
       ratio = static_cast<float>(nXSize) / static_cast<float>(nYSize);
       destWidth = this->dataPtr->side;
+      // The decimal part is discarted for interpret the result as pixels
       destHeight = static_cast<float>(destWidth) / static_cast<float>(ratio);
     }
     else
     {
       ratio = static_cast<float>(nYSize) / static_cast<float>(nXSize);
       destHeight = this->dataPtr->side;
+      // The decimal part is discarted for interpret the result as pixels
       destWidth = static_cast<float>(destHeight) / static_cast<float>(ratio);
     }
 
