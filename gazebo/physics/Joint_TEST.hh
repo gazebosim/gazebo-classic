@@ -135,7 +135,7 @@ class Joint_TEST : public ServerFixture,
     /// \brief Parent link pose for spawned model.
     public: math::Pose parentLinkPose;
 
-    /// \brief Flag to disable including link pose per issue #.
+    /// \brief Flag to disable including link pose per issue #978.
     public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
