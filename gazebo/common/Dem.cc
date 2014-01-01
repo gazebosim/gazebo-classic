@@ -332,8 +332,12 @@ int Dem::LoadData()
     // Read the whole raster data and convert it to a GDT_Float32 array.
     // In this step the DEM is scaled to destWidth x destHeight
     buffer.resize(destWidth * destHeight);
-    this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
-                         destWidth, destHeight, GDT_Float32, 0, 0);
+    if (this->dataPtr->band->RasterIO(GF_Read, 0, 0, nXSize, nYSize, &buffer[0],
+                         destWidth, destHeight, GDT_Float32, 0, 0) != CE_None)
+    {
+      gzerr << "Failure calling RasterIO while loading a DEM file\n";
+      return -1;
+    }
 
     // Copy and align 'buffer' into the target vector. The destination vector is
     // initialized to 0, so all the points not contained in 'buffer' will be
