@@ -20,6 +20,7 @@ endif()
 set(tests
   846_typo_in_camera.cc
   876_random_number_generator.cc
+  978_joint_anchor.cc
 )
 
 gz_build_tests(${tests})
