@@ -56,22 +56,33 @@ namespace gazebo
     /// \brief Name of model containing plugin.
     private: std::string modelName;
 
-    /// \brief Stiffness parameter, used in conjunction with damping
-    ///        to compute joint erp, cfm
-    private: double stiffness;
+    /// \brief max torque of the motor.
+    private: double maxTorque;
 
-    /// \brief Damping parameter, used in conjunction with stiffness
-    ///        to compute joint erp, cfm
-    private: double damping;
+    /// \brief torque speed slope of the motor.
+    private: double torqueSpeedSlope;
 
-    /// \brief Names of allowed target links, specified in sdf parameters.
-    private: std::vector<std::string> linkNames;
+    /// \brief motor shaft joint name.
+    /// parent link is the motor body.
+    /// child link is the spinning shaft.
+    private: std::string motorShaftJointName;
 
-    /// \brief Pointer to link currently targeted by mud joint.
-    private: std::vector<physics::LinkPtr> links;
+    /// \brief pointer to motor shaft joint.
+    private: physics::JointPtr motorShaftJoint;
 
-    /// \brief Dynamically created joint for simulating mud forces.
-    private: std::vector<physics::JointPtr> joints;
+    /// \brief motor position/velocity encoder joint name.
+    /// Joint position is used as encoder sensor output.
+    private: std::string encoderJointName;
+
+    /// \brief pointer to encoder joint.
+    private: physics::JointPtr encoderJoint;
+
+    /// \brief motor force torque sensor joint name.
+    /// force and torque is used to construct ft sensor output.
+    private: std::string forceTorqueSensorJointName;
+
+    /// \brief pointer to force torque sensor joint.
+    private: physics::JointPtr forceTorqueSensorJoint;
 
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;

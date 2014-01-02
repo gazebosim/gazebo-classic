@@ -282,7 +282,7 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   /* debug */
-  if (true)
+  if (false)
   {
     gzerr << "=============================\n";
     gzerr << "Link: [" << this->link->GetName()

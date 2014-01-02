@@ -29,7 +29,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(MotorDemoPlugin)
 
 /////////////////////////////////////////////////
-MotorDemoPlugin::MotorDemoPlugin() : stiffness(0.0), damping(100.0)
+MotorDemoPlugin::MotorDemoPlugin() : maxTorque(0.0), torqueSpeedSlope(-1.0)
 {
 }
 
@@ -50,43 +50,53 @@ void MotorDemoPlugin::Load(physics::ModelPtr _model,
 
   GZ_ASSERT(_sdf, "MotorDemoPlugin _sdf pointer is NULL");
 
-  if (_sdf->HasElement("stiffness"))
-    this->stiffness = _sdf->Get<double>("stiffness");
+  if (_sdf->HasElement("max_torque"))
+    this->maxTorque = _sdf->Get<double>("max_torque");
 
-  if (_sdf->HasElement("damping"))
-    this->damping = _sdf->Get<double>("damping");
+  // torque speed curve?
+  // how to define this curve?  See example:
+  // http://lancet.mit.edu/motors/motors3.html
+  if (_sdf->HasElement("torque_speed_slope"))
+    this->torqueSpeedSlope = _sdf->Get<double>("torque_speed_slope");
 
-  if (_sdf->HasElement("link_name"))
+  if (_sdf->HasElement("motor_shaft_joint_name"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("link_name");
-    while (elem)
-    {
-      linkNames.push_back(elem->Get<std::string>());
-      links.push_back(physics::LinkPtr());
-      joints.push_back(physics::JointPtr());
-      elem = elem->GetNextElement("link_name");
-    }
+    this->motorShaftJointName =
+      _sdf->Get<std::string>("motor_shaft_joint_name");
   }
-  GZ_ASSERT(linkNames.size() == links.size(),
-    "Length of links data structure doesn't match linkNames");
-  GZ_ASSERT(linkNames.size() == joints.size(),
-    "Length of joints data structure doesn't match linkNames");
+  else
+  {
+    gzerr << "motor_shaft_joint_name not specified, cannot load plugin.\n";
+    return;
+  }
+
+  if (_sdf->HasElement("encoder_joint_name"))
+  {
+    this->encoderJointName =
+      _sdf->Get<std::string>("encoder_joint_name");
+  }
+  else
+  {
+    gzerr << "encoder_joint_name not specified, cannot load plugin.\n";
+    return;
+  }
+
+  if (_sdf->HasElement("force_torque_sensor_joint_name"))
+  {
+    this->forceTorqueSensorJointName =
+      _sdf->Get<std::string>("force_torque_sensor_joint_name");
+  }
+  else
+  {
+    gzerr << "force_torque_sensor_joint_name not specified,"
+          << " cannot load plugin.\n";
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
 void MotorDemoPlugin::Init()
 {
-  for (unsigned int i = 0; i < this->linkNames.size(); ++i)
-  {
-    physics::LinkPtr link = boost::dynamic_pointer_cast<physics::Link>(
-        this->world->GetEntity(this->linkNames[i]));
-
-    if (!link)
-      continue;
-
-    // do something with this link?
-  }
-
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&MotorDemoPlugin::OnUpdate, this));
 }
@@ -94,22 +104,4 @@ void MotorDemoPlugin::Init()
 /////////////////////////////////////////////////
 void MotorDemoPlugin::OnUpdate()
 {
-  // Iterate through the list of allowed links
-  std::vector<std::string>::iterator iterLinkName =
-    this->linkNames.begin();
-  std::vector<physics::LinkPtr>::iterator iterLink = this->links.begin();
-  std::vector<physics::JointPtr>::iterator iterJoint = this->joints.begin();
-  unsigned int countIters = 0;
-  // Only check the length of the first iterator since we used a GZ_ASSERT
-  // in the Load function to confirm the vectors have the same length
-  while (iterLinkName != this->linkNames.end())
-  {
-    // do something to iterLink
-
-    // Increment
-    ++countIters;
-    ++iterJoint;
-    ++iterLink;
-    ++iterLinkName;
-  }
 }
