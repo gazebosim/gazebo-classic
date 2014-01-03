@@ -32,6 +32,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -76,6 +77,8 @@ namespace gazebo
       /// Load a world from and SDF pointer.
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
+
+      public: void Load(rml::World _sdf);
 
       /// \brief Save a world to a file.
       ///
@@ -580,6 +583,7 @@ namespace gazebo
 
       /// \brief THe world's SDF values.
       private: sdf::ElementPtr sdf;
+      private: sdf::World worldSDF;
 
       /// \brief All the plugins.
       private: std::vector<WorldPluginPtr> plugins;

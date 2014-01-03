@@ -43,6 +43,12 @@ if (NOT PROTOBUF_PROTOC_LIBRARY)
 endif()
 
 ########################################
+find_package(RML REQUIRED)
+if (NOT RML_FOUND)
+  BUILD_ERROR ("Missing: Robot Markup Language (RML).")
+endif()
+
+########################################
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")

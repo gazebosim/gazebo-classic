@@ -159,14 +159,22 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  this->loaded = false;
+  this->worldSDF.SetFromSDF(_sdf);
   this->sdf = _sdf;
+  this->Load(this->worldSDF);
+}
 
-  if (this->sdf->Get<std::string>("name").empty())
+//////////////////////////////////////////////////
+void World::Load(sdf::World _sdf)
+{
+  this->loaded = false;
+
+  // DELETE: if (this->sdf->Get<std::string>("name").empty())
+  if (this->worldSDF.name().empty())
     gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->Get<std::string>("name");
+    this->name = this->worldSDF.name();
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
@@ -214,7 +222,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
+  // DELETE std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
+  std::string type = this->worldSDF.physics().type();
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -255,7 +264,8 @@ void World::Load(sdf::ElementPtr _sdf)
     this->LoadEntities(this->sdf, this->rootElement);
 
     // Set the state of the entities
-    if (this->sdf->HasElement("state"))
+    // DELETE if (this->sdf->HasElement("state"))
+    if (this->worldSDF.has_state())
     {
       sdf::ElementPtr childElem = this->sdf->GetElement("state");
 
