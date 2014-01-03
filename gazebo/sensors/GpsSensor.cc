@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ void GpsSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void GpsSensor::UpdateImpl(bool /*_force*/)
+bool GpsSensor::UpdateImpl(bool /*_force*/)
 {
   // Get latest pose information
   if (this->parentLink)
@@ -157,6 +157,8 @@ void GpsSensor::UpdateImpl(bool /*_force*/)
 
   if (this->gpsPub)
     this->gpsPub->Publish(this->lastGpsMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

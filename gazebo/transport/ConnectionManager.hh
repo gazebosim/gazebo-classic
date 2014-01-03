@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,15 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      /// \brief Initialize the connection manager
-      /// \param[in] _masterHost Host where the master is running
-      /// \param[in] _masterPort Port where the master is running
+      /// \brief Initialize the connection manager.
+      /// \param[in] _masterHost Host where the master is running.
+      /// \param[in] _masterPort Port where the master is running.
+      /// \param[in] _timeoutIterations Number of times to wait for
+      /// a connection to master.
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
-                        unsigned int _masterPort);
+                        unsigned int _masterPort,
+                        uint32_t _timeoutIterations = 30);
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
@@ -68,11 +71,11 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      /// \brief Subscribe to a topic
-      /// \param[in] _topic The topic to subscribe to
-      /// \param[in] _msgType The type of the topic
+      /// \brief Subscribe to a topic.
+      /// \param[in] _topic The topic to subscribe to.
+      /// \param[in] _msgType The type of the topic.
       /// \param[in] _latching If true, latch the latest incoming message;
-      /// otherwise don't
+      /// otherwise don't.
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);

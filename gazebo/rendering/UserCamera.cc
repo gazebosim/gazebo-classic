@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -517,7 +517,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
+  this->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
 }
 

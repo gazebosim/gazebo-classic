@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,6 @@ math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
 
 /////////////////////////////////////////////////
 void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }

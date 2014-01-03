@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,9 +61,8 @@ namespace gazebo
       /// \brief Initialize the camera
       protected: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// Finalize the camera
       protected: virtual void Fini();
@@ -82,13 +81,19 @@ namespace gazebo
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
 
+      /// \brief Handle the render event.
+      private: void Render();
+
+      /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
 
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }
 }
 #endif
-
-

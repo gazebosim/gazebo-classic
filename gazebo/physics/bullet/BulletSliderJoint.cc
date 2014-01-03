@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,6 +222,7 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 {
+  /// \TODO: special case bullet specific linear damping, this needs testing.
   if (this->bulletSlider)
     this->bulletSlider->setDampingDirLin(_damping);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,12 +67,6 @@ void signal_handler(int)
 //////////////////////////////////////////////////
 bool parse_args(int _argc, char **_argv)
 {
-  if (signal(SIGINT, signal_handler) == SIG_ERR)
-  {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
-    return false;
-  }
-
   po::options_description v_desc("Options");
   v_desc.add_options()
     ("quiet,q", "Reduce output to stdout.")
@@ -206,6 +200,16 @@ bool gui::run(int _argc, char **_argv)
 
   if (!gazebo::init())
     return false;
+
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = signal_handler;
+  if (sigaction(SIGINT, &sigact, NULL))
+  {
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    return false;
+  }
 
   g_app->exec();
 

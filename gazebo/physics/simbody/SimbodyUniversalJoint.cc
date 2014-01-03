@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,6 @@ math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*_index*/) const
 math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
 {
   return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////

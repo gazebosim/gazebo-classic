@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent)
+    : Entity(_parent), initialized(false)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
@@ -241,6 +241,8 @@ void Link::Init()
       collision->Init();
     }
   }
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
