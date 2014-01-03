@@ -121,7 +121,13 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 {
   if (this->jointId)
-    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  {
+    /// \TODO: issue thread pitch is angle / translation
+    double pitch = 0;
+    if (!math::equal(_threadPitch, 0.0))
+      pitch = -1.0 / _threadPitch;
+    dJointSetScrewThreadPitch(this->jointId, pitch);
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }

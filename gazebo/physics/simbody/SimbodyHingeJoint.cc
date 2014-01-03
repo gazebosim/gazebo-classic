@@ -53,7 +53,7 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
   // points
   gzdbg << "SimbodyHingeJoint::SetAxis: setting axis is "
         << "not yet implemented.  The axis are set during joint construction "
-        << "in SimbodyPhyiscs.cc for now.\n";
+        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
@@ -95,13 +95,13 @@ double SimbodyHingeJoint::GetVelocity(int _index) const
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
-  gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
+  gzdbg << "SimbodyHingeJoint::SetMaxForce: doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 {
-  gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
+  gzdbg << "SimbodyHingeJoint::GetMaxForce: doesn't make sense in simbody...\n";
   return 0;
 }
 

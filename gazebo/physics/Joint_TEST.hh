@@ -37,8 +37,11 @@ class Joint_TEST : public ServerFixture,
              {
              }
 
-  /// \brief Load example world with a few joints
-  /// Measure / verify static force torques against analytical answers.
+  /// \brief Test screw joint implementation
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ScrewJoint1(const std::string &_physicsEngine);
+
+  /// \brief Test universal joint implementation
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void UniversalJoint1(const std::string &_physicsEngine);
 

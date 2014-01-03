@@ -118,6 +118,12 @@ namespace gazebo
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
 
