@@ -271,10 +271,14 @@ void Camera::Load()
   {
     sdf::ElementPtr distortionElem = this->sdf->GetElement("distortion");
 
+    std::string type = distortionElem->Get<std::string>("type");
+    if (type == "barrel")
+      this->dataPtr->distortionType = CameraPrivate::BARREL;
     this->dataPtr->radialCoeff = distortionElem->Get<math::Vector3>("radial");
     this->dataPtr->tangentialCoeff =
         distortionElem->Get<math::Vector2d>("tangential");
     this->dataPtr->lensCenter = distortionElem->Get<math::Vector2d>("center");
+    this->dataPtr->distortionCrop = distortionElem->Get<bool>("crop");
     this->dataPtr->distortionActive = true;
   }
 }
@@ -1469,90 +1473,64 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     // Distortion
     if (this->dataPtr->distortionActive)
     {
-      this->dataPtr->distortUVScale.x = 1.0;
-      this->dataPtr->distortUVScale.y = 1.0;
+      this->dataPtr->distortionScale.x = 1.0;
+      this->dataPtr->distortionScale.y = 1.0;
 
-      double dtlx = GZ_DBL_MAX;
-      double dtly = GZ_DBL_MAX;
-      double dbrx = GZ_DBL_MAX;
-      double dbry = GZ_DBL_MAX;
-      double tlx = 0;
-      double tly = 0;
-      double brx = 0;
-      double bry = 0;
-
-      double tlox = 0;
-      double tloy = 0;
-      double brox = 0;
-      double broy = 0;
-      double dtl = GZ_DBL_MAX;
-      double dbr = GZ_DBL_MAX;
-
-      double incrU = 1.0 / (this->imageWidth);
-      double incrV = 1.0 / (this->imageHeight);
-
-      for (double u = 0; u < 1.0; u+=incrU)
+      if (this->dataPtr->distortionCrop
+          && this->dataPtr->distortionType == CameraPrivate::BARREL)
       {
-        for (double v = 0; v < 1.0; v+=incrV)
+        double tlx = 0;
+        double tly = 0;
+        double brx = 0;
+        double bry = 0;
+        double dtl = GZ_DBL_MAX;
+        double dbr = GZ_DBL_MAX;
+        double incrU = 1.0 / (this->imageWidth);
+        double incrV = 1.0 / (this->imageHeight);
+        for (double u = 0; u < 1.0; u+=incrU)
         {
-          math::Vector2d texCoord(u, v);
-          math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
-          math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
-
-          double rSq = normalized.x * normalized.x + normalized.y * normalized.y;
-          math::Vector3 dist = normalized * ( 1.0 +
-              this->dataPtr->radialCoeff.x * rSq +
-              this->dataPtr->radialCoeff.y * rSq * rSq +
-              this->dataPtr->radialCoeff.z * rSq * rSq * rSq);
-          dist.x += this->dataPtr->tangentialCoeff.x
-              * (rSq + 2 * (normalized.x*normalized.x)) +
-              2 * this->dataPtr->tangentialCoeff.y * normalized.x * normalized.y;
-          dist.y += this->dataPtr->tangentialCoeff.y
-              * (rSq + 2 * (normalized.y*normalized.y)) +
-              2 * this->dataPtr->tangentialCoeff.x * normalized.x * normalized.y;
-          math::Vector2d out = this->dataPtr->lensCenter
-              + math::Vector2d(dist.x, dist.y);
-
-          double dx = out.x - 0.0;
-          double dy = out.y - 0.0;
-          if (dx >= 0 && dy >= 0 && (dx + dy) < dtl)
+          for (double v = 0; v < 1.0; v+=incrV)
           {
-            dtlx = dx;
-            tlx = u;
-            dtly = dy;
-            tly = v;
-            tlox =out.x;
-            tloy =out.y;
-            dtl = dx + dy;
-          }
-          dx = out.x - 1.0;
-          dy = out.y - 1.0;
-          if (dx <= 0 && dy <= 0 && (fabs(dx) + fabs(dy)) < dbr)
-          {
-            dbrx = fabs(dx);
-            brx = u;
-            dbry = fabs(dy);
-            bry = v;
-            brox =out.x;
-            broy =out.y;
-            dbr = (fabs(dx) + fabs(dy));
+            math::Vector2d texCoord(u, v);
+            math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
+            math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
+            double rSq = normalized.x * normalized.x
+                + normalized.y * normalized.y;
+            math::Vector3 dist = normalized * ( 1.0 +
+                this->dataPtr->radialCoeff.x * rSq +
+                this->dataPtr->radialCoeff.y * rSq * rSq +
+                this->dataPtr->radialCoeff.z * rSq * rSq * rSq);
+            dist.x += this->dataPtr->tangentialCoeff.x
+                * (rSq + 2 * (normalized.x*normalized.x)) +
+                2 * this->dataPtr->tangentialCoeff.y
+                * normalized.x * normalized.y;
+            dist.y += this->dataPtr->tangentialCoeff.y
+                * (rSq + 2 * (normalized.y*normalized.y)) +
+                2 * this->dataPtr->tangentialCoeff.x
+                * normalized.x * normalized.y;
+            math::Vector2d out = this->dataPtr->lensCenter
+                + math::Vector2d(dist.x, dist.y);
+            double dx = out.x - 0.0;
+            double dy = out.y - 0.0;
+            if (dx >= 0 && dy >= 0 && (dx + dy) < dtl)
+            {
+              tlx = u;
+              tly = v;
+              dtl = dx + dy;
+            }
+            dx = out.x - 1.0;
+            dy = out.y - 1.0;
+            if (dx <= 0 && dy <= 0 && (fabs(dx) + fabs(dy)) < dbr)
+            {
+              brx = u;
+              bry = v;
+              dbr = (fabs(dx) + fabs(dy));
+            }
           }
         }
+        this->dataPtr->distortionScale.x = brx - tlx;
+        this->dataPtr->distortionScale.y = bry - tly;
       }
-
-      gzerr << " tl br " << tlx << ", " << tly << ", " << brx << ", " << bry
-          << std::endl;
-      gzerr << " dtlx dtly " << dtlx << ", " << dtly << ", " << dbrx << ", " << dbry
-          << std::endl;
-      gzerr << " tlo bro " << tlox << ", " << tloy << ", " << brox << ", " << broy
-          << std::endl;
-      double scalex = brx - tlx;
-      double scaley = bry - tly;
-      gzerr << " scale " << scalex << ", " << scaley << std::endl;
-
-      this->dataPtr->distortUVScale.x = scalex;
-      this->dataPtr->distortUVScale.y = scaley;
-
 
       Ogre::MaterialPtr distMat =
           Ogre::MaterialManager::getSingleton().getByName(
@@ -1575,8 +1553,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
           Ogre::Vector3(1.0, 1.0, 1.0)));
       params->setNamedConstant("scaleIn",
           static_cast<Ogre::Vector3>(
-          Ogre::Vector3(this->dataPtr->distortUVScale.x,
-          this->dataPtr->distortUVScale.y, 0.0)));
+          Ogre::Vector3(this->dataPtr->distortionScale.x,
+          this->dataPtr->distortionScale.y, 0.0)));
       this->dataPtr->lensDistortionInstance =
           Ogre::CompositorManager::getSingleton().addCompositor(
           this->viewport, "CameraDistortion/Default");

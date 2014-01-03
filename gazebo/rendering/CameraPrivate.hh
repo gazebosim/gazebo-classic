@@ -113,7 +113,7 @@ namespace gazebo
       /// \brief Which noise type we support
       public: enum DistortionModelType
       {
-        BROWN
+        BARREL
       };
 
       /// \brief Type of lens distortion we're applying
@@ -128,9 +128,12 @@ namespace gazebo
       /// \brief Lens center used for distortion
       public: math::Vector2d lensCenter;
 
-      /// \brief Scale applied to distorted image in order to remove black
-      /// region at the border.
-      public: math::Vector2d distortUVScale;
+      /// \brief Scale applied to distorted image.
+      public: math::Vector2d distortionScale;
+
+      /// \brief True if the distorted image will be cropped to remove the
+      /// black pixels at the corners of the image.
+      public: bool distortionCrop;
 
       /// \brief Communication Node
       public: transport::NodePtr node;

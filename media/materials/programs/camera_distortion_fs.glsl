@@ -8,15 +8,6 @@ uniform vec2 center;
 uniform vec3 scale;
 uniform vec3 scaleIn;
 
-bool equal(float a, float b)
-{
-  float eps = 0.000005;
-  float c = a - b;
-  if ( c*c < eps)
-    return true;
-  else return false;
-}
-
 vec2 warp(vec2 texCoord)
 {
 
@@ -30,10 +21,10 @@ vec2 warp(vec2 texCoord)
       radial.z * rSq * rSq * rSq);
 
   // tangential distortion: p1, p2
-  dist.x += tangential.x * (rSq + 2 * (normalized.x*normalized.x)) +
-      2 * tangential.y * normalized.x * normalized.y;
-  dist.y += tangential.y * (rSq + 2 * (normalized.y*normalized.y)) +
+  dist.x += tangential.y * (rSq + 2 * (normalized.x*normalized.x)) +
       2 * tangential.x * normalized.x * normalized.y;
+  dist.y += tangential.x * (rSq + 2 * (normalized.y*normalized.y)) +
+      2 * tangential.y * normalized.x * normalized.y;
 
   return center.xy + scale * dist;
 }
@@ -41,15 +32,5 @@ vec2 warp(vec2 texCoord)
 void main()
 {
   vec2 uv = warp(gl_TexCoord[0].xy);
-
-//  float tl = 0.13875;
-//  float br = 0.86125;
-  /*float tlx = 0.08125;
-  float brx = 0.91875;
-  float tly = 0.0833333;
-  float bry = 0.916667;
-  if ( equal(gl_TexCoord[0].x, tlx) || equal(gl_TexCoord[0].y, tly)
-      || equal(gl_TexCoord[0].x, brx) || equal(gl_TexCoord[0].y, bry))
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
-  else*/ gl_FragColor = texture2D(RT, uv);
+  gl_FragColor = texture2D(RT, uv);
 }
