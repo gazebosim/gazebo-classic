@@ -151,7 +151,8 @@
           <limit>
             <lower>-1.7</lower>
             <upper>1.7</upper>
-            <stiffness>1e12</stiffness>
+            <stiffness>1e6</stiffness>
+            <dissipation>1.0</dissipation>
           </limit>
           <dynamics>
             <damping>0.1</damping>
@@ -172,6 +173,8 @@
           <limit>
             <lower>-1.7</lower>
             <upper>1.7</upper>
+            <stiffness>1e6</stiffness>
+            <dissipation>1.0</dissipation>
           </limit>
           <dynamics>
             <damping>0.1</damping>

@@ -51,6 +51,11 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
   world->Step(1);
   double t = world->GetSimTime().Double();
 
+
+  /// \TODO: FIXME: simbody loses joint limits after resetting simulation
+  /// Add a test to check joint limits after calling Joint::Reset()
+
+
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
