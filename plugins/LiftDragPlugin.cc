@@ -220,7 +220,7 @@ void LiftDragPlugin::OnUpdate()
     cl = this->cla * this->alpha / cosSweepAngle2;
 
   // compute lift force at cp
-  math::Vector3 lift = cl * q * liftDirection;
+  math::Vector3 lift = cl * q * this->area * liftDirection;
 
   // compute cd at cp, check for stall, correct for sweep
   double cd;
@@ -243,7 +243,7 @@ void LiftDragPlugin::OnUpdate()
   cd = fabs(cd);
 
   // drag at cp
-  math::Vector3 drag = cd * q * dragDirection;
+  math::Vector3 drag = cd * q * this->area * dragDirection;
 
   // compute cm at cp, check for stall, correct for sweep
   double cm;
@@ -270,7 +270,7 @@ void LiftDragPlugin::OnUpdate()
   cm = 0.0;
 
   // compute moment (torque) at cp
-  math::Vector3 moment = cm * q * momentDirection;
+  math::Vector3 moment = cm * q * this->area * momentDirection;
 
   // moment arm from cg to cp in inertial plane
   math::Vector3 momentArm = pose.rot.RotateVector(
@@ -282,7 +282,7 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   /* debug */
-  if (true)
+  if (false)
   {
     gzerr << "=============================\n";
     gzerr << "Link: [" << this->link->GetName()
