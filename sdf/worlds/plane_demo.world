@@ -2,7 +2,7 @@
 <sdf version="1.4">
   <world name="default">
     <physics type="ode">
-      <gravity>0.0 0.0 -9.81</gravity>
+      <gravity>0.0 0.0 -1.00</gravity>
       <ode>
         <solver>
           <type>quick</type>
@@ -461,7 +461,7 @@
 
 
       <link name="wing_1">
-        <pose>3 0 1.5 0 0 0</pose>
+        <pose>3 0 1.5 0.1 0 0</pose>
         <inertial>
           <pose>0.0 5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -496,7 +496,7 @@
         </visual>
       </link>
       <link name="wing_2">
-        <pose>3 0 1.5 0 0 0</pose>
+        <pose>3 0 1.5 -0.1 0 0</pose>
         <inertial>
           <pose>0.0 -5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -683,6 +683,62 @@
         </physics>
       </joint>
 
+      <joint name="wing_5_joint" type="revolute">
+        <parent>body</parent>
+        <child>wing_5</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+          </limit>
+          <xyz>0.0 0.0 1.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+
+      <link name="wing_5">
+        <pose>9 0 2.0 0 0 0</pose>
+        <inertial>
+          <pose>0.0 0 1 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>0.0465</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.0006</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.0470</izz>
+          </inertia>
+          <mass>2.0</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>0.0 0 1 0.0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>1.5 0.01 2.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.0 0 1 0.0 0.0 0</pose>
+          <geometry>
+            <box>
+              <size>1.5 0.01 2.0</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.5 0.2 1.0</ambient>
+            <diffuse>.421 0.225 0.0 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
 
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -749,7 +805,7 @@
         <link_name>lift_drag_demo_model::wing_2</link_name>
       </plugin>
       <plugin name="gazebo_wing_3" filename="libLiftDragPlugin.so">
-        <a0>-0.1</a0>
+        <a0>0.01</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
@@ -765,7 +821,7 @@
         <link_name>lift_drag_demo_model::wing_3</link_name>
       </plugin>
       <plugin name="gazebo_wing_4" filename="libLiftDragPlugin.so">
-        <a0>-0.1</a0>
+        <a0>0.01</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
@@ -779,6 +835,22 @@
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::wing_4</link_name>
+      </plugin>
+      <plugin name="gazebo_wing_5" filename="libLiftDragPlugin.so">
+        <a0>0.03</a0>
+        <cla>4.000</cla>
+        <cda>0.001</cda>
+        <cma>0.00</cma>
+        <alpha_stall>0.2</alpha_stall>
+        <cla_stall>-0.2</cla_stall>
+        <cda_stall>1.0</cda_stall>
+        <cma_stall>0.0</cma_stall>
+        <cp>0.0 0 1.0</cp>
+        <area>3</area>
+        <air_density>1.2041</air_density>
+        <forward>-1 0 0</forward>
+        <upward>0 1 0</upward>
+        <link_name>lift_drag_demo_model::wing_5</link_name>
       </plugin>
 
 
