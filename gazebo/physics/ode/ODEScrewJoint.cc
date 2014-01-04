@@ -53,6 +53,33 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+math::Vector3 ODEScrewJoint::GetAnchor(int /*index*/) const
+{
+  dVector3 result;
+
+  if (this->jointId)
+    dJointGetScrewAnchor(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+{
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
+
+  if (this->jointId)
+    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 {
   dVector3 result;
@@ -66,11 +93,46 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
+void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+{
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
+
+  /// ODE needs global axis
+  /// \TODO: currently we assume joint axis is specified in model frame,
+  /// this is incorrect, and should be corrected to be
+  /// joint frame which is specified in child link frame.
+  math::Vector3 globalAxis = _axis;
+  if (this->parentLink)
+    globalAxis =
+      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+
+  if (this->jointId)
+    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+math::Angle ODEScrewJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
   if (this->jointId)
-    result = dJointGetScrewPosition(this->jointId);
+  {
+    if (_index < this->GetAngleCount())
+    {
+      if (_index == 0)
+        result = dJointGetScrewAngle(this->jointId);
+      else if (_index == 1)
+        result = dJointGetScrewPosition(this->jointId);
+    }
+    else
+    {
+      gzerr << "ODEScrewJoint::GetAngleImpl(" << _index
+            << "): index exceeds allowed range(" << this->GetAngleCount()
+            << ").\n";
+    }
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -97,36 +159,12 @@ void ODEScrewJoint::SetVelocity(int /*index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
-{
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
-
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-
-  if (this->jointId)
-    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-}
-
-//////////////////////////////////////////////////
 void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 {
   if (this->jointId)
   {
-    /// \TODO: issue thread pitch is angle / translation
-    double pitch = 0;
-    if (!math::equal(_threadPitch, 0.0))
-      pitch = -1.0 / _threadPitch;
-    dJointSetScrewThreadPitch(this->jointId, pitch);
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -155,6 +193,7 @@ void ODEScrewJoint::SetForceImpl(int /*_index*/, double _effort)
 void ODEScrewJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
+
   if (this->jointId)
     dJointSetScrewParam(this->jointId, _parameter, _value);
   else

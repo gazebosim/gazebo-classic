@@ -56,48 +56,9 @@ namespace gazebo
                  {
                    T::Load(_sdf);
 
-                   if (_sdf->HasElement("thread_pitch"))
-                   {
-                     this->threadPitch =
-                       _sdf->GetElement("thread_pitch")->Get<double>();
-                   }
-                   else
-                   {
-                     this->threadPitch = 1.0;
-                     gzwarn << "<thread_pitch> element not specified. "
-                            << "Using default value of "
-                            << this->threadPitch
-                            << ". \n";
-                   }
-
-                   if (_sdf->HasElement("axis"))
-                   {
-                     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
-                     if (axisElem->HasElement("limit"))
-                     {
-                       sdf::ElementPtr limitElem =
-                         _sdf->GetElement("axis")->GetElement("limit");
-
-                       // Perform this three step ordering to ensure the
-                       // parameters are set properly. This is taken from
-                       // the ODE wiki.
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
-                       this->SetLowStop(0, limitElem->Get<double>("lower"));
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
-                     }
-                   }
+                   this->threadPitch =
+                     _sdf->GetElement("thread_pitch")->Get<double>();
                  }
-
-      /// \brief Set the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \param[in] _anchor Anchor value for the joint.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      /// \brief Get the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set screw joint thread pitch.
       ///
@@ -126,15 +87,6 @@ namespace gazebo
                  }
     };
     /// \}
-
-    template<class T>
-    void ScrewJoint<T>::SetAnchor(int /*_index*/,
-                                  const math::Vector3 &_anchor)
-    {this->fakeAnchor = _anchor;}
-
-    template<class T>
-    math::Vector3 ScrewJoint<T>::GetAnchor(int /*_index*/) const
-    {return this->fakeAnchor;}
   }
 }
 #endif
