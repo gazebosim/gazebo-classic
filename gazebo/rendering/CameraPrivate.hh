@@ -63,15 +63,8 @@ namespace gazebo
       public: boost::shared_ptr<GaussianNoiseCompositorListener>
         gaussianNoiseCompositorListener;
 
-      /// \brief Lens distortion compositor
-      public: Ogre::CompositorInstance *lensDistortionInstance;
-
-      /// \brief Lens distortion compositor listener
-      public: boost::shared_ptr<LensDistortionCompositorListener>
-        lensDistortionCompositorListener;
-
-      /// \brief If true, apply lens distortion model
-      public: bool distortionActive;
+      /// \brief Lens distortion model
+      public: DistortionPtr distortion;
 
       /// \brief Queue of move positions.
       public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;

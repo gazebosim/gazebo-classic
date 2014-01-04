@@ -60,6 +60,7 @@ namespace gazebo
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class Distortion;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -144,6 +145,11 @@ namespace gazebo
     /// \def ContactVisualPtr
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def DistortionPtr
+    /// \brief Shared pointer to Distortion
+    typedef boost::shared_ptr<Distortion> DistortionPtr;
+
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable
