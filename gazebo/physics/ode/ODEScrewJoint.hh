@@ -80,7 +80,13 @@ namespace gazebo
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
       // Documentation inherited
+      public: virtual void SetThreadPitch(double _threadPitch);
+
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       protected: virtual void SetForceImpl(int _index, double _effort);

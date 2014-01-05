@@ -56,8 +56,14 @@ namespace gazebo
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
+      /// \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(double _threadPitch);
+
       /// \copydoc ScrewJoint::GetThreadPitch
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      /// \copydoc ScrewJoint::GetThreadPitch
+      public: virtual double GetThreadPitch();
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);

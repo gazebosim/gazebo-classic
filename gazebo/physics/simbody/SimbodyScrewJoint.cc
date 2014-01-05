@@ -293,10 +293,23 @@ void SimbodyScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 }
 
 //////////////////////////////////////////////////
+void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
+{
+  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+        << "not yet implemented.  The pitch are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
+}
+
+//////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch(unsigned int _index)
 {
   return this->threadPitch;
+}
 
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetThreadPitch()
+{
+  return this->threadPitch;
 
   /* if we want to get active thread pitch, use below
   /// \TODO: deprecate _index parameter, thread pitch is a property of the

@@ -33,7 +33,7 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
     gzerr << "Bullet Screw Joint is not yet working.  See issue #992.\n";
     return;
   }
-  // Load our force torque test world
+  // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
@@ -65,7 +65,7 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(t, dt);
   gzlog << "t after one step : " << t << "\n";
 
-  // get joint and get force torque
+  // get model, joints and get links
   physics::ModelPtr model_1 = world->GetModel("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
@@ -81,15 +81,18 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(0), 0);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
+  getchar();
+
   // move child link 45deg about x
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
+  double pitch = joint_00->GetThreadPitch();
+  link_00->SetWorldPose(math::Pose(-0.25*M_PI*pitch, 0, 2, 0.25*M_PI, 0, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
@@ -127,6 +130,11 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
         << "]\n";
 }
 
+TEST_P(Joint_TEST, ScrewJoint1)
+{
+  ScrewJoint1(this->physicsEngine);
+}
+
 void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
@@ -134,7 +142,7 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
     gzerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
     return;
   }
-  // Load our force torque test world
+  // Load our universal joint test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
@@ -161,7 +169,7 @@ void Joint_TEST::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(t, dt);
   gzlog << "t after one step : " << t << "\n";
 
-  // get joint and get force torque
+  // get model, joint and links
   physics::ModelPtr model_1 = world->GetModel("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");

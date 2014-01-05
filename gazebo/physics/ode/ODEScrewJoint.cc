@@ -49,7 +49,7 @@ ODEScrewJoint::~ODEScrewJoint()
 void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<ODEJoint>::Load(_sdf);
-  this->SetThreadPitch(0, this->threadPitch);
+  this->SetThreadPitch(this->threadPitch);
 }
 
 //////////////////////////////////////////////////
@@ -171,10 +171,27 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
+void ODEScrewJoint::SetThreadPitch(double _threadPitch)
+{
+  if (this->jointId)
+  {
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
 double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "not yet implemented\n";
-  return 0;
+  return this->threadPitch;
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetThreadPitch()
+{
+  return this->threadPitch;
 }
 
 //////////////////////////////////////////////////
