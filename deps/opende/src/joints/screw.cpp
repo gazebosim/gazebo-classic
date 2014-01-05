@@ -270,11 +270,11 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       dVector3 p, q; // plane space of ax1
       dMultiply0_331 ( ax1, R1, axis1 );
       dPlaneSpace ( ax1, p, q );
+      dVector3 a1, a2;
 
       if ( node[1].body )
       {
         // angular constraints if axis are not aligned with cg's
-        dVector3 a2;
         dMultiply0_331( a2, R2, anchor2 );
         dVector3 tmpp;
         dCalcVectorCross3(tmpp, p, a2);
@@ -293,7 +293,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       }
 
       // angular constraints if axis are not aligned with cg's
-      dVector3 a1;
       dMultiply0_331( a1, R1, anchor1 );
       dVector3 tmpp;
       dCalcVectorCross3(tmpp, p, a1);
@@ -332,28 +331,48 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       dReal k = info->fps * info->erp;
       if ( node[1].body )
       {
-          dVector3 ofs;  // offset point in global coordinates
-          dMultiply0_331 ( ofs, R2, offset );
-          for (int i = 0; i < 3; i++ ) cgdiff[i] += ofs[i];
-          info->c[0] = k * dCalcVectorDot3 ( p, cgdiff );
-          info->c[1] = k * dCalcVectorDot3 ( q, cgdiff );
+          // dVector3 ofs;  // offset point in global coordinates
+          // dMultiply0_331 ( ofs, R2, offset );
+          // for (int i = 0; i < 3; i++ ) cgdiff[i] += ofs[i];
+
+          // error between body anchors
+          dVector3 error12;
+          for (int i = 0; i < 3; ++i)
+            error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] - node[0].body->posr.pos[i];
+
+          // error in the p direction is error12 dot p
+          info->c[0] = k * (dCalcVectorDot3(error12, p));
+          // error in the q direction is error12 dot p
+          info->c[1] = k * (dCalcVectorDot3(error12, q));
           // interpenetration error for screw constraint
           info->c[2] = k * lin_err;
       }
       else
       {
-          dVector3 ofs;  // offset point in global coordinates
-          for (int i = 0; i < 3; i++ ) ofs[i] = offset[i] - pos1[i];
-          info->c[0] = k * dCalcVectorDot3 ( p, ofs );
-          info->c[1] = k * dCalcVectorDot3 ( q, ofs );
+          // debug
+          // printf ("anchor1 %f %f %f\n", anchor1[0], anchor1[1], anchor1[2]);
+          // printf ("anchor2 %f %f %f\n", anchor2[0], anchor2[1], anchor2[2]);
+          // printf ("a1 %f %f %f\n", a1[0], a1[1], a1[2]);
+          // printf ("p1 %f %f %f\n",
+          //   node[0].body->posr.pos[0],
+          //   node[0].body->posr.pos[1],
+          //   node[0].body->posr.pos[2]);
+
+          // error of body's anchor
+          dVector3 error1;
+          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] - node[0].body->posr.pos[i];
+          // printf ("error1 %f %f %f\n", error1[0], error1[1], error1[2]);
+
+          // error in the p direction is error1 dot p
+          info->c[0] = k * (dCalcVectorDot3(error1, p));
+          // error in the q direction
+          info->c[1] = k * (dCalcVectorDot3(error1, q));
           // interpenetration error for screw constraint
           info->c[2] = k * lin_err;
 
           if ( flags & dJOINT_REVERSE )
               for (int i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
       }
-
-      for (int i = 0; i < 3; ++i ) info->c[i] = 0;
 
       // uncommnet to enforce slider joint limit
       // limot.addLimot ( this, info, 5, ax1, 0 );
