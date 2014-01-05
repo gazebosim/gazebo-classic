@@ -88,6 +88,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetThreadPitch();
 
+      // Documentation inherited.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index);
+
       // Documentation inherited
       protected: virtual void SetForceImpl(int _index, double _effort);
     };

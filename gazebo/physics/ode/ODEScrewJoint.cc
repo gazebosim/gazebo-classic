@@ -119,7 +119,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(int _index) const
   math::Angle result;
   if (this->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < static_cast<int>(this->GetAngleCount()))
     {
       if (_index == 0)
         result = dJointGetScrewAngle(this->jointId);
@@ -240,4 +240,31 @@ void ODEScrewJoint::SetMaxForce(int /*_index*/, double _t)
 double ODEScrewJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAttribute(const std::string &_key, int _index,
+                                   const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else
+    ODEJoint::SetAttribute(_key, _index, _value);
+}
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return ODEJoint::GetAttribute(_key, _index);
 }

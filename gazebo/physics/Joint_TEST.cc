@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
 
@@ -88,21 +89,24 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
-  getchar();
-
   // move child link 45deg about x
-  double pitch = joint_00->GetThreadPitch();
-  link_00->SetWorldPose(math::Pose(-0.25*M_PI*pitch, 0, 2, 0.25*M_PI, 0, 0));
+  double pitch = joint_00->GetAttribute("thread_pitch", 0);
+  math::Pose pose_00 = math::Pose(0.25*M_PI*pitch, 0, 2, 0.25*M_PI, 0, 0);
+  math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
+  link_00->SetWorldPose(pose_00);
+  link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] pitch [" << pitch
         << "]\n";
+
+  getchar();
 
   // move child link 45deg about y
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
