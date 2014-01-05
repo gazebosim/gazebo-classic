@@ -267,8 +267,11 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(int _index) const
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
+    {
+      gzerr << "Get " << _index << "\n";
       return math::Angle(this->mobod.getOneQ(
         this->simbodyPhysics->integ->getState(), _index));
+    }
     else
     {
       gzdbg << "SimbodyScrewJoint::GetAngleImpl() simbody not yet initialized, "
@@ -327,4 +330,32 @@ double SimbodyScrewJoint::GetThreadPitch()
     return 0.0;
   }
   */
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetAttribute(const std::string &_key, int _index,
+  const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else
+    SimbodyJoint::SetAttribute(_key, _index, _value);
+}
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetAttribute(const std::string &_key,
+  unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return SimbodyJoint::GetAttribute(_key, _index);
 }
