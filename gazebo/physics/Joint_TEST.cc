@@ -90,47 +90,60 @@ void Joint_TEST::ScrewJoint1(const std::string &_physicsEngine)
         << "]\n";
 
   // move child link 45deg about x
-  double pitch = joint_00->GetAttribute("thread_pitch", 0);
-  math::Pose pose_00 = math::Pose(0.25*M_PI*pitch, 0, 2, 0.25*M_PI, 0, 0);
+  double pitch_00 = joint_00->GetAttribute("thread_pitch", 0);
+  math::Pose pose_00 = math::Pose(0.25*M_PI*pitch_00, 0, 2, 0.25*M_PI, 0, 0);
   math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0);
+  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI*pitch_00);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
-        << "] pitch [" << pitch
+        << "] pitch_00 [" << pitch_00
         << "]\n";
-
-  getchar();
 
   // move child link 45deg about y
+  double pitch_01 = joint_01->GetAttribute("thread_pitch", 0);
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
-  EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI);
+  pose_00 = math::Pose(0.25*M_PI*pitch_00, 0, 2, 0.25*M_PI, 0, 0);
+  pose_01 = math::Pose(0.3*M_PI*pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
+  link_00->SetWorldPose(pose_00);
+  link_01->SetWorldPose(pose_01);
+  EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
+  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI*pitch_00);
+  EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
+  EXPECT_EQ(joint_01->GetAngle(1), 0.3*M_PI*pitch_01);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] pitch_00 [" << pitch_00
+        << "] pitch_01 [" << pitch_01
         << "]\n";
 
+  // new poses should not violate the constraint.  take a few steps
+  // and make sure nothing moves.
+  world->Step(10);
+
   // move child link 90deg about both x and "rotated y axis" (z)
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.5*M_PI);
+  EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
+  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI*pitch_00);
+  EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
+  EXPECT_EQ(joint_01->GetAngle(1), 0.3*M_PI*pitch_01);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] pitch_00 [" << pitch_00
+        << "] pitch_01 [" << pitch_01
         << "]\n";
 }
 
