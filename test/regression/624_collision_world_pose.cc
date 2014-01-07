@@ -16,14 +16,17 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
-class Issue624Test : public Joint_TEST
+typedef std::tr1::tuple<const char *, const char *> std_string2;
+
+class Issue624Test : public ServerFixture,
+                     public ::testing::WithParamInterface<std_string2>
 {
   public: void CollisionWorldPose(const std::string &_physicsEngine);
+  protected: std::string physicsEngine;
 };
 
 
