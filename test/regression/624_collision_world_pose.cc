@@ -16,17 +16,15 @@
 */
 
 #include "ServerFixture.hh"
+#include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *, const char *> std_string2;
-
 class Issue624Test : public ServerFixture,
-                     public ::testing::WithParamInterface<std_string2>
+                     public testing::WithParamInterface<const char*>
 {
   public: void CollisionWorldPose(const std::string &_physicsEngine);
-  protected: std::string physicsEngine;
 };
 
 
@@ -131,12 +129,10 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
 
 TEST_P(Issue624Test, CollisionWorldPose)
 {
-  CollisionWorldPose(this->physicsEngine);
+  CollisionWorldPose(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue624Test,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("")));
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue624Test, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 /// Main
