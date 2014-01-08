@@ -1,5 +1,61 @@
 ## Gazebo 2.0
 
+### Gazebo 2.2.0 (2014-01-10)
+1. Added support for OGRE-1.9.
+    * [Pull request #883](https://bitbucket.org/osrf/gazebo/pull-request/883)
+1. Added unit test for issue 624.
+    * [Issue #624](https://bitbucket.org/osrf/gazebo/issue/624).
+    * [Pull request #889](https://bitbucket.org/osrf/gazebo/pull-request/889)
+1. Use 3x3 PCF shadows for smoother shadows.
+    * [Pull request #887](https://bitbucket.org/osrf/gazebo/pull-request/887)
+1. Update manpage copyright to 2014.
+    * [Pull request #893](https://bitbucket.org/osrf/gazebo/pull-request/893)
+1. Added friction integration test .
+    * [Pull request #885](https://bitbucket.org/osrf/gazebo/pull-request/885)
+1. Fix joint anchor when link pose is not specified.
+    * [Issue #978](https://bitbucket.org/osrf/gazebo/issue/978)
+    * [Pull request #862](https://bitbucket.org/osrf/gazebo/pull-request/862)
+1. Added (ESC) tooltip for GUI Selection Mode icon.
+    * [Issue #993](https://bitbucket.org/osrf/gazebo/issue/993)
+    * [Pull request #888](https://bitbucket.org/osrf/gazebo/pull-request/888)
+1. Removed old comment about resolved issue.
+    * [Issue #837](https://bitbucket.org/osrf/gazebo/issue/837)
+    * [Pull request #880](https://bitbucket.org/osrf/gazebo/pull-request/880)
+1. Made SimbodyLink::Get* function thread-safe
+    * [Issue #918](https://bitbucket.org/osrf/gazebo/issue/918)
+    * [Pull request #872](https://bitbucket.org/osrf/gazebo/pull-request/872)
+1. Suppressed spurious gzlog messages in ODE::Body
+    * [Issue #983](https://bitbucket.org/osrf/gazebo/issue/983)
+    * [Pull request #875](https://bitbucket.org/osrf/gazebo/pull-request/875)
+1. Fixed Force Torque Sensor Test by properly initializing some values.
+    * [Issue #982](https://bitbucket.org/osrf/gazebo/issue/982)
+    * [Pull request #869](https://bitbucket.org/osrf/gazebo/pull-request/869)
+1. Added breakable joint plugin to support breakable walls.
+    * [Pull request #865](https://bitbucket.org/osrf/gazebo/pull-request/865)
+1. Used different tuple syntax to fix compilation on OSX mavericks.
+    * [Issue #947](https://bitbucket.org/osrf/gazebo/issue/947)
+    * [Pull request #858](https://bitbucket.org/osrf/gazebo/pull-request/858)
+1. Fixed sonar test and deprecation warning.
+    * [Pull request #856](https://bitbucket.org/osrf/gazebo/pull-request/856)
+1. Speed up test compilation.
+    * Part of [Issue #955](https://bitbucket.org/osrf/gazebo/issue/955)
+    * [Pull request #846](https://bitbucket.org/osrf/gazebo/pull-request/846)
+1. Added Joint::SetEffortLimit API
+    * [Issue #923](https://bitbucket.org/osrf/gazebo/issue/923)
+    * [Pull request #808](https://bitbucket.org/osrf/gazebo/pull-request/808)
+1. Made bullet output less verbose.
+    * [Pull request #839](https://bitbucket.org/osrf/gazebo/pull-request/839)
+1. Convergence acceleration and stability tweak to make atlas_v3 stable
+    * [Issue #895](https://bitbucket.org/osrf/gazebo/issue/895)
+    * [Pull request #772](https://bitbucket.org/osrf/gazebo/pull-request/772)
+1. Added colors, textures and world files for the SPL RoboCup environment
+    * [Pull request #838](https://bitbucket.org/osrf/gazebo/pull-request/838)
+1. Fixed bitbucket_pullrequests tool to work with latest BitBucket API.
+    * [Issue #933](https://bitbucket.org/osrf/gazebo/issue/933)
+    * [Pull request #841](https://bitbucket.org/osrf/gazebo/pull-request/841)
+1. Fixed cppcheck warnings.
+    * [Pull request #842](https://bitbucket.org/osrf/gazebo/pull-request/842)
+ 
 ### Gazebo 2.1.0 (2013-11-08)
 1. Fix mainwindow unit test
     * [Pull request #752](https://bitbucket.org/osrf/gazebo/pull-request/752)
@@ -147,6 +203,47 @@
     * [Pull Request #716](https://bitbucket.org/osrf/gazebo/pull-request/716)
 
 ## Gazebo 1.9
+
+### Gazebo 1.9.2 (2014-01-10)
+
+1. Add thickness to plane to remove shadow flickering.
+    * [Pull request #886](https://bitbucket.org/osrf/gazebo/pull-request/886)
+1. Temporary GUI shadow toggle fix.
+    * [Issue #925](https://bitbucket.org/osrf/gazebo/issue/925)
+    * [Pull request #868](https://bitbucket.org/osrf/gazebo/pull-request/868)
+1. Fix memory access bugs with libc++ on mavericks.
+    * [Issue #965](https://bitbucket.org/osrf/gazebo/issue/965)
+    * [Pull request #857](https://bitbucket.org/osrf/gazebo/pull-request/857)
+    * [Pull request #881](https://bitbucket.org/osrf/gazebo/pull-request/881)
+1. Replaced printf with cout in gztopic hz.
+    * [Issue #969](https://bitbucket.org/osrf/gazebo/issue/969)
+    * [Pull request #854](https://bitbucket.org/osrf/gazebo/pull-request/854)
+1. Add Dark grey material and fix indentation.
+    * [Pull request #851](https://bitbucket.org/osrf/gazebo/pull-request/851)
+1. Fixed sonar sensor unit test.
+    * [Pull request #848](https://bitbucket.org/osrf/gazebo/pull-request/848)
+1. Convergence acceleration and stability tweak to make atlas_v3 stable.
+    * [Pull request #845](https://bitbucket.org/osrf/gazebo/pull-request/845)
+1. Update gtest to 1.7.0 to resolve problems with libc++.
+    * [Issue #947](https://bitbucket.org/osrf/gazebo/issue/947)
+    * [Pull request #827](https://bitbucket.org/osrf/gazebo/pull-request/827)
+1. Fixed LD_LIBRARY_PATH for plugins.
+    * [Issue #957](https://bitbucket.org/osrf/gazebo/issue/957)
+    * [Pull request #844](https://bitbucket.org/osrf/gazebo/pull-request/844)
+1. Fix transceiver sporadic errors, backport of [pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811).
+    * [Pull request #836](https://bitbucket.org/osrf/gazebo/pull-request/836)
+1. Modified the MsgTest to be deterministic with time checks.
+    * [Pull request #843](https://bitbucket.org/osrf/gazebo/pull-request/843)
+1. Fixed seg fault in LaserVisual.
+    * [Issue #950](https://bitbucket.org/osrf/gazebo/issue/950)
+    * [Pull request #832](https://bitbucket.org/osrf/gazebo/pull-request/832)
+1. Implemented the option to disable tests that need a working screen to run properly, backport of [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764).
+    * [Pull request #837](https://bitbucket.org/osrf/gazebo/pull-request/837)
+1. Cleaned up gazebo shutdown.
+    * [Pull request #829](https://bitbucket.org/osrf/gazebo/pull-request/829)
+1. Fixed bug associated with loading joint child links.
+    * [Issue #943](https://bitbucket.org/osrf/gazebo/issue/943)
+    * [Pull request #820](https://bitbucket.org/osrf/gazebo/pull-request/820)
 
 ### Gazebo 1.9.2 (2013-11-08)
 1. Fix enable/disable sky and clouds from SDF
