@@ -62,7 +62,7 @@
 1. Visualize moment of inertia
     * Pull request [#745](https://bitbucket.org/osrf/gazebo/pull-request/745), [#769](https://bitbucket.org/osrf/gazebo/pull-request/769), [#787](https://bitbucket.org/osrf/gazebo/pull-request/787)
     * [Issue #203](https://bitbucket.org/osrf/gazebo/issue/203)
-1. Update tool to cound lines of code
+1. Update tool to count lines of code
     * [Pull request #758](https://bitbucket.org/osrf/gazebo/pull-request/758)
 1. Implement World::Clear
     * Pull request [#785](https://bitbucket.org/osrf/gazebo/pull-request/785), [#804](https://bitbucket.org/osrf/gazebo/pull-request/804)
@@ -76,13 +76,13 @@
     * [Pull request #707](https://bitbucket.org/osrf/gazebo/pull-request/707)
 1. Added plugin path to LID_LIBRARY_PATH in setup.sh
     * [Pull request #750](https://bitbucket.org/osrf/gazebo/pull-request/750)
-1. Fixe for OSX
+1. Fix for OSX
     * [Pull request #766](https://bitbucket.org/osrf/gazebo/pull-request/766)
     * [Pull request #786](https://bitbucket.org/osrf/gazebo/pull-request/786)
     * [Issue #906](https://bitbucket.org/osrf/gazebo/issue/906)
 1. Update copyright information
     * [Pull request #771](https://bitbucket.org/osrf/gazebo/pull-request/771)
-1. Enable screen dependant tests
+1. Enable screen dependent tests
     * [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
     * [Issue #811](https://bitbucket.org/osrf/gazebo/issue/811)
 1. Fix gazebo command line help message
@@ -119,7 +119,7 @@
     * [Issue #920](https://bitbucket.org/osrf/gazebo/issue/920)
 1. Fix bitbucket pullrequest command line tool to match new API
     * [Pull request #803](https://bitbucket.org/osrf/gazebo/pull-request/803)
-1. Fix transceiver spanw errors in tests
+1. Fix transceiver spawn errors in tests
     * [Pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
     * [Pull request #814](https://bitbucket.org/osrf/gazebo/pull-request/814)
  
@@ -169,7 +169,7 @@
 1. Add test for rotational joints.
     * [Pull Request #697](https://bitbucket.org/osrf/gazebo/pull-request/697)
     * Resolves: [Issue #820](https://bitbucket.org/osrf/gazebo/issue/820)
-1. Fix compilation of tests useing Joint base class
+1. Fix compilation of tests using Joint base class
     * [Pull Request #701](https://bitbucket.org/osrf/gazebo/pull-request/701)
 1. Terrain paging implemented.
     * [Pull Request #687](https://bitbucket.org/osrf/gazebo/pull-request/687)
@@ -230,14 +230,16 @@
 1. Fixed LD_LIBRARY_PATH for plugins.
     * [Issue #957](https://bitbucket.org/osrf/gazebo/issue/957)
     * [Pull request #844](https://bitbucket.org/osrf/gazebo/pull-request/844)
-1. Fix transceiver sporadic errors, backport of [pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
+1. Fix transceiver sporadic errors.
+    * Backport of [pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
     * [Pull request #836](https://bitbucket.org/osrf/gazebo/pull-request/836)
 1. Modified the MsgTest to be deterministic with time checks.
     * [Pull request #843](https://bitbucket.org/osrf/gazebo/pull-request/843)
 1. Fixed seg fault in LaserVisual.
     * [Issue #950](https://bitbucket.org/osrf/gazebo/issue/950)
     * [Pull request #832](https://bitbucket.org/osrf/gazebo/pull-request/832)
-1. Implemented the option to disable tests that need a working screen to run properly, backport of [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
+1. Implemented the option to disable tests that need a working screen to run properly.
+    * Backport of [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
     * [Pull request #837](https://bitbucket.org/osrf/gazebo/pull-request/837)
 1. Cleaned up gazebo shutdown.
     * [Pull request #829](https://bitbucket.org/osrf/gazebo/pull-request/829)
@@ -252,7 +254,7 @@
     * [Pull request #815](https://bitbucket.org/osrf/gazebo/pull-request/815])
 1. Fix GPU laser when interacting with heightmaps
     * [Pull request #796](https://bitbucket.org/osrf/gazebo/pull-request/796])
-1. Added API/ABI cheker command line tool
+1. Added API/ABI checker command line tool
     * [Pull request #765](https://bitbucket.org/osrf/gazebo/pull-request/765])
 1. Added gtest version information 
     * [Pull request #801](https://bitbucket.org/osrf/gazebo/pull-request/801])
@@ -306,7 +308,7 @@
 * Fix Gazebo build for machines without a valid display.[https://bitbucket.org/osrf/gazebo/commits/37f00422eea03365b839a632c1850431ee6a1d67]
 
 ### Gazebo 1.8.4 (2013-06-03)
-* Fix UDRF to SDF converter so that URDF gazebo extensions are applied to all collsions in a link.[https://bitbucket.org/osrf/gazebo/pull-request/579]
+* Fix UDRF to SDF converter so that URDF gazebo extensions are applied to all collisions in a link.[https://bitbucket.org/osrf/gazebo/pull-request/579]
 * Prevent transport layer from locking when a gzclient connects to a gzserver over a connection with high latency.[https://bitbucket.org/osrf/gazebo/pull-request/572]
 * Improve performance and fix uninitialized conditional jumps.[https://bitbucket.org/osrf/gazebo/pull-request/571]
 
