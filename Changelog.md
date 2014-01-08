@@ -204,7 +204,7 @@
 
 ## Gazebo 1.9
 
-### Gazebo 1.9.2 (2014-01-10)
+### Gazebo 1.9.3 (2014-01-10)
 
 1. Add thickness to plane to remove shadow flickering.
     * [Pull request #886](https://bitbucket.org/osrf/gazebo/pull-request/886)
@@ -230,14 +230,14 @@
 1. Fixed LD_LIBRARY_PATH for plugins.
     * [Issue #957](https://bitbucket.org/osrf/gazebo/issue/957)
     * [Pull request #844](https://bitbucket.org/osrf/gazebo/pull-request/844)
-1. Fix transceiver sporadic errors, backport of [pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811).
+1. Fix transceiver sporadic errors, backport of [pull request #811](https://bitbucket.org/osrf/gazebo/pull-request/811)
     * [Pull request #836](https://bitbucket.org/osrf/gazebo/pull-request/836)
 1. Modified the MsgTest to be deterministic with time checks.
     * [Pull request #843](https://bitbucket.org/osrf/gazebo/pull-request/843)
 1. Fixed seg fault in LaserVisual.
     * [Issue #950](https://bitbucket.org/osrf/gazebo/issue/950)
     * [Pull request #832](https://bitbucket.org/osrf/gazebo/pull-request/832)
-1. Implemented the option to disable tests that need a working screen to run properly, backport of [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764).
+1. Implemented the option to disable tests that need a working screen to run properly, backport of [Pull request #764](https://bitbucket.org/osrf/gazebo/pull-request/764)
     * [Pull request #837](https://bitbucket.org/osrf/gazebo/pull-request/837)
 1. Cleaned up gazebo shutdown.
     * [Pull request #829](https://bitbucket.org/osrf/gazebo/pull-request/829)
