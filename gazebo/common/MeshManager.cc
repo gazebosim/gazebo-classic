@@ -342,9 +342,9 @@ void MeshManager::CreatePlane(const std::string &name,
   for (int i = 0; i <= 1; ++i)
   {
     double z = i*thickness;
-    for (int y = 0; y <= segments.y; y++)
+    for (int y = 0; y <= segments.y; ++y)
     {
-      for (int x = 0; x <= segments.x; x++)
+      for (int x = 0; x <= segments.x; ++x)
       {
         // Compute the position of the vertex
         vec.x = (x * xSpace) - halfWidth;
