@@ -60,7 +60,7 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
 double RaySensorNoisePlugin::OnApplyNoise(double _in)
 {
   // Apply alternating random noise.
-  double randNoise = math::Rand::GetDblNormal(0, this->fixedNoiseRate);
+  double randNoise = math::Rand::GetDblUniform(0, this->fixedNoiseRate);
   this->sign *= -1;
   return _in + this->sign*randNoise*_in;
 }

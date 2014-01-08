@@ -31,6 +31,7 @@ set(tests
   imu.cc
   laser.cc
   model_database.cc
+  noise.cc
   nondefault_world.cc
   physics.cc
   physics_msgs.cc
