@@ -66,6 +66,10 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
 {
   // Interpolated 3x3 PCF
   // Adapted from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
+
+  if (offset.x <= 0.0 || offset.y <= 0.0 || shadowMapPos.w <= 0.0)
+    return 1.0;
+
   shadowMapPos = shadowMapPos / shadowMapPos.w;
   vec2 uv = shadowMapPos.xy;
 
@@ -82,9 +86,9 @@ float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
   // load all pixels needed for the computation
   // this way a pixel won't be loaded twice
   float kernel[9];
-  for (int i = 0; i < X; i++)
+  for (int i = 0; i < X; ++i)
   {
-    for (int j = 0; j < X; j++)
+    for (int j = 0; j < X; ++j)
     {
        kernel[i * X + j] = texture2DCompare(shadowMap,
           topLeft + vec2(i, j) * texelSize, shadowMapPos.z);
