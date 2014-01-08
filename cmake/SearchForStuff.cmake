@@ -200,7 +200,7 @@ if (PKG_CONFIG_FOUND)
   else ()
     set (INCLUDE_RTSHADER OFF CACHE BOOL "Enable GPU shaders")
   endif ()
-  
+
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
   # There are some runtime problems to solve with ogre-1.9. 
   # Please read gazebo issues: 994, 995, 996
