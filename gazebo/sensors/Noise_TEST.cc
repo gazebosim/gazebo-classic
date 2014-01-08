@@ -189,6 +189,7 @@ TEST(NoiseTest, ApplyGaussian)
     EXPECT_NEAR(noise->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(*noise, g_applyCount);
+    delete noise;
   }
 
   // GAUSSIAN with non-zero mean, exact bias, and standard deviations
