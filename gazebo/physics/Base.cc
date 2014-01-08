@@ -290,8 +290,8 @@ BasePtr Base::GetByName(const std::string &_name)
   BasePtr result;
   Base_V::const_iterator iter;
 
-  for (iter =  this->children.begin();
-      iter != iterEnd && result == NULL; ++iter)
+  for (iter = this->children.begin();
+      iter != this->children.end() && result == NULL; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;
