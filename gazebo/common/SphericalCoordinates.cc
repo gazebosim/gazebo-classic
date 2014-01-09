@@ -19,7 +19,6 @@
 #include <math.h>
 
 #include "gazebo/common/Console.hh"
-
 #include "gazebo/common/SphericalCoordinates.hh"
 
 using namespace gazebo;
@@ -42,7 +41,7 @@ SphericalCoordinatesPrivate::SurfaceType SphericalCoordinates::Convert(
 {
   if ("EARTH_WGS84" == _str)
     return SphericalCoordinatesPrivate::EARTH_WGS84;
-  // else
+
   gzerr << "SurfaceType string not recognized, "
         << "EARTH_WGS84 returned by default" << std::endl;
   return SphericalCoordinatesPrivate::EARTH_WGS84;
@@ -58,8 +57,8 @@ SphericalCoordinates::SphericalCoordinates()
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(
-                        const SphericalCoordinatesPrivate::SurfaceType _type)
-  : dataPtr(new SphericalCoordinatesPrivate)
+    const SphericalCoordinatesPrivate::SurfaceType _type)
+      : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
 }
@@ -68,8 +67,8 @@ SphericalCoordinates::SphericalCoordinates(
 SphericalCoordinates::SphericalCoordinates(
     const SphericalCoordinatesPrivate::SurfaceType _type,
     const math::Angle &_latitude, const math::Angle &_longitude,
-    double _elevation, const math::Angle &_heading) :
-      dataPtr(new SphericalCoordinatesPrivate)
+    double _elevation, const math::Angle &_heading)
+      : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
   this->SetLatitudeReference(_latitude);
@@ -85,7 +84,7 @@ SphericalCoordinates::~SphericalCoordinates()
 
 //////////////////////////////////////////////////
 SphericalCoordinatesPrivate::SurfaceType SphericalCoordinates::GetSurfaceType()
-   const
+    const
 {
   return this->dataPtr->surfaceType;
 }
@@ -147,7 +146,7 @@ void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::SphericalFromLocal(
-                                      const math::Vector3 &_xyz) const
+    const math::Vector3 &_xyz) const
 {
   double radiusMeridional = 1.0;
   double radiusNormal = 1.0;
@@ -195,7 +194,7 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
-  const
+    const
 {
   double headingSine = sin(this->dataPtr->headingOffset.Radian());
   double headingCosine = cos(this->dataPtr->headingOffset.Radian());
