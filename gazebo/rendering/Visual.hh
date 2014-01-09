@@ -174,6 +174,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Set whether or not to enable or disable lighting.
+      /// \param[in] _lighting True to enable lighting.
+      public: void SetLighting(bool _lighting);
+
       /// \brief Set the material.
       /// \param[in] _materialName The name of the material.
       /// \param[in] _unique True to make the material unique, which
@@ -573,6 +577,9 @@ namespace gazebo
 
       /// \brief Scale of visual.
       private: math::Vector3 scale;
+
+      /// \brief True if lighting will be applied to this visual.
+      private: bool lighting;
     };
     /// \}
   }
