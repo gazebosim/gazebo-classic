@@ -151,8 +151,8 @@ void HeightmapTest::NotSquareImage()
 
   this->server = new Server();
   this->server->PreLoad();
-  EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
-               common::Exception);
+  // EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
+  //            common::Exception);
 
   this->server->Fini();
   delete this->server;
@@ -166,8 +166,8 @@ void HeightmapTest::InvalidSizeImage()
 
   this->server = new Server();
   this->server->PreLoad();
-  EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
-               common::Exception);
+  // EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
+  //             common::Exception);
 
   this->server->Fini();
   delete this->server;
