@@ -231,7 +231,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
-    common::SphericalCoordinates::SurfaceType surfaceType =
+    common::SphericalCoordinatesPrivate::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
     math::Angle latitude, longitude, heading;

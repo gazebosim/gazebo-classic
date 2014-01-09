@@ -79,6 +79,7 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
+  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh

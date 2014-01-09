@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "gazebo/common/SphericalCoordinatesPrivate.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
@@ -34,21 +35,13 @@ namespace gazebo
     /// \brief Convert spherical coordinates for planetary surfaces.
     class SphericalCoordinates
     {
-      /// \enum SurfaceType
-      /// \brief Unique identifiers for planetary surface models.
-      public: enum SurfaceType
-              {
-                /// \brief Model of reference ellipsoid for earth, based on
-                /// WGS 84 standard. see wikipedia: World_Geodetic_System
-                EARTH_WGS84 = 1
-              };
-
       /// \brief Constructor.
       public: SphericalCoordinates();
 
       /// \brief Constructor with surface type input.
       /// \param[in] _type SurfaceType specification.
-      public: SphericalCoordinates(const SurfaceType _type);
+      public: SphericalCoordinates(
+                          const SphericalCoordinatesPrivate::SurfaceType _type);
 
       /// \brief Constructor with surface type, angle, and elevation inputs.
       /// \param[in] _type SurfaceType specification.
@@ -56,11 +49,12 @@ namespace gazebo
       /// \param[in] _longitude Reference longitude.
       /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
-      public: SphericalCoordinates(const SurfaceType _type,
-                                   const math::Angle &_latitude,
-                                   const math::Angle &_longitude,
-                                   double _elevation,
-                                   const math::Angle &_heading);
+      public: SphericalCoordinates(
+                          const SphericalCoordinatesPrivate::SurfaceType _type,
+                          const math::Angle &_latitude,
+                          const math::Angle &_longitude,
+                          double _elevation,
+                          const math::Angle &_heading);
 
       /// \brief Destructor.
       public: ~SphericalCoordinates();
@@ -69,20 +63,19 @@ namespace gazebo
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
       /// \return Conversion to SurfaceType.
-      public: static SurfaceType Convert(const std::string &_str);
+      public: static SphericalCoordinatesPrivate::SurfaceType Convert(
+                                    const std::string &_str);
 
       /// \brief Get the distance between two points expressed in geographic
       /// latitude and longitude. It assumes that both points are at sea level.
@@ -100,7 +93,7 @@ namespace gazebo
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
-      public: SurfaceType GetSurfaceType() const;
+      public: SphericalCoordinatesPrivate::SurfaceType GetSurfaceType() const;
 
       /// \brief Get reference geodetic latitude.
       /// \return Reference geodetic latitude.
@@ -122,7 +115,8 @@ namespace gazebo
 
       /// \brief Set SurfaceType for planetary surface model.
       /// \param[in] _type SurfaceType value.
-      public: void SetSurfaceType(const SurfaceType &_type);
+      public: void SetSurfaceType(
+                        const SphericalCoordinatesPrivate::SurfaceType &_type);
 
       /// \brief Set reference geodetic latitude.
       /// \param[in] _angle Reference geodetic latitude.
@@ -140,21 +134,9 @@ namespace gazebo
       /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const math::Angle &_angle);
 
-      /// \brief Type of surface being used.
-      private: SurfaceType surfaceType;
-
-      /// \brief Latitude of reference point.
-      private: math::Angle latitudeReference;
-
-      /// \brief Longitude of reference point.
-      private: math::Angle longitudeReference;
-
-      /// \brief Elevation of reference point relative to sea level in meters.
-      private: double elevationReference;
-
-      /// \brief Heading offset, expressed as angle from East to
-      ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
-      private: math::Angle headingOffset;
+      /// internal
+      /// \brief Pointer to the private data
+      private: SphericalCoordinatesPrivate *dataPtr;
     };
     /// \}
   }

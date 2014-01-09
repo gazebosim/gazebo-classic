@@ -27,8 +27,8 @@ using namespace gazebo;
 TEST(SphericalCoordinatesTest, Constructor)
 {
   // Default surface type
-  common::SphericalCoordinates::SurfaceType st =
-    common::SphericalCoordinates::EARTH_WGS84;
+  common::SphericalCoordinatesPrivate::SurfaceType st =
+    common::SphericalCoordinatesPrivate::EARTH_WGS84;
 
   // No arguments, default parameters
   {
@@ -68,8 +68,8 @@ TEST(SphericalCoordinatesTest, Constructor)
 TEST(SphericalCoordinatesTest, Convert)
 {
   // Default surface type
-  common::SphericalCoordinates::SurfaceType st =
-    common::SphericalCoordinates::EARTH_WGS84;
+  common::SphericalCoordinatesPrivate::SurfaceType st =
+    common::SphericalCoordinatesPrivate::EARTH_WGS84;
 
   EXPECT_EQ(common::SphericalCoordinates::Convert("EARTH_WGS84"), st);
 }
@@ -79,8 +79,8 @@ TEST(SphericalCoordinatesTest, Convert)
 TEST(SphericalCoordinatesTest, SetFunctions)
 {
   // Default surface type
-  common::SphericalCoordinates::SurfaceType st =
-    common::SphericalCoordinates::EARTH_WGS84;
+  common::SphericalCoordinatesPrivate::SurfaceType st =
+    common::SphericalCoordinatesPrivate::EARTH_WGS84;
 
   // Default parameters
   common::SphericalCoordinates sc;
@@ -112,8 +112,8 @@ TEST(SphericalCoordinatesTest, SetFunctions)
 TEST(SphericalCoordinatesTest, CoordinateTransforms)
 {
   // Default surface type
-  common::SphericalCoordinates::SurfaceType st =
-    common::SphericalCoordinates::EARTH_WGS84;
+  common::SphericalCoordinatesPrivate::SurfaceType st =
+    common::SphericalCoordinatesPrivate::EARTH_WGS84;
 
   {
     // Parameters
