@@ -83,11 +83,8 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
 //////////////////////////////////////////////////
 SphericalCoordinates::~SphericalCoordinates()
 {
-  if (this->dataPtr)
-  {
-    delete this->dataPtr;
-    this->dataPtr = NULL;
-  }
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
