@@ -62,6 +62,7 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
   : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
+  this->SetElevationReference(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -82,6 +83,8 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
 //////////////////////////////////////////////////
 SphericalCoordinates::~SphericalCoordinates()
 {
+  if (this->dataPtr)
+    delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
