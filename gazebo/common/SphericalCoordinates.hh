@@ -20,7 +20,6 @@
 
 #include <string>
 
-#include "gazebo/common/SphericalCoordinatesPrivate.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
@@ -28,6 +27,8 @@ namespace gazebo
 {
   namespace common
   {
+    class SphericalCoordinatesPrivate;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -35,13 +36,22 @@ namespace gazebo
     /// \brief Convert spherical coordinates for planetary surfaces.
     class SphericalCoordinates
     {
+      /// \enum SurfaceType
+      /// \brief Unique identifiers for planetary surface models.
+      public: enum SurfaceType
+              {
+                /// \brief Model of reference ellipsoid for earth, based on
+                /// WGS 84 standard. see wikipedia: World_Geodetic_System
+                EARTH_WGS84 = 1
+              };
+
       /// \brief Constructor.
       public: SphericalCoordinates();
 
       /// \brief Constructor with surface type input.
       /// \param[in] _type SurfaceType specification.
       public: SphericalCoordinates(
-          const SphericalCoordinatesPrivate::SurfaceType _type);
+          const SphericalCoordinates::SurfaceType _type);
 
       /// \brief Constructor with surface type, angle, and elevation inputs.
       /// \param[in] _type SurfaceType specification.
@@ -50,7 +60,7 @@ namespace gazebo
       /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
       public: SphericalCoordinates(
-          const SphericalCoordinatesPrivate::SurfaceType _type,
+          const SphericalCoordinates::SurfaceType _type,
           const math::Angle &_latitude,
           const math::Angle &_longitude,
           double _elevation,
@@ -74,7 +84,7 @@ namespace gazebo
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
       /// \return Conversion to SurfaceType.
-      public: static SphericalCoordinatesPrivate::SurfaceType Convert(
+      public: static SphericalCoordinates::SurfaceType Convert(
           const std::string &_str);
 
       /// \brief Get the distance between two points expressed in geographic
@@ -93,7 +103,7 @@ namespace gazebo
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
-      public: SphericalCoordinatesPrivate::SurfaceType GetSurfaceType() const;
+      public: SphericalCoordinates::SurfaceType GetSurfaceType() const;
 
       /// \brief Get reference geodetic latitude.
       /// \return Reference geodetic latitude.
@@ -116,7 +126,7 @@ namespace gazebo
       /// \brief Set SurfaceType for planetary surface model.
       /// \param[in] _type SurfaceType value.
       public: void SetSurfaceType(
-          const SphericalCoordinatesPrivate::SurfaceType &_type);
+          const SphericalCoordinates::SurfaceType &_type);
 
       /// \brief Set reference geodetic latitude.
       /// \param[in] _angle Reference geodetic latitude.

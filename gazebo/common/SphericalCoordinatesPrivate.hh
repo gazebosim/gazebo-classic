@@ -18,12 +18,17 @@
 #ifndef _SPHERICALCOORDINATES_PRIVATE_HH_
 #define _SPHERICALCOORDINATES_PRIVATE_HH_
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/Angle.hh"
+
 
 namespace gazebo
 {
   namespace common
   {
+
+    class SphericalCoordinates;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -32,17 +37,8 @@ namespace gazebo
     /// \brief Private data for the SphericalCoordinates class.
     class SphericalCoordinatesPrivate
     {
-      /// \enum SurfaceType
-      /// \brief Unique identifiers for planetary surface models.
-      public: enum SurfaceType
-              {
-                /// \brief Model of reference ellipsoid for earth, based on
-                /// WGS 84 standard. see wikipedia: World_Geodetic_System
-                EARTH_WGS84 = 1
-              };
-
       /// \brief Type of surface being used.
-      public: SurfaceType surfaceType;
+      public: SphericalCoordinates::SurfaceType surfaceType;
 
       /// \brief Latitude of reference point.
       public: math::Angle latitudeReference;
