@@ -179,6 +179,20 @@ TEST(SphericalCoordinatesTest, CoordinateTransforms)
   }
 }
 
+//////////////////////////////////////////////////
+// Test distance
+TEST(SphericalCoordinatesTest, Distance)
+{
+  math::Angle latA, longA, latB, longB;
+  latA.SetFromDegree(46.250944);
+  longA.SetFromDegree(-122.249972);
+  latB.SetFromDegree(46.124953);
+  longB.SetFromDegree(-122.251683);
+  double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
+
+  EXPECT_NEAR(14002, d, 20);
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

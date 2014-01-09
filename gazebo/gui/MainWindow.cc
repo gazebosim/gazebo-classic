@@ -1186,6 +1186,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
+      cam->SetUseSDFPose(true);
     }
 
     if (_msg->camera().has_view_controller())
