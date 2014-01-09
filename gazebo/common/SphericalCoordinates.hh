@@ -51,7 +51,7 @@ namespace gazebo
       /// \brief Constructor with surface type input.
       /// \param[in] _type SurfaceType specification.
       public: SphericalCoordinates(
-          const SphericalCoordinates::SurfaceType _type);
+          const SurfaceType _type);
 
       /// \brief Constructor with surface type, angle, and elevation inputs.
       /// \param[in] _type SurfaceType specification.
@@ -59,12 +59,11 @@ namespace gazebo
       /// \param[in] _longitude Reference longitude.
       /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
-      public: SphericalCoordinates(
-          const SphericalCoordinates::SurfaceType _type,
-          const math::Angle &_latitude,
-          const math::Angle &_longitude,
-          double _elevation,
-          const math::Angle &_heading);
+      public: SphericalCoordinates(const SurfaceType _type,
+                                   const math::Angle &_latitude,
+                                   const math::Angle &_longitude,
+                                   double _elevation,
+                                   const math::Angle &_heading);
 
       /// \brief Destructor.
       public: ~SphericalCoordinates();
@@ -84,8 +83,7 @@ namespace gazebo
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
       /// \return Conversion to SurfaceType.
-      public: static SphericalCoordinates::SurfaceType Convert(
-          const std::string &_str);
+      public: static SurfaceType Convert(const std::string &_str);
 
       /// \brief Get the distance between two points expressed in geographic
       /// latitude and longitude. It assumes that both points are at sea level.
@@ -103,7 +101,7 @@ namespace gazebo
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
-      public: SphericalCoordinates::SurfaceType GetSurfaceType() const;
+      public: SurfaceType GetSurfaceType() const;
 
       /// \brief Get reference geodetic latitude.
       /// \return Reference geodetic latitude.
@@ -125,8 +123,7 @@ namespace gazebo
 
       /// \brief Set SurfaceType for planetary surface model.
       /// \param[in] _type SurfaceType value.
-      public: void SetSurfaceType(
-          const SphericalCoordinates::SurfaceType &_type);
+      public: void SetSurfaceType(const SurfaceType &_type);
 
       /// \brief Set reference geodetic latitude.
       /// \param[in] _angle Reference geodetic latitude.

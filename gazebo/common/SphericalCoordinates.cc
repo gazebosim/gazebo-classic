@@ -42,35 +42,35 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
   const std::string &_str)
 {
   if ("EARTH_WGS84" == _str)
-    return SphericalCoordinates::EARTH_WGS84;
+    return EARTH_WGS84;
 
   gzerr << "SurfaceType string not recognized, "
         << "EARTH_WGS84 returned by default" << std::endl;
-  return SphericalCoordinates::EARTH_WGS84;
+  return EARTH_WGS84;
 }
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates()
   : dataPtr(new SphericalCoordinatesPrivate)
 {
-  this->SetSurfaceType(SphericalCoordinates::EARTH_WGS84);
+  this->SetSurfaceType(EARTH_WGS84);
   this->SetElevationReference(0.0);
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(
-    const SphericalCoordinates::SurfaceType _type)
-      : dataPtr(new SphericalCoordinatesPrivate)
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
+  : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(
-    const SphericalCoordinates::SurfaceType _type,
-    const math::Angle &_latitude, const math::Angle &_longitude,
-    double _elevation, const math::Angle &_heading)
-      : dataPtr(new SphericalCoordinatesPrivate)
+SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
+                                           const math::Angle &_latitude,
+                                           const math::Angle &_longitude,
+                                           double _elevation,
+                                           const math::Angle &_heading)
+  : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
   this->SetLatitudeReference(_latitude);
@@ -85,8 +85,7 @@ SphericalCoordinates::~SphericalCoordinates()
 }
 
 //////////////////////////////////////////////////
-SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType()
-    const
+SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 {
   return this->dataPtr->surfaceType;
 }
@@ -116,8 +115,7 @@ math::Angle SphericalCoordinates::GetHeadingOffset() const
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetSurfaceType(
-    const SphericalCoordinates::SurfaceType &_type)
+void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 {
   this->dataPtr->surfaceType = _type;
 }
@@ -157,7 +155,7 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
 
   switch (this->dataPtr->surfaceType)
   {
-    case SphericalCoordinates::EARTH_WGS84:
+    case EARTH_WGS84:
       // Currently uses radius of curvature equations from wikipedia
       // http://en.wikipedia.org/wiki/Earth_radius#Radius_of_curvature
       {

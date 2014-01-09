@@ -26,7 +26,6 @@ namespace gazebo
 {
   namespace common
   {
-
     class SphericalCoordinates;
 
     /// \addtogroup gazebo_common
