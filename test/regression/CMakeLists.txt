@@ -18,8 +18,8 @@ if(HAVE_BULLET)
 endif()
 
 set(tests
-  846_typo_in_camera.cc
   876_random_number_generator.cc
+  978_joint_anchor.cc
 )
 
 gz_build_tests(${tests})
@@ -31,6 +31,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  846_typo_in_camera.cc
 )
 
 gz_build_dri_tests(${dri_tests})

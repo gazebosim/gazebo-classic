@@ -161,7 +161,8 @@ namespace gazebo
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;
 
-      private: Ogre::PSSMShadowCameraSetup *pssmSetup;
+      /// \brief Parallel Split Shadow Map (PSSM) camera setup
+      private: Ogre::ShadowCameraSetupPtr pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

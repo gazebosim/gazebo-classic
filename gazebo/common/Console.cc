@@ -52,6 +52,7 @@ bool Console::GetQuiet()
 Logger::Logger(const std::string &_prefix, int _color, LogType _type)
   : std::ostream(new Buffer(_type, _color)), color(_color), prefix(_prefix)
 {
+  this->setf(std::ios_base::unitbuf);
 }
 
 /////////////////////////////////////////////////
@@ -63,6 +64,7 @@ Logger::~Logger()
 /////////////////////////////////////////////////
 Logger &Logger::operator()()
 {
+  Console::log << "(" << Time::GetWallTime() << ") ";
   (*this) << this->prefix;
 
   return (*this);
@@ -73,6 +75,7 @@ Logger &Logger::operator()(const std::string &_file, int _line)
 {
   int index = _file.find_last_of("/") + 1;
 
+  Console::log << "(" << Time::GetWallTime() << ") ";
   (*this) << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
@@ -99,7 +102,8 @@ int Logger::Buffer::sync()
     return -1;
 
   // Log messages to disk
-  Console::log() << this->str() << std::endl;
+  Console::log << this->str();
+  Console::log.flush();
 
   // Output to terminal
   if (!Console::GetQuiet())
@@ -143,7 +147,11 @@ void FileLogger::Init(const std::string &_filename)
     return;
 
   if (!getenv("HOME"))
-    gzthrow("Missing HOME environment variable");
+  {
+    gzerr << "Missing HOME environment variable."
+          << "No log file will be generated.";
+    return;
+  }
 
   boost::filesystem::path logPath(getenv("HOME"));
   logPath = logPath / ".gazebo/" / _filename;

@@ -40,7 +40,7 @@ namespace gazebo
     #define gzdbg (gazebo::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::warn())
+    #define gzwarn (gazebo::common::Console::warn(__FILE__, __LINE__))
 
     /// \brief Output an error message
     #define gzerr (gazebo::common::Console::err(__FILE__, __LINE__))
