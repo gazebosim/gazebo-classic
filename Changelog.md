@@ -2,6 +2,9 @@
 
 ### Gazebo 2.2.0 (2014-01-10)
 1. Fix compilation when using OGRE-1.9 (full support is being worked on)
+    * [Issue #994](https://bitbucket.org/osrf/gazebo/issue/994)
+    * [Issue #995](https://bitbucket.org/osrf/gazebo/issue/995)
+    * [Issue #996](https://bitbucket.org/osrf/gazebo/issue/996)
     * [Pull request #883](https://bitbucket.org/osrf/gazebo/pull-request/883)
 1. Added unit test for issue 624.
     * [Issue #624](https://bitbucket.org/osrf/gazebo/issue/624).
