@@ -97,7 +97,11 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
   {
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::RTShader::ShaderGenerator::finalize();
+#else
+    Ogre::RTShader::ShaderGenerator::destroy();
+#endif
     this->shaderGenerator = NULL;
   }
 
@@ -475,10 +479,12 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // pssmCasterPass->setFog(true);
 
   // shadow camera setup
-  if (!this->pssmSetup)
-    this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 200;
+  // issue #925 workaround for gazebo 1.9 branch. DO NOT merge back to
+  // gazebo 3.0 as there is a better fix in place (pull request #867).
+  this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
+
+  double shadowFarDistance = 500;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 

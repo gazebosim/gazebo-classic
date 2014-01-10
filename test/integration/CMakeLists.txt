@@ -36,7 +36,9 @@ set(tests
   laser.cc
   nondefault_world.cc
   physics.cc
+  physics_friction.cc
   physics_msgs.cc
+  physics_thread_safe.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
