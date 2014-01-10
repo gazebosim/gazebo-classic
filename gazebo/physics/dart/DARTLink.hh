@@ -146,19 +146,19 @@ namespace gazebo
       public: void updateDirtyPoseFromDARTTransformation();
 
       /// \brief
-      public: dart::dynamics::BodyNode* GetBodyNode() const;
+      public: dart::dynamics::BodyNode *GetBodyNode() const;
 
       /// \brief
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief
-      public: dart::simulation::World* GetDARTWorld(void) const;
+      public: dart::simulation::World *GetDARTWorld(void) const;
 
       /// \brief
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief
-      public: dart::dynamics::BodyNode* GetDARTBodyNode() const;
+      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
 
       /// \brief
       public: void SetDARTParentJoint(DARTJointPtr _dartParentJoint);
@@ -170,7 +170,7 @@ namespace gazebo
       private: DARTPhysicsPtr dartPhysics;
 
       /// \brief
-      private: dart::dynamics::BodyNode* dtBodyNode;
+      private: dart::dynamics::BodyNode *dtBodyNode;
 
       /// \brief
       private: DARTJointPtr dartParentJoint;
@@ -179,10 +179,10 @@ namespace gazebo
       private: std::vector<DARTJointPtr> dartChildJoints;
 
       /// \brief Weld joint for static link mode.
-      private: dart::dynamics::WeldJoint* dtStaticJoint;
+      private: dart::dynamics::WeldJoint *dtStaticJoint;
 
-      /// \brief
-      private: dart::dynamics::Joint* dtDynamicJoint;
+      /// \brief Pointer to the DART joint.
+      private: dart::dynamics::Joint *dtDynamicJoint;
 
       /// \biref If true, freeze link to world (inertial) frame.
       private: bool staticLink;

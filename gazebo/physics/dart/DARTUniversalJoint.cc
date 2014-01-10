@@ -87,19 +87,21 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(int _index) const
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+  // See: https://bitbucket.org/osrf/gazebo/issue/494
+  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAxis(int _index, const math::Vector3& _axis)
+void DARTUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
 
   if (_index == 0)
   {
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // joint-axis-reference-frame-doesnt-match
     Eigen::Isometry3d dtTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
@@ -109,7 +111,8 @@ void DARTUniversalJoint::SetAxis(int _index, const math::Vector3& _axis)
   else if (_index == 1)
   {
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // joint-axis-reference-frame-doesnt-match
     Eigen::Isometry3d dtTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;

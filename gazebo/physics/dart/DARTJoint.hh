@@ -62,11 +62,8 @@ namespace gazebo
       public: virtual void Detach();
 
       /// \brief Set the anchor point
-      public: virtual void SetAnchor(int /*index*/,
-                                     const gazebo::math::Vector3 & /*anchor*/)
-      {
-        // nothing to do here for DART.
-      }
+      public: virtual void SetAnchor(int /*_index*/,
+                                     const gazebo::math::Vector3 &/*_anchor*/);
 
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
@@ -131,10 +128,12 @@ namespace gazebo
       private: void SaveForce(int _index, double _force);
 
       /// \brief Get DART model pointer.
+      /// \return A pointer to the DART model.
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief Get DART joint pointer.
-      public: dart::dynamics::Joint* getDARTJoint() { return dtJoint; }
+      /// \return A pointer to the DART joint.
+      public: dart::dynamics::Joint *GetDARTJoint();
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
@@ -151,10 +150,10 @@ namespace gazebo
       protected: DARTPhysicsPtr dartPhysicsEngine;
 
       /// \brief DART joint pointer
-      protected: dart::dynamics::Joint* dtJoint;
+      protected: dart::dynamics::Joint *dtJoint;
 
       /// \brief DART child body node pointer
-      protected: dart::dynamics::BodyNode* dtChildBodyNode;
+      protected: dart::dynamics::BodyNode *dtChildBodyNode;
     };
   }
 }

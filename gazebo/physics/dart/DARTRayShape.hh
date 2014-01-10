@@ -50,12 +50,14 @@ namespace gazebo
       public: virtual void Update();
 
       /// \brief Get the nearest intersection
+      /// \param[out] _dist Distance to the intersection.
+      /// \param[out] _entity Name of the entity that was hit.
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
       /// \brief Set the ray based on starting and ending points relative to
       ///        the body
-      /// \param posStart Start position, relative the body
-      /// \param posEnd End position, relative to the body
+      /// \param[in] _posStart Start position, relative the body
+      /// \param[in] _posEnd End position, relative to the body
       public: virtual void SetPoints(const math::Vector3 &_posStart,
                                      const math::Vector3 &_posEnd);
 
