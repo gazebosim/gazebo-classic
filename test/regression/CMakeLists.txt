@@ -18,8 +18,10 @@ if(HAVE_BULLET)
 endif()
 
 set(tests
+  624_collision_world_pose.cc
   846_typo_in_camera.cc
   876_random_number_generator.cc
+  978_joint_anchor.cc
 )
 
 gz_build_tests(${tests})
