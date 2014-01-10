@@ -1,7 +1,7 @@
 ## Gazebo 2.0
 
 ### Gazebo 2.2.0 (2014-01-10)
-1. Added support for OGRE-1.9.
+1. Fix compilation when using OGRE-1.9 (full support is being worked on)
     * [Pull request #883](https://bitbucket.org/osrf/gazebo/pull-request/883)
 1. Added unit test for issue 624.
     * [Issue #624](https://bitbucket.org/osrf/gazebo/issue/624).
