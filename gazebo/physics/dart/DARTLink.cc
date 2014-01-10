@@ -499,12 +499,6 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode*DARTLink::GetBodyNode() const
-{
-  return dtBodyNode;
-}
-
-//////////////////////////////////////////////////
 DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(

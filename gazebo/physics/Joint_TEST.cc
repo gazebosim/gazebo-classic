@@ -661,14 +661,14 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
           << child << " "
           << parent << std::endl;
     joint = SpawnJoint(_jointType, worldChild, worldParent);
-    EXPECT_TRUE(joint.get() != NULL);
+    EXPECT_TRUE(joint != NULL);
 
     physics::LinkPtr link;
     if (!worldChild)
       link = joint->GetChild();
     else if (!worldParent)
       link = joint->GetParent();
-    EXPECT_TRUE(link.get() != NULL);
+    EXPECT_TRUE(link != NULL);
 
     math::Pose initialPose = link->GetWorldPose();
     world->StepWorld(100);

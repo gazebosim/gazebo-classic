@@ -54,7 +54,7 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
   }
 
   this->dtBodyNode
-      = boost::static_pointer_cast<DARTLink>(this->link)->GetBodyNode();
+      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////

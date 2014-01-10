@@ -127,7 +127,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void DebugPrint() const;
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Get an parameter of the physics engine
@@ -147,14 +147,16 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      /// \brief
+      /// \brief Find DART Link corresponding to DART BodyNode.
+      /// \param[in] _dtBodyNode The DART BodyNode.
+      /// \return Pointer to the DART Link.
       private: DARTLinkPtr FindDARTLink(
           const dart::dynamics::BodyNode *_dtBodyNode);
 
       /// \brief
       private: void InitDARTWorld();
 
-      /// \brief
+      /// \brief Pointer to DART World associated with this DART Physics.
       private: dart::simulation::World *dtWorld;
     };
 
