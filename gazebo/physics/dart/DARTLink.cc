@@ -34,8 +34,6 @@ DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent),
     dtBodyNode(new dart::dynamics::BodyNode)
 {
-  dtStaticJoint = new dart::dynamics::WeldJoint;
-  dtDynamicJoint = NULL;
   staticLink = false;
 }
 
@@ -44,8 +42,6 @@ DARTLink::~DARTLink()
 {
   // We don't need to delete dartBodyNode because skeletone will delete
   // dartBodyNode if this is registered to the skeletone.
-
-  delete dtStaticJoint;
 }
 
 //////////////////////////////////////////////////

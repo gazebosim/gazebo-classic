@@ -135,10 +135,8 @@ namespace gazebo
       /// \return The value of the parameter
       public: virtual boost::any GetParam(DARTParam _param) const;
 
-      /// \brief
-      public: void Attach(DARTJointPtr _joint, LinkPtr _parent, LinkPtr _child);
-
-      /// \brief
+      /// \brief Get pointer to DART World associated with this DART Physics.
+      /// \return The pointer to DART World.
       public: dart::simulation::World *GetDARTWorld();
 
       // Documentation inherited
@@ -152,9 +150,6 @@ namespace gazebo
       /// \return Pointer to the DART Link.
       private: DARTLinkPtr FindDARTLink(
           const dart::dynamics::BodyNode *_dtBodyNode);
-
-      /// \brief
-      private: void InitDARTWorld();
 
       /// \brief Pointer to DART World associated with this DART Physics.
       private: dart::simulation::World *dtWorld;

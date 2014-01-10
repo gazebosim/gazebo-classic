@@ -506,8 +506,3 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
   return res;
 }
 
-//////////////////////////////////////////////////
-void DARTPhysics::InitDARTWorld()
-{
-  // this->dtWorld->init();
-}

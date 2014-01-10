@@ -183,12 +183,6 @@ namespace gazebo
       /// \brief List of pointers to the child joints.
       private: std::vector<DARTJointPtr> dartChildJoints;
 
-      /// \brief Weld joint for static link mode.
-      private: dart::dynamics::WeldJoint *dtStaticJoint;
-
-      /// \brief Pointer to the DART joint.
-      private: dart::dynamics::Joint *dtDynamicJoint;
-
       /// \biref If true, freeze link to world (inertial) frame.
       private: bool staticLink;
     };
