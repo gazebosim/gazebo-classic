@@ -94,6 +94,7 @@ namespace gazebo
 
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
+                   /// \return Return 0 on success.
                    public: virtual int sync();
 
                    /// \brief Stream to output information into.
@@ -142,6 +143,7 @@ namespace gazebo
                    /// \brief Constructor.
                    /// \param[in] _type Output destination type
                    /// (STDOUT, or STDERR)
+                   /// \param[in] _color Color of the output stream.
                    public: Buffer(LogType _type, int _color);
 
                    /// \brief Destructor.
@@ -149,6 +151,7 @@ namespace gazebo
 
                    /// \brief Sync the stream (output the string buffer
                    /// contents).
+                   /// \return Return 0 on success.
                    public: virtual int sync();
 
                    /// \brief Destination type for the messages.
