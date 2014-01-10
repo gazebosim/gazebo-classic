@@ -32,7 +32,7 @@ using namespace physics;
 DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine)
 {
-  this->SetName("DART Ray Shape");
+  this->SetName("DART_ray_shape");
   this->physicsEngine =
     boost::static_pointer_cast<DARTPhysics>(_physicsEngine);
 }
@@ -41,7 +41,7 @@ DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
 DARTRayShape::DARTRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
-  this->SetName("DART Ray Shape");
+  this->SetName("DART_ray_shape");
   this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
@@ -58,7 +58,7 @@ void DARTRayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void DARTRayShape::GetIntersection(double& _dist, std::string& _entity)
+void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 {
   _dist = 0;
   _entity = "";

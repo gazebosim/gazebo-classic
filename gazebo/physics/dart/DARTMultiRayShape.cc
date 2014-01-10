@@ -33,7 +33,7 @@ using namespace physics;
 DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
   : MultiRayShape(_parent)
 {
-  this->SetName("DART Multiray Shape");
+  this->SetName("DART_multiray_shape");
   this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }

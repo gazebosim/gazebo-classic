@@ -69,11 +69,12 @@ void DARTCollision::Init()
     // TODO: Don't change offset of shape until dart supports plane shape.
     boost::shared_ptr<DARTPlaneShape> planeShape =
         boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
-    if (planeShape)
-      return;
 
-    math::Pose relativePose = this->GetRelativePose();
-    this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    if (!planeShape)
+    {
+      math::Pose relativePose = this->GetRelativePose();
+      this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    }
   }
 }
 
@@ -124,13 +125,13 @@ gazebo::math::Box DARTCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode*DARTCollision::GetDARTBodyNode() const
+dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 {
   return dtBodyNode;
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape,
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
@@ -138,7 +139,7 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape,
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::Shape* DARTCollision::GetDARTCollisionShape() const
+dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 {
   return dtCollisionShape;
 }

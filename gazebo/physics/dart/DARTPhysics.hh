@@ -34,8 +34,6 @@ namespace gazebo
 {
   namespace physics
   {
-    // class Entity;
-
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \{
@@ -78,16 +76,16 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DARTPhysics();
 
-      /// \brief Load the DART engine
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the DART engine
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Finilize the DART engine.
+      // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Rest the DART engine.
+      // Documentation inherited
       public: virtual void Reset();
 
       // Documentation inherited
@@ -112,19 +110,19 @@ namespace gazebo
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual CollisionPtr CreateCollision(const std::string& _type,
+      public: virtual CollisionPtr CreateCollision(const std::string &_type,
                                                    LinkPtr _body);
 
       // Documentation inherited
-      public: virtual JointPtr CreateJoint(const std::string& _type,
+      public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual ShapePtr CreateShape(const std::string& _shapeType,
+      public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3& gravity);
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -137,6 +135,12 @@ namespace gazebo
       /// \return The value of the parameter
       public: virtual boost::any GetParam(DARTParam _param) const;
 
+      /// \brief
+      public: void Attach(DARTJointPtr _joint, LinkPtr _parent, LinkPtr _child);
+
+      /// \brief
+      public: dart::simulation::World *GetDARTWorld();
+
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
@@ -145,19 +149,13 @@ namespace gazebo
 
       /// \brief
       private: DARTLinkPtr FindDARTLink(
-          const dart::dynamics::BodyNode* _dtBodyNode);
+          const dart::dynamics::BodyNode *_dtBodyNode);
 
       /// \brief
       private: void InitDARTWorld();
 
       /// \brief
-      public: void Attach(DARTJointPtr _joint, LinkPtr _parent, LinkPtr _child);
-
-      /// \brief
-      public: dart::simulation::World* GetDARTWorld() { return dtWorld; }
-
-      /// \brief
-      private: dart::simulation::World* dtWorld;
+      private: dart::simulation::World *dtWorld;
     };
 
   /// \}

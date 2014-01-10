@@ -51,7 +51,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3& _axis);
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int _index) const;
@@ -72,7 +72,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(int _index, double _effort);
 
       /// \brief Revolute joint of DART
-      protected: dart::dynamics::RevoluteJoint* dtRevoluteJoint;
+      protected: dart::dynamics::RevoluteJoint *dtRevoluteJoint;
     };
   }
 }

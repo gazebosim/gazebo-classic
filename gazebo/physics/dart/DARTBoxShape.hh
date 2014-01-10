@@ -57,17 +57,22 @@ namespace gazebo
           // Warn user, but still create shape with very small value
           // otherwise later resize operations using setLocalScaling
           // will not be possible
-          gzwarn << "Setting box shape's x to zero \n";
+          gzwarn << "Setting box shape's x to zero is not supported in DART, "
+                 << "using 1e-4.\n";
           size.x = 1e-4;
         }
+
         if (math::equal(size.y, 0.0))
         {
-          gzwarn << "Setting box shape's y to zero \n";
+          gzwarn << "Setting box shape's y to zero is not supported in DART, "
+                 << "using 1e-4.\n";
           size.y = 1e-4;
         }
+
         if (math::equal(size.z, 0.0))
         {
-          gzwarn << "Setting box shape's z to zero \n";
+          gzwarn << "Setting box shape's z to zero is not supported in DART "
+                 << "using 1e-4.\n";
           size.z = 1e-4;
         }
 
@@ -78,16 +83,16 @@ namespace gazebo
 
         if (dartCollisionParent->GetDARTCollisionShape() == NULL)
         {
-          dart::dynamics::BodyNode* dtBodyNode =
+          dart::dynamics::BodyNode *dtBodyNode =
               dartCollisionParent->GetDARTBodyNode();
-          dart::dynamics::BoxShape* dtBoxShape =
+          dart::dynamics::BoxShape *dtBoxShape =
               new dart::dynamics::BoxShape(DARTTypes::ConvVec3(size));
           dtBodyNode->addCollisionShape(dtBoxShape);
           dartCollisionParent->SetDARTCollisionShape(dtBoxShape);
         }
         else
         {
-          dart::dynamics::BoxShape* dtBoxShape =
+          dart::dynamics::BoxShape *dtBoxShape =
               dynamic_cast<dart::dynamics::BoxShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
           dtBoxShape->setDim(DARTTypes::ConvVec3(size));

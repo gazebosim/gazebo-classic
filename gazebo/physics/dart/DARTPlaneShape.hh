@@ -45,9 +45,9 @@ namespace gazebo
 
         // math::Vector3 n = this->GetNormal();
 
-        dart::dynamics::BodyNode* dtBodyNode =
+        dart::dynamics::BodyNode *dtBodyNode =
             dartCollisionParent->GetDARTBodyNode();
-        dart::dynamics::BoxShape* dtBoxShape =
+        dart::dynamics::BoxShape *dtBoxShape =
             new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 0.01));
         dtBodyNode->addCollisionShape(dtBoxShape);
         dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -0.005));
