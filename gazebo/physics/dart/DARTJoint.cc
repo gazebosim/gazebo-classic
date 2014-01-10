@@ -579,7 +579,7 @@ DARTModelPtr DARTJoint::GetDARTModel() const
 }
 
 /////////////////////////////////////////////////
-dart::dynamics::Joint *GetDARTJoint()
+dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 {
   return this->dtJoint;
 }

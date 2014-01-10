@@ -421,7 +421,7 @@ boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *GetDARTWorld()
+dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
   return this->dtWorld;
 }
