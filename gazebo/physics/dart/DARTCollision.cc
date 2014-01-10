@@ -23,7 +23,6 @@
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 
 using namespace gazebo;

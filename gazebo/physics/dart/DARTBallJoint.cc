@@ -19,7 +19,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
 
 using namespace gazebo;
 using namespace physics;
