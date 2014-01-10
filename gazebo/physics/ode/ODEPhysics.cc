@@ -900,10 +900,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
-    fd = (_collision1->GetRelativePose() +
-      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -918,10 +915,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         surf1->mu1 > surf2->mu1))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
-    fd = (_collision2->GetRelativePose() +
-      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
     /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
