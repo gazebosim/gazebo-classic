@@ -105,7 +105,7 @@ void RaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     this->noises.push_back(
-        NoiseManager::LoadNoiseModel(rayElem->GetElement("noise"),
+        NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
         this->GetType()));
   }
 

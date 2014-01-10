@@ -198,7 +198,7 @@ TEST(NoiseTest, ApplyGaussian)
   biasMean = 100.0;
   biasStddev = 0.0;
   {
-    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
 
     GaussianNoise(*(noise.get()), g_applyCount);
@@ -216,7 +216,7 @@ TEST(NoiseTest, ApplyGaussian)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+      sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
           NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
       sensors::GaussianNoiseModel *noiseModel =
           dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
@@ -246,7 +246,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
 
@@ -261,7 +261,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
     sensors::GaussianNoiseModel *noiseModel =
@@ -279,7 +279,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.0;
   {
-    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
 
@@ -299,7 +299,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
 
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
-      sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+      sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
           NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
           biasStddev, precision));
       sensors::GaussianNoiseModel *noiseModel =
@@ -324,7 +324,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   biasStddev = 0.0;
   precision = 0.3;
   {
-    sensors::NoisePtr noise = sensors::NoiseManager::LoadNoiseModel(
+    sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
 
