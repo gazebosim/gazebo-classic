@@ -383,7 +383,7 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
   {
     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetLinearVel" << std::endl;
 }
@@ -467,7 +467,7 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
   {
     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetAngularVel" << std::endl;
 }
@@ -503,7 +503,7 @@ void ODELink::SetForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetForce" << std::endl;
 }
@@ -516,7 +516,7 @@ void ODELink::SetTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetTorque" << std::endl;
 }
@@ -529,7 +529,7 @@ void ODELink::AddForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForce" << std::endl;
 }
@@ -542,7 +542,7 @@ void ODELink::AddRelativeForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddRelativeForce" << std::endl;
 }
@@ -557,7 +557,7 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
                           _relpos.x, _relpos.y, _relpos.z);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForceAtRelativePosition"
@@ -575,7 +575,7 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
     dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
                           _pos.x, _pos.y, _pos.z);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForceAtWorldPosition"
@@ -591,7 +591,7 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddTorque" << std::endl;
 }
@@ -604,7 +604,7 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddRelativeTorque" << std::endl;
 }
