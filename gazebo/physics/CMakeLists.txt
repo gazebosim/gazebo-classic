@@ -9,6 +9,10 @@ if (HAVE_SIMBODY)
   add_subdirectory(simbody)
 endif()
 
+if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
+endif()
+
 set (sources
   Actor.cc
   Base.cc
@@ -113,6 +117,10 @@ endif()
 
 if (HAVE_SIMBODY)
   target_link_libraries(gazebo_physics gazebo_physics_simbody)
+endif()
+
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_physics)
