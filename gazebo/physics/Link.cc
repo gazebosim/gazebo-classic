@@ -46,7 +46,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent)
+    : Entity(_parent), initialized(false)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
@@ -241,6 +241,8 @@ void Link::Init()
       collision->Init();
     }
   }
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
