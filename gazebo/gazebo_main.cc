@@ -40,7 +40,9 @@ void help()
     << "process.\n\n";
 
   std::cerr << "Options:\n"
-  << "  -q [ --quiet ]                Reduce output to stdout.\n"
+  << "  -v [ --version ]              Output version information.\n"
+  << "  --verbose                     Increase the messages written to the "
+  <<                                  "terminal.\n"
   << "  -h [ --help ]                 Produce this help message.\n"
   << "  -u [ --pause ]                Start the server in a paused state.\n"
   << "  -e [ --physics ] arg          Specify a physics engine "
@@ -54,7 +56,8 @@ void help()
   << "state data\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
-  << "  --minimal_comms               Reduce the messages output by gzserver\n"
+  << "  --minimal_comms               Reduce the TCP/IP traffic output by "
+  <<                                  "gazebo\n"
   << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
 }
 

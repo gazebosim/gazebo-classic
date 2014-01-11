@@ -31,6 +31,11 @@ TEST(HelpersTest, Helpers)
   EXPECT_FLOAT_EQ(12.345, math::parseFloat("12.345"));
   EXPECT_FLOAT_EQ(-12.345, math::parseFloat("-12.345"));
   EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
+
+  EXPECT_EQ(1u, math::roundUpPowerOfTwo(0));
+  EXPECT_EQ(1u, math::roundUpPowerOfTwo(1));
+  EXPECT_EQ(2u, math::roundUpPowerOfTwo(2));
+  EXPECT_EQ(2048u, math::roundUpPowerOfTwo(1025));
 }
 
 /////////////////////////////////////////////////
