@@ -51,6 +51,9 @@ Dem::~Dem()
 
   if (this->dataPtr->dataSet)
     GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

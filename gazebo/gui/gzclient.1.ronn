@@ -11,8 +11,10 @@ Gazebo GUI client which allows visualization and user interaction.
 
 ## OPTIONS
 
-* -q, --quiet :
- Reduce output to stdout.
+* -v, --version :
+ Output version information.
+* --verbose :
+ Increase the messages written to the terminal.
 * -h, --help :
  Produce this help message.
 * -g, --gui-plugin arg :
