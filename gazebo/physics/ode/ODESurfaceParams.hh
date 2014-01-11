@@ -100,14 +100,14 @@ namespace gazebo
 
       /// \brief Dry friction coefficient in the primary friction direction
       ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector consstrained to be perpendicular to the
+      ///        otherwise, a vector constrained to be perpendicular to the
       ///        contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double mu1;
 
       /// \brief Dry friction coefficient in the second friction direction
       ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector consstrained to be perpendicular to the
+      ///        otherwise, a vector constrained to be perpendicular to the
       ///        contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double mu2;
