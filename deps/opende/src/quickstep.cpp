@@ -1798,7 +1798,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dMultiply2_333 (tmp,b_ptr->mass.I,b_ptr->posr.R);
       dMultiply0_333 (MOIrow,b_ptr->posr.R,tmp);
 
-      // if (b_ptr->flags & dxBodyGyroscopic) {
+      if (b_ptr->flags & dxBodyGyroscopic) {
       {
         // compute rotational force
         dMultiply0_331 (tmp,MOIrow,b_ptr->avel);
