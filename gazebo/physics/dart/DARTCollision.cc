@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 
 using namespace gazebo;
@@ -55,7 +54,7 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
   }
 
   this->dtBodyNode
-      = boost::static_pointer_cast<DARTLink>(this->link)->GetBodyNode();
+      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -69,11 +68,12 @@ void DARTCollision::Init()
     // TODO: Don't change offset of shape until dart supports plane shape.
     boost::shared_ptr<DARTPlaneShape> planeShape =
         boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
-    if (planeShape)
-      return;
 
-    math::Pose relativePose = this->GetRelativePose();
-    this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    if (!planeShape)
+    {
+      math::Pose relativePose = this->GetRelativePose();
+      this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    }
   }
 }
 
@@ -124,13 +124,13 @@ gazebo::math::Box DARTCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode*DARTCollision::GetDARTBodyNode() const
+dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 {
   return dtBodyNode;
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape,
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
@@ -138,7 +138,7 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape* _shape,
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::Shape* DARTCollision::GetDARTCollisionShape() const
+dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 {
   return dtCollisionShape;
 }

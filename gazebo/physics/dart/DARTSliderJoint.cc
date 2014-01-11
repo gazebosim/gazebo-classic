@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -80,7 +79,8 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int _index) const
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+  // See: https://bitbucket.org/osrf/gazebo/issue/494
+  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 
@@ -90,7 +90,8 @@ void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
   if (_index == 0)
   {
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();

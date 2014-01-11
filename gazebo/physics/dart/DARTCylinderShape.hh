@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,22 +46,27 @@ namespace gazebo
           gzerr << "Cylinder shape does not support negative radius\n";
           return;
         }
+
         if (_length < 0)
         {
           gzerr << "Cylinder shape does not support negative length\n";
           return;
         }
+
         if (math::equal(_radius, 0.0))
         {
           // Warn user, but still create shape with very small value
           // otherwise later resize operations using setLocalScaling
           // will not be possible
-          gzwarn << "Setting cylinder shape's radius to zero \n";
+          gzwarn << "Setting cylinder shape's radius to zero not supported "
+                 << "in DART, using 1e-4.\n";
           _radius = 1e-4;
         }
+
         if (math::equal(_length, 0.0))
         {
-          gzwarn << "Setting cylinder shape's length to zero \n";
+          gzwarn << "Setting cylinder shape's length to zero not supported "
+                 << "in DART, using 1e-4.\n";
           _length = 1e-4;
         }
 
@@ -72,16 +77,16 @@ namespace gazebo
 
         if (dartCollisionParent->GetDARTCollisionShape() == NULL)
         {
-          dart::dynamics::BodyNode* dtBodyNode =
+          dart::dynamics::BodyNode *dtBodyNode =
               dartCollisionParent->GetDARTBodyNode();
-          dart::dynamics::CylinderShape* dtCylinderShape =
+          dart::dynamics::CylinderShape *dtCylinderShape =
               new dart::dynamics::CylinderShape(_radius, _length);
           dtBodyNode->addCollisionShape(dtCylinderShape);
           dartCollisionParent->SetDARTCollisionShape(dtCylinderShape);
         }
         else
         {
-          dart::dynamics::CylinderShape* dtCylinderShape =
+          dart::dynamics::CylinderShape *dtCylinderShape =
               dynamic_cast<dart::dynamics::CylinderShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
           dtCylinderShape->setRadius(_radius);
