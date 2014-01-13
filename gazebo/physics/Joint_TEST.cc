@@ -783,6 +783,7 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
       joint->Init();
       joint->SetAxis(0, axis);
     }
+
     // remove the joint
     {
       bool paused = world->IsPaused();
