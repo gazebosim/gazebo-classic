@@ -14,8 +14,8 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
-  SpringTestPlugin
   ModelTrajectoryTestPlugin
+  SpringTestPlugin
 )
 
 foreach (src ${plugins})
