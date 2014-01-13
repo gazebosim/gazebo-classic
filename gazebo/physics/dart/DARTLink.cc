@@ -269,18 +269,8 @@ math::Vector3 DARTLink::GetWorldAngularVel() const
 /////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldForce() const
 {
-  // TODO: Need verification
-  math::Vector3 force;
-
-  Eigen::Isometry3d W = this->dtBodyNode->getWorldTransform();
-  Eigen::Matrix6d G   = this->dtBodyNode->getInertia();
-  Eigen::VectorXd V   = this->dtBodyNode->getBodyVelocity();
-  Eigen::VectorXd dV  = this->dtBodyNode->getBodyAcceleration();
-  Eigen::Vector6d F   = G * dV - dart::math::dad(V, G * V);
-
-  force = DARTTypes::ConvVec3(W.linear() * F.tail<3>());
-
-  return force;
+  Eigen::Vector6d F = this->dtBodyNode->getExternalForceGlobal();
+  return DARTTypes::ConvVec3(F.tail<3>());
 }
 
 //////////////////////////////////////////////////
