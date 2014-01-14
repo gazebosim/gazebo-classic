@@ -26,17 +26,18 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RenderWidget;
-    class ToolsWidget;
-    class ModelListWidget;
-    class Editor;
+    class GAZEBO_VISIBLE RenderWidget;
+    class GAZEBO_VISIBLE ToolsWidget;
+    class GAZEBO_VISIBLE ModelListWidget;
+    class GAZEBO_VISIBLE Editor;
 
-    class MainWindow : public QMainWindow
+    class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 

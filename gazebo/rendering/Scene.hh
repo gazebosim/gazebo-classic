@@ -36,38 +36,39 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/util/system.hh"
 
 namespace SkyX
 {
-  class SkyX;
-  class BasicController;
+  class GAZEBO_VISIBLE SkyX;
+  class GAZEBO_VISIBLE BasicController;
 }
 
 namespace Ogre
 {
-  class SceneManager;
-  class RaySceneQuery;
-  class Node;
-  class Entity;
-  class Mesh;
-  class Vector3;
-  class Quaternion;
+  class GAZEBO_VISIBLE SceneManager;
+  class GAZEBO_VISIBLE RaySceneQuery;
+  class GAZEBO_VISIBLE Node;
+  class GAZEBO_VISIBLE Entity;
+  class GAZEBO_VISIBLE Mesh;
+  class GAZEBO_VISIBLE Vector3;
+  class GAZEBO_VISIBLE Quaternion;
 }
 
 namespace boost
 {
-  class mutex;
+  class GAZEBO_VISIBLE mutex;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Projector;
-    class Light;
-    class Visual;
-    class Grid;
-    class Heightmap;
+    class GAZEBO_VISIBLE Projector;
+    class GAZEBO_VISIBLE Light;
+    class GAZEBO_VISIBLE Visual;
+    class GAZEBO_VISIBLE Grid;
+    class GAZEBO_VISIBLE Heightmap;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -76,7 +77,7 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class Scene : public boost::enable_shared_from_this<Scene>
+    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,

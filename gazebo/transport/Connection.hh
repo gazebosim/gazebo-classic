@@ -36,6 +36,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
 
@@ -45,14 +46,14 @@ namespace gazebo
   {
     extern bool is_stopped();
 
-    class IOManager;
-    class Connection;
+    class GAZEBO_VISIBLE IOManager;
+    class GAZEBO_VISIBLE Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class ConnectionReadTask : public tbb::task
+    class GAZEBO_VISIBLE ConnectionReadTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -96,7 +97,7 @@ namespace gazebo
     ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class Connection : public boost::enable_shared_from_this<Connection>
+    class GAZEBO_VISIBLE Connection : public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();

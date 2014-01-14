@@ -25,6 +25,7 @@
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 class btRigidBody;
 
@@ -32,7 +33,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class BulletMotionState;
+    class GAZEBO_VISIBLE BulletMotionState;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class BulletLink : public Link
+    class GAZEBO_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);

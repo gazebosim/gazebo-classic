@@ -29,20 +29,21 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class JointData;
-    class JointInspector;
+    class GAZEBO_VISIBLE JointData;
+    class GAZEBO_VISIBLE JointInspector;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class JointMaker JointMaker.hh
     /// \brief Joint visualization
-    class JointMaker : public QObject
+    class GAZEBO_VISIBLE JointMaker : public QObject
     {
       Q_OBJECT
 
@@ -193,7 +194,7 @@ namespace gazebo
 
     /// \class JointData JointData.hh
     /// \brief Helper class to store joint data
-    class JointData : public QObject
+    class GAZEBO_VISIBLE JointData : public QObject
     {
       Q_OBJECT
 

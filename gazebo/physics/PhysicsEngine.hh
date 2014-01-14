@@ -28,19 +28,20 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class ContactManager;
+    class GAZEBO_VISIBLE ContactManager;
 
     /// \addtogroup gazebo_physics
     /// \{
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class PhysicsEngine
+    class GAZEBO_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.

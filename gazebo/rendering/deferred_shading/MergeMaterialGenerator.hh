@@ -18,6 +18,7 @@
 #define _MERGEMATERIALGENERATOR_HH_
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// there.  In order to support more, either expand this class or make sure
     /// that objects that will not get treated correctly will not have materials
     /// generated for them.
-    class MergeMaterialGenerator : public MaterialGenerator
+    class GAZEBO_VISIBLE MergeMaterialGenerator : public MaterialGenerator
     {
       /// The relevant options for materials
       public: enum MaterialPermutations

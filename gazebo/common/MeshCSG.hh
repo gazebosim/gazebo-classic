@@ -18,6 +18,7 @@
 #define _MESHCSG_HH_
 
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;
@@ -28,14 +29,14 @@ namespace gazebo
 {
   namespace common
   {
-    class Mesh;
+    class GAZEBO_VISIBLE Mesh;
 
     /// \addtogroup gazebo_common Common
     /// \{
 
     /// \class MeshCSG MeshCSG.hh common/common.hh
     /// \brief Creates CSG meshes
-    class MeshCSG
+    class GAZEBO_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};

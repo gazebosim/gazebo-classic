@@ -23,6 +23,7 @@
 #define _SLIDERJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// \class SliderJoint SliderJoint.hh physics/physics.hh
     /// \brief A slider joint
     template<class T>
-    class SliderJoint : public T
+    class GAZEBO_VISIBLE SliderJoint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.

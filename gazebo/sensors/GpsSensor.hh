@@ -27,6 +27,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class GpsSensor GpsSensor.hh sensors/sensors.hh
     /// \brief GpsSensor to provide position measurement.
-    class GpsSensor: public Sensor
+    class GAZEBO_VISIBLE GpsSensor: public Sensor
     {
       /// \brief Constructor.
       public: GpsSensor();

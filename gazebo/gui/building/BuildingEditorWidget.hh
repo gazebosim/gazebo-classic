@@ -19,13 +19,14 @@
 #define _BUILDING_EDITOR_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class LevelWidget;
-    class ScaleWidget;
+    class GAZEBO_VISIBLE LevelWidget;
+    class GAZEBO_VISIBLE ScaleWidget;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -33,7 +34,7 @@ namespace gazebo
     /// \class BuildingEditorWidget BuildingEditorWidget.hh
     /// \brief The parent widget of the building editor, level widget and scale
     /// widget.
-    class BuildingEditorWidget : public QWidget
+    class GAZEBO_VISIBLE BuildingEditorWidget : public QWidget
     {
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.

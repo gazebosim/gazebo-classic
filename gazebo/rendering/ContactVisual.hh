@@ -27,11 +27,12 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class Entity;
-  class SceneNode;
+  class GAZEBO_VISIBLE Entity;
+  class GAZEBO_VISIBLE SceneNode;
 }
 
 namespace gazebo
@@ -41,14 +42,14 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class DynamicLines;
+    class GAZEBO_VISIBLE DynamicLines;
 
     /// \class ContactVisual ContactVisual.hh rendering/rendering.hh
     /// \brief Contact visualization
     ///
     /// This class visualizes contact points by drawing arrows in the 3D
     /// environment.
-    class ContactVisual : public Visual
+    class GAZEBO_VISIBLE ContactVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the ContactVisual

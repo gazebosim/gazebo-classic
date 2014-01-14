@@ -28,6 +28,7 @@
 #include <iostream>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class Time
+    class GAZEBO_VISIBLE Time
     {
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;

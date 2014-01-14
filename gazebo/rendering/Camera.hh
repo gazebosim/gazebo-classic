@@ -42,16 +42,17 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
 {
-  class Texture;
-  class RenderTarget;
-  class Camera;
-  class Viewport;
-  class SceneNode;
-  class AnimationState;
+  class GAZEBO_VISIBLE Texture;
+  class GAZEBO_VISIBLE RenderTarget;
+  class GAZEBO_VISIBLE Camera;
+  class GAZEBO_VISIBLE Viewport;
+  class GAZEBO_VISIBLE SceneNode;
+  class GAZEBO_VISIBLE AnimationState;
 }
 
 namespace gazebo
@@ -60,11 +61,11 @@ namespace gazebo
   /// \brief Rendering namespace
   namespace rendering
   {
-    class MouseEvent;
-    class ViewController;
-    class Scene;
-    class GaussianNoiseCompositorListener;
-    class CameraPrivate;
+    class GAZEBO_VISIBLE MouseEvent;
+    class GAZEBO_VISIBLE ViewController;
+    class GAZEBO_VISIBLE Scene;
+    class GAZEBO_VISIBLE GaussianNoiseCompositorListener;
+    class GAZEBO_VISIBLE CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -74,7 +75,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

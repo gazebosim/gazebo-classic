@@ -20,6 +20,7 @@
 #include <string>
 #include <iostream>
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class Material Material.hh common/common.hh
     /// \brief Encapsulates description of a material
-    class Material
+    class GAZEBO_VISIBLE Material
     {
       public: enum ShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
       public: static std::string ShadeModeStr[SHADE_COUNT];

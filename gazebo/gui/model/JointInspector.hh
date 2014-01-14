@@ -23,17 +23,18 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/util/system.hh"
 
 
 namespace gazebo
 {
   namespace gui
   {
-    class JointMaker;
+    class GAZEBO_VISIBLE JointMaker;
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
-    class JointInspector : public QDialog
+    class GAZEBO_VISIBLE JointInspector : public QDialog
     {
       Q_OBJECT
 

@@ -18,6 +18,7 @@
 #define _GUITYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_gui
@@ -27,10 +28,10 @@ namespace gazebo
   /// \brief GUI forward declarations and type defines
   namespace gui
   {
-    class TopicView;
-    class ImageView;
-    class TextView;
-    class LaserView;
+    class GAZEBO_VISIBLE TopicView;
+    class GAZEBO_VISIBLE ImageView;
+    class GAZEBO_VISIBLE TextView;
+    class GAZEBO_VISIBLE LaserView;
 
     /// \def TopicViewPtr
     /// \brief Boost shared pointer to a TopicView object

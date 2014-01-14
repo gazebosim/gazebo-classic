@@ -24,6 +24,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
     template<class T>
-    class UniversalJoint : public T
+    class GAZEBO_VISIBLE UniversalJoint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.

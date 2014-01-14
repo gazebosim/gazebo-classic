@@ -23,6 +23,7 @@
 
 #include "gazebo/transport/Connection.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
-    class PublicationTransport
+    class GAZEBO_VISIBLE PublicationTransport
     {
       /// \brief Constructor
       /// \param[in] _topic Topic that we're publishing

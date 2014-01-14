@@ -27,23 +27,24 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Plane.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class ColladaLoader;
-    class STLLoader;
-    class Mesh;
-    class Plane;
-    class SubMesh;
+    class GAZEBO_VISIBLE ColladaLoader;
+    class GAZEBO_VISIBLE STLLoader;
+    class GAZEBO_VISIBLE Mesh;
+    class GAZEBO_VISIBLE Plane;
+    class GAZEBO_VISIBLE SubMesh;
 
     /// \addtogroup gazebo_common Common
     /// \{
 
     /// \class MeshManager MeshManager.hh common/common.hh
     /// \brief Maintains and manages all meshes
-    class MeshManager : public SingletonT<MeshManager>
+    class GAZEBO_VISIBLE MeshManager : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();

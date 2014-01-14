@@ -33,27 +33,28 @@
 #include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class Material;
-  class RenderTarget;
-  class Texture;
-  class Viewport;
+  class GAZEBO_VISIBLE Material;
+  class GAZEBO_VISIBLE RenderTarget;
+  class GAZEBO_VISIBLE Texture;
+  class GAZEBO_VISIBLE Viewport;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
+    class GAZEBO_VISIBLE Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
     /// \class DepthCamera DepthCamera.hh rendering/rendering.hh
     /// \brief Depth camera used to render depth data into an image buffer
-    class DepthCamera : public Camera
+    class GAZEBO_VISIBLE DepthCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

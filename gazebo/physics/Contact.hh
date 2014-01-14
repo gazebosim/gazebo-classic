@@ -31,6 +31,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -43,14 +44,14 @@ namespace gazebo
 {
   namespace physics
   {
-    class Collision;
+    class GAZEBO_VISIBLE Collision;
     /// \addtogroup gazebo_physics
     /// \{
 
     /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
     /// a number of contact points
-    class Contact
+    class GAZEBO_VISIBLE Contact
     {
       /// \brief Constructor.
       public: Contact();

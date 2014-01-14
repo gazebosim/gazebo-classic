@@ -24,17 +24,17 @@ namespace gazebo
 {
   namespace math
   {
-    class Quaternion;
-    class Vector2i;
-    class Vector2d;
-    class Vector3;
-    class Vector4;
-    class Box;
-    class Plane;
-    class Angle;
-    class Matrix3;
-    class Matrix4;
-    class Rand;
+    class GAZEBO_VISIBLE Quaternion;
+    class GAZEBO_VISIBLE Vector2i;
+    class GAZEBO_VISIBLE Vector2d;
+    class GAZEBO_VISIBLE Vector3;
+    class GAZEBO_VISIBLE Vector4;
+    class GAZEBO_VISIBLE Box;
+    class GAZEBO_VISIBLE Plane;
+    class GAZEBO_VISIBLE Angle;
+    class GAZEBO_VISIBLE Matrix3;
+    class GAZEBO_VISIBLE Matrix4;
+    class GAZEBO_VISIBLE Rand;
   }
 }
 

@@ -44,6 +44,7 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -60,7 +61,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class World : public boost::enable_shared_from_this<World>
+    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       ///

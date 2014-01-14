@@ -26,13 +26,14 @@
 
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Ray collision
-    class ODERayShape : public RayShape
+    class GAZEBO_VISIBLE ODERayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.

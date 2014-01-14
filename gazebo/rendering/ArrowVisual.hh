@@ -23,10 +23,11 @@
 
 #include <string>
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace ogre
 {
-  class SceneNode;
+  class GAZEBO_VISIBLE SceneNode;
 }
 
 namespace gazebo
@@ -38,7 +39,7 @@ namespace gazebo
 
     /// \class ArrowVisual ArrowVisual.hh rendering/rendering.hh
     /// \brief Basic arrow visualization
-    class ArrowVisual : public Visual
+    class GAZEBO_VISIBLE ArrowVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the arrow visual

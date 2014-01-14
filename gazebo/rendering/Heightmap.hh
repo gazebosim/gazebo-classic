@@ -31,23 +31,24 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class TerrainGlobalOptions;
-  class TerrainGroup;
-  class Terrain;
+  class GAZEBO_VISIBLE TerrainGlobalOptions;
+  class GAZEBO_VISIBLE TerrainGroup;
+  class GAZEBO_VISIBLE Terrain;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GzTerrainMatGen;
+    class GAZEBO_VISIBLE GzTerrainMatGen;
 
     /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
     /// \brief Pretends to provide procedural page content to avoid page loading
-    class DummyPageProvider : public Ogre::PageProvider
+    class GAZEBO_VISIBLE DummyPageProvider : public Ogre::PageProvider
     {
       /// \brief Give a provider the opportunity to prepare page content
       /// procedurally. The parameters are not used.
@@ -84,7 +85,7 @@ namespace gazebo
 
     /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
-    class Heightmap
+    class GAZEBO_VISIBLE Heightmap
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
@@ -345,7 +346,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
+    class GAZEBO_VISIBLE GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
       public: GzTerrainMatGen();

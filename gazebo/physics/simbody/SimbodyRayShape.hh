@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief Ray shape for simbody
-    class SimbodyRayShape : public RayShape
+    class GAZEBO_VISIBLE SimbodyRayShape : public RayShape
     {
       /// \brief Constructor.
       /// \param[in] _physicsEngine Pointer to the physics engine.

@@ -20,12 +20,13 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class MouseEvent;
+    class GAZEBO_VISIBLE MouseEvent;
   }
 
   /// \ingroup gazebo_gui
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class EntityMaker EntityMaker.hh gui/gui.hh
     /// \brief to make an entity base class
-    class EntityMaker
+    class GAZEBO_VISIBLE EntityMaker
     {
       /// \def CreateCallback
       /// \brief boost::function with vector3 pos and vector3 scale

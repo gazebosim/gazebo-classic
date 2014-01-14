@@ -37,10 +37,11 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace gazebo
@@ -52,7 +53,7 @@ namespace gazebo
 
     /// \class Entity Entity.hh physics/physics.hh
     /// \brief Base class for all physics objects in Gazebo.
-    class Entity : public Base
+    class GAZEBO_VISIBLE Entity : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the entity.

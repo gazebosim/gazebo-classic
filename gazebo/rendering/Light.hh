@@ -31,18 +31,19 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class Light;
+  class GAZEBO_VISIBLE Light;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
-    class DynamicLines;
+    class GAZEBO_VISIBLE Scene;
+    class GAZEBO_VISIBLE DynamicLines;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -54,7 +55,7 @@ namespace gazebo
     /// class encapsulates all three. Point lights are light light bulbs,
     /// spot lights project a cone of light, and directional lights are light
     /// sun light.
-    class Light
+    class GAZEBO_VISIBLE Light
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.

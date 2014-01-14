@@ -27,27 +27,28 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace msgs
   {
-    class Visual;
+    class GAZEBO_VISIBLE Visual;
   }
 
   namespace gui
   {
-    class EntityMaker;
-    class EditorItem;
-    class BuildingModelManip;
-    class FinishBuildingDialog;
+    class GAZEBO_VISIBLE EntityMaker;
+    class GAZEBO_VISIBLE EditorItem;
+    class GAZEBO_VISIBLE BuildingModelManip;
+    class GAZEBO_VISIBLE FinishBuildingDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class BuildingMaker : public EntityMaker
+    class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
       /// \brief Constructor
       public: BuildingMaker();

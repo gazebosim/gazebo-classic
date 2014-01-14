@@ -24,6 +24,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class TransmitterVisual TransmitterVisual.hh rendering/rendering.hh
     /// \brief Visualization for the wireless propagation data.
-    class TransmitterVisual : public Visual
+    class GAZEBO_VISIBLE TransmitterVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

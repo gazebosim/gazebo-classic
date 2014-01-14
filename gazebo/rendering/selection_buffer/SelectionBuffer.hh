@@ -18,26 +18,27 @@
 #define _SELECTIONBUFFER_HH_
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class SceneManager;
-  class Camera;
-  class RenderTarget;
-  class RenderTexture;
-  class PixelBox;
-  class Overlay;
+  class GAZEBO_VISIBLE SceneManager;
+  class GAZEBO_VISIBLE Camera;
+  class GAZEBO_VISIBLE RenderTarget;
+  class GAZEBO_VISIBLE RenderTexture;
+  class GAZEBO_VISIBLE PixelBox;
+  class GAZEBO_VISIBLE Overlay;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class MaterialSwitcher;
-    class SelectionRenderListener;
-    class Scene;
+    class GAZEBO_VISIBLE MaterialSwitcher;
+    class GAZEBO_VISIBLE SelectionRenderListener;
+    class GAZEBO_VISIBLE Scene;
 
-    class SelectionBuffer
+    class GAZEBO_VISIBLE SelectionBuffer
     {
       /// \brief Constructor
       /// \param[in] _camera Name of the camera to generate a selection

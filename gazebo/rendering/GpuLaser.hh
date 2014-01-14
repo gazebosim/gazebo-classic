@@ -37,34 +37,35 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class Material;
-  class Renderable;
-  class Pass;
-  class AutoParamDataSource;
-  class Matrix4;
-  class MovableObject;
+  class GAZEBO_VISIBLE Material;
+  class GAZEBO_VISIBLE Renderable;
+  class GAZEBO_VISIBLE Pass;
+  class GAZEBO_VISIBLE AutoParamDataSource;
+  class GAZEBO_VISIBLE Matrix4;
+  class GAZEBO_VISIBLE MovableObject;
 }
 
 namespace gazebo
 {
   namespace common
   {
-    class Mesh;
+    class GAZEBO_VISIBLE Mesh;
   }
 
   namespace rendering
   {
-    class Scene;
+    class GAZEBO_VISIBLE Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    class GpuLaser : public Camera, public Ogre::RenderObjectListener
+    class GAZEBO_VISIBLE GpuLaser : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

@@ -113,6 +113,36 @@ target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRA
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
 
+############################################################################################################
+# Append str to a string property of a target.
+# target:      string: target name.
+# property:            name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# str:         string: string to be appended to the property
+macro(my_append_target_property target property str)
+  get_target_property(current_property ${target} ${property})
+  if(NOT current_property) # property non-existent or empty
+      set_target_properties(${target} PROPERTIES GENERATED TRUE ${property} ${str})
+  else()
+      set_target_properties(${target} PROPERTIES ${property} "${current_property} ${str}")
+  endif()
+endmacro(my_append_target_property)
+
+############################################################################################################
+# Add/append compile flags to a target.
+# target: string: target name.
+# flags : string: compile flags to be appended
+macro(my_add_compile_flags target flags)
+  my_append_target_property(${target} COMPILE_FLAGS ${flags})
+endmacro(my_add_compile_flags)
+
+############################################################################################################
+# Add/append link flags to a target.
+# target: string: target name.
+# flags : string: link flags to be appended
+macro(my_add_link_flags target flags)
+  my_append_target_property(${target} LINK_FLAGS ${flags})
+endmacro(my_add_link_flags)
+
 set(PROTO_SRCS)
 set(PROTO_HDRS)
 foreach(FIL ${msgs})
@@ -133,9 +163,9 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
-
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
+#my_add_link_flags(gazebo_msgs "-fvisibility=default")
+my_add_compile_flags(gazebo_msgs "-fvisibility=default")
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math

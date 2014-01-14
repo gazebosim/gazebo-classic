@@ -41,12 +41,13 @@
 #include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GLWidget : public QWidget
+    class GAZEBO_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
 

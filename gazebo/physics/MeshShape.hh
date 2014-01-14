@@ -27,6 +27,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class MeshShape MeshShape.hh physics/physics.hh
     /// \brief Triangle mesh collision shape
-    class MeshShape : public Shape
+    class GAZEBO_VISIBLE MeshShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision.

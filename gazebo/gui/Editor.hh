@@ -22,16 +22,17 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class MainWindow;
+    class GAZEBO_VISIBLE MainWindow;
 
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor.
-    class Editor : public QObject
+    class GAZEBO_VISIBLE Editor : public QObject
     {
       Q_OBJECT
 

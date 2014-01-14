@@ -25,6 +25,7 @@
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btPoint2PointConstraint;
 
@@ -37,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief BulletBallJoint class models a ball joint in Bullet.
-    class BulletBallJoint : public BallJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Bullet Ball Joint Constructor
       public: BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent);

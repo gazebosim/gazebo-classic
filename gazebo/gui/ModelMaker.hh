@@ -22,17 +22,18 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace msgs
   {
-    class Visual;
+    class GAZEBO_VISIBLE Visual;
   }
 
   namespace gui
   {
-    class ModelMaker : public EntityMaker
+    class GAZEBO_VISIBLE ModelMaker : public EntityMaker
     {
       public: ModelMaker();
       public: virtual ~ModelMaker();

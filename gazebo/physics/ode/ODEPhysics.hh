@@ -37,13 +37,14 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ODEJointFeedback
+    class GAZEBO_VISIBLE ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -58,7 +59,7 @@ namespace gazebo
     };
 
     /// \brief ODE physics engine.
-    class ODEPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.

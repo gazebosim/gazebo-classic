@@ -25,19 +25,20 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class Mesh;
-    class Color;
+    class GAZEBO_VISIBLE Mesh;
+    class GAZEBO_VISIBLE Color;
   }
 
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
-    class TrajectoryInfo
+    class GAZEBO_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
       public: TrajectoryInfo();
@@ -67,7 +68,7 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class Actor : public Model
+    class GAZEBO_VISIBLE Actor : public Model
     {
       /// \brief Constructor
       /// \param[in] _parent Parent object

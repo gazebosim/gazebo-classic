@@ -21,21 +21,22 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RectItem;
-    class BuildingItem;
-    class WindowDoorInspectorDialog;
+    class GAZEBO_VISIBLE RectItem;
+    class GAZEBO_VISIBLE BuildingItem;
+    class GAZEBO_VISIBLE WindowDoorInspectorDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class WindowItem WindowItem.hh
     /// \brief 2D representation of a window.
-    class WindowItem : public RectItem, public BuildingItem
+    class GAZEBO_VISIBLE WindowItem : public RectItem, public BuildingItem
     {
         Q_OBJECT
 

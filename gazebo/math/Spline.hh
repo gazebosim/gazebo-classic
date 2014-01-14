@@ -23,6 +23,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class Spline Spline.hh math/gzmath.hh
     /// \brief Splines
-    class Spline
+    class GAZEBO_VISIBLE Spline
     {
       /// \brief constructor
       public: Spline();

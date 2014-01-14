@@ -23,20 +23,21 @@
 #define BULLETRAYSENSOR_HH
 
 #include <vector>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class BulletRayCollision;
-    class BulletLink;
+    class GAZEBO_VISIBLE BulletRayCollision;
+    class GAZEBO_VISIBLE BulletLink;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief An Bullet Ray sensor
-    class BulletRaySensor : public PhysicsRaySensor
+    class GAZEBO_VISIBLE BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
       public: BulletRaySensor(Link *body);

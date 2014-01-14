@@ -18,21 +18,22 @@
 #define MESHLOADER_HH
 
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class Mesh;
-    class Skeleton;
-    class SkeletonNode;
+    class GAZEBO_VISIBLE Mesh;
+    class GAZEBO_VISIBLE Skeleton;
+    class GAZEBO_VISIBLE SkeletonNode;
 
     /// \addtogroup gazebo_common Common
     /// \{
 
     /// \class MeshLoader MeshLoader.hh common/common.hh
     /// \brief Base class for loading meshes
-    class MeshLoader
+    class GAZEBO_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader();

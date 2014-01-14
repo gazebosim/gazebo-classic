@@ -40,29 +40,30 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class MovableObject;
-  class SceneNode;
-  class StaticGeometry;
-  class RibbonTrail;
-  class AnimationState;
-  class SkeletonInstance;
+  class GAZEBO_VISIBLE MovableObject;
+  class GAZEBO_VISIBLE SceneNode;
+  class GAZEBO_VISIBLE StaticGeometry;
+  class GAZEBO_VISIBLE RibbonTrail;
+  class GAZEBO_VISIBLE AnimationState;
+  class GAZEBO_VISIBLE SkeletonInstance;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class WireBox;
+    class GAZEBO_VISIBLE WireBox;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.

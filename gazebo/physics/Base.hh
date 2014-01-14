@@ -30,6 +30,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -69,7 +70,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class Base : public boost::enable_shared_from_this<Base>
+    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.

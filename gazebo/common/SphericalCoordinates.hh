@@ -22,19 +22,20 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class SphericalCoordinatesPrivate;
+    class GAZEBO_VISIBLE SphericalCoordinatesPrivate;
 
     /// \addtogroup gazebo_common
     /// \{
 
     /// \class SphericalCoordinates SphericalCoordinates.hh commmon/common.hh
     /// \brief Convert spherical coordinates for planetary surfaces.
-    class SphericalCoordinates
+    class GAZEBO_VISIBLE SphericalCoordinates
     {
       /// \enum SurfaceType
       /// \brief Unique identifiers for planetary surface models.

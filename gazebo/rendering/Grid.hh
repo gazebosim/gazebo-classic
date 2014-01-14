@@ -27,19 +27,20 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class ManualObject;
-  class SceneNode;
-  class Any;
+  class GAZEBO_VISIBLE ManualObject;
+  class GAZEBO_VISIBLE SceneNode;
+  class GAZEBO_VISIBLE Any;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
+    class GAZEBO_VISIBLE Scene;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -49,7 +50,7 @@ namespace gazebo
     ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an
     ///  identity orientation is drawn along the XY plane.
-    class Grid
+    class GAZEBO_VISIBLE Grid
     {
       /// \brief Constructor
       ///

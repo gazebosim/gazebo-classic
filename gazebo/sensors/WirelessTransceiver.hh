@@ -22,6 +22,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class WirelessTransceiver WirelessTransceiver.hh sensors/sensors.hh
     /// \brief Sensor class for receiving wireless signals.
-    class WirelessTransceiver: public Sensor
+    class GAZEBO_VISIBLE WirelessTransceiver: public Sensor
     {
       /// \brief Constructor
       public: WirelessTransceiver();

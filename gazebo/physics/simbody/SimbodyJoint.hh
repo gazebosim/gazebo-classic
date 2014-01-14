@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class SimbodyJoint : public Joint
+    class GAZEBO_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
       public: SimbodyJoint(BasePtr _parent);

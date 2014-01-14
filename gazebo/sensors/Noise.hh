@@ -22,6 +22,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class Noise Noise.hh sensors/sensors.hh
     /// \brief Noise models for sensor output signals.
-    class Noise
+    class GAZEBO_VISIBLE Noise
     {
       /// \brief Which noise types we support
       public: enum NoiseType

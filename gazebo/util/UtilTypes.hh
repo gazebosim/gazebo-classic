@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_util
@@ -28,9 +29,9 @@ namespace gazebo
 {
   namespace util
   {
-    class DiagnosticTimer;
-    class OpenALSink;
-    class OpenALSource;
+    class GAZEBO_VISIBLE DiagnosticTimer;
+    class GAZEBO_VISIBLE OpenALSink;
+    class GAZEBO_VISIBLE OpenALSource;
 
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class

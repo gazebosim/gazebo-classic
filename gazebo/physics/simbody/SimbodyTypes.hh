@@ -16,6 +16,7 @@
 */
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -25,11 +26,11 @@ namespace gazebo
 {
   namespace physics
   {
-    class SimbodyCollision;
-    class SimbodyLink;
-    class SimbodyModel;
-    class SimbodyPhysics;
-    class SimbodyRayShape;
+    class GAZEBO_VISIBLE SimbodyCollision;
+    class GAZEBO_VISIBLE SimbodyLink;
+    class GAZEBO_VISIBLE SimbodyModel;
+    class GAZEBO_VISIBLE SimbodyPhysics;
+    class GAZEBO_VISIBLE SimbodyRayShape;
 
     /// \def SimbodyPhysicsPtr
     /// \brief Boost shared point to SimbodyPhysics

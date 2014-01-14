@@ -24,12 +24,13 @@
 #include <string>
 #include <vector>
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    class Video;
+    class GAZEBO_VISIBLE Video;
   }
 
   namespace rendering
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
     /// \brief A visual element that displays a video as a texture
-    class VideoVisual : public Visual
+    class GAZEBO_VISIBLE VideoVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the video visual.

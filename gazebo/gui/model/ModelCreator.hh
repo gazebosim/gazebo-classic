@@ -32,24 +32,25 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace msgs
   {
-    class Visual;
+    class GAZEBO_VISIBLE Visual;
   }
 
   namespace gui
   {
-    class PartData;
+    class GAZEBO_VISIBLE PartData;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a model with parts and joints.
-    class ModelCreator : public QObject
+    class GAZEBO_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
 
@@ -273,7 +274,7 @@ namespace gazebo
 
     /// \class SensorData SensorData.hh
     /// \brief Helper class to store sensor data
-    class SensorData
+    class GAZEBO_VISIBLE SensorData
     {
       /// \brief Name of sensor.
       public: std::string name;
@@ -296,7 +297,7 @@ namespace gazebo
 
     /// \class PartData PartData.hh
     /// \brief Helper class to store part data
-    class PartData : public QObject
+    class GAZEBO_VISIBLE PartData : public QObject
     {
       Q_OBJECT
 

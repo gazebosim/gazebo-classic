@@ -28,23 +28,24 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class OrbitViewController;
-    class FPSViewController;
-    class Visual;
-    class GUIOverlay;
-    class SelectionBuffer;
+    class GAZEBO_VISIBLE OrbitViewController;
+    class GAZEBO_VISIBLE FPSViewController;
+    class GAZEBO_VISIBLE Visual;
+    class GAZEBO_VISIBLE GUIOverlay;
+    class GAZEBO_VISIBLE SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class UserCamera : public Camera
+    class GAZEBO_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.

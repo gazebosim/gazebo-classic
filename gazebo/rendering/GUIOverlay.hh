@@ -31,17 +31,18 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class RenderTarget;
+  class GAZEBO_VISIBLE RenderTarget;
 }
 
 #ifdef HAVE_CEGUI
 namespace CEGUI
 {
-  class OgreRenderer;
-  class Window;
+  class GAZEBO_VISIBLE OgreRenderer;
+  class GAZEBO_VISIBLE Window;
 }
 #endif
 
@@ -54,7 +55,7 @@ namespace gazebo
 
     /// \class GUIOverlay GUIOverlay.hh rendering/rendering.hh
     /// \brief A class that creates a CEGUI overlay on a render window
-    class GUIOverlay
+    class GAZEBO_VISIBLE GUIOverlay
     {
       /// \brief Constructor
       public: GUIOverlay();

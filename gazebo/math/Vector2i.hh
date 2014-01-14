@@ -25,6 +25,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Vector2i Vector2i.hh math/gzmath.hh
     /// \brief Generic integer x, y vector
-    class Vector2i
+    class GAZEBO_VISIBLE Vector2i
     {
       /// \brief Constructor
       public: Vector2i();

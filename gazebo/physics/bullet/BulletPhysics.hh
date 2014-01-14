@@ -30,21 +30,22 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class Entity;
-    class XMLConfigNode;
-    class Mass;
+    class GAZEBO_VISIBLE Entity;
+    class GAZEBO_VISIBLE XMLConfigNode;
+    class GAZEBO_VISIBLE Mass;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Bullet physics engine
-    class BulletPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.

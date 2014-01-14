@@ -19,6 +19,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <google/protobuf/message.h>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_transport
@@ -27,12 +28,12 @@ namespace gazebo
 {
   namespace transport
   {
-    class Publisher;
-    class Publication;
-    class PublicationTransport;
-    class Subscriber;
-    class SubscriptionTransport;
-    class Node;
+    class GAZEBO_VISIBLE Publisher;
+    class GAZEBO_VISIBLE Publication;
+    class GAZEBO_VISIBLE PublicationTransport;
+    class GAZEBO_VISIBLE Subscriber;
+    class GAZEBO_VISIBLE SubscriptionTransport;
+    class GAZEBO_VISIBLE Node;
 
     /// \def MessagePtr
     /// \brief Shared_ptr to protobuf message

@@ -21,23 +21,24 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/PolylineItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class PolylineItem;
-    class GrabberHandle;
-    class LineSegmentItem;
-    class BuildingItem;
-    class WallInspectorDialog;
+    class GAZEBO_VISIBLE PolylineItem;
+    class GAZEBO_VISIBLE GrabberHandle;
+    class GAZEBO_VISIBLE LineSegmentItem;
+    class GAZEBO_VISIBLE BuildingItem;
+    class GAZEBO_VISIBLE WallInspectorDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class WallItem WallItem.hh
     /// \brief 2D representation of a wall.
-    class WallItem : public PolylineItem, public BuildingItem
+    class GAZEBO_VISIBLE WallItem : public PolylineItem, public BuildingItem
     {
       Q_OBJECT
 

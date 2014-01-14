@@ -22,10 +22,11 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 namespace SimTK
 {
-  class ContactGeometry;
+  class GAZEBO_VISIBLE ContactGeometry;
 }
 
 namespace gazebo
@@ -37,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody collisions
-    class SimbodyCollision : public Collision
+    class GAZEBO_VISIBLE SimbodyCollision : public Collision
     {
       /// \brief Constructor
       public: SimbodyCollision(LinkPtr _parent);

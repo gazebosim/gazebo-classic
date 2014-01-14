@@ -28,6 +28,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,11 +37,11 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    class DynamicLines;
+    class GAZEBO_VISIBLE DynamicLines;
 
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.
-    class LaserVisual : public Visual
+    class GAZEBO_VISIBLE LaserVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

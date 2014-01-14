@@ -24,12 +24,13 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Heightmap;
+    class GAZEBO_VISIBLE Heightmap;
   }
 
   namespace gui
@@ -39,7 +40,7 @@ namespace gazebo
 
     /// \class TerrainEditorPalette TerrainEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class TerrainEditorPalette : public QWidget
+    class GAZEBO_VISIBLE TerrainEditorPalette : public QWidget
     {
       Q_OBJECT
 

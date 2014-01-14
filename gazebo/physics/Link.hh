@@ -36,19 +36,20 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace util
   {
-    class OpenALSource;
-    class OpenALSink;
+    class GAZEBO_VISIBLE OpenALSource;
+    class GAZEBO_VISIBLE OpenALSink;
   }
 
   namespace physics
   {
-    class Model;
-    class Collision;
+    class GAZEBO_VISIBLE Model;
+    class GAZEBO_VISIBLE Collision;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -57,7 +58,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class Link : public Entity
+    class GAZEBO_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.

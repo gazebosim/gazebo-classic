@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class EditorItem EditorItem.hh
     /// \brief Base class of an item in the editor.
-    class EditorItem : public QObject
+    class GAZEBO_VISIBLE EditorItem : public QObject
     {
       Q_OBJECT
 

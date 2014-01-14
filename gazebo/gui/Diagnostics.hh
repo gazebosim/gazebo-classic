@@ -27,15 +27,16 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class IncrementalPlot;
+    class GAZEBO_VISIBLE IncrementalPlot;
 
     /// \brief Plot diagnostic information
-    class Diagnostics : public QDialog
+    class GAZEBO_VISIBLE Diagnostics : public QDialog
     {
       Q_OBJECT
 

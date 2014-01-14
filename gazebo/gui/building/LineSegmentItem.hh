@@ -19,19 +19,20 @@
 #define _LINE_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class EditorItem;
+    class GAZEBO_VISIBLE EditorItem;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class LineSegmentItem LineSegmentItem.hh
     /// \brief 2D line segment.
-    class LineSegmentItem : public EditorItem, public QGraphicsLineItem
+    class GAZEBO_VISIBLE LineSegmentItem : public EditorItem, public QGraphicsLineItem
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item.

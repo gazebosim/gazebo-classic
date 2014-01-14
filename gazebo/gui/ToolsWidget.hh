@@ -22,12 +22,13 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class JointControlWidget;
+    class GAZEBO_VISIBLE JointControlWidget;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -35,7 +36,7 @@ namespace gazebo
     /// \class ToolsWidget ToolsWidget.hh gui/ToolsWidget.hh
     /// \brief A widget that manages all the tools on the right side of the
     /// render widget.
-    class ToolsWidget : public QWidget
+    class GAZEBO_VISIBLE ToolsWidget : public QWidget
     {
       Q_OBJECT
 

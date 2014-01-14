@@ -21,12 +21,13 @@
 
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace msgs
   {
-    class Visual;
+    class GAZEBO_VISIBLE Visual;
   }
   namespace gui
   {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class CylinderMaker CylinderMaker.hh
     /// \brief to make a cylinder
-    class CylinderMaker : public EntityMaker
+    class GAZEBO_VISIBLE CylinderMaker : public EntityMaker
     {
       /// \brief Constructor
       public: CylinderMaker();

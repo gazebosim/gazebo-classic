@@ -26,6 +26,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;
@@ -34,7 +35,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class TimePanel : public QWidget
+    class GAZEBO_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 

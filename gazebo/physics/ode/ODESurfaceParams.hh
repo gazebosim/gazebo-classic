@@ -23,13 +23,14 @@
 #define _ODESURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Surface params
-    class ODESurfaceParams
+    class GAZEBO_VISIBLE ODESurfaceParams
     {
       /// \brief Constructor
       public: ODESurfaceParams();

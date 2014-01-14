@@ -28,6 +28,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This sensor is used for simulating standard monocular cameras
-    class CameraSensor : public Sensor
+    class GAZEBO_VISIBLE CameraSensor : public Sensor
     {
       /// \brief Constructor
       public: CameraSensor();
