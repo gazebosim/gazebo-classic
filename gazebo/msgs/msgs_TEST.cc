@@ -308,6 +308,26 @@ TEST(MsgsTest, SetPlane)
   EXPECT_TRUE(math::equal(1.0, msg.d()));
 }
 
+TEST(MsgsTest, Initialization)
+{
+  {
+    msgs::Vector3d msg;
+    EXPECT_DOUBLE_EQ(0, msg.x());
+    EXPECT_DOUBLE_EQ(0, msg.y());
+    EXPECT_DOUBLE_EQ(0, msg.z());
+  }
+
+  {
+    msgs::Wrench msg;
+    EXPECT_DOUBLE_EQ(0, msg.force().x());
+    EXPECT_DOUBLE_EQ(0, msg.force().y());
+    EXPECT_DOUBLE_EQ(0, msg.force().z());
+    EXPECT_DOUBLE_EQ(0, msg.torque().x());
+    EXPECT_DOUBLE_EQ(0, msg.torque().y());
+    EXPECT_DOUBLE_EQ(0, msg.torque().z());
+  }
+}
+
 TEST(MsgsTest, GUIFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());

@@ -855,7 +855,7 @@ bool SDFCommand::RunImpl()
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzsdf.log");
+    gzLogInit("gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {
@@ -898,7 +898,7 @@ bool SDFCommand::RunImpl()
       return -1;
     }
 
-    std::cout << "Success\n";
+    std::cout << "Check complete\n";
   }
   else if (this->vm.count("describe"))
   {
@@ -929,6 +929,8 @@ bool SDFCommand::RunImpl()
         std::ofstream stream(path.string().c_str(), std::ios_base::out);
         stream << printer.Str();
         stream.close();
+
+        std::cout << "Success\n";
       }
     }
     else
@@ -1083,7 +1085,7 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::common::Console::Instance()->SetQuiet(true);
+  gazebo::common::Console::SetQuiet(true);
 
   // Hidden options
   po::options_description hiddenOptions("hidden options");

@@ -1,5 +1,7 @@
 # gazebo bash completion
 
+shopt -s extglob
+
 function _gz
 {
   local prev cur cmd opts
@@ -30,8 +32,12 @@ function _gz
 
     if [[ "$cmd" == "help" ]]; then
       opts=`gz debug`
-    else
+    elif [[ "$cur" == -* ]]; then
       opts=`gz debug -o "$cmd"`
+    else
+      COMPREPLY=($(compgen -f  -- "${COMP_WORDS[${COMP_CWORD}]}" ))
+      complete -o filenames -o nospace -F "_gz" "gz"
+      return
     fi
 
   else
@@ -40,4 +46,4 @@ function _gz
 
   COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
 }
-complete -F "_gz" "gz"
+complete  -F "_gz" "gz"

@@ -73,7 +73,7 @@ void waitForMsg(const std::string &_cmd)
 
   bool good = false;
   int iters = 0;
-  while (!good and iters < 10)
+  while (!good and iters < 20)
   {
     custom_exec(_cmd);
 
@@ -82,7 +82,7 @@ void waitForMsg(const std::string &_cmd)
     ++iters;
   }
 
-  EXPECT_LT(iters, 10);
+  EXPECT_LT(iters, 20);
   EXPECT_TRUE(!g_msgDebugOut.empty());
 }
 
@@ -642,6 +642,9 @@ TEST(gz, SDF)
   EXPECT_EQ(output, "Check complete\n");
 
   // Print empty.world
+  // Regenerate using:
+  // gz sdf -p test/worlds/empty_different_name.world
+  // | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
   output = custom_exec_str(std::string("gz sdf -p ") + path.string());
   EXPECT_EQ(output, sdf_print_empty_world_different_name);
 
