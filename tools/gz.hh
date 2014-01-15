@@ -232,7 +232,12 @@ namespace gazebo
     // Documentation inherited
     protected: virtual bool TransportRequired();
 
+    /// \brief Displays help message for specified command.
+    /// \param[in] _command Command to display help message.
     private: void Help(const std::string &_command);
+
+    // Prevent clang warning
+    using Command::Help;
   };
 
   /// \brief Debug command
