@@ -855,7 +855,7 @@ bool SDFCommand::RunImpl()
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzsdf.log");
+    gzLogInit("gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {
@@ -1085,7 +1085,7 @@ void SignalHandler(int /*dummy*/)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::common::Console::Instance()->SetQuiet(true);
+  gazebo::common::Console::SetQuiet(true);
 
   // Hidden options
   po::options_description hiddenOptions("hidden options");

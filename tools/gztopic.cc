@@ -559,7 +559,7 @@ int main(int argc, char **argv)
   if (!parse(argc, argv))
     return 0;
 
-  gazebo::common::Console::Instance()->SetQuiet(true);
+  gazebo::common::Console::SetQuiet(true);
 
   if (params[0] == "list")
     list();
