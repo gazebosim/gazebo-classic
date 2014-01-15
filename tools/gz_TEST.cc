@@ -21,15 +21,14 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
-#include <gazebo/transport/transport.hh>
+#include <gazebo/common/CommonIface.hh>
 #include <gazebo/msgs/msgs.hh>
+#include <gazebo/transport/transport.hh>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
-#include "test/data/pr2_state_log_expected.h"
-#include "test/data/sdf_descriptions_expected.h"
 #include "test_config.h"
 
 std::string g_msgDebugOut;
@@ -591,62 +590,86 @@ TEST(gz, Stress)
 /////////////////////////////////////////////////
 TEST(gz, SDF)
 {
-  std::string output;
   boost::filesystem::path path;
 
   init();
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
-  // 1.0 description
-  // Regenerate using:
-  // gz sdf -d -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -d -v 1.0");
-  EXPECT_EQ(output, sdf_description_1_0);
-
-  // 1.2 description
-  // Regenerate using:
-  // gz sdf -d -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -d -v 1.2");
-  EXPECT_EQ(output, sdf_description_1_2);
-
-  // 1.3 description
-  // Regenerate using:
-  // gz sdf -d -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -d -v 1.3");
-  EXPECT_EQ(output, sdf_description_1_3);
-
-  // 1.0 doc
-  // Regenerate using:
-  // gz sdf -o -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -o -v 1.0");
-  EXPECT_EQ(output, sdf_doc_1_0);
-
-  // 1.2 doc
-  // Regenerate using:
-  // gz sdf -o -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -o -v 1.2");
-  EXPECT_EQ(output, sdf_doc_1_2);
-
-  // 1.3 doc
-  // Regenerate using:
-  // gz sdf -o -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str("gz sdf -o -v 1.3");
-  EXPECT_EQ(output, sdf_doc_1_3);
+  {
+    // 1.0 description
+    // Regenerate using:
+    // gz sdf -d -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -d -v 1.0");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+  }
+  
+  {
+    // 1.2 description
+    // Regenerate using:
+    // gz sdf -d -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -d -v 1.2");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+  }
+  
+  {
+    // 1.3 description
+    // Regenerate using:
+    // gz sdf -d -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -d -v 1.3");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+  }
+  
+  {
+    // 1.0 doc
+    // Regenerate using:
+    // gz sdf -o -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -o -v 1.0");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "sdf_doc_1_0");
+  }
+  
+  {
+    // 1.2 doc
+    // Regenerate using:
+    // gz sdf -o -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -o -v 1.2");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "sdf_doc_1_2");
+  }
+  
+  {
+    // 1.3 doc
+    // Regenerate using:
+    // gz sdf -o -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output = custom_exec_str("gz sdf -o -v 1.3");
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "sdf_doc_1_3");
+  }
 
   path = TEST_PATH;
   path /= "worlds/empty_different_name.world";
 
-  // Check empty.world
-  output = custom_exec_str(std::string("gz sdf -k ") + path.string());
-  EXPECT_EQ(output, "Check complete\n");
-
-  // Print empty.world
-  // Regenerate using:
-  // gz sdf -p test/worlds/empty_different_name.world
-  // | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-  output = custom_exec_str(std::string("gz sdf -p ") + path.string());
-  EXPECT_EQ(output, sdf_print_empty_world_different_name);
+  {
+    // Check empty.world
+    std::string output =
+      custom_exec_str(std::string("gz sdf -k ") + path.string());
+    EXPECT_EQ(output, "Check complete\n");
+  }
+  
+  {
+    // Print empty.world
+    // Regenerate using:
+    // gz sdf -p test/worlds/empty_different_name.world
+    // | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
+    std::string output =
+      custom_exec_str(std::string("gz sdf -p ") + path.string());
+    std::string shasum = gazebo::common::get_sha1<std::string>(output);
+    EXPECT_EQ(shasum, "sdf_print_empty_world_different_name");
+  }
 
   path = PROJECT_BINARY_PATH;
   path = path / "test" / "sdf_convert_test.world";
@@ -659,9 +682,12 @@ TEST(gz, SDF)
     "</sdf>";
   file.close();
 
-  // Convert 1.3 SDF
-  output = custom_exec_str(std::string("gz sdf -c ") + path.string());
-  EXPECT_EQ(output, "Success\n");
+  {
+    // Convert 1.3 SDF
+    std::string output =
+      custom_exec_str(std::string("gz sdf -c ") + path.string());
+    EXPECT_EQ(output, "Success\n");
+  }
 
   fini();
 }
