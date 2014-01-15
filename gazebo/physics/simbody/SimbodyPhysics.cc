@@ -1130,7 +1130,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
           (*ci)->GetShape()))->GetSize())/2;
 
         /// \TODO: harcoded resolution, make collision resolution
-        /// an adjustable parameter
+        /// an adjustable parameter (#980)
         // number times to chop the longest side.
         const int resolution = 6;
         // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
