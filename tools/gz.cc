@@ -33,37 +33,6 @@ boost::condition_variable Command::sigCondition;
 std::map<std::string, Command *> g_commandMap;
 
 /////////////////////////////////////////////////
-void Help(const std::string &_command)
-{
-  std::cerr << "This tool modifies various aspects of a "
-            << "running Gazebo simulation.\n\n";
-
-  if (_command.empty() || g_commandMap.find(_command) == g_commandMap.end())
-  {
-    std::cerr << "  Usage:  gz <command>\n\n"
-      << "List of commands:\n\n";
-
-    std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
-      << "help";
-    std::cerr << "Print this help text.\n";
-
-    for (std::map<std::string, Command*>::iterator iter = g_commandMap.begin();
-        iter != g_commandMap.end(); ++iter)
-    {
-      std::cerr << "  " << std::left << std::setw(10) << std::setfill(' ')
-        << iter->first;
-      std::cerr << iter->second->GetBrief() << "\n";
-    }
-
-    std::cerr << "\n\n";
-    std::cerr << "Use \"gz help <command>\" to print help for a "
-      "command.\n";
-  }
-  else if (g_commandMap.find(_command) != g_commandMap.end())
-    g_commandMap[_command]->Help();
-}
-
-/////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options")
 {
