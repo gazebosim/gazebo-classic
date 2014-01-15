@@ -157,11 +157,11 @@ namespace gazebo
       public: void SetDirtyPose(const math::Pose &_pose);
 
       /// \brief Internal call to change effect of gravity on Link
-      /// if gravityModeDirty and gravityMode are true.
+      /// based on gravityMode if gravityModeDirty is true.
       private: void ProcessSetGravityMode();
 
-      /// \brief Internal call to make link static if
-      /// staticLinkDirty and staticLink are true.
+      /// \brief Internal call to set link static
+      /// based on staticLink if staticLinkDirty is true.
       private: void ProcessSetLinkStatic();
 
       /// \brief: Force this link to be a base body, where its inboard
