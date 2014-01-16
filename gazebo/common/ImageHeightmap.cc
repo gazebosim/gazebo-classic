@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,27 @@
  */
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/ImageHeightmap.hh"
 
 using namespace gazebo;
 using namespace common;
 
 //////////////////////////////////////////////////
-ImageHeightmap::ImageHeightmap(const std::string &_filename)
-  : Image(_filename)
+ImageHeightmap::ImageHeightmap()
 {
+}
+
+//////////////////////////////////////////////////
+int ImageHeightmap::Load(const std::string &_filename)
+{
+  if (this->img.Load(_filename) != 0)
+  {
+    gzerr << "Unable to load image file as a terrain [" << _filename << "]\n";
+    return -1;
+  }
+
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -42,14 +54,14 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   GZ_ASSERT(imgWidth == imgHeight, "Heightmap image must be square");
 
   // Bytes per row
-  unsigned int pitch = this->GetPitch();
+  unsigned int pitch = this->img.GetPitch();
 
   // Bytes per pixel
   unsigned int bpp = pitch / imgWidth;
 
   unsigned char *data = NULL;
   unsigned int count;
-  this->GetData(&data, count);
+  this->img.GetData(&data, count);
 
   // Iterate over all the vertices
   for (unsigned int y = 0; y < _vertSize; ++y)
@@ -99,19 +111,25 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
 }
 
 //////////////////////////////////////////////////
+std::string ImageHeightmap::GetFilename() const
+{
+  return this->img.GetFilename();
+}
+
+//////////////////////////////////////////////////
 unsigned int ImageHeightmap::GetHeight() const
 {
-  return gazebo::common::Image::GetHeight();
+  return this->img.GetHeight();
 }
 
 //////////////////////////////////////////////////
 unsigned int ImageHeightmap::GetWidth() const
 {
-  return gazebo::common::Image::GetWidth();
+  return this->img.GetWidth();
 }
 
 //////////////////////////////////////////////////
 float ImageHeightmap::GetMaxElevation() const
 {
-  return this->GetMaxColor().r;
+  return this->img.GetMaxColor().r;
 }

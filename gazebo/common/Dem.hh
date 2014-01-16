@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Open Source Robotics Foundation
+ * Copyright 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 # include <string>
 # include <vector>
 
+# include "gazebo/common/DemPrivate.hh"
 # include "gazebo/common/HeightmapData.hh"
 # include "gazebo/math/Angle.hh"
 
@@ -47,7 +48,7 @@ namespace gazebo
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
-      /// \return True when the operation succeeds to open a file.
+      /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename="");
 
       /// \brief Get the elevation of a terrain's point in meters.
@@ -124,31 +125,12 @@ namespace gazebo
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
       /// a squared terrain with padding.
-      private: void LoadData();
+      /// \return 0 when the operation succeeds to open a file.
+      private: int LoadData();
 
-      /// \brief A set of associated raster bands.
-      private: GDALDataset *dataSet;
-
-      /// \brief A pointer to the band.
-      private: GDALRasterBand *band;
-
-      /// \brief Real width of the world in meters.
-      private: double worldWidth;
-
-      /// \brief Real height of the world in meters.
-      private: double worldHeight;
-
-      /// \brief Terrain's side (after the padding).
-      private: unsigned int side;
-
-      /// \brief Minimum elevation in meters.
-      private: double minElevation;
-
-      /// \brief Maximum elevation in meters.
-      private: double maxElevation;
-
-      /// \brief DEM data converted to be OGRE-compatible.
-      private: std::vector<float> demData;
+      /// internal
+      /// \brief Pointer to the private data.
+      private: DemPrivate *dataPtr;
     };
     /// \}
   }

@@ -98,9 +98,6 @@ Logger::Buffer::~Buffer()
 /////////////////////////////////////////////////
 int Logger::Buffer::sync()
 {
-  if (this->str().empty())
-    return -1;
-
   // Log messages to disk
   Console::log << this->str();
   Console::log.flush();
@@ -111,12 +108,10 @@ int Logger::Buffer::sync()
     if (this->type == Logger::STDOUT)
     {
      std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
-     std::cout.flush();
     }
     else
     {
      std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
-     std::cerr.flush();
     }
   }
 
@@ -128,6 +123,7 @@ int Logger::Buffer::sync()
 FileLogger::FileLogger(const std::string &_filename)
   : std::ostream(new Buffer(_filename))
 {
+  this->setf(std::ios_base::unitbuf);
 }
 
 /////////////////////////////////////////////////

@@ -27,7 +27,6 @@
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -91,7 +90,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet|simbody).")
+     "Specify a physics engine (ode|bullet|dart|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),

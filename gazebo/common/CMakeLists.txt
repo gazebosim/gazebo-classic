@@ -59,6 +59,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -78,6 +79,7 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
+  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
