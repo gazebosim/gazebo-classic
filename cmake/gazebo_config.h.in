@@ -22,6 +22,7 @@
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
 #cmakedefine HAVE_SIMBODY 1
+#cmakedefine HAVE_DART 1
 #cmakedefine INCLUDE_RTSHADER 1
 #cmakedefine HAVE_GTS 1
 #cmakedefine HAVE_QWT 1
