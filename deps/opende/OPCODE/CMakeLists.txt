@@ -85,4 +85,3 @@ Stdafx.h
 
 gz_add_library(gazebo_opcode ${sources})
 gz_install_library(gazebo_opcode)
-gz_install_includes("opcode" ${headers})

@@ -39,5 +39,4 @@ set ( headers
 
 gz_add_library(gazebo_gimpact ${sources})
 gz_install_library(gazebo_gimpact)
-gz_install_includes("GIMPACT" ${headers})
 

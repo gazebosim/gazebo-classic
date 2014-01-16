@@ -257,4 +257,3 @@ add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
 
 gz_install_library(gazebo_ode)
-gz_install_includes("ode" ${headers})
