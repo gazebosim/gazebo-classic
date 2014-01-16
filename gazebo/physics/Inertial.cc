@@ -19,31 +19,17 @@
 using namespace gazebo;
 using namespace physics;
 
-sdf::ElementPtr Inertial::sdfInertial;
-
 //////////////////////////////////////////////////
 Inertial::Inertial()
 {
   this->mass = 1;
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
-
-  if (!this->sdfInertial)
-  {
-    this->sdfInertial.reset(new sdf::Element);
-    initFile("inertial.sdf", this->sdfInertial);
-  }
-
-  // This is the only time this->sdfInertial should be used.
-  this->sdf = this->sdfInertial->Clone();
 }
 
 //////////////////////////////////////////////////
 Inertial::Inertial(double _m)
 {
-  this->sdf.reset(new sdf::Element);
-  initFile("inertial.sdf", this->sdf);
-
   this->mass = _m;
   this->cog.Set(0, 0, 0, 0, 0, 0);
   this->principals.Set(1, 1, 1);
@@ -53,63 +39,59 @@ Inertial::Inertial(double _m)
 //////////////////////////////////////////////////
 Inertial::Inertial(const Inertial &_inertial)
 {
-  this->sdf.reset(new sdf::Element);
-  initFile("inertial.sdf", this->sdf);
-
   (*this) = _inertial;
 }
 
 //////////////////////////////////////////////////
 Inertial::~Inertial()
 {
-  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Inertial::Load(sdf::ElementPtr _sdf)
 {
-  this->UpdateParameters(_sdf);
+  rml::Inertial rmlInertial;
+  rmlInertial.SetFromXML(_sdf);
+  this->UpdateParameters(rmlInertial);
+}
+
+//////////////////////////////////////////////////
+void Inertial::Load(const rml::Inertial &_rml)
+{
+  this->UpdateParameters(_rml);
 }
 
 //////////////////////////////////////////////////
 void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  rml::Inertial rmlInertial;
+  rmlInertial.SetFromXML(_sdf);
+  this->UpdateParameters(rmlInertial);
+}
+
+//////////////////////////////////////////////////
+void Inertial::UpdateParameters(const rml::Inertial &_rml)
+{
+  this->rml = _rml;
 
   // use default pose (identity) if not specified in sdf
-  math::Pose pose = this->sdf->Get<math::Pose>("pose");
+  math::Pose pose = math::Pose(this->rml.pose());
   this->SetCoG(pose);
 
-  // if (this->sdf->HasElement("inertia"))
+  // if (this->rml.has_inertia())
   // Do the following whether an inertia element was specified or not.
   // Otherwise SetUpdateFunc won't get called.
   {
-    sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
     this->SetInertiaMatrix(
-        inertiaElem->Get<double>("ixx"),
-        inertiaElem->Get<double>("iyy"),
-        inertiaElem->Get<double>("izz"),
-        inertiaElem->Get<double>("ixy"),
-        inertiaElem->Get<double>("ixz"),
-        inertiaElem->Get<double>("iyz"));
-
-    inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIXX, this));
-    inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIYY, this));
-    inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIZZ, this));
-    inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIXY, this));
-    inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIXZ, this));
-    inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
-        boost::bind(&Inertial::GetIYZ, this));
+        this->rml.inertia().Get<double>("ixx"),
+        this->rml.inertia().Get<double>("iyy"),
+        this->rml.inertia().Get<double>("izz"),
+        this->rml.inertia().Get<double>("ixy"),
+        this->rml.inertia().Get<double>("ixz"),
+        this->rml.inertia().Get<double>("iyz"));
   }
 
-  this->SetMass(this->sdf->Get<double>("mass"));
-  this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
-      boost::bind(&Inertial::GetMass, this));
+  this->SetMass(this->rml.mass());
 }
 
 //////////////////////////////////////////////////
@@ -130,18 +112,15 @@ Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
 //////////////////////////////////////////////////
 void Inertial::Reset()
 {
-  sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
-
-  this->mass = this->sdf->Get<double>("mass");
+  this->mass = this->rml.mass();
   this->cog.Set(0, 0, 0, 0, 0, 0);
   this->SetInertiaMatrix(
-        inertiaElem->Get<double>("ixx"),
-        inertiaElem->Get<double>("iyy"),
-        inertiaElem->Get<double>("izz"),
-
-        inertiaElem->Get<double>("ixy"),
-        inertiaElem->Get<double>("ixz"),
-        inertiaElem->Get<double>("iyz"));
+        this->rml.inertia().ixx(),
+        this->rml.inertia().iyy(),
+        this->rml.inertia().izz(),
+        this->rml.inertia().ixy(),
+        this->rml.inertia().ixz(),
+        this->rml.inertia().iyz());
 }
 
 //////////////////////////////////////////////////

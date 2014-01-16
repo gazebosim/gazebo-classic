@@ -96,47 +96,55 @@ ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
 
   return model;
 }
-
 //////////////////////////////////////////////////
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
-  PhysicsEngine::Load(_sdf);
+  rml::Physics physicsRML;
+  physicsRML.SetFromXML(_sdf);
+  this->Load(physicsRML);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::Load(const rml::Physics &_rml)
+{
+  bool result = PhysicsEngine::Load(_rml);
+
+  if (!result)
+    return result;
 
   this->stepTimeDouble = this->GetMaxStepSize();
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
-  this->integ->setAccuracy(
-    simbodyElem->Get<double>("accuracy"));
+  this->integ->setAccuracy(_rml.simbody().accuracy());
 
   // Set stiction max slip velocity to make it less stiff.
-  this->contact.setTransitionVelocity(
-    simbodyElem->Get<double>("max_transient_velocity"));
-
-  sdf::ElementPtr simbodyContactElem = simbodyElem->GetElement("contact");
+  this->contact.setTransitionVelocity(_rml.simbody().max_transient_velocity());
 
   // system wide contact properties, assigned in AddCollisionsToLink()
   this->contactMaterialStiffness =
-    simbodyContactElem->Get<double>("stiffness");
+    _rml.simbody().contact().stiffness();
   this->contactMaterialDissipation =
-    simbodyContactElem->Get<double>("dissipation");
+    _rml.simbody().contact().dissipation();
   this->contactMaterialStaticFriction =
-    simbodyContactElem->Get<double>("static_friction");
+    _rml.simbody().contact().static_friction();
   this->contactMaterialDynamicFriction =
-    simbodyContactElem->Get<double>("dynamic_friction");
+    _rml.simbody().contact().dynamic_friction();
   this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("viscous_friction");
+    _rml.simbody().contact().viscous_friction();
 
   // below are not used yet, but should work it into the system
   this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("plastic_coef_restitution");
+    _rml.simbody().contact().plastic_coef_restitution();
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->Get<double>("plastic_impact_velocity");
+    _rml.simbody().contact().plastic_impact_velocity();
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+    _rml.simbody().contact().override_impact_capture_velocity();
   this->contactImpactCaptureVelocity =
-    simbodyContactElem->Get<double>("override_stiction_transition_velocity");
+    _rml.simbody().contact().override_stiction_transition_velocity();
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1206,7 +1214,7 @@ math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
     math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
 }
 
-/////////////////////////////////////////////////
+//////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
   const math::Pose pose = _element->Get<math::Pose>("pose");

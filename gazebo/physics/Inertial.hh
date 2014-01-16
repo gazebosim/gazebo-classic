@@ -20,6 +20,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -53,11 +54,20 @@ namespace gazebo
 
       /// \brief Load from SDF values.
       /// \param[in] _sdf SDF value to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load from RML values.
+      /// \param[in] _rml RML values to load from.
+      public: void Load(const rml::Inertial &_rml);
 
       /// \brief update the parameters using new sdf values.
       /// \param[in] _sdf Update values from.
-      public: void UpdateParameters(sdf::ElementPtr _sdf);
+      public: void UpdateParameters(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief update the parameters using new RML values.
+      /// \param[in] _rml New inertial values..
+      public: void UpdateParameters(const rml::Inertial &_rml);
 
       /// \brief Reset all the mass properties.
       public: void Reset();
@@ -260,12 +270,8 @@ namespace gazebo
       /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
       private: math::Vector3 products;
 
-      /// \brief Our SDF values.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief An SDF pointer that allows us to only read the inertial.sdf
-      /// file once, which in turns limits disk reads.
-      private: static sdf::ElementPtr sdfInertial;
+      /// \brief Our RML values.
+      private: sdf::ElementPtr rml;
     };
     /// \}
   }

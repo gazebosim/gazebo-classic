@@ -59,10 +59,14 @@ namespace gazebo
 
       /// \brief Load the model.
       /// \param[in] _sdf SDF parameters to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the model.
+      /// \param[in] _rml RML parameters to load from.
+      public: bool Load(const rml::Model &_rml);
 
       /// \brief Load all the joints.
-      public: void LoadJoints();
+      public: bool LoadJoints();
 
       /// \brief Initialize the model.
       public: virtual void Init();
@@ -75,11 +79,16 @@ namespace gazebo
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the SDF values for the model.
       /// \return The SDF value for this model.
-      public: virtual const sdf::ElementPtr GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF() GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Get the RML values for the model.
+      /// \return The RML values for this model.
+      public: const rml::Model &GetRML();
 
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
@@ -312,16 +321,16 @@ namespace gazebo
       private: void LoadLinks();
 
       /// \brief Load a joint helper function.
-      /// \param[in] _sdf SDF parameter.
-      private: void LoadJoint(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML parameter.
+      private: void LoadJoint(const rml::Joint &_rml);
 
       /// \brief Load a plugin helper function.
       /// \param[in] _sdf SDF parameter.
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
+      private: void LoadPlugin(const rml::Plugin &_rml);
 
       /// \brief Load a gripper helper function.
       /// \param[in] _sdf SDF parameter.
-      private: void LoadGripper(sdf::ElementPtr _sdf);
+      private: void LoadGripper(const rml::Gripper &_rml);
 
       /// \brief Remove a link from the model's cached list of links.
       /// This does not delete the link.
@@ -370,6 +379,9 @@ namespace gazebo
 
       /// \brief True if plugins have been loaded.
       private: bool pluginsLoaded;
+
+      /// \brief The model's RML values.
+      private: rml::Model rml;
     };
     /// \}
   }

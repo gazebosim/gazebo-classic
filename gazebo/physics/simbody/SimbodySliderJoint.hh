@@ -45,6 +45,12 @@ namespace gazebo
       public: virtual ~SimbodySliderJoint();
 
       // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited.
+      public: virtual void Load(const rml::Joint &_rml);
+
+      // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
@@ -76,9 +82,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
-
-      // Documentation inherited.
-      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(int _index, double _force);

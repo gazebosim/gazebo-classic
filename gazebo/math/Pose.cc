@@ -52,6 +52,13 @@ Pose::Pose(const Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+Pose::Pose(const sdf::Pose &_pose)
+  :pos(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+   rot(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)
+{
+}
+
+//////////////////////////////////////////////////
 Pose::~Pose()
 {
 }

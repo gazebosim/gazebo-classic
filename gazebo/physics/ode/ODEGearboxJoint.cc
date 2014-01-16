@@ -54,8 +54,18 @@ void ODEGearboxJoint::Init()
 //////////////////////////////////////////////////
 void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 {
-  GearboxJoint<ODEJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
 
+  GearboxJoint<ODEJoint>::Load(rmlJoint);
+
+  this->SetGearRatio(this->gearRatio);
+}
+
+//////////////////////////////////////////////////
+void ODEGearboxJoint::Load(const rml::Joint &_rml)
+{
+  GearboxJoint<ODEJoint>::Load(_rml);
   this->SetGearRatio(this->gearRatio);
 }
 

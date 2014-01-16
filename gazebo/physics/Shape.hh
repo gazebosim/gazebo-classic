@@ -45,6 +45,11 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Shape();
 
+      /// \brief Load the shape based on an rml::Geometry object.
+      /// \param[in] _rml Geometry that defines the shape.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Collision &_rml);
+
       /// \brief Initialize the shape.
       public: virtual void Init() = 0;
 
@@ -69,6 +74,9 @@ namespace gazebo
 
       /// \brief This shape's scale;
       protected: math::Vector3 scale;
+
+      /// \brief RML configuration values.
+      protected: rml::Collision rml;
     };
     /// \}
   }

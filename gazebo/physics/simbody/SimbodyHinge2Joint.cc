@@ -43,7 +43,15 @@ SimbodyHinge2Joint::~SimbodyHinge2Joint()
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
-  Hinge2Joint<SimbodyJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodyHinge2Joint::Load(const rml::Joint &_rml)
+{
+  Hinge2Joint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

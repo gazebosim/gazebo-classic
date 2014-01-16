@@ -144,6 +144,7 @@ target_link_libraries(gazebo_common
   ${libtar_libraries}
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
+  ${RML_LIBRARIES}
   pthread
 )
 

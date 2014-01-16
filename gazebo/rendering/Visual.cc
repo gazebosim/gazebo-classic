@@ -363,17 +363,17 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_laser_retro())
     this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
-  if (_msg->has_plugin())
+  for (int i = 0; i < _msg->plugin_size(); ++i)
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("plugin");
-    if (_msg->plugin().has_name())
-      elem->GetAttribute("name")->Set(_msg->plugin().name());
-    if (_msg->plugin().has_filename())
-      elem->GetAttribute("filename")->Set(_msg->plugin().filename());
-    if (_msg->plugin().has_innerxml())
+    sdf::ElementPtr elem = this->sdf->AddElement("plugin");
+    if (_msg->plugin(i).has_name())
+      elem->GetAttribute("name")->Set(_msg->plugin(i).name());
+    if (_msg->plugin(i).has_filename())
+      elem->GetAttribute("filename")->Set(_msg->plugin(i).filename());
+    if (_msg->plugin(i).has_innerxml())
     {
       TiXmlDocument innerXML;
-      innerXML.Parse(_msg->plugin().innerxml().c_str());
+      innerXML.Parse(_msg->plugin(i).innerxml().c_str());
       sdf::copyChildren(elem, innerXML.RootElement());
     }
   }

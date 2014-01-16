@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for contact joints
- * Author: Nate Koenig
- * Date: 30 July 2003
- */
 
 #include <float.h>
 #include "gazebo/common/Assert.hh"
@@ -45,52 +41,38 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
-  {
-    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    GZ_ASSERT(bounceElem, "Surface sdf member is NULL");
-    this->bounce = bounceElem->Get<double>("restitution_coefficient");
-    this->bounceThreshold = bounceElem->Get<double>("threshold");
-  }
+  rml::Surface rmlSurface;
+  rmlSurface.SetFromXML(_sdf);
+  this->Load(rmlSurface);
+}
 
-  {
-    sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-    GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
-    {
-      sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
-      this->mu1 = frictionOdeElem->Get<double>("mu");
-      this->mu2 = frictionOdeElem->Get<double>("mu2");
+//////////////////////////////////////////////////
+void SurfaceParams::Load(const rml::Surface &_rml)
+{
+  this->bounce = _rml.bounce().restitution_coefficient();
+  this->bounceThreshold = _rml.bounce().threshold();
 
-      if (this->mu1 < 0)
-        this->mu1 = FLT_MAX;
-      if (this->mu2 < 0)
-        this->mu2 = FLT_MAX;
+  this->mu1 = _rml.friction().ode().mu();
+  this->mu2 = _rml.friction().ode().mu2();
 
-      this->slip1 = frictionOdeElem->Get<double>("slip1");
-      this->slip2 = frictionOdeElem->Get<double>("slip2");
-      this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
-    }
-  }
+  if (this->mu1 < 0)
+    this->mu1 = FLT_MAX;
+  if (this->mu2 < 0)
+    this->mu2 = FLT_MAX;
 
-  {
-    sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-    GZ_ASSERT(contactElem, "Surface sdf member is NULL");
-    {
-      this->collideWithoutContact =
-        contactElem->Get<bool>("collide_without_contact");
-      this->collideWithoutContactBitmask =
-          contactElem->Get<unsigned int>("collide_without_contact_bitmask");
-      sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-      GZ_ASSERT(contactOdeElem, "Surface sdf member is NULL");
-      this->kp = contactOdeElem->Get<double>("kp");
-      this->kd = contactOdeElem->Get<double>("kd");
-      this->cfm = contactOdeElem->Get<double>("soft_cfm");
-      this->erp = contactOdeElem->Get<double>("soft_erp");
-      this->maxVel = contactOdeElem->Get<double>("max_vel");
-      this->minDepth = contactOdeElem->Get<double>("min_depth");
-    }
-  }
+  this->slip1 = _rml.friction().ode().slip1();
+  this->slip2 = _rml.friction().ode().slip2();
+  this->fdir1 = _rml.friction().ode().fdir1();
+
+  this->collideWithoutContact = _rml.contact().collide_without_contact();
+  this->collideWithoutContactBitmask =
+    _rml.contact().collide_without_contact_bitmask();
+  this->kp = _rml.contact().ode().kp();
+  this->kd = _rml.contact().ode().kd();
+  this->cfm = _rml.contact().ode().soft_cfm();
+  this->erp = _rml.contact().ode().soft_erp();
+  this->maxVel = _rml.contact().ode().max_vel();
+  this->minDepth = _rml.contact().ode().min_depth();
 }
 
 /////////////////////////////////////////////////

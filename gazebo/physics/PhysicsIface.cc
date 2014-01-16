@@ -124,6 +124,12 @@ void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void physics::load_world(WorldPtr _world, rml::World _rml)
+{
+  _world->Load(_rml);
+}
+
+/////////////////////////////////////////////////
 void physics::init_world(WorldPtr _world)
 {
   _world->Init();

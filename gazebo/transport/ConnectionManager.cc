@@ -140,13 +140,13 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     return false;
   }
 
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   packet.ParseFromString(initData);
 
-  if (packet.type() == "version_init")
+  if (packet.msg_type() == "version_init")
   {
     robot_msgs::StringMsg msg;
-    msg.ParseFromString(packet.serialized_data());
+    msg.ParseFromString(packet.msg_data());
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
@@ -163,10 +163,10 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     gzerr << "Didn't receive an init from the master\n";
 
   packet.ParseFromString(namespacesData);
-  if (packet.type() == "topic_namepaces_init")
+  if (packet.msg_type() == "topic_namepaces_init")
   {
     robot_msgs::StringMsg_V result;
-    result.ParseFromString(packet.serialized_data());
+    result.ParseFromString(packet.msg_data());
     boost::mutex::scoped_lock lock(this->namespaceMutex);
 
     for (int i = 0; i < result.data_size(); i++)
@@ -179,10 +179,10 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     gzerr << "Did not get topic_namespaces_init msg from master\n";
 
   packet.ParseFromString(publishersData);
-  if (packet.type() == "publishers_init")
+  if (packet.msg_type() == "publishers_init")
   {
     msgs::Publishers pubs;
-    pubs.ParseFromString(packet.serialized_data());
+    pubs.ParseFromString(packet.msg_data());
 
     boost::recursive_mutex::scoped_lock lock(this->listMutex);
     for (int i = 0; i < pubs.publisher_size(); i++)
@@ -348,19 +348,19 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
 /////////////////////////////////////////////////
 void ConnectionManager::ProcessMessage(const std::string &_data)
 {
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   packet.ParseFromString(_data);
 
-  if (packet.type() == "publisher_add")
+  if (packet.msg_type() == "publisher_add")
   {
     msgs::Publish result;
-    result.ParseFromString(packet.serialized_data());
+    result.ParseFromString(packet.msg_data());
     this->publishers.push_back(result);
   }
-  else if (packet.type() == "publisher_del")
+  else if (packet.msg_type() == "publisher_del")
   {
     msgs::Publish result;
-    result.ParseFromString(packet.serialized_data());
+    result.ParseFromString(packet.msg_data());
 
     std::list<msgs::Publish>::iterator iter = this->publishers.begin();
     while (iter != this->publishers.end())
@@ -373,10 +373,10 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
         ++iter;
     }
   }
-  else if (packet.type() == "topic_namespace_add")
+  else if (packet.msg_type() == "topic_namespace_add")
   {
     robot_msgs::StringMsg result;
-    result.ParseFromString(packet.serialized_data());
+    result.ParseFromString(packet.msg_data());
 
     boost::mutex::scoped_lock lock(this->namespaceMutex);
     this->namespaces.push_back(std::string(result.data()));
@@ -387,20 +387,20 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // as a workaround to address transport blocking issue when gzclient connects
   // to gzserver, see issue #714. "publisher_advertise", intended
   // for gzserver when gzclient connects, is parallelized and made non-blocking.
-  else if (packet.type() == "publisher_update")
+  else if (packet.msg_type() == "publisher_update")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
       TopicManager::Instance()->ConnectSubToPub(pub);
     }
   }
-  else if (packet.type() == "publisher_advertise")
+  else if (packet.msg_type() == "publisher_advertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
@@ -412,29 +412,29 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // publisher_subscribe. This occurs when we try to subscribe to a topic, and
   // the master informs us of a remote host that is publishing on our
   // requested topic
-  else if (packet.type() == "publisher_subscribe")
+  else if (packet.msg_type() == "publisher_subscribe")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
       TopicManager::Instance()->ConnectSubToPub(pub);
     }
   }
-  else if (packet.type() == "unsubscribe")
+  else if (packet.msg_type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    sub.ParseFromString(packet.msg_data());
 
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(),
         sub.host(), sub.port());
   }
-  else if (packet.type() == "unadvertise")
+  else if (packet.msg_type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
 
     // Disconnection all local subscribers from a remote publisher
     TopicManager::Instance()->DisconnectSubFromPub(pub.topic(),
@@ -443,7 +443,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   else
   {
     gzerr << "ConnectionManager::OnMasterRead unknown type["
-          << packet.type() << "][" << packet.serialized_data()
+          << packet.msg_type() << "][" << packet.msg_data()
           << "] Data[" << _data << "]\n";
   }
 }
@@ -471,14 +471,14 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
     return;
   }
 
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   packet.ParseFromString(_data);
 
   // If we have an incoming (remote) subscription
-  if (packet.type() == "sub")
+  if (packet.msg_type() == "sub")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    sub.ParseFromString(packet.msg_data());
 
     // Create a transport link for the publisher to the remote subscriber
     // via the connection

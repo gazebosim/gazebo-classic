@@ -4,6 +4,7 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
   ${ROBOT_MSGS_INCLUDE_DIRS}
 )
 
@@ -11,6 +12,7 @@ link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${SDF_LIBRARY_DIRS}
+  ${RML_LIBRARY_DIRS}
   ${ROBOT_MSGS_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )

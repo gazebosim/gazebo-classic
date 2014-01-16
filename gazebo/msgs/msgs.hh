@@ -20,6 +20,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include <robot_msgs/MessageTypes.hh>
 #include "gazebo/msgs/MessageTypes.hh"
@@ -74,20 +75,40 @@ namespace gazebo
     /// \return A robot_msgs::Vector3d object
     robot_msgs::Vector3d      Convert(const math::Vector3 &_v);
 
+    /// \brief Convert a sdf::Vector3 to a robot_msgs::Vector3d
+    /// \param[in] _v The vector to convert
+    /// \return A robot_msgs::Vector3d object
+    robot_msgs::Vector3d      Convert(const sdf::Vector3 &_v);
+
     /// \brief Convert a math::Quaternion to a robot_msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A robot_msgs::Quaternion object
     robot_msgs::Quaternion Convert(const math::Quaternion &_q);
+
+    /// \brief Convert a sdf::Quaternion to a robot_msgs::Quaternion
+    /// \param[in] _q The quaternion to convert
+    /// \return A robot_msgs::Quaternion object
+    robot_msgs::Quaternion Convert(const sdf::Quaternion &_q);
 
     /// \brief Convert a math::Pose to a robot_msgs::Pose
     /// \param[in] _p The pose to convert
     /// \return A robot_msgs::Pose object
     robot_msgs::Pose       Convert(const math::Pose &_p);
 
+    /// \brief Convert a sdf::Pose to a robot_msgs::Pose
+    /// \param[in] _p The pose to convert
+    /// \return A robot_msgs::Pose object
+    robot_msgs::Pose       Convert(const sdf::Pose &_p);
+
     /// \brief Convert a common::Color to a robot_msgs::Color
     /// \param[in] _c The color to convert
     /// \return A robot_msgs::Color object
     robot_msgs::Color      Convert(const common::Color &_c);
+
+    /// \brief Convert a sdf::Color to a robot_msgs::Color
+    /// \param[in] _c The color to convert
+    /// \return A robot_msgs::Color object
+    robot_msgs::Color      Convert(const sdf::Color &_c);
 
     /// \brief Convert a common::Time to a robot_msgs::Time
     /// \param[in] _t The time to convert
@@ -156,25 +177,50 @@ namespace gazebo
     /// \param[in] _v A math::Vector3 reference
     void Set(robot_msgs::Vector3d *_pt, const math::Vector3 &_v);
 
-    /// \brief Set a robot_msgs::Vector2d from a math::Vector3
+    /// \brief Set a robot_msgs::Vector3d from a sdf::Vector3
+    /// \param[out] _pt A robot_msgs::Vector3d pointer
+    /// \param[in] _v A sdf::Vector3 reference
+    void Set(robot_msgs::Vector3d *_pt, const sdf::Vector3 &_v);
+
+    /// \brief Set a robot_msgs::Vector2d from a math::Vector2d
     /// \param[out] _pt A robot_msgs::Vector2d pointer
     /// \param[in] _v A math::Vector2d reference
     void Set(robot_msgs::Vector2d *_pt, const math::Vector2d &_v);
+
+    /// \brief Set a robot_msgs::Vector2d from a sdf::Vector2d
+    /// \param[out] _pt A robot_msgs::Vector2d pointer
+    /// \param[in] _v A sdf::Vector2d reference
+    void Set(robot_msgs::Vector2d *_pt, const sdf::Vector2d &_v);
 
     /// \brief Set a robot_msgs::Quaternion from a math::Quaternion
     /// \param[out] _q A robot_msgs::Quaternion pointer
     /// \param[in] _v A math::Quaternion reference
     void Set(robot_msgs::Quaternion *_q, const math::Quaternion &_v);
 
+    /// \brief Set a robot_msgs::Quaternion from a sdf::Quaternion
+    /// \param[out] _q A robot_msgs::Quaternion pointer
+    /// \param[in] _v A sdf::Quaternion reference
+    void Set(robot_msgs::Quaternion *_q, const sdf::Quaternion &_v);
+
     /// \brief Set a robot_msgs::Pose from a math::Pose
     /// \param[out] _p A robot_msgs::Pose pointer
     /// \param[in] _v A math::Pose reference
     void Set(robot_msgs::Pose *_p, const math::Pose &_v);
 
+    /// \brief Set a robot_msgs::Pose from a sdf::Pose
+    /// \param[out] _p A robot_msgs::Pose pointer
+    /// \param[in] _v A sdf::Pose reference
+    void Set(robot_msgs::Pose *_p, const sdf::Pose &_v);
+
     /// \brief Set a robot_msgs::Color from a common::Color
     /// \param[out] _p A robot_msgs::Color pointer
     /// \param[in] _v A common::Color reference
     void Set(robot_msgs::Color *_c, const common::Color &_v);
+
+    /// \brief Set a robot_msgs::Color from a sdf::Color
+    /// \param[out] _p A robot_msgs::Color pointer
+    /// \param[in] _v A sdf::Color reference
+    void Set(robot_msgs::Color *_c, const sdf::Color &_v);
 
     /// \brief Set a robot_msgs::Time from a common::Time
     /// \param[out] _p A robot_msgs::Time pointer
@@ -191,40 +237,81 @@ namespace gazebo
     /// \return The new msgs::TrackVisual object
     msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::TrackVisual from a track visual RML element
+    /// \param[in] _rml The RML element
+    /// \return The new msgs::TrackVisual object
+    msgs::TrackVisual TrackVisualFromRML(
+        const rml::Gui::Camera::Track_Visual &_rml);
+
     /// \brief Create a msgs::GUI from a GUI SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::GUI object
     msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::GUI from a GUI RML element
+    /// \param[in] _sdf The RML element
+    /// \return The new msgs::GUI object
+    msgs::GUI GUIFromRML(const rml::Gui &_rml);
 
     /// \brief Create a msgs::Light from a light SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Light object
     msgs::Light LightFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Light from a light RML element
+    /// \param[in] _rml The RML element
+    /// \return The new msgs::Light object
+    msgs::Light LightFromRML(const rml::Light &_rml);
+
     /// \brief Create a msgs::MeshGeom from a mesh SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::MeshGeom object
-    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf);
+    msgs::MeshGeom MeshFromSDF(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+    /// \brief Create a msgs::MeshGeom from a mesh RML element
+    /// \param[in] _sdf The rml element
+    /// \return The new msgs::MeshGeom object
+    msgs::MeshGeom MeshFromRML(const rml::Mesh &_rml);
 
     /// \brief Create a msgs::Geometry from a geometry SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Geometry object
     msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Geometry from a geometry RML element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Geometry object
+    msgs::Geometry GeometryFromRML(const rml::Geometry &_rml);
+
     /// \brief Create a msgs::Visual from a visual SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Visual object
-    msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
+    msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+    /// \brief Create a msgs::Visual from a visual RML element
+    /// \param[in] _rml The RML element
+    /// \return The new msgs::Visual object
+    msgs::Visual VisualFromRML(const rml::Visual &_rml);
 
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Fog object
     msgs::Fog FogFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Fog from a fog RML element
+    /// \param[in] _sdf The RML element
+    /// \return The new msgs::Fog object
+    msgs::Fog FogFromSDF(const rml::Scene::Fog &_rml);
+
     /// \brief Create a msgs::Scene from a scene SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Scene object
-    msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
+    msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+    /// \brief Create a msgs::Scene from a scene RML element
+    /// \param[in] _rml The rml element
+    /// \return The new msgs::Scene object
+    msgs::Scene SceneFromRML(const rml::Scene &_rml);
 
     /// \cond
     const google::protobuf::FieldDescriptor *GetFD(
@@ -241,4 +328,3 @@ namespace gazebo
 }
 
 #endif
-

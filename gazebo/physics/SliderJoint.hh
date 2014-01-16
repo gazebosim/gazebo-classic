@@ -47,8 +47,17 @@ namespace gazebo
 
       /// \brief Load a SliderJoint.
       /// \param[in] _sdf SDF values to load from
-      public: virtual void Load(sdf::ElementPtr _sdf)
-              {T::Load(_sdf);}
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
+              {
+                rml::Joint rmlJoint;
+                rmlJoint.SetFromXML(_sdf);
+                T::Load(rmlJoint);
+              }
+
+      /// \brief Load a SliderJoint.
+      /// \param[in] _rml RML values to load from
+      public: virtual void Load(const rml::Joint &_rml)
+              {T::Load(_rml);}
 
       // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const

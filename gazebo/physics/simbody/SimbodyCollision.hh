@@ -49,6 +49,9 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _ptr);
 
       // Documentation inherited
+      public: virtual bool Load(const rml::Collision &_rml);
+
+      // Documentation inherited
       public: virtual void OnPoseChange();
 
       // Documentation inherited

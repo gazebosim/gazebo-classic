@@ -66,15 +66,23 @@ Model::~Model()
 //////////////////////////////////////////////////
 void Model::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_sdf);
+  rml::Model modelRML;
+  modelRML.SetFromXML(_sdf);
+  this->Load(modelRML);
+}
+
+//////////////////////////////////////////////////
+bool Model::Load(const rml::Model &_rml)
+{
+  this->rml = _rml;
+  Entity::Load(_rml.name(), _rml.pose());
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
-  this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  this->SetStatic(this->rml._static());
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  this->SetAutoDisable(this->rml.allow_auto_disable());
+
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -82,6 +90,8 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -91,32 +101,28 @@ void Model::LoadLinks()
   /// BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  if (this->sdf->HasElement("link"))
+  bool canonicalLinkInitialized = false;
+  for (std::vector<rml::Link>::iterator iter = this->rml.link().begin();
+      iter != this->rml.link().end(); ++iter)
   {
-    sdf::ElementPtr linkElem = this->sdf->GetElement("link");
-    bool canonicalLinkInitialized = false;
-    while (linkElem)
+    // Create a new link
+    LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
+        boost::static_pointer_cast<Model>(shared_from_this()));
+
+    /// \TODO: canonical link is hardcoded to the first link.
+    ///        warn users for now, need  to add parsing of
+    ///        the canonical tag in RML
+    if (!canonicalLinkInitialized)
     {
-      // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::static_pointer_cast<Model>(shared_from_this()));
-
-      /// \TODO: canonical link is hardcoded to the first link.
-      ///        warn users for now, need  to add parsing of
-      ///        the canonical tag in sdf
-      if (!canonicalLinkInitialized)
-      {
-        link->SetCanonicalLink(true);
-        this->canonicalLink = link;
-        canonicalLinkInitialized = true;
-      }
-
-      // Load the link using the config node. This also loads all of the
-      // bodies collisionetries
-      link->Load(linkElem);
-      linkElem = linkElem->GetNextElement("link");
-      this->links.push_back(link);
+      link->SetCanonicalLink(true);
+      this->canonicalLink = link;
+      canonicalLinkInitialized = true;
     }
+
+    // Load the link using the config node. This also loads all of the
+    // bodies collisionetries
+    link->Load(*iter);
+    this->links.push_back(link);
   }
 }
 
@@ -124,31 +130,23 @@ void Model::LoadLinks()
 void Model::LoadJoints()
 {
   // Load the joints
-  if (this->sdf->HasElement("joint"))
+  for(std::vector<rml::Joint>::iterator iter = this->rml.joint().begin();
+      iter != this->rml.joint().end(); ++iter)
   {
-    sdf::ElementPtr jointElem = this->sdf->GetElement("joint");
-    while (jointElem)
+    try
     {
-      try
-      {
-        this->LoadJoint(jointElem);
-      }
-      catch(...)
-      {
-        gzerr << "LoadJoint Failed\n";
-      }
-      jointElem = jointElem->GetNextElement("joint");
+      this->LoadJoint(*iter);
+    }
+    catch(...)
+    {
+      gzerr << "LoadJoint Failed\n";
     }
   }
 
-  if (this->sdf->HasElement("gripper"))
+  for(std::vector<rml::Gripper>::iterator iter = this->rml.gripper().begin();
+      iter != this->rml.gripper().end(); ++iter)
   {
-    sdf::ElementPtr gripperElem = this->sdf->GetElement("gripper");
-    while (gripperElem)
-    {
-      this->LoadGripper(gripperElem);
-      gripperElem = gripperElem->GetNextElement("gripper");
-    }
+    this->LoadGripper(*iter);
   }
 }
 
@@ -363,7 +361,13 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 const sdf::ElementPtr Model::GetSDF()
 {
-  return Entity::GetSDF();
+  return sdf::ElementPtr();
+}
+
+//////////////////////////////////////////////////
+const rml::Model Model::GetRML()
+{
+  return this->rml;
 }
 
 //////////////////////////////////////////////////
@@ -619,11 +623,11 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadJoint(sdf::ElementPtr _sdf)
+void Model::LoadJoint(const rml::Joint &_rml)
 {
   JointPtr joint;
 
-  std::string stype = _sdf->Get<std::string>("type");
+  std::string stype = _rml.type();
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
      boost::static_pointer_cast<Model>(shared_from_this()));
@@ -637,7 +641,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
-  joint->Load(_sdf);
+  joint->Load(_rml);
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
   {
@@ -655,11 +659,11 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Model::LoadGripper(sdf::ElementPtr _sdf)
+void Model::LoadGripper(const rml::Gripper &_rml)
 {
   GripperPtr gripper(new Gripper(
       boost::static_pointer_cast<Model>(shared_from_this())));
-  gripper->Load(_sdf);
+  gripper->Load(_rml);
   this->grippers.push_back(gripper);
 }
 
@@ -686,10 +690,10 @@ void Model::LoadPlugins()
     if (iterations < 50)
     {
       // Load the plugins
-      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-      while (pluginElem)
+      for (std::vector<rml::Plugin>::iterator iter = this->rml.plugin().begin();
+           iter != this->rml.plugin.end(); ++iter)
       {
-        this->LoadPlugin(pluginElem);
+        this->LoadPlugin(*iter);
         pluginElem = pluginElem->GetNextElement("plugin");
       }
     }
@@ -705,20 +709,7 @@ void Model::LoadPlugins()
 //////////////////////////////////////////////////
 unsigned int Model::GetPluginCount() const
 {
-  unsigned int result = 0;
-
-  // Count all the plugins specified in SDF
-  if (this->sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      result++;
-      pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
-
-  return result;
+  return this->rml.plugin_size();
 }
 
 //////////////////////////////////////////////////
@@ -737,10 +728,10 @@ unsigned int Model::GetSensorCount() const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadPlugin(sdf::ElementPtr _sdf)
+void Model::LoadPlugin(const rml::Plugin _rml)
 {
-  std::string pluginName = _sdf->Get<std::string>("name");
-  std::string filename = _sdf->Get<std::string>("filename");
+  std::string pluginName = _rml.name();
+  std::string filename = _rml.filename();
   gazebo::ModelPluginPtr plugin =
     gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
@@ -755,7 +746,7 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     }
 
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
-    plugin->Load(myself, _sdf);
+    plugin->Load(myself, _rml);
     plugin->Init();
     this->plugins.push_back(plugin);
   }
@@ -1017,7 +1008,7 @@ void Model::SetAutoDisable(bool _auto)
 /////////////////////////////////////////////////
 bool Model::GetAutoDisable() const
 {
-  return this->sdf->Get<bool>("allow_auto_disable");
+  return this->rml.allow_auto_disable();
 }
 
 /////////////////////////////////////////////////

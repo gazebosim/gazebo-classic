@@ -11,9 +11,17 @@
     </include>
     <!-- Pioneer2dx model with a hokuyo laser and camera-->
     <model name="pioneer2dx">
-      <include filename="pioneer2dx.model" />
-      <include filename="hokuyo.model" model_pose="0.2 0 0.3 0 0 0" />
-      <include filename="camera.model" model_pose="0.2 0 0.5 0 0 0" />
+      <include>
+        <uri>model://pioneer2dx</uri>
+      </include>
+      <include>
+        <pose>0.2 0 0.3 0 0 0</pose>
+        <uri>model://hokuyo</uri>
+      </include>
+      <include>
+        <pose>0.2 0 0.5 0 0 0</pose>
+        <uri>model://camera</uri>
+      </include>
     </model>
   </world>
 </sdf>

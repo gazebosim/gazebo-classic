@@ -35,7 +35,6 @@ meshgeom.proto
 model_configuration.proto
 model.proto
 model_v.proto
-packet.proto
 physics.proto
 planegeom.proto
 plugin.proto

@@ -51,10 +51,17 @@ namespace gazebo
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
               {
-                T::Load(_sdf);
+                rml::Joint rmlJoint;
+                rmlJoint.SetFromXML(_sdf);
+                T::Load(rmlJoint);
               }
+
+      /// \brief Load joint
+      /// \param[in] _rml RML values to load from
+      public: virtual void Load(const rml::Joint &_rml)
+              {T::Load(_rml);}
 
       /// \brief Initialize joint
       protected: virtual void Init()

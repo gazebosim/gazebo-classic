@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
 #ifndef _POSE_HH_
 #define _POSE_HH_
 
 #include <iostream>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -62,6 +59,10 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
+
+      /// \brief Constructor using an sdf::Pose
+      /// \param[in] _pose RML Pose to copy from;
+      public: Pose(const sdf::Pose &_pose);
 
       /// \brief Destructor
       public: virtual ~Pose();

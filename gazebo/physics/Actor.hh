@@ -78,7 +78,11 @@ namespace gazebo
 
       /// \brief Load the actor
       /// \param[in] _sdf SDF parameters
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the actor
+      /// \param[in] _rml RML parameters
+      public: bool Load(const rml::Actor &_rml);
 
       /// \brief Initialize the actor
       public: virtual void Init();
@@ -104,14 +108,14 @@ namespace gazebo
 
       /// \brief Get the SDF values for the actor.
       /// \return Pointer to the SDF values.
-      public: virtual const sdf::ElementPtr GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF() GAZEBO_DEPRECATED(2.0);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
       /// \param[in] _radiau Radius of the sphere.
-      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
+      private: void AddSphereInertia(rml::Link *_linkRml,
                                      const math::Pose &_pose,
                                      double _mass, double _radius);
 
@@ -120,7 +124,7 @@ namespace gazebo
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
-      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
+      private: void AddSphereCollision(rml::Link *_linkRml,
                                        const std::string &_name,
                                        const math::Pose &_pose,
                                        double _radius);
@@ -132,7 +136,7 @@ namespace gazebo
       /// \param[in] _radius Radius of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
+      private: void AddSphereVisual(rml::Link *_linkSdf,
                                     const std::string &_name,
                                     const math::Pose &_pose,
                                     double _radius,
@@ -146,7 +150,7 @@ namespace gazebo
       /// \param[in] _size Dimensions of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
+      private: void AddBoxVisual(rml::Link *_linkRml,
                                  const std::string &_name,
                                  const math::Pose &_pose,
                                  const math::Vector3 &_size,
@@ -157,17 +161,17 @@ namespace gazebo
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
-      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
+      private: void AddActorVisual(rml::Link *_linkRml,
                                    const std::string &_name,
                                    const math::Pose &_pose);
 
       /// \brief Load an animation from SDF.
       /// \param[in] _sdf SDF element containing the animation.
-      private: void LoadAnimation(sdf::ElementPtr _sdf);
+      private: void LoadAnimation(const rml::Actor::Animation &_rml);
 
-      /// \brief Load an animation script from SDF.
-      /// \param[in] _sdf SDF element containing the animation script.
-      private: void LoadScript(sdf::ElementPtr _sdf);
+      /// \brief Load an animation script from RML.
+      /// \param[in] _rml RML element containing the animation script.
+      private: void LoadScript(const rml::Actor::Script &_rml);
 
       /// \brief Set the actor's pose.
       /// \param[in] _frame Each frame name and transform.
@@ -250,7 +254,7 @@ namespace gazebo
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 
-      /// \brief THe old action.
+      /// \brief The old action.
       protected: std::string oldAction;
     };
     /// \}

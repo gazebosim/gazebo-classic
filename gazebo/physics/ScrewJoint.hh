@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic/rotational joint
- * Author: Nate Koenig, John Hsu
- * Date: 21 May 2003
- */
 
-#ifndef _SCREWJOINT_HH_
-#define _SCREWJOINT_HH_
+#ifndef _GAZEBO_SCREWJOINT_HH_
+#define _GAZEBO_SCREWJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
@@ -52,15 +48,21 @@ namespace gazebo
 
       /// \brief Load a ScrewJoint.
       /// \param[in] _sdf SDF value to load from
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
                  {
-                   T::Load(_sdf);
+                   rml::Joint rmlJoint;
+                   rmlJoint.SetFromXML(_sdf);
+                   this->Load(rmlJoint);
+                 }
 
-                   if (_sdf->HasElement("thread_pitch"))
-                   {
-                     this->threadPitch =
-                       _sdf->GetElement("thread_pitch")->Get<double>();
-                   }
+      /// \brief Load a ScrewJoint.
+      /// \param[in] _rml RML value to load from
+      public: virtual void Load(const rml::Joint &_rml)
+                 {
+                   T::Load(_rml);
+
+                   if (_rml.has_thread_pitch())
+                     this->threadPitch = _rml.thread_pitch();
                    else
                    {
                      this->threadPitch = 1.0;
@@ -70,21 +72,18 @@ namespace gazebo
                             << ". \n";
                    }
 
-                   if (_sdf->HasElement("axis"))
+                   if (_rml.has_axis())
                    {
-                     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
-                     if (axisElem->HasElement("limit"))
+                     this->SetAxis(0, math::Vector3(_rml.axis().xyz().x,
+                         _rml.axis().xyz().y, _rml.axis().xyz().z));
+                     if (_rml.axis().has_limit())
                      {
-                       sdf::ElementPtr limitElem =
-                         _sdf->GetElement("axis")->GetElement("limit");
-
                        // Perform this three step ordering to ensure the
                        // parameters are set properly. This is taken from
                        // the ODE wiki.
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
-                       this->SetLowStop(0, limitElem->Get<double>("lower"));
-                       this->SetHighStop(0, limitElem->Get<double>("upper"));
+                       this->SetHighStop(0, _rml.axis().limit().upper());
+                       this->SetLowStop(0, _rml.axis().limit().lower());
+                       this->SetHighStop(0, _rml.axis().limit().upper());
                      }
                    }
                  }

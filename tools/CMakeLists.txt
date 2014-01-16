@@ -5,11 +5,13 @@ include_directories(
   ${tinyxml_include_dirs}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
+  ${RML_INCLUDE_DIRS}
   ${ROBOT_MSGS_INCLUDE_DIRS}
 )
 
 link_directories( 
   ${SDF_LIBRARY_DIRS}
+  ${RML_LIBRARY_DIRS}
   ${ROBOT_MSGS_LIBRARY_DIRS}
 )
 

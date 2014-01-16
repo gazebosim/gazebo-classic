@@ -42,7 +42,15 @@ SimbodyBallJoint::~SimbodyBallJoint()
 //////////////////////////////////////////////////
 void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 {
-  BallJoint<SimbodyJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodyBallJoint::Load(const rml::Joint &_rml)
+{
+  BallJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

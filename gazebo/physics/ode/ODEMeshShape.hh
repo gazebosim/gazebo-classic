@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
 #ifndef _ODEMESHSHAPE_HH_
 #define _ODEMESHSHAPE_HH_
@@ -39,7 +35,10 @@ namespace gazebo
       public: virtual ~ODEMeshShape();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Collision &_rml);
 
       // Documentation inherited
       public: virtual void Init();

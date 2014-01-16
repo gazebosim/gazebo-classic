@@ -67,12 +67,6 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
-
-  if (!this->sdfJoint)
-  {
-    this->sdfJoint.reset(new sdf::Element);
-    sdf::initFile("joint.sdf", this->sdfJoint);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -105,61 +99,55 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
   this->parentLink = _parent;
   this->childLink = _child;
 
-  // Joint is loaded without sdf from a model
-  // Initialize this->sdf so it can be used for data storage
-  this->sdf = this->sdfJoint->Clone();
-
   this->LoadImpl(_pose);
 }
 
 //////////////////////////////////////////////////
 void Joint::Load(sdf::ElementPtr _sdf)
 {
-  Base::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void Joint::Load(const rml::Joint &_rml)
+{
+  this->rml = _rml;
+
+  Base::Load(this->rml.name());
 
   // Joint force and torque feedback
-  if (_sdf->HasElement("physics"))
+  if (this->rml.has_physics())
   {
-    sdf::ElementPtr physicsElem = _sdf->GetElement("physics");
-    if (physicsElem->HasElement("provide_feedback"))
-    {
-      this->SetProvideFeedback(physicsElem->Get<bool>("provide_feedback"));
-    }
+    this->SetProvideFeedback(this->rml.physics().provide_feedback());
   }
 
-  if (_sdf->HasElement("axis"))
+  if (this->rml.has_axis())
   {
-    sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-    if (axisElem->HasElement("limit"))
+    if (this->rml.axis().has_limit())
     {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
       // store joint stop stiffness and dissipation coefficients
-      this->stopStiffness[0] = limitElem->Get<double>("stiffness");
-      this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+      this->stopStiffness[0] = this->rml.axis().limit().stiffness();
+      this->stopDissipation[0] = this->rml.axis().limit().dissipation();
     }
   }
-  if (_sdf->HasElement("axis2"))
+
+  if (this->rml.has_axis2())
   {
-    sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
-    if (axisElem->HasElement("limit"))
+    if (this->rml.axis2().has_limit())
     {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
       // store joint stop stiffness and dissipation coefficients
-      this->stopStiffness[1] = limitElem->Get<double>("stiffness");
-      this->stopDissipation[1] = limitElem->Get<double>("dissipation");
+      this->stopStiffness[1] = this->rml.axis2().limit().stiffness();
+      this->stopDissipation[1] = this->rml.axis2().limit().dissipation();
     }
   }
 
-  sdf::ElementPtr parentElem = _sdf->GetElement("parent");
-  sdf::ElementPtr childElem = _sdf->GetElement("child");
+  GZ_ASSERT(this->rml.has_parent(), "Joint parent not set.");
+  GZ_ASSERT(this->rml.has_child(), "Joint child not set");
 
-  GZ_ASSERT(parentElem, "Parent element is NULL");
-  GZ_ASSERT(childElem, "Child element is NULL");
-
-  std::string parentName = parentElem->Get<std::string>();
-  std::string childName = childElem->Get<std::string>();
+  std::string parentName = this->rml.parent();
+  std::string childName = this->rml.child();
 
   if (this->model)
   {
@@ -181,7 +169,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->Get<math::Pose>("pose");
+  this->anchorPose = math::Pose(this->rml.pose());
   this->LoadImpl(this->anchorPose);
 }
 
@@ -206,24 +194,22 @@ void Joint::LoadImpl(const math::Pose &_pose)
   else
     this->anchorPos = _pose.pos;
 
-  if (this->sdf->HasElement("sensor"))
+  if (this->rml.has_sensor())
   {
-    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
-    while (sensorElem)
+    for (std::vector<rml::Sensor>::const_iterator iter =
+         this->rml.sensor().begin(); iter != this->rml.sensor().end(); ++iter)
     {
       /// \todo This if statement is a hack to prevent Joints from creating
       /// other sensors. We should make this more generic.
-      if (sensorElem->Get<std::string>("type") == "force_torque")
+      if ((*iter).type() == "force_torque")
       {
         std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+          sensors::create_sensor((*iter), this->GetWorld()->GetName(),
               this->GetScopedName(), this->GetId());
         this->sensors.push_back(sensorName);
       }
       else
-        gzerr << "A joint cannot load a [" <<
-          sensorElem->Get<std::string>("type") << "] sensor.\n";
-      sensorElem = sensorElem->GetNextElement("sensor");
+        gzerr << "A joint cannot load a [" << (*iter).type() << "] sensor.\n";
     }
   }
 }
@@ -244,17 +230,14 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->sdf->HasElement("axis"))
+  if (this->rml.has_axis())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
-    if (axisElem->HasElement("limit"))
+    this->SetAxis(0, math::Vector3(this->rml.axis().xyz()));
+    if (this->rml.axis().has_limit())
     {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
       // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->Get<double>("upper");
-      this->lowerLimit[0] = limitElem->Get<double>("lower");
+      this->upperLimit[0] = this->rml.axis().limit().upper();
+      this->lowerLimit[0] = this->rml.axis().limit().lower();
 
       // Perform this three step ordering to ensure the
       // parameters are set properly.
@@ -263,22 +246,20 @@ void Joint::Init()
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
 
-      this->effortLimit[0] = limitElem->Get<double>("effort");
-      this->velocityLimit[0] = limitElem->Get<double>("velocity");
+      this->effortLimit[0] = this->rml.axis().limit().effort();
+      this->velocityLimit[0] = this->rml.axis().limit().velocity();
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->rml.has_axis2())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
-    if (axisElem->HasElement("limit"))
+    this->SetAxis(1, this->rml.axis2().xyz());
+    if (this->rml.axis2().has_limit())
     {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->Get<double>("upper");
-      this->lowerLimit[1] = limitElem->Get<double>("lower");
+      this->upperLimit[1] = this->rml.axis2().limit().upper();
+      this->lowerLimit[1] = this->rml.axis2().limit().lower();
 
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
@@ -287,14 +268,14 @@ void Joint::Init()
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
 
-      this->effortLimit[1] = limitElem->Get<double>("effort");
-      this->velocityLimit[1] = limitElem->Get<double>("velocity");
+      this->effortLimit[1] = this->rml.axis2().limit().effort();
+      this->velocityLimit[1] = this->rml.axis2().limit().velocity();
     }
   }
 
   // Set parent name: if parentLink is NULL, it's name be the world
   if (!this->parentLink)
-    this->sdf->GetElement("parent")->Set("world");
+    this->rml.set_parent("world");
 
   // for debugging only
   // this->ComputeInertiaRatio();
@@ -305,12 +286,10 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 {
   math::Vector3 vec;
 
-  if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
-  else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
-  // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
-  // vec.Round();
+  if (_index == 0 && this->rml.has_axis())
+    vec = this->rml.axis().xyz();
+  else if (this->rml.has_axis2())
+    vec = this->rml.axis2().xyz();
   return vec;
 }
 
@@ -493,16 +472,13 @@ math::Angle Joint::GetAngle(int _index) const
 //////////////////////////////////////////////////
 void Joint::SetHighStop(int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
   {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
+    this->rml.mutable_axis()->mutable_limit()->set_upper(_angle.Radian());
   }
   else if (_index == 1)
   {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
+    this->rml.mutable_axis2()->mutable_limit()->set_upper(_angle.Radian());
   }
   else
   {
@@ -514,16 +490,13 @@ void Joint::SetHighStop(int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 void Joint::SetLowStop(int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
   {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
+    this->rml.axis().limit().set_lower(_angle.Radian());
   }
   else if (_index == 1)
   {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
+    this->rml.axis2().limit().set_lower(_angle.Radian());
   }
   else
   {
@@ -741,21 +714,15 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 
   if (_index == 0)
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
     // store lower joint limits
     this->lowerLimit[_index] = _limit;
-    limitElem->GetElement("lower")->Set(_limit.Radian());
+    this->rml.axis().limit().set_lower(_limit.Radian());
   }
   else if (_index == 1)
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
     // store lower joint limits
     this->lowerLimit[_index] = _limit;
-    limitElem->GetElement("lower")->Set(_limit.Radian());
+    this->rml.axis2().limit().set_lower(_limit.Radian());
   }
   else
   {
@@ -778,21 +745,15 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
 
   if (_index == 0)
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
     // store upper joint limits
     this->upperLimit[_index] = _limit;
-    limitElem->GetElement("upper")->Set(_limit.Radian());
+    this->rml.axis().limit().set_upper(_limit.Radian());
   }
   else if (_index == 1)
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
     // store upper joint limits
     this->upperLimit[_index] = _limit;
-    limitElem->GetElement("upper")->Set(_limit.Radian());
+    this->rml.axis2().limit().set_upper(_limit.Radian());
   }
   else
   {

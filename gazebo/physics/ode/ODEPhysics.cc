@@ -166,30 +166,29 @@ ODEPhysics::~ODEPhysics()
   this->worldId = NULL;
 }
 
-//////////////////////////////////////////////////
-void ODEPhysics::Load(sdf::ElementPtr _sdf)
-{
-  PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+
+//////////////////////////////////////////////////
+bool ODEPhysics::Load(const rml::Physics &_rml)
+{
+  bool result = PhysicsEngine::Load(_rml);
+  if (!result)
+    return result;
+
+  this->maxContacts = _rml.max_contacts();
   this->SetMaxContacts(this->maxContacts);
 
-  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  sdf::ElementPtr solverElem = odeElem->GetElement("solver");
-
-  this->stepType = solverElem->Get<std::string>("type");
+  this->stepType = _rml.ode().solver().type();
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
-      odeElem->GetElement("constraints")->Get<double>(
-        "contact_max_correcting_vel"));
+      _rml.ode().constraints().contact_max_correcting_vel());
 
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId,
-       odeElem->GetElement("constraints")->Get<double>(
-        "contact_surface_layer"));
+       _rml.ode().constraints().contact_surface_layer());
 
   // Enable auto-disable by default. Models with joints are excluded from
   // auto-disable
@@ -207,12 +206,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
-  if (odeElem->HasElement("constraints"))
+  if (_rml.ode().has_constraints())
   {
     dWorldSetCFM(this->worldId,
-        odeElem->GetElement("constraints")->Get<double>("cfm"));
+        _rml.ode().constraints().cfm());
     dWorldSetERP(this->worldId,
-        odeElem->GetElement("constraints")->Get<double>("erp"));
+        _rml.ode().constraints().erp());
   }
   else
     dWorldSetERP(this->worldId, 0.2);
@@ -226,7 +225,20 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   else if (this->stepType == "world")
     this->physicsStepFunc = &dWorldStep;
   else
-    gzthrow(std::string("Invalid step type[") + this->stepType);
+  {
+    gzerr << "Invalid step type[" << this->stepType << "]\n";
+    return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::Load(sdf::ElementPtr _sdf)
+{
+  rml::Physics physicsRML;
+  physicsRML.SetFromXML(_sdf);
+  this->Load(physicsRML);
 }
 
 /////////////////////////////////////////////////

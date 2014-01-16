@@ -41,6 +41,15 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
+bool Shape::Load(const rml::Collision &_rml)
+{
+  bool result = Base::Load(_rml.name());
+  this->rml = _rml;
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Shape::GetScale() const
 {
   return this->scale;

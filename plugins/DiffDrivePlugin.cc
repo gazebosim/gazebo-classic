@@ -87,12 +87,12 @@ void DiffDrivePlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
+void DiffDrivePlugin::OnVelMsg(ConstCmdVel2DPtr &_msg)
 {
   double vr, va;
 
-  vr = _msg->position().x();
-  va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
+  vr = _msg->velocity();
+  va = _msg->theta();
 
   this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
   this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;

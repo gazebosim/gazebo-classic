@@ -115,75 +115,73 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
+  rml::Link linkRML;
+  linkRML.SetFromXML(_sdf);
+  this->Load(linkRML);
+}
+
+//////////////////////////////////////////////////
+bool Link::Load(const rml::Link &_rml)
+{
   bool needUpdate = false;
 
-  Entity::Load(_sdf);
+  this->rml = _rml;
+  Entity::Load(_rml.name(), _rml.pose());
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
-  this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetSelfCollide, this));
+  this->SetSelfCollide(this->rml.self_collide());
 
   // Parse visuals from SDF
   this->ParseVisuals();
 
   // Load the geometries
-  if (this->sdf->HasElement("collision"))
+  for(std::vector<rml::Collision>::const_iterator iter =
+      this->rml.collision().begin();
+      iter != this->rml.collision().end(); ++iter)
   {
-    sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
-    while (collisionElem)
-    {
-      // Create and Load a collision, which will belong to this body.
-      this->LoadCollision(collisionElem);
-      collisionElem = collisionElem->GetNextElement("collision");
-    }
+    // Create and Load a collision, which will belong to this body.
+    this->LoadCollision(*iter);
   }
 
-  if (this->sdf->HasElement("sensor"))
+  // Load the sensors
+  for(std::vector<rml::Sensor>::const_iterator iter =
+      this->rml.sensor().begin();
+      iter != this->rml.sensor().end(); ++iter)
   {
-    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
-    while (sensorElem)
+    /// \todo This if statement is a hack to prevent Links from creating
+    /// a force torque sensor. We should make this more generic.
+    if ((*iter).type() == "force_torque")
     {
-      /// \todo This if statement is a hack to prevent Links from creating
-      /// a force torque sensor. We should make this more generic.
-      if (sensorElem->Get<std::string>("type") == "force_torque")
-      {
-        gzerr << "A link cannot load a [" <<
-          sensorElem->Get<std::string>("type") << "] sensor.\n";
-      }
-      else if (sensorElem->Get<std::string>("type") != "__default__")
-      {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
-        this->sensors.push_back(sensorName);
-      }
-      sensorElem = sensorElem->GetNextElement("sensor");
+      gzerr << "A link cannot load a [" << (*iter).type() << "] sensor.\n";
+    }
+    else if ((*iter).type() != "__default__")
+    {
+      std::string sensorName =
+        sensors::create_sensor(*iter, this->GetWorld()->GetName(),
+            this->GetScopedName(), this->GetId());
+      this->sensors.push_back(sensorName);
     }
   }
 
   if (!this->IsStatic())
-  {
-    this->inertial->Load(this->sdf->GetElement("inertial"));
-  }
+    this->inertial->Load(this->rml.inertial());
 
 #ifdef HAVE_OPENAL
-  if (_sdf->HasElement("audio_source"))
+  if (this->rml.has_audio_source())
   {
     // bool onContact = false;
-    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
     std::vector<std::string> collisionNames;
 
-    while (audioElem)
+    for (std::vector<rml::Audio_Source>::const_iterator iter =
+        this->rml.audio_source().begin(); this->rml.audio_source.end(); ++iter)
     {
       util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
-          audioElem);
+          *iter);
 
       std::vector<std::string> names = source->GetCollisionNames();
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
-      audioElem = audioElem->GetNextElement("audio_source");
       this->audioSources.push_back(source);
     }
 
@@ -205,11 +203,11 @@ void Link::Load(sdf::ElementPtr _sdf)
     needUpdate = true;
   }
 
-  if (_sdf->HasElement("audio_sink"))
+  if (this->rml.has_audio_sink())
   {
     needUpdate = true;
     this->audioSink = util::OpenAL::Instance()->CreateSink(
-        _sdf->GetElement("audio_sink"));
+        this->rml.audio_sink());
   }
 #endif
 
@@ -227,8 +225,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->rml.pose());
+  this->SetInitialRelativePose(this->.pose());
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -304,6 +302,7 @@ void Link::ResetPhysicsStates()
 //////////////////////////////////////////////////
 void Link::UpdateParameters(sdf::ElementPtr _sdf)
 {
+  /* RE-IMPLEMENT ME
   Entity::UpdateParameters(_sdf);
 
   if (this->sdf->HasElement("inertial"))
@@ -356,7 +355,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
         collision->UpdateParameters(collisionElem);
       collisionElem = collisionElem->GetNextElement("collision");
     }
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -410,9 +409,8 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide() const
 {
-  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
-  if (this->sdf->HasElement("self_collide"))
-    return this->sdf->Get<bool>("self_collide");
+  if (this->rml.has_self_collide())
+    return this->rml.self_collide();
   else
     return false;
 }
@@ -501,11 +499,26 @@ Link_V Link::GetParentJointsLinks() const
 }
 
 //////////////////////////////////////////////////
-void Link::LoadCollision(sdf::ElementPtr _sdf)
+void Link::LoadCollision(const rml::Collision &_rml)
 {
   CollisionPtr collision;
-  std::string geomType =
-    _sdf->GetElement("geometry")->GetFirstElement()->GetName();
+  std::string geomType;
+
+  // Use of reflection would be nice here.
+  if (_rml.has_heightmap())
+    geomType = "heightmap";
+  else if (_rml.has_box())
+    geomType = "box";
+  else if (_rml.has_sphere())
+    geomType = "sphere";
+  else if (_rml.has_cylinder())
+    geomType = "cylinder";
+  else if (_rml.has_mesh())
+    geomType = "mesh";
+  else if (_rml.has_image())
+    geomType = "image";
+  else if (_rml.has_plane())
+    geomType = "plane";
 
   if (geomType == "heightmap" || geomType == "map")
     this->SetStatic(true);
@@ -516,7 +529,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
 
-  collision->Load(_sdf);
+  collision->Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -766,18 +779,15 @@ void Link::FillMsg(msgs::Link &_msg)
     vis->CopyFrom(iter->second);
   }
 
-  if (this->sdf->HasElement("projector"))
+  if (this->rml.has_projector())
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("projector");
-
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(
-        this->GetScopedName() + "::" + elem->Get<std::string>("name"));
-    proj->set_texture(elem->Get<std::string>("texture"));
-    proj->set_fov(elem->Get<double>("fov"));
-    proj->set_near_clip(elem->Get<double>("near_clip"));
-    proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
+    proj->set_name(this->GetScopedName() + "::" + this->rml.projector().name());
+    proj->set_texture(this->rml.projector().texture());
+    proj->set_fov(this->rml.projector().fov());
+    proj->set_near_clip(this->rml.projector().near_clip());
+    proj->set_far_clip(this->rml.projector().far_clip());
+    msgs::Set(proj->mutable_pose(), this->rml.projector().pose());
   }
 }
 
@@ -910,19 +920,13 @@ void Link::SetState(const LinkState &_state)
 /////////////////////////////////////////////////
 double Link::GetLinearDamping() const
 {
-  if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
-  else
-    return 0.0;
+  return this->rml.velocity_decay().linear();
 }
 
 /////////////////////////////////////////////////
 double Link::GetAngularDamping() const
 {
-  if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->Get<double>("angular");
-  else
-    return 0.0;
+  return this->rml.velocity_decay().angular();
 }
 
 /////////////////////////////////////////////////
@@ -1006,30 +1010,25 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 void Link::ParseVisuals()
 {
   // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
+  for(std::vector<rml::Visual>const_iterator iter = this->rml.visual().begin();
+      iter != this->rml.visual().end(); ++iter)
   {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+    msgs::Visual msg = msgs::VisualFromSDF(iter);
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
-      msg.set_id(physics::getUniqueId());
-      msg.set_parent_name(this->GetScopedName());
-      msg.set_parent_id(this->GetId());
-      msg.set_is_static(this->IsStatic());
+    std::string visName = this->GetScopedName() + "::" + msg.name();
+    msg.set_name(visName);
+    msg.set_id(physics::getUniqueId());
+    msg.set_parent_name(this->GetScopedName());
+    msg.set_parent_id(this->GetId());
+    msg.set_is_static(this->IsStatic());
 
-      this->visPub->Publish(msg);
+    this->visPub->Publish(msg);
 
-      Visuals_M::iterator iter = this->visuals.find(msg.id());
-      if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+    Visuals_M::iterator iter = this->visuals.find(msg.id());
+    if (iter != this->visuals.end())
+      gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
-      this->visuals[msg.id()] = msg;
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
+    this->visuals[msg.id()] = msg;
   }
 }
 

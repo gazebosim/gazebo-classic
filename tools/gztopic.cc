@@ -158,7 +158,7 @@ bool parse(int argc, char **argv)
 transport::ConnectionPtr connect_to_master()
 {
   std::string data, namespacesData, publishersData;
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
 
   std::string host;
   unsigned int port;
@@ -183,10 +183,10 @@ transport::ConnectionPtr connect_to_master()
     }
 
     packet.ParseFromString(data);
-    if (packet.type() == "init")
+    if (packet.msg_type() == "init")
     {
       robot_msgs::StringMsg msg;
-      msg.ParseFromString(packet.serialized_data());
+      msg.ParseFromString(packet.msg_data());
       if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
         std::cerr << "Conflicting gazebo versions\n";
     }
@@ -199,7 +199,7 @@ transport::ConnectionPtr connect_to_master()
 void list()
 {
   std::string data;
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   msgs::Request request;
   msgs::Publishers pubs;
 
@@ -223,7 +223,7 @@ void list()
     }
 
     packet.ParseFromString(data);
-    pubs.ParseFromString(packet.serialized_data());
+    pubs.ParseFromString(packet.msg_data());
 
     // This list is used to filter topic output.
     std::list<std::string> listed;
@@ -280,7 +280,7 @@ msgs::TopicInfo get_topic_info(const std::string &_topic)
   msgs::TopicInfo topic_info;
   std::string data;
   msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
 
   transport::ConnectionPtr connection = connect_to_master();
 
@@ -291,10 +291,10 @@ msgs::TopicInfo get_topic_info(const std::string &_topic)
   {
     connection->Read(data);
     packet.ParseFromString(data);
-  } while (packet.type() != "topic_info_response" && ++i < 10);
+  } while (packet.msg_type() != "topic_info_response" && ++i < 10);
 
   if (i <10)
-    topic_info.ParseFromString(packet.serialized_data());
+    topic_info.ParseFromString(packet.msg_data());
   else
     std::cerr << "Unable to get topic info.\n";
 

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ODEHingeJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include <boost/bind.hpp>
 
@@ -48,7 +44,18 @@ ODEHingeJoint::~ODEHingeJoint()
 //////////////////////////////////////////////////
 void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 {
-  HingeJoint<ODEJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+
+  HingeJoint<ODEJoint>::Load(rmlJoint);
+
+  this->SetParam(dParamFMax, 0);
+}
+
+//////////////////////////////////////////////////
+void ODEHingeJoint::Load(const rml::Joint &_rml)
+{
+  HingeJoint<ODEJoint>::Load(_rml);
 
   this->SetParam(dParamFMax, 0);
 }

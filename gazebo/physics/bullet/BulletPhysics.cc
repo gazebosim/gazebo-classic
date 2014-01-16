@@ -298,16 +298,16 @@ BulletPhysics::~BulletPhysics()
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::Load(sdf::ElementPtr _sdf)
+void BulletPhysics::Load(const rml::Physics &_rml)
 {
-  PhysicsEngine::Load(_sdf);
+  PhysicsEngine::Load(_rml);
 
-  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  math::Vector3 g = this->rml.gravity();
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
+
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -325,10 +325,10 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   // the following are undocumented members of btContactSolverInfo
   // m_globalCfm: constraint force mixing
-  info.m_globalCfm =
-    bulletElem->GetElement("constraints")->Get<double>("cfm");
+  info.m_globalCfm = _rml.bullet().constraints().cfm();
+
   // m_erp: Baumgarte factor
-  info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
+  info.m_erp = _rml.bullet().constraints().erp();
 
   info.m_numIterations =
       boost::any_cast<int>(this->GetParam(PGS_ITERS));
@@ -351,6 +351,14 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // info.m_globalCfm = 0.0;
   // info.m_splitImpulse = 0;
   // info.m_splitImpulsePenetrationThreshold = 0.0;
+}
+
+//////////////////////////////////////////////////
+void BulletPhysics::Load(sdf::ElementPtr _sdf)
+{
+  rml::Physics physicsRML;
+  physicsRML.SetFromXML(_sdf);
+  this->Load(physicsRML);
 }
 
 //////////////////////////////////////////////////

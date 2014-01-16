@@ -35,19 +35,25 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(math::Vector3(
+        this->rml.geometry().box_shape().size().x,
+        this->rml.geometry().box_shape().size().y,
+        this->rml.geometry().box_shape().size().z));
 }
 
 //////////////////////////////////////////////////
 void BoxShape::SetSize(const math::Vector3 &_size)
 {
-  this->sdf->GetElement("size")->Set(_size);
+  this->rml.mutable_geometry()->mutable_box_shape()->set_size(
+      sdf::Vector3(_size.x, _size.y, _size.z));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BoxShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return math::Vector3(this->rml.geometry().box_shape().size().x,
+                       this->rml.geometry().box_shape().size().y,
+                       this->rml.geometry().box_shape().size().z);
 }
 
 //////////////////////////////////////////////////

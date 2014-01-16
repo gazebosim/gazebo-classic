@@ -81,11 +81,11 @@ TEST(MsgsTest, Packet)
   msg.set_data("test_string");
   std::string data = msgs::Package("test_type", msg);
 
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   packet.ParseFromString(data);
-  msg.ParseFromString(packet.serialized_data());
+  msg.ParseFromString(packet.msg_data());
 
-  EXPECT_STREQ("test_type", packet.type().c_str());
+  EXPECT_STREQ("test_type", packet.msg_type().c_str());
   EXPECT_STREQ("test_string", msg.data().c_str());
 }
 

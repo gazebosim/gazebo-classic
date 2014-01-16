@@ -75,19 +75,16 @@ bool sensors::fini()
 /////////////////////////////////////////////////
 std::string sensors::create_sensor(sdf::ElementPtr _elem,
                                    const std::string &_worldName,
-                                   const std::string &_parentName)
+                                   const std::string &_parentName,
+                                   uint32_t _parentId)
 {
-  if (g_disable)
-    return "";
-
-  SensorPtr parentSensor = get_sensor(_parentName);
-  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
-
-  return create_sensor(_elem, _worldName, _parentName, parentSensor->GetId());
+  rml::Sensor rmlSensor;
+  rmlSensor.SetFromXML(_elem);
+  create_sensor(rmlSensor, _worldName, _parentName, _parentId);
 }
 
 /////////////////////////////////////////////////
-std::string sensors::create_sensor(sdf::ElementPtr _elem,
+std::string sensors::create_sensor(const rml::Sensor &_rml,
                                    const std::string &_worldName,
                                    const std::string &_parentName,
                                    uint32_t _parentId)

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Box geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
 #ifndef _BOXSHAPE_HH_
 #define _BOXSHAPE_HH_

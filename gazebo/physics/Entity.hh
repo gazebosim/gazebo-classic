@@ -65,6 +65,12 @@ namespace gazebo
       /// \param[in] _sdf Pointer to an SDF element.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Load the entity.
+      /// \param[in] _name Name of the entity.
+      /// \param[in] _pose Pose of the entity
+      public: virtual bool Load(const std::string &_name = "__default__",
+                  const math::Pose &_pose = math::Pose::Zero);
+
       /// \brief Finalize the entity.
       public: virtual void Fini();
 

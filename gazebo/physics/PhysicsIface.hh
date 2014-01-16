@@ -19,6 +19,7 @@
 
 #include <string>
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 
@@ -50,7 +51,13 @@ namespace gazebo
     /// \brief Load world from sdf::Element pointer.
     /// \param[in] _world Pointer to a world.
     /// \param[in] _sdf SDF values to load from.
-    void load_world(WorldPtr _world, sdf::ElementPtr _sdf);
+    void load_world(WorldPtr _world,
+        sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+    /// \brief Load world from rml::World object.
+    /// \param[in] _world Pointer to a world.
+    /// \param[in] _rml RML values to load from.
+    void load_world(WorldPtr _world, rml::World _rml);
 
     /// \brief Init world given a pointer to it.
     /// \param[in] _world World to initialize.
@@ -73,7 +80,11 @@ namespace gazebo
 
     /// \brief load multiple worlds from single sdf::Element pointer
     /// \param[in] _sdf SDF values used to create worlds.
-    void load_worlds(sdf::ElementPtr _sdf);
+    void load_worlds(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+    /// \brief load multiple worlds from single rml::World object.
+    /// \param[in] _rml RML values used to create worlds.
+    void load_worlds(rml::World _rml);
 
     /// \brief initialize multiple worlds stored in static variable
     /// gazebo::g_worlds

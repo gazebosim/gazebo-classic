@@ -63,28 +63,37 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
+  rml::Gripper rmlGripper;
+  rmlGripper.SetFromXML(_sdf);
+  this->Load(rmlGripper);
+}
+
+/////////////////////////////////////////////////
+void Gripper::Load(const rml::Gripper &_rml)
+{
   this->node->Init(this->world->GetName());
 
-  this->name = _sdf->Get<std::string>("name");
+  this->name = _rml.name();
   this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
 
-  sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
-  this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
-  this->attachSteps = graspCheck->Get<int>("attach_steps");
-  this->detachSteps = graspCheck->Get<int>("detach_steps");
+  this->minContactCount = _rml.grasp_check().min_contact_count();
+  this->attachSteps = _rml.grasp_check().attach_steps();
+  this->detachSteps = _rml.grasp_check().detach_steps();
 
-  sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
-  this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
+  this->palmLink = this->model->GetLink(_rml.palm_link());
   if (!this->palmLink)
-    gzerr << "palm link [" << palmLinkElem->Get<std::string>()
-          << "] not found!\n";
+    gzerr << "palm link [" << _rml.palm_link() << "] not found!\n";
 
-  sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
-
-  while (gripperLinkElem)
+  for (std::vector<std::string>::const_iterator iter =
+      _rml.gripper_link().begin(); iter != _rml.gripper_link().end(); ++iter)
   {
-    physics::LinkPtr gripperLink
-      = this->model->GetLink(gripperLinkElem->Get<std::string>());
+    physics::LinkPtr gripperLink = this->model->GetLink(*iter);
+    if (!gripperLink)
+    {
+      gzerr << "Unable to get gripper link[" << *iter << "]\n";
+      continue;
+    }
+
     for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
     {
       physics::CollisionPtr collision = gripperLink->GetCollision(j);
@@ -95,7 +104,6 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
       this->collisions[collision->GetScopedName()] = collision;
     }
-    gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
   }
 
   if (!this->collisions.empty())

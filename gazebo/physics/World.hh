@@ -32,6 +32,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -76,6 +77,12 @@ namespace gazebo
       /// Load a world from and SDF pointer.
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Load the world using RML parameters.
+      ///
+      /// Load a world from RML object.
+      /// \param[in] _world RML World object.
+      public: void Load(rml::World _world);
 
       /// \brief Save a world to a file.
       ///
@@ -347,19 +354,38 @@ namespace gazebo
       /// \brief Create and load all entities.
       /// \param[in] _sdf SDF element.
       /// \param[in] _parent Parent of the model to load.
-      private: void LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent);
+      private: void LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
+               GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Create and load all entities.
+      /// \param[in] _rml RML element.
+      /// \param[in] _parent Parent of the model to load.
+      private: void LoadEntities(const rml::World _rml, BasePtr _parent);
 
       /// \brief Load a model.
       /// \param[in] _sdf SDF element containing the Model description.
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
-      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
+      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent)
+               GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load a model.
+      /// \param[in] _rml RML element containing the Model description.
+      /// \param[in] _parent Parent of the model.
+      /// \return Pointer to the newly created Model.
+      private: ModelPtr LoadModel(const rml::Model &_rml, BasePtr _parent);
 
       /// \brief Load an actor.
       /// \param[in] _sdf SDF element containing the Actor description.
       /// \param[in] _parent Parent of the Actor.
       /// \return Pointer to the newly created Actor.
       private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr _parent);
+
+      /// \brief Load an actor.
+      /// \param[in] _rml RML element containing the Actor description.
+      /// \param[in] _parent Parent of the Actor.
+      /// \return Pointer to the newly created Actor.
+      private: ActorPtr LoadActor(const rml::Actor _rml, BasePtr _parent);
 
       /// \brief Load a road.
       /// \param[in] _sdf SDF element containing the Road description.

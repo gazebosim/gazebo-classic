@@ -40,7 +40,15 @@ SimbodyMeshShape::~SimbodyMeshShape()
 //////////////////////////////////////////////////
 void SimbodyMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyMeshShape::Load(const rml::Collision &_rml)
+{
+  return MeshShape::Load(_rml);
 }
 
 //////////////////////////////////////////////////

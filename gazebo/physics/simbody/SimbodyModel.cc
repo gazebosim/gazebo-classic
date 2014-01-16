@@ -40,7 +40,15 @@ SimbodyModel::~SimbodyModel()
 //////////////////////////////////////////////////
 void SimbodyModel::Load(sdf::ElementPtr _sdf)
 {
-  Model::Load(_sdf);
+  rml::Model rmlModel;
+  rmlModel.SetFromXML(_sdf);
+  this->Load(rmlModel);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyModel::Load(const rml::Model &_rml)
+{
+  return Model::Load(_rml);
 }
 
 //////////////////////////////////////////////////

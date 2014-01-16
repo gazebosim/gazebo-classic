@@ -98,6 +98,48 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+bool OpenAL::Load(const rml::World::Audio &_rml)
+{
+  std::string deviceName = "default";
+
+  if (_rml.has_device())
+    deviceName = _rml.device();
+
+  // Open the default audio device
+  if (deviceName == "default")
+    this->audioDevice = alcOpenDevice(NULL);
+  else
+    this->audioDevice = alcOpenDevice(deviceName.c_str());
+
+  // Make sure that we could open the audio device
+  if (this->audioDevice == NULL)
+  {
+    gzerr << "Unable to open audio device["
+      << deviceName << "]\n Audio will be disabled.\n";
+    return false;
+  }
+
+  // Create the audio context
+  this->context = alcCreateContext(this->audioDevice, NULL);
+
+  if (this->context == NULL)
+  {
+    gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
+    return false;
+  }
+
+  // Make the context current
+  alcMakeContextCurrent(this->context);
+
+  // Clear error code
+  alGetError();
+
+  alDistanceModel(AL_EXPONENT_DISTANCE);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 void OpenAL::Fini()
 {
   if (this->audioDevice)

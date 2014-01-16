@@ -20,7 +20,9 @@
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -56,7 +58,12 @@ namespace gazebo
 
       /// \brief Load the OpenAL server.
       /// \return True on success.
-      public: bool Load(sdf::ElementPtr _sdf = sdf::ElementPtr());
+      public: bool Load(sdf::ElementPtr _sdf =
+                  sdf::ElementPtr()) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the OpenAL server.
+      /// \return True on success.
+      public: bool Load(const rml::World::Audio &_rml);
 
       /// \brief Finalize.
       public: void Fini();

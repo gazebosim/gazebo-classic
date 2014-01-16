@@ -43,7 +43,15 @@ SimbodySliderJoint::~SimbodySliderJoint()
 //////////////////////////////////////////////////
 void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 {
-  SliderJoint<SimbodyJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodySliderJoint::Load(const rml::Joint &_rml)
+{
+  SliderJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -170,13 +178,11 @@ math::Angle SimbodySliderJoint::GetHighStop(int _index)
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return math::Angle(this->rml.axis().limit().upper());
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
+    return math::Angle(this->rml.axis2().limit().upper());
   }
   else
   {
@@ -196,13 +202,11 @@ math::Angle SimbodySliderJoint::GetLowStop(int _index)
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return math::Angle(this->rml.axis().limit().lower());
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
+    return math::Angle(this->rml.axis2().limit().lower());
   }
   else
   {

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for a surface
- * Author: Nate Koenig
- * Date: 30 July 2003
- */
 
 #ifndef _SURFACEPARAMS_HH_
 #define _SURFACEPARAMS_HH_
@@ -48,6 +44,10 @@ namespace gazebo
       /// \brief Load the contact params.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Load the contact params.
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(const rml::Surface &_rml);
 
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.

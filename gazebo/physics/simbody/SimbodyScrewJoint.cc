@@ -42,7 +42,15 @@ SimbodyScrewJoint::~SimbodyScrewJoint()
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 {
-  ScrewJoint<SimbodyJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::Load(const rml::Joint &_rml)
+{
+  ScrewJoint<SimbodyJoint>::Load(_rml);
   this->SetThreadPitch(0, this->threadPitch);
 }
 

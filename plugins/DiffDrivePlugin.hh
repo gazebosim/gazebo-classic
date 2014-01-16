@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_DIFFDRIVE_PLUGIN_HH_
 #define _GAZEBO_DIFFDRIVE_PLUGIN_HH_
 
+#include <robot_msgs/MessageTypes.hh>
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -32,7 +33,7 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void OnVelMsg(ConstPosePtr &_msg);
+    private: void OnVelMsg(ConstCmdVel2DPtr &_msg);
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;

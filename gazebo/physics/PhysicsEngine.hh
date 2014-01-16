@@ -53,6 +53,11 @@ namespace gazebo
       /// \param[in] _sdf Pointer to the SDF parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Load the physics engine.
+      /// \param[in] _rml RML physics parameters.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Physics &_rml);
+
       /// \brief Initialize the physics engine.
       public: virtual void Init() = 0;
 
@@ -292,6 +297,9 @@ namespace gazebo
 
       /// \brief Our SDF values.
       protected: sdf::ElementPtr sdf;
+
+      /// \brief Our RML values.
+      protected: rml::Physics rml;
 
       /// \brief Node for communication.
       protected: transport::NodePtr node;

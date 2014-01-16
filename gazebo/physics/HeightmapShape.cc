@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <string.h>
 #include <math.h>
@@ -75,13 +71,24 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
-  Base::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.mutable_geometry()->mutable_heightmap_shape()->SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
 
-  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
+//////////////////////////////////////////////////
+bool HeightmapShape::Load(const rml::Collision &_rml)
+{
+  Base::Load(_rml.name());
+
+  std::string filename = common::find_file(
+      this->rml.geometry().heightmap_shape().uri());
+
   if (filename.empty())
   {
-    gzthrow("Unable to find heightmap[" +
-            this->sdf->Get<std::string>("uri") + "]\n");
+    gzerr << "Unable to find heightmap[" <<
+      this->rml.geometry().heightmap_shape().uri() << "]\n";
+    return false;
   }
 
   // Use the image to get the size of the heightmap
@@ -90,8 +97,11 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   if (this->img.GetWidth() != this->img.GetHeight() ||
       !math::isPowerOfTwo(this->img.GetWidth()-1))
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
+    gzerr << "Heightmap image size must be square, with a size of 2^n+1\n";
+    return false;
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -219,19 +229,25 @@ void HeightmapShape::FillHeightMap()
 //////////////////////////////////////////////////
 std::string HeightmapShape::GetURI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->rml.geometry().heightmap_shape().uri();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return math::Vector3(
+      this->rml.geometry().heightmap_shape().size().x,
+      this->rml.geometry().heightmap_shape().size().y,
+      this->rml.geometry().heightmap_shape().size().z);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return math::Vector3(
+      this->rml.geometry().heightmap_shape().pos().x,
+      this->rml.geometry().heightmap_shape().pos().y,
+      this->rml.geometry().heightmap_shape().pos().z);
 }
 
 //////////////////////////////////////////////////

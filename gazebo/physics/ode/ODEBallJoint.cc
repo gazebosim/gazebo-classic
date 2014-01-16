@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: An ODE ball joint
- * Author: Nate Koenig
- * Date: k13 Oct 2009
- */
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"

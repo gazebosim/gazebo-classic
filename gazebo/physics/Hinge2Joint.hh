@@ -55,15 +55,34 @@ namespace gazebo
 
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
               {
-                T::Load(_sdf);
+                rml::Joint rmlJoint;
+                rmlJoint.SetFromXML(_sdf);
+                T::Load(rmlJoint);
 
                 this->SetAxis(0,
                     _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
 
                 this->SetAxis(1,
                     _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+              }
+
+      /// \brief Load the joint.
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(const rml::Joint &_rml)
+              {
+                T::Load(_rml);
+
+                this->SetAxis(0, math::Vector3(
+                    _rml.axis().xyz().x,
+                    _rml.axis().xyz().y,
+                    _rml.axis().xyz().z));
+
+                this->SetAxis(1, math::Vector3(
+                    _rml.axis2().xyz().x,
+                    _rml.axis2().xyz().y,
+                    _rml.axis2().xyz().z));
               }
     };
     /// \}

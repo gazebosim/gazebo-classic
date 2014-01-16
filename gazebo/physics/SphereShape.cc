@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 #include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
@@ -38,19 +34,19 @@ SphereShape::~SphereShape()
 //////////////////////////////////////////////////
 void SphereShape::Init()
 {
-  this->SetRadius(this->sdf->Get<double>("radius"));
+  this->SetRadius(this->rml.geometry().sphere_shape().radius());
 }
 
 //////////////////////////////////////////////////
 void SphereShape::SetRadius(double _radius)
 {
-  this->sdf->GetElement("radius")->Set(_radius);
+  this->rml.mutable_geometry()->mutable_sphere_shape()->set_radius(_radius);
 }
 
 //////////////////////////////////////////////////
 double SphereShape::GetRadius() const
 {
-  return this->sdf->Get<double>("radius");
+  return this->rml.geometry().sphere_shape().radius();
 }
 
 //////////////////////////////////////////////////

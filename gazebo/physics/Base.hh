@@ -144,6 +144,10 @@ namespace gazebo
       /// \param[in] node Pointer to an SDF parameters
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Load.
+      /// \param[in] _name Name of this object.
+      public: bool Load(const std::string &_name = "__default__");
+
       /// \brief Finialize the object
       public: virtual void Fini();
 
@@ -299,7 +303,7 @@ namespace gazebo
       protected: void ComputeScopedName();
 
       /// \brief The SDF values for this object.
-      protected: sdf::ElementPtr sdf;
+      // DELETE protected: sdf::ElementPtr sdf;
 
       /// \brief Parent of this entity.
       protected: BasePtr parent;

@@ -65,14 +65,26 @@ else ()
 endif ()
 
 ########################################
+find_package(RML)
+if (NOT RML_FOUND)
+  BUILD_ERROR ("Missing: Robot Markup Language (RML). Required for reading "
+    "and writing RML configuration files.")
+else()
+  message(STATUS "Looking for RML - found")
+endif()
+
+########################################
+find_package(SDFormat)
+if (NOT SDFormat_FOUND)
+  BUILD_ERROR ("Missing: SDFormat. Required for reading and writing SDF "
+    "configuration files.")
+else()
+  message(STATUS "Looking for SDF - found")
+endif()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=1.4.10)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")

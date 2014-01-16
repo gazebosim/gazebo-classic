@@ -36,8 +36,16 @@ Road::~Road()
 /////////////////////////////////////////////////
 void Road::Load(sdf::ElementPtr _elem)
 {
-  Base::Load(_elem);
-  this->SetName(_elem->Get<std::string>("name"));
+  rml::Road roadRML;
+  roadRML.SetFromXML(_elem);
+  this->Load(roadRML);
+}
+
+/////////////////////////////////////////////////
+void Road::Load(const rml::Road &_rml)
+{
+  Base::Load(_rml.name());
+  this->rml = _rml;
 }
 
 /////////////////////////////////////////////////
@@ -51,14 +59,13 @@ void Road::Init()
   msgs::Road msg;
   msg.set_name(this->GetName());
 
-  this->width = this->sdf->Get<double>("width");
+  this->width = this->rml.width();
   msg.set_width(this->width);
 
-  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
-  while (pointElem)
+  for (std::vector<sdf::Vector3>::const_iterator iter =
+      this->rml.point().begin(); iter != this->rml.point.end(); ++iter)
   {
-    math::Vector3 point = pointElem->Get<math::Vector3>();
-    pointElem = pointElem->GetNextElement("point");
+    math::Vector3 point = msgs::Convert(*iter);
 
     robot_msgs::Vector3d *ptMsg = msg.add_point();
     msgs::Set(ptMsg, point);

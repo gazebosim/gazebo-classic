@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
 
 #ifndef _VECTOR3_HH_
 #define _VECTOR3_HH_
@@ -25,6 +21,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Helpers.hh"
 
@@ -68,6 +65,10 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _v a vector
       public: Vector3(const Vector3 &_v);
+
+      /// \brief SDF constructor
+      /// \param[in] _v A SDF vector
+      public: Vector3(const sdf::Vector3 &_v);
 
       /// \brief Destructor
       public: virtual ~Vector3();
@@ -171,6 +172,11 @@ namespace gazebo
       /// \param[in] _v a new value
       /// \return this
       public: Vector3 &operator =(const Vector3 &_v);
+
+      /// \brief Assignment operator
+      /// \param[in] _v Set from sdf::Vector3 new value
+      /// \return this
+      public: Vector3 &operator =(const sdf::Vector3 &_v);
 
       /// \brief Assignment operator
       /// \param[in] _value assigned to all elements

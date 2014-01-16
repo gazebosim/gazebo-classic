@@ -25,6 +25,8 @@
 #include <vector>
 #include <string>
 
+#include <rml/rml.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -68,7 +70,12 @@ namespace gazebo
 
       /// \brief Load the body based on an SDF element.
       /// \param[in] _sdf SDF parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load the body based on an RML element.
+      /// \param[in] _rml RML parameters.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Link &_rml);
 
       /// \brief Initialize the body.
       public: virtual void Init();
@@ -84,7 +91,8 @@ namespace gazebo
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
 
       /// \brief Update the collision.
       /// \param[in] _info Update information.
@@ -456,8 +464,8 @@ namespace gazebo
       private: void PublishData();
 
       /// \brief Load a new collision helper function.
-      /// \param[in] _sdf SDF element used to load the collision.
-      private: void LoadCollision(sdf::ElementPtr _sdf);
+      /// \param[in] _rml RML values used to load the collision.
+      private: void LoadCollision(const rml::Collision &_rml);
 
       /// \brief Set the inertial properties based on the collision
       /// entities.
@@ -491,6 +499,9 @@ namespace gazebo
 
       /// \brief Offsets for the attached models.
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief Configuration data for this link.
+      protected: rml::Link rml;
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;

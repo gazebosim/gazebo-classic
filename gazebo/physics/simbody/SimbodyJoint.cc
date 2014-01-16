@@ -43,49 +43,49 @@ SimbodyJoint::~SimbodyJoint()
 //////////////////////////////////////////////////
 void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::Load(const rml::Joint &_rml)
+{
   // store a pointer to the simbody physics engine for convenience
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
     this->model->GetWorld()->GetPhysicsEngine());
 
-  Joint::Load(_sdf);
+  Joint::Load(_rml);
 
   // read must_be_loop_joint
   // \TODO: clean up
-  if (_sdf->HasElement("physics") &&
-    _sdf->GetElement("physics")->HasElement("simbody"))
-  {
-    this->mustBreakLoopHere = _sdf->GetElement("physics")->
-      GetElement("simbody")->Get<bool>("must_be_loop_joint");
-  }
+  if (_rml.has_physics() && _rml.physics().has_simbody())
+    this->mustBreakLoopHere = _rml.physics().simbody().must_be_loop_joint();
 
-  if (this->sdf->HasElement("axis"))
+  if (this->rml.has_axis())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
+    if (this->rml.axis().has_dynamics())
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
       /// \TODO: switch to GetElement so default values apply
       /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (this->rml.axis().dynamics().has_damping())
       {
-        this->dissipationCoefficient[0] = dynamicsElem->Get<double>("damping");
+        this->dissipationCoefficient[0] =
+          this->rml.axis().dynamics().damping();
       }
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->rml.has_axis2())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    if (axisElem->HasElement("dynamics"))
+    if (this->rml.axis2().has_dynamics())
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
       /// \TODO: switch to GetElement so default values apply
       /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (this->rml.axis2().dynamics().has_damping())
       {
-        this->dissipationCoefficient[1] = dynamicsElem->Get<double>("damping");
+        this->dissipationCoefficient[1] = 
+          this->rml.axis2().dynamics().damping();
       }
     }
   }
@@ -106,16 +106,35 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
-  if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+  math::Pose childPose(math::Vector3(
+        this->rml.pose().pos.x,
+        this->rml.pose().pos.y,
+        this->rml.pose().pos.z),
+      math::Quaternion(
+        this->rml.pose().rot.x, this->rml.pose().rot.y,
+        this->rml.pose().rot.z, this->rml.pose().rot.w));
+
+  // The following is not supported.
+  // if (this->rml.child().has_pose())
+  // {
+  //   childPose.Set(
+  //       math::Vector3(
+  //         this->rml.child().pose().pos.x,
+  //         this->rml.child().pose().pos.y,
+  //         this->rml.child().pose().pos.z),
+  //       math::Quaternion(
+  //         this->rml.child().pose().rot.x, this->rml.child().pose().rot.y,
+  //         this->rml.child().pose().rot.z, this->rml.child().pose().rot.w));
+  // }
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
   math::Pose parentPose;
-  if (_sdf->GetElement("parent")->HasElement("pose"))
-    this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
-  else
+
+  // The following is not supported.
+  // if (this->rml.parent().has_pose())
+  //   this->xPA = physics::SimbodyPhysics::GetPose(this->rml.parent().pose());
+  // else
   {
     SimTK::Transform X_MC, X_MP;
     if (this->parentLink)
@@ -277,12 +296,13 @@ void SimbodyJoint::SetAxis(int _index, const math::Vector3 &/*_axis*/)
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
   math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+    math::Vector3(this->rml.axis().xyz().x, this->rml.axis().xyz().y,
+                  this->rml.axis().xyz().z));
 
   if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
+    this->rml.axis().set_xyz(sdf::Vector3(axis.x, axis.y, axis.z));
   else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(axis);
+    this->rml.axis2().set_xyz(sdf::Vector3(axis.x, axis.y, axis.z));
   else
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }

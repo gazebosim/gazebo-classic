@@ -84,9 +84,9 @@ Entity::~Entity()
 }
 
 //////////////////////////////////////////////////
-void Entity::Load(sdf::ElementPtr _sdf)
+bool Entity::Load(const std::string &_name, const math::Pose &_pose)
 {
-  Base::Load(_sdf);
+  Base::Load(_name);
   this->node->Init(this->GetWorld()->GetName());
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
@@ -96,16 +96,12 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
-  {
-    if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
-                        this->parentEntity->worldPose;
-    else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+  if (this->parent && this->parentEntity)
+    this->worldPose = _pose + this->parentEntity->worldPose;
+  else
+    this->worldPose = _pose;
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
-  }
+  this->initialRelativePose = _pose;
 
   if (this->parent)
   {
@@ -127,6 +123,23 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
   else
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+void Entity::Load(sdf::ElementPtr _sdf)
+{
+  math::Pose sdfPose;
+  std::string sdfName;
+
+  if (_sdf->HasAttribute("name"))
+    sdfName = _sdf->Get<std::string>("name");
+
+  if (_sdf->HasElement("pose"))
+    sdfPose = _sdf->Get<math::Pose>("pose");
+
+  this->Load(sdfName, sdfPose);
 }
 
 //////////////////////////////////////////////////

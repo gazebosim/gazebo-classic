@@ -48,7 +48,15 @@ ODESliderJoint::~ODESliderJoint()
 //////////////////////////////////////////////////
 void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 {
-  SliderJoint<ODEJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  SliderJoint<ODEJoint>::Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::Load(const rml::Joint &_rml)
+{
+  SliderJoint<ODEJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

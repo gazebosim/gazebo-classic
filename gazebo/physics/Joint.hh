@@ -26,7 +26,9 @@
 #include <vector>
 
 #include <boost/any.hpp>
+#include <rml/rml.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
@@ -107,7 +109,11 @@ namespace gazebo
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load physics::Joint from a rml::Joint object.
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(const rml::Joint &_rml);
 
       /// \brief Initialize a joint.
       public: virtual void Init();
@@ -551,12 +557,15 @@ namespace gazebo
       /// for example: ODEJoint::useImplicitSpringDamper.
       protected: bool useCFMDamping;
 
+      /// \brief Provide Feedback data for contact forces
+      protected: bool provideFeedback;
+
+      /// \brief Configuration data for this joint.
+      protected: rml::Joint rml;
+
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.
       private: static sdf::ElementPtr sdfJoint;
-
-      /// \brief Provide Feedback data for contact forces
-      protected: bool provideFeedback;
 
       /// \brief Names of all the sensors attached to the link.
       private: std::vector<std::string> sensors;

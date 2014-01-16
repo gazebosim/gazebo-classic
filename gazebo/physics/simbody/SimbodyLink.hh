@@ -44,7 +44,10 @@ namespace gazebo
       public: virtual ~SimbodyLink();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _ptr);
+      public: virtual void Load(sdf::ElementPtr _ptr) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Link &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

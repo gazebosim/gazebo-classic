@@ -136,13 +136,13 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
 
-  msgs::Packet packet;
+  robot_msgs::Packet packet;
   packet.ParseFromString(_data);
 
-  if (packet.type() == "register_topic_namespace")
+  if (packet.msg_type() == "register_topic_namespace")
   {
     robot_msgs::StringMsg worldNameMsg;
-    worldNameMsg.ParseFromString(packet.serialized_data());
+    worldNameMsg.ParseFromString(packet.msg_data());
 
     std::list<std::string>::iterator iter;
     iter = std::find(this->worldNames.begin(), this->worldNames.end(),
@@ -161,11 +161,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       }
     }
   }
-  else if (packet.type() == "advertise")
+  else if (packet.msg_type() == "advertise")
   {
     boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
 
     Connection_M::iterator iter2;
     for (iter2 = this->connections.begin();
@@ -188,22 +188,22 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       }
     }
   }
-  else if (packet.type() == "unadvertise")
+  else if (packet.msg_type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString(packet.serialized_data());
+    pub.ParseFromString(packet.msg_data());
     this->RemovePublisher(pub);
   }
-  else if (packet.type() == "unsubscribe")
+  else if (packet.msg_type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    sub.ParseFromString(packet.msg_data());
     this->RemoveSubscriber(sub);
   }
-  else if (packet.type() == "subscribe")
+  else if (packet.msg_type() == "subscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString(packet.serialized_data());
+    sub.ParseFromString(packet.msg_data());
 
     this->subscribers.push_back(std::make_pair(sub, conn));
 
@@ -219,10 +219,10 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       }
     }
   }
-  else if (packet.type() == "request")
+  else if (packet.msg_type() == "request")
   {
     msgs::Request req;
-    req.ParseFromString(packet.serialized_data());
+    req.ParseFromString(packet.msg_data());
 
     if (req.request() == "get_publishers")
     {
@@ -286,7 +286,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
   }
   else
-    std::cerr << "Master Unknown message type[" << packet.type()
+    std::cerr << "Master Unknown message type[" << packet.msg_type()
               << "] From[" << conn->GetRemotePort() << "]\n";
 }
 

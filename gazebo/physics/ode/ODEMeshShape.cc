@@ -91,7 +91,15 @@ void ODEMeshShape::Update()
 //////////////////////////////////////////////////
 void ODEMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
+
+//////////////////////////////////////////////////
+bool ODEMeshShape::Load(const rml::Collision &_rml)
+{
+  return MeshShape::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -127,11 +135,11 @@ void ODEMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->Get<math::Vector3>("scale").x;
+      this->rml.geometry().mesh_shape().scale().x;
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->Get<math::Vector3>("scale").y;
+      this->rml.geometry().mesh_shape().scale().y;
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->Get<math::Vector3>("scale").z;
+      this->rml.geometry().mesh_shape().scale().z;
   }
 
   // Build the ODE triangle mesh

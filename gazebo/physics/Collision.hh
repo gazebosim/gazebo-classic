@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifndef _COLLISION_HH_
 #define _COLLISION_HH_
@@ -54,14 +50,20 @@ namespace gazebo
 
       /// \brief Load the collision.
       /// \param[in] _sdf SDF to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the collision.
+      /// \param[in] _rml RML collision configuration values.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Collision &_rml);
 
       /// \brief Initialize the collision.
       public: virtual void Init();
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(2.0);
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _placeable True to make the object movable.
@@ -226,6 +228,9 @@ namespace gazebo
 
       /// \brief Unique id for collision visual.
       private: uint32_t collisionVisualId;
+
+      /// \brief RML configuration values.
+      private: rml::Collision rml;
     };
     /// \}
   }

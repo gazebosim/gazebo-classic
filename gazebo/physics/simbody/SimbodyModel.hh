@@ -39,7 +39,10 @@ namespace gazebo
       public: virtual ~SimbodyModel();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Model &_rml);
 
       // Documentation inherited
       public: virtual void Init();

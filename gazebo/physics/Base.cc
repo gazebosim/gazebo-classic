@@ -40,8 +40,8 @@ Base::Base(BasePtr _parent)
   this->saveable = true;
   this->selected = false;
 
-  this->sdf.reset(new sdf::Element);
-  this->sdf->AddAttribute("name", "string", "__default__", true);
+  // DELETE: this->sdf.reset(new sdf::Element);
+  // DELETE: this->sdf->AddAttribute("name", "string", "__default__", true);
   this->name = "__default__";
 
   if (this->parent)
@@ -67,21 +67,34 @@ Base::~Base()
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+
+  // DELETE if (this->sdf)
+  // DELETE   this->sdf->Reset();
+  // DELETE this->sdf.reset();
+}
+
+//////////////////////////////////////////////////
+bool Base::Load(const std::string &_name)
+{
+  this->name = _name;
+
+  if (this->parent)
+  {
+    this->world = this->parent->GetWorld();
+    this->parent->AddChild(shared_from_this());
+  }
+
+  this->ComputeScopedName();
+  return true;
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  if (_sdf)
-    this->sdf = _sdf;
+  GZ_ASSERT(_sdf != NULL, "sdf is NULL");
 
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
-
-  if (this->sdf->HasAttribute("name"))
-    this->name = this->sdf->Get<std::string>("name");
+  if (_sdf->HasAttribute("name"))
+    this->name = _sdf->Get<std::string>("name");
   else
     this->name.clear();
 
@@ -95,11 +108,11 @@ void Base::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Base::UpdateParameters(sdf::ElementPtr _sdf)
+void Base::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  this->sdf->Copy(_sdf);
+  // DELET GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  // DELETE GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  // FIX: this->sdf->Copy(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -139,9 +152,9 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
-  this->sdf->GetAttribute("name")->Set(_name);
+  // DELETE GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  // DELETE GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
+  // DELETE this->sdf->GetAttribute("name")->Set(_name);
   this->name = _name;
   this->ComputeScopedName();
 }
@@ -392,9 +405,8 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  this->sdf->Update();
-  return this->sdf;
+  // DELETE GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  // DELETE this->sdf->Update();
+  // DELETE return this->sdf;
+  return sdf::ElementPtr();
 }
-
-

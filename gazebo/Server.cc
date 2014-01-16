@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -294,7 +295,9 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  return this->LoadImpl(sdf->root, _physics);
+  rml::RML rml;
+  rml.SetFromXML(sdf->root);
+  return this->LoadImpl(rml, _physics);
 }
 
 /////////////////////////////////////////////////
@@ -314,7 +317,9 @@ bool Server::LoadString(const std::string &_sdfString)
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  rml::RML rml;
+  rml.SetFromXML(sdf->root);
+  return this->LoadImpl(rml);
 }
 
 /////////////////////////////////////////////////
@@ -334,7 +339,7 @@ bool Server::PreLoad()
 }
 
 /////////////////////////////////////////////////
-bool Server::LoadImpl(sdf::ElementPtr _elem,
+bool Server::LoadImpl(rml::RML _rml,
                       const std::string &_physics)
 {
   /// Load the sensors library
@@ -354,11 +359,9 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
             << "], the default will be used instead.\n";
     }
     // Try inserting physics engine name if one is given
-    else if (_elem->HasElement("world") &&
-             _elem->GetElement("world")->HasElement("physics"))
+    else if (_rml.has_world() && _rml.world().has_physics())
     {
-      _elem->GetElement("world")->GetElement("physics")
-           ->GetAttribute("type")->Set(_physics);
+      _rml.world().physics().set_type(_physics);
     }
     else
     {
@@ -366,15 +369,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     }
   }
 
-  sdf::ElementPtr worldElem = _elem->GetElement("world");
-  if (worldElem)
+  if (_rml.has_world())
   {
     physics::WorldPtr world = physics::create_world();
 
     // Create the world
     try
     {
-      physics::load_world(world, worldElem);
+      physics::load_world(world, _rml.world(0));
     }
     catch(common::Exception &e)
     {

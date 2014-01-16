@@ -69,95 +69,119 @@ Actor::~Actor()
 //////////////////////////////////////////////////
 void Actor::Load(sdf::ElementPtr _sdf)
 {
-  sdf::ElementPtr skinSdf = _sdf->GetElement("skin");
-  this->skinFile = skinSdf->Get<std::string>("filename");
-  this->skinScale = skinSdf->Get<double>("scale");
+  rml::Actor rmlActor;
+  rmlActor.SetFromXML(_sdf);
+  this->Load(rmlActor);
+}
+
+//////////////////////////////////////////////////
+bool Actor::Load(const rml::Actor &_rml)
+{
+  bool result = false;
+
+  rml::Model rmlModified;
+  rmlModified.set_name(_rml.name());
+  rmlModified.set_pose(_rml.pose());
+
+  this->skinFile = _rml.skin().filename();
+  this->skinScale = _rml.skin().scale();
 
   MeshManager::Instance()->Load(this->skinFile);
-  std::string actorName = _sdf->Get<std::string>("name");
+  std::string actorName = _rml.name();
 
-/*  double radius = 1.0;
-  unsigned int pointNum = 32;
-  for (unsigned int i = 0; i < pointNum; i++)
-  {
-    double angle = (2 * i * M_PI) / pointNum;
-    double x = radius * sin(angle);
-    double y = radius * cos(angle);
-    if (math::equal(x, 0.0))
-      x = 0;
-    if (math::equal(y, 0.0))
-      y = 0;
-    std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
-  }   */
+  // double radius = 1.0;
+  // unsigned int pointNum = 32;
+  // for (unsigned int i = 0; i < pointNum; i++)
+  // {
+  //   double angle = (2 * i * M_PI) / pointNum;
+  //   double x = radius * sin(angle);
+  //   double y = radius * cos(angle);
+  //   if (math::equal(x, 0.0))
+  //     x = 0;
+  //   if (math::equal(y, 0.0))
+  //     y = 0;
+  //   std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
+  // } 
 
   if (MeshManager::Instance()->HasMesh(this->skinFile))
   {
     this->mesh = MeshManager::Instance()->GetMesh(this->skinFile);
     if (!this->mesh->HasSkeleton())
-      gzthrow("Collada file does not contain skeletal animation.");
+    {
+      gzerr << "Collada file does not contain skeletal animation.\n";
+      return false;
+    }
+
     this->skeleton = mesh->GetSkeleton();
     this->skeleton->Scale(this->skinScale);
-    /// create the link sdfs for the model
+
+    /// create the links for the model
     NodeMap nodes = this->skeleton->GetNodes();
 
-    sdf::ElementPtr linkSdf;
-    linkSdf = _sdf->GetElement("link");
-    linkSdf->GetAttribute("name")->Set(actorName + "_pose");
-    linkSdf->GetElement("gravity")->Set(false);
-    sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
+    rml::Link *rmlLink = rmlModified.add_link();
 
-//    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
-//    this->AddSphereCollision(linkSdf, actorName + "_pose_col",
-//                                             math::Pose(), 0.02);
-    this->AddBoxVisual(linkSdf, actorName + "_pose_vis", math::Pose(),
-                       math::Vector3(0.05, 0.05, 0.05), "Gazebo/White",
-                       Color::White);
-    this->AddActorVisual(linkSdf, actorName + "_visual", math::Pose());
+    rmlLink->set_name(actorName + "_pose");
+    rmlLink->set_gravity(false);
+
+//    this->AddSphereInertia(rmlLink, math::Pose(), 1.0, 0.01);
+//    this->AddSphereCollision(rmlLink, actorName + "_pose_col",
+//    math::Pose(), 0.02);
+    this->AddBoxVisual(rmlLink, actorName + "_pose_vis", math::Pose(),
+        math::Vector3(0.05, 0.05, 0.05), "Gazebo/White", Color::White);
+    this->AddActorVisual(rmlLink, actorName + "_visual", math::Pose());
 
     this->visualName = actorName + "::" + actorName + "_pose::"
-                             + actorName + "_visual";
+                       + actorName + "_visual";
 
     this->visualId = gazebo::physics::getUniqueId();
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
-      SkeletonNode* bone = iter->second;
+      SkeletonNode *bone = iter->second;
 
-      linkSdf = _sdf->AddElement("link");
+      rmlLink = rmlModified.add_link();
 
-      linkSdf->GetAttribute("name")->Set(bone->GetName());
-      linkSdf->GetElement("gravity")->Set(false);
-      linkPose = linkSdf->GetElement("pose");
+      rmlLink->set_name(bone->GetName());
+      rmlLink->set_gravity(false);
+
       math::Pose pose(bone->GetModelTransform().GetTranslation(),
                       bone->GetModelTransform().GetRotation());
+
       if (bone->IsRootNode())
         pose = math::Pose();
-      linkPose->Set(pose);
+
+      rmlLink->set_pose(sdf::Pose(
+            sdf::Vector3(pose.pos.x, pose.pos.y, pose.pos.z),
+            sdf::Quaternion(pose.rot.w, pose.rot.x, pose.rot.y, pose.rot.z)));
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
-      this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
+      this->AddSphereInertia(rmlLink, math::Pose(), 1.0, 0.01);
 
       /// FIXME hardcoded collision to sphere with radius 0.02
-      this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
-                       math::Pose(), 0.02);
+      this->AddSphereCollision(rmlLink, bone->GetName() + "_collision",
+                               math::Pose(), 0.02);
 
       /// FIXME hardcoded visual to red sphere with radius 0.02
       if (bone->IsRootNode())
       {
-        this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-                            math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
+        this->AddSphereVisual(rmlLink, bone->GetName() + "__SKELETON_VISUAL__",
+                              math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
       }
       else
+      {
         if (bone->GetChildCount() == 0)
         {
-            this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
-                            "Gazebo/Yellow", Color::Yellow);
+            this->AddSphereVisual(rmlLink, bone->GetName() +
+                                  "__SKELETON_VISUAL__", math::Pose(), 0.02,
+                                  "Gazebo/Yellow", Color::Yellow);
         }
         else
-          this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
-                            "Gazebo/Red", Color::Red);
+        {
+          this->AddSphereVisual(rmlLink, bone->GetName() +
+                                "__SKELETON_VISUAL__", math::Pose(), 0.02,
+                                "Gazebo/Red", Color::Red);
+        }
+      }
 
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
       {
@@ -171,82 +195,88 @@ void Actor::Load(sdf::ElementPtr _sdf)
         {
           math::Vector3 r = curChild->GetTransform().GetTranslation();
           math::Vector3 linkPos = math::Vector3(r.x / 2.0,
-                                    r.y / 2.0, r.z / 2.0);
+              r.y / 2.0, r.z / 2.0);
           double theta = atan2(dir.y, dir.x);
           double phi = acos(dir.z / length);
 
           math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
           bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
 
-          this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
+          this->AddBoxVisual(rmlLink, bone->GetName() + "_" +
             curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
             math::Vector3(0.02, 0.02, length), "Gazebo/Green", Color::Green);
         }
       }
     }
 
-    sdf::ElementPtr animSdf = _sdf->GetElement("animation");
-
-    while (animSdf)
+    for (std::vector<rml::Actor::Animation>::const_iterator iter =
+         _rml.animation().begin(); iter != _rml.animation().end(); ++iter)
     {
-      this->LoadAnimation(animSdf);
-      animSdf = animSdf->GetNextElement("animation");
+      this->LoadAnimation(*iter);
     }
 
-    this->LoadScript(_sdf->GetElement("script"));
+    this->LoadScript(_rml.script());
 
     /// we are ready to load the links
-    Model::Load(_sdf);
+    result = Model::Load(rmlModified);
     this->bonePosePub = this->node->Advertise<msgs::PoseAnimation>(
-                                       "~/skeleton_pose/info", 10);
+        "~/skeleton_pose/info", 10);
   }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-void Actor::LoadScript(sdf::ElementPtr _sdf)
+void Actor::LoadScript(const rml::Actor::Script &_rml)
 {
-  this->loop = _sdf->Get<bool>("loop");
-  this->startDelay = _sdf->Get<double>("delay_start");
-  this->autoStart = _sdf->Get<bool>("auto_start");
+  this->loop = _rml.loop();
+  this->startDelay = _rml.delay_start();
+  this->autoStart = _rml.auto_start();
   this->active = this->autoStart;
 
-  if (_sdf->HasElement("trajectory"))
+  if (_rml.has_trajectory())
   {
-    sdf::ElementPtr trajSdf = _sdf->GetElement("trajectory");
-    while (trajSdf)
+    for (std::vector<rml::Actor::Script::Trajectory>::const_iterator
+         iter = _rml.trajectory().begin(); iter != _rml.trajectory().end();
+         ++iter)
     {
-      if (this->skelAnimation.find(trajSdf->Get<std::string>("type")) ==
-              this->skelAnimation.end())
+      if (this->skelAnimation.find((*iter).type()) == this->skelAnimation.end())
       {
         gzwarn << "Resource not found for trajectory of type " <<
-                  trajSdf->Get<std::string>("type") << "\n";
+                  (*iter).type() << "\n";
         continue;
       }
 
       TrajectoryInfo tinfo;
-      tinfo.id = trajSdf->Get<int>("id");
-      tinfo.type = trajSdf->Get<std::string>("type");
-      std::vector<TrajectoryInfo>::iterator iter = this->trajInfo.begin();
-      while (iter != this->trajInfo.end())
+      tinfo.id = (*iter).id();
+      tinfo.type = (*iter).type();
+      std::vector<TrajectoryInfo>::iterator iter2 = this->trajInfo.begin();
+      while (iter2 != this->trajInfo.end())
       {
-        if (iter->id > tinfo.id)
+        if (iter2->id > tinfo.id)
           break;
-        ++iter;
+        ++iter2;
       }
 
-      unsigned int idx = iter - this->trajInfo.begin();
-      this->trajInfo.insert(iter, tinfo);
+      unsigned int idx = iter2 - this->trajInfo.begin();
+      this->trajInfo.insert(iter2, tinfo);
 
       std::map<double, math::Pose> points;
 
-      if (trajSdf->HasElement("waypoint"))
+      if ((*iter).has_waypoint())
       {
-        sdf::ElementPtr wayptSdf = trajSdf->GetElement("waypoint");
-        while (wayptSdf)
+        std::vector<rml::Actor::Script::Trajectory::Waypoint>::const_iterator
+          wayIter = (*iter).waypoint().begin();
+        for (; wayIter != (*iter).waypoint().begin(); ++wayIter)
         {
-          points[wayptSdf->Get<double>("time")] =
-                                          wayptSdf->Get<math::Pose>("pose");
-          wayptSdf = wayptSdf->GetNextElement("waypoint");
+          points[(*wayIter).time()] = math::Pose(
+                math::Vector3((*wayIter).pose().pos.x,
+                              (*wayIter).pose().pos.y,
+                              (*wayIter).pose().pos.z),
+                math::Quaternion((*wayIter).pose().rot.w,
+                                 (*wayIter).pose().rot.x,
+                                 (*wayIter).pose().rot.y,
+                                 (*wayIter).pose().rot.z));
         }
 
         std::map<double, math::Pose>::reverse_iterator last = points.rbegin();
@@ -280,10 +310,9 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
                 this->skelAnimation[this->trajInfo[idx].type]->GetLength();
         this->trajInfo[idx].translated = false;
       }
-
-      trajSdf = trajSdf->GetNextElement("trajectory");
     }
   }
+
   double scriptTime = 0.0;
   if (!this->skelAnimation.empty())
   {
@@ -310,9 +339,9 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Actor::LoadAnimation(sdf::ElementPtr _sdf)
+void Actor::LoadAnimation(const rml::Actor::Animation &_rml)
 {
-  std::string animName = _sdf->Get<std::string>("name");
+  std::string animName = _rml.name();
 
   if (animName == "__default__")
   {
@@ -327,10 +356,10 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   }
   else
   {
-    std::string animFile = _sdf->Get<std::string>("filename");
+    std::string animFile = _rml.filename();
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
-    double animScale = _sdf->Get<double>("scale");
+    double animScale = _rml.scale();
     Skeleton *skel = NULL;
 
     if (extension == "bvh")
@@ -383,7 +412,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       {
         this->skelAnimation[animName] =
             skel->GetAnimation(0);
-        this->interpolateX[animName] = _sdf->Get<bool>("interpolate_x");
+        this->interpolateX[animName] = _rml.interpolate_x();
         this->skelNodesMap[animName] = skelMap;
       }
     }
@@ -582,7 +611,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   }
 
   robot_msgs::Time *stamp = msg.add_time();
-  stamp->CopyFrom(msgs::Convert(_time));
+  stamp->CopyFrom(msgs::Convert(common::Time(_time)));
 
   robot_msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
@@ -609,92 +638,100 @@ void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 //////////////////////////////////////////////////
 const sdf::ElementPtr Actor::GetSDF()
 {
-  return Model::GetSDF();
+  return sdf::ElementPtr();
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereInertia(sdf::ElementPtr _linkSdf,
+void Actor::AddSphereInertia(rml::Link *_linkRml,
                              const math::Pose &_pose,
                              double _mass, double _radius)
 {
   double ixx = 2.0 * _mass * _radius * _radius / 5.0;
-  sdf::ElementPtr inertialSdf = _linkSdf->GetElement("inertial");
-  sdf::ElementPtr inertialPoseSdf = inertialSdf->GetElement("pose");
-  inertialPoseSdf->Set(_pose);
-  inertialSdf->GetElement("mass")->Set(_mass);
-  sdf::ElementPtr tensorSdf = inertialSdf->GetElement("inertia");
-  tensorSdf->GetElement("ixx")->Set(ixx);
-  tensorSdf->GetElement("ixy")->Set(0.00);
-  tensorSdf->GetElement("ixz")->Set(0.00);
-  tensorSdf->GetElement("iyy")->Set(ixx);
-  tensorSdf->GetElement("iyz")->Set(0.00);
-  tensorSdf->GetElement("izz")->Set(ixx);
+
+  _linkRml->mutable_inertial()->set_pose(sdf::Pose(
+        sdf::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+        sdf::Quaternion(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)));
+
+  _linkRml->mutable_inertial()->set_mass(_mass);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_ixx(ixx);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_ixy(0.00);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_ixz(0.00);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_iyy(ixx);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_iyz(0.00);
+  _linkRml->mutable_inertial()->mutable_inertia()->set_izz(ixx);
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereCollision(sdf::ElementPtr _linkSdf,
+void Actor::AddSphereCollision(rml::Link *_linkRml,
                                const std::string &_name,
                                const math::Pose &_pose,
                                double _radius)
 {
-  sdf::ElementPtr collisionSdf = _linkSdf->GetElement("collision");
-  collisionSdf->GetAttribute("name")->Set(_name);
-  sdf::ElementPtr collPoseSdf = collisionSdf->GetElement("pose");
-  collPoseSdf->Set(_pose);
-  sdf::ElementPtr geomColSdf = collisionSdf->GetElement("geometry");
-  sdf::ElementPtr sphereColSdf = geomColSdf->GetElement("sphere");
-  sphereColSdf->GetElement("radius")->Set(_radius);
+  rml::Collision *collisionRml = _linkRml->add_collision();
+  collisionRml->set_name(_name);
+
+  collisionRml->set_pose(sdf::Pose(
+      sdf::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+      sdf::Quaternion(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)));
+
+  collisionRml->mutable_geometry()->mutable_sphere_shape()->set_radius(_radius);
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+void Actor::AddSphereVisual(rml::Link *_rmlLink, const std::string &_name,
             const math::Pose &_pose, double _radius,
             const std::string &_material, const common::Color &_ambient)
 {
-  sdf::ElementPtr visualSdf = _linkSdf->GetElement("visual");
-  visualSdf->GetAttribute("name")->Set(_name);
-  sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(_pose);
-  sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
-  sdf::ElementPtr sphereVisSdf = geomVisSdf->GetElement("sphere");
-  sphereVisSdf->GetElement("radius")->Set(_radius);
-  sdf::ElementPtr matSdf = visualSdf->GetElement("material");
-  matSdf->GetElement("script")->Set(_material);
-  sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
-  colorSdf->Set(_ambient);
+  rml::Visual *visualRml = _rmlLink->add_visual();
+
+  visualRml->set_name(_name);
+
+  visualRml->mutable_geometry()->mutable_sphere_shape()->set_radius(_radius);
+
+  visualRml->set_pose(sdf::Pose(
+        sdf::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+        sdf::Quaternion(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)));
+
+  visualRml->mutable_material()->mutable_script()->set_name(_material);
+  visualRml->mutable_material()->set_ambient(
+      sdf::Color(_ambient.r, _ambient.g, _ambient.b, _ambient.a));
 }
 
 //////////////////////////////////////////////////
-void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+void Actor::AddBoxVisual(rml::Link *_rmlLink, const std::string &_name,
     const math::Pose &_pose, const math::Vector3 &_size,
     const std::string &_material, const common::Color &_ambient)
 {
-  sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
-  visualSdf->GetAttribute("name")->Set(_name);
-  sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(_pose);
-  sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
-  sdf::ElementPtr boxSdf = geomVisSdf->GetElement("box");
-  boxSdf->GetElement("size")->Set(_size);
-  sdf::ElementPtr matSdf = visualSdf->GetElement("material");
-  matSdf->GetElement("script")->Set(_material);
-  sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
-  colorSdf->Set(_ambient);
+  rml::Visual *visualRml = _rmlLink->add_visual();
+  visualRml->set_name(_name);
+
+  visualRml->mutable_geometry()->mutable_box_shape()->set_size(
+      sdf::Vector3(_size.x, _size.y, _size.z));
+
+  visualRml->set_pose(sdf::Pose(
+      sdf::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+      sdf::Quaternion(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)));
+
+  visualRml->mutable_material()->mutable_script()->set_name(_material);
+  visualRml->mutable_material()->set_ambient(
+      sdf::Color(_ambient.r, _ambient.g, _ambient.b, _ambient.a));
 }
 
 //////////////////////////////////////////////////
-void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+void Actor::AddActorVisual(rml::Link *_linkRml, const std::string &_name,
                            const math::Pose &_pose)
 {
-  sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
-  visualSdf->GetAttribute("name")->Set(_name);
-  sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(_pose);
-  sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
-  sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
-  meshSdf->GetElement("filename")->Set(this->skinFile);
-  meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
-      this->skinScale, this->skinScale));
+  rml::Visual *visualRml = _linkRml->add_visual();
+
+  visualRml->set_name(_name);
+
+  visualRml->set_pose(sdf::Pose(
+        sdf::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z),
+        sdf::Quaternion(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z)));
+
+  visualRml->mutable_geometry()->mutable_mesh_shape()->set_uri(this->skinFile);
+  visualRml->mutable_geometry()->mutable_mesh_shape()->set_scale(
+      sdf::Vector3(this->skinScale, this->skinScale, this->skinScale));
 }
 
 //////////////////////////////////////////////////

@@ -24,6 +24,7 @@
 #include <boost/thread.hpp>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -95,9 +96,9 @@ namespace gazebo
     public: bool GetInitialized() const;
 
     /// \brief Load implementation.
-    /// \param[in] _elem Description of the world to load.
+    /// \param[in] _rml Description of the world to load.
     /// \param[in] _physics Type of physics engine to use (ode|bullet|simbody).
-    private: bool LoadImpl(sdf::ElementPtr _elem,
+    private: bool LoadImpl(rml::RML _rml,
                            const std::string &_physics="");
 
     /// \brief SIGINT handler

@@ -82,6 +82,16 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void PhysicsEngine::Load(const rml::Physics &_rml)
+{
+  this->rml = _rml;
+
+  this->realTimeUpdateRate = this->rml.real_time_update_rate();
+  this->targetRealTimeFactor = this->rml.real_time_factor();
+  this->maxStepSize = this->rml.max_step_size();
+}
+
+//////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
   this->world.reset();

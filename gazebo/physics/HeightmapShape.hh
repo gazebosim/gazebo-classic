@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
 #ifndef _HEIGHTMAPSHAPE_HH_
 #define _HEIGHTMAPSHAPE_HH_
@@ -54,6 +50,9 @@ namespace gazebo
       /// \brief Load the heightmap.
       /// \param[in] _sdf SDF value to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Collision &_rml);
 
       /// \brief Initialize the heightmap.
       public: virtual void Init();

@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid collision
- * Author: Nate Koenig
-*/
 
 #ifndef _MAPSHAPE_HH_
 #define _MAPSHAPE_HH_

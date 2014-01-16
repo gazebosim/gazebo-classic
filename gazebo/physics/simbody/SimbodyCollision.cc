@@ -39,7 +39,15 @@ SimbodyCollision::~SimbodyCollision()
 //////////////////////////////////////////////////
 void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 {
-  Collision::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyCollision::Load(const rml::Collision &_rml)
+{
+  return Collision::Load(_rml);
 }
 
 //////////////////////////////////////////////////

@@ -43,7 +43,11 @@ namespace gazebo
 
       /// \brief Load the road from SDF.
       /// \param[in] _sdf SDF values to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the road from RML.
+      /// \param[in] _rml RML values to load from.
+      public: void Load(const rml::Road &_rml);
 
       /// \brief Initialize the road.
       public: virtual void Init();
@@ -59,6 +63,9 @@ namespace gazebo
 
       /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
+
+      /// \brief The road's RML values.
+      private: rml::Road rml;
     };
     /// \}
   }

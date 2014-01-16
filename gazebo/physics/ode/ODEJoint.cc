@@ -71,100 +71,89 @@ ODEJoint::~ODEJoint()
 //////////////////////////////////////////////////
 void ODEJoint::Load(sdf::ElementPtr _sdf)
 {
-  Joint::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
 
-  if (this->sdf->HasElement("physics") &&
-      this->sdf->GetElement("physics")->HasElement("ode"))
+//////////////////////////////////////////////////
+void ODEJoint::Load(const rml::Joint &_rml)
+{
+  Joint::Load(_rml);
+
+  if (this->rml.has_physics() && this->rml.physics().has_ode())
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
-
-    if (elem->HasElement("cfm_damping"))
+    if (this->rml.physics().ode().cfm_damping())
     {
       gzwarn << "Deprecating sdf <cfm_damping>, "
              << "replace with <implicit_spring_damper> in sdf 1.5.\n";
-      this->useImplicitSpringDamper = elem->Get<bool>("cfm_damping");
+      this->useImplicitSpringDamper = this->rml.physics().ode().cfm_damping();
     }
-    else if (elem->HasElement("implicit_spring_damper"))
+    else if (this->rml.physics().ode().implicit_spring_damper())
     {
-      this->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
+      this->useImplicitSpringDamper =
+        this->rml.physics().ode().implicit_spring_damper();
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->stopERP = elem->GetElement("limit")->Get<double>("erp");
+    this->stopERP = this->rml.physics().ode().limit().erp();
     for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
       this->SetAttribute("stop_erp", i, this->stopERP);
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->stopCFM = elem->GetElement("limit")->Get<double>("cfm");
+    this->stopCFM = this->rml.physics().ode().limit().cfm();
     for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
       this->SetAttribute("stop_cfm", i, this->stopCFM);
 
-    if (elem->HasElement("suspension"))
+    if (this->rml.physics().ode().has_suspension())
     {
       this->SetParam(dParamSuspensionERP,
-          elem->GetElement("suspension")->Get<double>("erp"));
+          this->rml.physics().ode().suspension().erp());
       this->SetParam(dParamSuspensionCFM,
-          elem->GetElement("suspension")->Get<double>("cfm"));
+          this->rml.physics().ode().suspension().cfm());
     }
 
-    if (elem->HasElement("fudge_factor"))
+    if (this->rml.physics().ode().has_fudge_factor())
       this->SetParam(dParamFudgeFactor,
-          elem->GetElement("fudge_factor")->Get<double>());
+          this->rml.physics().ode().fudge_factor());
 
-    if (elem->HasElement("cfm"))
-        this->SetAttribute("cfm", 0, elem->Get<double>("cfm"));
+    if (this->rml.physics().ode().has_cfm())
+        this->SetAttribute("cfm", 0, this->rml.physics().ode().cfm());
 
-    if (elem->HasElement("erp"))
-        this->SetAttribute("erp", 0, elem->Get<double>("erp"));
+    if (this->rml.physics().ode().has_erp())
+        this->SetAttribute("erp", 0, this->rml.physics().ode().erp());
 
-    if (elem->HasElement("bounce"))
-        this->SetParam(dParamBounce,
-          elem->GetElement("bounce")->Get<double>());
+    if (this->rml.physics().ode().has_bounce())
+        this->SetParam(dParamBounce, this->rml.physics().ode().bounce());
 
-    if (elem->HasElement("max_force"))
-      this->SetParam(dParamFMax,
-          elem->GetElement("max_force")->Get<double>());
+    if (this->rml.physics().ode().has_max_force())
+      this->SetParam(dParamFMax, this->rml.physics().ode().max_force());
 
-    if (elem->HasElement("velocity"))
-      this->SetParam(dParamVel,
-          elem->GetElement("velocity")->Get<double>());
+    if (this->rml.physics().ode().has_velocity())
+      this->SetParam(dParamVel, this->rml.physics().ode().velocity());
   }
 
-  if (this->sdf->HasElement("axis"))
+  if (this->rml.has_axis())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
+    if (this->rml.axis().has_dynamics())
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (this->rml.axis().dynamics().has_damping())
+        this->SetDamping(0, this->rml.axis().dynamics().damping());
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+      if (this->rml.axis().dynamics().has_friction())
         gzlog << "joint friction not implemented\n";
-      }
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->rml.has_axis2())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
+    if (this->rml.axis2().has_dynamics())
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (this->rml.axis2().dynamics().has_damping())
+        this->SetDamping(1, this->rml.axis2().dynamics().damping());
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+      if (this->rml.axis2().dynamics().has_friction())
         gzlog << "joint friction not implemented\n";
-      }
     }
   }
 }
@@ -408,9 +397,11 @@ void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   // record axis in sdf element
   if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  {
+    this->rml.axis().set_xyz(sdf::Vector3(_axis.x, _axis.y, _axis.z));
+  }
   else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+    this->rml.axis2().set_xyz(sdf::Vector3(_axis.x, _axis.y, _axis.z));
   else
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }

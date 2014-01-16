@@ -52,7 +52,12 @@ namespace gazebo
       /// \brief Load the gripper.
       /// \param[in] _sdf Shared point to an sdf element that contains the list
       /// of links in the gripper.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Load the gripper.
+      /// \param[in] _rml RML element that contains the list of links in the
+      /// gripper.
+      public: virtual void Load(const rml::Gripper &_rml);
 
       /// \brief Initialize.
       public: virtual void Init();

@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
 
 #ifndef _MESHSHAPE_HH_
 #define _MESHSHAPE_HH_
 
 #include <string>
+#include <rml/rml.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"

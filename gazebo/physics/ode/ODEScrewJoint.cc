@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include <boost/bind.hpp>
 
@@ -48,7 +44,15 @@ ODEScrewJoint::~ODEScrewJoint()
 //////////////////////////////////////////////////
 void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 {
-  ScrewJoint<ODEJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::Load(const rml::Joint &_rml)
+{
+  ScrewJoint<ODEJoint>::Load(_rml);
   this->SetThreadPitch(0, this->threadPitch);
 }
 

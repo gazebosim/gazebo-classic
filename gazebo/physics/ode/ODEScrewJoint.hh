@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #ifndef _ODESCREWJOINT_HH_
 #define _ODESCREWJOINT_HH_
@@ -41,7 +37,10 @@ namespace gazebo
       public: virtual ~ODEScrewJoint();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited
+      public: virtual void Load(const rml::Joint &_rml);
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;

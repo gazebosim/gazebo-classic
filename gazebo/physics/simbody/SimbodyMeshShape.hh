@@ -41,6 +41,9 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
+      public: bool Load(const rml::Collision &_rml);
+
+      // Documentation inherited
       protected: virtual void Init();
     };
     /// \}

@@ -49,9 +49,12 @@ namespace gazebo
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
-      public: virtual void Load(sdf::ElementPtr _sdf)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
               {
-                T::Load(_sdf);
+                rml::Joint rmlJoint;
+                rmlJoint.SetFromXML(_sdf);
+                T::Load(rmlJoint);
+
                 if (_sdf->HasElement("gearbox_ratio"))
                 {
                   this->gearRatio =
@@ -68,6 +71,28 @@ namespace gazebo
                   this->referenceBody =
                     _sdf->Get<std::string>("gearbox_reference_body");
                 }
+                else
+                {
+                  gzerr << "Gearbox joint missing reference body.\n";
+                }
+              }
+
+      /// \brief Load joint.
+      /// \param[in] _rml RML values to load from.
+      public: virtual void Load(const rml::Joint &_rml)
+              {
+                T::Load(_rml);
+
+                if (_rml.has_gearbox_ratio())
+                  this->gearRatio = _rml.gearbox_ratio();
+                else
+                {
+                  gzerr << "should not see this\n";
+                  this->gearRatio = 1.0;
+                }
+
+                if (_rml.has_gearbox_reference_body())
+                  this->referenceBody = _rml.gearbox_reference_body();
                 else
                 {
                   gzerr << "Gearbox joint missing reference body.\n";

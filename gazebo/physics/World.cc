@@ -162,6 +162,138 @@ World::~World()
 }
 
 //////////////////////////////////////////////////
+void World::Load(rml::World _world)
+{
+  this->loaded = false;
+  // DELETE?: this->sdf = _sdf;
+
+  if (_world.name().empty())
+    gzwarn << "create_world(world_name =["
+           << this->name << "]) overwrites RML world name\n!";
+  else
+    this->name = _world.name();
+
+#ifdef HAVE_OPENAL
+  if (_world.has_audio())
+    util::OpenAL::Instance()->Load(_world.audio());
+#endif
+
+  this->sceneMsg.CopyFrom(msgs::SceneFromRML(_world.scene()));
+  this->sceneMsg.set_name(this->GetName());
+
+  // The period at which messages are processed
+  this->processMsgsPeriod = common::Time(0, 200000000);
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->GetName());
+
+  // pose pub for server side, mainly used for updating and timestamping
+  // Scene, which in turn will be used by rendering sensors.
+  // TODO: replace local communication with shared memory for efficiency.
+  this->poseLocalPub = this->node->Advertise<robot_msgs::PosesStamped>(
+    "~/pose/local/info", 10);
+
+  // pose pub for client with a cap on publishing rate to reduce traffic
+  // overhead
+  this->posePub = this->node->Advertise<robot_msgs::PosesStamped>(
+    "~/pose/info", 10, 60);
+
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
+  if (_world.has_gui())
+    this->guiPub->Publish(msgs::GUIFromRML(_world.gui()));
+
+  this->factorySub = this->node->Subscribe("~/factory",
+                                           &World::OnFactoryMsg, this);
+  this->controlSub = this->node->Subscribe("~/world_control",
+                                           &World::OnControl, this);
+
+  this->requestSub = this->node->Subscribe("~/request",
+                                           &World::OnRequest, this, true);
+  this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
+  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
+      &World::OnModelMsg, this);
+
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->statPub =
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
+  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
+  this->physicsEngine = PhysicsFactory::NewPhysicsEngine(
+      _world.physics().type(), shared_from_this());
+
+  if (this->physicsEngine == NULL)
+    gzthrow("Unable to create physics engine\n");
+
+  // This should come before loading of entities
+  this->physicsEngine->Load(_world.physics());
+
+  // This should also come before loading of entities
+  if (_world.has_spherical_coordinates())
+  {
+    rml::Spherical_Coordinates spherical = _world.spherical_coordinates();
+    common::SphericalCoordinates::SurfaceType surfaceType =
+      common::SphericalCoordinates::Convert(spherical.surface_model());
+
+    math::Angle latitude, longitude, heading;
+    double elevation = spherical.elevation();
+    latitude.SetFromDegree(spherical.latitude_deg());
+    longitude.SetFromDegree(spherical.longitude_deg());
+    heading.SetFromDegree(spherical.heading_deg());
+
+    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
+      surfaceType, latitude, longitude, elevation, heading));
+  }
+
+  if (this->sphericalCoordinates == NULL)
+    gzthrow("Unable to create spherical coordinates data structure\n");
+
+  this->rootElement.reset(new Base(BasePtr()));
+  this->rootElement->SetName(this->GetName());
+  this->rootElement->SetWorld(shared_from_this());
+
+  // A special order is necessary when loading a world that contains state
+  // information. The joints must be created last, otherwise they get
+  // initialized improperly.
+  {
+    // Create all the entities
+    this->LoadEntities(_world, this->rootElement);
+
+    // Set the state of the entities
+    if (_world.has_state())
+    {
+      for (std::vector<rml::State>::const_iter iter = _world.state().begin();
+           iter != _world.state().end(); ++iter)
+      {
+        WorldState myState;
+        myState.Load(*iter);
+        this->SetState(myState);
+
+        // TODO: We currently load just the first state data. Need to
+        // implement a better mechanism for handling multiple states
+        break;
+      }
+    }
+
+    for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+      this->GetModel(i)->LoadJoints();
+  }
+
+  // TODO: Performance test to see if TBB model updating is necessary
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  // if (this->GetModelCount() < 20)
+  this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
+  // else
+  // this->modelUpdateFunc = &World::ModelUpdateTBB;
+
+  event::Events::worldCreated(this->GetName());
+
+  this->loaded = true;
+}
+
+//////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
   this->loaded = false;
@@ -791,29 +923,30 @@ EntityPtr World::GetEntity(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
+ModelPtr World::LoadModel(sdf::ElementPtr _sdf, BasePtr _parent)
+{
+  rml::Model modelRML;
+  modelRML.SetFromXML(_sdf);
+  this->LoadModel(_sdf);
+}
+
+//////////////////////////////////////////////////
+ModelPtr World::LoadModel(const rml::Model &_rml, BasePtr _parent)
 {
   boost::mutex::scoped_lock lock(*this->loadModelMutex);
   ModelPtr model;
 
-  if (_sdf->GetName() == "model")
-  {
-    model = this->physicsEngine->CreateModel(_parent);
-    model->SetWorld(shared_from_this());
-    model->Load(_sdf);
+  model = this->physicsEngine->CreateModel(_parent);
+  model->SetWorld(shared_from_this());
+  model->Load(_rml);
 
-    event::Events::addEntity(model->GetScopedName());
+  event::Events::addEntity(model->GetScopedName());
 
-    msgs::Model msg;
-    model->FillMsg(msg);
-    this->modelPub->Publish(msg);
+  msgs::Model msg;
+  model->FillMsg(msg);
+  this->modelPub->Publish(msg);
 
-    this->EnableAllModels();
-  }
-  else
-  {
-    gzerr << "SDF is missing the <model> tag:\n";
-  }
+  this->EnableAllModels();
 
   this->PublishModelPose(model);
   this->models.push_back(model);
@@ -821,11 +954,19 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
+ActorPtr World::LoadActor(sdf::ElementPtr _sdf, BasePtr _parent)
+{
+  rml::Actor actorRML;
+  actorRML.SetFromXML(_sdf);
+  this->LoadActor(actorRML);
+}
+
+//////////////////////////////////////////////////
+ActorPtr World::LoadActor(const rml::Actor &_rml, BasePtr _parent)
 {
   ActorPtr actor(new Actor(_parent));
   actor->SetWorld(shared_from_this());
-  actor->Load(_sdf);
+  actor->Load(_rml);
 
   event::Events::addEntity(actor->GetScopedName());
 
@@ -837,62 +978,69 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
+RoadPtr World::LoadRoad(sdf::ElementPtr _sdf, BasePtr _parent)
+{
+  rml::Road roadRML;
+  roadRML.SetFromXML(_sdf);
+  this->LoadRoad(roadRML);
+}
+
+//////////////////////////////////////////////////
+RoadPtr World::LoadRoad(const rml::Road &_rml, BasePtr _parent)
 {
   RoadPtr road(new Road(_parent));
-  road->Load(_sdf);
+  road->Load(_rml);
   return road;
 }
 
 //////////////////////////////////////////////////
-void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
+void World::LoadEntities(const sdf::ElementPtr _sdf, BasePtr _parent)
 {
-  if (_sdf->HasElement("light"))
+  rml::World worldRML;
+  worldRML.SetFromXML(_sdf);
+  this->LoadEntities(worldRML, _parent);
+}
+
+//////////////////////////////////////////////////
+void World::LoadEntities(const rml::World &_rml, BasePtr _parent)
+{
+  if (_rml.has_light())
   {
-    sdf::ElementPtr childElem = _sdf->GetElement("light");
-    while (childElem)
+    for (std::vector<rml::Light>::const_iterator iter = _rml.light().begin();
+         iter != _rml.light().end(); ++iter)
     {
       msgs::Light *lm = this->sceneMsg.add_light();
-      lm->CopyFrom(msgs::LightFromSDF(childElem));
-
-      childElem = childElem->GetNextElement("light");
+      lm->CopyFrom(msgs::LightFromRML(*iter));
     }
   }
 
-  if (_sdf->HasElement("model"))
+  if (_rml.has_model())
   {
-    sdf::ElementPtr childElem = _sdf->GetElement("model");
-
-    while (childElem)
+    for (std::vector<rml::Model>::const_iterator iter = _rml.model().begin();
+         iter != _rml.model().end(); ++iter)
     {
-      this->LoadModel(childElem, _parent);
+      this->LoadModel(*iter, _parent);
 
       // TODO : Put back in the ability to nest models. We should do this
       // without requiring a joint.
-
-      childElem = childElem->GetNextElement("model");
     }
   }
 
-  if (_sdf->HasElement("actor"))
+  if (_rml.has_actor())
   {
-    sdf::ElementPtr childElem = _sdf->GetElement("actor");
-
-    while (childElem)
+    for (std::vector<rml::Actor>::const_iterator iter = _rml.actor().begin();
+         iter != _rml.actor().end(); ++iter)
     {
-      this->LoadActor(childElem, _parent);
-
-      childElem = childElem->GetNextElement("actor");
+      this->LoadActor(*iter, _parent);
     }
   }
 
-  if (_sdf->HasElement("road"))
+  if (_rml.has_road())
   {
-    sdf::ElementPtr childElem = _sdf->GetElement("road");
-    while (childElem)
+    for (std::vector<rml::Road>::const_iterator iter = _rml.road().begin();
+         iter != _rml.road().end(); ++iter)
     {
-      this->LoadRoad(childElem, _parent);
-      childElem = childElem->GetNextElement("road");
+      this->LoadRoad(*iter, _parent);
     }
   }
 }

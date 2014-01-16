@@ -47,7 +47,16 @@ ODEHinge2Joint::~ODEHinge2Joint()
 //////////////////////////////////////////////////
 void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
-  Hinge2Joint<ODEJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+
+  Hinge2Joint<ODEJoint>::Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void ODEHinge2Joint::Load(const rml::Joint &_rml)
+{
+  Hinge2Joint<ODEJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

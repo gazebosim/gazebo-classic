@@ -47,7 +47,10 @@ namespace gazebo
       public: virtual ~SimbodyPhysics();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Physics &_rml);
 
       // Documentation inherited
       public: virtual void Init();
@@ -141,7 +144,8 @@ namespace gazebo
       /// \brief If the given element contains a <pose> element, return it as a
       /// Transform. Otherwise return the identity Transform. If there
       /// is more than one <pose> element, only the first one is processed.
-      public: static SimTK::Transform GetPose(sdf::ElementPtr _element);
+      public: static SimTK::Transform GetPose(sdf::ElementPtr _element)
+              GAZEBO_DEPRECATED(2.0);
 
       /// \brief Convert Base::GetType() to string,
       /// this is needed by the MultibodyGraphMaker.

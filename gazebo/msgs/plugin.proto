@@ -10,6 +10,17 @@ message Plugin
   required string name         = 1;
   required string filename     = 2;
   optional string innerxml     = 3 [default = ""];
+
+  message Property
+  {
+    optional string key        = 1;
+
+    /// \brief Optional value for the property.
+    optional string value      = 2;
+
+    /// \brief Value for each repeated key.
+    repeated Property properties = 3;
+  }
+
+  repeated Property properties     = 4; 
 }
-
-

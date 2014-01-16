@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/ode/ODECollision.hh"

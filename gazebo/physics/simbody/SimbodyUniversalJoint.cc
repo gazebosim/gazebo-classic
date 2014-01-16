@@ -39,7 +39,15 @@ SimbodyUniversalJoint::~SimbodyUniversalJoint()
 //////////////////////////////////////////////////
 void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 {
-  UniversalJoint<SimbodyJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+void SimbodyUniversalJoint::Load(const rml::Joint &_rml)
+{
+  UniversalJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

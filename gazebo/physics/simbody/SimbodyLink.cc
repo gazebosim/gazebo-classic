@@ -51,16 +51,24 @@ SimbodyLink::~SimbodyLink()
 //////////////////////////////////////////////////
 void SimbodyLink::Load(sdf::ElementPtr _sdf)
 {
+  rml::Link rmlLink;
+  rmlLink.SetFromXML(_sdf);
+  this->Load(rmlLink);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyLink::Load(const rml::Link &_rml)
+{
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->simbodyPhysics == NULL)
     gzthrow("Not using the simbody physics engine");
 
-  if (_sdf->HasElement("must_be_base_link"))
-    this->mustBeBaseLink = _sdf->Get<bool>("must_be_base_link");
+  if (_rml.has_must_be_base_link())
+    this->mustBeBaseLink = _rml.must_be_base_link();
 
-  Link::Load(_sdf);
+  return Link::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -103,7 +111,7 @@ void SimbodyLink::Fini()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetElement("gravity")->Set(_mode);
+  this->rml.set_gravity(_mode);
   this->gravityMode = _mode;
   if (this->physicsInitialized)
   {
