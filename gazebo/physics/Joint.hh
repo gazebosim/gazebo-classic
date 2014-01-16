@@ -481,6 +481,12 @@ namespace gazebo
       /// \return Pose of joint frame relative to world frame.
       public: math::Pose GetWorldPose() const;
 
+      /// \brief Get orientation of reference frame for specified axis,
+      /// relative to world frame. The value of axisParentModelFrame
+      /// is used to determine the appropriate frame.
+      /// \return Orientation of axis frame relative to world frame.
+      public: math::Quaternion GetAxisFrame(unsigned int _index) const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -559,6 +565,11 @@ namespace gazebo
       /// Deprecated, pushing this flag into individual physics engine,
       /// for example: ODEJoint::useImplicitSpringDamper.
       protected: bool useCFMDamping;
+
+      /// \brief Flags that are set to true if an axis value is expressed
+      /// in the parent model frame. Otherwise use the joint frame.
+      /// See issue #494.
+      protected: bool axisParentModelFrame[MAX_JOINT_AXIS];
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

@@ -98,19 +98,21 @@ void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
+  if (_index < 0 || _index >= this->GetAngleCount())
+  {
+    gzerr << "SetAxis error, _index[" << _index << "] out of range."
+          << std::endl;
+    return;
+  }
+
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
     dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
