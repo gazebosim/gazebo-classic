@@ -83,5 +83,4 @@ OPC_VolumeCollider.h
 Stdafx.h
 )
 
-gz_add_library(gazebo_opcode ${sources})
-gz_install_library(gazebo_opcode)
+add_library(gazebo_opcode STATIC ${sources})

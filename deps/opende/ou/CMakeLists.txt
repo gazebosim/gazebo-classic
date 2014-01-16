@@ -14,6 +14,4 @@ include_directories(
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -D_OU_NAMESPACE=gazebo_odeou")
 
-gz_add_library(gazebo_opende_ou ${sources})
-#target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
-gz_install_library(gazebo_opende_ou)
+add_library(gazebo_opende_ou ${sources})

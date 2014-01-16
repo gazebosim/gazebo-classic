@@ -37,6 +37,4 @@ set ( headers
   include/GIMPACT/gim_math.h
 )
 
-gz_add_library(gazebo_gimpact ${sources})
-gz_install_library(gazebo_gimpact)
-
+add_library(gazebo_gimpact STATIC ${sources})

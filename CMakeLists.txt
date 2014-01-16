@@ -313,15 +313,12 @@ else (build_errors)
     gazebo
     gazebo_ccd
     gazebo_common
-    gazebo_gimpact
     gazebo_gui
     gazebo_gui_building
     gazebo_gui_viewers
     gazebo_math
     gazebo_msgs
     gazebo_ode
-    gazebo_opcode
-    gazebo_opende_ou
     gazebo_physics
     gazebo_physics_ode
     gazebo_rendering
