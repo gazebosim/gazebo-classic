@@ -300,7 +300,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
            << "] stiffness not implement in DART\n";
   }
   else
-    gzerr << "SetStiffnessDamping _index too large.\n";
+    gzerr << "SetStiffnessDamping _index " << _index << " is too large.\n";
 }
 
 //////////////////////////////////////////////////
