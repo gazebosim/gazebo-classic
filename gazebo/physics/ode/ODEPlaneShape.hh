@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,8 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-
-        double altitude = 0;
-
+        math::Pose pose = oParent->GetWorldPose();
+        double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),

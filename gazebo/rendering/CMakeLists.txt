@@ -25,11 +25,13 @@ set (sources
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
+  GpuLaser.cc
   Grid.cc
   GUIOverlay.cc
   Heightmap.cc
   JointVisual.cc
   LaserVisual.cc
+  SonarVisual.cc
   Light.cc
   Material.cc
   MovableText.cc
@@ -37,18 +39,21 @@ set (sources
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
-  Rendering.cc
+  RenderingIface.cc
   Road2d.cc
   RFIDVisual.cc
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  SelectionObj.cc
+  TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
   Visual.cc
   WireBox.cc
   WindowManager.cc
+  WrenchVisual.cc
 )
 
 set (headers
@@ -63,11 +68,13 @@ set (headers
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
+  GpuLaser.hh
   Grid.hh
   GUIOverlay.hh
   Heightmap.hh
   JointVisual.hh
   LaserVisual.hh
+  SonarVisual.hh
   Light.hh
   Material.hh
   MovableText.hh
@@ -75,47 +82,66 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
-  Rendering.hh
+  RenderingIface.hh
   RenderTypes.hh
   Road2d.hh
   RFIDVisual.hh
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  SelectionObj.hh
+  TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh
   Visual.hh
   WireBox.hh
   WindowManager.hh
+  WrenchVisual.hh
   ogre_gazebo.h
   cegui.h
 )
 
+set (gtest_sources
+)
+
+gz_build_tests(${gtest_sources})
+
+set (gtest_sources_dri
+  GpuLaser_TEST.cc
+  Heightmap_TEST.cc
+)
+
+gz_build_dri_tests(${gtest_sources_dri})
+
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
-                          "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
 )
 
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
-  gazebo_common 
-  gazebo_sdf_interface
+  gazebo_common
+  gazebo_msgs
   gazebo_skyx
   gazebo_selection_buffer
-  ${ogre_libraries} 
-  ${OPENGL_LIBRARIES} 
+  gazebo_transport
+  ${ogre_libraries}
+  ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
-  X11 
 )
+
+if (NOT APPLE)
+  target_link_libraries(gazebo_rendering X11)
+endif()
 
 if (${OGRE_VERSION} GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)

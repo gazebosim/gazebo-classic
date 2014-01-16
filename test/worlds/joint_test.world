@@ -8,7 +8,7 @@
                 <solver>
                     <type>quick</type>
                     <dt>0.001</dt>
-                    <iters>40</iters>
+                    <iters>1000</iters>
                     <sor>1.0</sor>
                 </solver>
                 <constraints>
@@ -30,14 +30,14 @@
                 <inertial>
                     <pose>0 0 0 0 0 0</pose>
                     <inertia>
-                        <ixx>1.000000</ixx>
+                        <ixx>200.000000</ixx>
                         <ixy>0.000000</ixy>
                         <ixz>0.000000</ixz>
-                        <iyy>1.000000</iyy>
+                        <iyy>300.000000</iyy>
                         <iyz>0.000000</iyz>
-                        <izz>1.000000</izz>
+                        <izz>400.000000</izz>
                     </inertia>
-                    <mass>10.000000</mass>
+                    <mass>1.000000</mass>
                 </inertial>
                 <visual name="visual_cylinder">
                     <pose>0 0 -0.5 0 0 0</pose>
@@ -61,6 +61,84 @@
                     </geometry>
                 </collision>
             </link>
+            <joint name="joint_01" type="revolute">
+              <parent>world</parent>
+              <child>link_1</child>
+              <pose>0 0 0 0 0 0</pose>
+              <axis>
+                <limit>
+                  <effort>1000.000000</effort>
+                  <velocity>1000.000000</velocity>
+                </limit>
+                <dynamics>
+                  <damping>0.000000</damping>
+                  <friction>0.000000</friction>
+                </dynamics>
+                <xyz>1.000000 0.000000 0.000000</xyz>
+              </axis>
+              <physics>
+                <provide_feedback>true</provide_feedback>
+              </physics>
+            </joint>
+            <static>0</static>
+        </model>
+        <model name="model_2">
+            <pose>2 0 0 0 0 0</pose>
+            <link name="link_1">
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <pose>0 0 0 0 0 0</pose>
+                    <inertia>
+                        <ixx>200.000000</ixx>
+                        <ixy>0.000000</ixy>
+                        <ixz>0.000000</ixz>
+                        <iyy>300.000000</iyy>
+                        <iyz>0.000000</iyz>
+                        <izz>400.000000</izz>
+                    </inertia>
+                    <mass>1.000000</mass>
+                </inertial>
+                <visual name="visual_cylinder">
+                    <pose>0 0 -0.5 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.100000</radius>
+                            <length>1.000000</length>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/Green</script>
+                    </material>
+                </visual>
+                <collision name="collision_cylinder">
+                    <pose>0 0 -0.5 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.100000</radius>
+                            <length>1.000000</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+            </link>
+            <joint name="joint_01" type="revolute">
+              <parent>world</parent>
+              <child>link_1</child>
+              <pose>0 0 0 0 0 0</pose>
+              <axis>
+                <limit>
+                  <effort>1000.000000</effort>
+                  <velocity>1000.000000</velocity>
+                </limit>
+                <dynamics>
+                  <damping>0.000000</damping>
+                  <friction>0.000000</friction>
+                </dynamics>
+                <xyz>0.000000 0.000000 1.000000</xyz>
+              </axis>
+              <physics>
+                <provide_feedback>true</provide_feedback>
+              </physics>
+            </joint>
             <static>0</static>
         </model>
     </world>

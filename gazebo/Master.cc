@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
 */
 #include <google/protobuf/descriptor.h>
-#include "transport/IOManager.hh"
+#include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
@@ -52,7 +52,7 @@ void Master::Init(uint16_t _port)
 }
 
 //////////////////////////////////////////////////
-void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
+void Master::OnAccept(transport::ConnectionPtr _newConnection)
 {
   // Send the gazebo version string
   msgs::GzString versionMsg;
@@ -81,7 +81,6 @@ void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
   }
   _newConnection->EnqueueMsg(
       msgs::Package("publishers_init", publishersMsg), true);
-
 
   // Add the connection to our list
   {
@@ -122,8 +121,9 @@ void Master::OnRead(const unsigned int _connectionIndex,
   }
   else
   {
-    gzerr << "Master got empty data message from["
-          << conn->GetRemotePort() << "]\n";
+    gzlog << "Master got empty data message from["
+          << conn->GetRemotePort() << "]. This is most likely fine, since"
+          << "the remote side probably terminated.\n";
   }
 }
 
@@ -185,7 +185,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
+        iter->second->EnqueueMsg(msgs::Package("publisher_advertise", pub));
       }
     }
   }
@@ -216,7 +216,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        conn->EnqueueMsg(msgs::Package("publisher_update", iter->first));
+        conn->EnqueueMsg(msgs::Package("publisher_subscribe", iter->first));
       }
     }
   }
@@ -315,7 +315,7 @@ void Master::RunOnce()
   // Process the incoming message queue
   {
     boost::recursive_mutex::scoped_lock lock(this->msgsMutex);
-    while (this->msgs.size() > 0)
+    while (!this->msgs.empty())
     {
       this->ProcessMessage(this->msgs.front().first,
                            this->msgs.front().second);

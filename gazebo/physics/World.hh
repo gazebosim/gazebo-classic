@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@
 #include <set>
 #include <deque>
 #include <string>
+#include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -41,14 +44,6 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/sdf/sdf.hh"
-
-namespace boost
-{
-  class thread;
-  class mutex;
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -96,7 +91,13 @@ namespace gazebo
       /// \brief Run the world in a thread.
       ///
       /// Run the update loop.
-      public: void Run();
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void Run(unsigned int _iterations = 0);
+
+      /// \brief Return the running state of the world.
+      /// \return True if the world is running.
+      public: bool GetRunning() const;
 
       /// \brief Stop the world.
       ///
@@ -109,6 +110,8 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Remove all entities from the world.
+      /// This function has delayed effect. Models are cleared at the end
+      /// of the current update iteration.
       public: void Clear();
 
       /// \brief Get the name of the world.
@@ -120,6 +123,10 @@ namespace gazebo
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
+
+      /// \brief Return the spherical coordinates converter.
+      /// \return Pointer to the spherical coordinates converter.
+      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -268,9 +275,14 @@ namespace gazebo
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Step the world forward in time.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -311,6 +323,10 @@ namespace gazebo
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Get the total number of iterations.
+      /// \return Number of iterations that simulation has taken.
+      public: uint32_t GetIterations() const;
 
       /// \cond
       /// This is an internal function.
@@ -374,10 +390,6 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief Called when a log control message is received.
-      /// \param[in] _data The log control message.
-      private: void OnLogControl(ConstLogControlPtr &_data);
-
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -407,7 +419,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.
@@ -431,6 +443,11 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
+      /// \brief Remove a model from the cached list of models.
+      /// This does not delete the model.
+      /// \param[in] _name Name of the model to remove.
+      private: void RemoveModel(const std::string &_name);
+
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -444,14 +461,21 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
-      /// \brief Publish log status message.
-      private: void PublishLogStatus();
+      /// \brief Thread function for logging state data.
+      private: void LogWorker();
+
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
 
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Pointer the spherical coordinates data.
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
@@ -464,9 +488,6 @@ namespace gazebo
 
       /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
-
-      /// \brief Incoming message buffer.
-      private: std::vector<google::protobuf::Message> messages;
 
       /// \brief Name of the world.
       private: std::string name;
@@ -516,14 +537,11 @@ namespace gazebo
       /// \brief Publisher for pose messages.
       private: transport::PublisherPtr posePub;
 
+      /// \brief Publisher for local pose messages.
+      private: transport::PublisherPtr poseLocalPub;
+
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
-
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-
-      /// \brief Publisher of log status messages.
-      private: transport::PublisherPtr logStatusPub;
 
       /// \brief Subscriber to factory messages.
       private: transport::SubscriberPtr factorySub;
@@ -545,9 +563,6 @@ namespace gazebo
 
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
-
-      /// \brief Period used to send out world statistics.
-      private: common::Time statPeriod;
 
       /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
@@ -637,8 +652,12 @@ namespace gazebo
       /// \brief Period over which messages should be processed.
       private: common::Time processMsgsPeriod;
 
-      /// \brief Buffer of states.
-      private: std::deque<WorldState> states;
+      /// \brief Alternating buffer of states.
+      private: std::deque<WorldState> states[2];
+
+      /// \brief Keep track of current state buffer being updated
+      private: int currentStateBuffer;
+
       private: WorldState prevStates[2];
       private: int stateToggle;
 
@@ -657,6 +676,37 @@ namespace gazebo
 
       /// \brief The number of simulation iterations.
       private: uint64_t iterations;
+
+      /// \brief The number of simulation iterations to take before stopping.
+      private: uint64_t stopIterations;
+
+      /// \brief Condition used for log worker.
+      private: boost::condition_variable logCondition;
+
+      /// \brief Condition used to guarantee the log worker thread doesn't
+      /// skip an interation.
+      private: boost::condition_variable logContinueCondition;
+
+      /// \brief Last iteration recorded by the log worker thread.
+      private: uint64_t logPrevIteration;
+
+      /// \brief Real time value set from a log file.
+      private: common::Time logRealTime;
+
+      /// \brief Mutex to protect the log worker thread.
+      private: boost::mutex logMutex;
+
+      /// \brief Mutex to protect the log state buffers
+      private: boost::mutex logBufferMutex;
+
+      /// \brief Mutex to protect the deleteEntity list.
+      private: boost::mutex entityDeleteMutex;
+
+      /// \brief Worker thread for logging.
+      private: boost::thread *logThread;
+
+      /// \brief A cached list of models. This is here for performance.
+      private: Model_V models;
     };
     /// \}
   }

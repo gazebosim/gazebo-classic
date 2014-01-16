@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #define _GUI_EVENTS_HH_
 
 #include <string>
-#include "common/Event.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -28,31 +28,13 @@ namespace gazebo
     class Events
     {
       /////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the add entity signal
+      /// \brief Connect a boost::slot the add entity signal
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return createEntity.Connect(_subscriber); }
       public: static void DisconnectCreateEntity(
                   event::ConnectionPtr _subscriber)
               { createEntity.Disconnect(_subscriber); }
-
-      /////////////////////////////////////////////////
-      public: template<typename T>
-              static event::ConnectionPtr ConnectMousePress(T _subscriber)
-              { return mousePress.Connect(_subscriber); }
-      public: static void DisconnectMousePress(
-                  event::ConnectionPtr _subscriber)
-              { mousePress.Disconnect(_subscriber); }
-
-      /////////////////////////////////////////////////
-      public: template<typename T>
-              static event::ConnectionPtr ConnectMouseRelease(T _subscriber)
-              { return mouseRelease.Connect(_subscriber); }
-      public: static void DisconnectMouseRelease(
-                  event::ConnectionPtr _subscriber)
-              { mouseRelease.Disconnect(_subscriber); }
-
-
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the move mode signal
@@ -116,6 +98,15 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
               { inputStepSize.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the follow signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectFollow(T _subscriber)
+              { return follow.Connect(_subscriber); }
+      public: static void DisconnectFollow(
+              event::ConnectionPtr _subscriber)
+              { follow.Disconnect(_subscriber); }
+
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 
@@ -130,11 +121,11 @@ namespace gazebo
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;
 
+      /// \brief Event triggered when the user follows a model. The model
+      /// name is given as the function parameter.
+      public: static event::EventT<void (const std::string &)> follow;
+
       public: static event::EventT<void (std::string)> keyPress;
-      public: static event::EventT<void (const common::MouseEvent &)>
-              mousePress;
-      public: static event::EventT<void (const common::MouseEvent &)>
-              mouseRelease;
 
       /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;
