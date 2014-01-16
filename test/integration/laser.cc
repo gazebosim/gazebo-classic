@@ -280,6 +280,14 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
     return;
   }
 
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test a ray sensor that has a vertical range component.
   // Place a box within range and verify range values,
   // then move the box out of range and verify range values
@@ -376,6 +384,14 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
     return;
   }
 
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test ray sensor scan resolution.
   // Orient the sensor to face downwards and verify that the interpolated
   // range values all intersect with ground plane at z = 0;
@@ -449,6 +465,14 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since simbody does not support ray sensor, "
           << "Please see issue #867.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
     return;
   }
 
