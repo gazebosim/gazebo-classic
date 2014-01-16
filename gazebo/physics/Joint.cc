@@ -849,7 +849,7 @@ void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopStiffness(unsigned int _index)
+double Joint::GetStopStiffness(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -864,7 +864,7 @@ double Joint::GetStopStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopDissipation(unsigned int _index)
+double Joint::GetStopDissipation(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -879,7 +879,15 @@ double Joint::GetStopDissipation(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetInitialAnchorPose()
+math::Pose Joint::GetInitialAnchorPose() const
 {
+  return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetWorldPose() const
+{
+  if (this->childLink)
+    return this->anchorPose + this->childLink->GetWorldPose();
   return this->anchorPose;
 }
