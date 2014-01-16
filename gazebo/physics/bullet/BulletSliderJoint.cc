@@ -179,7 +179,7 @@ void BulletSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetVelocity(int /*_index*/) const
+double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
   // I'm not sure this will work
@@ -189,14 +189,15 @@ double BulletSliderJoint::GetVelocity(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 {
   if (this->bulletSlider)
     this->bulletSlider->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -220,7 +221,8 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
+void BulletSliderJoint::SetDamping(unsigned int /*index*/,
+    const double _damping)
 {
   /// \TODO: special case bullet specific linear damping, this needs testing.
   if (this->bulletSlider)
@@ -228,7 +230,7 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForceImpl(int /*_index*/, double _effort)
+void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->bulletSlider && this->constraint)
   {
@@ -255,7 +257,7 @@ void BulletSliderJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetHighStop(int /*_index*/,
+void BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
                                     const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
@@ -264,7 +266,7 @@ void BulletSliderJoint::SetHighStop(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetLowStop(int /*_index*/,
+void BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
                                    const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
@@ -273,7 +275,7 @@ void BulletSliderJoint::SetLowStop(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -284,7 +286,7 @@ math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -295,14 +297,14 @@ math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetMaxForce(int /*_index*/, double _force)
+void BulletSliderJoint::SetMaxForce(unsigned int /*_index*/, double _force)
 {
   if (this->bulletSlider)
     this->bulletSlider->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetMaxForce(int /*_index*/)
+double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   double result = 0;
   if (this->bulletSlider)
@@ -311,7 +313,7 @@ double BulletSliderJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   math::Vector3 result;
   if (this->bulletSlider)
@@ -329,7 +331,7 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletSlider)

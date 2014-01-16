@@ -67,3 +67,38 @@ void ODEBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
+
+//////////////////////////////////////////////////
+math::Vector3 ODEBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+{
+}
+
+//////////////////////////////////////////////////
+double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+double ODEBallJoint::GetMaxForce(unsigned int /*_index*/)
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
+{
+}
+
+//////////////////////////////////////////////////
+math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+{
+  return math::Angle(0);
+}
+

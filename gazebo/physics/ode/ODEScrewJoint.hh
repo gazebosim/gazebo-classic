@@ -44,40 +44,42 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(int index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetThreadPitch(int _index, double _threadPitch);
+      public: virtual void SetThreadPitch(unsigned int _index,
+                  double _threadPitch);
 
       // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
-      public: virtual double GetParam(int _parameter) const;
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
+      public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited
-      protected: virtual void SetForceImpl(int _index, double _effort);
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
   }
 }

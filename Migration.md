@@ -53,7 +53,7 @@
 
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
-    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
 
 1. **gazebo/physics/Link.hh**
