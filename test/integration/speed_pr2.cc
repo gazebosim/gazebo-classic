@@ -32,6 +32,12 @@ void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
           << "Please see issue #857.\n";
     return;
   }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
 
   Load("worlds/empty.world", false, _physicsEngine);
   double emptySpeed;
