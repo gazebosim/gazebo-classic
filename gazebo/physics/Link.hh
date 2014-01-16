@@ -492,6 +492,9 @@ namespace gazebo
       /// \brief Offsets for the attached models.
       protected: std::vector<math::Pose> attachedModelsOffset;
 
+      /// \brief This flag is set to true when the link is initialized.
+      protected: bool initialized;
+
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;
 
