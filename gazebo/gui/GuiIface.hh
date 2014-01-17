@@ -19,26 +19,38 @@
 
 #include <string>
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    GAZEBO_VISIBLE
     void load();
 
+    GAZEBO_VISIBLE
     void init();
 
+    GAZEBO_VISIBLE
     bool run(int _argc, char **_argv);
+    GAZEBO_VISIBLE
     void stop();
 
+    GAZEBO_VISIBLE
     void set_world(const std::string& _name);
+    GAZEBO_VISIBLE
     std::string get_world();
 
+    GAZEBO_VISIBLE
     void set_active_camera(rendering::UserCameraPtr _cam);
+    GAZEBO_VISIBLE
     rendering::UserCameraPtr get_active_camera();
+    GAZEBO_VISIBLE
     void clear_active_camera();
 
+    GAZEBO_VISIBLE
     unsigned int get_entity_id(const std::string &_name);
+    GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
   }
 }

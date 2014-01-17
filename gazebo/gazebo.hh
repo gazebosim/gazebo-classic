@@ -19,19 +19,28 @@
 
 #include <gazebo/gazebo_core.hh>
 #include <string>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  GAZEBO_VISIBLE
   void print_version();
+  GAZEBO_VISIBLE
   void add_plugin(const std::string &_filename);
 
+  GAZEBO_VISIBLE
   bool load(int _argc = 0, char **_argv = 0);
+  GAZEBO_VISIBLE
   bool init();
+  GAZEBO_VISIBLE
   void run();
+  GAZEBO_VISIBLE
   void stop();
+  GAZEBO_VISIBLE
   void fini();
 
   /// \brief Find a file in the gazebo search paths
+  GAZEBO_VISIBLE
   std::string find_file(const std::string &_file);
 }
 
