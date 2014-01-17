@@ -50,7 +50,7 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -60,7 +60,7 @@ math::Vector3 DARTUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetGlobalAxis(int _index) const
+math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -93,7 +93,8 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void DARTUniversalJoint::SetAxis(unsigned int _index,
+    const math::Vector3 &_axis)
 {
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
 
@@ -126,7 +127,7 @@ void DARTUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTUniversalJoint::GetAngleImpl(int _index) const
+math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -149,7 +150,7 @@ math::Angle DARTUniversalJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double DARTUniversalJoint::GetVelocity(int _index) const
+double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0.0;
 
@@ -164,7 +165,7 @@ double DARTUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetVelocity(int _index, double _vel)
+void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_dq(_vel);
@@ -175,7 +176,7 @@ void DARTUniversalJoint::SetVelocity(int _index, double _vel)
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetMaxForce(int _index, double _force)
+void DARTUniversalJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tauMax(_force);
@@ -186,7 +187,7 @@ void DARTUniversalJoint::SetMaxForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-double DARTUniversalJoint::GetMaxForce(int _index)
+double DARTUniversalJoint::GetMaxForce(unsigned int _index)
 {
   double result = 0.0;
 
@@ -201,7 +202,7 @@ double DARTUniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetForceImpl(int _index, double _effort)
+void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tau(_effort);
