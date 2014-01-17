@@ -465,6 +465,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 
       if (!this->noises.empty())
       {
+        // currently supports only one noise model per laser sensor
         range = this->noises[0]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
