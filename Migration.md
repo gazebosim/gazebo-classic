@@ -13,8 +13,8 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
-1. **Function in Joint class use unsigned int, instead of int**
-    + All functions in Joint classes (gazebo/physics/*Joint*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/*Joint*) now use unsigned integers instead of integers when referring to a specific joint axis.
+1. **Functions in joint classes use unsigned int, instead of int**
+    + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
 1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
