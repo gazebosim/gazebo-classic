@@ -185,13 +185,13 @@ namespace gazebo
       /// \brief store gravity mode given link might not be around
       private: bool gravityMode;
 
-      /// \biref Trigger setting of link according to staticLink.
+      /// \brief Trigger setting of link according to staticLink.
       private: bool staticLinkDirty;
 
-      /// \biref Trigger setting of link gravity mode
+      /// \brief Trigger setting of link gravity mode
       private: bool gravityModeDirty;
 
-      /// \biref If true, freeze link to world (inertial) frame.
+      /// \brief If true, freeze link to world (inertial) frame.
       private: bool staticLink;
 
       /// \brief Event connection for SetLinkStatic
