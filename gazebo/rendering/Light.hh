@@ -204,6 +204,10 @@ namespace gazebo
 
       /// \brief Pointer to the scene.
       private: ScenePtr scene;
+
+      /// \brief Get whether the light is visible.
+      /// \return True if the light is visible.
+      public: bool GetVisible() const;
     };
     /// \}
   }
