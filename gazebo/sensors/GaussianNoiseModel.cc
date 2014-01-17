@@ -21,6 +21,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"
 

@@ -141,7 +141,7 @@ void CameraSensor::Init()
     if (cameraSdf->HasElement("noise"))
     {
       NoisePtr noise =
-          NoiseManager::LoadNoiseModel(cameraSdf->GetElement("noise"),
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
         this->GetType());
       this->noises.push_back(noise);
       noise->SetCamera(this->camera);

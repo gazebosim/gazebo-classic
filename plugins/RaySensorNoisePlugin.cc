@@ -40,7 +40,10 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr /*_sdf*/)
 {
   if (!_parent)
-    gzthrow("RaySensorNoisePlugin requires a ray sensor as its parent");
+  {
+    gzerr << "RaySensorNoisePlugin requires a ray sensor as its parent.\n";
+    return;
+  }
 
   sensors::NoisePtr noise = _parent->GetNoise();
 

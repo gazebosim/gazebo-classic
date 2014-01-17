@@ -25,7 +25,7 @@ using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
-NoisePtr NoiseManager::LoadNoiseModel(sdf::ElementPtr _sdf,
+NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     const std::string &_sensorType)
 {
   GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");

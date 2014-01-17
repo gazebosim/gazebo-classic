@@ -24,9 +24,13 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/sensors/Noise.hh"
+
+namespace Ogre
+{
+  class CompositorInstance;
+}
 
 namespace gazebo
 {

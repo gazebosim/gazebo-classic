@@ -33,9 +33,9 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class NoiseManager Noise.hh
+    /// \class NoiseFactory Noise.hh sensors/sensors.hh
     /// \brief Use this noise manager for creating and loading noise models.
-    class NoiseManager
+    class NoiseFactory
     {
       /// \brief Load a noise model based on the input sdf parameters and
       /// sensor type.
@@ -44,7 +44,7 @@ namespace gazebo
       /// distinguish between image and non image sensors in order to create
       /// the appropriate noise model.
       /// \return Pointer to the noise model created.
-      public: static NoisePtr LoadNoiseModel(sdf::ElementPtr _sdf,
+      public: static NoisePtr NewNoiseModel(sdf::ElementPtr _sdf,
           const std::string &_sensorType = "");
     };
 
