@@ -97,7 +97,7 @@ void ODEScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);

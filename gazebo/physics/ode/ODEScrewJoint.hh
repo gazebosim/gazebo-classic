@@ -47,7 +47,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAxis(unsigned int index,
+      public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
       // Documentation inherited

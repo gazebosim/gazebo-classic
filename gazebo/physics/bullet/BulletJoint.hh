@@ -97,7 +97,7 @@ namespace gazebo
                                         const boost::any &_value);
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &_key,
-                                          unsigned int _index)
+                                          unsigned int _index);
 
       // Documentation inherited.
       public: virtual void CacheForceTorque();
