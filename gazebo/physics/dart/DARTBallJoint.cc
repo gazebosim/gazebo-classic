@@ -50,11 +50,51 @@ void DARTBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 DARTBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+{
+}
+
+//////////////////////////////////////////////////
+double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+double DARTBallJoint::GetMaxForce(unsigned int /*_index*/)
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
+{
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+{
+  return math::Angle(0);
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
+{
+  gzerr << "Not implemented";
 }

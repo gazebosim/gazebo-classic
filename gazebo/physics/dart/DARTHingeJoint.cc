@@ -52,7 +52,7 @@ void DARTHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
+math::Vector3 DARTHingeJoint::GetAnchor(unsigned int /*index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -62,7 +62,7 @@ math::Vector3 DARTHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
+math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -85,7 +85,7 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
+void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
 {
   if (_index == 0)
   {
@@ -108,7 +108,7 @@ void DARTHingeJoint::SetAxis(int _index, const math::Vector3& _axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
+math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -126,7 +126,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetVelocity(int _index, double _vel)
+void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_dq(_vel);
@@ -135,7 +135,7 @@ void DARTHingeJoint::SetVelocity(int _index, double _vel)
 }
 
 //////////////////////////////////////////////////
-double DARTHingeJoint::GetVelocity(int _index) const
+double DARTHingeJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0.0;
 
@@ -148,7 +148,7 @@ double DARTHingeJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetMaxForce(int _index, double _force)
+void DARTHingeJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tauMax(_force);
@@ -157,7 +157,7 @@ void DARTHingeJoint::SetMaxForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-double DARTHingeJoint::GetMaxForce(int _index)
+double DARTHingeJoint::GetMaxForce(unsigned int _index)
 {
   double result = 0.0;
 
@@ -170,7 +170,7 @@ double DARTHingeJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetForceImpl(int _index, double _effort)
+void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tau(_effort);

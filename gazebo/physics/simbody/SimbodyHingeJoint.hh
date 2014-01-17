@@ -47,34 +47,36 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int _index, double _rate);
+      public: virtual void SetVelocity(unsigned int _index, double _rate);
 
       // Documentation inherited.
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(int _index);
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(int _index);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       /// \brief save simbody state for spawning
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
@@ -83,10 +85,10 @@ namespace gazebo
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(int _index) const;
+      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       /// \brief save simbody state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;
