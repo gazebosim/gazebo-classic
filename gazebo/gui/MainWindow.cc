@@ -863,6 +863,7 @@ void MainWindow::CreateActions()
   g_arrowAct->setStatusTip(tr("Move camera"));
   g_arrowAct->setCheckable(true);
   g_arrowAct->setChecked(true);
+  g_arrowAct->setToolTip(tr("Selection Mode (Esc)"));
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
@@ -1185,6 +1186,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
+      cam->SetUseSDFPose(true);
     }
 
     if (_msg->camera().has_view_controller())
