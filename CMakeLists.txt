@@ -318,7 +318,6 @@ else (build_errors)
     gazebo_gui_viewers
     gazebo_math
     gazebo_msgs
-    gazebo_ode
     gazebo_physics
     gazebo_physics_ode
     gazebo_rendering

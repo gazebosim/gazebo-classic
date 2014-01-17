@@ -245,7 +245,7 @@ endif()
 
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-gz_add_library(gazebo_ode ${sources})
+add_library(gazebo_ode STATIC ${sources})
 target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
@@ -255,5 +255,3 @@ target_link_libraries(gazebo_ode
 
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
-
-gz_install_library(gazebo_ode)
