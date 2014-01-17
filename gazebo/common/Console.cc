@@ -59,7 +59,7 @@ void Console::Init(const std::string &_logFilename)
   this->logStream = new std::ofstream(logPath.string().c_str(), std::ios::out);
 
   if (! this->logStream->is_open())
-    gzerr << "Error opening log file: " << logPath << std::endl;
+    std::cerr << "Error opening log file: " << logPath << std::endl;
 }
 
 //////////////////////////////////////////////////
