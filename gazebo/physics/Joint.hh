@@ -392,7 +392,8 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
@@ -400,7 +401,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual double GetAttribute(const std::string &_key,
-                                                unsigned int _index) = 0;
+                                          unsigned int _index) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.

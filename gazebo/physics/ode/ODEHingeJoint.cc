@@ -67,7 +67,8 @@ math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAnchor(unsigned int /*index*/, const math::Vector3 &_anchor)
+void ODEHingeJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);

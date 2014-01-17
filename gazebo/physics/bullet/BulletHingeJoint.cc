@@ -181,7 +181,8 @@ math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
+void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame

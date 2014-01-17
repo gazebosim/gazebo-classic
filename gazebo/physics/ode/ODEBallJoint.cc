@@ -41,7 +41,7 @@ ODEBallJoint::~ODEBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -54,7 +54,8 @@ math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
+void ODEBallJoint::SetAnchor(unsigned int /*_index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->jointId)
     dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
@@ -63,7 +64,7 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
