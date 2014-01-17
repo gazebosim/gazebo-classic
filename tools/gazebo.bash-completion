@@ -28,6 +28,14 @@ function _gz
           return
           ;;
       esac;
+    elif [[ "$cmd" == "camera" ]]; then
+      case ${prev} in
+        -c|--camera-name)
+          opts=`gz camera -l 2>/dev/null`
+          COMPREPLY=($(compgen -W "$opts" -- ${cur}))
+          return
+          ;;
+      esac;
     fi
 
     if [[ "$cmd" == "help" ]]; then

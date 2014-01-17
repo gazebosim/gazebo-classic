@@ -77,6 +77,8 @@ bool TopicCommand::RunImpl()
     this->Bw(this->vm["bw"].as<std::string>());
   else if (this->vm.count("view"))
     this->View(this->vm["view"].as<std::string>());
+  else
+    this->Help();
 
   return true;
 }
@@ -113,7 +115,7 @@ void TopicCommand::List()
 /////////////////////////////////////////////////
 msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
 {
-  msgs::TopicInfo topic_info;
+  msgs::TopicInfo topicInfo;
   std::string data;
   msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
   msgs::Packet packet;
@@ -130,12 +132,12 @@ msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
   } while (packet.type() != "topic_info_response" && ++i < 10);
 
   if (i <10)
-    topic_info.ParseFromString(packet.serialized_data());
+    topicInfo.ParseFromString(packet.serialized_data());
   else
     std::cerr << "Unable to get topic info.\n";
 
   delete request;
-  return topic_info;
+  return topicInfo;
 }
 
 /////////////////////////////////////////////////

@@ -116,7 +116,7 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
           this->Out(result, _state) << std::fixed << rpy.z << " ";
           break;
         default:
-          gzerr << "Invalid pose value[" << *elemIter << "]\n";
+          std::cerr << "Invalid pose value[" << *elemIter << "]\n";
           break;
       }
     }
@@ -203,7 +203,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
       }
       catch(...)
       {
-        gzerr << "Inavlid axis value[" << *elemIter << "]\n";
+        std::cerr << "Inavlid axis value[" << *elemIter << "]\n";
       }
     }
   }
@@ -441,7 +441,7 @@ std::string ModelFilter::FilterParts(gazebo::physics::ModelState &_state,
     result << this->FilterPose(pose, "pose", elemParts, _state);
   }
   else
-    gzerr << "Invalid model state component["
+    std::cerr << "Invalid model state component["
       << *_partIter << "]\n";
 
   return result.str();
@@ -628,13 +628,17 @@ bool LogCommand::RunImpl()
       filename = vm["file"].as<std::string>();
     else
     {
-      gzerr << "No log file specified\n";
+      std::cerr << "No log file specified\n";
+      std::cerr << "For more info: gz help log\n";
+
       return false;
     }
 
     // Load log file from string
     if (!this->LoadLogFromFile(filename))
+    {
       return false;
+    }
   }
 
   // Create a state sdf element.
@@ -649,6 +653,8 @@ bool LogCommand::RunImpl()
     this->Record(this->vm["record"].as<bool>());
   else if (this->vm.count("info"))
     this->Info(filename);
+  else
+    this->Help();
 
   return true;
 }
@@ -852,7 +858,7 @@ void LogCommand::Record(bool _start)
 
   if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
   {
-    gzerr << "Unable to create a connection to topic ~/log/control.\n";
+    std::cerr << "Unable to create a connection to topic ~/log/control.\n";
     return;
   }
 
@@ -870,7 +876,7 @@ std::string LogCommand::GetFileSizeStr(const std::string &_filename)
   std::ifstream ifs(_filename.c_str());
   if (!ifs)
   {
-    gzerr << "Unable to open file[" << _filename << "]\n";
+    std::cerr << "Unable to open file[" << _filename << "]\n";
     return std::string();
   }
 
@@ -912,7 +918,7 @@ bool LogCommand::LoadLogFromFile(const std::string &_filename)
 {
   if (_filename.empty())
   {
-    gzerr << "Log filename is empty.\n";
+    std::cerr << "Log filename is empty.\n";
     return false;
   }
 
@@ -922,7 +928,7 @@ bool LogCommand::LoadLogFromFile(const std::string &_filename)
   }
   catch(gazebo::common::Exception &_e)
   {
-    gzerr << "Unable to open log file[" << _filename << "]\n";
+    std::cerr << "Unable to open log file[" << _filename << "]\n";
     return false;
   }
 

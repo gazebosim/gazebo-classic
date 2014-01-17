@@ -293,6 +293,8 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       {
         if (siter->first.topic() == req.data())
         {
+          //if (!ti.has_msg_type())
+          ti.set_msg_type(siter->first.msg_type());
           msgs::Subscribe *sub = ti.add_subscriber();
           sub->CopyFrom(siter->first);
         }
