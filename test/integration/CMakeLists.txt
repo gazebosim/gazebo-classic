@@ -34,6 +34,8 @@ set(tests
   file_handling.cc
   gripper.cc
   imu.cc
+  joint_force_torque.cc
+  joint_spawn.cc
   laser.cc
   model_database.cc
   nondefault_world.cc
