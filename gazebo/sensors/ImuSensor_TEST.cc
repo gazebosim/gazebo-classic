@@ -84,6 +84,13 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheckBullet)
 }
 #endif
 
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckDART)
+{
+  BasicImuSensorCheck("dart");
+}
+#endif
+
 // Drop a model with imu sensor and measure its linear acceleration
 void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 {
@@ -159,6 +166,13 @@ TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
 TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
 {
   LinearAccelerationTest("bullet");
+}
+#endif
+
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, LinearAccelerationTestDART)
+{
+  LinearAccelerationTest("dart");
 }
 #endif
 

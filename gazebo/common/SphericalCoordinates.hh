@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ namespace gazebo
 {
   namespace common
   {
+    class SphericalCoordinatesPrivate;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -69,15 +71,13 @@ namespace gazebo
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz)
-              const;
+      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
@@ -140,21 +140,9 @@ namespace gazebo
       /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const math::Angle &_angle);
 
-      /// \brief Type of surface being used.
-      private: SurfaceType surfaceType;
-
-      /// \brief Latitude of reference point.
-      private: math::Angle latitudeReference;
-
-      /// \brief Longitude of reference point.
-      private: math::Angle longitudeReference;
-
-      /// \brief Elevation of reference point relative to sea level in meters.
-      private: double elevationReference;
-
-      /// \brief Heading offset, expressed as angle from East to
-      ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
-      private: math::Angle headingOffset;
+      /// internal
+      /// \brief Pointer to the private data
+      private: SphericalCoordinatesPrivate *dataPtr;
     };
     /// \}
   }
