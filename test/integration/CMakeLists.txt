@@ -34,6 +34,7 @@ set(tests
   file_handling.cc
   gripper.cc
   imu.cc
+  joint_universal.cc
   laser.cc
   model_database.cc
   nondefault_world.cc

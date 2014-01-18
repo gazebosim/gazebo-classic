@@ -809,6 +809,53 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
+      else if (type == "universal")
+      {
+        UnitVec3 axis1(
+          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+        UnitVec3 axis2(
+          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(1)));
+
+        // Simbody's univeral joint is along axis1=Y and axis2=X
+        // note X and Y are reversed because Simbody defines universal joint
+        // rotation in body-fixed frames, whereas Gazebo/ODE uses space-fixed
+        // frames.
+        Rotation R_JF(axis1, XAxis, axis2, YAxis);
+        Transform X_IF(X_IF0.R()*R_JF, X_IF0.p());
+        Transform X_OM(X_OM0.R()*R_JF, X_OM0.p());
+        MobilizedBody::Universal uJoint(
+            parentMobod,      X_IF,
+            massProps,        X_OM,
+            direction);
+        mobod = uJoint;
+
+        for (unsigned int nj = 0; nj < 2; ++nj)
+        {
+          double low = gzJoint->GetLowerLimit(nj).Radian();
+          double high = gzJoint->GetUpperLimit(nj).Radian();
+
+          // initialize stop stiffness and dissipation from joint parameters
+          gzJoint->limitForce[nj] =
+            Force::MobilityLinearStop(this->forces, mobod,
+            SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
+            gzJoint->GetStopDissipation(nj), low, high);
+
+          // gzdbg << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
+          //       << "] low [" << low
+          //       << "] high [" << high
+          //       << "]\n";
+
+          // gzdbg << "SimbodyPhysics SetDamping ("
+          //       << gzJoint->GetDampingCoefficient()
+          //       << ")\n";
+          // Create a damper for every joint even if damping coefficient
+          // is zero.  This will allow user to change damping coefficients
+          // on the fly.
+          gzJoint->damper[nj] =
+            Force::MobilityLinearDamper(this->forces, mobod, nj,
+                                     gzJoint->GetDamping(nj));
+        }
+      }
       else if (type == "revolute")
       {
         UnitVec3 axis(
@@ -824,13 +871,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        gzdbg << "Setting limitForce for [" << gzJoint->GetName() << "]\n";
+        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
 
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce =
+        gzJoint->limitForce[0] =
           Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
           gzJoint->GetStopDissipation(0), low, high);
@@ -841,7 +888,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper =
+        gzJoint->damper[0] =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
@@ -870,7 +917,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce =
+        gzJoint->limitForce[0] =
           Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
           gzJoint->GetStopDissipation(0), low, high);
@@ -878,7 +925,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper =
+        gzJoint->damper[0] =
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 

@@ -76,10 +76,13 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
 
   if (this->jointId)
   {
-    if (_index == 0)
+    // flipping axis 1 and 2 around
+    if (_index == 1)
       dJointGetUniversalAxis1(this->jointId, result);
-    else
+    else if (_index == 0)
       dJointGetUniversalAxis2(this->jointId, result);
+    else
+      gzerr << "Joint index out of bounds.\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -104,12 +107,15 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 
   if (this->jointId)
   {
-    if (_index == 0)
+    // flipping axis 1 and 2 around
+    if (_index == 1)
       dJointSetUniversalAxis1(this->jointId,
         globalAxis.x, globalAxis.y, globalAxis.z);
-    else
+    else if (_index == 0)
       dJointSetUniversalAxis2(this->jointId,
         globalAxis.x, globalAxis.y, globalAxis.z);
+    else
+      gzerr << "Joint index out of bounds.\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -122,10 +128,13 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   if (this->jointId)
   {
-    if (_index == 0)
+    // flipping axis 1 and 2 around
+    if (_index == 1)
       result = dJointGetUniversalAngle1(this->jointId);
-    else
+    else if (_index == 0)
       result = dJointGetUniversalAngle2(this->jointId);
+    else
+      gzerr << "Joint index out of bounds.\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -140,10 +149,13 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 
   if (this->jointId)
   {
-    if (_index == 0)
+    // flipping axis 1 and 2 around
+    if (_index == 1)
       result = dJointGetUniversalAngle1Rate(this->jointId);
-    else
+    else if (_index == 0)
       result = dJointGetUniversalAngle2Rate(this->jointId);
+    else
+      gzerr << "Joint index out of bounds.\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -154,10 +166,13 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  if (_index == 0)
+  // flipping axis 1 and 2 around
+  if (_index == 1)
     this->SetParam(dParamVel, _angle);
-  else
+  else if (_index == 0)
     this->SetParam(dParamVel2, _angle);
+  else
+    gzerr << "Joint index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
@@ -165,10 +180,13 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->jointId)
   {
-    if (_index == 0)
+    // flipping axis 1 and 2 around
+    if (_index == 1)
       dJointAddUniversalTorques(this->jointId, _effort, 0);
-    else
+    else if (_index == 0)
       dJointAddUniversalTorques(this->jointId, 0, _effort);
+    else
+      gzerr << "Joint index out of bounds.\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -177,19 +195,26 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
 {
-  if (_index == 0)
+  // flipping axis 1 and 2 around
+  if (_index == 1)
     this->SetParam(dParamFMax, _t);
-  else
+  else if (_index == 0)
     this->SetParam(dParamFMax2, _t);
+  else
+    gzerr << "Joint index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
 double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
-  if (_index == 0)
+  // flipping axis 1 and 2 around
+  if (_index == 1)
     return this->GetParam(dParamFMax);
-  else
+  else if (_index == 0)
     return this->GetParam(dParamFMax2);
+  
+  gzerr << "Joint index out of bounds.\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
