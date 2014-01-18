@@ -67,7 +67,8 @@ namespace gazebo
       // Documentation inherited
       public: void AddTag(RFIDTag *_tag);
 
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited.
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

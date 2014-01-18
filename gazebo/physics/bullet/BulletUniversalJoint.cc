@@ -94,27 +94,27 @@ void BulletUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 BulletUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
+math::Vector3 BulletUniversalJoint::GetAxis(unsigned int _index) const
 {
   btVector3 axis = this->bulletUniversal->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetAxis(int /*_index*/,
+void BulletUniversalJoint::SetAxis(unsigned int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
   // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetAngle(int _index) const
+math::Angle BulletUniversalJoint::GetAngle(unsigned int _index) const
 {
   if (_index == 0)
     return this->bulletUniversal->getAngle1();
@@ -123,39 +123,42 @@ math::Angle BulletUniversalJoint::GetAngle(int _index) const
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::GetVelocity(int /*_index*/) const
+double BulletUniversalJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletUniversalJoint::SetVelocity(unsigned int /*_index*/,
+    double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void BulletUniversalJoint::SetForceImpl(unsigned int /*_index*/,
+    double /*_torque*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void BulletUniversalJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::GetMaxForce(int /*_index*/)
+double BulletUniversalJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
+void BulletUniversalJoint::SetHighStop(unsigned int _index,
+    const math::Angle &_angle)
 {
   if (this->bulletUniversal)
   {
@@ -171,7 +174,8 @@ void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
+void BulletUniversalJoint::SetLowStop(unsigned int _index,
+    const math::Angle &_angle)
 {
   if (this->bulletUniversal)
   {
@@ -187,7 +191,7 @@ void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetHighStop(int _index)
+math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
 {
   math::Angle result;
 
@@ -204,7 +208,7 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetLowStop(int _index)
+math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 {
   math::Angle result;
 
@@ -221,14 +225,14 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletUniversalJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "BulletUniversalJoint::GetGlobalAxis not implemented\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "BulletUniversalJoint::GetAngleImpl not implemented\n";
   return math::Angle();

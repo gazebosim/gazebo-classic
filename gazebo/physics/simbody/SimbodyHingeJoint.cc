@@ -47,7 +47,8 @@ void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void SimbodyHingeJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -57,9 +58,9 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetVelocity(int _index, double _rate)
+void SimbodyHingeJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
@@ -68,9 +69,9 @@ void SimbodyHingeJoint::SetVelocity(int _index, double _rate)
 }
 
 //////////////////////////////////////////////////
-double SimbodyHingeJoint::GetVelocity(int _index) const
+double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -93,33 +94,32 @@ double SimbodyHingeJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodyHingeJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzdbg << "SimbodyHingeJoint::SetMaxForce: doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
+double SimbodyHingeJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzdbg << "SimbodyHingeJoint::GetMaxForce: doesn't make sense in simbody...\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetForceImpl(int _index, double _torque)
+void SimbodyHingeJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()) &&
-      this->physicsInitialized)
+  if (_index < this->GetAngleCount() && this->physicsInitialized)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetHighStop(int _index,
+void SimbodyHingeJoint::SetHighStop(unsigned int _index,
                                    const math::Angle &_angle)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     Joint::SetHighStop(_index, _angle);
     if (this->physicsInitialized)
@@ -141,10 +141,10 @@ void SimbodyHingeJoint::SetHighStop(int _index,
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetLowStop(int _index,
+void SimbodyHingeJoint::SetLowStop(unsigned int _index,
                                   const math::Angle &_angle)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     Joint::SetLowStop(_index, _angle);
     if (this->physicsInitialized)
@@ -166,9 +166,9 @@ void SimbodyHingeJoint::SetLowStop(int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetHighStop(int _index)
+math::Angle SimbodyHingeJoint::GetHighStop(unsigned int _index)
 {
-  if (_index >= static_cast<int>(this->GetAngleCount()))
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "SimbodyHingeJoint::GetHighStop: Invalid joint index ["
           << _index << "] when trying to get high stop\n";
@@ -188,9 +188,9 @@ math::Angle SimbodyHingeJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetLowStop(int _index)
+math::Angle SimbodyHingeJoint::GetLowStop(unsigned int _index)
 {
-  if (_index >= static_cast<int>(this->GetAngleCount()))
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "SimbodyHingeJoint::GetLowStop: Invalid joint index [" << _index
           << "] when trying to get low stop\n";
@@ -210,11 +210,11 @@ math::Angle SimbodyHingeJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
+math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < static_cast<int>(this->GetAngleCount()))
+      _index < this->GetAngleCount())
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
       this->simbodyPhysics->integ->getState());
@@ -227,7 +227,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
   }
   else
   {
-    if (_index >= static_cast<int>(this->GetAngleCount()))
+    if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -261,9 +261,9 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngleImpl(int _index) const
+math::Angle SimbodyHingeJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)

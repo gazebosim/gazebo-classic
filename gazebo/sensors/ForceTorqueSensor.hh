@@ -59,6 +59,10 @@ namespace gazebo
       /// \return The latested measured force.
       public: math::Vector3 GetForce() const;
 
+      /// \brief Get Parent Joint
+      /// \return Pointer to the joint containing this sensor
+      public: physics::JointPtr GetJoint() const;
+
       // Documentation inherited.
       public: virtual bool IsActive();
 
@@ -75,10 +79,13 @@ namespace gazebo
               {update.Disconnect(_conn);}
 
       // Documentation inherited.
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
+
+      /// \brief Update event.
+      protected: event::EventT<void(msgs::WrenchStamped)> update;
 
       /// \brief Parent joint, from which we get force torque info.
       private: physics::JointPtr parentJoint;
@@ -91,9 +98,6 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrench message
       private: boost::mutex mutex;
-
-      /// \brief Update event.
-      protected: event::EventT<void(msgs::WrenchStamped)> update;
     };
     /// \}
   }

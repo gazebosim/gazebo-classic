@@ -47,28 +47,7 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
-{
-  // Simbody seems to handle setAxis improperly. It readjust all the pivot
-  // points
-  gzdbg << "SimbodyScrewJoint::SetAxis: setting axis is "
-        << "not yet implemented.  The axis are set during joint construction "
-        << "in SimbodyPhysics.cc for now.\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetVelocity(int _index, double _rate)
-{
-  if (_index < static_cast<int>(this->GetAngleCount()))
-    this->mobod.setOneU(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      SimTK::MobilizerUIndex(_index), _rate);
-  else
-    gzerr << "SimbodyScrewJoint::SetVelocity _index too large.\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyScrewJoint::GetVelocity(int _index) const
+double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
@@ -93,20 +72,46 @@ double SimbodyScrewJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetMaxForce(int /*_index*/, double /*_force*/)
+void SimbodyScrewJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  gzdbg << "SimbodyScrewJoint::SetMaxForce: doesn't make sense in simbody...\n";
+  if (_index < static_cast<int>(this->GetAngleCount()))
+    this->mobod.setOneU(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      SimTK::MobilizerUIndex(_index), _rate);
+  else
+    gzerr << "SimbodyScrewJoint::SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetMaxForce(int /*index*/)
+void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
-  gzdbg << "SimbodyScrewJoint::GetMaxForce: doesn't make sense in simbody...\n";
-  return 0;
+  // Simbody seems to handle setAxis improperly. It readjust all the pivot
+  // points
+  gzdbg << "SimbodyScrewJoint::SetAxis: setting axis is "
+        << "not yet implemented.  The axis are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetForceImpl(int _index, double _torque)
+void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
+    double /*_threadPitch*/)
+{
+  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+        << "not yet implemented.  The pitch are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
+{
+  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+        << "not yet implemented.  The pitch are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 {
   if (_index < static_cast<int>(this->GetAngleCount()) &&
       this->physicsInitialized)
@@ -116,7 +121,7 @@ void SimbodyScrewJoint::SetForceImpl(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(int _index,
+void SimbodyScrewJoint::SetHighStop(unsigned int _index,
   const math::Angle &_angle)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -141,7 +146,7 @@ void SimbodyScrewJoint::SetHighStop(int _index,
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(int _index,
+void SimbodyScrewJoint::SetLowStop(unsigned int _index,
   const math::Angle &_angle)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -166,7 +171,7 @@ void SimbodyScrewJoint::SetLowStop(int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(int _index)
+math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= static_cast<int>(this->GetAngleCount()))
   {
@@ -188,7 +193,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(int _index)
+math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= static_cast<int>(this->GetAngleCount()))
   {
@@ -210,7 +215,20 @@ math::Angle SimbodyScrewJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyScrewJoint::GetGlobalAxis(int _index) const
+void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
+{
+  gzdbg << "SimbodyScrewJoint::SetMaxForce: doesn't make sense in simbody...\n";
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
+{
+  gzdbg << "SimbodyScrewJoint::GetMaxForce: doesn't make sense in simbody...\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
@@ -261,7 +279,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(int _index) const
+math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
@@ -285,22 +303,6 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(int _index) const
     gzerr << "index out of bound\n";
     return math::Angle(SimTK::NaN);
   }
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
-{
-  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
-        << "not yet implemented.  The pitch are set during joint construction "
-        << "in SimbodyPhysics.cc for now.\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
-{
-  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
-        << "not yet implemented.  The pitch are set during joint construction "
-        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////

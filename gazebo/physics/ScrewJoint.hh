@@ -65,8 +65,8 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
-      public: virtual void SetThreadPitch(int _index, double _threadPitch)
-        GAZEBO_DEPRECATED(3.0) = 0;
+      public: virtual void SetThreadPitch(unsigned int _index,
+                  double _threadPitch) GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Set screw joint thread pitch.
       ///

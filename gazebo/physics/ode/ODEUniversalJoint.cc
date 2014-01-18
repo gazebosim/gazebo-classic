@@ -45,7 +45,7 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -57,7 +57,8 @@ math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void ODEUniversalJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -69,7 +70,7 @@ void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
+math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -90,7 +91,7 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -121,7 +122,7 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
+math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -142,7 +143,7 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEUniversalJoint::GetVelocity(int _index) const
+double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
 
@@ -163,7 +164,7 @@ double ODEUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetVelocity(int _index, double _angle)
+void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
   // flipping axis 1 and 2 around
   if (_index == 1)
@@ -175,7 +176,7 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetForceImpl(int _index, double _effort)
+void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->jointId)
   {
@@ -192,7 +193,7 @@ void ODEUniversalJoint::SetForceImpl(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetMaxForce(int _index, double _t)
+void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
 {
   // flipping axis 1 and 2 around
   if (_index == 1)
@@ -204,7 +205,7 @@ void ODEUniversalJoint::SetMaxForce(int _index, double _t)
 }
 
 //////////////////////////////////////////////////
-double ODEUniversalJoint::GetMaxForce(int _index)
+double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
   // flipping axis 1 and 2 around
   if (_index == 1)
@@ -216,7 +217,7 @@ double ODEUniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetParam(int _parameter, double _value)
+void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
 

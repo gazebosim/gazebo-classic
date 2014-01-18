@@ -55,7 +55,8 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
+  gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
 
@@ -518,7 +519,8 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
-    unsigned int _vSamples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -544,13 +546,13 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
     << "        <vertical>"
     << "          <samples>" << _vSamples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _vResolution << "</resolution>"
     << "          <min_angle>" << _vMinAngle << "</min_angle>"
     << "          <max_angle>" << _vMaxAngle << "</max_angle>"
     << "        </vertical>"

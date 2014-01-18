@@ -397,11 +397,11 @@ TEST_F(TransportTest, IfaceGetAdvertisedTopics)
 
   topics = transport::getAdvertisedTopics("gazebo.msgs.WorldStatistics");
   EXPECT_FALSE(topics.empty());
-  EXPECT_EQ(topics.size(), 1);
+  EXPECT_EQ(topics.size(), 1u);
 
   topics = transport::getAdvertisedTopics("gazebo.msgs.PosesStamped");
   EXPECT_FALSE(topics.empty());
-  EXPECT_EQ(topics.size(), 2);
+  EXPECT_EQ(topics.size(), 2u);
 
   std::map<std::string, std::list<std::string> > topicMap =
     transport::getAdvertisedTopics();

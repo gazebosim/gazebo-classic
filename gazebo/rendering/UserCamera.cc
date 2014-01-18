@@ -60,6 +60,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
+
+  this->SetUseSDFPose(false);
 }
 
 //////////////////////////////////////////////////
@@ -235,6 +237,18 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
   this->viewController->HandleKeyReleaseEvent(_key);
+}
+
+/////////////////////////////////////////////////
+bool UserCamera::IsCameraSetInWorldFile()
+{
+  return this->isCameraSetInWorldFile;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetUseSDFPose(bool _value)
+{
+  this->isCameraSetInWorldFile = _value;
 }
 
 /////////////////////////////////////////////////
@@ -517,7 +531,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
+  this->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
 }
 

@@ -45,19 +45,19 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetAxis(int /*_index*/,
+void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
   /// Universal Joint are built in SimbodyPhysics.cc, so this init block
@@ -77,7 +77,7 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
 
 
 //////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetVelocity(int _index) const
+double SimbodyUniversalJoint::GetVelocity(unsigned int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {
@@ -103,7 +103,8 @@ double SimbodyUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetVelocity(int _index, double _rate)
+void SimbodyUniversalJoint::SetVelocity(unsigned int _index,
+    double _angle)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
     this->mobod.setOneU(
@@ -114,7 +115,8 @@ void SimbodyUniversalJoint::SetVelocity(int _index, double _rate)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetForceImpl(int _index, double _torque)
+void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
+    double _torque)
 {
   if (_index < static_cast<int>(this->GetAngleCount()) &&
       this->physicsInitialized)
@@ -124,20 +126,20 @@ void SimbodyUniversalJoint::SetForceImpl(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodyUniversalJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetMaxForce(int /*_index*/)
+double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetHighStop(int _index,
+void SimbodyUniversalJoint::SetHighStop(unsigned int _index,
   const math::Angle &_angle)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -162,7 +164,7 @@ void SimbodyUniversalJoint::SetHighStop(int _index,
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetLowStop(int _index,
+void SimbodyUniversalJoint::SetLowStop(unsigned int _index,
   const math::Angle &_angle)
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
@@ -187,7 +189,7 @@ void SimbodyUniversalJoint::SetLowStop(int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
+math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= static_cast<int>(this->GetAngleCount()))
   {
@@ -214,7 +216,7 @@ math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetLowStop(int _index)
+math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= static_cast<int>(this->GetAngleCount()))
   {
@@ -241,7 +243,8 @@ math::Angle SimbodyUniversalJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(int _index) const
+math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
@@ -314,7 +317,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetAngleImpl(int _index) const
+math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   if (_index < static_cast<int>(this->GetAngleCount()))
   {

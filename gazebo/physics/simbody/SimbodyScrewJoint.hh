@@ -45,10 +45,12 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetThreadPitch(int _index, double _threadPitch);
+      public: virtual void SetThreadPitch(unsigned int _index,
+                  double _threadPitch);
 
       // Documentation inherited.
       public: virtual void SetThreadPitch(double _threadPitch);
@@ -60,34 +62,36 @@ namespace gazebo
       public: virtual double GetThreadPitch();
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(int _index);
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(int _index);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key, int _index,
@@ -98,7 +102,7 @@ namespace gazebo
                                                 unsigned int _index);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _force);
+      protected: virtual void SetForceImpl(unsigned int _index, double _force);
     };
     /// \}
   }

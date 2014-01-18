@@ -45,6 +45,10 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 DepthCameraSensor::DepthCameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&DepthCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -138,15 +142,29 @@ void DepthCameraSensor::SetActive(bool value)
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::UpdateImpl(bool /*_force*/)
+void DepthCameraSensor::Render()
+{
+  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  // Update all the cameras
+  this->Render();
+
+  this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
+}
+
+//////////////////////////////////////////////////
+bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
 {
   // Sensor::Update(force);
-  if (this->camera)
-  {
-    this->camera->Render();
-    this->camera->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
-  }
+  if (!this->rendered)
+    return false;
+
+  this->camera->PostRender();
+
+  this->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////

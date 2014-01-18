@@ -361,28 +361,6 @@ void Joint_TEST::ForceTorque1(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(Joint_TEST, ForceTorque1ODE)
-{
-  ForceTorque1("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque1Simbody)
-{
-  ForceTorque1("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-
-/// bullet collision parameters needs tweaking?
-TEST_F(Joint_TEST, ForceTorque1Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque1("bullet");
-}
-#endif  // HAVE_BULLET
-
 void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 {
   // Load our force torque test world
@@ -453,7 +431,16 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
 
     EXPECT_NEAR(wrench_01.body2Force.x,  -600.0,  6.0);
     EXPECT_NEAR(wrench_01.body2Force.y,  1000.0, 10.0);
-    EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  2.0);
+    if (_physicsEngine == "dart")
+    {
+      // DART needs greater tolerance due to joint limit violation
+      // Please see issue #902
+      EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  8.6);
+    }
+    else
+    {
+      EXPECT_NEAR(wrench_01.body2Force.z,   200.0,  2.0);
+    }
     EXPECT_NEAR(wrench_01.body2Torque.x, -750.0,  7.5);
     EXPECT_NEAR(wrench_01.body2Torque.y, -450.0,  4.5);
     EXPECT_NEAR(wrench_01.body2Torque.z,    0.0,  0.1);
@@ -476,7 +463,16 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_NEAR(wrench_12.body1Force.x,   300.0,  3.0);
     EXPECT_NEAR(wrench_12.body1Force.y,  -500.0,  5.0);
-    EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
+    if (_physicsEngine == "dart")
+    {
+      // DART needs greater tolerance due to joint limit violation
+      // Please see issue #902
+      EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  4.3);
+    }
+    else
+    {
+      EXPECT_NEAR(wrench_12.body1Force.z,  -100.0,  1.0);
+    }
     EXPECT_NEAR(wrench_12.body1Torque.x,  250.0,  5.0);
     EXPECT_NEAR(wrench_12.body1Torque.y,  150.0,  3.0);
     EXPECT_NEAR(wrench_12.body1Torque.z,    0.0,  0.1);
@@ -510,29 +506,16 @@ void Joint_TEST::ForceTorque2(const std::string &_physicsEngine)
   gzdbg << "t after 20 steps : " << t << "\n";
 }
 
-TEST_F(Joint_TEST, ForceTorque2ODE)
-{
-  ForceTorque2("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, ForceTorque2Simbody)
-{
-  ForceTorque2("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-TEST_F(Joint_TEST, ForceTorque2Bullet)
-{
-  // uncomment when bullet 2.82 is released
-  // ForceTorque2("bullet");
-}
-#endif  // HAVE_BULLET
-
 void Joint_TEST::GetForceTorqueWithAppliedForce(
   const std::string &_physicsEngine)
 {
+  // Explicit joint damping in bullet is causing this test to fail.
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #619.\n";
+    return;
+  }
+
   // Load our force torque test world
   Load("worlds/force_torque_test2.world", true, _physicsEngine);
 
@@ -647,27 +630,6 @@ void Joint_TEST::GetForceTorqueWithAppliedForce(
   }
 }
 
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceODE)
-{
-  GetForceTorqueWithAppliedForce("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceSimbody)
-{
-  GetForceTorqueWithAppliedForce("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, GetForceTorqueWithAppliedForceBullet)
-{
-  // uncomment when bullet 2.82 is released
-  // GetForceTorqueWithAppliedForce("bullet");
-}
-#endif  // HAVE_BULLET
-
 // Fixture for testing all joint types.
 class Joint_TEST_All : public Joint_TEST {};
 
@@ -726,6 +688,18 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
     EXPECT_TRUE(parent == NULL);
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    // DART assumes that: (i) every link has its parent joint (ii) root link
+    // is the only link that doesn't have parent link.
+    // Child world link breaks dart for now. Do we need to support it?
+    gzerr << "Skip tests for child world link cases "
+          << "since DART does not allow joint with world as child. "
+          << "Please see issue #914. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+    return;
   }
 
   {
@@ -818,6 +792,17 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
   physics::JointPtr joint;
   for (unsigned int i = 0; i < 2; ++i)
   {
+    if (_physicsEngine == "dart" && i == 0)
+    {
+      // DART assumes that: (i) every link has its parent joint (ii) root link
+      // is the only link that doesn't have parent link.
+      // Child world link breaks dart for now. Do we need to support it?
+      gzerr << "Skip tests for child world link cases "
+            << "since DART does not allow joint with world as child. "
+            << "Please see issue #914. "
+            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+      return;
+    }
     bool worldChild = (i == 0);
     bool worldParent = (i == 1);
     std::string child = worldChild ? "world" : "child";
@@ -945,11 +930,6 @@ void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(Joint_TEST, JointTorqueTest)
-{
-  JointTorqueTest(this->physicsEngine);
-}
-
 void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   /// \TODO: Disable for now until functionality is implemented
@@ -963,6 +943,12 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   if (_physicsEngine == "simbody")
   {
     gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
+  /// \TODO: dart not complete for this test
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #903.\n";
     return;
   }
 
@@ -1065,14 +1051,28 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(Joint_TEST, JointCreationDestructionTest)
-{
-  JointCreationDestructionTest(this->physicsEngine);
-}
-
 //////////////////////////////////////////////////
 void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
 {
+  /// SpringDamper implemented not yet released for dart
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #975.\n";
+    return;
+  }
+  /// SpringDamper unimplemented for simbody
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for simbody, see issue #886.\n";
+    return;
+  }
+  /// bullet collision parameters needs tweaking
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #887.\n";
+    return;
+  }
+
   // Load our inertial test world
   Load("worlds/spring_damper_test.world", true, _physicsEngine);
 
@@ -1201,28 +1201,6 @@ void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
   EXPECT_EQ(cyclesContact,        17);
 }
 
-TEST_F(Joint_TEST, SpringDamperTestODE)
-{
-  SpringDamperTest("ode");
-}
-
-#ifdef HAVE_SIMBODY
-TEST_F(Joint_TEST, SpringDamperTestSimbody)
-{
-  gzerr << "SpringDampe unimplemented for Simbody, see issue #886.\n";
-  // SpringDamperTest("simbody");
-}
-#endif  // HAVE_SIMBODY
-
-#ifdef HAVE_BULLET
-/// bullet collision parameters needs tweaking
-TEST_F(Joint_TEST, SpringDamperTestBullet)
-{
-  gzerr << "SpringDamper unimplemented for Bullet, see issue #887.\n";
-  // SpringDamperTest("bullet");
-}
-#endif  // HAVE_BULLET
-
 TEST_F(Joint_TEST, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
@@ -1262,6 +1240,36 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_TRUE(child);
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
+}
+
+TEST_P(Joint_TEST, ForceTorque1)
+{
+  ForceTorque1(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, ForceTorque2)
+{
+  ForceTorque2(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, GetForceTorqueWithAppliedForce)
+{
+  GetForceTorqueWithAppliedForce(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, JointTorqueTest)
+{
+  JointTorqueTest(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, JointCreationDestructionTest)
+{
+  JointCreationDestructionTest(this->physicsEngine);
+}
+
+TEST_P(Joint_TEST, SpringDamperTest)
+{
+  SpringDamperTest(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,

@@ -233,7 +233,7 @@ void SimbodyJoint::CacheForceTorque()
 }
 
 //////////////////////////////////////////////////
-LinkPtr SimbodyJoint::GetJointLink(int _index) const
+LinkPtr SimbodyJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
@@ -266,7 +266,7 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(int _index, const math::Vector3 &/*_axis*/)
+void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
 {
   math::Pose parentModelPose;
   if (this->parentLink)
@@ -294,7 +294,7 @@ JointWrench SimbodyJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetForce(int _index, double _force)
+void SimbodyJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
@@ -321,11 +321,11 @@ double SimbodyJoint::GetForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SaveForce(int _index, double _force)
+void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
@@ -355,7 +355,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAnchor(int /*_index*/,
+void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
   gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
@@ -363,12 +363,11 @@ void SimbodyJoint::SetAnchor(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetDamping(int _index, const double _damping)
+void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      this->stiffnessCoefficient[_index],
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
   }
   else
@@ -381,12 +380,11 @@ void SimbodyJoint::SetDamping(int _index, const double _damping)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetStiffness(int _index, const double _stiffness)
+void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      _stiffness,
+    this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
   }
   else
@@ -426,7 +424,7 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetAnchor(int /*_index*/) const
+math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
   gzdbg << "Not implement in Simbody\n";
   return math::Vector3();
@@ -447,14 +445,15 @@ math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(Attribute, int /*_index*/, double /*_value*/)
+void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
+    double /*_value*/)
 {
   gzdbg << "Not implement in Simbody\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &/*_key*/, int /*_index*/,
-    const boost::any &/*_value*/)
+void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
+    unsigned int /*_index*/, const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Simbody\n";
 }
