@@ -619,12 +619,8 @@ math::Vector3 Camera::GetWorldPosition() const
 //////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
-  math::Vector3 sRot, pRot;
-
-  sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
-  pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
-
-  return math::Quaternion(sRot.x, pRot.y, sRot.z);
+  Ogre::Quaternion rot = this->sceneNode->getOrientation();
+  return math::Quaternion(rot.w, rot.x, rot.y, rot.z);
 }
 
 //////////////////////////////////////////////////
@@ -658,18 +654,13 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   if (this->animState)
     return;
 
-  math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
-  p.SetFromEuler(math::Vector3(0, rpy.y, 0));
 
-  // Set the roll and yaw.
-  s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
+  // Set the roll and yaw for sceneNode
+  math::Quaternion s(rpy.x, rpy.y, rpy.z);
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
-
-  this->pitchNode->setOrientation(
-      Ogre::Quaternion(p.w, p.x, p.y, p.z));
 
   this->sceneNode->needUpdate();
   this->pitchNode->needUpdate();
@@ -681,7 +672,7 @@ void Camera::Translate(const math::Vector3 &direction)
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
   this->sceneNode->translate(this->sceneNode->getOrientation() *
-      this->pitchNode->getOrientation() * vec);
+      this->sceneNode->getOrientation() * vec);
 }
 
 //////////////////////////////////////////////////
@@ -693,7 +684,7 @@ void Camera::RotateYaw(math::Angle _angle)
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->pitchNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
 
 

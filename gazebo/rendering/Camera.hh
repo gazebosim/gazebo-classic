@@ -624,9 +624,15 @@ namespace gazebo
       protected: Ogre::Viewport *viewport;
 
       /// \brief Scene node that controls camera position.
+      /// sceneNode and pitchNode are here because they split
+      /// out roll and yaw from pitch for historical reasons.
+      /// We should combine them into a single Node.
       protected: Ogre::SceneNode *sceneNode;
 
       /// \brief Scene nod that controls camera pitch.
+      /// sceneNode and pitchNode are here because they split
+      /// out roll and yaw from pitch for historical reasons.
+      /// We should combine them into a single Node.
       protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
