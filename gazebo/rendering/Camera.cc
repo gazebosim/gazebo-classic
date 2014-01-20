@@ -274,16 +274,10 @@ void Camera::Init()
 
   this->CreateCamera();
 
-  // Create a scene node to control pitch motion
-  this->pitchNode =
-    this->sceneNode->createChildSceneNode(this->scopedUniqueName + "PitchNode");
-  this->pitchNode->pitch(Ogre::Degree(0));
-
-  this->pitchNode->attachObject(this->camera);
+  this->sceneNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
   this->sceneNode->setInheritScale(false);
-  this->pitchNode->setInheritScale(false);
 
   this->saveCount = 0;
 
@@ -419,7 +413,6 @@ void Camera::Update()
     double yaw = atan2(direction.y, direction.x);
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
-    pitch = math::clamp(pitch, 0.0, 0.25*M_PI);
 
     double currPitch = this->GetWorldRotation().GetAsEuler().y;
     double currYaw = this->GetWorldRotation().GetAsEuler().z;
@@ -451,7 +444,6 @@ void Camera::Update()
     displacement *= scaling;
 
     math::Vector3 pos = this->GetWorldPosition() + displacement;
-    pos.z = math::clamp(pos.z, 3.0, pos.z);
 
     this->SetWorldPosition(pos);
   }
@@ -643,9 +635,6 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
     return;
 
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
-
-  // The pitch nodes needs to be told to update its transform
-  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -663,7 +652,6 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
   this->sceneNode->needUpdate();
-  this->pitchNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -1005,6 +993,7 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetPitchNode() const
 {
+  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL.\n";
   return this->pitchNode;
 }
 
@@ -1638,8 +1627,9 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   else if (dyaw < -M_PI)
     rpy.z -= 2*M_PI;
 
-  Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
+  math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
+  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
+    pitchYawOnly.y, pitchYawOnly.z);
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1655,21 +1645,15 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
   key = strack->createNodeKeyFrame(0);
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
   key->setRotation(this->sceneNode->getOrientation());
 
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
-
   key = strack->createNodeKeyFrame(_time);
   key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  key->setRotation(yawFinal);
+  key->setRotation(pitchYawFinal);
 
-  key = ptrack->createNodeKeyFrame(_time);
-  key->setRotation(pitchFinal);
 
   this->animState =
     this->scene->GetManager()->createAnimationState(trackName);
@@ -1708,14 +1692,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
   key = strack->createNodeKeyFrame(0);
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
   key->setRotation(this->sceneNode->getOrientation());
-
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
@@ -1733,15 +1713,14 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
       rpy.z -= 2*M_PI;
 
     prevYaw = rpy.z;
-    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
-    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
+
+    math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
+    Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
+      pitchYawOnly.y, pitchYawOnly.z);
 
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
-    key->setRotation(yawFinal);
-
-    key = ptrack->createNodeKeyFrame(tt);
-    key->setRotation(pitchFinal);
+    key->setRotation(pitchYawFinal);
 
     tt += dt;
   }
