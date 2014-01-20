@@ -97,6 +97,7 @@ set (headers
 set (qt_tests
   DataLogger_TEST.cc
   TimePanel_TEST.cc
+  GuiIface_TEST.cc
 )
 
 # MainWindow is using screen rendering

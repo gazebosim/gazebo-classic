@@ -81,6 +81,10 @@ namespace gazebo
       private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
+
+      /// \brief Save GUI configuration to INI file.
+      private slots: void SaveINI();
+
       private slots: void About();
       private slots: void Step();
       private slots: void NewModel();
