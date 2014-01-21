@@ -635,6 +635,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
     return;
 
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+  this->sceneNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
