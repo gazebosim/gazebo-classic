@@ -151,6 +151,9 @@ TEST(Console_TEST, LogStdEndl)
 /// \brief Test Console::ColorWarn with \n characters
 TEST(Console_TEST, ColorWarnSlashN)
 {
+  // Initialize Console
+  gzLogInit("test.log");
+  gazebo::common::Console::SetQuiet(false);
 
   EXPECT_TRUE(getenv("HOME") != NULL);
 
