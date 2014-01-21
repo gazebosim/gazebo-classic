@@ -38,7 +38,6 @@ namespace gazebo
               std::string test_name       = test_info->name();
               std::string test_case_name  = test_info->test_case_name();
               
-              std::cout << "OOOH" + test_case_name + "_" + test_name + ".log" << std::endl;
               // Initialize Console
               gzLogInit(test_case_name + "_" + test_name + ".log");
               gazebo::common::Console::SetQuiet(false);
