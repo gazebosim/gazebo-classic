@@ -28,8 +28,6 @@ const int g_messageRepeat = 4;
 class Console_fixture_TEST : public gazebo::testing::AutoLogFixture
 { };
 
-//  public gazebo::AutoLogFixture;
-
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
