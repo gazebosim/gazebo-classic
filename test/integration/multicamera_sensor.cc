@@ -60,6 +60,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 {
   Load("worlds/camera_rotation_test.world");
 
+  gzerr << "loaded"; getchar();
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
