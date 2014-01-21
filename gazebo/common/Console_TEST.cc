@@ -104,8 +104,6 @@ TEST_F(Console_fixture_TEST, LogSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(loggedString.find(stream.str()) != std::string::npos);
   }
-
-  EXPECT_FALSE(true);
 }
 
 //////////////////////////////////////////////////
