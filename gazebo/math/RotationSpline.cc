@@ -15,7 +15,6 @@
  *
 */
 #include "gazebo/math/RotationSpline.hh"
-#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace math;

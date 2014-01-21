@@ -21,7 +21,6 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
-#include "gazebo/common/Exception.hh"
 
 namespace gazebo
 {

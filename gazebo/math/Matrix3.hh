@@ -18,7 +18,6 @@
 #define _MATRIX3_HH_
 
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 
 namespace gazebo

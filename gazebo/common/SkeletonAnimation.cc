@@ -17,7 +17,6 @@
 
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
