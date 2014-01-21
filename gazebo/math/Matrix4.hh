@@ -17,11 +17,11 @@
 #ifndef _MATRIX4_HH_
 #define _MATRIX4_HH_
 
-#include <assert.h>
 #include <iostream>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
+#include "gazebo/common/Exception.hh"
 
 namespace gazebo
 {
@@ -160,14 +160,14 @@ namespace gazebo
       /// \return the row
       public: inline double *operator[](size_t _row)
               {
-                assert(_row < 4);
+                GZ_ASSERT(_row < 4, "Number of the row is bigger than 3");
                 return this->m[_row];
               }
       /// \param[in] _row the row index
       /// \return the row
        public: inline const double *operator[](size_t _row) const
               {
-                assert(_row < 4);
+                GZ_ASSERT(_row < 4, "Number of the row is bigger than 3");
                 return this->m[_row];
               }
 

@@ -17,9 +17,9 @@
 #ifndef _MATRIX3_HH_
 #define _MATRIX3_HH_
 
-#include <assert.h>
-
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 
 namespace gazebo
 {
@@ -143,7 +143,7 @@ namespace gazebo
       /// \return a pointer to the row
       public: inline const double *operator[](size_t _row) const
               {
-                assert(_row < 3);
+                GZ_ASSERT(_row < 3, "Number of the row is bigger than 2");
                 return this->m[_row];
               }
 
@@ -152,7 +152,7 @@ namespace gazebo
       /// \return a pointer to the row
       public: inline double *operator[](size_t _row)
               {
-                assert(_row < 3);
+                GZ_ASSERT(_row < 3, "Number of the row is bigger than 2");
                 return this->m[_row];
               }
 

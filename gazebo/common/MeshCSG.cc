@@ -193,7 +193,7 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   si = gts_surface_inter_new(gts_surface_inter_class(), s1, s2, tree1, tree2,
       isOpen1, isOpen2);
-  assert(gts_surface_inter_check(si, &closed));
+  GZ_ASSERT(gts_surface_inter_check(si, &closed));
   if (!closed)
   {
     gzerr << "the intersection of " << _m1->GetName() << " and "
