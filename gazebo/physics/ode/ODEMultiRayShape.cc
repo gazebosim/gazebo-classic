@@ -143,7 +143,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
-      GZ_ASSERT(rayCollision == NULL, "rayCollision is null");
+      GZ_ASSERT(rayCollision == NULL, "rayCollision is not null");
       rayCollision = static_cast<ODECollision*>(collision2);
       hitCollision = static_cast<ODECollision*>(collision1);
       dGeomRaySetParams(_o2, 0, 0);
