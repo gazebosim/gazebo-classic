@@ -21,8 +21,14 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
+#include "test/util.hh"
 
 const int g_messageRepeat = 4;
+
+class Console_fixture_TEST : public gazebo::testing::AutoLogFixture
+{ };
+
+//  public gazebo::AutoLogFixture;
 
 /////////////////////////////////////////////////
 /// \brief Test Console::Init and Console::Log
@@ -67,12 +73,8 @@ TEST(Console_TEST, InitAndLog)
 
 //////////////////////////////////////////////////
 /// \brief Test Console::Log with \n characters
-TEST(Console_TEST, LogSlashN)
+TEST_F(Console_fixture_TEST, LogSlashN)
 {
-  // Initialize Console
-  gzLogInit("test.log");
-  gazebo::common::Console::SetQuiet(false);
-
   EXPECT_TRUE(getenv("HOME") != NULL);
 
   // Make sure that the log file has been created
@@ -104,6 +106,8 @@ TEST(Console_TEST, LogSlashN)
     stream << logString << " _n__ " << i;
     EXPECT_TRUE(loggedString.find(stream.str()) != std::string::npos);
   }
+
+  EXPECT_FALSE(true);
 }
 
 //////////////////////////////////////////////////
@@ -151,9 +155,6 @@ TEST(Console_TEST, LogStdEndl)
 /// \brief Test Console::ColorWarn with \n characters
 TEST(Console_TEST, ColorWarnSlashN)
 {
-  // Initialize Console
-  gzLogInit("test.log");
-  gazebo::common::Console::SetQuiet(false);
 
   EXPECT_TRUE(getenv("HOME") != NULL);
 
