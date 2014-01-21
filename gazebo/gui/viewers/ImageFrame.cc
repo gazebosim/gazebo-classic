@@ -70,14 +70,16 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   img.GetRGBData(&rgbData, rgbDataSize);
 
-  // Get the image data in a QT friendly format
-  QImage qimage(_msg.width(), _msg.height(),
-               QImage::Format_RGB888);
-  // Store the image data
-  memcpy(qimage.bits(), rgbData, rgbDataSize);
+  if (_msg.width() != static_cast<int>(this->image.width()) ||
+      _msg.height() != static_cast<int>(this->image.height()))
+  {
+    QImage qimage(_msg.width(), _msg.height(), QImage::Format_RGB888);
+    this->image = qimage.copy();
+  }
 
+  // Store the image data
+  memcpy(this->image.bits(), rgbData, rgbDataSize);
   boost::mutex::scoped_lock lock(this->mutex);
-  this->image = qimage.copy();
 
   this->update();
   delete [] rgbData;
