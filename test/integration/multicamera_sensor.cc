@@ -31,19 +31,17 @@ class MultiCameraSensor : public ServerFixture
 };
 
 unsigned char* img0Left = NULL;
-unsigned char* imgtLeft = NULL;
+unsigned char* imgt = NULL;
 unsigned char* img1Left = NULL;
 unsigned char* img2Left = NULL;
 unsigned char* img0Right = NULL;
-unsigned char* imgtRight = NULL;
 unsigned char* img1Right = NULL;
 unsigned char* img2Right = NULL;
 int imageCount0Left = 0;
-int imageCounttLeft = 0;
+int imageCountt = 0;
 int imageCount1Left = 0;
 int imageCount2Left = 0;
 int imageCount0Right = 0;
-int imageCounttRight = 0;
 int imageCount1Right = 0;
 int imageCount2Right = 0;
 
@@ -81,8 +79,8 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraTranslated);
-  sensors::MultiCameraSensorPtr camSensorTranslated =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+  sensors::CameraSensorPtr camSensorTranslated =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated1);
   sensors::MultiCameraSensorPtr camSensorRotated1 =
@@ -98,19 +96,17 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   // initialize global variables
   imageCount0Left  = 0;
-  imageCounttLeft  = 0;
+  imageCountt  = 0;
   imageCount1Left  = 0;
   imageCount2Left  = 0;
   imageCount0Right = 0;
-  imageCounttRight = 0;
   imageCount1Right = 0;
   imageCount2Right = 0;
   img0Left = new unsigned char[width * height * depth];
-  imgtLeft = new unsigned char[width * height * depth];
+  imgt = new unsigned char[width * height * depth];
   img1Left = new unsigned char[width * height * depth];
   img2Left = new unsigned char[width * height * depth];
   img0Right = new unsigned char[width * height * depth];
-  imgtRight = new unsigned char[width * height * depth];
   img1Right = new unsigned char[width * height * depth];
   img2Right = new unsigned char[width * height * depth];
 
@@ -120,9 +116,9 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
       camSensorUnrotated->GetCamera(0)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount0Left, img0Left,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr ctLeft =
-      camSensorTranslated->GetCamera(0)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCounttLeft, imgtLeft,
+    event::ConnectionPtr ct =
+      camSensorTranslated->GetCamera()->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCountt, imgt,
             _1, _2, _3, _4, _5));
     event::ConnectionPtr c1Left =
       camSensorRotated1->GetCamera(0)->ConnectNewImageFrame(
@@ -136,10 +132,6 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     event::ConnectionPtr c0Right =
       camSensorUnrotated->GetCamera(1)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount0Right, img0Right,
-            _1, _2, _3, _4, _5));
-    event::ConnectionPtr ctRight =
-      camSensorTranslated->GetCamera(1)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCounttRight, imgtRight,
             _1, _2, _3, _4, _5));
     event::ConnectionPtr c1Right =
       camSensorRotated1->GetCamera(1)->ConnectNewImageFrame(
@@ -158,17 +150,18 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
     // Get at least 10 images from each camera
     int waitCount = 0;
-    while (imageCount0Left < 10 || imageCounttLeft < 10 ||
-           imageCount1Left < 10 || imageCount2Left < 10)
+    while (imageCount0Left < 10 || imageCountt < 10 ||
+           imageCount1Left < 10 || imageCount2Left < 10 ||
+           imageCount0Right < 10 ||
+           imageCount1Right < 10 || imageCount2Right < 10)
     {
       // wait at most 10 seconds sim time.
       if (++waitCount >= 1000)
         gzerr << "Err [" << imageCount0Left
-              << "/10, " << imageCounttLeft
+              << "/10, " << imageCountt
               << "/10, " << imageCount1Left
               << "/10, " << imageCount2Left
               << "/10, " << imageCount0Right
-              << "/10, " << imageCounttRight
               << "/10, " << imageCount1Right
               << "/10, " << imageCount2Right
               << "/10] images received from cameras\n";
@@ -187,7 +180,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
       double diffAvg = 0.0;
 
       // compare left images
-      this->ImageCompare(img0Left, imgtLeft, width, height, depth,
+      this->ImageCompare(img0Left, imgt, width, height, depth,
                          diffMax, diffSum, diffAvg);
 
       // We expect that there will be some non-zero difference between the two
@@ -196,26 +189,39 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
       // We expect that the average difference will be well within 3-sigma.
       EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+    }
+
+    // compare unrotated left against translated left, both should be
+    // seeing the green block, if not, pose translation in <camera> tag
+    // is broken.
+    // Note, right camera of translated camera (imgtRight) should also
+    // see green block.
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = -1.0;
 
       // compare right of translated camera to
       // right of unrotated/untranslated camera images
       // the result should differ as former sees green block and latter
       // sees red block.
-      this->ImageCompare(img0Right, imgtRight, width, height, depth,
+      gzerr << "wait"; getchar();
+      this->ImageCompare(img0Right, imgt, width, height, depth,
                          diffMax, diffSum, diffAvg);
+      gzerr << "done"; getchar();
 
       // We expect that there will be some non-zero difference between the two
       // images.
-      EXPECT_NE(diffSum, 0u);
+      EXPECT_GT(diffSum, 0u);
 
       // We expect that the average difference will be well within 3-sigma.
-      EXPECT_GT(fabs(diffAvg)/255., 1e-16);
+      EXPECT_GT(fabs(diffAvg)/255., 0.1);
     }
 
     // compare unrotated against rotated1
     {
       unsigned int diffMax = 0, diffSum = 0;
       double diffAvg = 0.0;
+
       // compare left images
       this->ImageCompare(img0Left, img1Left, width, height, depth,
                          diffMax, diffSum, diffAvg);
@@ -225,8 +231,13 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
       EXPECT_EQ(diffSum, 0u);
 
       // We expect that the average difference will be well within 3-sigma.
-      EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+      EXPECT_NEAR(diffAvg/255., 0.0, 1.0);
+    }
 
+    // compare unrotated against rotated1
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = 0.0;
       // compare right images
       this->ImageCompare(img0Right, img1Right, width, height, depth,
                          diffMax, diffSum, diffAvg);
@@ -254,6 +265,12 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
       // We expect that the average difference will be well within 3-sigma.
       EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+    }
+
+    // compare unrotated against rotated2
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = 0.0;
 
       // compare right images
       this->ImageCompare(img0Right, img2Right, width, height, depth,
@@ -275,22 +292,20 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
     // disconnect callbacks
     camSensorUnrotated->GetCamera(0)->DisconnectNewImageFrame(c0Left);
-    camSensorTranslated->GetCamera(0)->DisconnectNewImageFrame(ctLeft);
+    camSensorTranslated->GetCamera()->DisconnectNewImageFrame(ct);
     camSensorRotated1->GetCamera(0)->DisconnectNewImageFrame(c1Left);
     camSensorRotated2->GetCamera(0)->DisconnectNewImageFrame(c2Left);
     camSensorUnrotated->GetCamera(1)->DisconnectNewImageFrame(c0Right);
-    camSensorTranslated->GetCamera(1)->DisconnectNewImageFrame(ctRight);
     camSensorRotated1->GetCamera(1)->DisconnectNewImageFrame(c1Right);
     camSensorRotated2->GetCamera(1)->DisconnectNewImageFrame(c2Right);
   }
 
   // cleanup
   delete[] img0Left;
-  delete[] imgtLeft;
+  delete[] imgt;
   delete[] img1Left;
   delete[] img2Left;
   delete[] img0Right;
-  delete[] imgtRight;
   delete[] img1Right;
   delete[] img2Right;
 }

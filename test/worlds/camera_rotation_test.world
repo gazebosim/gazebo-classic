@@ -57,6 +57,7 @@
           </geometry>
         </visual>
         <sensor name="multicamera_sensor_unrotated" type="multicamera">
+          <always_on>1</always_on>
           <update_rate>15</update_rate>
           <pose>0 0 0 0 0 0</pose>
           <camera name="left">
@@ -94,7 +95,7 @@
          Both cameras should see the green block.
          Use this camera for green block ground truth in testing.
     -->
-    <model name="cam_x_rot_test_translated_cameras_1">
+    <model name="cam_x_rot_test_translated_camera_1">
       <static>1</static>
       <pose>0 11 1 0 0 0</pose>
       <link name="cam_x_rot_test_2_link">
@@ -106,23 +107,10 @@
             </box>
           </geometry>
         </visual>
-        <sensor name="multicamera_sensor_translated" type="multicamera">
+        <sensor name="multicamera_sensor_translated" type="camera">
           <update_rate>15</update_rate>
           <pose>0 0 0 0 0 0</pose>
-          <camera name="left">
-            <pose>0 0 0 0 0 0</pose>
-            <horizontal_fov>1.3962634</horizontal_fov>
-            <image>
-              <width>1024</width>
-              <height>544</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.02</near>
-              <far>100</far>
-            </clip>
-          </camera>
-          <camera name="right">
+          <camera name="single_camera">
             <pose>0 0 0 0 0 0</pose>
             <horizontal_fov>1.3962634</horizontal_fov>
             <image>

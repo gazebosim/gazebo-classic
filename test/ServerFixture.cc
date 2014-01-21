@@ -393,16 +393,22 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 {
   _diffMax = 0;
   _diffSum = 0;
-  _diffAvg = 0;
+  // _diffAvg = 0;
 
-  for (unsigned int y = 0; y < _height; y++)
+  for (unsigned int y = 0; y < _height; ++y)
   {
-    for (unsigned int x = 0; x < _width*_depth; x++)
+    for (unsigned int x = 0; x < _width*_depth; ++x)
     {
       unsigned int a = _imageA[(y*_width*_depth)+x];
       unsigned int b = _imageB[(y*_width*_depth)+x];
 
       unsigned int diff = (unsigned int)(abs(a - b));
+
+      if (_diffAvg < 0 && (a > 0 || b > 0) && a != b)
+        gzerr << "(" << (void*)_imageA
+              << ", " << (void*)_imageB
+              << ") ind: (" << x << ", " << y
+              << ") val: [" << a << ", " << b << ", " << diff << "]\n";
 
       if (diff > _diffMax)
         _diffMax = diff;
