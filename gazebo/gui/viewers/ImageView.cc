@@ -30,40 +30,28 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 33)
+: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 60)
 {
   this->setWindowTitle(tr("Gazebo: Image View"));
 
-  // Create the image display
-  // {
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->pixmap = QPixmap(":/images/no_image.png");
-  QPixmap image = (this->pixmap.scaled(320, 240, Qt::KeepAspectRatio,
-                                 Qt::SmoothTransformation));
-  this->imageLabel = new QLabel();
-  this->imageLabel->setPixmap(image);
-  this->imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  this->imageLabel->setMinimumSize(320, 240);
-  this->imageLabel->setScaledContents(true);
+  this->imageFrame = new ImageFrame(this);
+  this->imageFrame->setMinimumSize(320, 240);
+  this->imageFrame->show();
+  frameLayout->addWidget(this->imageFrame);
 
-  frameLayout->addWidget(this->imageLabel);
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
-  // }
 }
 
 /////////////////////////////////////////////////
 ImageView::~ImageView()
 {
-  this->sub.reset();
-}
+  delete this->imageFrame;
+  this->imageFrame = NULL;
 
-/////////////////////////////////////////////////
-void ImageView::UpdateImpl()
-{
-  // Update the image output
-  this->imageLabel->setPixmap(this->pixmap);
+  this->sub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -79,30 +67,7 @@ void ImageView::SetTopic(const std::string &_topicName)
 void ImageView::OnImage(ConstImageStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()),
-      _msg->image().data().size());
+  this->OnMsg(msgs::Convert(_msg->time()), _msg->image().data().size());
 
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
-
-  // Convert the image data to RGB
-  common::Image img;
-  img.SetFromData(
-      (unsigned char *)(_msg->image().data().c_str()),
-      _msg->image().width(),
-      _msg->image().height(),
-      (common::Image::PixelFormat)(_msg->image().pixel_format()));
-
-  img.GetRGBData(&rgbData, rgbDataSize);
-
-  // Get the image data in a QT friendly format
-  QImage image(_msg->image().width(), _msg->image().height(),
-               QImage::Format_RGB888);
-  // Store the image data
-  memcpy(image.bits(), rgbData, rgbDataSize);
-
-  // Set the pixmap used by the image label.
-  this->pixmap = QPixmap::fromImage(image);
-
-  delete [] rgbData;
+  this->imageFrame->OnImage(_msg->image());
 }

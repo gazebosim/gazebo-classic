@@ -31,7 +31,7 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImagesStamped", ImagesView)
 
 /////////////////////////////////////////////////
 ImagesView::ImagesView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.ImagesStamped", "images", 33)
+: TopicView(_parent, "gazebo.msgs.ImagesStamped", "images", 60)
 {
   this->setWindowTitle(tr("Gazebo: Images View"));
 
@@ -59,23 +59,21 @@ ImagesView::~ImagesView()
 void ImagesView::UpdateImpl()
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  std::vector<QLabel*>::iterator labelIter = this->imageLabels.begin();
-  std::vector<QImage>::iterator imageIter = this->images.begin();
+  std::vector<ImageFrame*>::iterator imageIter = this->images.begin();
 
   // Clear out the images if the flag is set.
   if (this->clearImages)
   {
     // Remove all the images, and delete them
-    for (; labelIter != this->imageLabels.end(); )
+    for (; imageIter != this->images.end(); )
     {
-      (*labelIter)->hide();
-      this->frameLayout->removeWidget(*labelIter);
-      delete *labelIter;
-      labelIter = this->imageLabels.erase(labelIter);
+      (*imageIter)->hide();
+      this->frameLayout->removeWidget(*imageIter);
+      delete *imageIter;
+      imageIter = this->images.erase(imageIter);
     }
 
     // Clear the lists
-    this->imageLabels.clear();
     this->images.clear();
 
     // Make sure to adjust the size of the widget
@@ -85,16 +83,6 @@ void ImagesView::UpdateImpl()
     // Reset frame
     this->clearImages = false;
     return;
-  }
-
-  // Update the images if there are sizes
-  if (!this->images.empty())
-  {
-    // Update the image output
-    for (; labelIter != this->imageLabels.end(); ++labelIter, ++imageIter)
-    {
-      (*labelIter)->setPixmap(QPixmap::fromImage(*imageIter));
-    }
   }
 
   // Create new images when necessary
@@ -123,22 +111,15 @@ void ImagesView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void ImagesView::AddImage(int _width, int _height)
 {
-  QPixmap pixmap(":/images/no_image.png");
-  QPixmap image = (pixmap.scaled(_width, _height, Qt::KeepAspectRatio,
-        Qt::SmoothTransformation));
-
-  QLabel *imageLabel = new QLabel();
-  imageLabel->setPixmap(image);
-  imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  imageLabel->setMinimumSize(320, 240);
-  imageLabel->setScaledContents(true);
-  this->imageLabels.push_back(imageLabel);
+  ImageFrame *imageFrame = new ImageFrame(this);
+  imageFrame->setBaseSize(_width, _height);
+  imageFrame->setMinimumSize(320, 240);
+  imageFrame->show();
+  this->images.push_back(imageFrame);
 
   // Add the lable to the correct row and column
-  this->frameLayout->addWidget(imageLabel, (this->imageLabels.size()-1) / 2,
-      (this->imageLabels.size()-1) % 2);
-
-  this->images.push_back(QImage(_width, _height, QImage::Format_RGB888));
+  this->frameLayout->addWidget(imageFrame, (this->images.size()-1) / 2,
+      (this->images.size()-1) % 2);
 }
 
 /////////////////////////////////////////////////
@@ -149,9 +130,6 @@ void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
   if (!lock)
       return;
 
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
-
   if (this->clearImages)
     return;
 
@@ -160,32 +138,16 @@ void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->image_size(); ++i)
   {
-    rgbData = NULL;
-    rgbDataSize = 0;
-
-    dataSize += _msg->image(0).data().size();
+    dataSize += _msg->image(i).data().size();
 
     if (i >= static_cast<int>(this->images.size()))
     {
-      this->addImage.push_back(std::make_pair(_msg->image(0).width(),
-                                              _msg->image(0).height()));
+      this->addImage.push_back(std::make_pair(_msg->image(i).width(),
+                                              _msg->image(i).height()));
       continue;
     }
 
-    // Convert the image data to RGB
-    common::Image img;
-    img.SetFromData(
-        (unsigned char *)(_msg->image(i).data().c_str()),
-        _msg->image(i).width(),
-        _msg->image(i).height(),
-        (common::Image::PixelFormat)(_msg->image(i).pixel_format()));
-
-    img.GetRGBData(&rgbData, rgbDataSize);
-
-    // Store the image data
-    memcpy(this->images[i].bits(), rgbData, rgbDataSize);
-
-    delete [] rgbData;
+    this->images[i]->OnImage(_msg->image(i));
   }
 
   // Update the Hz and Bandwidth info

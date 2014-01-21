@@ -29,6 +29,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/viewers/ImageFrame.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 
 namespace gazebo
@@ -62,11 +63,12 @@ namespace gazebo
       private: void AddImage(int _width, int _height);
 
       /// \brief A label is used to display the image data.
-      private: std::vector<QLabel *> imageLabels;
+      // private: std::vector<QLabel *> imageLabels;
 
       /// \brief Storage mechansim for image data.
-      private: std::vector<QPixmap> pixmaps;
-      private: std::vector<QImage> images;
+      // private: std::vector<QPixmap> pixmaps;
+      // private: std::vector<QImage> images;
+      private: std::vector<ImageFrame *> images;
 
       /// \brief Pointer to the frame containing the images
       private: QGridLayout *frameLayout;
