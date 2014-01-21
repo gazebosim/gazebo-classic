@@ -158,7 +158,7 @@ void DARTJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-LinkPtr DARTJoint::GetJointLink(int _index) const
+LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
@@ -224,14 +224,14 @@ void DARTJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetAnchor(int /*_index*/,
+void DARTJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 &/*_anchor*/)
 {
   // nothing to do here for DART.
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetDamping(int _index, double _damping)
+void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
   this->dampingCoefficient = _damping;
 
@@ -256,12 +256,11 @@ void DARTJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetStiffness(int _index, const double _stiffness)
+void DARTJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      _stiffness,
+    this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
   }
   else
@@ -304,7 +303,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetHighStop(int _index, const math::Angle &_angle)
+void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -320,7 +319,7 @@ void DARTJoint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetLowStop(int _index, const math::Angle &_angle)
+void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -335,7 +334,7 @@ void DARTJoint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetHighStop(int _index)
+math::Angle DARTJoint::GetHighStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -351,7 +350,7 @@ math::Angle DARTJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetLowStop(int _index)
+math::Angle DARTJoint::GetLowStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -455,7 +454,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetAttribute(const std::string &_key, int _index,
+void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
                              const boost::any &_value)
 {
   if (_key == "hi_stop")
@@ -529,12 +528,6 @@ double DARTJoint::GetAttribute(const std::string& _key,
 }
 
 //////////////////////////////////////////////////
-JointWrench DARTJoint::GetForceTorque(int _index)
-{
-  return this->GetForceTorque(static_cast<unsigned int>(_index));
-}
-
-//////////////////////////////////////////////////
 JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench jointWrench;
@@ -576,7 +569,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 /////////////////////////////////////////////////
-void DARTJoint::SetForce(int _index, double _force)
+void DARTJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
@@ -633,11 +626,11 @@ dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 }
 
 /////////////////////////////////////////////////
-void DARTJoint::SaveForce(int _index, double _force)
+void DARTJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
