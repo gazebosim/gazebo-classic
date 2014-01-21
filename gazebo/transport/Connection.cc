@@ -73,6 +73,7 @@ Connection::Connection()
 
   this->acceptor = NULL;
   this->readQuit = false;
+  this->connectError = false;
   this->writeQueue.clear();
   this->writeCount = 0;
 
