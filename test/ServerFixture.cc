@@ -89,6 +89,7 @@ void ServerFixture::TearDown()
 /////////////////////////////////////////////////
 void ServerFixture::Unload()
 {
+  gzdbg << "ServerFixture::Unload" << std::endl;
   this->serverRunning = false;
   if (this->node)
     this->node->Fini();
@@ -138,9 +139,9 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/100.0
+         << static_cast<double>(waitCount)/10.0
          << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/100.0
+         << static_cast<double>(maxWaitCount)/10.0
          << " seconds\n";
 
   if (waitCount >= maxWaitCount)
