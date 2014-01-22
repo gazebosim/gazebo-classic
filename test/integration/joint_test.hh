@@ -30,10 +30,10 @@ using namespace gazebo;
 
 typedef std::tr1::tuple<const char *, const char *> std_string2;
 
-class Joint_TEST : public ServerFixture,
+class JointTest : public ServerFixture,
                    public ::testing::WithParamInterface<std_string2>
 {
-  protected: Joint_TEST() : ServerFixture(), spawnCount(0)
+  protected: JointTest() : ServerFixture(), spawnCount(0)
              {
              }
 

@@ -36,6 +36,7 @@ set(tests
   imu.cc
   joint_force_torque.cc
   joint_spawn.cc
+  joint_test.cc
   laser.cc
   model_database.cc
   nondefault_world.cc
