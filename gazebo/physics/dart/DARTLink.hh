@@ -183,7 +183,7 @@ namespace gazebo
       /// \brief List of pointers to the child joints.
       private: std::vector<DARTJointPtr> dartChildJoints;
 
-      /// \biref If true, freeze link to world (inertial) frame.
+      /// \brief If true, freeze link to world (inertial) frame.
       private: bool staticLink;
     };
     /// \}
