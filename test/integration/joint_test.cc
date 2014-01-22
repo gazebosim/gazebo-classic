@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
+#include "test/integration/joint_test.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0
@@ -27,7 +27,7 @@
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
+void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   /// \TODO: Disable for now until functionality is implemented
   /// bullet collision parameters needs tweaking
@@ -149,7 +149,7 @@ void Joint_TEST::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
+void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 {
   /// SpringDamper implemented not yet released for dart
   if (_physicsEngine == "dart")
@@ -299,7 +299,7 @@ void Joint_TEST::SpringDamperTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-TEST_F(Joint_TEST, joint_SDF14)
+TEST_F(JointTest, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
 
@@ -340,17 +340,17 @@ TEST_F(Joint_TEST, joint_SDF14)
   EXPECT_EQ(child->GetName(), "body1");
 }
 
-TEST_P(Joint_TEST, JointCreationDestructionTest)
+TEST_P(JointTest, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
 }
 
-TEST_P(Joint_TEST, SpringDamperTest)
+TEST_P(JointTest, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Joint_TEST,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("")));
 

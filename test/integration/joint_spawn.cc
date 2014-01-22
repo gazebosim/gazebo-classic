@@ -18,15 +18,15 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
+#include "test/integration/joint_test.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0
 
 using namespace gazebo;
 
-class JointSpawningTest : public Joint_TEST
+class JointSpawningTest : public JointTest
 {
   /// \brief Spawn model with each type of joint.
   /// \param[in] _physicsEngine Type of physics engine to use.

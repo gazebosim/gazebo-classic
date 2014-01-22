@@ -61,6 +61,9 @@
 1. **gazebo/physics/Link.hh**
     + bool initialized
 
+1. **gazebo/rendering/Light.hh**
+    + bool GetVisible() const
+
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
 
