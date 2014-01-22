@@ -107,7 +107,8 @@ class Joint_TEST : public ServerFixture,
   {
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              axis(math::Vector3(1, 0, 0))
+              wait(common::Time(99, 0)),
+              noLinkPose(false), axis(math::Vector3(1, 0, 0))
             {
             }
 
@@ -137,6 +138,9 @@ class Joint_TEST : public ServerFixture,
 
     /// \brief Parent link pose for spawned model.
     public: math::Pose parentLinkPose;
+
+    /// \brief Flag to disable including link pose per issue #978.
+    public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
     public: math::Pose jointPose;
@@ -187,17 +191,21 @@ class Joint_TEST : public ServerFixture,
               << "  <pose>" << _opt.modelPose << "</pose>";
             if (!_opt.worldParent)
             {
-              modelStr
-                << "  <link name='parent'>"
-                << "    <pose>" << _opt.parentLinkPose << "</pose>"
-                << "  </link>";
+              modelStr << "  <link name='parent'>";
+              if (!_opt.noLinkPose)
+              {
+                modelStr << "    <pose>" << _opt.parentLinkPose << "</pose>";
+              }
+              modelStr << "  </link>";
             }
             if (!_opt.worldChild)
             {
-              modelStr
-                << "  <link name='child'>"
-                << "    <pose>" << _opt.childLinkPose << "</pose>"
-                << "  </link>";
+              modelStr << "  <link name='child'>";
+              if (!_opt.noLinkPose)
+              {
+                modelStr << "    <pose>" << _opt.childLinkPose << "</pose>";
+              }
+              modelStr << "  </link>";
             }
             modelStr
               << "  <joint name='joint' type='" << _opt.type << "'>"

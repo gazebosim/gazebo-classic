@@ -13,6 +13,8 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **Functions in joint classes use unsigned int, instead of int**
+    + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
 1. **gazebo/sensors/Noise.hh** `ABI change`
     + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
     + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
@@ -20,7 +22,7 @@
     + ***Replacement:*** virtual void Noise::~Noise()
     + ***Removed:*** void Noise::Apply() const
     + ***Replacement:*** void Noise::Apply()
-    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class. Changed some functions to virtual and remove const keyword in the process.
+    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class.
 1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
@@ -61,8 +63,14 @@
 
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
-    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+
+1. **gazebo/physics/Link.hh**
+    + bool initialized
+
+1. **gazebo/rendering/Light.hh**
+    + bool GetVisible() const
 
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
@@ -79,6 +87,9 @@
 
 ### Deletions
 
+1. **gazebo/physics/Base.hh**
+    + Base_V::iterator childrenEnd
+    
 1. **gazebo/sensors/Noise.hh**
     + double Noise::GetMean() const
     + double Noise::GetStdDev() const

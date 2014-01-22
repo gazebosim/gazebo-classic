@@ -1057,8 +1057,13 @@ bool Camera::SaveFrame(const unsigned char *_image,
 
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
 
+  // OGRE 1.9 renames codeToFile to encodeToFile
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  pCodec->codeToFile(stream, filename, codecDataPtr);
+  #else
+  pCodec->encodeToFile(stream, filename, codecDataPtr);
+  #endif
   return true;
 }
 
