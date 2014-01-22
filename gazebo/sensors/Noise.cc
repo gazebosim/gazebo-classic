@@ -29,6 +29,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     const std::string &_sensorType)
 {
   GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");
+  GZ_ASSERT(_sdf->GetName() == "noise", "Not a noise SDF element");
+
   std::string typeString = _sdf->Get<std::string>("type");
 
   NoisePtr noise;
