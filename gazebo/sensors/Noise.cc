@@ -42,10 +42,16 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     }
     else
       noise.reset(new GaussianNoiseModel());
+
+    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
+        noise->GetNoiseType() == Noise::GAUSSIAN_QUANTIZED,
+        "Noise type should be gaussian or gaussian_quantized");
   }
   else
   {
     noise.reset(new Noise());
+    GZ_ASSERT(noise->GetNoiseType() == Noise::NONE,
+        "Noise type should be none");
   }
   noise->Load(_sdf);
 

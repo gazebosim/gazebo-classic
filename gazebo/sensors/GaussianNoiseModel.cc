@@ -37,8 +37,10 @@ namespace gazebo
         mean(_mean), stddev(_stddev) {}
 
     /// \brief Callback that OGRE will invoke for us on each render call
-    public: virtual void notifyMaterialRender(unsigned int _pass_id,
-                                              Ogre::MaterialPtr & _mat)
+    /// \param[in] _passID OGRE material pass ID.
+    /// \param[_mat] _mat Pointer to OGRE material.
+    public: virtual void notifyMaterialRender(unsigned int _passId,
+                                              Ogre::MaterialPtr &_mat)
     {
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
@@ -53,13 +55,13 @@ namespace gazebo
       // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
       // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-      _mat->getTechnique(0)->getPass(_pass_id)->
+      _mat->getTechnique(0)->getPass(_passId)->
         getFragmentProgramParameters()->
         setNamedConstant("offsets", offsets);
-      _mat->getTechnique(0)->getPass(_pass_id)->
+      _mat->getTechnique(0)->getPass(_passId)->
         getFragmentProgramParameters()->
         setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
-      _mat->getTechnique(0)->getPass(_pass_id)->
+      _mat->getTechnique(0)->getPass(_passId)->
         getFragmentProgramParameters()->
         setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
     }
@@ -118,7 +120,14 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("precision"))
   {
     this->precision = _sdf->Get<double>("precision");
-    this->quantized = true;
+    if (math::equal(this->precision, 0.0, 1e-6) || this->precision < 0)
+    {
+      gzerr << "Noise precision cannot be less or equal to 0" << std::endl;
+    }
+    else
+    {
+      this->quantized = true;
+    }
   }
 }
 
