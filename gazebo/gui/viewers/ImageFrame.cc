@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include "gazebo/common/Image.hh"
+#include "gazebo/gui/viewers/ImageFramePrivate.hh"
 #include "gazebo/gui/viewers/ImageFrame.hh"
 
 using namespace gazebo;
@@ -23,24 +24,26 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 ImageFrame::ImageFrame(QWidget *_parent)
-  : QFrame(_parent)
+  : QFrame(_parent), dataPtr(new ImageFramePrivate())
 {
 }
 
 /////////////////////////////////////////////////
 ImageFrame::~ImageFrame()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
   QPainter painter(this);
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
-  if (!this->image.isNull())
+  if (!this->dataPtr->image.isNull())
   {
-    painter.drawImage(this->contentsRect(), this->image);
+    painter.drawImage(this->contentsRect(), this->dataPtr->image);
   }
   else
   {
@@ -70,16 +73,16 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   img.GetRGBData(&rgbData, rgbDataSize);
 
-  if (_msg.width() != static_cast<int>(this->image.width()) ||
-      _msg.height() != static_cast<int>(this->image.height()))
+  if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
+      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
   {
     QImage qimage(_msg.width(), _msg.height(), QImage::Format_RGB888);
-    this->image = qimage.copy();
+    this->dataPtr->image = qimage.copy();
   }
 
   // Store the image data
-  memcpy(this->image.bits(), rgbData, rgbDataSize);
-  boost::mutex::scoped_lock lock(this->mutex);
+  memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   this->update();
   delete [] rgbData;

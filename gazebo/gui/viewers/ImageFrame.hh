@@ -17,8 +17,6 @@
 #ifndef _IMAGEFRAME_HH_
 #define _IMAGEFRAME_HH_
 
-#include <boost/thread/mutex.hpp>
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 
@@ -26,6 +24,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ImageFramePrivate;
+
     /// \brief Frame that draws an image when a paintevent is received.
     class ImageFrame : public QFrame
     {
@@ -45,11 +45,8 @@ namespace gazebo
       /// \param[in] _event Pointer to the event information.
       protected: void paintEvent(QPaintEvent *_event);
 
-      /// \brief The image to draw.
-      private: QImage image;
-
-      /// \brief Mutex for protecting the image.
-      private: boost::mutex mutex;
+      /// \brief Pointer to private data
+      private: ImageFramePrivate *dataPtr;
     };
   }
 }
