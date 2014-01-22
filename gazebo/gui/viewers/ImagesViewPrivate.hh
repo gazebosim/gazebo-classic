@@ -18,6 +18,7 @@
 #define _IMAGESVIEW_PRIVATE_HH_
 
 #include <vector>
+#include <utility>
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/gui/viewers/ImageFrame.hh"
