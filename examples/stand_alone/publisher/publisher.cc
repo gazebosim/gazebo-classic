@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  * Copyright 2013 Dereck Wonnacott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

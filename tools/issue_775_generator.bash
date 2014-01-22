@@ -3,7 +3,7 @@ lower=`echo $1 | tr '[:upper:]' '[:lower:]'`
 guard=_GAZEBO_`echo $1 | tr '[:lower:]' '[:upper:]'`_HH_
 cat <<END
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
