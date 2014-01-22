@@ -36,6 +36,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ImagesViewPrivate;
+
     class ImagesView : public TopicView
     {
       Q_OBJECT
@@ -62,25 +64,8 @@ namespace gazebo
       /// \param[in] _height Height of the image.
       private: void AddImage(int _width, int _height);
 
-      /// \brief A label is used to display the image data.
-      // private: std::vector<QLabel *> imageLabels;
-
-      /// \brief Storage mechansim for image data.
-      // private: std::vector<QPixmap> pixmaps;
-      // private: std::vector<QImage> images;
-      private: std::vector<ImageFrame *> images;
-
-      /// \brief Pointer to the frame containing the images
-      private: QGridLayout *frameLayout;
-
-      /// \brief Mutex to protect the image vectors
-      private: boost::mutex mutex;
-
-      /// \brief Set to true to clear the images from the widget
-      private: bool clearImages;
-
-      /// \brief Vector of image sizes to add
-      private: std::vector<std::pair<int, int> > addImage;
+      /// \brief Private data.
+      private: ImagesViewPrivate *dataPtr;
     };
   }
 }

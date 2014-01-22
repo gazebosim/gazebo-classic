@@ -32,6 +32,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ImageViewPrivate;
+
     class ImageView : public TopicView
     {
       Q_OBJECT
@@ -50,8 +52,8 @@ namespace gazebo
       /// \param[in] _msg New image message.
       public: void OnImage(ConstImageStampedPtr &_msg);
 
-      /// \brief The frame which draws the image.
-      private: ImageFrame *imageFrame;
+      /// \brief Private data.
+      private: ImageViewPrivate *dataPtr;
     };
   }
 }

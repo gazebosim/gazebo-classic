@@ -21,6 +21,7 @@
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/ImageViewPrivate.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
 
 using namespace gazebo;
@@ -30,16 +31,17 @@ GZ_REGISTER_STATIC_VIEWER("gazebo.msgs.ImageStamped", ImageView)
 
 /////////////////////////////////////////////////
 ImageView::ImageView(QWidget *_parent)
-: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 60)
+: TopicView(_parent, "gazebo.msgs.ImageStamped", "image", 60),
+  dataPtr(new ImageViewPrivate())
 {
   this->setWindowTitle(tr("Gazebo: Image View"));
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->imageFrame = new ImageFrame(this);
-  this->imageFrame->setMinimumSize(320, 240);
-  this->imageFrame->show();
-  frameLayout->addWidget(this->imageFrame);
+  this->dataPtr->imageFrame = new ImageFrame(this);
+  this->dataPtr->imageFrame->setMinimumSize(320, 240);
+  this->dataPtr->imageFrame->show();
+  frameLayout->addWidget(this->dataPtr->imageFrame);
 
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
@@ -48,8 +50,8 @@ ImageView::ImageView(QWidget *_parent)
 /////////////////////////////////////////////////
 ImageView::~ImageView()
 {
-  delete this->imageFrame;
-  this->imageFrame = NULL;
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 
   this->sub.reset();
 }
@@ -69,5 +71,5 @@ void ImageView::OnImage(ConstImageStampedPtr &_msg)
   // Update the Hz and Bandwidth info
   this->OnMsg(msgs::Convert(_msg->time()), _msg->image().data().size());
 
-  this->imageFrame->OnImage(_msg->image());
+  this->dataPtr->imageFrame->OnImage(_msg->image());
 }
