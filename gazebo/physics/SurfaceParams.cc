@@ -19,8 +19,7 @@
  * Date: 30 July 2003
  */
 
-#include <float.h>
-#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -41,10 +40,14 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
+  if (!_sdf)
+    gzerr << "Surface _sdf is NULL" << std::endl;
+  else
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-    GZ_ASSERT(contactElem, "Surface contact sdf member is NULL");
+    if (!contactElem)
+      gzerr << "Surface contact sdf member is NULL" << std::endl;
+    else
     {
       this->collideWithoutContact =
         contactElem->Get<bool>("collide_without_contact");

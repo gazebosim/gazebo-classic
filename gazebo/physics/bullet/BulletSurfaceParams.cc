@@ -16,7 +16,7 @@
 */
 
 #include <float.h>
-#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
@@ -40,24 +40,31 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
   // Load parent class
   SurfaceParams::Load(_sdf);
 
-  GZ_ASSERT(_sdf, "Surface _sdf is NULL");
+  if (!_sdf)
+    gzerr << "Surface _sdf is NULL" << std::endl;
+  else
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-    GZ_ASSERT(frictionElem, "Surface sdf member is NULL");
+    if (!frictionElem)
+      gzerr << "Surface friction sdf member is NULL" << std::endl;
     {
       // Note this should not be looking in the "ode" block
       // Update this when sdformat has bullet friction parameters
       // See sdformat issue #31
       // https://bitbucket.org/osrf/sdformat/issue/31
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      GZ_ASSERT(frictionOdeElem, "Surface sdf member is NULL");
-      this->mu1 = frictionOdeElem->Get<double>("mu");
-      this->mu2 = frictionOdeElem->Get<double>("mu2");
+      if (!frictionOdeElem)
+        gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+      else
+      {
+        this->mu1 = frictionOdeElem->Get<double>("mu");
+        this->mu2 = frictionOdeElem->Get<double>("mu2");
 
-      if (this->mu1 < 0)
-        this->mu1 = FLT_MAX;
-      if (this->mu2 < 0)
-        this->mu2 = FLT_MAX;
+        if (this->mu1 < 0)
+          this->mu1 = FLT_MAX;
+        if (this->mu2 < 0)
+          this->mu2 = FLT_MAX;
+      }
     }
   }
 }
