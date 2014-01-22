@@ -212,10 +212,10 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
       // We expect that there will be some non-zero difference between the two
       // images.
-      EXPECT_GT(diffSum, 0u);
+      EXPECT_GT(diffSum, 100u);
 
       // We expect that the average difference will be well within 3-sigma.
-      EXPECT_GT(fabs(diffAvg)/255., 0.1);
+      EXPECT_GT(fabs(diffAvg)/255., 0.0549);
     }
 
     // compare unrotated against rotated1
@@ -232,7 +232,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
       EXPECT_EQ(diffSum, 0u);
 
       // We expect that the average difference will be well within 3-sigma.
-      EXPECT_NEAR(diffAvg/255., 0.0, 1.0);
+      EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
     }
 
     // compare unrotated against rotated1
