@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \brief Callback that OGRE will invoke for us on each render call
     /// \param[in] _passID OGRE material pass ID.
-    /// \param[_mat] _mat Pointer to OGRE material.
+    /// \param[in] _mat Pointer to OGRE material.
     public: virtual void notifyMaterialRender(unsigned int _passId,
                                               Ogre::MaterialPtr &_mat)
     {
