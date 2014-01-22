@@ -476,17 +476,6 @@ void Joint_TEST::SpawnJointTypes(const std::string &_physicsEngine,
   }
 
   {
-    if (_physicsEngine == "dart")
-    {
-      // DART assumes that: (i) every link has its parent joint (ii) root link
-      // is the only link that doesn't have parent link.
-      // Child world link breaks dart for now. Do we need to support it?
-      gzerr << "Skip tests for child world link cases "
-            << "since DART does not allow joint with world as child. "
-            << "Please see issue #914. "
-            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-      return;
-    }
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
     ASSERT_TRUE(joint != NULL);
@@ -574,7 +563,6 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::JointPtr joint;
-
   for (unsigned int i = 0; i < 2; ++i)
   {
     if (_physicsEngine == "dart" && i == 0)
@@ -596,14 +584,14 @@ void Joint_TEST::SpawnJointRotationalWorld(const std::string &_physicsEngine,
           << child << " "
           << parent << std::endl;
     joint = SpawnJoint(_jointType, worldChild, worldParent);
-    EXPECT_TRUE(joint.get() != NULL);
+    EXPECT_TRUE(joint != NULL);
 
     physics::LinkPtr link;
     if (!worldChild)
       link = joint->GetChild();
     else if (!worldParent)
       link = joint->GetParent();
-    EXPECT_TRUE(link.get() != NULL);
+    EXPECT_TRUE(link != NULL);
 
     math::Pose initialPose = link->GetWorldPose();
     world->Step(100);
@@ -656,13 +644,6 @@ INSTANTIATE_TEST_CASE_P(TestRuns, Joint_TEST_RotationalWorld,
 ////////////////////////////////////////////////////////////////////////
 void Joint_TEST::JointTorqueTest(const std::string &_physicsEngine)
 {
-  /// \TODO: dart not complete for this test
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for DART, see issues #903.\n";
-    return;
-  }
-
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -39,7 +38,7 @@ DARTJoint::DARTJoint(BasePtr _parent)
 {
   this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
-  this->stiffnessDampingInitialized = false;
+
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
 }
@@ -127,7 +126,7 @@ void DARTJoint::Init()
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
+        gzlog << "joint friction not implemented in DART.\n";
       }
     }
   }
@@ -146,7 +145,7 @@ void DARTJoint::Init()
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
+        gzlog << "joint friction not implemented in DART.\n";
       }
     }
   }
@@ -225,20 +224,34 @@ void DARTJoint::Detach()
 }
 
 //////////////////////////////////////////////////
+void DARTJoint::SetAnchor(int /*_index*/,
+    const gazebo::math::Vector3 &/*_anchor*/)
+{
+  // nothing to do here for DART.
+}
+
+//////////////////////////////////////////////////
 void DARTJoint::SetDamping(int _index, double _damping)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  this->dampingCoefficient = _damping;
+
+  if (this->GetAngleCount() > 2)
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      this->stiffnessCoefficient[_index],
-      _damping);
-  }
-  else
-  {
-     gzerr << "DARTJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+     gzerr << "Incompatible joint type, GetAngleCount() = "
+           << this->GetAngleCount() << " > 2\n";
      return;
+  }
+
+  // \TODO: implement on a per axis basis (requires additional sdf parameters)
+
+  /// \TODO:  this check might not be needed?  attaching an object to a static
+  /// body should not affect damping application.
+  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
+  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+  if (!parentStatic && !childStatic)
+  {
+    this->dtJoint->setDampingCoefficient(_index, _damping);
   }
 }
 
@@ -270,39 +283,28 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
-    /// \TODO: this check might not be needed?  attaching an object to a static
-    /// body should not affect damping application.
-    bool parentStatic =
-      this->GetParent() ? this->GetParent()->IsStatic() : false;
-    bool childStatic =
-      this->GetChild() ? this->GetChild()->IsStatic() : false;
+    /// \TODO: set joint stiffness coefficient
 
-    if (!this->stiffnessDampingInitialized)
+    /// setting joint damping
+    bool parentStatic = this->GetParent() ?
+      this->GetParent()->IsStatic() : false;
+    bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+
+    if (!parentStatic && !childStatic)
     {
-      if (!parentStatic && !childStatic)
-      {
-        this->dtJoint->setSpringStiffness(
-              static_cast<int>(_index), _stiffness, _reference);
-        this->dtJoint->setDampingCoefficient(
-              static_cast<int>(_index), _damping);
-        this->stiffnessDampingInitialized = true;
-      }
-      else
-      {
-        gzwarn << "Spring Damper for Joint[" << this->GetName()
-               << "] is not initialized because either parent[" << parentStatic
-               << "] or child[" << childStatic << "] is static.\n";
-      }
+      this->dtJoint->setDampingCoefficient(_index, _damping);
     }
+
+    /// \TODO: add spring force element
+    gzdbg << "Joint [" << this->GetName()
+           << "] stiffness not implement in DART\n";
   }
   else
-  {
-    gzerr << "SetStiffnessDamping _index too large.\n";
-  }
+    gzerr << "SetStiffnessDamping _index " << _index << " is too large.\n";
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
+void DARTJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -318,7 +320,7 @@ void DARTJoint::SetHighStop(int _index, const math::Angle& _angle)
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetLowStop(int _index, const math::Angle& _angle)
+void DARTJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -375,9 +377,9 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
     return result;
   }
 
-  //----------------------------------------------------------------------------
+  //---------------------------------------------
   // Parent and child link information
-  //----------------------------------------------------------------------------
+  //---------------------------------------------
   DARTLinkPtr theChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
@@ -390,7 +392,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
+    dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
@@ -433,7 +435,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
+    dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(
       dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
@@ -537,9 +539,9 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench jointWrench;
 
-  //----------------------------------------------------------------------------
+  //---------------------------------------------
   // Parent and child link information
-  //----------------------------------------------------------------------------
+  //---------------------------------------------
   DARTLinkPtr theChildLink =
     boost::static_pointer_cast<DARTLink>(this->childLink);
 
@@ -552,7 +554,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   // the parent Link frame.
   if (theChildLink != NULL)
   {
-    dart::dynamics::BodyNode* dartChildBody = theChildLink->GetDARTBodyNode();
+    dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
@@ -573,6 +575,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   return jointWrench;
 }
 
+/////////////////////////////////////////////////
 void DARTJoint::SetForce(int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
@@ -580,10 +583,13 @@ void DARTJoint::SetForce(int _index, double _force)
   this->SetForceImpl(_index, force);
 
   // for engines that supports auto-disable of links
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 }
 
+/////////////////////////////////////////////////
 double DARTJoint::GetForce(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
@@ -598,6 +604,7 @@ double DARTJoint::GetForce(unsigned int _index)
   }
 }
 
+/////////////////////////////////////////////////
 unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
@@ -607,20 +614,25 @@ unsigned int DARTJoint::GetAngleCount() const
   return angleCount;
 }
 
-void DARTJoint::ApplyStiffnessDamping()
+/////////////////////////////////////////////////
+void DARTJoint::ApplyDamping()
 {
-  // DART applies stiffness and damping force implicitly itself by setting
-  // the stiffness coefficient and the damping coefficient using
-  // dart::dynamics::Joint::setSpringStiffness(index, stiffnessCoeff) and
-  // dart::dynamics::Joint::setDampingCoefficient(index, dampingCoeff).
-  // Therefore, we do nothing here.
+  // DART applying damping force inside of DART.
 }
 
+/////////////////////////////////////////////////
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
   return boost::dynamic_pointer_cast<DARTModel>(this->model);
 }
 
+/////////////////////////////////////////////////
+dart::dynamics::Joint *DARTJoint::GetDARTJoint()
+{
+  return this->dtJoint;
+}
+
+/////////////////////////////////////////////////
 void DARTJoint::SaveForce(int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,

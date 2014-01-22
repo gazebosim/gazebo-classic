@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,47 +142,46 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
-      // TODO: (in test)
+      /// \brief Store DART Transformation to Entity::dirtyPose and add this
+      ///        link to World::dirtyPoses so that World::Update() trigger
+      ///        Entity::SetWorldPose() for this link.
       public: void updateDirtyPoseFromDARTTransformation();
 
-      /// \brief
-      public: dart::dynamics::BodyNode* GetBodyNode() const;
-
-      /// \brief
+      /// \brief Get pointer to DART Physics engine associated with this link.
+      /// \return Pointer to the DART Physics engine.
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
-      /// \brief
-      public: dart::simulation::World* GetDARTWorld(void) const;
+      /// \brief Get pointer to DART World associated with this link.
+      /// \return Pointer to the DART World.
+      public: dart::simulation::World *GetDARTWorld(void) const;
 
-      /// \brief
+      /// \brief Get pointer to DART Model associated with this link.
+      /// \return Pointer to the DART Model.
       public: DARTModelPtr GetDARTModel() const;
 
-      /// \brief
-      public: dart::dynamics::BodyNode* GetDARTBodyNode() const;
+      /// \brief Get pointer to DART BodyNode associated with this link.
+      /// \return Pointer to DART BodyNode.
+      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
 
-      /// \brief
+      /// \brief Set parent joint of this link.
+      /// \param[in] _dartParentJoint Pointer to the parent joint.
       public: void SetDARTParentJoint(DARTJointPtr _dartParentJoint);
 
-      /// \brief
+      /// \brief Set child joint of this link.
+      /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
       /// \brief Pointer to the DART physics engine.
       private: DARTPhysicsPtr dartPhysics;
 
-      /// \brief
-      private: dart::dynamics::BodyNode* dtBodyNode;
+      /// \brief Pointer to the DART BodyNode.
+      private: dart::dynamics::BodyNode *dtBodyNode;
 
-      /// \brief
+      /// \brief Pointer to the parent joint.
       private: DARTJointPtr dartParentJoint;
 
-      /// \brief
+      /// \brief List of pointers to the child joints.
       private: std::vector<DARTJointPtr> dartChildJoints;
-
-      /// \brief Weld joint for static link mode.
-      private: dart::dynamics::WeldJoint* dtStaticJoint;
-
-      /// \brief
-      private: dart::dynamics::Joint* dtDynamicJoint;
 
       /// \biref If true, freeze link to world (inertial) frame.
       private: bool staticLink;

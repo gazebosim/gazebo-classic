@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace gazebo
       {
         if (_radius < 0)
         {
-          gzerr << "Sphere shape does not support negative radius\n";
+          gzerr << "Sphere shape does not support negative radius.\n";
           return;
         }
         if (math::equal(_radius, 0.0))
@@ -50,7 +50,8 @@ namespace gazebo
           // Warn user, but still create shape with very small value
           // otherwise later resize operations using setLocalScaling
           // will not be possible
-          gzwarn << "Setting sphere shape's radius to zero \n";
+          gzwarn << "Setting sphere shape's radius to zero is not supported "
+                 << "in DART, using 1e-4.\n";
           _radius = 1e-4;
         }
 
@@ -61,9 +62,9 @@ namespace gazebo
 
         if (dartCollisionParent->GetDARTCollisionShape() == NULL)
         {
-          dart::dynamics::BodyNode* dtBodyNode =
+          dart::dynamics::BodyNode *dtBodyNode =
               dartCollisionParent->GetDARTBodyNode();
-          dart::dynamics::EllipsoidShape* dtEllisoidShape =
+          dart::dynamics::EllipsoidShape *dtEllisoidShape =
               new dart::dynamics::EllipsoidShape(Eigen::Vector3d(_radius*2.0,
                                                                  _radius*2.0,
                                                                  _radius*2.0));
@@ -72,7 +73,7 @@ namespace gazebo
         }
         else
         {
-          dart::dynamics::EllipsoidShape* dtEllipsoidShape =
+          dart::dynamics::EllipsoidShape *dtEllipsoidShape =
               dynamic_cast<dart::dynamics::EllipsoidShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
           dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,

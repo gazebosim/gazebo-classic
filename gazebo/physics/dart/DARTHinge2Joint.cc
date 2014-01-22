@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ math::Vector3 DARTHinge2Joint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(int _index, const math::Vector3& _axis)
+void DARTHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
@@ -119,7 +119,8 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(int _index) const
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference-frame-doesnt-match
+  // See: https://bitbucket.org/osrf/gazebo/issue/494/
+  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 

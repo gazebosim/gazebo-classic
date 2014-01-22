@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,19 +139,19 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  dart::constraint::ConstraintDynamics* dtConstraintDynamics =
+  dart::constraint::ConstraintDynamics *dtConstraintDynamics =
       this->dtWorld->getConstraintHandler();
-  dart::collision::CollisionDetector* dtCollisionDetector =
+  dart::collision::CollisionDetector *dtCollisionDetector =
       dtConstraintDynamics->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
-    const dart::collision::Contact& dtContact =
+    const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode* dtBodyNode1 =
+    dart::dynamics::BodyNode *dtBodyNode1 =
         dtContact.collisionNode1->getBodyNode();
-    dart::dynamics::BodyNode* dtBodyNode2 =
+    dart::dynamics::BodyNode *dtBodyNode2 =
         dtContact.collisionNode2->getBodyNode();
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
@@ -204,17 +204,20 @@ void DARTPhysics::UpdateCollision()
     contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
     contactFeedback->normals[0] = DARTTypes::ConvVec3(dtContact.normal);
     contactFeedback->depths[0] = dtContact.penetrationDepth;
+
     if (!dartLink1->IsStatic())
     {
       contactFeedback->wrench[0].body1Force = localForce1;
       contactFeedback->wrench[0].body1Torque = localTorque1;
     }
+
     if (!dartLink2->IsStatic())
     {
       contactFeedback->wrench[0].body2Force = localForce2;
       contactFeedback->wrench[0].body2Torque = localTorque2;
     }
-    contactFeedback->count++;
+
+    ++contactFeedback->count;
   }
 }
 
@@ -249,6 +252,7 @@ void DARTPhysics::UpdatePhysics()
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
   }
+
   // this->lastUpdateTime = currTime;
 }
 
@@ -261,7 +265,7 @@ std::string DARTPhysics::GetType() const
 //////////////////////////////////////////////////
 void DARTPhysics::SetSeed(uint32_t /*_seed*/)
 {
-  gzerr << "Not implemented yet...\n";
+  gzwarn << "Not implemented yet in DART.\n";
 }
 
 //////////////////////////////////////////////////
@@ -276,7 +280,10 @@ ModelPtr DARTPhysics::CreateModel(BasePtr _parent)
 LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
-    gzthrow("Link must have a parent\n");
+  {
+    gzerr << "Link must have a parent in DART.\n";
+    return LinkPtr();
+  }
 
   DARTLinkPtr link(new DARTLink(_parent));
   link->SetWorld(_parent->GetWorld());
@@ -348,13 +355,13 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
   else
-    gzthrow("Unable to create joint of type[" << _type << "]");
+    gzerr << "Unable to create joint of type[" << _type << "]";
 
   return joint;
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3& _gravity)
+void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dtWorld->setGravity(
@@ -364,9 +371,10 @@ void DARTPhysics::SetGravity(const gazebo::math::Vector3& _gravity)
 //////////////////////////////////////////////////
 void DARTPhysics::DebugPrint() const
 {
-  gzwarn << "Not implemented!\n";
+  gzwarn << "Not implemented in DART.\n";
 }
 
+//////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
   DARTParam param;
@@ -380,9 +388,11 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
     gzwarn << _key << " is not supported in ode" << std::endl;
     return 0;
   }
+
   return this->GetParam(param);
 }
 
+//////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
@@ -410,6 +420,13 @@ boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
   return value;
 }
 
+//////////////////////////////////////////////////
+dart::simulation::World *DARTPhysics::GetDARTWorld()
+{
+  return this->dtWorld;
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 {
   msgs::Response response;
@@ -422,9 +439,10 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
-    // min_step_size is defined but not yet used
-//    physicsMsg.set_min_step_size(
-//        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
@@ -433,64 +451,22 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
+//////////////////////////////////////////////////
 void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 {
-  if (_msg->has_solver_type())
-  {
-//    sdf::ElementPtr solverElem =
-//      this->sdf->GetElement("dart")->GetElement("solver");
-//    if (_msg->solver_type() == "quick")
-//    {
-//      solverElem->GetElement("type")->Set("quick");
-//      this->physicsStepFunc = &dWorldQuickStep;
-//    }
-//    else if (_msg->solver_type() == "world")
-//    {
-//      solverElem->GetElement("type")->Set("world");
-//      this->physicsStepFunc = &dWorldStep;
-//    }
-  }
-
-//  if (_msg->has_precon_iters())
-//    this->SetSORPGSPreconIters(_msg->precon_iters());
-
-//  if (_msg->has_iters())
-//    this->SetSORPGSIters(_msg->iters());
-
-//  if (_msg->has_sor())
-//    this->SetSORPGSW(_msg->sor());
-
-//  if (_msg->has_cfm())
-//    this->SetWorldCFM(_msg->cfm());
-
-//  if (_msg->has_erp())
-//    this->SetWorldERP(_msg->erp());
-
-//  if (_msg->has_enable_physics())
-//    this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-//  if (_msg->has_contact_max_correcting_vel())
-//    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
-
-//  if (_msg->has_contact_surface_layer())
-//    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
-//  if (_msg->has_real_time_factor())
-//    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
-//  if (_msg->has_real_time_update_rate())
-//  {
-//    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-//  }
-//  else if (_msg->has_update_rate())
-//  {
-//    this->SetRealTimeUpdateRate(_msg->update_rate());
-//    gzwarn <<
-//        "Physics update rate is deprecated by real time update rate\n";
-//  }
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
 
   if (_msg->has_max_step_size())
   {
@@ -501,8 +477,9 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   this->world->EnableAllModels();
 }
 
+//////////////////////////////////////////////////
 DARTLinkPtr DARTPhysics::FindDARTLink(
-    const dart::dynamics::BodyNode* _dtBodyNode)
+    const dart::dynamics::BodyNode *_dtBodyNode)
 {
   DARTLinkPtr res;
 
@@ -528,10 +505,4 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
   return res;
 }
-
-void DARTPhysics::InitDARTWorld()
-{
-  // dtWorld->init();
-}
-
 

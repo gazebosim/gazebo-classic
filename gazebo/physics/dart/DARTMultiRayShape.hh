@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,13 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void UpdateRays();
 
-      /// \brief Add a ray to the collision
+      /// \brief Add a ray to the collision.
+      /// \param[in] _start Start location of the ray.
+      /// \param[in] _end End location of the ray.
       protected: void AddRay(const math::Vector3 &_start,
                              const math::Vector3 &_end);
 
+      /// \brief Pointer to the DART physics engine.
       private: DARTPhysicsPtr physicsEngine;
     };
   }

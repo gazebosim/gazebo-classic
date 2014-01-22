@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,20 @@ TEST(SphericalCoordinatesTest, CoordinateTransforms)
       EXPECT_NEAR(sph.z, elev, 1e-6);
     }
   }
+}
+
+//////////////////////////////////////////////////
+// Test distance
+TEST(SphericalCoordinatesTest, Distance)
+{
+  math::Angle latA, longA, latB, longB;
+  latA.SetFromDegree(46.250944);
+  longA.SetFromDegree(-122.249972);
+  latB.SetFromDegree(46.124953);
+  longB.SetFromDegree(-122.251683);
+  double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
+
+  EXPECT_NEAR(14002, d, 20);
 }
 
 /////////////////////////////////////////////////
