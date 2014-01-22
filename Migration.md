@@ -13,6 +13,14 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **gazebo/sensors/Noise.hh** `ABI change`
+    + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Removed:*** void Noise::~Noise()
+    + ***Replacement:*** virtual void Noise::~Noise()
+    + ***Removed:*** void Noise::Apply() const
+    + ***Replacement:*** void Noise::Apply()
+    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class. Changed some functions to virtual and remove const keyword in the process.
 1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
@@ -59,7 +67,23 @@
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
 
+1. **gazebo/sensors/Noise.hh**
+    + virtual double ApplyImpl(double _in)
+    + virtual void Fini()
+    + virtual void SetCustomNoiseCallback(boost::function<double (double)> _cb)
+
+1. **gazebo/sensors/Sensor.hh**
+    + NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/GaussianNoiseModel.hh**
+
 ### Deletions
+
+1. **gazebo/sensors/Noise.hh**
+    + double Noise::GetMean() const
+    + double Noise::GetStdDev() const
+    + double Noise::GetBias() const
+    + ***Note:*** Moved gaussian noise functions to a new GaussianNoiseModel class
 
 ## Gazebo 1.9 to 2.0
 

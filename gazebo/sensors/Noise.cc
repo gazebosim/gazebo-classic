@@ -47,13 +47,18 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
 
     GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
         noise->GetNoiseType() == Noise::GAUSSIAN_QUANTIZED,
-        "Noise type should be gaussian or gaussian_quantized");
+        "Noise type should be 'gaussian' or 'gaussian_quantized'");
   }
-  else
+  else if (typeString == "none" || typeString == "custom")
   {
     noise.reset(new Noise());
     GZ_ASSERT(noise->GetNoiseType() == Noise::NONE,
-        "Noise type should be none");
+        "Noise type should be 'none'");
+  }
+  else
+  {
+    gzerr << "Unrecognized noise type" << std::endl;
+    return NoisePtr();
   }
   noise->Load(_sdf);
 
