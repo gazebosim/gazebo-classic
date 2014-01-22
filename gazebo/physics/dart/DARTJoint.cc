@@ -608,9 +608,9 @@ unsigned int DARTJoint::GetAngleCount() const
 }
 
 /////////////////////////////////////////////////
-void DARTJoint::ApplyDamping()
+void DARTJoint::ApplyStiffnessDamping()
 {
-  // DART applying damping force inside of DART.
+  // Stiffness and damping force is automatically applied by DART.
 }
 
 /////////////////////////////////////////////////
