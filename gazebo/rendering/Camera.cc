@@ -131,7 +131,6 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   this->camera = NULL;
   this->viewport = NULL;
 
-  this->pitchNode = NULL;
   this->sceneNode = NULL;
 
   this->screenshotPath = getenv("HOME");
@@ -165,7 +164,6 @@ Camera::~Camera()
   delete [] this->saveFrameBuffer;
   delete [] this->bayerFrameBuffer;
 
-  this->pitchNode = NULL;
   this->sceneNode = NULL;
 
   if (this->renderTexture && this->scene->GetInitialized())
@@ -991,8 +989,9 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetPitchNode() const
 {
-  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL.\n";
-  return this->pitchNode;
+  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL."
+        << " Use GetSceneNode() instead.\n";
+  return NULL;
 }
 
 //////////////////////////////////////////////////

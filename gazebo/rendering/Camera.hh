@@ -335,9 +335,9 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
-      /// \brief Get the camera's pitch scene node
-      /// \return The pitch node the camera is attached to
-      public: Ogre::SceneNode *GetPitchNode() const;
+      /// \brief Deprecated: Get the camera's pitch scene node
+      /// \return NULL. Use GetSceheNode() instead.
+      public: Ogre::SceneNode *GetPitchNode() const GAZEBO_DEPRECATED(3.0);
 
       /// \brief Get a pointer to the image data
       ///
@@ -624,16 +624,8 @@ namespace gazebo
       protected: Ogre::Viewport *viewport;
 
       /// \brief Scene node that controls camera position.
-      /// sceneNode and pitchNode are here because they split
-      /// out roll and yaw from pitch for historical reasons.
-      /// We should combine them into a single Node.
+      /// and orientation.
       protected: Ogre::SceneNode *sceneNode;
-
-      /// \brief Scene nod that controls camera pitch.
-      /// sceneNode and pitchNode are here because they split
-      /// out roll and yaw from pitch for historical reasons.
-      /// We should combine them into a single Node.
-      protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
