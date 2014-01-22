@@ -107,6 +107,10 @@ namespace gazebo
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(bool _s);
 
+      /// \brief Get whether the light is visible.
+      /// \return True if the light is visible.
+      public: bool GetVisible() const;
+
       /// \brief Set the light type.
       /// \param[in] _type The light type: "point", "spot", "directional"
       public: void SetLightType(const std::string &_type);

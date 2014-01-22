@@ -307,9 +307,6 @@ namespace gazebo
       /// \brief Children of this entity.
       protected: Base_V children;
 
-      /// \brief End of the children vector.
-      protected: Base_V::iterator childrenEnd;
-
       /// \brief Pointer to the world.
       protected: WorldPtr world;
 

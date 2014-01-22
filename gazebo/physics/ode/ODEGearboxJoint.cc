@@ -78,7 +78,7 @@ void ODEGearboxJoint::SetGearRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(int _index) const
+math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int _index) const
 {
   dVector3 result;
 
@@ -93,7 +93,8 @@ math::Vector3 ODEGearboxJoint::GetAnchor(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
+void ODEGearboxJoint::SetAnchor(unsigned int _index,
+                                const math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -110,7 +111,7 @@ void ODEGearboxJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetGlobalAxis(int _index) const
+math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -125,7 +126,7 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -152,42 +153,42 @@ void ODEGearboxJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEGearboxJoint::GetAngleImpl(int /*index*/) const
+math::Angle ODEGearboxJoint::GetAngleImpl(unsigned int /*index*/) const
 {
   gzlog << "GetAngle not implemented for gearbox\n";
   return math::Angle(0);
 }
 
 //////////////////////////////////////////////////
-double ODEGearboxJoint::GetVelocity(int /*index*/) const
+double ODEGearboxJoint::GetVelocity(unsigned int /*index*/) const
 {
   gzlog << "GetVelocity not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetVelocity(int /*index*/, double /*_angle*/)
+void ODEGearboxJoint::SetVelocity(unsigned int /*index*/, double /*_angle*/)
 {
   gzlog << "SetVelocity not implemented for gearbox\n";
   return;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetMaxForce(int /*index*/, double /*_t*/)
+void ODEGearboxJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
 {
   gzlog << "SetMaxForce not implemented for gearbox\n";
   return;
 }
 
 //////////////////////////////////////////////////
-double ODEGearboxJoint::GetMaxForce(int /*index*/)
+double ODEGearboxJoint::GetMaxForce(unsigned int /*index*/)
 {
   gzlog << "GetMaxForce not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetForceImpl(int /*_index*/, double /*_effort*/)
+void ODEGearboxJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   if (this->jointId)
     gzlog << "SetForce not implemented for gearbox\n";
@@ -196,14 +197,14 @@ void ODEGearboxJoint::SetForceImpl(int /*_index*/, double /*_effort*/)
 }
 
 //////////////////////////////////////////////////
-double ODEGearboxJoint::GetParam(int /*_parameter*/) const
+double ODEGearboxJoint::GetParam(unsigned int /*_parameter*/) const
 {
   gzlog << "GetParam not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetParam(int /*_parameter*/, double /*_value*/)
+void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 {
   gzlog << "SetParam not implemented for gearbox\n";
   return;

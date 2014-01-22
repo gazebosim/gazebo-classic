@@ -16,9 +16,15 @@ if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
+if(HAVE_DART)
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
+endif()
 
 set(tests
+  624_collision_world_pose.cc
   876_random_number_generator.cc
+  978_joint_anchor.cc
 )
 
 gz_build_tests(${tests})
