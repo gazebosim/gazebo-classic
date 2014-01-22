@@ -42,6 +42,7 @@ namespace gazebo
     public: virtual void notifyMaterialRender(unsigned int _passId,
                                               Ogre::MaterialPtr &_mat)
     {
+      GZ_ASSERT(!_mat.isNull(), "Null OGRE material");
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
 
@@ -55,15 +56,17 @@ namespace gazebo
       // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
       // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-      _mat->getTechnique(0)->getPass(_passId)->
-        getFragmentProgramParameters()->
-        setNamedConstant("offsets", offsets);
-      _mat->getTechnique(0)->getPass(_passId)->
-        getFragmentProgramParameters()->
-        setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
-      _mat->getTechnique(0)->getPass(_passId)->
-        getFragmentProgramParameters()->
-        setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
+      Ogre::Technique *technique = _mat->getTechnique(0);
+      GZ_ASSERT(technique, "Null OGRE material technique");
+      Ogre::Pass *pass = technique->getPass(_passId);
+      GZ_ASSERT(pass, "Null OGRE material pass");
+      Ogre::GpuProgramParametersSharedPtr params =
+          pass->getFragmentProgramParameters();
+      GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
+
+      params->setNamedConstant("offsets", offsets);
+      params->setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
+      params->setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
     }
 
     /// \brief Mean that we'll pass down to the GLSL fragment shader.
