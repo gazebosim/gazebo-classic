@@ -60,7 +60,7 @@ namespace gazebo
       public: virtual void Reset();
 
       // Documentation inherited.
-      public: virtual LinkPtr GetJointLink(int _index) const;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
@@ -71,7 +71,7 @@ namespace gazebo
       /// overriden in the child classes where appropriate.
       /// \param[in] _parameter ID of the parameter to get.
       /// \return Value of the parameter.
-      public: virtual double GetParam(int _parameter) const;
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       /// \brief Set an ODE joint paramter.
       ///
@@ -79,13 +79,14 @@ namespace gazebo
       /// classes where appropriate
       /// \param[in] _parameter ID of the parameter to set.
       /// \param[in] _value Value to set.
-      public: virtual void SetParam(int _parameter, double _value);
+      public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
-      public: virtual void SetStiffness(int _index, const double _stiffness);
+      public: virtual void SetStiffness(unsigned int _index,
+                                        const double _stiffness);
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
@@ -151,7 +152,8 @@ namespace gazebo
       /// high force (|f| > fThreshold) scenarios.
       /// Stability region is determined by:
       ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
-      private: double ApplyAdaptiveDamping(int _index, const double _damping);
+      private: double ApplyAdaptiveDamping(unsigned int _index,
+                   const double _damping);
 
       /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
       /// \param[in] _dt time step size
@@ -190,16 +192,18 @@ namespace gazebo
       private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(int _index);
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(int _index);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
@@ -208,14 +212,16 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
+      public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
                                         double _value);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
@@ -229,7 +235,7 @@ namespace gazebo
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetForce(int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force);
 
       // Documentation inherited.
       public: virtual double GetForce(unsigned int _index);
@@ -246,12 +252,13 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      protected: virtual void SetForceImpl(int _index, double _force) = 0;
+      protected: virtual void SetForceImpl(
+                     unsigned int _index, double _force) = 0;
 
       /// \brief Save external forces applied to this Joint.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      private: void SaveForce(int _index, double _force);
+      private: void SaveForce(unsigned int _index, double _force);
 
       /// \brief This is our ODE ID
       protected: dJointID jointId;

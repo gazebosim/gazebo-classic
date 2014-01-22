@@ -153,6 +153,8 @@ void FileLogger::Init(const std::string &_filename)
   logPath = logPath / ".gazebo/" / _filename;
 
   buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+  if (!buf->stream->is_open())
+    std::cerr << "Error opening log file: " << logPath << std::endl;
 
   // Output the version of gazebo.
   (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
