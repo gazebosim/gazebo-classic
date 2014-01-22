@@ -404,12 +404,6 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 
       unsigned int diff = (unsigned int)(abs(a - b));
 
-      if (_diffAvg < 0 && (a > 0 || b > 0) && a != b)
-        gzerr << "(" << (void*)_imageA
-              << ", " << (void*)_imageB
-              << ") ind: (" << x << ", " << y
-              << ") val: [" << a << ", " << b << ", " << diff << "]\n";
-
       if (diff > _diffMax)
         _diffMax = diff;
 

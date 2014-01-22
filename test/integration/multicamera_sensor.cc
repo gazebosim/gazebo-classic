@@ -60,7 +60,6 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 {
   Load("worlds/camera_rotation_test.world");
 
-  gzerr << "loaded"; getchar();
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
@@ -205,10 +204,12 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
       // right of unrotated/untranslated camera images
       // the result should differ as former sees green block and latter
       // sees red block.
-      gzerr << "wait"; getchar();
       this->ImageCompare(img0Right, imgt, width, height, depth,
                          diffMax, diffSum, diffAvg);
-      gzerr << "done"; getchar();
+
+      // use below to construct test for rotated2 left camera offset
+      // math::Quaternion a(1.2, 1.3, 1.4);
+      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
 
       // We expect that there will be some non-zero difference between the two
       // images.

@@ -631,10 +631,6 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
   if (this->animState)
     return;
 
-  gzerr << this->scopedUniqueName
-        << " [" << _pos
-        << "] [" << this->animState
-        << "]\n";
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
   this->sceneNode->needUpdate();
 }
