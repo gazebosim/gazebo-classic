@@ -93,6 +93,13 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test since there's an issue with dart's friction"
+          << " parameters (#1000)"
+          << std::endl;
+    return;
+  }
 
   Load("worlds/test_friction.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
