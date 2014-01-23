@@ -89,6 +89,7 @@ GaussianNoiseModel::GaussianNoiseModel()
     precision(0.0),
     quantized(false)
 {
+  this->type = Noise::GAUSSIAN;
 }
 
 //////////////////////////////////////////////////
@@ -130,6 +131,7 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     else
     {
       this->quantized = true;
+      this->type = Noise::GAUSSIAN_QUANTIZED;
     }
   }
 }

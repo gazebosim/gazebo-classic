@@ -103,11 +103,11 @@ namespace gazebo
       /// \param[in] _camera Camera associated to an image sensor
       public: virtual void SetCamera(rendering::CameraPtr _camera);
 
+      /// \brief Which type of noise we're applying
+      protected: NoiseType type;
+
       /// \brief Noise sdf element.
       private: sdf::ElementPtr sdf;
-
-      /// \brief Which type of noise we're applying
-      private: NoiseType type;
 
       /// \brief Callback function for applying custom noise to sensor data.
       private: boost::function<double (double)> customNoiseCallback;
