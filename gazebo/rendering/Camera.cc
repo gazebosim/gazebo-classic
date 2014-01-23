@@ -480,16 +480,13 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // Render, but don't swap buffers.
-    this->renderTarget->update(false);
+    this->renderTarget->update();
   }
 }
 
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  this->renderTarget->swapBuffers();
-
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
