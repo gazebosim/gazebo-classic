@@ -755,7 +755,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // There is no corresponding Gazebo joint for this mobilizer.
       // Create the joint and set its default position to be the default
       // pose of the base link relative to the Ground frame.
-      GZ_ASSERT(type == "free", "type is not 'free', not allowed."); // May add more types later
+      // Currently only `free` is allowed, we may add more types later
+      GZ_ASSERT(type == "free", "type is not 'free', not allowed.");
       if (type == "free")
       {
         MobilizedBody::Free freeJoint(

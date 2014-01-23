@@ -212,7 +212,7 @@ double ODEUniversalJoint::GetMaxForce(unsigned int _index)
     return this->GetParam(dParamFMax);
   else if (_index == 0)
     return this->GetParam(dParamFMax2);
-  
+
   gzerr << "Joint index out of bounds.\n";
   return 0;
 }

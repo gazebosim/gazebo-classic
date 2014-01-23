@@ -529,7 +529,8 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    GZ_ASSERT(_numFragments > 0, "_numFragments must be at least 1 for the master");
+    GZ_ASSERT(_numFragments > 0,
+              "_numFragments must be at least 1 for the master");
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());
