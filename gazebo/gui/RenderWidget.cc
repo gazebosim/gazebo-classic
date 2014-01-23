@@ -104,16 +104,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  //bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
-  //                           QSizePolicy::Minimum));
-  //bottomPanelLayout->addWidget(playFrame, 0);
   bottomPanelLayout->addWidget(timePanel, 0);
-  // bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Preferred,
-  //                           QSizePolicy::Minimum));
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
-
 
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
