@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,8 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   si = gts_surface_inter_new(gts_surface_inter_class(), s1, s2, tree1, tree2,
       isOpen1, isOpen2);
-  assert(gts_surface_inter_check(si, &closed));
+  GZ_ASSERT(gts_surface_inter_check(si, &closed),
+            "si is not an orientable manifold");
   if (!closed)
   {
     gzerr << "the intersection of " << _m1->GetName() << " and "
