@@ -51,7 +51,7 @@ Quaternion RotationSpline::Interpolate(unsigned int _fromIndex, double _t,
                                        bool _useShortestPath)
 {
   // Bounds check
-  GZ_ASSERT(_fromIndex < this->points.size(), "fromIndex out of bounds");
+  assert (_fromIndex < this->points.size() && "fromIndex out of bounds");
 
   if ((_fromIndex + 1) == this->points.size())
   {
@@ -154,7 +154,7 @@ void RotationSpline::RecalcTangents()
 
 const Quaternion& RotationSpline::GetPoint(unsigned int _index) const
 {
-  GZ_ASSERT(_index < this->points.size(), "Point index is out of bounds!!");
+  assert (_index < this->points.size() && "Point index is out of bounds!!");
 
   return this->points[_index];
 }
@@ -173,7 +173,7 @@ void RotationSpline::Clear()
 void RotationSpline::UpdatePoint(unsigned int _index,
                                  const Quaternion &_value)
 {
-  GZ_ASSERT(_index < this->points.size(), "Point index is out of bounds!!");
+  assert (_index < this->points.size() && "Point index is out of bounds!!");
 
   this->points[_index] = _value;
   if (this->autoCalc)
