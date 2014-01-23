@@ -2,6 +2,11 @@
 <sdf version="1.4">
   <world name="default">
 
+    <!-- Remove the grid -->
+    <scene>
+      <grid>false</grid>
+    </scene>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
