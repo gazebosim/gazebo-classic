@@ -20,5 +20,3 @@
 
 
 using namespace gazebo;
-
-

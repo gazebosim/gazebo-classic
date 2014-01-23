@@ -147,8 +147,7 @@ void DepthCameraSensor::Render()
   if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
     return;
 
-  // Update all the cameras
-  this->Render();
+  this->camera->Render();
 
   this->rendered = true;
   this->lastMeasurementTime = this->scene->GetSimTime();

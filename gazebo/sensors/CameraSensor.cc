@@ -35,6 +35,8 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
@@ -135,6 +137,15 @@ void CameraSensor::Init()
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
+
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+        this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(this->camera);
+    }
   }
   else
     gzerr << "No world name\n";

@@ -28,6 +28,7 @@ set (plugins
   MudPlugin
   PressurePlugin
   RayPlugin
+  RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin

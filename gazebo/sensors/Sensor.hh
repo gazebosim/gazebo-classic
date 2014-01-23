@@ -31,6 +31,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
@@ -207,6 +208,12 @@ namespace gazebo
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
 
+      /// \brief Get the sensor's noise model.
+      /// \param[in] _index Index of the noise model. For most sensors this
+      /// will be 0. For a multi camera sensor the index can be >=0.
+      /// \return The sensor's noise model.
+      public: NoisePtr GetNoise(unsigned int _index = 0) const;
+
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
       protected: bool NeedsUpdate();
@@ -258,6 +265,9 @@ namespace gazebo
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
+
+      /// \brief Noise added to sensor data
+      protected: std::vector<NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;
