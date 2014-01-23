@@ -32,6 +32,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent Qt widget
       public: ImageFrame(QWidget *_parent);
 
       /// \brief Destructor

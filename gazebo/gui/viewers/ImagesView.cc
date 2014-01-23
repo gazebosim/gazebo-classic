@@ -39,7 +39,7 @@ ImagesView::ImagesView(QWidget *_parent)
 
   // Create the layout and frame for images
   // {
-  this->dataPtr->frameLayout = new QGridLayout(this);
+  this->dataPtr->frameLayout = new QGridLayout;
   this->dataPtr->frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   this->frame->setObjectName("blackBorderFrame");
@@ -64,7 +64,7 @@ ImagesView::~ImagesView()
 void ImagesView::UpdateImpl()
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
-  std::vector<ImageFrame*>::iterator imageIter = this->dataPtr->images.begin();
+  std::vector<ImageFrame *>::iterator imageIter = this->dataPtr->images.begin();
 
   // Clear out the images if the flag is set.
   if (this->dataPtr->clearImages)
