@@ -52,15 +52,6 @@ void GuiIface_TEST::noINIFile()
   QVERIFY(width == 100);
   QVERIFY(height == 200);
 
-  // Test 1: Remove gui.ini file. Make sure gui::load works, and we can get
-  // geometry values.
-
-  // Test 2: gui.ini file exists. Make sure gui::load works, and we can get
-  // geometry values.
-  
-  // Test 3: gui.ini file exists. Set values, make sure we get the correct
-  // values back. Save a configuration file, make sure it exists, and we
-  // can read the values back in.
   gazebo::gui::stop();
 }
 
