@@ -91,7 +91,7 @@ void TopicCommand::List()
   msgs::Request request;
   msgs::GzString_V topics;
 
-  transport::ConnectionPtr connection = this->ConnectToMaster();
+  transport::ConnectionPtr connection = transport::connectToMaster();
 
   if (connection)
   {
@@ -120,7 +120,7 @@ msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
   msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
   msgs::Packet packet;
 
-  transport::ConnectionPtr connection = this->ConnectToMaster();
+  transport::ConnectionPtr connection = transport::connectToMaster();
 
   connection->EnqueueMsg(msgs::Package("request", *request), true);
 

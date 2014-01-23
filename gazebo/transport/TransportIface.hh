@@ -150,6 +150,10 @@ namespace gazebo
     /// \return True if minimal comms is enabled.
     bool getMinimalComms();
 
+    /// \brief Create a connection to master.
+    /// \return Connection to the master.
+    transport::ConnectionPtr connectToMaster();
+
     /// \}
   }
 }
