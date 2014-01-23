@@ -17,6 +17,7 @@
 
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 
 using namespace gazebo;
 using namespace common;

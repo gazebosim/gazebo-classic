@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"

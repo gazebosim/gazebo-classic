@@ -21,6 +21,7 @@
 
 #include <boost/thread.hpp>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
