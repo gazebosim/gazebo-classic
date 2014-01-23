@@ -45,6 +45,7 @@
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/MapShape.hh"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
