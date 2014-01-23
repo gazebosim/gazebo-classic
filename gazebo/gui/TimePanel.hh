@@ -59,6 +59,9 @@ namespace gazebo
       /// \brief Update the data output.
       private slots: void Update();
 
+      /// \brief Qt call back when the step value in the spinbox changed
+      private slots: void OnStepValueChanged(int _value);
+
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when
       /// leaving.
@@ -107,6 +110,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the memeber variables.
       private: boost::mutex mutex;
+
+      /// \brief Tool button that holds the step widget
+      private: QToolButton *stepButton;
     };
   }
 }
