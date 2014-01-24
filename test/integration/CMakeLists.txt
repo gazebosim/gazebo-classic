@@ -45,6 +45,7 @@ set(tests
   physics_friction.cc
   physics_msgs.cc
   physics_thread_safe.cc
+  physics_unconstrained_forced_dynamics.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
