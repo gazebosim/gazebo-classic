@@ -26,6 +26,7 @@ QAction *gazebo::gui::g_openAct = 0;
 QAction *gazebo::gui::g_importAct = 0;
 QAction *gazebo::gui::g_saveAct = 0;
 QAction *gazebo::gui::g_saveAsAct = 0;
+QAction *gazebo::gui::g_saveCfgAct = 0;
 QAction *gazebo::gui::g_aboutAct = 0;
 QAction *gazebo::gui::g_quitAct = 0;
 QAction *gazebo::gui::g_dataLoggerAct = 0;
