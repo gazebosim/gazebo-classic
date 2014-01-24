@@ -27,6 +27,7 @@ class UnconstrainedForced : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
   public: void DampedLinear(const std::string &_physicsEngine);
+  public: void SpringLinear(const std::string &_physicsEngine);
   public: void DampedAngular(const std::string &_physicsEngine);
 };
 
@@ -149,6 +150,133 @@ void UnconstrainedForced::DampedLinear(const std::string &_physicsEngine)
 TEST_P(UnconstrainedForced, DampedLinear)
 {
   DampedLinear(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// Damped linear
+////////////////////////////////////////////////////////////////////////
+void UnconstrainedForced::SpringLinear(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // set time step size to 0.001
+  double dt = 0.01;
+  physics->SetMaxStepSize(dt);
+
+  // turn off gravity
+  physics->SetGravity(math::Vector3(0, 0, 0));
+
+  // spawn a box in midair (h = 2)
+  SpawnBox("rigid_body",
+    math::Vector3(1, 1, 1),  // size
+    math::Vector3(0, 0, 2),  // position
+    math::Vector3(0, 0, 0),  // orientation
+    false);  // not static
+
+  // get handle to box model
+  physics::ModelPtr model = world->GetModel("rigid_body");
+  ASSERT_TRUE(model.get() != NULL);
+
+  // get handle to canonical link
+  physics::LinkPtr link =  model->GetLink();
+
+  // set link mass
+  double mass = 1.0;
+  link->GetInertial()->SetMass(mass);
+
+  // set link moi for box
+  double ixx = 1.0 / 12.0 * mass * (2.0);
+  link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+
+  // declare stiffness coefficient
+  double stiffness = 10.0;
+
+  // declare initial position of box
+  math::Vector3 p0(1.0, 0, 2.0);
+
+  // declare spring reference position
+  math::Vector3 pr(0.0, 0, 2.0);
+
+  // set initial pose of link
+  link->SetWorldPose(math::Pose(p0, math::Quaternion()));
+
+  // get initial position of link
+  math::Vector3 v0 = link->GetWorldLinearVel();
+
+  // cache initial sim time
+  double t0 = world->GetSimTime().Double();
+
+  // get time step size
+  // double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+
+  // run simulation for 1 second
+  double testDuration = 1.0;  // 1 second
+
+  // calculate number of steps needed
+  unsigned int steps = testDuration / dt;
+
+  // compute first order integrated velocity with v1
+  double v1 = v0.x;
+
+  for (unsigned int step = 0; step < steps; ++step)
+  {
+    double t = world->GetSimTime().Double();
+
+    // compute analytical natural frequency
+    double w = sqrt(stiffness / mass);
+
+    // compute analytical position
+    math::Vector3 pa = v0 / w * sin( w * (t - t0)) +
+                       (p0 - pr) * cos( w * (t - t0));
+
+    // compute analytical velocity by differentiating position
+    math::Vector3 va = v0 * cos( w * (t - t0)) -
+                       w * (p0 - pr) * sin( w * (t - t0));
+
+    // get simulation position and velocity
+    math::Vector3 p = link->GetWorldPose().pos;
+    math::Vector3 v = link->GetWorldLinearVel();
+
+    // compute spring force, reference position is 0
+    math::Vector3 springForce = -stiffness * (p - pr);
+
+    // debug results
+    gzdbg << "engine: [" << _physicsEngine
+          << "] t: [" << t
+          << "] v: [" << v
+          << "] vdebug: [" << v1
+          << "] va: [" << va
+          << "] p: [" << (p - pr)
+          << "] pa: [" << pa
+          << "] fd: [" << springForce
+          << "]\n";
+
+    // check results
+    EXPECT_GT(dt, 0);
+
+
+    // apply force to simulate spring force
+    link->SetForce(springForce);
+
+    // take a step
+    world->Step(1);
+
+    // compute first order integrated velocity
+    v1 = v1 + dt * springForce.x / mass;
+  }
+}
+
+TEST_P(UnconstrainedForced, SpringLinear)
+{
+  SpringLinear(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
