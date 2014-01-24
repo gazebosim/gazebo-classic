@@ -75,6 +75,7 @@ void UnconstrainedForced::LinearDamper(const std::string &_physicsEngine)
   // set link moi for box
   double ixx = 1.0 / 12.0 * mass * (2.0);
   link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+  link->UpdateMass();
 
   // declare damping coefficient
   double damping = 0.1;
@@ -197,6 +198,7 @@ void UnconstrainedForced::LinearSpringDamper(const std::string &_physicsEngine)
   // set link moi for box
   double ixx = 1.0 / 12.0 * mass * (2.0);
   link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+  link->UpdateMass();
 
   // declare damping coefficient
   double damping = 0.1;
@@ -374,6 +376,7 @@ void UnconstrainedForced::LinearSpring(const std::string &_physicsEngine)
   // set link moi for box
   double ixx = 1.0 / 12.0 * mass * (2.0);
   link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+  link->UpdateMass();
 
   // declare stiffness coefficient
   double stiffness = 10.0;
@@ -502,6 +505,7 @@ void UnconstrainedForced::AngularDamper(const std::string &_physicsEngine)
   // set link moi for box
   double ixx = 1.0 / 12.0 * mass * (2.0);
   link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+  link->UpdateMass();
 
   // declare damping coefficient
   double damping = 0.1;
@@ -572,7 +576,7 @@ void UnconstrainedForced::AngularDamper(const std::string &_physicsEngine)
     world->Step(1);
 
     // compute first order integrated velocity
-    v1 = v1 + dt * damperForce.x / mass;
+    v1 = v1 + dt * damperForce.x / ixx;
   }
 }
 
