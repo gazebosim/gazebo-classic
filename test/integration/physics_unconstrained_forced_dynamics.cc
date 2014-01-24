@@ -48,7 +48,7 @@ void UnconstrainedForced::LinearDamper(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set time step size to 0.001
-  double dt = 0.01;
+  double dt = 0.001;
   physics->SetMaxStepSize(dt);
 
   // turn off gravity
@@ -103,17 +103,23 @@ void UnconstrainedForced::LinearDamper(const std::string &_physicsEngine)
   // compute first order integrated velocity
   double v1 = v0.x;
 
+  std::cout << "engine t p.x p.y p.z "
+        << "p_analytical.x p_analytical.y p_analytical.z "
+        << "v.x v.y v.z v_debug "
+        << "v_analytical.x v_analytical.y v_analytical.z "
+        << "f.x f.y f.z\n";
+
   for (unsigned int step = 0; step < steps; ++step)
   {
     double t = world->GetSimTime().Double();
 
     // compute analytical velocity
-    math::Vector3 va = v0 * exp(-damping / ixx * (t - t0));
+    math::Vector3 va = v0 * exp(-damping / mass * (t - t0));
 
     // compute analytical position by integrating velocity
-    math::Vector3 pa = p0 - ixx * v0 / damping * (
-      exp(-damping / ixx * t) -
-      exp(-damping / ixx * t0));
+    math::Vector3 pa = p0 - mass * v0 / damping * (
+      exp(-damping / mass * t) -
+      exp(-damping / mass * t0));
 
     // get simulation position and velocity
     math::Vector3 p = link->GetWorldPose().pos;
@@ -123,15 +129,10 @@ void UnconstrainedForced::LinearDamper(const std::string &_physicsEngine)
     math::Vector3 damperForce = -damping * v;
 
     // debug results
-    gzdbg << "engine: [" << _physicsEngine
-          << "] t: [" << t
-          << "] v: [" << v
-          << "] vdebug: [" << v1
-          << "] va: [" << va
-          << "] p: [" << p
-          << "] pa: [" << pa
-          << "] fd: [" << damperForce
-          << "]\n";
+    std::cout <<  _physicsEngine << " " << t
+          << " " << p << " " << pa
+          << " " << v << " " << v1 << " " << va
+          << " " << damperForce << "\n";
 
     // check results
     EXPECT_GT(dt, 0);
@@ -239,6 +240,12 @@ void UnconstrainedForced::LinearSpringDamper(const std::string &_physicsEngine)
   // over/under damped
   bool underdamped = (xi < 1.0) ? true : false;
 
+  std::cout << "engine t p.x p.y p.z "
+        << "p_analytical.x p_analytical.y p_analytical.z "
+        << "v.x v.y v.z v_debug "
+        << "v_analytical.x v_analytical.y v_analytical.z "
+        << "f.x f.y f.z\n";
+
   for (unsigned int step = 0; step < steps; ++step)
   {
     double t = world->GetSimTime().Double();
@@ -299,15 +306,10 @@ void UnconstrainedForced::LinearSpringDamper(const std::string &_physicsEngine)
     math::Vector3 damperForce = -damping * v;
 
     // debug results
-    gzdbg << "engine: [" << _physicsEngine
-          << "] t: [" << t
-          << "] v: [" << v
-          << "] vdebug: [" << v1
-          << "] va: [" << va
-          << "] p: [" << (p - pr)
-          << "] pa: [" << pa
-          << "] fd: [" << springForce + damperForce
-          << "]\n";
+    std::cout <<  _physicsEngine << " " << t
+          << " " << (p -pr) << " " << pa
+          << " " << v << " " << v1 << " " << va
+          << " " << springForce + damperForce << "\n";
 
     // check results
     EXPECT_GT(dt, 0);
@@ -403,6 +405,12 @@ void UnconstrainedForced::LinearSpring(const std::string &_physicsEngine)
   // compute first order integrated velocity with v1
   double v1 = v0.x;
 
+  std::cout << "engine t p.x p.y p.z "
+        << "p_analytical.x p_analytical.y p_analytical.z "
+        << "v.x v.y v.z v_debug "
+        << "v_analytical.x v_analytical.y v_analytical.z "
+        << "f.x f.y f.z\n";
+
   for (unsigned int step = 0; step < steps; ++step)
   {
     double t = world->GetSimTime().Double();
@@ -426,15 +434,10 @@ void UnconstrainedForced::LinearSpring(const std::string &_physicsEngine)
     math::Vector3 springForce = -stiffness * (p - pr);
 
     // debug results
-    gzdbg << "engine: [" << _physicsEngine
-          << "] t: [" << t
-          << "] v: [" << v
-          << "] vdebug: [" << v1
-          << "] va: [" << va
-          << "] p: [" << (p - pr)
-          << "] pa: [" << pa
-          << "] fd: [" << springForce
-          << "]\n";
+    std::cout <<  _physicsEngine << " " << t
+          << " " << (p -pr) << " " << pa
+          << " " << v << " " << v1 << " " << va
+          << " " << springForce << "\n";
 
     // check results
     EXPECT_GT(dt, 0);
@@ -527,17 +530,23 @@ void UnconstrainedForced::AngularDamper(const std::string &_physicsEngine)
   // compute first order integrated velocity
   double v1 = v0.x;
 
+  std::cout << "engine t p.x p.y p.z "
+        << "p_analytical.x p_analytical.y p_analytical.z "
+        << "v.x v.y v.z v_debug "
+        << "v_analytical.x v_analytical.y v_analytical.z "
+        << "f.x f.y f.z\n";
+
   for (unsigned int step = 0; step < steps; ++step)
   {
     double t = world->GetSimTime().Double();
 
     // compute analytical velocity
-    math::Vector3 va = v0 * exp(-damping / mass * (t - t0));
+    math::Vector3 va = v0 * exp(-damping / ixx * (t - t0));
 
     // compute analytical position by integrating velocity
-    math::Vector3 ra = r0 - mass * v0 / damping * (
-      exp(-damping / mass * t) -
-      exp(-damping / mass * t0));
+    math::Vector3 ra = r0 - ixx * v0 / damping * (
+      exp(-damping / ixx * t) -
+      exp(-damping / ixx * t0));
 
     // get simulation position and velocity
     math::Vector3 r = link->GetWorldPose().rot.GetAsEuler();
@@ -547,15 +556,10 @@ void UnconstrainedForced::AngularDamper(const std::string &_physicsEngine)
     math::Vector3 damperForce = -damping * v;
 
     // debug results
-    gzdbg << "engine: [" << _physicsEngine
-          << "] t: [" << t
-          << "] v: [" << v
-          << "] vdebug: [" << v1
-          << "] va: [" << va
-          << "] r: [" << r
-          << "] ra: [" << ra
-          << "] fd: [" << damperForce
-          << "]\n";
+    std::cout <<  _physicsEngine << " " << t
+          << " " << r << " " << ra
+          << " " << v << " " << v1 << " " << va
+          << " " << damperForce << "\n";
 
     // check results
     EXPECT_GT(dt, 0);
