@@ -34,8 +34,7 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
   std::string typeString = _sdf->Get<std::string>("type");
 
   NoisePtr noise;
-  if (typeString == "gaussian" ||
-      typeString == "gaussian_quantized")
+  if (typeString == "gaussian")
   {
     if (_sensorType == "camera" || _sensorType == "depth" ||
       _sensorType == "multicamera")
@@ -45,9 +44,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     else
       noise.reset(new GaussianNoiseModel());
 
-    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
-        noise->GetNoiseType() == Noise::GAUSSIAN_QUANTIZED,
-        "Noise type should be 'gaussian' or 'gaussian_quantized'");
+    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN,
+        "Noise type should be 'gaussian'");
   }
   else if (typeString == "none" || typeString == "custom")
   {
@@ -87,8 +85,6 @@ void Noise::Load(sdf::ElementPtr _sdf)
     this->type = NONE;
   else if (typeString == "gaussian")
     this->type = GAUSSIAN;
-  else if (typeString == "gaussian_quantized")
-    this->type = GAUSSIAN_QUANTIZED;
   else if (typeString == "custom")
     this->type = CUSTOM;
   else

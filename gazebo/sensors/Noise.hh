@@ -57,8 +57,7 @@ namespace gazebo
       {
         NONE,
         CUSTOM,
-        GAUSSIAN,
-        GAUSSIAN_QUANTIZED
+        GAUSSIAN
       };
 
       /// \brief Constructor.

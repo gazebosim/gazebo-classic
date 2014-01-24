@@ -89,11 +89,11 @@ TEST(NoiseTest, Types)
     EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN);
   }
 
-  // GAUSSIAN_QUANTIZED type
+  // GAUSSIAN type
   {
     sensors::Noise noise;
-    noise.Load(NoiseSdf("gaussian_quantized", 0, 0, 0, 0, 0));
-    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN_QUANTIZED);
+    noise.Load(NoiseSdf("gaussian", 0, 0, 0, 0, 0));
+    EXPECT_EQ(noise.GetNoiseType(), sensors::Noise::GAUSSIAN);
   }
 }
 
@@ -238,7 +238,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
 {
   double mean, stddev, biasMean, biasStddev, precision;
 
-  // GAUSSIAN_QUANTIZED with zero means and standard deviations
+  // GAUSSIAN with zero means and standard deviations
   // should be the same as NONE
   mean = 0.0;
   stddev = 0.0;
@@ -247,13 +247,13 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   precision = 0.0;
   {
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
-        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        NoiseSdf("gaussian", mean, stddev, biasMean,
         biasStddev, precision));
 
     NoNoise(*noise.get(), g_applyCount);
   }
 
-  // GAUSSIAN_QUANTIZED with non-zero means and standard deviations,
+  // GAUSSIAN with non-zero means and standard deviations,
   // but no bias or precision
   mean = 10.0;
   stddev = 5.0;
@@ -262,7 +262,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   precision = 0.0;
   {
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
-        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        NoiseSdf("gaussian", mean, stddev, biasMean,
         biasStddev, precision));
     sensors::GaussianNoiseModel *noiseModel =
         dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
@@ -280,7 +280,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   precision = 0.0;
   {
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
-        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        NoiseSdf("gaussian", mean, stddev, biasMean,
         biasStddev, precision));
 
     GaussianNoise(*noise.get(), g_applyCount);
@@ -300,7 +300,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
     for (unsigned int i = 0; i < g_applyCount; ++i)
     {
       sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
-          NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+          NoiseSdf("gaussian", mean, stddev, biasMean,
           biasStddev, precision));
       sensors::GaussianNoiseModel *noiseModel =
           dynamic_cast<sensors::GaussianNoiseModel *>(noise.get());
@@ -325,7 +325,7 @@ TEST(NoiseTest, ApplyGaussianQuantized)
   precision = 0.3;
   {
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
-        NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
+        NoiseSdf("gaussian", mean, stddev, biasMean,
         biasStddev, precision));
 
     EXPECT_NEAR(noise->Apply(0.32), 0.3, 1e-6);
