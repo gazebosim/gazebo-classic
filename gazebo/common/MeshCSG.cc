@@ -18,9 +18,10 @@
 #include <string>
 #include <gts.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshCSG.hh"
 #include "gazebo/common/MeshManager.hh"
