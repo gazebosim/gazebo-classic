@@ -13,6 +13,10 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **gazebo/gui/GuiIface.hh**
+    + ***Removed:*** void load() `ABI change`
+    + ***Replacement:*** bool load();
+    + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
 1. **gazebo/sensors/Noise.hh** `ABI change`
