@@ -137,7 +137,7 @@ set (gtest_sources
   BoxShape_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
-  Joint_TEST.cc
   PhysicsEngine_TEST.cc
-  SphereShape_TEST.cc)
+  SphereShape_TEST.cc
+)
 gz_build_tests(${gtest_sources})

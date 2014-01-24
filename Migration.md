@@ -13,8 +13,20 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **gazebo/gui/GuiIface.hh**
+    + ***Removed:*** void load() `ABI change`
+    + ***Replacement:*** bool load();
+    + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
+1. **gazebo/sensors/Noise.hh** `ABI change`
+    + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Removed:*** void Noise::~Noise()
+    + ***Replacement:*** virtual void Noise::~Noise()
+    + ***Removed:*** void Noise::Apply() const
+    + ***Replacement:*** void Noise::Apply()
+    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class.
 1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
@@ -102,10 +114,26 @@
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
 
+1. **gazebo/sensors/Noise.hh**
+    + virtual double ApplyImpl(double _in)
+    + virtual void Fini()
+    + virtual void SetCustomNoiseCallback(boost::function<double (double)> _cb)
+
+1. **gazebo/sensors/Sensor.hh**
+    + NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/GaussianNoiseModel.hh**
+
 ### Deletions
 
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
+    
+1. **gazebo/sensors/Noise.hh**
+    + double Noise::GetMean() const
+    + double Noise::GetStdDev() const
+    + double Noise::GetBias() const
+    + ***Note:*** Moved gaussian noise functions to a new GaussianNoiseModel class
 
 1. **gazebo/physics/SurfaceParams.hh**
     + double bounce
