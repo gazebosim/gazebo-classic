@@ -26,15 +26,16 @@ using namespace gazebo;
 class UnconstrainedForced : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
-  public: void DampedLinear(const std::string &_physicsEngine);
-  public: void SpringLinear(const std::string &_physicsEngine);
-  public: void DampedAngular(const std::string &_physicsEngine);
+  public: void LinearDamper(const std::string &_physicsEngine);
+  public: void LinearSpring(const std::string &_physicsEngine);
+  public: void LinearSpringDamper(const std::string &_physicsEngine);
+  public: void AngularDamper(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
-// Damped linear
+// Damper linear
 ////////////////////////////////////////////////////////////////////////
-void UnconstrainedForced::DampedLinear(const std::string &_physicsEngine)
+void UnconstrainedForced::LinearDamper(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -119,7 +120,7 @@ void UnconstrainedForced::DampedLinear(const std::string &_physicsEngine)
     math::Vector3 v = link->GetWorldLinearVel();
 
     // compute damping force
-    math::Vector3 dampingForce = -damping * v;
+    math::Vector3 damperForce = -damping * v;
 
     // debug results
     gzdbg << "engine: [" << _physicsEngine
@@ -129,7 +130,7 @@ void UnconstrainedForced::DampedLinear(const std::string &_physicsEngine)
           << "] va: [" << va
           << "] p: [" << p
           << "] pa: [" << pa
-          << "] fd: [" << dampingForce
+          << "] fd: [" << damperForce
           << "]\n";
 
     // check results
@@ -137,25 +138,201 @@ void UnconstrainedForced::DampedLinear(const std::string &_physicsEngine)
 
 
     // apply force to simulate damping force
-    link->SetForce(dampingForce);
+    link->SetForce(damperForce);
 
     // take a step
     world->Step(1);
 
     // compute first order integrated velocity
-    v1 = v1 + dt * dampingForce.x / mass;
+    v1 = v1 + dt * damperForce.x / mass;
   }
 }
 
-TEST_P(UnconstrainedForced, DampedLinear)
+TEST_P(UnconstrainedForced, LinearDamper)
 {
-  DampedLinear(GetParam());
+  LinearDamper(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Damped linear
+// Linear Spring Damper
 ////////////////////////////////////////////////////////////////////////
-void UnconstrainedForced::SpringLinear(const std::string &_physicsEngine)
+void UnconstrainedForced::LinearSpringDamper(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // set time step size to 0.001
+  double dt = 0.01;
+  physics->SetMaxStepSize(dt);
+
+  // turn off gravity
+  physics->SetGravity(math::Vector3(0, 0, 0));
+
+  // spawn a box in midair (h = 2)
+  SpawnBox("rigid_body",
+    math::Vector3(1, 1, 1),  // size
+    math::Vector3(0, 0, 2),  // position
+    math::Vector3(0, 0, 0),  // orientation
+    false);  // not static
+
+  // get handle to box model
+  physics::ModelPtr model = world->GetModel("rigid_body");
+  ASSERT_TRUE(model.get() != NULL);
+
+  // get handle to canonical link
+  physics::LinkPtr link =  model->GetLink();
+
+  // set link mass
+  double mass = 1.0;
+  link->GetInertial()->SetMass(mass);
+
+  // set link moi for box
+  double ixx = 1.0 / 12.0 * mass * (2.0);
+  link->GetInertial()->SetInertiaMatrix(ixx, ixx, ixx, 0, 0, 0);
+
+  // declare damping coefficient
+  double damping = 0.1;
+
+  // declare stiffness coefficient
+  double stiffness = 10.0;
+
+  // declare initial position of box
+  math::Vector3 p0(1.0, 0, 2.0);
+
+  // declare spring reference position
+  math::Vector3 pr(0.0, 0, 2.0);
+
+  // set initial pose of link
+  link->SetWorldPose(math::Pose(p0, math::Quaternion()));
+
+  // get initial position of link
+  math::Vector3 v0 = link->GetWorldLinearVel();
+
+  // cache initial sim time
+  double t0 = world->GetSimTime().Double();
+
+  // get time step size
+  // double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+
+  // run simulation for 1 second
+  double testDuration = 1.0;  // 1 second
+
+  // calculate number of steps needed
+  unsigned int steps = testDuration / dt;
+
+  // compute first order integrated velocity with v1
+  double v1 = v0.x;
+
+  // compute analytical natural frequency
+  double wn = sqrt(stiffness / mass);
+
+  // compute analytical xi (critical damping ratio)
+  double xi = damping / (mass * 2.0 * wn);
+
+  // over/under damped
+  bool underdamped = (xi < 1.0) ? true : false;
+
+  for (unsigned int step = 0; step < steps; ++step)
+  {
+    double t = world->GetSimTime().Double();
+
+    // compute analytical position for underdamped or overdamped case
+    math::Vector3 pa;
+
+    // compute analytical velocity by differentiating position
+    math::Vector3 va;
+
+    if (underdamped)
+    {
+      // compute analytical damping ratio
+      double wd = wn * sqrt(1.0 - xi * xi);
+
+      // compute analytical constants based on initial conditions
+      math::Vector3 a(sqrt(
+        (wd*wd*p0.x*p0.x + (v0.x + xi * wn * p0.x) * (v0.x + xi * wn * p0.x)) /
+        (wd * wd)), 0, 0);
+
+      // compute analytical frequency lag
+      double phi = atan(wd * p0.x / (v0.x + xi * wn * p0.x));
+
+      // compute analytical position
+      pa = a * exp(-xi * wn * (t - t0)) * sin( wd * (t - t0) + phi);
+
+      // compute analytical velocity (by chain rule)
+      va = -xi*wn*pa +
+           wd * a * exp(-xi * wn * (t - t0)) * cos( wd * (t - t0) + phi);
+    }
+    else
+    {
+      // compute analytical damping ratio
+      double wd = wn * sqrt(xi * xi - 1.0);
+
+      // compute analytical constants based on initial conditions
+      math::Vector3 a1 = (-v0 + (-xi + sqrt(xi*xi -1.0))*wn*p0) / (2.0 * wd);
+      math::Vector3 a2 = ( v0 + ( xi + sqrt(xi*xi -1.0))*wn*p0) / (2.0 * wd);
+
+      // compute analytical position
+      pa = exp(-xi * wn * (t - t0)) * (
+           a1 * exp(-wd*wn*(t - t0)) +
+           a2 * exp( wd*wn*(t - t0)));
+
+      // compute analytical velocity (by chain rule)
+      va = -xi*wn*pa +
+           exp(-xi * wn * (t - t0)) * (
+           -wd*wn*a1 * exp(-wd*wn*(t - t0)) +
+            wd*wn*a2 * exp( wd*wn*(t - t0)));
+    }
+
+    // get simulation position and velocity
+    math::Vector3 p = link->GetWorldPose().pos;
+    math::Vector3 v = link->GetWorldLinearVel();
+
+    // compute spring force, reference position is 0
+    math::Vector3 springForce = -stiffness * (p - pr);
+    math::Vector3 damperForce = -damping * v;
+
+    // debug results
+    gzdbg << "engine: [" << _physicsEngine
+          << "] t: [" << t
+          << "] v: [" << v
+          << "] vdebug: [" << v1
+          << "] va: [" << va
+          << "] p: [" << (p - pr)
+          << "] pa: [" << pa
+          << "] fd: [" << springForce + damperForce
+          << "]\n";
+
+    // check results
+    EXPECT_GT(dt, 0);
+
+
+    // apply force to simulate spring force
+    link->SetForce(springForce + damperForce);
+
+    // take a step
+    world->Step(1);
+
+    // compute first order integrated velocity
+    v1 = v1 + dt * (springForce.x + damperForce.x) / mass;
+  }
+}
+
+TEST_P(UnconstrainedForced, LinearSpringDamper)
+{
+  LinearSpringDamper(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// Linear Spring
+////////////////////////////////////////////////////////////////////////
+void UnconstrainedForced::LinearSpring(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -274,15 +451,15 @@ void UnconstrainedForced::SpringLinear(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(UnconstrainedForced, SpringLinear)
+TEST_P(UnconstrainedForced, LinearSpring)
 {
-  SpringLinear(GetParam());
+  LinearSpring(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
 // torsional spring force check angular dynamics
 ////////////////////////////////////////////////////////////////////////
-void UnconstrainedForced::DampedAngular(const std::string &_physicsEngine)
+void UnconstrainedForced::AngularDamper(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -367,7 +544,7 @@ void UnconstrainedForced::DampedAngular(const std::string &_physicsEngine)
     math::Vector3 v = link->GetWorldAngularVel();
 
     // compute damping force
-    math::Vector3 dampingForce = -damping * v;
+    math::Vector3 damperForce = -damping * v;
 
     // debug results
     gzdbg << "engine: [" << _physicsEngine
@@ -377,7 +554,7 @@ void UnconstrainedForced::DampedAngular(const std::string &_physicsEngine)
           << "] va: [" << va
           << "] r: [" << r
           << "] ra: [" << ra
-          << "] fd: [" << dampingForce
+          << "] fd: [" << damperForce
           << "]\n";
 
     // check results
@@ -385,19 +562,19 @@ void UnconstrainedForced::DampedAngular(const std::string &_physicsEngine)
 
 
     // apply force to simulate damping force
-    link->SetTorque(dampingForce);
+    link->SetTorque(damperForce);
 
     // take a step
     world->Step(1);
 
     // compute first order integrated velocity
-    v1 = v1 + dt * dampingForce.x / mass;
+    v1 = v1 + dt * damperForce.x / mass;
   }
 }
 
-TEST_P(UnconstrainedForced, DampedAngular)
+TEST_P(UnconstrainedForced, AngularDamper)
 {
-  DampedAngular(GetParam());
+  AngularDamper(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, UnconstrainedForced,
