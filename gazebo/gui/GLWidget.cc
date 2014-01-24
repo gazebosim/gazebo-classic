@@ -16,6 +16,7 @@
 */
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
