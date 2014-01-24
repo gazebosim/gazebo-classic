@@ -16,7 +16,7 @@
 */
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture,

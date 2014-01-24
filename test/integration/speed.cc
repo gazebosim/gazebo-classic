@@ -15,7 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 using namespace gazebo;
 class SpeedTest : public ServerFixture,

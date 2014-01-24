@@ -16,7 +16,7 @@
 */
 #include <string.h>
 #include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 using namespace gazebo;
 class NonDefaultWorld : public ServerFixture,

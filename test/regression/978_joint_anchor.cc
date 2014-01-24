@@ -17,7 +17,7 @@
 
 #include "ServerFixture.hh"
 #include "gazebo/physics/Joint_TEST.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 using namespace gazebo;
 

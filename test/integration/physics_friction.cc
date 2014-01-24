@@ -20,7 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 using namespace gazebo;
 

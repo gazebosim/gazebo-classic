@@ -18,7 +18,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 const double g_physics_tol = 1e-2;
 

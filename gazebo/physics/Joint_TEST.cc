@@ -19,7 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Joint_TEST.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0

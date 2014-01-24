@@ -52,6 +52,8 @@ set(TEST_TYPE "REGRESSION")
 add_subdirectory(regression)
 add_subdirectory(cmake)
 add_subdirectory(pkgconfig)
+set(TEST_TYPE "ACCURACY")
+add_subdirectory(accuracy)
 
 set(headers ServerFixture.hh)
 gz_install_includes("test" ${headers} ${PROJECT_BINARY_DIR}/test_config.h)

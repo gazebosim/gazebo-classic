@@ -19,7 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "helper_physics_generator.hh"
+#include "test/helpers/helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
