@@ -144,7 +144,7 @@ bool Server::ParseArgs(int argc, char **argv)
   if (this->vm.count("quiet"))
     gazebo::common::Console::Instance()->SetQuiet(true);
   else
-    gazebo::print_version();
+    gazebo::printVersion();
 
   if (this->vm.count("minimal_comms"))
     gazebo::transport::setMinimalComms(true);
@@ -173,7 +173,7 @@ bool Server::ParseArgs(int argc, char **argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 

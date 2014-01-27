@@ -95,7 +95,7 @@ bool parse_args(int _argc, char **_argv)
   }
 
   if (!vm.count("quiet"))
-    gazebo::print_version();
+    gazebo::printVersion();
   else
     gazebo::common::Console::Instance()->SetQuiet(true);
 
@@ -109,7 +109,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 

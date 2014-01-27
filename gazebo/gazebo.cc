@@ -40,7 +40,19 @@ void gazebo::print_version()
 }
 
 /////////////////////////////////////////////////
+void gazebo::printVersion()
+{
+  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
+}
+
+/////////////////////////////////////////////////
 void gazebo::add_plugin(const std::string &_filename)
+{
+  gazebo::addPlugin(_filename);
+}
+
+/////////////////////////////////////////////////
+void gazebo::addPlugin(const std::string &_filename)
 {
   if (_filename.empty())
     return;
@@ -145,8 +157,9 @@ bool gazebo::setupClient(int _argc, char **_argv)
   sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   // Initialize the informational logger. This will log warnings, and
+  // errors.
   if (!gazebo::common::Console::Instance()->IsInitialized())
-    gazebo::common::Console::Instance()->Init("default.log") errors.
+    gazebo::common::Console::Instance()->Init("default.log");
 
   // Load all the system plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =

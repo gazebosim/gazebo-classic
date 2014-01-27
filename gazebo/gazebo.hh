@@ -22,11 +22,12 @@
 
 namespace gazebo
 {
-  void print_version();
-  void add_plugin(const std::string &_filename);
+  /// \brief Output version information to the terminal.
+  void printVersion();
 
-  /// \brief Find a file in the gazebo search paths
-  std::string find_file(const std::string &_file);
+  /// \brief Add a system plugin.
+  /// \param[in] _filename Path to the plugin.
+  void addPlugin(const std::string &_filename);
 
   /// \brief Start a gazebo server. This starts transportation, and makes it
   /// possible to create worlds.
@@ -56,28 +57,38 @@ namespace gazebo
   bool shutdown();
 
   /// \brief Deprecated.
-  /// \sa gazebo::setupClient
-  /// \sa gazebo::setupServer
-  bool load(int _argc = 0, char **_argv = 0) GAZEBO_DEPRECATED(3.0);
+  /// \sa gazebo::printVersion.
+  void print_version() GAZEBO_DEPRECATED(2.3);
 
   /// \brief Deprecated.
-  /// \sa gazebo::setupClient
-  /// \sa gazebo::setupServer
-  bool init() GAZEBO_DEPRECATED(3.0);
+  /// \sa gazebo::addPlugin.
+  void add_plugin(const std::string &_filename) GAZEBO_DEPRECATED(2.3);
+
+  /// \brief Not implemented.
+  /// \sa gazebo::common::findFile.
+  std::string find_file(const std::string &_file) GAZEBO_DEPRECATED(2.3);
 
   /// \brief Deprecated.
-  /// \sa gazebo::setupClient
-  /// \sa gazebo::setupServer
-  void run() GAZEBO_DEPRECATED(3.0);
+  /// \sa gazebo::setupClient.
+  /// \sa gazebo::setupServer.
+  bool load(int _argc = 0, char **_argv = 0) GAZEBO_DEPRECATED(2.3);
 
   /// \brief Deprecated.
-  /// \sa gazebo::shutdown
-  void stop() GAZEBO_DEPRECATED(3.0);
+  /// \sa gazebo::setupClient.
+  /// \sa gazebo::setupServer.
+  bool init() GAZEBO_DEPRECATED(2.3);
 
   /// \brief Deprecated.
-  /// \sa gazebo::shutdown
-  void fini() GAZEBO_DEPRECATED(3.0);
+  /// \sa gazebo::setupClient.
+  /// \sa gazebo::setupServer.
+  void run() GAZEBO_DEPRECATED(2.3);
 
+  /// \brief Deprecated.
+  /// \sa gazebo::shutdown.
+  void stop() GAZEBO_DEPRECATED(2.3);
+
+  /// \brief Deprecated.
+  /// \sa gazebo::shutdown.
+  void fini() GAZEBO_DEPRECATED(2.3);
 }
-
 #endif
