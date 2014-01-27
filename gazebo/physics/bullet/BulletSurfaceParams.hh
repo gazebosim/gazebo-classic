@@ -15,12 +15,14 @@
  *
 */
 
-#ifndef _SURFACEPARAMS_HH_
-#define _SURFACEPARAMS_HH_
+#ifndef _BULLETSURFACEPARAMS_HH_
+#define _BULLETSURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 namespace gazebo
 {
@@ -29,36 +31,36 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
-    /// \brief SurfaceParams defines various Surface contact parameters.
-    /// These parameters defines the properties of a
-    /// physics::Contact constraint.
-    class SurfaceParams
+    /// \brief Bullet surface parameters.
+    class BulletSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
-      public: SurfaceParams();
+      public: BulletSurfaceParams();
 
       /// \brief Destructor.
-      public: virtual ~SurfaceParams();
+      public: virtual ~BulletSurfaceParams();
 
       /// \brief Load the contact params.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Fill in a surface message.
-      /// \param[in] _msg Message to fill with this object's values.
+      // Documentation inherited.
       public: virtual void FillMsg(msgs::Surface &_msg);
 
-      /// \brief Process a surface message.
-      /// \param[in] _msg Message to read values from.
+      // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
-      /// \brief Allow collision checking without generating a contact joint.
-      public: bool collideWithoutContact;
+      /// \brief Dry friction coefficient in the primary friction direction
+      ///        as defined by the friction pyramid.  This is fdir1 if defined,
+      ///        otherwise, a vector constrained to be perpendicular to the
+      ///        contact normal in the global y-z plane is used.
+      public: double mu1;
 
-      /// \brief Custom collision filtering used when collideWithoutContact is
-      /// true.
-      public: unsigned int collideWithoutContactBitmask;
+      /// \brief Dry friction coefficient in the second friction direction
+      ///        as defined by the friction pyramid.  This is fdir1 if defined,
+      ///        otherwise, a vector constrained to be perpendicular to the
+      ///        contact normal in the global y-z plane is used.
+      public: double mu2;
     };
     /// \}
   }
