@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,6 +162,19 @@ void SphereAtlasTestPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SphereAtlasTestPlugin::Init()
 {
+}
+
+/////////////////////////////////////////////////
+void SphereAtlasTestPlugin::Reset()
+{
+  gzlog << "SphereAtlasTestPlugin: \n"
+        << "  This is not a typical usage of plugin Reset function,\n"
+        << "  we are doing this just for testing purposes.\n";
+  if (this->updateConnection)
+  {
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+    this->updateConnection.reset();
+  }
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,10 +119,12 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
   EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  // Orientation should be identity, since it is reported relative
+  // to reference pose.
+  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorld)
@@ -204,10 +206,12 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  // Orientation should be identity, since it is reported relative
+  // to reference pose.
+  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorldNoise)
@@ -289,10 +293,12 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
-  EXPECT_NEAR(orientation.x, testPose.rot.x, IMU_TOL);
-  EXPECT_NEAR(orientation.y, testPose.rot.y, IMU_TOL);
-  EXPECT_NEAR(orientation.z, testPose.rot.z, IMU_TOL);
-  EXPECT_NEAR(orientation.w, testPose.rot.w, IMU_TOL);
+  // Orientation should be identity, since it is reported relative
+  // to reference pose.
+  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorldBias)

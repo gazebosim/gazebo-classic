@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
+
+#include <boost/thread.hpp>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -291,9 +293,14 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
   math::Vector3 v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     v = SimbodyPhysics::Vec3ToVector3(
       this->masterMobod.findStationVelocityInGround(
       this->simbodyPhysics->integ->getState(), station));
+  }
   else
     gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
            << " not yet initialized\n";
@@ -313,6 +320,11 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
     SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
     SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
     SimTK::Vec3 p_W(R_WF * p_F);
+
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
     const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
       this->simbodyPhysics->integ->getState());
     SimTK::Vec3 p_B(~R_WL * p_W);
@@ -334,6 +346,9 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
        this->simbodyPhysics->integ->getState());
     v = SimbodyPhysics::Vec3ToVector3(
@@ -355,6 +370,9 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
+  // lock physics update mutex to ensure thread safety
+  boost::recursive_mutex::scoped_lock lock(
+    *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
   SimTK::Vec3 w =
     this->masterMobod.getBodyAngularVelocity(
     this->simbodyPhysics->integ->getState());

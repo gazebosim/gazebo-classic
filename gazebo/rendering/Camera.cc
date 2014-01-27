@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1045,8 +1045,13 @@ bool Camera::SaveFrame(const unsigned char *_image,
 
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
 
+  // OGRE 1.9 renames codeToFile to encodeToFile
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  pCodec->codeToFile(stream, filename, codecDataPtr);
+  #else
+  pCodec->encodeToFile(stream, filename, codecDataPtr);
+  #endif
   return true;
 }
 

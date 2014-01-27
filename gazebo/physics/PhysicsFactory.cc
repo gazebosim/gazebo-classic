@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ void RegisterSimbodyPhysics();
   void RegisterBulletPhysics();
 #endif
 
+#ifdef HAVE_DART
+  void RegisterDARTPhysics();
+#endif
+
 using namespace gazebo;
 using namespace physics;
 
@@ -53,6 +57,10 @@ void PhysicsFactory::RegisterAll()
 
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  RegisterDARTPhysics();
 #endif
 }
 

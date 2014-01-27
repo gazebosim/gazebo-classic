@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,12 @@ class HeightmapTest : public ServerFixture,
 /////////////////////////////////////////////////
 void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
   Load("worlds/heightmap_test.world", true, _physicsEngine);
 
   // Make sure the render engine is available.
@@ -94,6 +100,12 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
   Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model);
@@ -120,6 +132,12 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
   Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model);

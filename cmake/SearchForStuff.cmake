@@ -136,6 +136,17 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find DART
+  find_package(DARTCore)
+  if (DARTCore_FOUND)
+    message (STATUS "Looking for DARTCore - found")
+    set (HAVE_DART TRUE)
+  else()
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    set (HAVE_DART FALSE)
+  endif()
+
+  #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
   if (NOT tinyxml_include_dir)
@@ -202,9 +213,14 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  # There are some runtime problems to solve with ogre-1.9. 
+  # Please read gazebo issues: 994, 995, 996
+  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  else (NOT OGRE_FOUND)
+  elseif (NOT MAX_VALID_OGRE_FOUND)
+    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
+  else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
     set(ogre_libraries ${ogre_libraries};${OGRE_LIBRARIES})
@@ -312,7 +328,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet>=2.81)
+  # First and preferred option is to look for bullet standard pkgconfig, 
+  # so check it first. if it is not present, check for the OSRF 
+  # custom bullet2.82.pc file
+  pkg_check_modules(BULLET bullet>=2.82)
+  if (NOT BULLET_FOUND)
+     pkg_check_modules(BULLET bullet2.82>=2.82)
+  endif()
+
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
     add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )

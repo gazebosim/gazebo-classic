@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,19 @@
 /// \brief Test Console::Init and Console::Log
 TEST(Console_TEST, InitAndLog)
 {
+  // We need to create the log directory if needed.
+  boost::filesystem::path logDirectory(getenv("HOME"));
+  logDirectory = logDirectory / ".gazebo";
+  if (!boost::filesystem::exists(logDirectory))
+    boost::filesystem::create_directories(logDirectory);
+
   // Initialize Console
   gazebo::common::Console::Instance()->Init("test.log");
-
   EXPECT_TRUE(getenv("HOME") != NULL);
 
   // Make sure that the log file has been created
-  std::string logPath = getenv("HOME");
-  boost::filesystem::path testLog(logPath);
-  testLog = testLog / ".gazebo/test.log";
+  boost::filesystem::path testLog;
+  testLog = logDirectory / "test.log";
   EXPECT_TRUE(boost::filesystem::exists(testLog));
 
   // Test Console::Log
