@@ -22,40 +22,6 @@
 
 namespace gazebo
 {
-  /// \brief Output version information to the terminal.
-  void printVersion();
-
-  /// \brief Add a system plugin.
-  /// \param[in] _filename Path to the plugin.
-  void addPlugin(const std::string &_filename);
-
-  /// \brief Start a gazebo server. This starts transportation, and makes it
-  /// possible to create worlds.
-  /// \param[in] _argc Number of commandline arguments.
-  /// \param[in] _argv The commandline arguments.
-  /// \return True on success
-  bool setupServer(int _argc = 0, char **_argv = 0);
-
-  /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation
-  /// \param[in] _argc Number of commandline arguments.
-  /// \param[in] _argv The commandline arguments.
-  /// \return True on success
-  bool setupClient(int _argc = 0, char **_argv = 0);
-
-  /// \brief Create and load a new world from an SDF world file.
-  /// \param[in] _worldFile The world file to load from.
-  /// \return Pointer to the created world. NULL on error.
-  gazebo::physics::WorldPtr loadWorld(const std::string &_worldFile);
-
-  /// \brief Run a world for a specific number of iterations.
-  /// \param[in] _world Pointer to a world.
-  /// \param[in] _iterations Number of iterations to execute.
-  void runWorld(gazebo::physics::WorldPtr _world, unsigned int _iterations);
-
-  /// \brief Stop and cleanup simulation.
-  bool shutdown();
-
   /// \brief Deprecated.
   /// \sa gazebo::printVersion.
   void print_version() GAZEBO_DEPRECATED(2.3);
@@ -90,5 +56,39 @@ namespace gazebo
   /// \brief Deprecated.
   /// \sa gazebo::shutdown.
   void fini() GAZEBO_DEPRECATED(2.3);
+
+  /// \brief Output version information to the terminal.
+  void printVersion();
+
+  /// \brief Add a system plugin.
+  /// \param[in] _filename Path to the plugin.
+  void addPlugin(const std::string &_filename);
+
+  /// \brief Start a gazebo server. This starts transportation, and makes it
+  /// possible to create worlds.
+  /// \param[in] _argc Number of commandline arguments.
+  /// \param[in] _argv The commandline arguments.
+  /// \return True on success
+  bool setupServer(int _argc = 0, char **_argv = 0);
+
+  /// \brief Start a gazebo client. This starts transportation, and makes it
+  /// possible to connect to a running simulation
+  /// \param[in] _argc Number of commandline arguments.
+  /// \param[in] _argv The commandline arguments.
+  /// \return True on success
+  bool setupClient(int _argc = 0, char **_argv = 0);
+
+  /// \brief Create and load a new world from an SDF world file.
+  /// \param[in] _worldFile The world file to load from.
+  /// \return Pointer to the created world. NULL on error.
+  gazebo::physics::WorldPtr loadWorld(const std::string &_worldFile);
+
+  /// \brief Run a world for a specific number of iterations.
+  /// \param[in] _world Pointer to a world.
+  /// \param[in] _iterations Number of iterations to execute.
+  void runWorld(gazebo::physics::WorldPtr _world, unsigned int _iterations);
+
+  /// \brief Stop and cleanup simulation.
+  bool shutdown();
 }
 #endif

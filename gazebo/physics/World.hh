@@ -90,12 +90,6 @@ namespace gazebo
       /// A value of zero disables run stop.
       public: void Run(unsigned int _iterations = 0);
 
-      /// \brief Run the world. This call blocks.
-      /// Run the update loop.
-      /// \param[in] _iterations Run for this many iterations, then stop.
-      /// A value of zero disables run stop.
-      public: void RunBlocking(unsigned int _iterations = 0);
-
       /// \brief Return the running state of the world.
       /// \return True if the world is running.
       public: bool GetRunning() const;
@@ -681,6 +675,13 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \todo In gazebo 3.0 this should be move to the proper section.
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
     };
     /// \}
   }

@@ -44,10 +44,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelRightMenu();
 
-      /// \brief Initialize the right menu.
-      /// \return True on success.
-      public: bool Init();
-
       /// \brief Show the right menu.
       /// \param[in] _modelName Name of the model that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
@@ -59,7 +55,6 @@ namespace gazebo
 
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
-
 
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
@@ -104,6 +99,11 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
+
+      /// \todo In gazebo 3.0 move this function to the correct section.
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh
