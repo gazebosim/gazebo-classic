@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: Local Gazebo configuration
- * Author: Nate Koenig, Jordi Polo
- * Date: 3 May 2008
- */
 
 #include <assert.h>
 #include <dirent.h>

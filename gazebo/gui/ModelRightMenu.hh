@@ -44,6 +44,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelRightMenu();
 
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
+
       /// \brief Show the right menu.
       /// \param[in] _modelName Name of the model that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click

@@ -186,9 +186,6 @@ namespace gazebo
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Node for communications.
-      private: transport::NodePtr node;
-
       /// \brief The type of render path used.
       private: RenderPathType renderPathType;
 

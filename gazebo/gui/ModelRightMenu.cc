@@ -35,11 +35,6 @@ ModelRightMenu::ModelRightMenu()
   KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
         boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelRightMenu::OnRequest, this);
-
   this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
@@ -104,6 +99,17 @@ ModelRightMenu::ModelRightMenu()
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+}
+
+//////////////////////////////////////////////////
+bool ModelRightMenu::Init()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelRightMenu::OnRequest, this);
+
+  return true;
 }
 
 /////////////////////////////////////////////////

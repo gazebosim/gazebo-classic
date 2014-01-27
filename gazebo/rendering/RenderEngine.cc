@@ -249,8 +249,6 @@ void RenderEngine::Init()
   if (this->renderPathType == NONE)
     return;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -283,10 +281,6 @@ void RenderEngine::Fini()
 {
   if (!this->initialized)
     return;
-
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
 
   this->connections.clear();
 

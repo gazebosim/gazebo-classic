@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,59 @@ namespace gazebo
   void print_version();
   void add_plugin(const std::string &_filename);
 
-  bool load(int _argc = 0, char **_argv = 0);
-  bool init();
-  void run();
-  void stop();
-  void fini();
-
   /// \brief Find a file in the gazebo search paths
   std::string find_file(const std::string &_file);
+
+  /// \brief Start a gazebo server. This starts transportation, and makes it
+  /// possible to create worlds.
+  /// \param[in] _argc Number of commandline arguments.
+  /// \param[in] _argv The commandline arguments.
+  /// \return True on success
+  bool setupServer(int _argc = 0, char **_argv = 0);
+
+  /// \brief Start a gazebo client. This starts transportation, and makes it
+  /// possible to connect to a running simulation
+  /// \param[in] _argc Number of commandline arguments.
+  /// \param[in] _argv The commandline arguments.
+  /// \return True on success
+  bool setupClient(int _argc = 0, char **_argv = 0);
+
+  /// \brief Create and load a new world from an SDF world file.
+  /// \param[in] _worldFile The world file to load from.
+  /// \return Pointer to the created world. NULL on error.
+  gazebo::physics::WorldPtr loadWorld(const std::string &_worldFile);
+
+  /// \brief Run a world for a specific number of iterations.
+  /// \param[in] _world Pointer to a world.
+  /// \param[in] _iterations Number of iterations to execute.
+  void runWorld(gazebo::physics::WorldPtr _world, unsigned int _iterations);
+
+  /// \brief Stop and cleanup simulation.
+  bool shutdown();
+
+  /// \brief Deprecated.
+  /// \sa gazebo::setupClient
+  /// \sa gazebo::setupServer
+  bool load(int _argc = 0, char **_argv = 0) GAZEBO_DEPRECATED(3.0);
+
+  /// \brief Deprecated.
+  /// \sa gazebo::setupClient
+  /// \sa gazebo::setupServer
+  bool init() GAZEBO_DEPRECATED(3.0);
+
+  /// \brief Deprecated.
+  /// \sa gazebo::setupClient
+  /// \sa gazebo::setupServer
+  void run() GAZEBO_DEPRECATED(3.0);
+
+  /// \brief Deprecated.
+  /// \sa gazebo::shutdown
+  void stop() GAZEBO_DEPRECATED(3.0);
+
+  /// \brief Deprecated.
+  /// \sa gazebo::shutdown
+  void fini() GAZEBO_DEPRECATED(3.0);
+
 }
 
 #endif

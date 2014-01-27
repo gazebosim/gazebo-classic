@@ -60,8 +60,8 @@ void print_usage()
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
-  gazebo::stop();
   gazebo::gui::stop();
+  gazebo::shutdown();
 }
 
 //////////////////////////////////////////////////
@@ -144,6 +144,7 @@ namespace gazebo
 /////////////////////////////////////////////////
 void gui::init()
 {
+  g_modelRightMenu->Init();
   g_main_win->show();
   g_main_win->Init();
 }
@@ -190,16 +191,11 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
     return false;
-
-  gazebo::run();
 
   gazebo::gui::load();
   gazebo::gui::init();
-
-  if (!gazebo::init())
-    return false;
 
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
@@ -213,15 +209,15 @@ bool gui::run(int _argc, char **_argv)
 
   g_app->exec();
 
-  gazebo::fini();
   gazebo::gui::fini();
+  gazebo::shutdown();
   return true;
 }
 
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  gazebo::stop();
+  gazebo::shutdown();
   g_active_camera.reset();
   g_app->quit();
 }
