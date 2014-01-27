@@ -57,12 +57,12 @@ void Console::Init(const std::string &_logFilename)
     boost::system::error_code ec;
     boost::filesystem::rename(logPath, newPath, ec);
     if (ec == 0)
-      gzwarn << "Deprecated log directory [" << logPath
-             << "] renamed to [" << newPath << "]" << std::endl;
+      std::cerr << "Deprecated log directory [" << logPath
+                << "] renamed to [" << newPath << "]" << std::endl;
     else
     {
-      gzerr << "Unable to rename deprecated log directory [" << logPath
-            << "] to [" << newPath << "]. Reason: " << ec.message();
+      std::cerr << "Unable to rename deprecated log directory [" << logPath
+                << "] to [" << newPath << "]. Reason: " << ec.message();
       return;
     }
   }
