@@ -33,7 +33,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
 int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::clientSetup(_argc, _argv);
+  gazebo::setupClient(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
