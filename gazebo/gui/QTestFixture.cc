@@ -111,9 +111,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
 
   this->server->Run();
 
-  if (_createScene)
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
-
   this->server->Fini();
 
   delete this->server;

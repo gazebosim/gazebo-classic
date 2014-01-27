@@ -230,8 +230,6 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
 
   this->server->Run();
 
-  rendering::remove_scene(gazebo::physics::get_world()->GetName());
-
   ASSERT_NO_THROW(this->server->Fini());
 
   delete this->server;
