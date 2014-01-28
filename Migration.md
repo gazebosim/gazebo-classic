@@ -130,6 +130,7 @@
     + Base_V::iterator childrenEnd
     
 1. **gazebo/sensors/Noise.hh**
+    + enum NoiseType::GAUSSIAN_QUANTIZED
     + double Noise::GetMean() const
     + double Noise::GetStdDev() const
     + double Noise::GetBias() const
