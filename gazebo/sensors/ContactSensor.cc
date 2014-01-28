@@ -50,12 +50,6 @@ ContactSensor::ContactSensor()
 ContactSensor::~ContactSensor()
 {
   this->collisions.clear();
-
-  std::string entityName =
-      this->world->GetEntity(this->parentName)->GetScopedName();
-  physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-  mgr->RemoveFilter(entityName);
 }
 
 //////////////////////////////////////////////////

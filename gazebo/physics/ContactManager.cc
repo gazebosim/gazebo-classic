@@ -58,6 +58,7 @@ ContactManager::~ContactManager()
   }
   this->customContactPublishers.clear();
   delete this->customMutex;
+  this->customMutex = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -86,7 +87,6 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   // custom contact publishers then don't create any contact information.
   // This is a signal to the Physics engine that it can skip the extra
   // processing necessary to get back contact information.
-
 
   std::vector<ContactPublisher *> publishers;
   {
