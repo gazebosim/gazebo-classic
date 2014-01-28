@@ -131,7 +131,6 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     else
     {
       this->quantized = true;
-      this->type = Noise::GAUSSIAN_QUANTIZED;
     }
   }
 }
