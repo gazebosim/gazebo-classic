@@ -34,7 +34,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
   std::string typeString = _sdf->Get<std::string>("type");
 
   NoisePtr noise;
-  if (typeString == "gaussian")
+  if (typeString == "gaussian" ||
+      typeString == "gaussian_quantized")
   {
     if (_sensorType == "camera" || _sensorType == "depth" ||
       _sensorType == "multicamera")
@@ -85,6 +86,14 @@ void Noise::Load(sdf::ElementPtr _sdf)
     this->type = NONE;
   else if (typeString == "gaussian")
     this->type = GAUSSIAN;
+  else if (typeString == "gaussian_quantized")
+  {
+    // Include legacy support for "gaussian_quantized" type string
+    // It was released in several versions of sdformat but removed
+    // in sdformat pull request #81
+    // https://bitbucket.org/osrf/sdformat/pull-request/81
+    this->type = GAUSSIAN;
+  }
   else if (typeString == "custom")
     this->type = CUSTOM;
   else
