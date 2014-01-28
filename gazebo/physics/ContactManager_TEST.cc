@@ -50,7 +50,6 @@ TEST_F(ContactManagerTest, CreateFilter)
   EXPECT_TRUE(!manager->HasFilter(emptyName));
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 
-
   // Verify we get a valid topic name after passing in collisions
   std::map<std::string, physics::CollisionPtr> collisionMap;
   collisionMap["test_collision"] = physics::CollisionPtr();

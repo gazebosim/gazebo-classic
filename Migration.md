@@ -65,6 +65,11 @@
 
 ### Additions
 
+1. **gazebo/physics/ContactManager.hh**
+    + unsigned int GetFilterCount()
+    + bool HasFilter(const std::string &_name);
+    + void RemoveFilter(const std::string &_name);
+
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
@@ -93,7 +98,7 @@
 
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
-    
+
 1. **gazebo/sensors/Noise.hh**
     + double Noise::GetMean() const
     + double Noise::GetStdDev() const
