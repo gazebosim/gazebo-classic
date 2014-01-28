@@ -300,7 +300,14 @@ void Scene::Init()
 
   // Create Sky. This initializes SkyX, and makes it invisible. A Sky
   // message must be received (via a scene message or on the ~/sky topic).
-  this->SetSky();
+  try
+  {
+    this->SetSky();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to create the sky\n";
+  }
 
   // Create Fog
   if (this->sdf->HasElement("fog"))

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifdef  __APPLE__
 # include <QtCore/qglobal.h>
@@ -154,14 +150,48 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
-  this->scenes.push_back(scene);
-
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
+  if (!this->initialized)
+  {
     gzerr << "RenderEngine is not initialized\n";
+    return ScenePtr();
+  }
+
+  ScenePtr scene;
+
+  try
+  {
+    scene.reset(new Scene(_name, _enableVisualizations, _isServer));
+  }
+  catch(...)
+  {
+    gzerr << "Failed to instantiate a scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Load();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to load scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Init();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to initialize scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  this->scenes.push_back(scene);
 
   rendering::Events::createScene(_name);
 
@@ -316,7 +346,8 @@ void RenderEngine::Fini()
       delete this->root;
     }
     catch(...)
-    { }
+    {
+    }
   }
   this->root = NULL;
 

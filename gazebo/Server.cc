@@ -52,6 +52,7 @@ bool Server::stop = true;
 Server::Server()
 {
   this->receiveMutex = new boost::mutex();
+  this->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -266,7 +267,7 @@ bool Server::ParseArgs(int argc, char **argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->stop && !transport::is_stopped();
+  return !this->stop && this->initialized;
 }
 
 /////////////////////////////////////////////////
@@ -447,6 +448,8 @@ void Server::Run()
 
   // Run each world. Each world starts a new thread
   physics::run_worlds(iterations);
+
+  this->initialized = true;
 
   // Update the sensors.
   while (!this->stop && physics::worlds_running())
