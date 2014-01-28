@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include <boost/thread.hpp>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -517,7 +518,7 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    assert(_numFragments > 0);  // must be at least 1 for the master
+    GZ_ASSERT(_numFragments > 0, "_numFragments must be at least 1 for the master");
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());

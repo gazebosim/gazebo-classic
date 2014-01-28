@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
+#include "test/integration/joint_test.hh"
 
 using namespace gazebo;
 
-class Issue978Test : public Joint_TEST
+class Issue978Test : public JointTest
 {
   public: void JointAnchor(const std::string &_physicsEngine);
 };
