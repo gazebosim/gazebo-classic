@@ -38,7 +38,7 @@ void ImagesView_TEST::Construction()
     QVERIFY(frame->children().size() == 1);
 
     view->hide();
-    delete view;
+    // delete view;
   }
 }
 
@@ -99,7 +99,7 @@ void ImagesView_TEST::Switch()
     }
 
     view->hide();
-    delete view;
+    // delete view;
   }
 }
 
