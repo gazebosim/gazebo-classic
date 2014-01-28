@@ -147,6 +147,15 @@ namespace gazebo
       /// param[in] _name Filter name.
       public: void RemoveFilter(const std::string &_name);
 
+      /// \brief Get the number of filters in the contact manager.
+      /// return Number of filters
+      public: unsigned int GetFilterCount();
+
+      /// \brief Check if a filter with the specified name exists.
+      /// param[in] _name Name of filter.
+      /// return True if the filter exists.
+      public: bool HasFilter(const std::string &_name);
+
       private: std::vector<Contact*> contacts;
 
       private: unsigned int contactIndex;

@@ -361,3 +361,18 @@ void ContactManager::RemoveFilter(const std::string &_name)
     this->customContactPublishers.erase(iter);
   }
 }
+
+/////////////////////////////////////////////////
+unsigned int ContactManager::GetFilterCount()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  return this->customContactPublishers.size();
+}
+
+/////////////////////////////////////////////////
+bool ContactManager::HasFilter(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  return this->customContactPublishers.find(_name) !=
+      this->customContactPublishers.end();
+}
