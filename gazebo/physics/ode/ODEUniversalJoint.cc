@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -57,7 +57,8 @@ math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void ODEUniversalJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -69,7 +70,7 @@ void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
+math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -87,7 +88,7 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
@@ -115,7 +116,7 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
+math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -133,7 +134,7 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEUniversalJoint::GetVelocity(int _index) const
+double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
 
@@ -151,7 +152,7 @@ double ODEUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetVelocity(int _index, double _angle)
+void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
   if (_index == 0)
     this->SetParam(dParamVel, _angle);
@@ -160,7 +161,7 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetForceImpl(int _index, double _effort)
+void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->jointId)
   {
@@ -174,7 +175,7 @@ void ODEUniversalJoint::SetForceImpl(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetMaxForce(int _index, double _t)
+void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
 {
   if (_index == 0)
     this->SetParam(dParamFMax, _t);
@@ -183,7 +184,7 @@ void ODEUniversalJoint::SetMaxForce(int _index, double _t)
 }
 
 //////////////////////////////////////////////////
-double ODEUniversalJoint::GetMaxForce(int _index)
+double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
   if (_index == 0)
     return this->GetParam(dParamFMax);
@@ -192,7 +193,7 @@ double ODEUniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetParam(int _parameter, double _value)
+void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
 

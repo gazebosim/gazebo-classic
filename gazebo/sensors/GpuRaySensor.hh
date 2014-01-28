@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,9 +67,8 @@ namespace gazebo
       /// \brief Initialize the ray
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
@@ -251,6 +250,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive();
 
+      /// brief Render the camera.
+      private: void Render();
+
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
 
@@ -299,26 +301,8 @@ namespace gazebo
       /// \brief Publisher to publish ray sensor data
       private: transport::PublisherPtr scanPub;
 
-      // Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      // If true, apply the noise model specified by other noise parameters
-      private: bool noiseActive;
-
-      // Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
-      // from which we sample
-      private: double noiseMean;
-
-      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
-      // the distibution from which we sample
-      private: double noiseStdDev;
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }

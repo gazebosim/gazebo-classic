@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,6 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
-      /// \brief Qt call back when the step value in the spinbox changed
-      private slots: void OnStepValueChanged(int _value);
-
       private slots: virtual void update();
 
       /// \brief Qt callback to clear overlay message if a duration is
@@ -116,9 +113,6 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
-
-      /// \brief Tool button that holds the step widget
-      private: QToolButton *stepButton;
     };
   }
 }

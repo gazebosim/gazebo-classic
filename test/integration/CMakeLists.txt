@@ -21,19 +21,30 @@ if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
+if(HAVE_DART)
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
+endif()
 
 set(tests
   bandwidth.cc
   contact_sensor.cc
+  dem.cc
   factory.cc
   file_handling.cc
   gripper.cc
   imu.cc
+  joint_force_torque.cc
+  joint_spawn.cc
+  joint_test.cc
   laser.cc
   model_database.cc
+  noise.cc
   nondefault_world.cc
   physics.cc
+  physics_friction.cc
   physics_msgs.cc
+  physics_thread_safe.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
@@ -54,6 +65,7 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 endif()
 

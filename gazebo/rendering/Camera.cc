@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <sdf/sdf.hh>
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -44,56 +45,6 @@ using namespace rendering;
 
 
 unsigned int CameraPrivate::cameraCounter = 0;
-
-namespace gazebo
-{
-namespace rendering
-{
-// We'll create an instance of this class for each camera, to be used to inject
-// random values on each render call.
-class GaussianNoiseCompositorListener
-  : public Ogre::CompositorInstance::Listener
-{
-  /// \brief Constructor, setting mean and standard deviation.
-  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
-      mean(_mean), stddev(_stddev) {}
-
-  /// \brief Callback that OGRE will invoke for us on each render call
-  public: virtual void notifyMaterialRender(unsigned int _pass_id,
-                                            Ogre::MaterialPtr & _mat)
-  {
-    // modify material here (wont alter the base material!), called for
-    // every drawn geometry instance (i.e. compositor render_quad)
-
-    // Sample three values within the range [0,1.0] and set them for use in
-    // the fragment shader, which will interpret them as offsets from (0,0)
-    // to use when computing pseudo-random values.
-    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0));
-    // These calls are setting parameters that are declared in two places:
-    // 1. media/materials/scripts/gazebo.material, in
-    //    fragment_program Gazebo/GaussianCameraNoiseFS
-    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("offsets", offsets);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("mean", (Ogre::Real)this->mean);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("stddev", (Ogre::Real)this->stddev);
-  }
-
-  /// \brief Mean that we'll pass down to the GLSL fragment shader.
-  private: double mean;
-  /// \brief Standard deviation that we'll pass down to the GLSL fragment
-  /// shader.
-  private: double stddev;
-};
-}  // namespace rendering
-}  // namespace gazebo
 
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_name, ScenePtr _scene,
@@ -231,30 +182,6 @@ void Camera::Load()
     this->SetHFOV(angle);
   }
 
-  // Handle noise model settings.
-  this->dataPtr->noiseActive = false;
-  if (this->sdf->HasElement("noise"))
-  {
-    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->dataPtr->noiseType = CameraPrivate::GAUSSIAN;
-      this->dataPtr->noiseMean = noiseElem->Get<double>("mean");
-      this->dataPtr->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->dataPtr->noiseActive = true;
-      this->dataPtr->gaussianNoiseCompositorListener.reset(new
-        GaussianNoiseCompositorListener(this->dataPtr->noiseMean,
-          this->dataPtr->noiseStdDev));
-      gzlog << "applying Gaussian noise model with mean "
-        << this->dataPtr->noiseMean <<
-        " and stddev " << this->dataPtr->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
-  }
-
   // Only create a command subscription for real cameras. Ignore camera's
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
@@ -296,12 +223,6 @@ void Camera::Fini()
   this->connections.clear();
   this->dataPtr->node.reset();
 
-  if (this->dataPtr->gaussianNoiseCompositorListener)
-  {
-    this->dataPtr->gaussianNoiseInstance->removeListener(
-      this->dataPtr->gaussianNoiseCompositorListener.get());
-  }
-
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
   if (this->renderTarget && this->scene->GetInitialized())
@@ -309,6 +230,8 @@ void Camera::Fini()
 
   this->viewport = NULL;
   this->renderTarget = NULL;
+
+  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -350,8 +273,8 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      this->TrackVisualImpl((*iter).data());
-      erase = true;
+      if (this->TrackVisualImpl((*iter).data()))
+        erase = true;
     }
     else if ((*iter).request() == "attach_visual")
     {
@@ -477,24 +400,13 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // Render, but don't swap buffers.
-    this->renderTarget->update(false);
-
-    this->lastRenderWallTime = common::Time::GetWallTime();
+    this->renderTarget->update();
   }
 }
 
 //////////////////////////////////////////////////
-common::Time Camera::GetLastRenderWallTime()
+void Camera::ReadPixelBuffer()
 {
-  return this->lastRenderWallTime;
-}
-
-//////////////////////////////////////////////////
-void Camera::PostRender()
-{
-  this->renderTarget->swapBuffers();
-
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
@@ -515,8 +427,67 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-    this->viewport->getTarget()->copyContentsToMemory(box);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+    // Case for UserCamera where there is no RenderTexture but
+    // a RenderTarget (RenderWindow) exists. We can not call SetRenderTarget
+    // because that overrides the this->renderTarget variable
+    if (this->renderTarget && !this->renderTexture)
+    {
+      // Create the render texture
+      this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
+        this->renderTarget->getName() + "_tex",
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(),
+        this->GetImageHeight(),
+        0,
+        (Ogre::PixelFormat)this->imageFormat,
+        Ogre::TU_RENDERTARGET)).getPointer();
+        Ogre::RenderTexture *rtt
+            = this->renderTexture->getBuffer()->getRenderTarget();
 
+      // Setup the viewport to use the texture
+      Ogre::Viewport *vp = rtt->addViewport(this->camera);
+      vp->setClearEveryFrame(true);
+      vp->setShadowsEnabled(true);
+      vp->setOverlaysEnabled(false);
+    }
+
+    // This update is only needed for client side data captures
+    if (this->renderTexture->getBuffer()->getRenderTarget()
+        != this->renderTarget)
+      this->renderTexture->getBuffer()->getRenderTarget()->update();
+
+    // The code below is equivalent to
+    // this->viewport->getTarget()->copyContentsToMemory(box);
+    // which causes problems on some machines if running ogre-1.7.4
+    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    pixelBuffer = this->renderTexture->getBuffer();
+    pixelBuffer->blitToMemory(box);
+#else
+    // There is a fix in ogre-1.8 for a buffer overrun problem in
+    // OgreGLXWindow.cpp's copyContentsToMemory(). It fixes reading
+    // pixels from buffer into memory.
+    this->viewport->getTarget()->copyContentsToMemory(box);
+#endif
+  }
+}
+
+//////////////////////////////////////////////////
+common::Time Camera::GetLastRenderWallTime()
+{
+  return this->lastRenderWallTime;
+}
+
+//////////////////////////////////////////////////
+void Camera::PostRender()
+{
+  this->ReadPixelBuffer();
+
+  this->lastRenderWallTime = common::Time::GetWallTime();
+
+  if (this->newData && (this->captureData || this->captureDataOnce))
+  {
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->GetFrameFilename());
@@ -529,6 +500,8 @@ void Camera::PostRender()
       this->SaveFrame(this->GetFrameFilename());
     }
 
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
     const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
@@ -552,12 +525,6 @@ void Camera::PostRender()
   }
 
   this->newData = false;
-}
-
-//////////////////////////////////////////////////
-math::Pose Camera::GetWorldPose()
-{
-  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
@@ -587,10 +554,7 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
-  math::Pose pose;
-  pose.pos = Conversions::Convert(this->camera->getDerivedPosition());
-  pose.rot = Conversions::Convert(this->camera->getDerivedOrientation());
-  return pose;
+  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
@@ -1090,8 +1054,13 @@ bool Camera::SaveFrame(const unsigned char *_image,
 
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
 
+  // OGRE 1.9 renames codeToFile to encodeToFile
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  pCodec->codeToFile(stream, filename, codecDataPtr);
+  #else
+  pCodec->encodeToFile(stream, filename, codecDataPtr);
+  #endif
   return true;
 }
 
@@ -1383,24 +1352,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
-    // Noise
-    if (this->dataPtr->noiseActive)
-    {
-      switch (this->dataPtr->noiseType)
-      {
-        case CameraPrivate::GAUSSIAN:
-          this->dataPtr->gaussianNoiseInstance =
-            Ogre::CompositorManager::getSingleton().addCompositor(
-              this->viewport, "CameraNoise/Gaussian");
-          this->dataPtr->gaussianNoiseInstance->setEnabled(true);
-          // gaussianNoiseCompositorListener was allocated in Load()
-          this->dataPtr->gaussianNoiseInstance->addListener(
-            this->dataPtr->gaussianNoiseCompositorListener.get());
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
-    }
 
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);

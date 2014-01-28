@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,23 +336,30 @@ void MeshManager::CreatePlane(const std::string &name,
   double xTex = uvTile.x / segments.x;
   double yTex = uvTile.y / segments.y;
 
-  for (int y = 0; y <= segments.y; y++)
+  // Give it some thickness to reduce shadow artifacts.
+  double thickness = 0.01;
+
+  for (int i = 0; i <= 1; ++i)
   {
-    for (int x = 0; x <= segments.x; x++)
+    double z = i*thickness;
+    for (int y = 0; y <= segments.y; ++y)
     {
-      // Compute the position of the vertex
-      vec.x = (x * xSpace) - halfWidth;
-      vec.y = (y * ySpace) - halfHeight;
-      vec.z = 0.0;
-      vec = xform.TransformAffine(vec);
-      subMesh->AddVertex(vec);
+      for (int x = 0; x <= segments.x; ++x)
+      {
+        // Compute the position of the vertex
+        vec.x = (x * xSpace) - halfWidth;
+        vec.y = (y * ySpace) - halfHeight;
+        vec.z = -z;
+        vec = xform.TransformAffine(vec);
+        subMesh->AddVertex(vec);
 
-      // Compute the normal
-      vec = xform.TransformAffine(norm);
-      subMesh->AddNormal(vec);
+        // Compute the normal
+        vec = xform.TransformAffine(norm);
+        subMesh->AddNormal(vec);
 
-      // Compute the texture coordinate
-      subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
+        // Compute the texture coordinate
+        subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
+      }
     }
   }
 

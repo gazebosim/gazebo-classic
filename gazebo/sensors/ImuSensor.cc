@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,7 +219,7 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::UpdateImpl(bool /*_force*/)
+bool ImuSensor::UpdateImpl(bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;
@@ -229,7 +229,7 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
 
     // Don't do anything if there is no new data to process.
     if (!this->dataDirty)
-      return;
+      return false;
 
     readIndex = this->dataIndex;
     this->dataIndex ^= 1;
@@ -328,6 +328,8 @@ void ImuSensor::UpdateImpl(bool /*_force*/)
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

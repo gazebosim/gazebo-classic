@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet|simbody).
+      /// \brief Return the physics engine type (ode|bullet|dart|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 

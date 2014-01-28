@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,6 +306,26 @@ TEST(MsgsTest, SetPlane)
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 
   EXPECT_TRUE(math::equal(1.0, msg.d()));
+}
+
+TEST(MsgsTest, Initialization)
+{
+  {
+    msgs::Vector3d msg;
+    EXPECT_DOUBLE_EQ(0, msg.x());
+    EXPECT_DOUBLE_EQ(0, msg.y());
+    EXPECT_DOUBLE_EQ(0, msg.z());
+  }
+
+  {
+    msgs::Wrench msg;
+    EXPECT_DOUBLE_EQ(0, msg.force().x());
+    EXPECT_DOUBLE_EQ(0, msg.force().y());
+    EXPECT_DOUBLE_EQ(0, msg.force().z());
+    EXPECT_DOUBLE_EQ(0, msg.torque().x());
+    EXPECT_DOUBLE_EQ(0, msg.torque().y());
+    EXPECT_DOUBLE_EQ(0, msg.torque().z());
+  }
 }
 
 TEST(MsgsTest, GUIFromSDF)

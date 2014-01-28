@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual unsigned int GetImageHeight() const;
 
+      /// brief Show if the user camera pose has changed in the world file.
+      /// return true if the camera pose changed in the world file.
+      public: bool IsCameraSetInWorldFile();
+
+      /// brief Set if the user camera pose has changed in the world file.
+      /// \param[in] _value True if the camera pose changed in the world file.
+      public: void SetUseSDFPose(bool _value);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -235,6 +243,10 @@ namespace gazebo
 
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;
+
+      /// \brief Flag to detect if the user changed the camera pose in the
+      /// world file.
+      private: bool isCameraSetInWorldFile;
     };
     /// \}
   }

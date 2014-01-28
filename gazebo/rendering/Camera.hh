@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class GaussianNoiseCompositorListener;
     class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
@@ -151,10 +150,6 @@ namespace gazebo
       /// \brief Set the scene this camera is viewing
       /// \param[in] _scene Pointer to the scene
       public: void SetScene(ScenePtr _scene);
-
-      /// \brief Get the global pose of the camera
-      /// \return Pose of the camera in the world coordinate frame
-      public: math::Pose GetWorldPose();
 
       /// \brief Get the camera position in the world
       /// \return The world position of the camera

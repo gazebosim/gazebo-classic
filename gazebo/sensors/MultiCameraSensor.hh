@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,10 +92,13 @@ namespace gazebo
       public: virtual bool IsActive();
 
       // Documentation inherited.
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
+
+      /// \brief Handle the render event.
+      private: void Render();
 
       /// \brief All the cameras.
       private: std::vector<rendering::CameraPtr> cameras;
@@ -106,7 +109,14 @@ namespace gazebo
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
 
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
+
+      /// \brief The images msg.
+      private: msgs::ImagesStamped msg;
+
+      /// \brief True if the sensor was rendered.
+      private: bool rendered;
     };
     /// \}
   }
