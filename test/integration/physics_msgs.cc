@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,11 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
         world->StepWorld(1);
         common::Time::MSleep(1);
       }
+
+      // Take a few steps to verify the correct model pose.
+      // dart has a failure mode that was not exposed without
+      // this change to the test.
+      world->StepWorld(10);
 
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
