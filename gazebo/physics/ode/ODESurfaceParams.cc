@@ -121,7 +121,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu( this->frictionPyramid.GetMu(0));
+  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMu(0));
   _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMu(1));
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
