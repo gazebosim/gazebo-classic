@@ -34,7 +34,6 @@ DiffDrivePlugin::DiffDrivePlugin()
 void DiffDrivePlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr _sdf)
 {
-  printf("LoadPlugin\n");
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
