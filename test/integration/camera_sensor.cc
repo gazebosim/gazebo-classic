@@ -320,13 +320,6 @@ TEST_F(CameraSensor, CheckNoise)
   EXPECT_NEAR(diffAvg/255., noiseMean, 3*noiseStdDev);
   delete[] img;
   delete[] img2;
-
-  camSensor.reset();
-  camSensorNoisy.reset();
-  sensor.reset();
-
-  gazebo::sensors::remove_sensor(cameraName);
-  gazebo::sensors::remove_sensor(cameraNameNoisy);
 }
 
 int main(int argc, char **argv)
