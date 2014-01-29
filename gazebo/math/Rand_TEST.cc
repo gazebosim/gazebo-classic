@@ -19,11 +19,15 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class RandTest : public gazebo::testing::AutoLogFixture 
+{ };
+
 //////////////////////////////////////////////////
-TEST(RandTest, Rand)
+TEST_F(RandTest, Rand)
 {
   double d;
   int i;
@@ -50,7 +54,7 @@ TEST(RandTest, Rand)
 }
 
 //////////////////////////////////////////////////
-TEST(RandTest, SetSeed)
+TEST_F(RandTest, SetSeed)
 {
   int N = 10;
   std::vector<int> first;

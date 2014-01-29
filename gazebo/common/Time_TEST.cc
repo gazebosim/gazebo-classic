@@ -20,10 +20,14 @@
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Time.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(TimeTest, Time)
+class TimeTest : public gazebo::testing::AutoLogFixture 
+{ };
+
+TEST_F(TimeTest, Time)
 {
   common::Timer timer;
   timer.Start();

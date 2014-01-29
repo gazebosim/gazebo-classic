@@ -21,20 +21,24 @@
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Angle.hh"
 #include "test_config.h"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class DemTest : public gazebo::testing::AutoLogFixture 
+{ };
 
 #ifdef HAVE_GDAL
 
 /////////////////////////////////////////////////
-TEST(DemTest, MisingFile)
+TEST_F(DemTest, MisingFile)
 {
   common::Dem dem;
   EXPECT_NE(dem.Load("/file/shouldn/never/exist.png"), 0);
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, NotDem)
+TEST_F(DemTest, NotDem)
 {
   common::Dem dem;
   boost::filesystem::path path;
@@ -44,7 +48,7 @@ TEST(DemTest, NotDem)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, UnsupportedDem)
+TEST_F(DemTest, UnsupportedDem)
 {
   common::Dem dem;
   boost::filesystem::path path;
@@ -54,7 +58,7 @@ TEST(DemTest, UnsupportedDem)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, NonSquaredDemPortrait)
+TEST_F(DemTest, NonSquaredDemPortrait)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
@@ -64,7 +68,7 @@ TEST(DemTest, NonSquaredDemPortrait)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, NonSquaredDemLandscape)
+TEST_F(DemTest, NonSquaredDemLandscape)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
@@ -74,7 +78,7 @@ TEST(DemTest, NonSquaredDemLandscape)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, SquaredDem)
+TEST_F(DemTest, SquaredDem)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
@@ -84,7 +88,7 @@ TEST(DemTest, SquaredDem)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, BasicAPI)
+TEST_F(DemTest, BasicAPI)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
@@ -121,7 +125,7 @@ TEST(DemTest, BasicAPI)
 }
 
 /////////////////////////////////////////////////
-TEST(DemTest, FillHeightmap)
+TEST_F(DemTest, FillHeightmap)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
