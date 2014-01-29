@@ -188,8 +188,16 @@ void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 
-  gui::OculusWindow *oculusWindow = new gui::OculusWindow();
-  oculusWindow->show();
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", ""); 
+
+  if (!visual.empty())
+  {
+    gui::OculusWindow *oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+    oculusWindow->show();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -787,7 +795,7 @@ void MainWindow::Orbit()
 /////////////////////////////////////////////////
 void MainWindow::ViewOculus()
 {
-  gui::OculusWindow *oculusWindow = new gui::OculusWindow();
+  gui::OculusWindow *oculusWindow = new gui::OculusWindow(0, 0, "");
   oculusWindow->show();
 }
 

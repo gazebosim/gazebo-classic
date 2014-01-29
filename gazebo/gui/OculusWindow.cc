@@ -10,9 +10,14 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-OculusWindow::OculusWindow(QWidget *_parent)
+OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
+    QWidget *_parent)
   : QWidget(_parent)
 {
+  this->xPos = _x;
+  this->yPos = _y;
+  this->visualName = _visual;
+
   setAttribute(Qt::WA_NativeWindow, true);
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
@@ -31,24 +36,9 @@ OculusWindow::OculusWindow(QWidget *_parent)
   this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
 
-  //mainFrame->setFrameShape(QFrame::NoFrame);
-  //mainFrame->show();
-
-  //this->glWidget = new GLWidget(mainFrame);
-
   QVBoxLayout *renderLayout = new QVBoxLayout;
   renderLayout->addWidget(this->renderFrame);
   renderLayout->setContentsMargins(0, 0, 0, 0);
-  // renderLayout->setSpacing(0);
-
-  // QFrame *renderFrame = new QFrame;
-  //renderFrame->setLayout(renderLayout);
-
-  //mainFrame->setLayout(renderLayout);
-
-  //QVBoxLayout *mainLayout = new QVBoxLayout;
-  //mainLayout->addWidget(mainFrame);
-  //mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(renderLayout);
   this->isFullScreen = false;
@@ -93,8 +83,13 @@ void OculusWindow::showEvent(QShowEvent *_event)
 {
   this->scene = rendering::get_scene();
 
-  this->oculusCamera = this->scene->CreateOculusCamera("gzclient_camera");
-  this->oculusCamera->AttachToVisual("atlas::pelvis::head_visual", true);
+  this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+
+  if (this->scene->GetVisual(this->visualName))
+    this->oculusCamera->AttachToVisual(this->visualName, true);
+  else
+    gzwarn << "Unable to attach Oculus camera to visual with name["
+      << this->visualName << "]\n";
 
   math::Vector3 camPos(0.1, 0, 0);
   math::Vector3 lookAt(0, 0, 0);
@@ -106,7 +101,6 @@ void OculusWindow::showEvent(QShowEvent *_event)
   this->oculusCamera->SetWorldPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
 
-  std::cout << "Create Oculus renderw window[" << this->GetOgreHandle() << "] Width[" << this->width() << "] height[" << this->height() << "]\n";
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(this->GetOgreHandle(), this->width(), this->height());
 
@@ -124,7 +118,7 @@ void OculusWindow::showEvent(QShowEvent *_event)
   this->resize(winSize);
 
   // Put the window on the ocuclus screen
-  this->setGeometry(1600, 0, 1280, 800);
+  this->setGeometry(this->xPos, this->yPos, 1280, 800);
 
   // Make the window full screen
   this->isFullScreen = true;

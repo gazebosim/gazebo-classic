@@ -81,7 +81,7 @@ if (PKG_CONFIG_FOUND)
 
   pkg_check_modules(libudev libudev)
   if (NOT libudev_FOUND)
-    BUILD_WARNING ("Missing: libudev. Required for Oculus rift and Razer Hydra.")
+    BUILD_ERROR ("Missing: libudev. Required for usb peripherals.")
     set(HAVE_LIBUDEV False)
   else()
     set(HAVE_LIBUDEV True)

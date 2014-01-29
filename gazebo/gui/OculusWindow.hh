@@ -18,7 +18,8 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      public: OculusWindow(QWidget *_parent = 0);
+      public: OculusWindow(int _x, int _y, const std::string &_visual,
+                  QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~OculusWindow();
@@ -38,6 +39,10 @@ namespace gazebo
       private: rendering::ScenePtr scene;
 
       private: bool isFullScreen;
+
+      private: int xPos;
+      private: int yPos;
+      private: std::string visualName;
     };
   }
 }
