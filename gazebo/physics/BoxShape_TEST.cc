@@ -15,8 +15,6 @@
  *
 */
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/physics/BoxShape.hh"
 #include "test/util.hh"
 
