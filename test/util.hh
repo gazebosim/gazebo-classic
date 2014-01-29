@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/filesystem.hpp>
 #include "gazebo/common/Console.hh"
 
 using namespace gazebo;
