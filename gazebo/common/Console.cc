@@ -135,13 +135,6 @@ FileLogger::~FileLogger()
 /////////////////////////////////////////////////
 void FileLogger::Init(const std::string &_filename)
 {
-  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
-      this->rdbuf());
-
-  // Only allow initialization once.
-  if (buf->stream)
-    return;
-
   if (!getenv("HOME"))
   {
     gzerr << "Missing HOME environment variable."
@@ -149,8 +142,16 @@ void FileLogger::Init(const std::string &_filename)
     return;
   }
 
+  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
+      this->rdbuf());
+
   boost::filesystem::path logPath(getenv("HOME"));
   logPath = logPath / ".gazebo/" / _filename;
+
+  // Check if the Init method has been already called, and if so
+  // remove current buffer.
+  if (buf->stream)
+    delete buf->stream;
 
   buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
   if (!buf->stream->is_open())

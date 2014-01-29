@@ -49,6 +49,8 @@ namespace gazebo
     #define gzlog (gazebo::common::Console::log())
 
     /// \brief Initialize log file with filename given by _str.
+    /// If called twice, it will close currently in use and open a new
+    /// log file.
     /// \param[in] _str Name of log file for gzlog messages.
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
