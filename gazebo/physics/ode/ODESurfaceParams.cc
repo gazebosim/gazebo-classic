@@ -28,7 +28,7 @@ ODESurfaceParams::ODESurfaceParams()
     bounce(0), bounceThreshold(100000),
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
-    mu1(1), mu2(1), slip1(0), slip2(0)
+    slip1(0), slip2(0)
 {
 }
 
@@ -83,17 +83,13 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           gzerr << "Surface friction ode sdf member is NULL" << std::endl;
         else
         {
-          this->mu1 = frictionOdeElem->Get<double>("mu");
-          this->mu2 = frictionOdeElem->Get<double>("mu2");
-
-          if (this->mu1 < 0)
-            this->mu1 = FLT_MAX;
-          if (this->mu2 < 0)
-            this->mu2 = FLT_MAX;
+          this->frictionPyramid.SetMu(0, frictionOdeElem->Get<double>("mu"));
+          this->frictionPyramid.SetMu(1, frictionOdeElem->Get<double>("mu2"));
+          this->frictionPyramid.direction1 =
+            frictionOdeElem->Get<math::Vector3>("fdir1");
 
           this->slip1 = frictionOdeElem->Get<double>("slip1");
           this->slip2 = frictionOdeElem->Get<double>("slip2");
-          this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
         }
       }
     }
@@ -125,11 +121,12 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->mu1);
-  _msg.mutable_friction()->set_mu2(this->mu2);
+  _msg.mutable_friction()->set_mu( this->frictionPyramid.GetMu(0));
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMu(1));
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
-  msgs::Set(_msg.mutable_friction()->mutable_fdir1(), this->fdir1);
+  msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
+            this->frictionPyramid.direction1);
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -150,20 +147,16 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->mu1 = _msg.friction().mu();
+      this->frictionPyramid.SetMu(0, _msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->mu2 = _msg.friction().mu2();
+      this->frictionPyramid.SetMu(1, _msg.friction().mu2());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
-      this->fdir1 = msgs::Convert(_msg.friction().fdir1());
-
-    if (this->mu1 < 0)
-      this->mu1 = FLT_MAX;
-    if (this->mu2 < 0)
-      this->mu2 = FLT_MAX;
+      this->frictionPyramid.direction1 =
+        msgs::Convert(_msg.friction().fdir1());
   }
 
   if (_msg.has_restitution_coefficient())

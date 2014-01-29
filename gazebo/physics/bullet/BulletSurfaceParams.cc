@@ -24,8 +24,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletSurfaceParams::BulletSurfaceParams()
-  : SurfaceParams(),
-    mu1(1), mu2(1)
+  : SurfaceParams()
 {
 }
 
@@ -57,13 +56,8 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction ode sdf member is NULL" << std::endl;
       else
       {
-        this->mu1 = frictionOdeElem->Get<double>("mu");
-        this->mu2 = frictionOdeElem->Get<double>("mu2");
-
-        if (this->mu1 < 0)
-          this->mu1 = FLT_MAX;
-        if (this->mu2 < 0)
-          this->mu2 = FLT_MAX;
+        this->frictionPyramid.SetMu(0, frictionOdeElem->Get<double>("mu"));
+        this->frictionPyramid.SetMu(1, frictionOdeElem->Get<double>("mu2"));
       }
     }
   }
@@ -74,8 +68,8 @@ void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->mu1);
-  _msg.mutable_friction()->set_mu2(this->mu2);
+  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMu(0));
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMu(1));
 }
 
 /////////////////////////////////////////////////
@@ -86,13 +80,8 @@ void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->mu1 = _msg.friction().mu();
+      this->frictionPyramid.SetMu(0, _msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->mu2 = _msg.friction().mu2();
-
-    if (this->mu1 < 0)
-      this->mu1 = FLT_MAX;
-    if (this->mu2 < 0)
-      this->mu2 = FLT_MAX;
+      this->frictionPyramid.SetMu(1, _msg.friction().mu2());
   }
 }

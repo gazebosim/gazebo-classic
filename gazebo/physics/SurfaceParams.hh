@@ -29,6 +29,41 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
+    /// \brief Parameters used for friction pyramid model.
+    class FrictionPyramid
+    {
+      /// \brief Constructor.
+      public: FrictionPyramid();
+
+      /// \brief Destructor.
+      public: virtual ~FrictionPyramid();
+
+      /// \brief Set the primary friction coefficient. If a negative value is
+      /// supplied, use an astronomically high value instead.
+      /// \param[in] _mu First friction value.
+      public: double GetMu(unsigned int _index);
+
+      /// \brief Set the primary friction coefficient. If a negative value is
+      /// supplied, use an astronomically high value instead.
+      /// \param[in] _mu First friction value.
+      public: void SetMu(unsigned int _index, double _mu);
+
+      /// \brief Vector for specifying the primary friction direction,
+      /// relative to the parent collision frame. The component of this
+      /// vector that is orthogonal to the surface normal will be set
+      /// as the primary friction direction.
+      /// If undefined, a vector consstrained to be perpendicular
+      /// to the contact normal in the global y-z plane is used.
+      /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
+      public: math::Vector3 direction1;
+
+      /// \brief Array of dry friction coefficients. mu[0] is in the
+      /// primary direction as defined by the friction pyramid.
+      /// mu[1] is in the second direction.
+      private: double mu[2];
+    };
+
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
     /// \brief SurfaceParams defines various Surface contact parameters.
     /// These parameters defines the properties of a
