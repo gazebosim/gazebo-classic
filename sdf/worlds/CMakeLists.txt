@@ -27,6 +27,7 @@ set (files
   presentation.world
   projector.world
   ray_cpu.world
+  robocup_3Dsim.world
   robocup09_spl_field.world
   robocup14_spl_field.world
   rubble.world

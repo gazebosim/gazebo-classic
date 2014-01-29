@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
 
 namespace gazebo
 {
@@ -81,6 +82,11 @@ namespace gazebo
       /// \brief Set the collision's space ID
       /// \param[in] _spaceid ID of an ODE collision space.
       public: void SetSpaceId(dSpaceID _spaceid);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to ODESurfaceParams.
+      /// \return Dynamically casted pointer to ODESurfaceParams.
+      public: ODESurfaceParamsPtr GetODESurface() const;
 
       /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();
