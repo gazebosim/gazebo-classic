@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/MapShape.hh"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
@@ -754,7 +755,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // There is no corresponding Gazebo joint for this mobilizer.
       // Create the joint and set its default position to be the default
       // pose of the base link relative to the Ground frame.
-      assert(type == "free");  // May add more types later
+      GZ_ASSERT(type == "free", "type is not 'free', not allowed."); // May add more types later
       if (type == "free")
       {
         MobilizedBody::Free freeJoint(
