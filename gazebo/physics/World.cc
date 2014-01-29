@@ -324,26 +324,26 @@ void World::Init()
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
-
   this->prevStates[0].SetWorld(shared_from_this());
   this->prevStates[1].SetWorld(shared_from_this());
 
   this->prevStates[0].SetName(this->GetName());
   this->prevStates[1].SetName(this->GetName());
 
-  this->initialized = true;
-
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
   this->logPrevIteration = 0;
 
-  // Mark the world initialization
-  gzlog << "World::Init" << std::endl;
-
   util::DiagnosticManager::Instance()->Init(this->GetName());
+
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
+
+  this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "Init world[" << this->GetName() << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////

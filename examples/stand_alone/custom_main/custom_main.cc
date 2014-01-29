@@ -26,13 +26,12 @@ int main(int _argc, char **_argv)
   gazebo::setupServer(_argc, _argv);
 
   // Load a world
-  gazebo::physics::WorldPtr world = gazebo::loadWorld("empty.world");
+  gazebo::physics::WorldPtr world = gazebo::loadWorld("worlds/empty.world");
 
   // This is your custom main loop. In this example the main loop is just a
   // for loop with 2 iterations.
   for (unsigned int i = 0; i < 2; ++i)
   {
-    printf("Iter\n");
     // Run simulation for 100 steps.
     gazebo::runWorld(world, 100);
   }

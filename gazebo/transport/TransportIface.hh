@@ -147,6 +147,7 @@ namespace gazebo
     /// \return True if minimal comms is enabled.
     bool getMinimalComms();
 
+    bool waitForNamespaces(const gazebo::common::Time &_maxWait);
     /// \}
   }
 }

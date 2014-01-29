@@ -259,7 +259,6 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   this->ProcessParams();
-  this->Init();
 
   return true;
 }
@@ -378,14 +377,13 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->worldModPub =
     this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
-  return true;
-}
+  // Wait for namespaces.
+  gazebo::transport::waitForNamespaces(gazebo::common::Time(1, 0));
 
-/////////////////////////////////////////////////
-void Server::Init()
-{
   physics::init_worlds();
   this->stop = false;
+
+  return true;
 }
 
 /////////////////////////////////////////////////

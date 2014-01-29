@@ -63,7 +63,6 @@ namespace gazebo
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
-    public: void Init();
     public: void Run();
     public: void Stop();
     public: void Fini();

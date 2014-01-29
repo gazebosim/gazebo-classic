@@ -34,6 +34,49 @@ std::vector<gazebo::SystemPluginPtr> g_plugins;
 gazebo::Master *g_master = NULL;
 
 /////////////////////////////////////////////////
+// This function is used by both setupClient and setupServer
+bool setup(int _argc, char **_argv)
+{
+  gazebo::common::load();
+
+  // The SDF find file callback.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
+  // Initialize the informational logger. This will log warnings, and
+  // errors.
+  if (!gazebo::common::Console::Instance()->IsInitialized())
+    gazebo::common::Console::Instance()->Init("default.log");
+
+  // Load all the system plugins
+  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
+       g_plugins.begin(); iter != g_plugins.end(); ++iter)
+  {
+    (*iter)->Load(_argc, _argv);
+  }
+
+  if (!gazebo::transport::init())
+  {
+    gzerr << "Unable to initialize transport.\n";
+    return false;
+  }
+
+  // Make sure the model database has started.
+  gazebo::common::ModelDatabase::Instance()->Start();
+
+  // Run transport loop. Starts a thread
+  gazebo::transport::run();
+
+  // Init all system plugins
+  for (std::vector<gazebo::SystemPluginPtr>::iterator iter = g_plugins.begin();
+       iter != g_plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 void gazebo::print_version()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
@@ -125,7 +168,11 @@ bool gazebo::setupServer(int _argc, char **_argv)
   g_master->Init(port);
   g_master->RunThread();
 
-  gazebo::setupClient(_argc, _argv);
+  if (!setup(_argc, _argv))
+  {
+    gzerr << "Unable to setup Gazebo\n";
+    return false;
+  }
 
   if (!sensors::load())
   {
@@ -151,44 +198,19 @@ bool gazebo::setupServer(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
-  gazebo::common::load();
-
-  // The SDF find file callback.
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
-
-  // Initialize the informational logger. This will log warnings, and
-  // errors.
-  if (!gazebo::common::Console::Instance()->IsInitialized())
-    gazebo::common::Console::Instance()->Init("default.log");
-
-  // Load all the system plugins
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       g_plugins.begin(); iter != g_plugins.end(); ++iter)
+  if (!setup(_argc, _argv))
   {
-    (*iter)->Load(_argc, _argv);
-  }
-
-  if (!gazebo::transport::init())
-  {
-    gzerr << "Unable to initialize transport.\n";
+    gzerr << "Unable to setup Gazebo\n";
     return false;
   }
 
-  // Make sure the model database has started.
-  gazebo::common::ModelDatabase::Instance()->Start();
-
-  // Run transport loop. Starts a thread
-  gazebo::transport::run();
-
-  // Init all system plugins
-  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
+  // Client should wait for namespaces.
+  gazebo::transport::waitForNamespaces(gazebo::common::Time(1, 0));
 
   return true;
 }
+
+
 
 /////////////////////////////////////////////////
 bool gazebo::shutdown()

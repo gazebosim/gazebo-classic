@@ -217,7 +217,6 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                                            _physics));
   else
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-  ASSERT_NO_THROW(this->server->Init());
 
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
