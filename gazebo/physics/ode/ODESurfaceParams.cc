@@ -55,15 +55,17 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
       {
         this->bounce = bounceElem->Get<double>("restitution_coefficient");
         if (this->bounce < 0)
+        {
           gzwarn << "bounce restitution_coefficient ["
                  << this->bounce
                  << "] < 0, so it will not be applied by ODE."
                  << std::endl;
+        }
         else if (this->bounce > 1)
         {
           gzwarn << "bounce restitution_coefficient ["
                  << this->bounce
-                 << "] > 1, which is outside the recommended range".
+                 << "] > 1, which is outside the recommended range."
                  << std::endl;
         }
         this->bounceThreshold = bounceElem->Get<double>("threshold");
