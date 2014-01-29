@@ -16,6 +16,7 @@
 */
 
 #include "test/util.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
 

@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/physics/CylinderShape.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
