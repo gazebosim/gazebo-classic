@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -55,9 +56,9 @@ void SimbodySliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetVelocity(int _index, double _rate)
+void SimbodySliderJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
@@ -66,9 +67,9 @@ void SimbodySliderJoint::SetVelocity(int _index, double _rate)
 }
 
 //////////////////////////////////////////////////
-double SimbodySliderJoint::GetVelocity(int _index) const
+double SimbodySliderJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->simbodyPhysics->simbodyPhysicsInitialized)
       return this->mobod.getOneU(
@@ -90,32 +91,32 @@ double SimbodySliderJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodySliderJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodySliderJoint::GetMaxForce(int /*_index*/)
+double SimbodySliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetForceImpl(int _index, double _torque)
+void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetHighStop(int _index,
+void SimbodySliderJoint::SetHighStop(unsigned int _index,
                                    const math::Angle &_angle)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     Joint::SetHighStop(_index, _angle);
     if (this->physicsInitialized)
@@ -136,10 +137,10 @@ void SimbodySliderJoint::SetHighStop(int _index,
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetLowStop(int _index,
+void SimbodySliderJoint::SetLowStop(unsigned int _index,
                                   const math::Angle &_angle)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     Joint::SetLowStop(_index, _angle);
     if (this->physicsInitialized)
@@ -160,9 +161,9 @@ void SimbodySliderJoint::SetLowStop(int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetHighStop(int _index)
+math::Angle SimbodySliderJoint::GetHighStop(unsigned int _index)
 {
-  if (_index >= static_cast<int>(this->GetAngleCount()))
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
@@ -186,9 +187,9 @@ math::Angle SimbodySliderJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetLowStop(int _index)
+math::Angle SimbodySliderJoint::GetLowStop(unsigned int _index)
 {
-  if (_index >= static_cast<int>(this->GetAngleCount()))
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
@@ -212,10 +213,10 @@ math::Angle SimbodySliderJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodySliderJoint::GetGlobalAxis(int _index) const
+math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < static_cast<int>(this->GetAngleCount()))
+      _index < this->GetAngleCount())
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
       this->simbodyPhysics->integ->getState());
@@ -228,7 +229,7 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(int _index) const
   }
   else
   {
-    if (_index >= static_cast<int>(this->GetAngleCount()))
+    if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -262,9 +263,9 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetAngleImpl(int _index) const
+math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->simbodyPhysics->simbodyPhysicsInitialized)
       return math::Angle(this->mobod.getOneQ(

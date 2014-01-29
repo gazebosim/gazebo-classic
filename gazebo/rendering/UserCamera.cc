@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
+
+  this->SetUseSDFPose(false);
 }
 
 //////////////////////////////////////////////////
@@ -235,6 +237,18 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
   this->viewController->HandleKeyReleaseEvent(_key);
+}
+
+/////////////////////////////////////////////////
+bool UserCamera::IsCameraSetInWorldFile()
+{
+  return this->isCameraSetInWorldFile;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetUseSDFPose(bool _value)
+{
+  this->isCameraSetInWorldFile = _value;
 }
 
 /////////////////////////////////////////////////

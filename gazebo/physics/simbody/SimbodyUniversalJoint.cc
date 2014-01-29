@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,19 +49,19 @@ void SimbodyUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAnchor(int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAxis(int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetAxis(int /*_index*/,
+void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
                                    const math::Vector3 &/*_axis*/)
 {
   gzerr << "Not implemented\n";
@@ -69,53 +69,55 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
 
 
 //////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetVelocity(int /*_index*/) const
+double SimbodyUniversalJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void SimbodyUniversalJoint::SetVelocity(unsigned int /*_index*/,
+    double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void SimbodyUniversalJoint::SetForceImpl(unsigned int /*_index*/,
+    double /*_torque*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodyUniversalJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetMaxForce(int /*_index*/)
+double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetHighStop(int /*_index*/,
+void SimbodyUniversalJoint::SetHighStop(unsigned int /*_index*/,
   const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetLowStop(int /*_index*/,
+void SimbodyUniversalJoint::SetLowStop(unsigned int /*_index*/,
   const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetHighStop(int /*_index*/)
+math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
   gzerr << "Not implemented\n";
@@ -123,7 +125,7 @@ math::Angle SimbodyUniversalJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetLowStop(int /*_index*/)
+math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   gzerr << "Not implemented\n";
@@ -131,14 +133,15 @@ math::Angle SimbodyUniversalJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   gzerr << "SimbodyUniversalJoint::GetGlobalAxis not implemented\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyUniversalJoint::GetAngleImpl not implemented\n";
   return math::Angle();

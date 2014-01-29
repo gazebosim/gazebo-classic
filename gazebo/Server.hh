@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ namespace gazebo
 
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.
-    /// \param[in] _physics Type of physics engine to use (ode|bullet|simbody).
+    /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
     /// \return True on success.
     public: bool LoadFile(const std::string &_filename="worlds/empty.world",
                           const std::string &_physics="");
@@ -96,7 +96,7 @@ namespace gazebo
 
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
-    /// \param[in] _physics Type of physics engine to use (ode|bullet|simbody).
+    /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
     private: bool LoadImpl(sdf::ElementPtr _elem,
                            const std::string &_physics="");
 

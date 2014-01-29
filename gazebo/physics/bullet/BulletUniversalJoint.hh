@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,49 +52,51 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       /// \brief Set the first axis of rotation
-      public: void SetAxis(int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
 
       /// \brief Get the first axis of rotation
-      public: virtual math::Vector3 GetAxis(int _index) const;
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       /// \brief Get the angle of axis 1
-      public: virtual math::Angle GetAngle(int _index) const;
+      public: virtual math::Angle GetAngle(unsigned int _index) const;
 
       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       /// \brief Get the angular rate of axis 1
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int _index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int _index);
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int _index);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       /// \brief Set the torque of a joint.
-      protected: virtual void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       /// \brief Pointer to bullet universal constraint
       private: btUniversalConstraint *bulletUniversal;

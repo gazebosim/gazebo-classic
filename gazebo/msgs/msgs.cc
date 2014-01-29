@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -493,9 +493,6 @@ namespace gazebo
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<math::Vector3>("pos"));
 
-        common::Image img(geomElem->Get<std::string>("uri"));
-        msgs::Set(result.mutable_heightmap()->mutable_image(), img);
-
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         msgs::HeightmapGeom::Texture *tex;
         while (textureElem)
@@ -579,6 +576,11 @@ namespace gazebo
             matMsg->mutable_script()->add_uri(uriElem->Get<std::string>());
             uriElem = uriElem->GetNextElement("uri");
           }
+        }
+
+        if (elem->HasElement("lighting"))
+        {
+          matMsg->set_lighting(elem->Get<bool>("lighting"));
         }
 
         if (elem->HasElement("shader"))
