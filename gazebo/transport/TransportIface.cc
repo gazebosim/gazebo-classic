@@ -346,4 +346,9 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
         namespaces);
     gazebo::common::Time::Sleep(waitTime);
   }
+
+  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
+    return true;
+  else
+    return false;
 }
