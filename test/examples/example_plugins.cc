@@ -16,23 +16,59 @@
  */
 #include <gtest/gtest.h>
 #include <stdio.h>
+#include <string>
+#include <boost/filesystem.hpp>
 
-const std::string cmakeSourceDir = CMAKE_SOURCE_DIR;
-const std::string helloWorldPath = "examples/plugins/hello_world";
-const std::string worldEditPath = "examples/plugins/world_edit";
+#include "gazebo/common/Console.hh"
+
+///////////////////////////////////////////////////////////////////
+// Create a temporary build folder
+boost::filesystem::path createTempBuildFolder(const std::string &_prefix)
+{
+  boost::filesystem::path path = boost::filesystem::temp_directory_path();
+  path /= boost::filesystem::unique_path(_prefix + "-%%%%-%%%%-%%%%-%%%%");
+  boost::filesystem::create_directories(path);
+  gzdbg << "mkdir " << path.string() << std::endl;
+  return path;
+}
+
+///////////////////////////////////////////////////////////////////
+// Get path to source folder with specified suffix
+boost::filesystem::path getSourcePath(const std::string &_suffix)
+{
+  boost::filesystem::path path = CMAKE_SOURCE_DIR;
+  path /= std::string("examples");
+  path /= std::string("plugins");
+  path /= _suffix;
+  gzdbg << "source " << path.string() << std::endl;
+  return path;
+}
+
+///////////////////////////////////////////////////////////////////
+// 
+void BuildExamplePlugins(const std::string &_prefix,
+                         const std::string &_suffix)
+{
+  // get a unique temporary build folder name
+  boost::filesystem::path build = createTempBuildFolder(_prefix);
+ 
+  // construct path of source folder
+  boost::filesystem::path source = getSourcePath(_suffix);
+
+  char cmd[1024];
+
+  // cd build && cmake source
+  snprintf(cmd, sizeof(cmd), "cd %s && cmake %s && make",
+    build.c_str(), source.c_str());
+  ASSERT_EQ(system(cmd), 0);
+}
 
 ///////////////////////////////////////////////////////////////////
 // This test verifies that the HelloWorld plugin builds successfully
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, HelloWorld)
 {
-  char cmd[1024];
-
-  snprintf(cmd, sizeof(cmd), "cmake %s",
-    std::string(cmakeSourceDir + '/' + helloWorldPath).c_str());
-  ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "make");
-  ASSERT_EQ(system(cmd), 0);
+  BuildExamplePlugins("build_HelloWorld", "hello_world");
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -40,13 +76,7 @@ TEST(ExamplePlugins, HelloWorld)
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, WorldEdit)
 {
-  char cmd[1024];
-
-  snprintf(cmd, sizeof(cmd), "cmake %s",
-    std::string(cmakeSourceDir + '/' + worldEditPath).c_str());
-  ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "make");
-  ASSERT_EQ(system(cmd), 0);
+  BuildExamplePlugins("build_WorldEdit", "world_edit");
 }
 
 int main(int argc, char **argv)
