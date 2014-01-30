@@ -67,6 +67,10 @@ void ExamplePlugins::Build(const std::string &_name)
   snprintf(cmd, sizeof(cmd), "cd %s && cmake %s && make",
     build.c_str(), source.c_str());
   ASSERT_EQ(system(cmd), 0);
+
+  // remove temporary folder
+  gzdbg << "removing " << build.string() << std::endl;
+  boost::filesystem::remove_all(build);
 }
 
 TEST_P(ExamplePlugins, Build)
