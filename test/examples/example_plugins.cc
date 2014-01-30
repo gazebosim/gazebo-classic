@@ -79,6 +79,22 @@ TEST(ExamplePlugins, WorldEdit)
   BuildExamplePlugins("build_WorldEdit", "world_edit");
 }
 
+///////////////////////////////////////////////////////////////////
+// This test verifies that the ModelPush plugin builds successfully
+// It doesn't try to execute the plugin.
+TEST(ExamplePlugins, ModelPush)
+{
+  BuildExamplePlugins("build_ModelPush", "model_push");
+}
+
+///////////////////////////////////////////////////////////////////
+// This test verifies that the Factory plugin builds successfully
+// It doesn't try to execute the plugin.
+TEST(ExamplePlugins, Factory)
+{
+  BuildExamplePlugins("build_Factory", "factory");
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
