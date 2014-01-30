@@ -45,15 +45,14 @@ boost::filesystem::path getSourcePath(const std::string &_suffix)
 }
 
 ///////////////////////////////////////////////////////////////////
-// 
-void BuildExamplePlugins(const std::string &_prefix,
-                         const std::string &_suffix)
+// Build plugin in subfolder _name in a temporary build folder
+void BuildExamplePlugins(const std::string &_name)
 {
   // get a unique temporary build folder name
-  boost::filesystem::path build = createTempBuildFolder(_prefix);
- 
+  boost::filesystem::path build = createTempBuildFolder(_name);
+
   // construct path of source folder
-  boost::filesystem::path source = getSourcePath(_suffix);
+  boost::filesystem::path source = getSourcePath(_name);
 
   char cmd[1024];
 
@@ -68,7 +67,7 @@ void BuildExamplePlugins(const std::string &_prefix,
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, HelloWorld)
 {
-  BuildExamplePlugins("build_HelloWorld", "hello_world");
+  BuildExamplePlugins("hello_world");
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -76,7 +75,7 @@ TEST(ExamplePlugins, HelloWorld)
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, WorldEdit)
 {
-  BuildExamplePlugins("build_WorldEdit", "world_edit");
+  BuildExamplePlugins("world_edit");
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -84,7 +83,7 @@ TEST(ExamplePlugins, WorldEdit)
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, ModelPush)
 {
-  BuildExamplePlugins("build_ModelPush", "model_push");
+  BuildExamplePlugins("model_push");
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -92,7 +91,7 @@ TEST(ExamplePlugins, ModelPush)
 // It doesn't try to execute the plugin.
 TEST(ExamplePlugins, Factory)
 {
-  BuildExamplePlugins("build_Factory", "factory");
+  BuildExamplePlugins("factory");
 }
 
 int main(int argc, char **argv)
