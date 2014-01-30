@@ -469,17 +469,17 @@ namespace gazebo
       /// \brief Get joint stop stiffness.
       /// \param[in] _index joint axis index.
       /// \return joint stop stiffness coefficient.
-      public: double GetStopStiffness(unsigned int _index);
+      public: double GetStopStiffness(unsigned int _index) const;
 
       /// \brief Get joint stop dissipation.
       /// \param[in] _index joint axis index.
       /// \return joint stop dissipation coefficient.
-      public: double GetStopDissipation(unsigned int _index);
+      public: double GetStopDissipation(unsigned int _index) const;
 
       /// \brief Get initial Anchor Pose specified by model
       /// <joint><pose>...</pose></joint>
       /// \return Joint::anchorPose, initial joint anchor pose.
-      public: math::Pose GetInitialAnchorPose();
+      public: math::Pose GetInitialAnchorPose() const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.

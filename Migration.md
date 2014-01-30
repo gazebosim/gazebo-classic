@@ -49,6 +49,11 @@
     + ***Modified:*** SurfaceParamsPtr Collision::surface
     + ***Note:*** Changed from `private` to `protected`
 
+1. **gazebo/physics/Joint.hh** `API change`
+    + ***Modified:*** Added const to Joint::GetStopStiffness(unsigned int _index)
+    + ***Modified:*** Added const to Joint::GetStopDissipation(unsigned int _index)
+    + ***Modified:*** Added const to Joint::GetInitialAnchorPose(unsigned int _index)
+
 1. **gazebo/physics/MultiRayShape.hh** `API change`
     + ***Removed:*** double MultiRayShape::GetRange(int _index)
     + ***Replacement:*** double MultiRayShape::GetRange(unsigned int _index)
