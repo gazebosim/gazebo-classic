@@ -22,6 +22,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
+#include "gazebo/math/Rand.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "test/util.hh"
 
