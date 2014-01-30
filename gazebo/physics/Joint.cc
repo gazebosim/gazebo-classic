@@ -891,3 +891,9 @@ math::Pose Joint::GetWorldPose() const
     return this->anchorPose + this->childLink->GetWorldPose();
   return this->anchorPose;
 }
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetParentAnchorWorldPose() const
+{
+  return math::Pose();
+}

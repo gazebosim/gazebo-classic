@@ -485,6 +485,11 @@ namespace gazebo
       /// \return Pose of joint frame relative to world frame.
       public: math::Pose GetWorldPose() const;
 
+      /// \brief Get pose of parent anchor relative to world frame.
+      /// This is identical to GetWorldPose for error-free fixed joints.
+      /// \return Pose of parent anchor relative to world frame.
+      public: math::Pose GetParentAnchorWorldPose() const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
