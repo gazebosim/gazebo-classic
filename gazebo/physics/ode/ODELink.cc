@@ -30,7 +30,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
-#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 
@@ -126,13 +126,13 @@ void ODELink::Init()
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
-          if (g->GetSurface()->maxVel < 0)
+          if (g->GetODESurface()->maxVel < 0)
           {
-            g->GetSurface()->maxVel =
+            g->GetODESurface()->maxVel =
              this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
           }
-          dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
-          dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
+          dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
+          dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
         }
       }
     }
@@ -335,8 +335,8 @@ void ODELink::UpdateSurface()
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set surface properties max_vel and min_depth
-        dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
-        dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
+        dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
+        dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
       }
     }
   }
