@@ -44,9 +44,16 @@ boost::filesystem::path getSourcePath(const std::string &_suffix)
   return path;
 }
 
+class ExamplePlugins : public ::testing::TestWithParam<const char*>
+{
+  /// \brief Build plugin in subfolder _name in a temporary build folder
+  /// \param[in] _name Subfolder to build.
+  public: void Build(const std::string &_name);
+};
+
 ///////////////////////////////////////////////////////////////////
 // Build plugin in subfolder _name in a temporary build folder
-void BuildExamplePlugins(const std::string &_name)
+void ExamplePlugins::Build(const std::string &_name)
 {
   // get a unique temporary build folder name
   boost::filesystem::path build = createTempBuildFolder(_name);
@@ -62,37 +69,17 @@ void BuildExamplePlugins(const std::string &_name)
   ASSERT_EQ(system(cmd), 0);
 }
 
-///////////////////////////////////////////////////////////////////
-// This test verifies that the HelloWorld plugin builds successfully
-// It doesn't try to execute the plugin.
-TEST(ExamplePlugins, HelloWorld)
+TEST_P(ExamplePlugins, Build)
 {
-  BuildExamplePlugins("hello_world");
+  Build(GetParam());
 }
 
-///////////////////////////////////////////////////////////////////
-// This test verifies that the WorldEdit plugin builds successfully
-// It doesn't try to execute the plugin.
-TEST(ExamplePlugins, WorldEdit)
-{
-  BuildExamplePlugins("world_edit");
-}
-
-///////////////////////////////////////////////////////////////////
-// This test verifies that the ModelPush plugin builds successfully
-// It doesn't try to execute the plugin.
-TEST(ExamplePlugins, ModelPush)
-{
-  BuildExamplePlugins("model_push");
-}
-
-///////////////////////////////////////////////////////////////////
-// This test verifies that the Factory plugin builds successfully
-// It doesn't try to execute the plugin.
-TEST(ExamplePlugins, Factory)
-{
-  BuildExamplePlugins("factory");
-}
+INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
+  "hello_world"
+  ,"world_edit"
+  ,"model_push"
+  ,"factory"
+));
 
 int main(int argc, char **argv)
 {
