@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    class GAZEBO_VISIBLE DynamicLines;
+    class DynamicLines;
 
     /// \class WrenchVisual WrenchVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.

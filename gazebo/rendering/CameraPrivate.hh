@@ -26,7 +26,7 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE CompositorInstance;
+  class CompositorInstance;
 }
 
 namespace gazebo

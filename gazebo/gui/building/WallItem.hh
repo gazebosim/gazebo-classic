@@ -27,11 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE PolylineItem;
-    class GAZEBO_VISIBLE GrabberHandle;
-    class GAZEBO_VISIBLE LineSegmentItem;
-    class GAZEBO_VISIBLE BuildingItem;
-    class GAZEBO_VISIBLE WallInspectorDialog;
+    class PolylineItem;
+    class GrabberHandle;
+    class LineSegmentItem;
+    class BuildingItem;
+    class WallInspectorDialog;
 
     /// \addtogroup gazebo_gui
     /// \{

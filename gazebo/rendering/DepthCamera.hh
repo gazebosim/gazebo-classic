@@ -37,17 +37,17 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Material;
-  class GAZEBO_VISIBLE RenderTarget;
-  class GAZEBO_VISIBLE Texture;
-  class GAZEBO_VISIBLE Viewport;
+  class Material;
+  class RenderTarget;
+  class Texture;
+  class Viewport;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Scene;
+    class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{

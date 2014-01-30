@@ -29,15 +29,15 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE EditorItem;
-    class GAZEBO_VISIBLE WindowItem;
-    class GAZEBO_VISIBLE StairsItem;
-    class GAZEBO_VISIBLE DoorItem;
-    class GAZEBO_VISIBLE WallItem;
-    class GAZEBO_VISIBLE FloorItem;
-    class GAZEBO_VISIBLE BuildingMaker;
-    class GAZEBO_VISIBLE LevelInspectorDialog;
-    class GAZEBO_VISIBLE GridLines;
+    class EditorItem;
+    class WindowItem;
+    class StairsItem;
+    class DoorItem;
+    class WallItem;
+    class FloorItem;
+    class BuildingMaker;
+    class LevelInspectorDialog;
+    class GridLines;
 
     /// \class Level EditorView.hh
     /// \brief A convenient structure for storing level information

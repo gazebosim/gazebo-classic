@@ -25,7 +25,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE GLWidget;
+  class GLWidget;
 
   namespace gui
   {

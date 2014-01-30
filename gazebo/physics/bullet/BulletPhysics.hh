@@ -36,9 +36,9 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE Entity;
-    class GAZEBO_VISIBLE XMLConfigNode;
-    class GAZEBO_VISIBLE Mass;
+    class Entity;
+    class XMLConfigNode;
+    class Mass;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics

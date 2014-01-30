@@ -22,21 +22,21 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE SceneManager;
-  class GAZEBO_VISIBLE Camera;
-  class GAZEBO_VISIBLE RenderTarget;
-  class GAZEBO_VISIBLE RenderTexture;
-  class GAZEBO_VISIBLE PixelBox;
-  class GAZEBO_VISIBLE Overlay;
+  class SceneManager;
+  class Camera;
+  class RenderTarget;
+  class RenderTexture;
+  class PixelBox;
+  class Overlay;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE MaterialSwitcher;
-    class GAZEBO_VISIBLE SelectionRenderListener;
-    class GAZEBO_VISIBLE Scene;
+    class MaterialSwitcher;
+    class SelectionRenderListener;
+    class Scene;
 
     class GAZEBO_VISIBLE SelectionBuffer
     {

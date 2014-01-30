@@ -29,7 +29,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE BuildingMaker;
+    class BuildingMaker;
 
     /// \addtogroup gazebo_gui
     /// \{

@@ -37,7 +37,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    class GAZEBO_VISIBLE DynamicLines;
+    class DynamicLines;
 
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.

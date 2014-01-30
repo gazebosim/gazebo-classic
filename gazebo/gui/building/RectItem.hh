@@ -27,9 +27,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE GrabberHandle;
-    class GAZEBO_VISIBLE RotateHandle;
-    class GAZEBO_VISIBLE EditorItem;
+    class GrabberHandle;
+    class RotateHandle;
+    class EditorItem;
 
     /// \addtogroup gazebo_gui
     /// \{

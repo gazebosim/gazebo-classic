@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace msgs
   {
-    class GAZEBO_VISIBLE Visual;
+    class Visual;
   }
 
     /// \ingroup gazebo_gui

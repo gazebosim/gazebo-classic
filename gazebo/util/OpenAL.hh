@@ -38,9 +38,9 @@ namespace gazebo
 {
   namespace util
   {
-    class GAZEBO_VISIBLE OpenALIface;
-    class GAZEBO_VISIBLE OpenALSource;
-    class GAZEBO_VISIBLE OpenALSink;
+    class OpenALIface;
+    class OpenALSource;
+    class OpenALSink;
 
     /// \addtogroup gazebo_util Utility
     /// \{

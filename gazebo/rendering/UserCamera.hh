@@ -34,11 +34,11 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE OrbitViewController;
-    class GAZEBO_VISIBLE FPSViewController;
-    class GAZEBO_VISIBLE Visual;
-    class GAZEBO_VISIBLE GUIOverlay;
-    class GAZEBO_VISIBLE SelectionBuffer;
+    class OrbitViewController;
+    class FPSViewController;
+    class Visual;
+    class GUIOverlay;
+    class SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{

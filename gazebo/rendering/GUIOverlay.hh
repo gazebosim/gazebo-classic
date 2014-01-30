@@ -35,14 +35,14 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE RenderTarget;
+  class RenderTarget;
 }
 
 #ifdef HAVE_CEGUI
 namespace CEGUI
 {
-  class GAZEBO_VISIBLE OgreRenderer;
-  class GAZEBO_VISIBLE Window;
+  class OgreRenderer;
+  class Window;
 }
 #endif
 

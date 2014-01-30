@@ -47,12 +47,12 @@
 // Forward Declarations
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Texture;
-  class GAZEBO_VISIBLE RenderTarget;
-  class GAZEBO_VISIBLE Camera;
-  class GAZEBO_VISIBLE Viewport;
-  class GAZEBO_VISIBLE SceneNode;
-  class GAZEBO_VISIBLE AnimationState;
+  class Texture;
+  class RenderTarget;
+  class Camera;
+  class Viewport;
+  class SceneNode;
+  class AnimationState;
 }
 
 namespace gazebo
@@ -61,11 +61,11 @@ namespace gazebo
   /// \brief Rendering namespace
   namespace rendering
   {
-    class GAZEBO_VISIBLE MouseEvent;
-    class GAZEBO_VISIBLE ViewController;
-    class GAZEBO_VISIBLE Scene;
-    class GAZEBO_VISIBLE GaussianNoiseCompositorListener;
-    class GAZEBO_VISIBLE CameraPrivate;
+    class MouseEvent;
+    class ViewController;
+    class Scene;
+    class GaussianNoiseCompositorListener;
+    class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions

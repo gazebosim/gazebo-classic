@@ -45,7 +45,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE Event;
+  class Event;
 
   /// \addtogroup gazebo_common Common
   /// \{

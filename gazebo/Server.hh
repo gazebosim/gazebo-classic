@@ -32,12 +32,12 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE mutex;
+  class mutex;
 }
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE Master;
+  class Master;
 
   /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,

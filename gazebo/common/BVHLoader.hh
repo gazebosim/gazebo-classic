@@ -35,7 +35,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Skeleton;
+    class Skeleton;
 
     /// \addtogroup gazebo_common
     /// \{

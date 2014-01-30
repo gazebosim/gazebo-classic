@@ -41,15 +41,15 @@ class QtVariantEditorFactory;
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
-  class GAZEBO_VISIBLE mutex;
+  class recursive_mutex;
+  class mutex;
 }
 
 namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelEditWidget;
+    class ModelEditWidget;
 
     class GAZEBO_VISIBLE ModelListWidget : public QWidget
     {

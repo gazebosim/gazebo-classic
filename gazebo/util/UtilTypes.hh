@@ -29,9 +29,9 @@ namespace gazebo
 {
   namespace util
   {
-    class GAZEBO_VISIBLE DiagnosticTimer;
-    class GAZEBO_VISIBLE OpenALSink;
-    class GAZEBO_VISIBLE OpenALSource;
+    class DiagnosticTimer;
+    class OpenALSink;
+    class OpenALSource;
 
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class

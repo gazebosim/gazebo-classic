@@ -32,10 +32,10 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE RenderWidget;
-    class GAZEBO_VISIBLE ToolsWidget;
-    class GAZEBO_VISIBLE ModelListWidget;
-    class GAZEBO_VISIBLE Editor;
+    class RenderWidget;
+    class ToolsWidget;
+    class ModelListWidget;
+    class Editor;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {

@@ -32,7 +32,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Material;
+    class Material;
 
     /// \addtogroup gazebo_common Common
     /// \{

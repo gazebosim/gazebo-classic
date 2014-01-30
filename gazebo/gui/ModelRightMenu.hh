@@ -31,7 +31,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE ViewState;
+    class ViewState;
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.

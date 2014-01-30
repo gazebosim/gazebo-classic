@@ -28,8 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE BuildingItem;
-    class GAZEBO_VISIBLE WallItem;
+    class BuildingItem;
+    class WallItem;
 
     /// \addtogroup gazebo_gui
     /// \{

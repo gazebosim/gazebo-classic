@@ -30,7 +30,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Heightmap;
+    class Heightmap;
   }
 
   namespace gui

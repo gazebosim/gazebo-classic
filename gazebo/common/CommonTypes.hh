@@ -53,12 +53,12 @@
 /// \brief Forward declarations for the common classes
 namespace gazebo
 {
-  class GAZEBO_VISIBLE WorldPlugin;
-  class GAZEBO_VISIBLE ModelPlugin;
-  class GAZEBO_VISIBLE SensorPlugin;
-  class GAZEBO_VISIBLE GUIPlugin;
-  class GAZEBO_VISIBLE SystemPlugin;
-  class GAZEBO_VISIBLE VisualPlugin;
+  class WorldPlugin;
+  class ModelPlugin;
+  class SensorPlugin;
+  class GUIPlugin;
+  class SystemPlugin;
+  class VisualPlugin;
 
   /// \def WorldPluginPtr
   /// \brief boost::shared_ptr to WorldPlugin
@@ -86,22 +86,22 @@ namespace gazebo
 
   namespace common
   {
-    class GAZEBO_VISIBLE Animation;
-    class GAZEBO_VISIBLE Color;
-    class GAZEBO_VISIBLE DiagnosticTimer;
-    class GAZEBO_VISIBLE Image;
-    class GAZEBO_VISIBLE Mesh;
-    class GAZEBO_VISIBLE SubMesh;
-    class GAZEBO_VISIBLE MouseEvent;
-    class GAZEBO_VISIBLE NumericAnimation;
-    class GAZEBO_VISIBLE Param;
-    class GAZEBO_VISIBLE PoseAnimation;
-    class GAZEBO_VISIBLE SkeletonAnimation;
-    class GAZEBO_VISIBLE SphericalCoordinates;
-    class GAZEBO_VISIBLE Time;
+    class Animation;
+    class Color;
+    class DiagnosticTimer;
+    class Image;
+    class Mesh;
+    class SubMesh;
+    class MouseEvent;
+    class NumericAnimation;
+    class Param;
+    class PoseAnimation;
+    class SkeletonAnimation;
+    class SphericalCoordinates;
+    class Time;
 
     template <typename T>
-    class GAZEBO_VISIBLE ParamT;
+    class ParamT;
 
     /// \brief Speed of light.
     static const double SpeedOfLight = 299792458;
@@ -137,7 +137,7 @@ namespace gazebo
 
   namespace event
   {
-    class GAZEBO_VISIBLE Connection;
+    class Connection;
 
     /// \def ConnectionPtr
     /// \brief boost::shared_ptr to a Connection class

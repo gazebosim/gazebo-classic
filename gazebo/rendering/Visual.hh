@@ -44,19 +44,19 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE MovableObject;
-  class GAZEBO_VISIBLE SceneNode;
-  class GAZEBO_VISIBLE StaticGeometry;
-  class GAZEBO_VISIBLE RibbonTrail;
-  class GAZEBO_VISIBLE AnimationState;
-  class GAZEBO_VISIBLE SkeletonInstance;
+  class MovableObject;
+  class SceneNode;
+  class StaticGeometry;
+  class RibbonTrail;
+  class AnimationState;
+  class SkeletonInstance;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE WireBox;
+    class WireBox;
 
     /// \addtogroup gazebo_rendering
     /// \{

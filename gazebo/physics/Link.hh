@@ -42,14 +42,14 @@ namespace gazebo
 {
   namespace util
   {
-    class GAZEBO_VISIBLE OpenALSource;
-    class GAZEBO_VISIBLE OpenALSink;
+    class OpenALSource;
+    class OpenALSink;
   }
 
   namespace physics
   {
-    class GAZEBO_VISIBLE Model;
-    class GAZEBO_VISIBLE Collision;
+    class Model;
+    class Collision;
 
     /// \addtogroup gazebo_physics
     /// \{

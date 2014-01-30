@@ -34,8 +34,8 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE SpaceTree;
-    class GAZEBO_VISIBLE QuadNode;
+    class SpaceTree;
+    class QuadNode;
 
     /// \addtogroup gazebo_physics
     /// \{

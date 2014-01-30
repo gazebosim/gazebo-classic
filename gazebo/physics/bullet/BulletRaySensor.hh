@@ -29,8 +29,8 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE BulletRayCollision;
-    class GAZEBO_VISIBLE BulletLink;
+    class BulletRayCollision;
+    class BulletLink;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics

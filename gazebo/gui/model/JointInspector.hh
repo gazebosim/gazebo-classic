@@ -30,7 +30,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE JointMaker;
+    class JointMaker;
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.

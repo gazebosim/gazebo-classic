@@ -24,11 +24,11 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE ODECollision;
-    class GAZEBO_VISIBLE ODELink;
-    class GAZEBO_VISIBLE ODERayShape;
-    class GAZEBO_VISIBLE ODESurfaceParams;
-    class GAZEBO_VISIBLE ODEPhysics;
+    class ODECollision;
+    class ODELink;
+    class ODERayShape;
+    class ODESurfaceParams;
+    class ODEPhysics;
 
     /// \def ODECollisionPtr
     /// \brief Boost shared point to ODECollision

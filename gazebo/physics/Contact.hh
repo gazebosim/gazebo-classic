@@ -44,7 +44,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE Collision;
+    class Collision;
     /// \addtogroup gazebo_physics
     /// \{
 

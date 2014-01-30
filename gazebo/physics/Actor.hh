@@ -31,8 +31,8 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Mesh;
-    class GAZEBO_VISIBLE Color;
+    class Mesh;
+    class Color;
   }
 
   namespace physics

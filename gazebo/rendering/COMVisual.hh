@@ -29,7 +29,7 @@
 
 namespace ogre
 {
-  class GAZEBO_VISIBLE SceneNode;
+  class SceneNode;
 }
 
 namespace gazebo
@@ -39,7 +39,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class GAZEBO_VISIBLE DynamicLines;
+    class DynamicLines;
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization

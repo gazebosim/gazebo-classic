@@ -46,8 +46,8 @@ namespace gazebo
   {
     extern bool is_stopped();
 
-    class GAZEBO_VISIBLE IOManager;
-    class GAZEBO_VISIBLE Connection;
+    class IOManager;
+    class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
     /// \cond

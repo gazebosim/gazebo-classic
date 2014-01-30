@@ -39,7 +39,7 @@ namespace gazebo
   namespace rendering
   {
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE LightMaterialGeneratorGLSL;
+    class LightMaterialGeneratorGLSL;
 
     template<typename techniquePolicy>
     class GAZEBO_VISIBLE LightMaterialGenerator: public MaterialGenerator, techniquePolicy

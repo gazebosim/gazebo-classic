@@ -28,9 +28,9 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Material;
-    class GAZEBO_VISIBLE SubMesh;
-    class GAZEBO_VISIBLE Skeleton;
+    class Material;
+    class SubMesh;
+    class Skeleton;
 
     /// \addtogroup gazebo_common Common
     /// \{

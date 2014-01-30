@@ -30,23 +30,23 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    class GAZEBO_VISIBLE Sensor;
-    class GAZEBO_VISIBLE RaySensor;
-    class GAZEBO_VISIBLE CameraSensor;
-    class GAZEBO_VISIBLE MultiCameraSensor;
-    class GAZEBO_VISIBLE DepthCameraSensor;
-    class GAZEBO_VISIBLE ContactSensor;
-    class GAZEBO_VISIBLE ImuSensor;
-    class GAZEBO_VISIBLE GpuRaySensor;
-    class GAZEBO_VISIBLE RFIDSensor;
-    class GAZEBO_VISIBLE RFIDTag;
-    class GAZEBO_VISIBLE SonarSensor;
-    class GAZEBO_VISIBLE ForceTorqueSensor;
-    class GAZEBO_VISIBLE GpsSensor;
-    class GAZEBO_VISIBLE Noise;
-    class GAZEBO_VISIBLE WirelessTransceiver;
-    class GAZEBO_VISIBLE WirelessTransmitter;
-    class GAZEBO_VISIBLE WirelessReceiver;
+    class Sensor;
+    class RaySensor;
+    class CameraSensor;
+    class MultiCameraSensor;
+    class DepthCameraSensor;
+    class ContactSensor;
+    class ImuSensor;
+    class GpuRaySensor;
+    class RFIDSensor;
+    class RFIDTag;
+    class SonarSensor;
+    class ForceTorqueSensor;
+    class GpsSensor;
+    class Noise;
+    class WirelessTransceiver;
+    class WirelessTransmitter;
+    class WirelessReceiver;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor

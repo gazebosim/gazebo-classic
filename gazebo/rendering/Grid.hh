@@ -31,16 +31,16 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE ManualObject;
-  class GAZEBO_VISIBLE SceneNode;
-  class GAZEBO_VISIBLE Any;
+  class ManualObject;
+  class SceneNode;
+  class Any;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Scene;
+    class Scene;
 
     /// \addtogroup gazebo_rendering
     /// \{

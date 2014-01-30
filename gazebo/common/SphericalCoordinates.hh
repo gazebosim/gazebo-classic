@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE SphericalCoordinatesPrivate;
+    class SphericalCoordinatesPrivate;
 
     /// \addtogroup gazebo_common
     /// \{

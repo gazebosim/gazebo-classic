@@ -29,7 +29,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Mesh;
+    class Mesh;
 
     /// \addtogroup gazebo_common Common
     /// \{

@@ -40,35 +40,35 @@
 
 namespace SkyX
 {
-  class GAZEBO_VISIBLE SkyX;
-  class GAZEBO_VISIBLE BasicController;
+  class SkyX;
+  class BasicController;
 }
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE SceneManager;
-  class GAZEBO_VISIBLE RaySceneQuery;
-  class GAZEBO_VISIBLE Node;
-  class GAZEBO_VISIBLE Entity;
-  class GAZEBO_VISIBLE Mesh;
-  class GAZEBO_VISIBLE Vector3;
-  class GAZEBO_VISIBLE Quaternion;
+  class SceneManager;
+  class RaySceneQuery;
+  class Node;
+  class Entity;
+  class Mesh;
+  class Vector3;
+  class Quaternion;
 }
 
 namespace boost
 {
-  class GAZEBO_VISIBLE mutex;
+  class mutex;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Projector;
-    class GAZEBO_VISIBLE Light;
-    class GAZEBO_VISIBLE Visual;
-    class GAZEBO_VISIBLE Grid;
-    class GAZEBO_VISIBLE Heightmap;
+    class Projector;
+    class Light;
+    class Visual;
+    class Grid;
+    class Heightmap;
 
     /// \addtogroup gazebo_rendering
     /// \{

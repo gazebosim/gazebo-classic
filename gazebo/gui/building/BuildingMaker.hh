@@ -33,15 +33,15 @@ namespace gazebo
 {
   namespace msgs
   {
-    class GAZEBO_VISIBLE Visual;
+    class Visual;
   }
 
   namespace gui
   {
-    class GAZEBO_VISIBLE EntityMaker;
-    class GAZEBO_VISIBLE EditorItem;
-    class GAZEBO_VISIBLE BuildingModelManip;
-    class GAZEBO_VISIBLE FinishBuildingDialog;
+    class EntityMaker;
+    class EditorItem;
+    class BuildingModelManip;
+    class FinishBuildingDialog;
 
     /// \addtogroup gazebo_gui
     /// \{

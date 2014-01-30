@@ -27,7 +27,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Light;
+    class Light;
   }
 
   namespace gui

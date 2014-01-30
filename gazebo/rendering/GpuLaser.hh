@@ -41,24 +41,24 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Material;
-  class GAZEBO_VISIBLE Renderable;
-  class GAZEBO_VISIBLE Pass;
-  class GAZEBO_VISIBLE AutoParamDataSource;
-  class GAZEBO_VISIBLE Matrix4;
-  class GAZEBO_VISIBLE MovableObject;
+  class Material;
+  class Renderable;
+  class Pass;
+  class AutoParamDataSource;
+  class Matrix4;
+  class MovableObject;
 }
 
 namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Mesh;
+    class Mesh;
   }
 
   namespace rendering
   {
-    class GAZEBO_VISIBLE Scene;
+    class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{

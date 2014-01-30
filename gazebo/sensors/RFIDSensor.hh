@@ -40,7 +40,7 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    class GAZEBO_VISIBLE RFIDTag;
+    class RFIDTag;
 
     /// \addtogroup gazebo_sensors
     /// \{

@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class GAZEBO_VISIBLE Camera;
+    class Camera;
 
     /// \class CameraVisual CameraVisual.hh rendering/rendering.hh
     /// \brief Basic camera visualization

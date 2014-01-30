@@ -26,11 +26,11 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE SimbodyCollision;
-    class GAZEBO_VISIBLE SimbodyLink;
-    class GAZEBO_VISIBLE SimbodyModel;
-    class GAZEBO_VISIBLE SimbodyPhysics;
-    class GAZEBO_VISIBLE SimbodyRayShape;
+    class SimbodyCollision;
+    class SimbodyLink;
+    class SimbodyModel;
+    class SimbodyPhysics;
+    class SimbodyRayShape;
 
     /// \def SimbodyPhysicsPtr
     /// \brief Boost shared point to SimbodyPhysics

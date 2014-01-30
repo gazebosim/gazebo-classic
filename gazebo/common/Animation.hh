@@ -34,9 +34,9 @@ namespace gazebo
 
   namespace common
   {
-    class GAZEBO_VISIBLE KeyFrame;
-    class GAZEBO_VISIBLE PoseKeyFrame;
-    class GAZEBO_VISIBLE NumericKeyFrame;
+    class KeyFrame;
+    class PoseKeyFrame;
+    class NumericKeyFrame;
 
     /// \addtogroup gazebo_common
     /// \{

@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelEditorPalette;
+    class ModelEditorPalette;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.

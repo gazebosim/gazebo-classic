@@ -34,9 +34,9 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Root;
-  class GAZEBO_VISIBLE LogManager;
-  class GAZEBO_VISIBLE OverlaySystem;
+  class Root;
+  class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo

@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE DynamicLines;
+    class DynamicLines;
     /// \addtogroup gazebo_rendering
     /// \{
 

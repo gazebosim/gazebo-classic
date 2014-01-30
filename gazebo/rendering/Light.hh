@@ -35,15 +35,15 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Light;
+  class Light;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Scene;
-    class GAZEBO_VISIBLE DynamicLines;
+    class Scene;
+    class DynamicLines;
 
     /// \addtogroup gazebo_rendering
     /// \{

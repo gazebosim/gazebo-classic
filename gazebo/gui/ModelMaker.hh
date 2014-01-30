@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace msgs
   {
-    class GAZEBO_VISIBLE Visual;
+    class Visual;
   }
 
   namespace gui

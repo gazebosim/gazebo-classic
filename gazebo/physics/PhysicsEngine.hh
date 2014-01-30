@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE ContactManager;
+    class ContactManager;
 
     /// \addtogroup gazebo_physics
     /// \{

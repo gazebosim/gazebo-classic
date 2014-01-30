@@ -32,7 +32,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE Link;
+    class Link;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics

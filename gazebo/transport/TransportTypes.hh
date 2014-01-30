@@ -28,12 +28,12 @@ namespace gazebo
 {
   namespace transport
   {
-    class GAZEBO_VISIBLE Publisher;
-    class GAZEBO_VISIBLE Publication;
-    class GAZEBO_VISIBLE PublicationTransport;
-    class GAZEBO_VISIBLE Subscriber;
-    class GAZEBO_VISIBLE SubscriptionTransport;
-    class GAZEBO_VISIBLE Node;
+    class Publisher;
+    class Publication;
+    class PublicationTransport;
+    class Subscriber;
+    class SubscriptionTransport;
+    class Node;
 
     /// \def MessagePtr
     /// \brief Shared_ptr to protobuf message

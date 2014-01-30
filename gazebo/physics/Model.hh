@@ -35,14 +35,14 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE Gripper;
+    class Gripper;
 
     /// \addtogroup gazebo_physics
     /// \{

@@ -33,11 +33,11 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE BulletCollision;
-    class GAZEBO_VISIBLE BulletLink;
-    class GAZEBO_VISIBLE BulletPhysics;
-    class GAZEBO_VISIBLE BulletRayShape;
-    class GAZEBO_VISIBLE BulletMotionState;
+    class BulletCollision;
+    class BulletLink;
+    class BulletPhysics;
+    class BulletRayShape;
+    class BulletMotionState;
 
     typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;

@@ -35,8 +35,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE JointData;
-    class GAZEBO_VISIBLE JointInspector;
+    class JointData;
+    class JointInspector;
 
     /// \addtogroup gazebo_gui
     /// \{

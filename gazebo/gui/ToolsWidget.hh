@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE JointControlWidget;
+    class JointControlWidget;
 
     /// \addtogroup gazebo_gui
     /// \{

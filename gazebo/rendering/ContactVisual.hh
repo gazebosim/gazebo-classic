@@ -31,8 +31,8 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE Entity;
-  class GAZEBO_VISIBLE SceneNode;
+  class Entity;
+  class SceneNode;
 }
 
 namespace gazebo
@@ -42,7 +42,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class GAZEBO_VISIBLE DynamicLines;
+    class DynamicLines;
 
     /// \class ContactVisual ContactVisual.hh rendering/rendering.hh
     /// \brief Contact visualization

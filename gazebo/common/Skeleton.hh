@@ -29,9 +29,9 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE SkeletonNode;
-    class GAZEBO_VISIBLE NodeTransform;
-    class GAZEBO_VISIBLE SkeletonAnimation;
+    class SkeletonNode;
+    class NodeTransform;
+    class SkeletonAnimation;
 
     typedef std::map<unsigned int, SkeletonNode*> NodeMap;
     typedef std::map<unsigned int, SkeletonNode*>::iterator NodeMapIter;

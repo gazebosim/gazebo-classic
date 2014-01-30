@@ -32,7 +32,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private
-    class GAZEBO_VISIBLE InsertModelWidgetPrivate;
+    class InsertModelWidgetPrivate;
 
     class GAZEBO_VISIBLE InsertModelWidget : public QWidget
     {

@@ -27,7 +27,7 @@
 
 namespace ogre
 {
-  class GAZEBO_VISIBLE SceneNode;
+  class SceneNode;
 }
 
 namespace gazebo

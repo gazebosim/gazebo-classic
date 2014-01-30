@@ -28,10 +28,10 @@ namespace gazebo
   /// \brief GUI forward declarations and type defines
   namespace gui
   {
-    class GAZEBO_VISIBLE TopicView;
-    class GAZEBO_VISIBLE ImageView;
-    class GAZEBO_VISIBLE TextView;
-    class GAZEBO_VISIBLE LaserView;
+    class TopicView;
+    class ImageView;
+    class TextView;
+    class LaserView;
 
     /// \def TopicViewPtr
     /// \brief Boost shared pointer to a TopicView object

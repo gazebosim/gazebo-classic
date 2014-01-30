@@ -40,27 +40,27 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Scene;
-    class GAZEBO_VISIBLE Light;
-    class GAZEBO_VISIBLE Camera;
-    class GAZEBO_VISIBLE UserCamera;
-    class GAZEBO_VISIBLE DepthCamera;
-    class GAZEBO_VISIBLE GpuLaser;
-    class GAZEBO_VISIBLE DynamicLines;
-    class GAZEBO_VISIBLE Visual;
-    class GAZEBO_VISIBLE LaserVisual;
-    class GAZEBO_VISIBLE SonarVisual;
-    class GAZEBO_VISIBLE WrenchVisual;
-    class GAZEBO_VISIBLE CameraVisual;
-    class GAZEBO_VISIBLE JointVisual;
-    class GAZEBO_VISIBLE AxisVisual;
-    class GAZEBO_VISIBLE ArrowVisual;
-    class GAZEBO_VISIBLE ContactVisual;
-    class GAZEBO_VISIBLE COMVisual;
-    class GAZEBO_VISIBLE RFIDVisual;
-    class GAZEBO_VISIBLE RFIDTagVisual;
-    class GAZEBO_VISIBLE WindowManager;
-    class GAZEBO_VISIBLE SelectionObj;
+    class Scene;
+    class Light;
+    class Camera;
+    class UserCamera;
+    class DepthCamera;
+    class GpuLaser;
+    class DynamicLines;
+    class Visual;
+    class LaserVisual;
+    class SonarVisual;
+    class WrenchVisual;
+    class CameraVisual;
+    class JointVisual;
+    class AxisVisual;
+    class ArrowVisual;
+    class ContactVisual;
+    class COMVisual;
+    class RFIDVisual;
+    class RFIDTagVisual;
+    class WindowManager;
+    class SelectionObj;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene

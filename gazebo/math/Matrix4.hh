@@ -28,8 +28,8 @@ namespace gazebo
 {
   namespace math
   {
-    class GAZEBO_VISIBLE Quaternion;
-    class GAZEBO_VISIBLE Pose;
+    class Quaternion;
+    class Pose;
 
     /// \addtogroup gazebo_math
     /// \{

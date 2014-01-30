@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE EditorItem;
+    class EditorItem;
 
     /// \addtogroup gazebo_gui
     /// \{

@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE IncrementalPlot;
+    class IncrementalPlot;
 
     /// \brief Plot diagnostic information
     class GAZEBO_VISIBLE Diagnostics : public QDialog

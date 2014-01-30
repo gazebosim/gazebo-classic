@@ -38,12 +38,12 @@ namespace gazebo
 {
   namespace msgs
   {
-    class GAZEBO_VISIBLE Visual;
+    class Visual;
   }
 
   namespace gui
   {
-    class GAZEBO_VISIBLE PartData;
+    class PartData;
 
     /// \addtogroup gazebo_gui
     /// \{

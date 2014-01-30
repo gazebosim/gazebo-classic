@@ -25,8 +25,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE LevelWidget;
-    class GAZEBO_VISIBLE ScaleWidget;
+    class LevelWidget;
+    class ScaleWidget;
 
     /// \addtogroup gazebo_gui
     /// \{

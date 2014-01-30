@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE MainWindow;
+    class MainWindow;
 
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor.

@@ -37,8 +37,8 @@ namespace gazebo
 
   namespace gui
   {
-    class GAZEBO_VISIBLE JointMaker;
-    class GAZEBO_VISIBLE ModelCreator;
+    class JointMaker;
+    class ModelCreator;
 
     /// \addtogroup gazebo_gui
     /// \{

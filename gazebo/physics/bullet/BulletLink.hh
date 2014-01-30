@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class GAZEBO_VISIBLE BulletMotionState;
+    class BulletMotionState;
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics

@@ -25,7 +25,7 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE RenderWindow;
+  class RenderWindow;
 }
 
 namespace gazebo

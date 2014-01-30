@@ -37,8 +37,8 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE Visual;
-    class GAZEBO_VISIBLE Scene;
+    class Visual;
+    class Scene;
 
     /// \addtogroup gazebo_rendering
     /// \{

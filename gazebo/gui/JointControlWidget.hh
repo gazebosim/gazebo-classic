@@ -28,9 +28,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE JointForceControl;
-    class GAZEBO_VISIBLE JointPIDPosControl;
-    class GAZEBO_VISIBLE JointPIDVelControl;
+    class JointForceControl;
+    class JointPIDPosControl;
+    class JointPIDVelControl;
 
     /// \class JointControlWidget JointControlWidget
     /// gui/JointControlWidget.hh

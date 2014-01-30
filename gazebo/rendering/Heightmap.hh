@@ -35,16 +35,16 @@
 
 namespace Ogre
 {
-  class GAZEBO_VISIBLE TerrainGlobalOptions;
-  class GAZEBO_VISIBLE TerrainGroup;
-  class GAZEBO_VISIBLE Terrain;
+  class TerrainGlobalOptions;
+  class TerrainGroup;
+  class Terrain;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE GzTerrainMatGen;
+    class GzTerrainMatGen;
 
     /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
     /// \brief Pretends to provide procedural page content to avoid page loading

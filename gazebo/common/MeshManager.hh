@@ -33,11 +33,11 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE ColladaLoader;
-    class GAZEBO_VISIBLE STLLoader;
-    class GAZEBO_VISIBLE Mesh;
-    class GAZEBO_VISIBLE Plane;
-    class GAZEBO_VISIBLE SubMesh;
+    class ColladaLoader;
+    class STLLoader;
+    class Mesh;
+    class Plane;
+    class SubMesh;
 
     /// \addtogroup gazebo_common Common
     /// \{

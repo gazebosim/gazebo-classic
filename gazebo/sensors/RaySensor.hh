@@ -33,9 +33,9 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE OgreDynamicLines;
-  class GAZEBO_VISIBLE Collision;
-  class GAZEBO_VISIBLE MultiRayShape;
+  class OgreDynamicLines;
+  class Collision;
+  class MultiRayShape;
 
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace

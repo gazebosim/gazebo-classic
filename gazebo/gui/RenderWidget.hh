@@ -31,11 +31,11 @@ class QHBoxLayout;
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE GLWidget;
+  class GLWidget;
 
   namespace gui
   {
-    class GAZEBO_VISIBLE BuildingEditorWidget;
+    class BuildingEditorWidget;
 
     class GAZEBO_VISIBLE RenderWidget : public QWidget
     {

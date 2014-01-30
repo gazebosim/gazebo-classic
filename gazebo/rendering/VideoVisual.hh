@@ -30,7 +30,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE Video;
+    class Video;
   }
 
   namespace rendering

@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace common
   {
-    class GAZEBO_VISIBLE MouseEvent;
+    class MouseEvent;
   }
 
   /// \ingroup gazebo_gui

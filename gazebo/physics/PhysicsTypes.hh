@@ -31,34 +31,34 @@ namespace gazebo
   /// \brief Physics forward declarations and type defines
   namespace physics
   {
-    class GAZEBO_VISIBLE Base;
-    class GAZEBO_VISIBLE Entity;
-    class GAZEBO_VISIBLE World;
-    class GAZEBO_VISIBLE Model;
-    class GAZEBO_VISIBLE Actor;
-    class GAZEBO_VISIBLE Link;
-    class GAZEBO_VISIBLE Collision;
-    class GAZEBO_VISIBLE Gripper;
-    class GAZEBO_VISIBLE Joint;
-    class GAZEBO_VISIBLE JointController;
-    class GAZEBO_VISIBLE Contact;
-    class GAZEBO_VISIBLE PhysicsEngine;
-    class GAZEBO_VISIBLE Mass;
-    class GAZEBO_VISIBLE Road;
-    class GAZEBO_VISIBLE Shape;
-    class GAZEBO_VISIBLE RayShape;
-    class GAZEBO_VISIBLE MultiRayShape;
-    class GAZEBO_VISIBLE Inertial;
-    class GAZEBO_VISIBLE SurfaceParams;
-    class GAZEBO_VISIBLE BoxShape;
-    class GAZEBO_VISIBLE CylinderShape;
-    class GAZEBO_VISIBLE MeshShape;
-    class GAZEBO_VISIBLE SphereShape;
-    class GAZEBO_VISIBLE MeshShape;
-    class GAZEBO_VISIBLE HeightmapShape;
-    class GAZEBO_VISIBLE ModelState;
-    class GAZEBO_VISIBLE LinkState;
-    class GAZEBO_VISIBLE JointState;
+    class Base;
+    class Entity;
+    class World;
+    class Model;
+    class Actor;
+    class Link;
+    class Collision;
+    class Gripper;
+    class Joint;
+    class JointController;
+    class Contact;
+    class PhysicsEngine;
+    class Mass;
+    class Road;
+    class Shape;
+    class RayShape;
+    class MultiRayShape;
+    class Inertial;
+    class SurfaceParams;
+    class BoxShape;
+    class CylinderShape;
+    class MeshShape;
+    class SphereShape;
+    class MeshShape;
+    class HeightmapShape;
+    class ModelState;
+    class LinkState;
+    class JointState;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
