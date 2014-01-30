@@ -20,8 +20,12 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
+
+#ifdef HAVE_BULLET
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
@@ -59,6 +63,7 @@ class PhysicsFrictionTest : public ServerFixture,
                   this->friction = (surface->frictionPyramid.GetMu(0)
                                   + surface->frictionPyramid.GetMu(1)) / 2.0;
                 }
+#ifdef HAVE_BULLET
                 else if (physics->GetType() == "bullet")
                 {
                   physics::BulletSurfaceParamsPtr surface =
@@ -68,6 +73,7 @@ class PhysicsFrictionTest : public ServerFixture,
                   this->friction = (surface->frictionPyramid.GetMu(0)
                                   + surface->frictionPyramid.GetMu(1)) / 2.0;
                 }
+#endif
               }
             }
     public: ~FrictionBox() {}
