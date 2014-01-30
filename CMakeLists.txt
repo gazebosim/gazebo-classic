@@ -240,6 +240,9 @@ if(APPLE)
   gz_setup_apple()
 endif()
 
+# Main includes for compilation
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
 message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
@@ -283,7 +286,6 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
  
-  include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
