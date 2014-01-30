@@ -481,6 +481,10 @@ namespace gazebo
       /// \return Joint::anchorPose, initial joint anchor pose.
       public: math::Pose GetInitialAnchorPose() const;
 
+      /// \brief Get pose of joint frame relative to world frame.
+      /// \return Pose of joint frame relative to world frame.
+      public: math::Pose GetWorldPose() const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.

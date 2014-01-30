@@ -883,3 +883,11 @@ math::Pose Joint::GetInitialAnchorPose() const
 {
   return this->anchorPose;
 }
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetWorldPose() const
+{
+  if (this->childLink)
+    return this->anchorPose + this->childLink->GetWorldPose();
+  return this->anchorPose;
+}

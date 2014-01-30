@@ -79,6 +79,7 @@
 ### Additions
 
 1. **gazebo/physics/Joint.hh**
+    + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
