@@ -525,6 +525,9 @@ namespace gazebo
       /// we do need this (e.g. GetForceTorque and joint visualization).
       protected: math::Pose anchorPose;
 
+      /// \brief Pose of joint anchor on parent in parent link frame.
+      protected: math::Pose parentAnchorPose;
+
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 

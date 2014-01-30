@@ -182,6 +182,13 @@ void Joint::Load(sdf::ElementPtr _sdf)
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
   this->anchorPose = _sdf->Get<math::Pose>("pose");
+
+  // Need to set this after this->anchorPose,
+  // since GetWorldPose() uses this->anchorPose.
+  this->parentAnchorPose = this->GetWorldPose();
+  if (this->parentLink)
+    this->parentAnchorPose -= this->parentLink->GetWorldPose();
+
   this->LoadImpl(this->anchorPose);
 }
 
@@ -895,5 +902,7 @@ math::Pose Joint::GetWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetParentAnchorWorldPose() const
 {
-  return math::Pose();
+  if (this->parentLink)
+    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+  return this->parentAnchorPose;
 }
