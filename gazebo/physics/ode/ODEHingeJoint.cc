@@ -99,13 +99,6 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
-  if (_index < 0 || _index >= this->GetAngleCount())
-  {
-    gzerr << "SetAxis error, _index[" << _index << "] out of range."
-          << std::endl;
-    return;
-  }
-
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
