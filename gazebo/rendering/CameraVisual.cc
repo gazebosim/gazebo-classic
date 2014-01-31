@@ -119,5 +119,4 @@ void CameraVisual::Update()
     return;
 
   this->camera->Render();
-  this->camera->PostRender();
 }
