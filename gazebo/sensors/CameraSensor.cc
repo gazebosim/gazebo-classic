@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
@@ -135,6 +137,15 @@ void CameraSensor::Init()
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
+
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+        this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(this->camera);
+    }
   }
   else
     gzerr << "No world name\n";

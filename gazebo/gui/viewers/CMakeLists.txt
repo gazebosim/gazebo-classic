@@ -3,6 +3,7 @@ include ( ${QT_USE_FILE} )
 
 
 set (sources
+  ImageFrame.cc
   ImageView.cc
   ImagesView.cc
   LaserView.cc
@@ -16,6 +17,7 @@ set (headers
 )
 
 set (qt_headers
+  ImageFrame.hh
   ImageView.hh
   ImagesView.hh
   LaserView.hh
