@@ -85,11 +85,7 @@ void OculusWindow::showEvent(QShowEvent *_event)
 
   this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
 
-  if (this->scene->GetVisual(this->visualName))
-    this->oculusCamera->AttachToVisual(this->visualName, true);
-  else
-    gzwarn << "Unable to attach Oculus camera to visual with name["
-      << this->visualName << "]\n";
+  this->oculusCamera->AttachToVisual(this->visualName, true);
 
   math::Vector3 camPos(0.1, 0, 0);
   math::Vector3 lookAt(0, 0, 0);
