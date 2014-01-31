@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -876,11 +877,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactSlip1 |
                          dContactSlip2;
 
+  ODESurfaceParamsPtr surf1 = _collision1->GetODESurface();
+  ODESurfaceParamsPtr surf2 = _collision2->GetODESurface();
+
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.
-  double kp = 1.0 /
-    (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
-  double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
+  double kp = 1.0 / (1.0 / surf1->kp + 1.0 / surf2->kp);
+  double kd = surf1->kd + surf2->kd;
 
   contact.surface.soft_erp = (this->maxStepSize * kp) /
                              (this->maxStepSize * kp + kd);
@@ -893,7 +896,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  math::Vector3 fd = surf1->fdir1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -907,9 +910,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  math::Vector3 fd2 = surf2->fdir1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+        surf1->mu1 > surf2->mu1))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -932,24 +935,24 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(_collision1->GetSurface()->mu1,
-                                _collision2->GetSurface()->mu1);
-  contact.surface.mu2 = std::min(_collision1->GetSurface()->mu2,
-                                 _collision2->GetSurface()->mu2);
+  contact.surface.mu = std::min(surf1->mu1,
+                                surf2->mu1);
+  contact.surface.mu2 = std::min(surf1->mu2,
+                                 surf2->mu2);
 
 
   // Set the slip values
-  contact.surface.slip1 = std::min(_collision1->GetSurface()->slip1,
-                                   _collision2->GetSurface()->slip1);
-  contact.surface.slip2 = std::min(_collision1->GetSurface()->slip2,
-                                   _collision2->GetSurface()->slip2);
+  contact.surface.slip1 = std::min(surf1->slip1,
+                                   surf2->slip1);
+  contact.surface.slip2 = std::min(surf1->slip2,
+                                   surf2->slip2);
 
   // Set the bounce values
-  contact.surface.bounce = std::min(_collision1->GetSurface()->bounce,
-                                    _collision2->GetSurface()->bounce);
+  contact.surface.bounce = std::min(surf1->bounce,
+                                    surf2->bounce);
   contact.surface.bounce_vel =
-    std::min(_collision1->GetSurface()->bounceThreshold,
-             _collision2->GetSurface()->bounceThreshold);
+    std::min(surf1->bounceThreshold,
+             surf2->bounceThreshold);
 
   // Get the ODE body IDs
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());

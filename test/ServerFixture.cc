@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ void ServerFixture::TearDown()
 /////////////////////////////////////////////////
 void ServerFixture::Unload()
 {
+  gzdbg << "ServerFixture::Unload" << std::endl;
   this->serverRunning = false;
   if (this->node)
     this->node->Fini();
@@ -139,9 +140,9 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/100.0
+         << static_cast<double>(waitCount)/10.0
          << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/100.0
+         << static_cast<double>(maxWaitCount)/10.0
          << " seconds\n";
 
   if (waitCount >= maxWaitCount)
