@@ -25,8 +25,7 @@
 
 using namespace gazebo;
 
-class AnimationTest : public gazebo::testing::AutoLogFixture 
-{ };
+class AnimationTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(AnimationTest, PoseAnimation)
 {

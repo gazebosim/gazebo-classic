@@ -28,8 +28,7 @@
 
 using namespace gazebo;
 
-class MeshTest : public gazebo::testing::AutoLogFixture 
-{ };
+class MeshTest : public gazebo::testing::AutoLogFixture { };
 
 std::string asciiSTLBox =
 "solid MYSOLID\n\

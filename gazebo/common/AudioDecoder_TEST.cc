@@ -33,8 +33,7 @@ extern "C" {
 
 using namespace gazebo;
 
-class AudioDecoder : public gazebo::testing::AutoLogFixture 
-{ };
+class AudioDecoder : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(AudioDecoder, FileNotSet)

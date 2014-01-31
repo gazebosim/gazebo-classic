@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class Color : public gazebo::testing::AutoLogFixture 
-{ };
+class Color : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(Color, Color)
 {

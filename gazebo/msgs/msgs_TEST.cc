@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class MsgsTest : public gazebo::testing::AutoLogFixture 
-{ };
+class MsgsTest : public gazebo::testing::AutoLogFixture { };
 
 void TimeTest(const common::Time &_t, const msgs::Time &_msg)
 {

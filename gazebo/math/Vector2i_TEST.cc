@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class Vector2iTest : public gazebo::testing::AutoLogFixture 
-{ };
+class Vector2iTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(Vector2iTest, Vector2i)
 {

@@ -24,8 +24,7 @@
 
 using namespace gazebo;
 
-class TimeTest : public gazebo::testing::AutoLogFixture 
-{ };
+class TimeTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(TimeTest, Time)
 {

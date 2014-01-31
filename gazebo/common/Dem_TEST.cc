@@ -25,8 +25,7 @@
 
 using namespace gazebo;
 
-class DemTest : public gazebo::testing::AutoLogFixture 
-{ };
+class DemTest : public gazebo::testing::AutoLogFixture { };
 
 #ifdef HAVE_GDAL
 

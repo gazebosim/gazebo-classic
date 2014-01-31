@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class QuaternionTest : public gazebo::testing::AutoLogFixture 
-{ };
+class QuaternionTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(QuaternionTest, Quaternion)
 {

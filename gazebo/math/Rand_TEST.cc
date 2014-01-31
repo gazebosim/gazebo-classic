@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class RandTest : public gazebo::testing::AutoLogFixture 
-{ };
+class RandTest : public gazebo::testing::AutoLogFixture { };
 
 //////////////////////////////////////////////////
 TEST_F(RandTest, Rand)

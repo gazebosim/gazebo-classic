@@ -21,8 +21,7 @@
 
 using namespace gazebo;
 
-class MaterialTest : public gazebo::testing::AutoLogFixture 
-{ };
+class MaterialTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(MaterialTest, Material)
 {

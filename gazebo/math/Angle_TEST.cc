@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class AngleTest : public gazebo::testing::AutoLogFixture 
-{ };
+class AngleTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(AngleTest, Angle)
 {

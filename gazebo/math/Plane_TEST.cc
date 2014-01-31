@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class PlaneTest : public gazebo::testing::AutoLogFixture 
-{ };
+class PlaneTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(PlaneTest, Plane)
 {

@@ -24,8 +24,7 @@
 
 using namespace gazebo;
 
-class Connection : public gazebo::testing::AutoLogFixture 
-{ };
+class Connection : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(Connection, IPWhiteList)

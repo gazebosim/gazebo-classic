@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class ColladaLoader : public gazebo::testing::AutoLogFixture 
-{ };
+class ColladaLoader : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(ColladaLoader, LoadBox)

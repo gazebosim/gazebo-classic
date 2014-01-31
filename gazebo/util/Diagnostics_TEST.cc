@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class DiagnosticsTest : public gazebo::testing::AutoLogFixture 
-{ };
+class DiagnosticsTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(DiagnosticsTest, Diagnostics)
 {

@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class EventTest : public gazebo::testing::AutoLogFixture 
-{ };
+class EventTest : public gazebo::testing::AutoLogFixture { };
 
 int g_callback = 0;
 int g_callback1 = 0;

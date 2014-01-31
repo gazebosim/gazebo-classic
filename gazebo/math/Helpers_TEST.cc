@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class HelpersTest : public gazebo::testing::AutoLogFixture 
-{ };
+class HelpersTest : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 // Test a few function in Helpers

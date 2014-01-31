@@ -24,8 +24,7 @@
 #include "gazebo/util/LogRecord.hh"
 #include "test/util.hh"
 
-class LogRecord_TEST : public gazebo::testing::AutoLogFixture 
-{ };
+class LogRecord_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord constructor and a few accessors

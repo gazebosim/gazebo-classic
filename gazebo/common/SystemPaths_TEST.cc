@@ -26,8 +26,7 @@
 
 using namespace gazebo;
 
-class SystemPathsTest : public gazebo::testing::AutoLogFixture 
-{ };
+class SystemPathsTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(SystemPathsTest, SystemPaths)
 {

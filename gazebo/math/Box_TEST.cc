@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class BoxTest : public gazebo::testing::AutoLogFixture 
-{ };
+class BoxTest : public gazebo::testing::AutoLogFixture { };
 
 class ExampleBox : public ::testing::Test
 {

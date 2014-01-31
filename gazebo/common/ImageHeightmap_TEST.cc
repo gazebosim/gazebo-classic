@@ -26,11 +26,9 @@
 
 using namespace gazebo;
 
-class ImageHeightmapTest : public gazebo::testing::AutoLogFixture 
-{ };
+class ImageHeightmapTest : public gazebo::testing::AutoLogFixture { };
 
-class DemTest : public gazebo::testing::AutoLogFixture 
-{ };
+class DemTest : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(DemTest, MisingFile)

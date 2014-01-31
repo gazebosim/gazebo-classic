@@ -25,8 +25,7 @@
 
 using namespace gazebo;
 
-class CommonIface_TEST : public gazebo::testing::AutoLogFixture 
-{ };
+class CommonIface_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// \brief Test CommonIface::GetSHA1

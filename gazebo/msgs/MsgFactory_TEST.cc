@@ -25,8 +25,7 @@
 #include "test_config.h"
 #include "test/util.hh"
 
-class MsgFactory : public gazebo::testing::AutoLogFixture 
-{ };
+class MsgFactory : public gazebo::testing::AutoLogFixture { };
 
 std::string custom_exec(const std::string &_cmd)
 {

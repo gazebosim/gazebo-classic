@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class Matrix3Test : public gazebo::testing::AutoLogFixture 
-{ };
+class Matrix3Test : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(Matrix3Test, Matrix3)
 {

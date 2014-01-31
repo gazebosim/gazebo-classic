@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class SphericalCoordinatesTest : public gazebo::testing::AutoLogFixture 
-{ };
+class SphericalCoordinatesTest : public gazebo::testing::AutoLogFixture { };
 
 //////////////////////////////////////////////////
 // Test different constructors, default parameters

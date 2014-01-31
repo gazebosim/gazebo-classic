@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class Exception : public gazebo::testing::AutoLogFixture 
-{ };
+class Exception : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(Exception, Exception)
 {

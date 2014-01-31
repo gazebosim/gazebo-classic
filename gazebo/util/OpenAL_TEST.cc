@@ -27,8 +27,7 @@
 
 using namespace gazebo;
 
-class OpenAL : public gazebo::testing::AutoLogFixture 
-{ };
+class OpenAL : public gazebo::testing::AutoLogFixture { };
 
 #ifdef HAVE_OPENAL
 /////////////////////////////////////////////////

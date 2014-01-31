@@ -25,8 +25,7 @@
 
 using namespace gazebo;
 
-class RotationSplineTest : public gazebo::testing::AutoLogFixture 
-{ };
+class RotationSplineTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(RotationSplineTest, RotationSpline)
 {

@@ -20,8 +20,7 @@
 
 using namespace gazebo;
 
-class BoxShapeTest : public gazebo::testing::AutoLogFixture 
-{ };
+class BoxShapeTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(BoxShapeTest, Scale)
 {

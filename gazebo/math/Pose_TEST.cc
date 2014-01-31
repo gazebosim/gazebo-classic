@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class PoseTest : public gazebo::testing::AutoLogFixture 
-{ };
+class PoseTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(PoseTest, Pose)
 {

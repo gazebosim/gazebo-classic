@@ -27,8 +27,7 @@
 
 using namespace gazebo;
 
-class BulletTypes : public gazebo::testing::AutoLogFixture 
-{ };
+class BulletTypes : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// Check Vector3 conversions

@@ -23,8 +23,7 @@
 
 using namespace gazebo;
 
-class SplineTest : public gazebo::testing::AutoLogFixture 
-{ };
+class SplineTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(SplineTest, Spline)
 {

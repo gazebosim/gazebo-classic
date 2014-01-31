@@ -22,8 +22,7 @@
 
 using namespace gazebo;
 
-class ImageTest : public gazebo::testing::AutoLogFixture 
-{ };
+class ImageTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(ImageTest, Image)
 {

@@ -28,8 +28,7 @@
 
 using namespace gazebo;
 
-class NoiseTest : public gazebo::testing::AutoLogFixture 
-{ };
+class NoiseTest : public gazebo::testing::AutoLogFixture { };
 
 const unsigned int g_applyCount = 100;
 
