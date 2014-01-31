@@ -24,6 +24,7 @@
 
 #include "gazebo/math/Rand.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/GaussianNoiseModel.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
