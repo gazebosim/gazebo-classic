@@ -64,14 +64,6 @@ void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
   /// actually does nothing.
   gzdbg << "SetAxis: setting axis is not yet implemented. The axes are set "
         << "during joint construction in SimbodyPhyiscs.cc for now.\n";
-
-  /// \TODO:  Better document this
-  /// Flip order of axis1 and axis2 because ODE/Gazebo currently uses
-  /// space-fixed axis for a universal joint, whereas Simbody uses
-  /// body-fixed axis for a universal joint.
-  /// Simbody implements a x-y body-fixed (first rotate about x-axis then
-  /// moving y-axis).  This is equivalent to y-x space-fixed (first rotate
-  /// aobut y-axis then around the original x-axis).
 }
 
 
@@ -82,9 +74,11 @@ double SimbodyUniversalJoint::GetVelocity(unsigned int _index) const
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
+    {
       return this->mobod.getOneU(
         this->simbodyPhysics->integ->getState(),
         SimTK::MobilizerUIndex(_index));
+    }
     else
     {
       gzdbg << "GetVelocity() simbody not yet initialized, "
@@ -105,22 +99,27 @@ void SimbodyUniversalJoint::SetVelocity(unsigned int _index,
     double _rate)
 {
   if (_index < this->GetAngleCount())
+  {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
+  }
   else
+  {
     gzerr << "SetVelocity _index too large.\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
     double _torque)
 {
-  if (_index < this->GetAngleCount() &&
-      this->physicsInitialized)
+  if (_index < this->GetAngleCount() && this->physicsInitialized)
+  {
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -191,7 +190,8 @@ math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int _index)
   {
     gzerr << "GetHighStop: Invalid joint index ["
           << _index << "] when trying to get high stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: consider returning NaN
+    return math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -206,7 +206,8 @@ math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int _index)
   else
   {
     gzerr << "GetHighStop: Should not be here in code, GetAngleCount < 0.\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: consider returning NaN
+    return math::Angle(0.0);
   }
 }
 
@@ -217,7 +218,8 @@ math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int _index)
   {
     gzerr << "GetLowStop: Invalid joint index ["
           << _index << "] when trying to get low stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: consider returning NaN
+    return math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -232,7 +234,8 @@ math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int _index)
   else
   {
     gzerr << "GetLowStop: Should not be here in code, GetAngleCount < 0.\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: consider returning NaN
+    return math::Angle(0.0);
   }
 }
 

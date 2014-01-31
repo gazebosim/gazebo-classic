@@ -34,9 +34,10 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
-    /// \TODO: Document that axis1 and axis2 are space-fixed, i.e.
-    /// moving about axis1 does not change axis2, both axis are fixed
-    /// in inertial space.
+    /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
+    /// body and axis2 attached to child body.  The implications are:
+    /// moving child link about axis1 changes axis2 orientation inertially,
+    /// while moving child link about axis2 does not affect axis1 orientation.
     template<class T>
     class UniversalJoint : public T
     {

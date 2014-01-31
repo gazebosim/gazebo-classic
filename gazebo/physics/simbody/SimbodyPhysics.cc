@@ -873,8 +873,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
-
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
