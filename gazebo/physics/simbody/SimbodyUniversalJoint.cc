@@ -193,12 +193,12 @@ math::Angle SimbodyUniversalJoint::GetHighStop(unsigned int _index)
     /// \TODO: consider returning NaN
     return math::Angle(0.0);
   }
-  else if (_index == 0)
+  else if (_index == UniversalJoint::AXIS_PARENT)
   {
     return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("upper"));
   }
-  else if (_index == 1)
+  else if (_index == UniversalJoint::AXIS_CHILD)
   {
     return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("upper"));
@@ -221,12 +221,12 @@ math::Angle SimbodyUniversalJoint::GetLowStop(unsigned int _index)
     /// \TODO: consider returning NaN
     return math::Angle(0.0);
   }
-  else if (_index == 0)
+  else if (_index == UniversalJoint::AXIS_PARENT)
   {
     return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("lower"));
   }
-  else if (_index == 1)
+  else if (_index == UniversalJoint::AXIS_CHILD)
   {
     return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("lower"));
@@ -247,7 +247,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
   {
-    if (_index == 0)
+    if (_index == UniversalJoint::AXIS_PARENT)
     {
       // express X-axis of X_IF in world frame
       const SimTK::Transform &X_IF = this->mobod.getInboardFrame(
@@ -259,7 +259,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
 
       return SimbodyPhysics::Vec3ToVector3(x_W);
     }
-    else if (_index == 1)
+    else if (_index == UniversalJoint::AXIS_CHILD)
     {
       // express Y-axis of X_OM in world frame
       const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(

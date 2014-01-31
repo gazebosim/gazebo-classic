@@ -35,12 +35,18 @@ namespace gazebo
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
     /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
-    /// body and axis2 attached to child body.  The implications are:
-    /// moving child link about axis1 changes axis2 orientation inertially,
-    /// while moving child link about axis2 does not affect axis1 orientation.
+    /// body and axis2 attached to child body.
     template<class T>
     class UniversalJoint : public T
     {
+      /// \enum AxisIndex
+      /// \brief Map joint axes to corresponding link.
+      public: enum AxisIndex
+      {
+        AXIS_PARENT = 0,
+        AXIS_CHILD  = 1
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)

@@ -813,10 +813,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "universal")
       {
-        UnitVec3 axis1(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
-        UnitVec3 axis2(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(1)));
+        UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT)));
+        UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD)));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
