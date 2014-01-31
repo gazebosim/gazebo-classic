@@ -111,6 +111,9 @@
 1. **gazebo/rendering/Light.hh**
     + bool GetVisible() const
 
+1. **gazebo/rendering/CameraVisual.hh**
+    + void CameraVisual::Update()
+
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
 
