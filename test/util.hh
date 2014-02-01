@@ -26,64 +26,70 @@ using namespace gazebo;
 
 namespace gazebo 
 {
-    namespace testing 
+  namespace testing 
+  {
+    /// \brief A utility class that stores test logs in ~/.gazebo/test_logs.
+    /// This functionality is needed to keep all the log information reported 
+    /// by gazebo during continuous integration. Without this, debugging
+    /// failing tests is significantly more difficult.
+    class AutoLogFixture : public ::testing::Test
     {
-        class AutoLogFixture : public ::testing::Test
+      /// \brief Setup the test fixture. This gets called by gtest.
+      protected: virtual void SetUp() 
+      {
+        ASSERT_TRUE(getenv("HOME") != NULL);
+
+        // We need to create the log directory if needed.
+        boost::filesystem::path logPath(getenv("HOME"));
+        logPath = logPath / ".gazebo" / "test_logs";
+        if (!boost::filesystem::exists(logPath))
+          boost::filesystem::create_directories(logPath);
+
+        const ::testing::TestInfo *const testInfo =
+          ::testing::UnitTest::GetInstance()->current_test_info();
+
+        std::string testName = testInfo->name();
+        std::string testCaseName = testInfo->test_case_name();
+        this->logFilename = testCaseName + "_" + testName + ".log";
+        this->logDirectory = logPath.string();
+
+        // Initialize Console
+        gzLogInit((boost::filesystem::path("test_logs") /
+             this->logFilename).string());
+        gazebo::common::Console::SetQuiet(false);
+      }
+
+      /// \brief Get a string with the full log file path.
+      /// \return The full log file path as a string.
+      protected: std::string GetFullLogPath() const
+      {
+        return this->logDirectory + "/" + this->logFilename;
+      }
+
+      /// \brief Get a string with all the log content loaded from the disk.
+      /// \return A string will all the log content.
+      protected: std::string GetLogContent() const
+      {
+        // Open the log file, and read back the string
+        std::ifstream ifs(this->GetFullLogPath().c_str(), std::ios::in);
+        std::string loggedString;
+
+        while (!ifs.eof())
         {
-          protected:
-            /// \brief Setup the test fixture. This gets called by gtest.
-            virtual void SetUp() 
-            {
-              ASSERT_TRUE(getenv("HOME") != NULL);
-              
-              // We need to create the log directory if needed.
-              boost::filesystem::path log_path(getenv("HOME"));
-              log_path = log_path / ".gazebo";
-              if (!boost::filesystem::exists(log_path))
-                boost::filesystem::create_directories(log_path);
+          std::string line;
+          std::getline(ifs, line);
+          loggedString += line;
+        }
 
-              const ::testing::TestInfo* const test_info =
-                ::testing::UnitTest::GetInstance()->current_test_info();
+        return loggedString;
+      }
 
-              std::string test_name       = test_info->name();
-              std::string test_case_name  = test_info->test_case_name();
-              log_filename_  = test_case_name + "_" + test_name + ".log";
-              log_directory_ = log_path.string();
-              
-              // Initialize Console
-              gzLogInit(log_filename_);
-              gazebo::common::Console::SetQuiet(false);
-            }
+      /// \brief String with the full path of the logfile
+      private: std::string logFilename;
 
-            /// \brief Return a string with the full log file path
-            std::string get_full_log_path() const
-            {
-              return log_directory_ + "/" + log_filename_;
-            }
-
-            /// \brief Return a string with all the log content loaded from the disk
-            std::string get_log_content() const
-            {
-              // Open the log file, and read back the string
-              std::ifstream ifs(get_full_log_path().c_str(), std::ios::in);
-              std::string loggedString;
-
-              while (!ifs.eof())
-              {
-                std::string line;
-                std::getline(ifs, line);
-                loggedString += line;
-              }
-
-              return loggedString;
-            }
- 
-            /// \brief String with the full path of the logfile
-            std::string log_filename_;
-            /// \brief String with the full path to log directory
-            std::string log_directory_;
-        };
-    }
+      /// \brief String with the full path to log directory
+      private: std::string logDirectory;
+    };
+  }
 }
-
 #endif

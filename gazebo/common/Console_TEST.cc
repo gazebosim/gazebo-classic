@@ -35,7 +35,7 @@ TEST_F(Console_TEST, InitAndLog)
   std::string logString = "this is a test";
 
   gzlog << logString << std::endl;
-  EXPECT_TRUE(get_log_content().find(logString) != std::string::npos);
+  EXPECT_TRUE(this->GetLogContent().find(logString) != std::string::npos);
 }
 
 //////////////////////////////////////////////////
@@ -49,13 +49,13 @@ TEST_F(Console_TEST, LogSlashN)
     gzlog << logString << " _n__ " << i << '\n';
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " _n__ " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -70,13 +70,13 @@ TEST_F(Console_TEST, LogStdEndl)
     gzlog << logString << " endl " << i << std::endl;
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " endl " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -91,13 +91,13 @@ TEST_F(Console_TEST, ColorWarnSlashN)
     gzwarn << logString << " _n__ " << i << '\n';
   }
   
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " _n__ " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -112,13 +112,13 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
     gzwarn << logString << " endl " << i << std::endl;
   }
   
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " endl " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -133,13 +133,13 @@ TEST_F(Console_TEST, ColorDbgSlashN)
     gzdbg << logString << " _n__ " << i << '\n';
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " _n__ " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -154,13 +154,13 @@ TEST_F(Console_TEST, ColorDbgStdEndl)
     gzdbg << logString << " endl " << i << std::endl;
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " endl " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -175,13 +175,13 @@ TEST_F(Console_TEST, ColorMsgSlashN)
     gzmsg << logString << " _n__ " << i << '\n';
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " _n__ " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -196,13 +196,13 @@ TEST_F(Console_TEST, ColorMsgStdEndl)
     gzmsg << logString << " endl " << i << std::endl;
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " endl " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -217,13 +217,13 @@ TEST_F(Console_TEST, ColorErrSlashN)
     gzerr << logString << " _n__ " << i << '\n';
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " _n__ " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -238,13 +238,13 @@ TEST_F(Console_TEST, ColorErrStdEndl)
     gzerr << logString << " endl " << i << std::endl;
   }
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
   {
     std::ostringstream stream;
     stream << logString << " endl " << i;
-    EXPECT_TRUE(log_content.find(stream.str()) != std::string::npos);
+    EXPECT_TRUE(logContent.find(stream.str()) != std::string::npos);
   }
 }
 
@@ -256,9 +256,9 @@ TEST_F(Console_TEST, ColorMsg)
 
   gzmsg << logString << std::endl;
   
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
-  EXPECT_TRUE(log_content.find(logString) != std::string::npos);
+  EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////
@@ -269,9 +269,9 @@ TEST_F(Console_TEST, ColorErr)
 
   gzerr << logString << std::endl;
 
-  std::string log_content = get_log_content();
+  std::string logContent = this->GetLogContent();
 
-  EXPECT_TRUE(log_content.find(logString) != std::string::npos);
+  EXPECT_TRUE(logContent.find(logString) != std::string::npos);
 }
 
 /////////////////////////////////////////////////
