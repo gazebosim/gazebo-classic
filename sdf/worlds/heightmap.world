@@ -1,10 +1,70 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
+
+    <model name="box1">
+      <pose>-63.0 -63. 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box2">
+      <pose>-63.0 63.0 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>
+            <diffuse>0 1 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box3">
+      <pose>63 63.0 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box4">
+      <pose>63 -63.0 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+        </visual>
+      </link>
+    </model>
 
     <model name="heightmap">
       <static>true</static>
@@ -19,23 +79,24 @@
           </geometry>
         </collision>
 
-        <visual name="visual">
+        <visual name="visual_abcedf">
           <geometry>
             <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
               <texture>
                 <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>50</size>
+                <size>1</size>
               </texture>
               <texture>
                 <diffuse>file://media/materials/textures/grass_diffusespecular.png</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>20</size>
+                <size>1</size>
               </texture>
               <texture>
                 <diffuse>file://media/materials/textures/fungus_diffusespecular.png</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>80</size>
+                <size>1</size>
               </texture>
               <blend>
                 <min_height>2</min_height>
@@ -54,5 +115,6 @@
 
       </link>
     </model>
+
   </world>
 </sdf>

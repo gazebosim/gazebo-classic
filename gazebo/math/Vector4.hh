@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "math/Matrix4.hh"
+#include "gazebo/math/Matrix4.hh"
 
 namespace gazebo
 {

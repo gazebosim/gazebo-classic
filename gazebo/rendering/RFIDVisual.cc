@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
  * Date: 
  */
 
-#include "transport/transport.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "common/MeshManager.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
 
-#include "rendering/RFIDVisual.hh"
+#include "gazebo/rendering/RFIDVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

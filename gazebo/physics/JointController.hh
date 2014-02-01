@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ namespace gazebo
 
       /// \brief Set the positions of a Joint by name.
       /// \sa JointController::SetJointPosition(JointPtr, double)
-      public: void SetJointPosition(const std::string &_name, double _position);
+      public: void SetJointPosition(
+        const std::string &_name, double _position, int _index = 0);
 
       /// \brief Set the positions of a set of Joint's.
       /// \sa JointController::SetJointPosition(JointPtr, double)
@@ -81,7 +82,8 @@ namespace gazebo
       ///   a loop structure.
       /// \param[in] _joint Joint to set.
       /// \param[in] _position Position of the joint.
-      public: void SetJointPosition(JointPtr _joint, double _position);
+      public: void SetJointPosition(
+        JointPtr _joint, double _position, int _index = 0);
 
       /// \brief Helper for SetJointPositions.
       /// \param[in] _joint Joint to move.

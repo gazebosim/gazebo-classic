@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,9 @@ namespace gazebo
         PlaneShape::CreatePlane();
         ODECollisionPtr oParent;
         oParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-
-        double altitude = 0;
-
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
+        math::Pose pose = oParent->GetWorldPose();
+        double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
@@ -60,7 +59,7 @@ namespace gazebo
         PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;
         odeParent =
-          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         dVector4 vec4;
 

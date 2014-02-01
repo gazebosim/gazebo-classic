@@ -31,8 +31,9 @@ struct dxJointBall : public dxJoint
 {
     dVector3 anchor1;   // anchor w.r.t first body
     dVector3 anchor2;   // anchor w.r.t second body
-    dReal erp;          // error reduction
-    dReal cfm;          // constraint force mix in
+    // erp and cfm moved to joint.h by OSRF
+    // dReal erp;          // error reduction
+    // dReal cfm;          // constraint force mix in
     void set( int num, dReal value );
     dReal get( int num );
 

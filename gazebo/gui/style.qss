@@ -1,6 +1,23 @@
+QToolButton
+{
+  border: 0;
+  text-align: left;
+  color: #d0d0d0;
+}
+
+QToolButton::disabled
+{
+  color: #303030;  
+}
+
 QLabel
 {
   color: #d0d0d0;
+}
+
+QFrame
+{
+  background-color: transparent;
 }
 
 QDialog
@@ -10,6 +27,7 @@ QDialog
 
 QWidget#topicSelector,
 QWidget#cameraSensor,
+QWidget#diagnosticsPlot,
 QWidget#dataLogger
 {
   background-color: #303030;
@@ -67,6 +85,11 @@ QMenuBar::item
 QMenuBar::item:selected
 {
   color: #f58113;
+}
+
+QMenuBar::item:disabled
+{
+  color: #5f5f5f;
 }
 
 QMenu
@@ -189,7 +212,6 @@ QListView::item
   color: #ffffff;
   border-radius: 4px;
 }
-
 
 QTreeView
 {
@@ -319,12 +341,19 @@ QDoubleSpinBox::down-button:pressed
 
 QPushButton
 {
-  color: #d0d0d0;
-  padding: 2px;
-  margin: 2px;
+  /*
   border: 2px outset #727272;
   border-radius: 4px;
   background: #737373;
+  */
+
+  color: #d0d0d0;
+  border: 2px solid #737373;
+  border-radius: 0px;
+  selection-color: transparent;
+  padding: 2px;
+  margin: 2px;
+  background: #505050;
 }
 
 QPushButton:hover
@@ -332,9 +361,15 @@ QPushButton:hover
   color: #f58113;
 }
 
+QPushButton:checked
+{
+  color: #f58113;
+  border: 2px solid #f58113;
+}
+
 QPushButton:pressed
 {
-  border: 2px inset #727272;
+  border: 2px solid #f58113;
 }
 
 QPushButton:!enabled
@@ -342,9 +377,9 @@ QPushButton:!enabled
   padding: 2px;
   margin: 2px;
   color: #909090;
-  border: 2px solid #707070;
   background: #707070;
-  border-radius: 4px;
+  /* border: 2px solid #707070; */
+  /* border-radius: 4px; */
 }
 
 QScrollBar:vertical
@@ -507,7 +542,8 @@ QTabBar::tab:!selected
 }
 
 QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane
+QTabWidget#buildingEditorTab::pane,
+QTabWidget#terrainEditorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -568,7 +604,8 @@ QWidget#renderWidget > QWidget
   margin-right: 0px;
 }
 
-QWidget#buildingEditorWidget > QWidget
+QWidget#buildingEditorWidget > QWidget,
+QWidget#terrainEditorWidget > QWidget
 {
   padding: 2px;
   background-color: #808080;
@@ -685,4 +722,15 @@ QFrame#dataLoggerSettingFrame
   border-top: 1px solid #555555;
   margin: 0px;
   padding: 0px;
+}
+
+QwtTextLabel
+{
+  font-size: 10px;
+}
+
+QwtScaleWidget
+{
+  color: white;
+  font-size: 11px;
 }

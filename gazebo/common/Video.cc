@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,13 +63,6 @@ Video::Video()
   this->pic = NULL;
 
 #ifdef HAVE_FFMPEG
-  static bool first = true;
-  if (first)
-  {
-    first = false;
-    av_register_all();
-  }
-
   this->pic = new AVPicture;
 #endif
 }
@@ -92,7 +85,7 @@ void Video::Cleanup()
   av_free(this->avFrame);
 
   // Close the video file
-  av_close_input_file(this->formatCtx);
+  avformat_close_input(&this->formatCtx);
 
   // Close the codec
   avcodec_close(this->codecCtx);
@@ -121,7 +114,7 @@ bool Video::Load(const std::string &_filename)
   }
 
   // Retrieve stream information
-  if (av_find_stream_info(this->formatCtx) < 0)
+  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
   {
     gzerr << "Couldn't find stream information\n";
     return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogRecord.hh"
+#include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     gazebo::common::Console::Instance()->Init("gzserver.log");
 
     // Initialize the data logger. This will log state information.
-    gazebo::common::LogRecord::Instance()->Init("gzserver");
+    gazebo::util::LogRecord::Instance()->Init("gzserver");
 
     // Output the version of Gazebo.
     gzlog << GAZEBO_VERSION_HEADER << std::endl;

@@ -11,7 +11,7 @@ set (sources
   BulletLink.cc
   BulletCollision.cc
   BulletMotionState.cc
-  BulletTrimeshShape.cc
+  BulletMeshShape.cc
   BulletJoint.cc
   BulletHingeJoint.cc
   BulletSliderJoint.cc
@@ -26,7 +26,7 @@ set (sources
 
 set (headers
   bullet_inc.h
-  bullet_math.h
+  bullet_math_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
@@ -45,13 +45,14 @@ set (headers
   BulletScrewJoint.hh
   BulletSliderJoint.hh
   BulletSphereShape.hh
-  BulletTrimeshShape.hh
+  BulletMeshShape.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
 )
 
 set (gtest_sources
   BulletTypes_TEST.cc
+  BulletPhysics_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,25 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-unsigned int Base::idCounter = 0;
-
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->id = ++idCounter;
+  this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
 
   this->sdf.reset(new sdf::Element);
   this->sdf->AddAttribute("name", "string", "__default__", true);
+  this->name = "__default__";
 
   if (this->parent)
   {
@@ -60,27 +60,38 @@ Base::~Base()
   this->SetParent(BasePtr());
 
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+       iter != this->children.end(); ++iter)
   {
     if (*iter)
       (*iter)->SetParent(BasePtr());
   }
   this->children.clear();
   this->childrenEnd = this->children.end();
+  if (this->sdf)
+    this->sdf->Reset();
   this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  if (_sdf)
+    this->sdf = _sdf;
 
-  this->sdf = _sdf;
+  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+
+  if (this->sdf->HasAttribute("name"))
+    this->name = this->sdf->Get<std::string>("name");
+  else
+    this->name.clear();
+
   if (this->parent)
   {
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
+
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -96,8 +107,9 @@ void Base::Fini()
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Fini();
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    if (*iter)
+      (*iter)->Fini();
 
   this->children.clear();
   this->childrenEnd = this->children.end();
@@ -115,7 +127,7 @@ void Base::Reset()
 void Base::Reset(Base::EntityType _resetType)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
@@ -130,21 +142,18 @@ void Base::SetName(const std::string &_name)
   GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
+  this->name = _name;
+  this->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
 std::string Base::GetName() const
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-
-  if (this->sdf->HasAttribute("name"))
-    return this->sdf->GetValueString("name");
-  else
-    return std::string();
+  return this->name;
 }
 
 //////////////////////////////////////////////////
-unsigned int Base::GetId() const
+uint32_t Base::GetId() const
 {
   return this->id;
 }
@@ -194,7 +203,7 @@ void Base::AddChild(BasePtr _child)
 void Base::RemoveChild(unsigned int _id)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
@@ -239,7 +248,7 @@ void Base::RemoveChild(const std::string &_name)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetScopedName() == _name)
       break;
@@ -287,10 +296,9 @@ BasePtr Base::GetByName(const std::string &_name)
 
   BasePtr result;
   Base_V::const_iterator iter;
-  Base_V::const_iterator iterEnd = this->childrenEnd;
 
-  for (iter =  this->children.begin();
-      iter != iterEnd && result == NULL; ++iter)
+  for (iter = this->children.begin();
+      iter != this->children.end() && result == NULL; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;
@@ -299,19 +307,22 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName() const
 {
+  return this->scopedName;
+}
+
+//////////////////////////////////////////////////
+void Base::ComputeScopedName()
+{
   BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
+  this->scopedName = this->GetName();
 
   while (p)
   {
     if (p->GetParent())
-      scopedName.insert(0, p->GetName()+"::");
+      this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
-
-  return scopedName;
 }
-
 
 //////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const
@@ -331,7 +342,7 @@ void Base::Print(const std::string &_prefix)
   Base_V::iterator iter;
   gzmsg << _prefix << this->GetName() << "\n";
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     (*iter)->Print(_prefix + "  ");
 }
 
@@ -341,7 +352,7 @@ bool Base::SetSelected(bool _s)
   this->selected = _s;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     (*iter)->SetSelected(_s);
 
   return true;
@@ -365,7 +376,7 @@ void Base::SetWorld(const WorldPtr &_newWorld)
   this->world = _newWorld;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->SetWorld(this->world);
   }

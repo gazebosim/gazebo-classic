@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _JOINT_HH_
 
 #include <string>
+#include <vector>
 
 #include <boost/any.hpp>
 
@@ -35,6 +36,11 @@
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
+
+/// \brief maximum number of axis per joint anticipated.
+/// Currently, this is 2 as 3-axis joints (e.g. ball)
+/// actuation, control is not there yet.
+#define MAX_JOINT_AXIS 2
 
 namespace gazebo
 {
@@ -99,16 +105,6 @@ namespace gazebo
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_pose);
 
-      /// \brief Set parent and child links of a physics::Joint and its
-      /// anchor offset position.
-      /// This funciton is deprecated, use
-      /// Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
-      /// \param[in] _parent Parent link.
-      /// \param[in] _child Child link.
-      /// \param[in] _pos Joint Anchor offset from child link.
-      public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Vector3 &_pos) GAZEBO_DEPRECATED;
-
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -155,15 +151,24 @@ namespace gazebo
       /// \brief Detach this joint from all links.
       public: virtual void Detach();
 
-      /// \brief Set the axis of rotation.
+      /// \brief Set the axis of rotation where axis is specified in local
+      /// joint frame.
       /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Axis value.
+      /// \param[in] _axis Vector in local joint frame of axis direction
+      ///                  (must have length greater than zero).
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
-      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _index Index of the axis to set, currently ignored, to be
+      ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Returns the current joint damping coefficient.
+      /// \param[in] _index Index of the axis to get, currently ignored, to be
+      ///                   implemented.
+      /// \return Joint viscous damping coefficient for this joint.
+      public: double GetDamping(int _index);
 
       /// \brief Callback to apply damping force to joint.
       public: virtual void ApplyDamping();
@@ -205,23 +210,39 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
       public: virtual void SetHighStop(int _index,
-                                       const math::Angle &_angle) = 0;
+                                       const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
       public: virtual void SetLowStop(int _index,
-                                      const math::Angle &_angle) = 0;
+                                      const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
+      /// This function is replaced by GetUpperLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
       public: virtual math::Angle GetHighStop(int _index) = 0;
 
       /// \brief Get the low stop of an axis(index).
+      /// This function is replaced by GetLowerLimit(unsigned int).
+      /// If you are interested in getting the value of dParamHiStop*,
+      /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
       public: virtual math::Angle GetLowStop(int _index) = 0;
+
+      /// \brief Get the effort limit on axis(index).
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
+      /// \return Effort limit specified in SDF
+      public: virtual double GetEffortLimit(int _index);
+
+      /// \brief Get the velocity limit on axis(index).
+      /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
+      /// \return Velocity limit specified in SDF
+      public: virtual double GetVelocityLimit(int _index);
 
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Index of the axis.
@@ -235,47 +256,63 @@ namespace gazebo
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.  Force is additive (multiple calls
+      /// to SetForce to the same joint in the same time
+      /// step will accumulate forces on that Joint).
+      /// Forces are truncated by effortLimit before applied.
       /// \param[in] _index Index of the axis.
-      /// \param[in] _force Force value.
-      public: virtual void SetForce(int _index, double _force);
+      /// \param[in] _effort Force value.
+      public: virtual void SetForce(int _index, double _effort) = 0;
+
+      /// \brief check if the force against velocityLimit and effortLimit,
+      /// truncate if necessary.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _effort Force value.
+      /// \return truncated effort
+      public: double CheckAndTruncateForce(int _index, double _effort);
 
       /// \brief @todo: not yet implemented.
-      /// Get the internal forces at a this Joint.
+      /// Get external forces applied at this Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(int _index);
+      public: virtual double GetForce(unsigned int _index);
 
-      /// \brief get force torque values at a joint
-      /// \param[in] _index Force and torque on child link if _index = 0
-      /// and on parent link of _index = 1
-      /// \return The force and torque at the joint
-      public: virtual JointWrench GetForceTorque(int _index) = 0;
+      /// \brief get internal force and torque values at a joint.
+      ///
+      ///   The force and torque values are returned in  a JointWrench
+      ///   data structure.  Where JointWrench.body1Force contains the
+      ///   force applied by the parent Link on the Joint specified in
+      ///   the parent Link frame, and JointWrench.body2Force contains
+      ///   the force applied by the child Link on the Joint specified
+      ///   in the child Link frame.  Note that this sign convention
+      ///   is opposite of the reaction forces of the Joint on the Links.
+      ///
+      ///   FIXME TODO: change name of this function to something like:
+      ///     GetNegatedForceTorqueInLinkFrame
+      ///   and make GetForceTorque call return non-negated reaction forces
+      ///   in perspective Link frames.
+      ///
+      ///   Note that for ODE you must set
+      ///     <provide_feedback>true<provide_feedback>
+      ///   in the joint sdf to use this.
+      ///
+      /// \param[in] _index Not used right now
+      /// \return The force and torque at the joint, see above for details
+      /// on conventions.
+      public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
       public: virtual void SetMaxForce(int _index, double _force) = 0;
 
       /// \brief Get the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
       public: virtual double GetMaxForce(int _index) = 0;
@@ -303,10 +340,7 @@ namespace gazebo
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons.  If using
-      /// imperial units (sorry), then unit of force is lb-force
-      /// not (lb-mass), etc.
+      /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const = 0;
@@ -314,10 +348,7 @@ namespace gazebo
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// Note that the unit of torque should be consistent with the rest
-      /// of the simulation scales.  E.g.  if you are using
-      /// metric units, the unit for force is Newtons-Meters.  If using
-      /// imperial units (sorry), then unit of force is lb-force-inches
-      /// not (lb-mass-inches), etc.
+      /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1)
       /// \return Torque applied to the link.
       public: virtual math::Vector3 GetLinkTorque(
@@ -331,6 +362,13 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value) = 0;
 
+      /// \brief Get a non-generic parameter for the joint.
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index) = 0;
+
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
@@ -343,6 +381,39 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
+      /// \brief Accessor to inertia ratio across this joint.
+      /// \param[in] _index Joint axis index.
+      /// \return returns the inertia ratio across specified joint axis.
+      public: double GetInertiaRatio(unsigned int _index) const;
+
+      /// \brief:  get the joint upper limit
+      /// (replaces GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetLowerLimit(unsigned int _index) const;
+
+      /// \brief:  get the joint lower limit
+      /// (replacee GetLowStop and GetHighStop)
+      /// \param[in] _index Index of the axis.
+      /// \return Upper limit of the axis.
+      public: math::Angle GetUpperLimit(unsigned int _index) const;
+
+      /// \brief Set whether the joint should generate feedback.
+      /// \param[in] _enable True to enable joint feedback.
+      public: virtual void SetProvideFeedback(bool _enable);
+
+      /// \brief Cache Joint Force Torque Values if necessary for physics engine
+      public: virtual void CacheForceTorque() { }
+
+      /// \brief Get damping coefficient of this joint
+      /// \return viscous joint damping coefficient
+      public: double GetDampingCoefficient() const;
+
+      /// \brief Get initial Anchor Pose specified by model
+      /// <joint><pose>...</pose></joint>
+      /// \return Joint::anchorPose, initial joint anchor pose.
+      public: math::Pose GetInitialAnchorPose();
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -352,10 +423,10 @@ namespace gazebo
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
 
-      /// \brief Helper function to load a joint.
-      /// This function is deprecated, use LoadImpl(math::Pose &)
-      /// \param[in] _pos Position of the anchor.
-      private: void LoadImpl(const math::Vector3 &_pos) GAZEBO_DEPRECATED;
+      /// \brief Computes inertiaRatio for this joint during Joint::Init
+      /// The inertia ratio for each joint between [1, +inf] gives a sense
+      /// of how well this model will perform in iterative LCP methods.
+      private: void ComputeInertiaRatio();
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -366,29 +437,70 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.
+      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
+      /// child frame specified in the parent link frame
       protected: math::Vector3 anchorPos;
+
+      /// \brief Anchor pose specified in SDF <joint><pose> tag.
+      /// AnchorPose is the transform from child link frame to joint frame
+      /// specified in the child link frame.
+      /// AnchorPos is more relevant in normal usage, but sometimes,
+      /// we do need this (e.g. GetForceTorque and joint visualization).
+      protected: math::Pose anchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 
-      /// \brief Joint update event.
-      private: event::EventT<void ()> jointUpdate;
-
       /// \brief joint dampingCoefficient
       protected: double dampingCoefficient;
-
-      /// \brief Angle used when the joint is paret of a static model.
-      private: math::Angle staticAngle;
 
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
 
-      /// \brief Save force applied by user
-      /// This plus the joint feedback (joint contstraint forces) is the
-      /// equivalent of simulated force torque sensor reading
-      /// Allocate a 2 vector in case hinge2 joint is used.
-      protected: double forceApplied[2];
+      /// \brief Store Joint effort limit as specified in SDF
+      protected: double effortLimit[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint velocity limit as specified in SDF
+      protected: double velocityLimit[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint inertia ratio.  This is a measure of how well
+      /// this model behaves using interative LCP solvers.
+      protected: double inertiaRatio[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint position lower limit as specified in SDF
+      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint position upper limit as specified in SDF
+      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+
+      /// \brief Cache Joint force torque values in case physics engine
+      /// clears them at the end of update step.
+      protected: JointWrench wrench;
+
+      /// \brief option to use CFM damping
+      protected: bool useCFMDamping;
+
+      /// \brief An SDF pointer that allows us to only read the joint.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfJoint;
+
+      /// \brief Provide Feedback data for contact forces
+      protected: bool provideFeedback;
+
+      /// \brief Names of all the sensors attached to the link.
+      private: std::vector<std::string> sensors;
+
+      /// \brief Joint update event.
+      private: event::EventT<void ()> jointUpdate;
+
+      /// \brief Angle used when the joint is parent of a static model.
+      private: math::Angle staticAngle;
+
+      // Added in 2.1 down here to preserve ABI
+      /// \brief Set the effort limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _effort Effort limit for the axis.
+      public: virtual void SetEffortLimit(unsigned int _index, double _effort);
     };
     /// \}
   }

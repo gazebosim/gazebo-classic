@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,24 @@
  * Date: 21 May 2009
  */
 
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/PhysicsFactory.hh"
-#include "common/Console.hh"
-#include "gazebo_config.h"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+void RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  void RegisterDARTPhysics();
 #endif
 
 using namespace gazebo;
@@ -43,8 +51,16 @@ void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+  RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  RegisterDARTPhysics();
 #endif
 }
 
@@ -72,7 +88,7 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
 }
 
 //////////////////////////////////////////////////
-bool PhysicsFactory::IsRegistered(const std::string _name)
+bool PhysicsFactory::IsRegistered(const std::string &_name)
 {
   return (engines.count(_name) > 0);
 }

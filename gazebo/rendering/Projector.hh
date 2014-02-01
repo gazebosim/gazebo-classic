@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@
 #include <string>
 #include <map>
 #include <list>
+#include <sdf/sdf.hh>
 
-#include "rendering/ogre_gazebo.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "msgs/msgs.hh"
-#include "sdf/sdf.hh"
-#include "transport/transport.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

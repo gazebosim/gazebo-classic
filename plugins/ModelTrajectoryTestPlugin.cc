@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
       this->model->GetName() + "/pose_trajectory",
       &ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg, this);
 
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&ModelTrajectoryTestPlugin::OnUpdate, this));
 }
 

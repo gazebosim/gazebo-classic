@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ namespace gazebo
       /// \brief Get the sphere's radius.
       /// \return Radius of the sphere.
       public: double GetRadius() const;
+
+      /// \brief Set the scale of the sphere.
+      /// \param[in] _scale Scale to set the sphere to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

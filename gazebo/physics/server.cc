@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@
 #include <errno.h>
 #include <iostream>
 #include <vector>
+#include <sdf/sdf.hh>
 
-#include "physics/Physics.hh"
-#include "common/Time.hh"
-#include "transport/Transport.hh"
-#include "sdf/sdf.hh"
-#include "gazebo_config.h"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/transport/TransportIface.hh"
+
+#include "gazebo/gazebo_config.h"
 
 // Command line options
 std::string config_filename = "";
@@ -98,7 +99,7 @@ void Load()
   while (worldElem)
   {
     gazebo::physics::WorldPtr world =
-      gazebo::physics::create_world(worldElem->GetValueString("name"));
+      gazebo::physics::create_world(worldElem->Get<std::string>("name"));
 
     // Create the world
     try

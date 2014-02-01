@@ -10,4 +10,5 @@ message LogControl
   optional bool stop            = 2;
   optional bool paused          = 3;
   optional string base_path     = 4;
+  optional string encoding      = 5;
 }

@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface WirelessNode
+/// \brief Message for sending info about a detected wireless transmitter
+
+
+message WirelessNode
+{
+  required string essid        = 1;
+  required double frequency    = 2;
+  required double signal_level = 3;
+}

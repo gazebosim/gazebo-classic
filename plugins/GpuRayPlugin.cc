@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 #include "plugins/GpuRayPlugin.hh"
-#include "sensors/GpuRaySensor.hh"
+#include "gazebo/sensors/GpuRaySensor.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)
@@ -30,7 +30,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::GpuRaySensor>(_sensor);
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(_sensor);
 
   if (!this->parentSensor)
   {

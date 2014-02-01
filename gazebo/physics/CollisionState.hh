@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,12 +96,12 @@ namespace gazebo
       /// \param[in] _out output stream
       /// \param[in] _state Collision state to output
       /// \return the stream
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                 const gazebo::physics::CollisionState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::CollisionState &_state)
       {
-        _out << "      <collision name='" << _state.name << "'>\n"
-             << "        <pose>" << _state.pose << "</pose>\n";
-        _out << "      </collision>\n";
+        _out << "<collision name='" << _state.name << "'>"
+             << "<pose>" << _state.pose << "</pose>";
+        _out << "</collision>";
 
         return _out;
       }

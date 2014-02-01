@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #define _BULLETRAYGEOM_HH_
 
 #include <string>
-#include "physics/RayShape.hh"
+#include "gazebo/physics/RayShape.hh"
 
 namespace gazebo
 {
@@ -58,8 +58,8 @@ namespace gazebo
       public: void SetPoints(const math::Vector3 &_posStart,
                              const math::Vector3 &_posEnd);
 
+      /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;
-      private: btCollisionWorld::ClosestRayResultCallback rayCallback;
     };
     /// \}
   }

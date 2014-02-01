@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ namespace gazebo
       public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
-
-      // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
       // Documentation inherited
@@ -65,9 +62,6 @@ namespace gazebo
       public: virtual void SetVelocity(int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
-
-      // Documentation inherited
       public: virtual void SetMaxForce(int _index, double _t);
 
       // Documentation inherited
@@ -75,6 +69,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(int _parameter, double _value);
+
+      // Documentation inherited
+      protected: virtual void SetForceImpl(int _index, double _effort);
     };
   }
 }

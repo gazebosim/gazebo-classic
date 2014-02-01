@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 // This disables warning messages
 #pragma GCC system_header
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_CEGUI
 #include <CEGUI/CEGUI.h>

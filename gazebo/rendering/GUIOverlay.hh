@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,15 @@
 #include <map>
 #include <vector>
 
-#include "rendering/cegui.h"
-#include "common/MouseEvent.hh"
-#include "common/Events.hh"
+#include "gazebo/rendering/cegui.h"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Events.hh"
 
-#include "math/MathTypes.hh"
+#include "gazebo/math/MathTypes.hh"
 
-#include "rendering/RenderTypes.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace Ogre
 {

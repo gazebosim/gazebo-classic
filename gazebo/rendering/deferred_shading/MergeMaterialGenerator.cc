@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -392,65 +392,65 @@ Ogre::MaterialPtr MergeMaterialGeneratorImpl::GenerateTemplateMaterial(
    Ogre::StringStream ss;
 
    ss << "void MergeVP(" << std::endl;
-   ss << "	float4 iPosition : POSITION," << std::endl;
+   ss << "  float4 iPosition : POSITION," << std::endl;
 //Get the normal, although this isn't 100% necesarry, it is cheaper to use the normal from the input
 //geometry than fetching it from the GBuffer
-ss << "	float3 iNormal   : NORMAL," << std::endl;
+ss << "  float3 iNormal   : NORMAL," << std::endl;
 
 Ogre::uint32 numTexCoords = (permutation & MergeMaterialGenerator::MP_TEXCOORD_MASK) >> 8;
-for (Ogre::uint32 i=0; i<numTexCoords; i++)
+for (Ogre::uint32 i = 0; i < numTexCoords; i++)
 {
-ss << "	float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
+ss << "  float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
 }
 
 if (permutation & MergeMaterialGenerator::MP_NORMAL_MAP)
 {
-ss << "	float3 iTangent : TANGENT0," << std::endl;
+ss << "  float3 iTangent : TANGENT0," << std::endl;
 }
 
 //TODO : Skinning inputs
 ss << std::endl;
 
-ss << "	out float4 oPosition : POSITION," << std::endl;
+ss << "  out float4 oPosition : POSITION," << std::endl;
 
 int texCoordNum=0;
-ss << "	out half3 oNormal : TEXCOORD" <<texCoordNum++<<","<<std::endl;
+ss << "  out half3 oNormal : TEXCOORD" <<texCoordNum++<<","<<std::endl;
 
 if ((permutation & MergeMaterialGenerator::MP_NORMAL_MAP) )
 {
-ss << "	out half3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-ss << "	out half3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+ss << "  out half3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+ss << "  out half3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
 }
-for (Ogre::uint32 i=0; i<numTexCoords; i++)
+for (Ogre::uint32 i = 0; i<numTexCoords; i++)
 {
-ss << "	out half2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+ss << "  out half2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
 }
 if(this->useDSF){
-ss << "	out float3 oViewPos : TEXCOORD"<<texCoordNum++<<"," << std::endl;
+ss << "  out float3 oViewPos : TEXCOORD"<<texCoordNum++<<"," << std::endl;
 }
 ss << std::endl;
 
-ss << "	uniform float4x4 cWorldViewProj," << std::endl;
-ss << "	uniform float4x4 cWorldView" << std::endl;
+ss << "  uniform float4x4 cWorldViewProj," << std::endl;
+ss << "  uniform float4x4 cWorldView" << std::endl;
 
-ss << "	)" << std::endl;
+ss << "  )" << std::endl;
 
 
 ss << "{" << std::endl;
-ss << "	oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
-ss << "	oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
+ss << "  oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
+ss << "  oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
 
 if (permutation & MergeMaterialGenerator::MP_NORMAL_MAP)
 {
-ss << "	oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
-ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
+ss << "  oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
+ss << "  oBiNormal = cross(oNormal, oTangent);" << std::endl;
 }
 
-for (Ogre::uint32 i=0; i<numTexCoords; i++) {
-ss << "	oUV" << i << " = iUV" << i << ';' << std::endl;
+for (Ogre::uint32 i = 0; i < numTexCoords; i++) {
+ss << "  oUV" << i << " = iUV" << i << ';' << std::endl;
 }
 if(this->useDSF){
-ss << "	oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
+ss << "  oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
 }
 ss << "}" << std::endl;
 
@@ -498,97 +498,97 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateFragmentShader(
     ss << "#define normal_epsilon 0.2" << std::endl;
   }
   ss << "void MergeFP(" << std::endl;
-  ss << "	half3 iNormal : TEXCOORD0," <<std::endl;
+  ss << "  half3 iNormal : TEXCOORD0," <<std::endl;
   //use the pixel position to index the LBuffer; this is more precise than
   //computing tex coords based on the view matrix(it's slightly more expensive
   //as well).
-  ss << "	float2 pixpos: WPOS";
+  ss << "  float2 pixpos: WPOS";
   if(this->useDSF){
-    ss<< ","<<std::endl<<"	uniform float cFarDistance";
-    ss<< ","<<std::endl<<"	uniform half cObjectId";
+    ss<< ","<<std::endl<<"  uniform float cFarDistance";
+    ss<< ","<<std::endl<<"  uniform half cObjectId";
   }
   int texCoordNum = 1;
   if (permutation & MergeMaterialGenerator::MP_NORMAL_MAP )
   {
-    ss << ',' << std::endl << "	half3 iTangent : TEXCOORD" << texCoordNum++ ;
-    ss << ',' << std::endl << "	half3 iBiNormal : TEXCOORD" << texCoordNum++ ;
+    ss << ',' << std::endl << "  half3 iTangent : TEXCOORD" << texCoordNum++ ;
+    ss << ',' << std::endl << "  half3 iBiNormal : TEXCOORD" << texCoordNum++ ;
   }
 
   Ogre::uint32 numTexCoords = (permutation & MergeMaterialGenerator::MP_TEXCOORD_MASK) >> 8;
-  for (Ogre::uint32 i=0; i<numTexCoords; i++)
+  for (Ogre::uint32 i = 0; i < numTexCoords; i++)
   {
-    ss << ',' << std::endl<< "	half2 iUV" << i << " : TEXCOORD" << texCoordNum++ ;
+    ss << ',' << std::endl<< "  half2 iUV" << i << " : TEXCOORD" << texCoordNum++ ;
   }
   if(this->useDSF)
-    ss << ',' << std::endl<< "	float3 iViewPos: TEXCOORD" << texCoordNum++ ;
+    ss << ',' << std::endl<< "  float3 iViewPos: TEXCOORD" << texCoordNum++ ;
 
-  ss << ',' << std::endl<< "	out half4 oColor0 : COLOR0" ;
+  ss << ',' << std::endl<< "  out half4 oColor0 : COLOR0" ;
 
   int samplerNum = 0;
 
   if (permutation & MergeMaterialGenerator::MP_NORMAL_MAP)
   {
-    ss << "," << std::endl << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")";
+    ss << "," << std::endl << "  uniform sampler sNormalMap : register(s" << samplerNum++ << ")";
   }
 
   Ogre::uint32 numTextures = permutation & MergeMaterialGenerator::MP_TEXTURE_MASK;
 
 
-  for (Ogre::uint32 i=0; i<numTextures; i++) {
-    ss << "," <<std::endl << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")";
+  for (Ogre::uint32 i = 0; i<numTextures; i++) {
+    ss << "," <<std::endl << "  uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")";
   }
-  ss << "," <<std::endl<<"	uniform sampler LBuffer : register(s"<< samplerNum++ <<")";
+  ss << "," <<std::endl<<"  uniform sampler LBuffer : register(s"<< samplerNum++ <<")";
   if(this->useDSF){
-    ss << "," <<std::endl<<"	uniform sampler DSFBuffer : register(s"<< samplerNum++ <<")";
+    ss << "," <<std::endl<<"  uniform sampler DSFBuffer : register(s"<< samplerNum++ <<")";
   }
   if (numTextures == 0 || permutation & MergeMaterialGenerator::MP_HAS_DIFFUSE_COLOUR)
   {
-    ss<<","<< std::endl << "	uniform half4 cDiffuseColour" ;
+    ss<<","<< std::endl << "  uniform half4 cDiffuseColour" ;
   }
-  ss <<","<<std::endl<< "	uniform half cSpecularity" ;
-  ss <<","<<std::endl<< "	uniform half cHeight";
-  ss <<","<<std::endl<< "	uniform half cWidth";
-  ss <<","<<std::endl<< "	uniform half cFlip";
-  ss << "	)" << std::endl;
+  ss <<","<<std::endl<< "  uniform half cSpecularity" ;
+  ss <<","<<std::endl<< "  uniform half cHeight";
+  ss <<","<<std::endl<< "  uniform half cWidth";
+  ss <<","<<std::endl<< "  uniform half cFlip";
+  ss << "  )" << std::endl;
 
 
   ss << "{" << std::endl;
   ss << " pixpos = fixUV(pixpos,cFlip);"<<std::endl;
   if(this->useDSF)
-    ss <<"	float2 LBuffpos_frac = frac(pixpos*0.75);"<<std::endl;
+    ss <<"  float2 LBuffpos_frac = frac(pixpos*0.75);"<<std::endl;
   //ss <<"  pixpos+=float2(0.5/0.75,0.5/0.75);"<<std::endl;
-  ss <<"	pixpos.x/=cWidth;"<<std::endl;
-  ss <<"	pixpos.y/=cHeight;"<<std::endl;
+  ss <<"  pixpos.x/=cWidth;"<<std::endl;
+  ss <<"  pixpos.y/=cHeight;"<<std::endl;
   if(this->useDSF){
     //calculate sample positions in order to reconstruct bilinear filtering
     ss <<"  float depth = length(iViewPos) / cFarDistance;"<<std::endl;
     ss <<"  float2 sample0 = float2(1/cWidth,- 1/cHeight) /(2*0.75);"<<std::endl;
-    ss <<"	float2 sample1 = float2(-1/cWidth,- 1/cHeight) /(2*0.75);"<<std::endl;
-    ss <<"	float2 sample2 = float2(1/cWidth ,+ 1/cHeight )/(2*0.75);"<<std::endl;
-    ss <<"	float2 sample3 = float2(-1/cWidth,+ 1/cHeight) /(2*0.75);"<<std::endl;
+    ss <<"  float2 sample1 = float2(-1/cWidth,- 1/cHeight) /(2*0.75);"<<std::endl;
+    ss <<"  float2 sample2 = float2(1/cWidth ,+ 1/cHeight )/(2*0.75);"<<std::endl;
+    ss <<"  float2 sample3 = float2(-1/cWidth,+ 1/cHeight) /(2*0.75);"<<std::endl;
 
 
     //get the values of the Discontinuity Sensible Filter
-    ss <<"	float4 DSF0 = tex2D(DSFBuffer,pixpos + sample0);"<<std::endl;
-    ss <<"	float4 DSF1 = tex2D(DSFBuffer,pixpos + sample1);"<<std::endl;
-    ss <<"	float4 DSF2 = tex2D(DSFBuffer,pixpos + sample2);"<<std::endl;
-    ss <<"	float4 DSF3 = tex2D(DSFBuffer,pixpos + sample3);"<<std::endl;
+    ss <<"  float4 DSF0 = tex2D(DSFBuffer,pixpos + sample0);"<<std::endl;
+    ss <<"  float4 DSF1 = tex2D(DSFBuffer,pixpos + sample1);"<<std::endl;
+    ss <<"  float4 DSF2 = tex2D(DSFBuffer,pixpos + sample2);"<<std::endl;
+    ss <<"  float4 DSF3 = tex2D(DSFBuffer,pixpos + sample3);"<<std::endl;
     //normalize the input normal for proper comparison
-    ss <<"	iNormal=normalize(iNormal);"<<std::endl;
+    ss <<"  iNormal=normalize(iNormal);"<<std::endl;
 
     //get the usual bilinear interpolation weights
     ss <<"  float4 w = float4((1-LBuffpos_frac.x)*(1-LBuffpos_frac.y),LBuffpos_frac.x*(1-LBuffpos_frac.y),"<<std::endl
       <<"(1-LBuffpos_frac.x)*LBuffpos_frac.y,LBuffpos_frac.x*LBuffpos_frac.y);"<<std::endl;
 
     //see if each sample is on the same surface or not
-    ss <<"	float w0 = saturate(100*(depth_epsilon - abs(depth-DSF0.r))) *"<<std::endl
-      <<"		saturate((1-1000*abs(DSF0.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF0.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF0.a)));"<<std::endl;
-    ss <<"	float w1 = saturate(100*(depth_epsilon - abs(depth-DSF1.r))) *"<<std::endl
-      <<"		saturate((1-1000*abs(DSF1.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF1.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF1.a)));"<<std::endl;
-    ss <<"	float w2 = saturate(100*(depth_epsilon - abs(depth-DSF2.r))) *"<<std::endl
-      <<"		saturate((1-1000*abs(DSF2.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF2.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF2.a)));"<<std::endl;
-    ss <<"	float w3 = saturate(100*(depth_epsilon - abs(depth-DSF3.r))) *"<<std::endl
-      <<"		saturate((1-1000*abs(DSF3.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF3.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF3.a)));"<<std::endl;
+    ss <<"  float w0 = saturate(100*(depth_epsilon - abs(depth-DSF0.r))) *"<<std::endl
+      <<"    saturate((1-1000*abs(DSF0.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF0.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF0.a)));"<<std::endl;
+    ss <<"  float w1 = saturate(100*(depth_epsilon - abs(depth-DSF1.r))) *"<<std::endl
+      <<"    saturate((1-1000*abs(DSF1.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF1.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF1.a)));"<<std::endl;
+    ss <<"  float w2 = saturate(100*(depth_epsilon - abs(depth-DSF2.r))) *"<<std::endl
+      <<"    saturate((1-1000*abs(DSF2.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF2.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF2.a)));"<<std::endl;
+    ss <<"  float w3 = saturate(100*(depth_epsilon - abs(depth-DSF3.r))) *"<<std::endl
+      <<"    saturate((1-1000*abs(DSF3.g - cObjectId)))*saturate(1000*(normal_epsilon - abs(iNormal.x-DSF3.b)))*saturate(1000*(normal_epsilon - abs(iNormal.y-DSF3.a)));"<<std::endl;
     //TODO: find a better way to check if at least a sample is on the surface
     ss <<" if(w0+w1+w2+w3 > 0)"<<std::endl;
     //bias bilinear filtering
@@ -597,29 +597,29 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateFragmentShader(
     ss <<"half4 lightVal = (w.x * tex2D(LBuffer,pixpos+sample0) + w.y * tex2D(LBuffer,pixpos + sample1) +w.z * tex2D(LBuffer,pixpos + sample2)+w.w * tex2D(LBuffer,pixpos + sample3))/(w.x+w.y+w.z+w.w);"<<std::endl;
   }
   else{
-    ss <<"	half4 lightVal = tex2D(LBuffer,pixpos);"<<std::endl;
+    ss <<"  half4 lightVal = tex2D(LBuffer,pixpos);"<<std::endl;
   }
 
-  ss << "	half3 diffuseCol;"<<std::endl;
+  ss << "  half3 diffuseCol;"<<std::endl;
   if (numTexCoords > 0 && numTextures > 0 )
   {
-    ss << "	diffuseCol = tex2D(sTex0, iUV0);" << std::endl;
+    ss << "  diffuseCol = tex2D(sTex0, iUV0);" << std::endl;
     if (permutation & MergeMaterialGenerator::MP_HAS_DIFFUSE_COLOUR)
     {
-      ss << "	diffuseCol *= cDiffuseColour.rgb;" << std::endl;
+      ss << "  diffuseCol *= cDiffuseColour.rgb;" << std::endl;
     }
   }
   else
   {
-    ss << "	diffuseCol = cDiffuseColour.rgb;" << std::endl;
+    ss << "  diffuseCol = cDiffuseColour.rgb;" << std::endl;
   }
   //use the luminance as an aproximation of the intensity of the NL*attenuation term
   ss <<"  half luminance = dot(lightVal.rgb, float3(0.2126, 0.7152, 0.0722));"<<std::endl;
   //reconstruct HV^n_light based on that, and get the specular term
   ss <<"  half3 specular = diffuseCol*max(0,pow(lightVal.a/luminance,1.0+cSpecularity));"<<std::endl;
   //get the final lighting value
-  ss <<"	half4 color = float4(lightVal.rgb*(diffuseCol + specular),1);"<<std::endl;
-  ss <<"	oColor0 = color;"<<std::endl;
+  ss <<"  half4 color = float4(lightVal.rgb*(diffuseCol + specular),1);"<<std::endl;
+  ss <<"  oColor0 = color;"<<std::endl;
   ss << "}" << std::endl;
 
   Ogre::String programSource = ss.str();

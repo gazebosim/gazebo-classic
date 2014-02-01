@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef ENTITYMAKER_HH
-#define ENTITYMAKER_HH
+#ifndef _ENTITYMAKER_HH_
+#define _ENTITYMAKER_HH_
 
-#include "rendering/RenderTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "math/Vector3.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

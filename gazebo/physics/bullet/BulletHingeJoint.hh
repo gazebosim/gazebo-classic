@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@
 #ifndef _BULLETHINGEJOINT_HH_
 #define _BULLETHINGEJOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
-#include "physics/HingeJoint.hh"
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/bullet/BulletPhysics.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/HingeJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 
 class btHingeConstraint;
 
@@ -51,19 +51,13 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      // Documentation inherited.
       public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
-
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int _index, double _damping);
 
       // Documentation inherited.
       public: virtual void SetVelocity(int _index, double _vel);
@@ -76,12 +70,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetMaxForce(int _index);
-
-      // Documentation inherited.
-      public: virtual void SetForce(int _index, double _torque);
-
-      // Documentation inherited.
-      public: virtual double GetForce(int _index);
 
       // Documentation inherited.
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
@@ -101,12 +89,19 @@ namespace gazebo
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(int _index, double _effort);
+
       /// \brief Pointer to bullet hinge constraint.
       private: btHingeConstraint *bulletHinge;
 
       /// \brief Offset angle used in GetAngleImpl, so that angles are reported
       ///        relative to the initial configuration.
       private: double angleOffset;
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      ///        in world frame.
+      private: math::Vector3 initialWorldAxis;
     };
     /// \}
   }
