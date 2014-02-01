@@ -105,7 +105,6 @@ void ModelPropShop::Load(int _argc, char **_argv)
 /////////////////////////////////////////////
 void ModelPropShop::Init()
 {
-  this->count = 0;
   this->updateConn = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this));
 
