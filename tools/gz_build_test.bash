@@ -61,6 +61,10 @@ do
   echo hg up $branch
   hg up $branch
 
+  # Apply testing patch (usually for more console messages)
+  touch $HOME/bin/gz_build_test_scpeters.patch
+  patch -p1 < $HOME/bin/gz_build_test_scpeters.patch
+
   # Build
   rm -rf build
   mkdir build
@@ -73,6 +77,7 @@ do
   . $BUILD_ROOT/install/share/gazebo/setup.sh
 
   echo "Branch: $branch" >> $logfile
+  echo "hg id: `hg id`" >> $logFile
   echo "==================================================" >> $logfile
 
   echo "Code Check Results" >> $logfile
