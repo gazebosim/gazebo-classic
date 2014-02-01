@@ -165,29 +165,27 @@ void SimbodyLink::OnPoseChange()
   if (!this->simbodyPhysics->simbodyPhysicsInitialized)
     return;
 
-  /// \TODO: limited functionality for now.
-  /// Setting 6 dof pose of a link works in simbody only if
-  /// the inboard joint is a free joint to the ground for now.
-
   if (this->masterMobod.isEmptyHandle())
     return;
 
+  /// Limited functionality for now:
+  /// Setting 6 dof pose of a link works in simbody only if
+  /// the inboard joint is a free joint to the ground for now.
+  /// If the inboard joint is not free, simbody tries to project
+  /// target pose into available DOF's.
+
+  /// Only change pose if parent is ground, otherwise do nothing
   if (!this->masterMobod.isGround() &&
       this->masterMobod.getParentMobilizedBody().isGround())
   {
     this->masterMobod.setQToFitTransform(
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+
+    // realize system after updating Q's
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
   }
-  // else
-  //   gzdbg << "Joint [" << this->GetScopedName()
-  //         << "] P[" << this->GetWorldPose() << "]\n";
-
-
-  /*
-  math::Pose pose = this->GetWorldPose();
-
-  */
 }
 
 //////////////////////////////////////////////////
@@ -518,7 +516,8 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    GZ_ASSERT(_numFragments > 0, "_numFragments must be at least 1 for the master");
+    GZ_ASSERT(_numFragments > 0,
+              "_numFragments must be at least 1 for the master");
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());
