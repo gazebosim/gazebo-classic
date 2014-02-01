@@ -59,6 +59,9 @@ namespace gazebo
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
 
+    /// \brief Pointer to the light.
+    private: rendering::LightPtr light;
+
     /// \brief Pointer to the sdf document.
     private: boost::shared_ptr<sdf::SDF> sdf;
 

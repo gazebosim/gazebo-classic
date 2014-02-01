@@ -1227,6 +1227,13 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
+  int fsaa = 4;
+
+  // Full-screen anti-aliasing only works correctly in 1.8 and above
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+  fsaa = 0;
+#endif
+
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       _textureName,
@@ -1239,7 +1246,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       Ogre::TU_RENDERTARGET,
       0,
       false,
-      4)).getPointer();
+      fsaa)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
