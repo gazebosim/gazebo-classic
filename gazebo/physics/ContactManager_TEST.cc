@@ -46,7 +46,7 @@ TEST_F(ContactManagerTest, CreateFilter)
   std::vector<std::string> collisions;
   std::string emptyName = "empty";
   std::string topic  = manager->CreateFilter(emptyName, collisions);
-  EXPECT_TRUE(topic == "");
+  EXPECT_EQ(topic, "");
   EXPECT_TRUE(!manager->HasFilter(emptyName));
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 
