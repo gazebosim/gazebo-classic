@@ -61,6 +61,9 @@
 
 ### Additions
 
+1. **gazebo/rendering/Light.hh**
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
+
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
