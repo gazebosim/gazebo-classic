@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <string.h>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <sstream>
@@ -152,6 +152,23 @@ void FileLogger::Init(const std::string &_filename)
   // remove current buffer.
   if (buf->stream)
     delete buf->stream;
+
+  // If the logPath is a directory, just rename it.
+  if (boost::filesystem::is_directory(logPath))
+  {
+    std::string newPath = logPath.string() + ".old";
+    boost::system::error_code ec;
+    boost::filesystem::rename(logPath, newPath, ec);
+    if (ec == 0)
+      std::cerr << "Deprecated log directory [" << logPath
+                << "] renamed to [" << newPath << "]" << std::endl;
+    else
+    {
+      std::cerr << "Unable to rename deprecated log directory [" << logPath
+                << "] to [" << newPath << "]. Reason: " << ec.message();
+      return;
+    }
+  }
 
   buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
   if (!buf->stream->is_open())
