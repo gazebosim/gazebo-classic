@@ -90,7 +90,7 @@ TEST_F(Console_TEST, ColorWarnSlashN)
   {
     gzwarn << logString << " _n__ " << i << '\n';
   }
-  
+
   std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -111,7 +111,7 @@ TEST_F(Console_TEST, ColorWarnStdEndl)
   {
     gzwarn << logString << " endl " << i << std::endl;
   }
-  
+
   std::string logContent = this->GetLogContent();
 
   for (int i = 0; i < g_messageRepeat; ++i)
@@ -255,7 +255,7 @@ TEST_F(Console_TEST, ColorMsg)
   std::string logString = "this is a msg test";
 
   gzmsg << logString << std::endl;
-  
+
   std::string logContent = this->GetLogContent();
 
   EXPECT_TRUE(logContent.find(logString) != std::string::npos);
