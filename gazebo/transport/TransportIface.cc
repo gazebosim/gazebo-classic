@@ -349,6 +349,5 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
 
   if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
     return true;
-  else
-    return false;
+  return false;
 }
