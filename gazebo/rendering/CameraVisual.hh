@@ -56,7 +56,7 @@ namespace gazebo
       public: void Load(unsigned int _width, unsigned int _height);
 
       /// \brief Update the visual
-      public: void Update();
+      private: void Update();
 
       /// \brief Event connections.
       private: std::vector<event::ConnectionPtr> connections;

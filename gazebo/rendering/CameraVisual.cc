@@ -108,7 +108,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
     this->parent->AttachVisual(shared_from_this());
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      event::Events::ConnectRender(
       boost::bind(&CameraVisual::Update, this)));
 }
 
