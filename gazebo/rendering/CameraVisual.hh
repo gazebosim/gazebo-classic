@@ -55,6 +55,13 @@ namespace gazebo
       /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
 
+      /// \brief Update the visual
+      private: void Update();
+
+      /// \brief Event connections.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Pointer to the camera.
       private: CameraPtr camera;
     };
     /// \}

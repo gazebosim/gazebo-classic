@@ -37,6 +37,7 @@ set(tests
   joint_force_torque.cc
   joint_spawn.cc
   joint_test.cc
+  joint_universal.cc
   laser.cc
   model_database.cc
   noise.cc
