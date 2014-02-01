@@ -18,24 +18,25 @@
 #define _GAZEBO_TEST_UTIL_HH_
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include <boost/filesystem.hpp>
 #include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 
-namespace gazebo 
+namespace gazebo
 {
-  namespace testing 
+  namespace testing
   {
     /// \brief A utility class that stores test logs in ~/.gazebo/test_logs.
-    /// This functionality is needed to keep all the log information reported 
+    /// This functionality is needed to keep all the log information reported
     /// by gazebo during continuous integration. Without this, debugging
     /// failing tests is significantly more difficult.
     class AutoLogFixture : public ::testing::Test
     {
       /// \brief Setup the test fixture. This gets called by gtest.
-      protected: virtual void SetUp() 
+      protected: virtual void SetUp()
       {
         ASSERT_TRUE(getenv("HOME") != NULL);
 
