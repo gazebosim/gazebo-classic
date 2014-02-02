@@ -377,8 +377,22 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->worldModPub =
     this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
+  common::Time waitTime(1, 0);
+  int waitCount = 0;
+  int maxWaitCount = 10;
+
   // Wait for namespaces.
-  gazebo::transport::waitForNamespaces(gazebo::common::Time(1, 0));
+  while (!gazebo::transport::waitForNamespaces(waitTime) &&
+      (waitCount++) < maxWaitCount)
+  {
+    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
+  }
+
+  if (waitCount >= maxWaitCount)
+  {
+    gzerr << "Waited " << (waitTime * waitCount).Double()
+      << " seconds for namespaces. Giving up.\n";
+  }
 
   physics::init_worlds();
   this->stop = false;
