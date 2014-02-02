@@ -339,6 +339,9 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
   gazebo::common::Time waitTime = std::min(
       gazebo::common::Time(0, 100000000), _maxWait / 10);
 
+  gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+      namespaces);
+
   while (namespaces.empty() &&
       gazebo::common::Time::GetWallTime() - startTime < _maxWait)
   {
