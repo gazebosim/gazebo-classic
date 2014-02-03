@@ -18,12 +18,15 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Helpers.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class HelpersTest : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
 // Test a few function in Helpers
-TEST(HelpersTest, Helpers)
+TEST_F(HelpersTest, Helpers)
 {
   EXPECT_EQ(12345, math::parseInt("12345"));
   EXPECT_EQ(-12345, math::parseInt("-12345"));
@@ -40,7 +43,7 @@ TEST(HelpersTest, Helpers)
 
 /////////////////////////////////////////////////
 // Test Helpers::fixnan functions
-TEST(HelpersTest, FixNaN)
+TEST_F(HelpersTest, FixNaN)
 {
   EXPECT_DOUBLE_EQ(math::fixnan(1.0 / 0.0), 0.0);
   EXPECT_DOUBLE_EQ(math::fixnan(-1.0 / 0.0), 0.0);

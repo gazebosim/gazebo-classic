@@ -24,8 +24,11 @@
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class MeshTest : public gazebo::testing::AutoLogFixture { };
 
 std::string asciiSTLBox =
 "solid MYSOLID\n\
@@ -117,7 +120,7 @@ endsolid MYSOLID";
 
 
 /////////////////////////////////////////////////
-TEST(MeshTest, Mesh)
+TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
@@ -245,7 +248,7 @@ TEST(MeshTest, Mesh)
 
 /////////////////////////////////////////////////
 // Test centering a submesh.
-TEST(MeshTest, MeshMove)
+TEST_F(MeshTest, MeshMove)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
@@ -267,7 +270,7 @@ TEST(MeshTest, MeshMove)
 
 /////////////////////////////////////////////////
 // Test centering a submesh.
-TEST(MeshTest, SubMeshCenter)
+TEST_F(MeshTest, SubMeshCenter)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
