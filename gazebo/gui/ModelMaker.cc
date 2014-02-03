@@ -271,8 +271,14 @@ void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button == common::MouseEvent::LEFT)
   {
-    this->CreateTheEntity();
-    this->Stop();
+    // Place if not dragging, or if dragged for less than 50 pixels.
+    // The 50 pixels is used to account for accidental mouse movement
+    // when placing an object.
+    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    {
+      this->CreateTheEntity();
+      this->Stop();
+    }
   }
 }
 
