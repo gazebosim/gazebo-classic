@@ -178,8 +178,10 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // Turn on the reference visual.
   this->refVisual->SetVisible(true);
 
-  // Middle mouse button is used to Orbit.
-  if (_event.buttons & common::MouseEvent::MIDDLE && _event.dragging)
+  // Middle mouse button or Shift + Left button is used to Orbit.
+  if (_event.dragging &&
+      (_event.buttons & common::MouseEvent::MIDDLE ||
+      (_event.buttons & common::MouseEvent::LEFT && _event.shift)))
   {
     // Compute the delta yaw and pitch.
     double dy = this->NormalizeYaw(drag.x * _event.moveScale * -0.4);
