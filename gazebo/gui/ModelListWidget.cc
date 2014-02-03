@@ -176,6 +176,13 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
+    else if (name == "Spherical Coordinates")
+    {
+      this->requestMsg = msgs::CreateRequest("spherical_coordinates_info",
+                                             this->selectedEntityName);
+      this->requestPub->Publish(*this->requestMsg);
+    }
+
     else
     {
       this->propTreeBrowser->clear();
@@ -248,6 +255,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->physicsMsg, NULL);
     else if (this->fillTypes[0] == "Light")
       this->FillPropertyTree(this->lightMsg, NULL);
+    else if (this->fillTypes[0] == "Spherical Coordinates")
+      this->FillPropertyTree(this->sphericalCoordMsg, NULL);
 
     this->fillingPropertyTree = false;
     this->fillTypes.pop_front();
@@ -394,6 +403,14 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->propMutex->lock();
     this->lightMsg.ParseFromString(_msg->serialized_data());
     this->fillTypes.push_back("Light");
+    this->propMutex->unlock();
+  }
+  else if (_msg->has_type() &&
+           _msg->type() == this->sphericalCoordMsg.GetTypeName())
+  {
+    this->propMutex->lock();
+    this->sphericalCoordMsg.ParseFromString(_msg->serialized_data());
+    this->fillTypes.push_back("Spherical Coordinates");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == "error")
@@ -1237,6 +1254,68 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
+    QtProperty *_parent)
+{
+  QtVariantProperty *item = NULL;
+
+  item = this->variantManager->addProperty(
+      QtVariantPropertyManager::enumTypeId(), tr("Surface Model"));
+  QStringList types;
+
+  const google::protobuf::EnumDescriptor *surfaceModelEnum =
+    _msg.GetDescriptor()->FindEnumTypeByName("SurfaceModel");
+
+  if (!surfaceModelEnum)
+  {
+    gzerr << "Unable to get SurfaceModel enum descriptor from "
+      << "SphericalCoordinates message. msgs::SphericalCoordinates "
+      << "has probably changed\n";
+    types << "invalid";
+  }
+  else
+  {
+    for (int i = 0; i < surfaceModelEnum->value_count(); ++i)
+      types << surfaceModelEnum->value(i)->name().c_str();
+  }
+  
+  item->setAttribute("enumNames", types);
+  item->setValue(0);
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("Latitude"));
+  item->setValue(_msg.latitude_deg());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("Longitude"));
+  item->setValue(_msg.longitude_deg());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("Elevation"));
+  item->setValue(_msg.elevation());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("Heading"));
+  item->setValue(_msg.heading_deg());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
 }
 
 /////////////////////////////////////////////////
@@ -2098,6 +2177,13 @@ void ModelListWidget::ResetTree()
   // Create the top level of items in the tree widget
   {
     this->ResetScene();
+
+    this->sphericalCoordItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("Spherical Coordinates"))));
+    this->sphericalCoordItem->setData(0,
+        Qt::UserRole, QVariant(tr("Spherical Coordinates")));
+    this->modelTreeWidget->addTopLevelItem(this->sphericalCoordItem);
 
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),

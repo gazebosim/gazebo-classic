@@ -160,6 +160,27 @@ namespace gazebo
       _t->set_nsec(_v.nsec);
     }
 
+    /////////////////////////////////////////////////
+    void Set(msgs::SphericalCoordinates *_s,
+             const common::SphericalCoordinates &_v)
+    {
+      switch(_v.GetSurfaceType())
+      {
+        case common::SphericalCoordinates::EARTH_WGS84:
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+        default:
+          gzerr << "Unable to map surface type[" <<  _v.GetSurfaceType()
+            << "] to a SphericalCoordinates message.\n";
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+      };
+
+      _s->set_latitude_deg(_v.GetLatitudeReference().Degree());
+      _s->set_longitude_deg(_v.GetLongitudeReference().Degree());
+      _s->set_heading_deg(_v.GetHeadingOffset().Degree());
+      _s->set_elevation(_v.GetElevationReference());
+    }
 
     /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v)

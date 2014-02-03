@@ -1445,6 +1445,15 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type(sceneMsg.GetTypeName());
     }
+    else if ((*iter).request() == "spherical_coordinates_info")
+    {
+      msgs::SphericalCoordinates sphereCoordMsg;
+      msgs::Set(&sphereCoordMsg, *(this->sphericalCoordinates));
+
+      std::string *serializedData = response.mutable_serialized_data();
+      sphereCoordMsg.SerializeToString(serializedData);
+      response.set_type(sphereCoordMsg.GetTypeName());
+    }
     else
       send = false;
 
