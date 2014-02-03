@@ -269,7 +269,7 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == common::MouseEvent::LEFT)
   {
     this->CreateTheEntity();
     this->Stop();
