@@ -61,7 +61,7 @@ namespace gazebo
       };
 
       /// \brief Constructor.
-      public: Noise();
+      public: explicit Noise(NoiseType _type);
 
       /// \brief Destructor.
       public: virtual ~Noise();
@@ -103,7 +103,7 @@ namespace gazebo
       public: virtual void SetCamera(rendering::CameraPtr _camera);
 
       /// \brief Which type of noise we're applying
-      protected: NoiseType type;
+      private: NoiseType type;
 
       /// \brief Noise sdf element.
       private: sdf::ElementPtr sdf;

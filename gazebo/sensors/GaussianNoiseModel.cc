@@ -82,14 +82,13 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::GaussianNoiseModel()
-  : Noise(),
+  : Noise(Noise::GAUSSIAN),
     mean(0.0),
     stdDev(0.0),
     bias(0.0),
     precision(0.0),
     quantized(false)
 {
-  this->type = Noise::GAUSSIAN;
 }
 
 //////////////////////////////////////////////////
