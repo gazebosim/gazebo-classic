@@ -4,6 +4,9 @@ add_subdirectory(ode)
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
+if (HAVE_DART)
+  add_subdirectory(dart)
+endif()
 
 if (HAVE_SIMBODY)
   add_subdirectory(simbody)
@@ -114,6 +117,9 @@ target_link_libraries(gazebo_physics
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics gazebo_physics_dart)
+endif()
 
 if (HAVE_SIMBODY)
   target_link_libraries(gazebo_physics gazebo_physics_simbody)
@@ -131,7 +137,7 @@ set (gtest_sources
   BoxShape_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
-  Joint_TEST.cc
   PhysicsEngine_TEST.cc
-  SphereShape_TEST.cc)
+  SphereShape_TEST.cc
+)
 gz_build_tests(${gtest_sources})
