@@ -1459,10 +1459,7 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-  {
-    std::cout << "Reset tracked visual\n";
     this->dataPtr->trackedVisual.reset();
-  }
 
   return false;
 }
