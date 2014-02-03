@@ -60,8 +60,9 @@ namespace gazebo
         GAUSSIAN
       };
 
-      /// \brief Constructor. This should not be called directly. Use
-      /// NoiseFactory::NewNoiseModel to instantiate a new noise model.
+      /// \brief Constructor. This should not be called directly unless creating
+      /// an empty noise model. Use NoiseFactory::NewNoiseModel to instantiate
+      /// a new noise model.
       /// \param[in] _type Type of noise model.
       /// \sa NoiseFactory::NewNoiseModel
       public: explicit Noise(NoiseType _type);
