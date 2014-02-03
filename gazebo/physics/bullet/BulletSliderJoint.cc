@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,10 +173,13 @@ void BulletSliderJoint::Init()
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetVelocity(int /*_index*/) const
+double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
   // I'm not sure this will work
@@ -186,14 +189,15 @@ double BulletSliderJoint::GetVelocity(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 {
   if (this->bulletSlider)
     this->bulletSlider->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
+void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -217,36 +221,17 @@ void BulletSliderJoint::SetAxis(int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
+void BulletSliderJoint::SetDamping(unsigned int /*index*/,
+    const double _damping)
 {
+  /// \TODO: special case bullet specific linear damping, this needs testing.
   if (this->bulletSlider)
     this->bulletSlider->setDampingDirLin(_damping);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetForce(int _index, double _effort)
+void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling BulletSliderJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
-       this->effortLimit[_index]);
-
   if (this->bulletSlider && this->constraint)
   {
     // x-axis of constraint frame
@@ -272,7 +257,7 @@ void BulletSliderJoint::SetForce(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetHighStop(int /*_index*/,
+void BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
                                     const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
@@ -281,7 +266,7 @@ void BulletSliderJoint::SetHighStop(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetLowStop(int /*_index*/,
+void BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
                                    const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
@@ -290,7 +275,7 @@ void BulletSliderJoint::SetLowStop(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -301,7 +286,7 @@ math::Angle BulletSliderJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
+math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletSlider)
@@ -312,14 +297,14 @@ math::Angle BulletSliderJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetMaxForce(int /*_index*/, double _force)
+void BulletSliderJoint::SetMaxForce(unsigned int /*_index*/, double _force)
 {
   if (this->bulletSlider)
     this->bulletSlider->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::GetMaxForce(int /*_index*/)
+double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   double result = 0;
   if (this->bulletSlider)
@@ -328,7 +313,7 @@ double BulletSliderJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   math::Vector3 result;
   if (this->bulletSlider)
@@ -346,7 +331,7 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletSlider)

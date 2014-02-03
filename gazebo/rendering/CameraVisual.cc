@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,24 +27,29 @@
 using namespace gazebo;
 using namespace rendering;
 
-/// \brief Constructor
+/////////////////////////////////////////////////
 CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 : Visual(_name, _vis)
 {
 }
 
+/////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
+  if (this->scene)
+    this->scene->RemoveCamera(this->camera->GetName());
+
   this->camera.reset();
 }
 
+/////////////////////////////////////////////////
 void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
   double width = 1.0;
   double height = _height / static_cast<double>(_width);
 
-  this->camera = this->scene->CreateCamera(this->GetName(), true);
+  this->camera = this->scene->CreateCamera(this->GetName(), false);
   this->camera->Load();
   this->camera->Init();
   this->camera->CreateRenderTexture(this->GetName() + "_RTT");
@@ -95,7 +100,23 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  this->camera->AttachToVisual(this->GetName(), true);
+  this->camera->AttachToVisual(this->GetId(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  if (this->parent)
+    this->parent->AttachVisual(shared_from_this());
+
+  this->connections.push_back(
+      event::Events::ConnectRender(
+      boost::bind(&CameraVisual::Update, this)));
+}
+
+/////////////////////////////////////////////////
+void CameraVisual::Update()
+{ 
+  if (!this->camera)
+    return;
+
+  this->camera->Render();
 }

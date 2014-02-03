@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_mgr), renderTarget(_renderTarget), texture(0),
+: sceneMgr(_mgr), renderTarget(_renderTarget),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);
@@ -112,7 +112,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->renderTexture->addListener(this->selectionTargetListener);
   this->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->renderTexture->getViewport(0)->setVisibilityMask(
-      ~GZ_VISIBILITY_NOT_SELECTABLE);
+      GZ_VISIBILITY_SELECTABLE);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 
@@ -172,7 +172,7 @@ void SelectionBuffer::CreateRTTOverlays()
 {
   Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
 
-  if (mgr->getByName("SelectionDebugOverlay"))
+  if (mgr && mgr->getByName("SelectionDebugOverlay"))
     return;
 
   Ogre::MaterialPtr baseWhite =
@@ -191,12 +191,21 @@ void SelectionBuffer::CreateRTTOverlays()
     static_cast<Ogre::OverlayContainer *>(
         mgr->createOverlayElement("Panel", "SelectionDebugPanel"));
 
-  panel->setMetricsMode(Ogre::GMM_PIXELS);
-  panel->setPosition(10, 10);
-  panel->setDimensions(400, 280);
-  panel->setMaterialName("SelectionDebugMaterial");
-  this->selectionDebugOverlay->add2D(panel);
-  this->selectionDebugOverlay->hide();
+  if (panel)
+  {
+    panel->setMetricsMode(Ogre::GMM_PIXELS);
+    panel->setPosition(10, 10);
+    panel->setDimensions(400, 280);
+    panel->setMaterialName("SelectionDebugMaterial");
+    this->selectionDebugOverlay->add2D(panel);
+    this->selectionDebugOverlay->hide();
+  }
+  else
+  {
+    gzlog << "Unable to create selection buffer overlay. "
+      "This will not effect Gazebo unless you're trying to debug "
+      "the selection buffer.\n";
+  }
 }
 
 /////////////////////////////////////////////////

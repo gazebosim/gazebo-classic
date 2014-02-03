@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,6 +205,83 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   delete [] scan;
   delete [] scan2;
+}
+
+
+/////////////////////////////////////////////////
+/// \brief Test GPU ray sensor interaction with terrain
+TEST_F(GPURaySensorTest, Heightmap)
+{
+  Load("worlds/gpu_laser_heightmap.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    return;
+  }
+
+  // Get a pointer to the gpu laser sensor
+  std::string gpuLaserName = "gpu_laser_sensor";
+  int t = 0;
+  while (sensors::get_sensor(gpuLaserName) == NULL && t < 100)
+  {
+    common::Time::MSleep(100);
+    ++t;
+  }
+  ASSERT_LT(t, 100);
+  sensors::SensorPtr sensor = sensors::get_sensor(gpuLaserName);
+  sensors::GpuRaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+
+  EXPECT_TRUE(raySensor != NULL);
+
+  // listen to new laser frames
+  float *scan = new float[raySensor->GetRayCount()
+      * raySensor->GetVerticalRayCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    raySensor->ConnectNewLaserFrame(
+        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
+          _1, _2, _3, _4, _5));
+
+  // wait for a few laser scans
+  int i = 0;
+  while (scanCount < 10 && i < 300)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  // Verify initial laser range readings. Nothing should be intersecting
+  double maxRange = 10;
+  EXPECT_NEAR(raySensor->GetRangeMax(), maxRange, LASER_TOL);
+
+  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+    EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
+
+  // Move laser model very close to terrain, it should now returns range values
+  // that are less than half the max range
+  std::string gpuLaserModelName = "gpu_laser";
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->GetModel(gpuLaserModelName)->SetWorldPose(
+      math::Pose(math::Vector3(13.2, 0, 0.035), math::Quaternion(0, 0, 0)));
+
+  // wait for a few laser scans
+  i = 0;
+  scanCount = 0;
+  while (scanCount < 10 && i < 300)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+    EXPECT_TRUE(raySensor->GetRange(i) < maxRange / 2.0);
 }
 
 int main(int argc, char **argv)

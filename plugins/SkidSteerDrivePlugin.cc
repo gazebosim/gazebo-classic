@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,12 +78,6 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("max_force"))
     this->maxForce = _sdf->GetElement("max_force")->Get<double>();
-  else if (_sdf->HasElement("MaxForce"))
-  {
-    gzerr << "The <MaxForce> element in the skid steer plugin is deprecated."
-          << "Use <max_force>\n";
-    this->maxForce = _sdf->GetElement("MaxForce")->Get<double>();
-  }
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
 

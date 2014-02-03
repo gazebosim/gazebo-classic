@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -44,10 +45,13 @@
 using namespace gazebo;
 using namespace rendering;
 
+// Note: The value of GZ_UINT32_MAX is reserved as a flag.
+uint32_t Visual::visualIdCount = GZ_UINT32_MAX - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
   this->scale = math::Vector3::One;
@@ -59,6 +63,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->sceneNode = NULL;
   this->animState = NULL;
   this->initialized = false;
+  this->lighting = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -93,6 +98,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
@@ -157,6 +163,7 @@ Visual::~Visual()
 void Visual::Fini()
 {
   this->plugins.clear();
+
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -204,7 +211,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 }
 
 /////////////////////////////////////////////////
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 {
   if (!_sceneNode)
     return;
@@ -348,6 +355,12 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       sdf::ElementPtr elem = this->sdf->GetElement("material");
       elem->GetElement("emissive")->Set(
           msgs::Convert(_msg->material().emissive()));
+    }
+
+    if (_msg->material().has_lighting())
+    {
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("lighting")->Set(_msg->material().lighting());
     }
   }
 
@@ -495,13 +508,19 @@ void Visual::Load()
       if (!matName.empty())
         this->SetMaterial(matName);
     }
-    else if (matElem->HasElement("ambient"))
+
+    if (matElem->HasElement("lighting"))
+    {
+      this->SetLighting(matElem->Get<bool>("lighting"));
+    }
+
+    if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->Get<common::Color>("ambient"));
-    else if (matElem->HasElement("diffuse"))
+    if (matElem->HasElement("diffuse"))
       this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
-    else if (matElem->HasElement("specular"))
+    if (matElem->HasElement("specular"))
       this->SetSpecular(matElem->Get<common::Color>("specular"));
-    else if (matElem->HasElement("emissive"))
+    if (matElem->HasElement("emissive"))
       this->SetEmissive(matElem->Get<common::Color>("emissive"));
   }
 
@@ -613,15 +632,18 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    if (this->useRTShader)
+    if (this->useRTShader && this->scene->GetInitialized() &&
+      _obj->getName().find("__COLLISION_VISUAL__") == std::string::npos)
+    {
       RTShaderSystem::Instance()->UpdateShaders();
+    }
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
 
-  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -776,6 +798,79 @@ math::Vector3 Visual::GetScale()
   return result;*/
 }
 
+//////////////////////////////////////////////////
+void Visual::SetLighting(bool _lighting)
+{
+  if (this->lighting == _lighting)
+    return;
+
+  this->lighting = _lighting;
+
+  if (this->useRTShader)
+  {
+    // Detach from RTShaderSystem otherwise setting lighting here will have
+    // no effect if shaders are used.
+    RTShaderSystem::Instance()->DetachEntity(this);
+  }
+
+  try
+  {
+    for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+    {
+      Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+      Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
+      if (entity)
+      {
+        for (unsigned j = 0; j < entity->getNumSubEntities(); ++j)
+        {
+          Ogre::MaterialPtr mat = entity->getSubEntity(j)->getMaterial();
+          if (!mat.isNull())
+          {
+            mat->setLightingEnabled(this->lighting);
+          }
+        }
+      }
+    }
+
+    // Apply lighting to all child scene nodes
+    for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+    {
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
+          this->sceneNode->getChild(i));
+      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      {
+        Ogre::MovableObject *obj = sn->getAttachedObject(j);
+
+        Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
+        if (entity)
+        {
+          for (unsigned k = 0; k < entity->getNumSubEntities(); ++k)
+          {
+            Ogre::MaterialPtr mat = entity->getSubEntity(k)->getMaterial();
+            if (!mat.isNull())
+            {
+              mat->setLightingEnabled(this->lighting);
+            }
+          }
+        }
+      }
+    }
+  }
+  catch(Ogre::Exception &e)
+  {
+    gzwarn << "Unable to set lighting to Geometry["
+           << this->sceneNode->getName() << ".\n";
+  }
+
+  // Apply lighting to all child visuals
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetLighting(this->lighting);
+  }
+}
+
 
 //////////////////////////////////////////////////
 void Visual::SetMaterial(const std::string &_materialName, bool _unique)
@@ -834,6 +929,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
   else
   {
+    if ( this->myMaterialName == _materialName)
+      return;
     this->myMaterialName = _materialName;
   }
 
@@ -878,13 +975,19 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized() && !this->lighting &&
+    this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
+  {
     RTShaderSystem::Instance()->UpdateShaders();
+  }
 }
 
 /////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -942,6 +1045,9 @@ void Visual::SetAmbient(const common::Color &_color)
 /// Set the diffuse color of the visual
 void Visual::SetDiffuse(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -996,6 +1102,9 @@ void Visual::SetDiffuse(const common::Color &_color)
 /// Set the specular color of the visual
 void Visual::SetSpecular(const common::Color &_color)
 {
+  if (!this->lighting)
+    return;
+
   if (this->myMaterialName.empty())
   {
     std::string matName = this->GetName() + "_MATERIAL_";
@@ -1119,13 +1228,15 @@ void Visual::SetWireframe(bool _show)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
+      if (material.isNull())
+        continue;
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
@@ -1212,7 +1323,7 @@ void Visual::SetTransparency(float _trans)
     }
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1234,6 +1345,16 @@ void Visual::SetHighlighted(bool _highlighted)
   {
     this->boundingBox->SetVisible(false);
   }
+}
+
+//////////////////////////////////////////////////
+bool Visual::GetHighlighted() const
+{
+  if (this->boundingBox)
+  {
+    return this->boundingBox->GetVisible();
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1465,7 +1586,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1481,7 +1602,7 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetAttribute("type")->Set(_type);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1550,6 +1671,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
   {
     if (*iter == _line)
     {
+      delete *iter;
       this->lines.erase(iter);
       break;
     }
@@ -1941,6 +2063,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
+    if (_msg->material().has_lighting())
+    {
+      this->SetLighting(_msg->material().lighting());
+    }
+
     if (_msg->material().has_script())
     {
       for (int i = 0; i < _msg->material().script().uri_size(); ++i)
@@ -2445,4 +2572,16 @@ void Visual::LoadPlugin(sdf::ElementPtr _sdf)
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetId(uint32_t _id)
+{
+  this->id = _id;
 }

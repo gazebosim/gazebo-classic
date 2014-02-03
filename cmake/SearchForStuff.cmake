@@ -1,5 +1,4 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include (${gazebo_cmake_dir}/FindSSE.cmake)
 include (CheckCXXSourceCompiles)
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
@@ -69,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.7)
+  pkg_check_modules(SDF sdformat>=1.4.10)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -125,12 +124,26 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Find bullet
-  pkg_check_modules(BULLET bullet>=2.81)
-  if (BULLET_FOUND)
-    set (HAVE_BULLET TRUE)
+  # Find Simbody
+  set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  find_package(Simbody)
+  if (SIMBODY_FOUND)
+    set (HAVE_SIMBODY TRUE)
   else()
-    set (HAVE_BULLET FALSE)
+    BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
+    set (HAVE_SIMBODY FALSE)
+  endif()
+
+  #################################################
+  # Find DART
+  find_package(DARTCore)
+  if (DARTCore_FOUND)
+    message (STATUS "Looking for DARTCore - found")
+    set (HAVE_DART TRUE)
+  else()
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    set (HAVE_DART FALSE)
   endif()
 
   #################################################
@@ -200,18 +213,20 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  # There are some runtime problems to solve with ogre-1.9. 
+  # Please read gazebo issues: 994, 995, 996
+  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  else (NOT OGRE_FOUND)
+  elseif (NOT MAX_VALID_OGRE_FOUND)
+    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
+  else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
     set(ogre_libraries ${ogre_libraries};${OGRE_LIBRARIES})
     set(ogre_library_dirs ${ogre_library_dirs} ${OGRE_LIBRARY_DIRS})
     set(ogre_cflags ${ogre_cflags} ${OGRE_CFLAGS})
   endif ()
-
-  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
-       CACHE INTERNAL "Ogre include path")
 
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   if (OGRE-Terrain_FOUND)
@@ -221,6 +236,19 @@ if (PKG_CONFIG_FOUND)
     set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
+
+  pkg_check_modules(OGRE-Overlay OGRE-Overlay)
+  if (OGRE-Overlay_FOUND)
+    set(ogre_ldflags ${ogre_ldflags} ${OGRE-Overlay_LDFLAGS})
+    set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Overlay_INCLUDE_DIRS})
+    set(ogre_libraries ${ogre_libraries};${OGRE-Overlay_LIBRARIES})
+    set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Overlay_LIBRARY_DIRS})
+    set(ogre_cflags ${ogre_cflags} ${OGRE-Overlay_CFLAGS})
+  endif()
+
+
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
+       CACHE INTERNAL "Ogre include path")
 
   # Also find OGRE's plugin directory, which is provided in its .pc file as the
   # `plugindir` variable.  We have to call pkg-config manually to get it.
@@ -300,11 +328,20 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  pkg_check_modules(BULLET bullet)
+  # First and preferred option is to look for bullet standard pkgconfig, 
+  # so check it first. if it is not present, check for the OSRF 
+  # custom bullet2.82.pc file
+  pkg_check_modules(BULLET bullet>=2.82)
+  if (NOT BULLET_FOUND)
+     pkg_check_modules(BULLET bullet2.82>=2.82)
+  endif()
+
   if (BULLET_FOUND)
     set (HAVE_BULLET TRUE)
+    add_definitions( -DLIBBULLET_VERSION=${BULLET_VERSION} )
   else()
     set (HAVE_BULLET FALSE)
+    add_definitions( -DLIBBULLET_VERSION=0.0 )
   endif()
 
 else (PKG_CONFIG_FOUND)
@@ -412,6 +449,18 @@ if (libdl_library AND libdl_include_dir)
   SET (HAVE_DL TRUE)
 else (libdl_library AND libdl_include_dir)
   SET (HAVE_DL FALSE)
+endif ()
+
+########################################
+# Find gdal
+include (FindGDAL)
+if (NOT GDAL_FOUND)
+  message (STATUS "Looking for libgdal - not found")
+  BUILD_WARNING ("GDAL not found, Digital elevation terrains support will be disabled.")
+  set (HAVE_GDAL OFF CACHE BOOL "HAVE GDAL" FORCE)
+else ()
+  message (STATUS "Looking for libgdal - found")
+  set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
 
 ########################################

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ TEST_F(TransportStressTest, ManyNodes)
   #endif
 
   // Check if there is enough memory available
-  if (! gazebo::test::memory::IsMemoryAvailable(requiredMB))
+  if (!gazebo::test::memory::IsMemoryAvailable(requiredMB))
   {
     gzdbg << "Skipped test since " << requiredMB <<
               "Mb of RAM were not available \n";
