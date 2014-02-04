@@ -16,6 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 #include "gazebo/math/Rand.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
@@ -112,13 +113,19 @@ void DataLogger_TEST::StressTest()
 {
   QBENCHMARK
   {
+    // Get a path suitable for temporary files
+    boost::system::error_code ec;
+    boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+    if (ec != 0)
+      QFAIL(("Failed creating temp directory: " + ec.message()).c_str());
+
     // Cleanup test directory.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(tmpDir / "gazebo_test");
 
     this->Load("worlds/empty.world");
 
     // Cleanup test directory.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(tmpDir / "gazebo_test");
 
     gazebo::transport::NodePtr node;
     gazebo::transport::PublisherPtr pub;
@@ -129,7 +136,7 @@ void DataLogger_TEST::StressTest()
     pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
     gazebo::msgs::LogControl msg;
-    msg.set_base_path("/tmp/gazebo_test");
+    msg.set_base_path((tmpDir / "gazebo_test").string());
     pub->Publish(msg);
 
     // Create a new data logger widget
@@ -150,16 +157,17 @@ void DataLogger_TEST::StressTest()
       gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 500));
     }
 
-    // There should be (count * 0.5) log directories in /tmp/gazebo_test
+    // There should be (count * 0.5) log directories in $TMP/gazebo_test
     // due to the record button being toggled.
     unsigned int dirCount = 0;
-    for (boost::filesystem::directory_iterator iter("/tmp/gazebo_test");
-        iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
+    for (boost::filesystem::directory_iterator
+          iter((tmpDir / "gazebo_test").string());
+          iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
     {
     }
 
     // Cleanup after ourselves.
-    boost::filesystem::remove_all("/tmp/gazebo_test");
+    boost::filesystem::remove_all(tmpDir / "gazebo_test");
 
     QVERIFY(dirCount == count / 2);
   }

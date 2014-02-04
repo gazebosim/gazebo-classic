@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
@@ -28,6 +31,15 @@ class PR2Test : public ServerFixture,
 
 void PR2Test::Load(std::string _physicsEngine)
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
   if (_physicsEngine == "simbody")
   {
     gzerr << "Abort test since simbody does not support screw joints in PR2, "
@@ -42,8 +54,8 @@ void PR2Test::Load(std::string _physicsEngine)
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
+  boost::filesystem::create_directories(tmpDir / "gazebo_test");
 
   ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
@@ -66,7 +78,7 @@ void PR2Test::Load(std::string _physicsEngine)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
+  while (!camSensor->SaveFrame((tmpDir / "gazebo_test/frame_10.jpg").string()))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -74,13 +86,13 @@ void PR2Test::Load(std::string _physicsEngine)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << "/tmp/gazebo_test/frame_" << i << ".jpg";
+    filename << tmpDir.string() << "/gazebo_test/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
 }
 
 TEST_P(PR2Test, Load)

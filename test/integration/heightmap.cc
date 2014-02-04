@@ -14,14 +14,17 @@
  * limitations under the License.
  *
 */
+
 #include <string.h>
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "ServerFixture.hh"
-#include "images_cmp.h"
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
+#include "images_cmp.h"
+#include "ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -39,6 +42,15 @@ class HeightmapTest : public ServerFixture,
 /////////////////////////////////////////////////
 void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
   if (_physicsEngine == "dart")
   {
     gzerr << "Aborting test for dart, see issue #909" << std::endl;
@@ -74,7 +86,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
 
-  testImage.SavePNG("/tmp/test_shape.png");
+  testImage.SavePNG((tmpDir / "test_shape.png").string());
 
   EXPECT_EQ(trueImage.GetWidth(), testImage.GetWidth());
   EXPECT_EQ(trueImage.GetHeight(), testImage.GetHeight());

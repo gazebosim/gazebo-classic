@@ -14,17 +14,15 @@
  * limitations under the License.
  *
  */
-#include <iomanip>
+
+#include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/date_time.hpp>
-
-#include "gazebo/math/Rand.hh"
-
-#include "gazebo/transport/transport.hh"
+#include <boost/system/error_code.hpp>
+#include <iomanip>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -32,9 +30,10 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Base64.hh"
-#include "gazebo/util/LogRecord.hh"
-
 #include "gazebo/gazebo_config.h"
+#include "gazebo/math/Rand.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/util/LogRecord.hh"
 
 using namespace gazebo;
 using namespace util;
@@ -50,6 +49,15 @@ LogRecord::LogRecord()
   this->firstUpdate = true;
   this->readyToStart = false;
 
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    return;
+  }
+
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
@@ -57,7 +65,7 @@ LogRecord::LogRecord()
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
-    this->logBasePath = boost::filesystem::path("/tmp/gazebo");
+    this->logBasePath = tmpDir / "gazebo";
   else
     this->logBasePath = boost::filesystem::path(homePath);
 

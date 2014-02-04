@@ -19,10 +19,9 @@
  * Date: 2 Feb 2011
  */
 
-#include "gazebo/transport/transport.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
@@ -31,12 +30,21 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    return;
+  }
+
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
-    gzwarn << "HOME environment variable missing. Diagnostic timing "
-      << "information will be logged to /tmp/gazebo.\n";
-    this->logPath = "/tmp/gazebo";
+    gzwarn << "HOME environment variable missing. Diagnostic timing " <<
+      "information will be logged to " << (tmpDir / "gazebo").string() << "\n";
+    this->logPath = tmpDir / "gazebo";
   }
   else
   {

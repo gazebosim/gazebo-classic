@@ -17,13 +17,15 @@
 
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "test_config.h"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/math/Vector3.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
@@ -122,9 +124,18 @@ endsolid MYSOLID";
 /////////////////////////////////////////////////
 TEST_F(MeshTest, Mesh)
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
+  boost::filesystem::create_directories(tmpDir / "gazebo_test");
 
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
@@ -227,23 +238,24 @@ TEST_F(MeshTest, Mesh)
   newMesh->GenSphericalTexCoord(math::Vector3(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile("/tmp/gazebo_test/gazebo_stl_test.stl", std::ios::out);
+  std::ofstream stlFile((tmpDir / "gazebo_test/gazebo_stl_test.stl").c_str(),
+      std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   mesh = common::MeshManager::Instance()->Load(
-      "/tmp/gazebo_test/gazebo_stl_test-bad.stl");
+      (tmpDir / "gazebo_test/gazebo_stl_test-bad.stl").string());
   EXPECT_EQ(NULL, mesh);
 
   mesh = common::MeshManager::Instance()->Load(
-      "/tmp/gazebo_test/gazebo_stl_test.stl");
+      (tmpDir / "gazebo_test/gazebo_stl_test.stl").string());
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
 }
 
 /////////////////////////////////////////////////

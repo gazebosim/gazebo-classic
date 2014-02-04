@@ -24,16 +24,17 @@
 #include <sys/types.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -47,10 +48,19 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    return;
+  }
+
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = "/tmp/gazebo";
+    home = (tmpDir / "gazebo").string();
   else
     home = homePath;
 
@@ -62,7 +72,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
+    if (home != (tmpDir / "gazebo").string())
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
