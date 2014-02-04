@@ -164,7 +164,7 @@ namespace gazebo
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v)
     {
-      switch(_v.GetSurfaceType())
+      switch (_v.GetSurfaceType())
       {
         case common::SphericalCoordinates::EARTH_WGS84:
           _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);

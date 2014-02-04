@@ -22,6 +22,7 @@
 #define CAMERAVISUAL_HH
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/Visual.hh"
 

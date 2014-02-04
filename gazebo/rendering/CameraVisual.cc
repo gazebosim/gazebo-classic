@@ -114,7 +114,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
 
 /////////////////////////////////////////////////
 void CameraVisual::Update()
-{ 
+{
   if (!this->camera)
     return;
 

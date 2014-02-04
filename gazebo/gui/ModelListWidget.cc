@@ -1281,7 +1281,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     for (int i = 0; i < surfaceModelEnum->value_count(); ++i)
       types << surfaceModelEnum->value(i)->name().c_str();
   }
-  
+
   item->setAttribute("enumNames", types);
   item->setValue(0);
   if (_parent)
