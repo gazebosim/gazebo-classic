@@ -596,13 +596,17 @@ TEST(gz, SDF)
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
+  // Note that the sdf descriptions are currently identical
+  // compare the shasum's in the three blocks below
+  // gazebo issue #1003
+  // https://bitbucket.org/osrf/gazebo/issue/1003
   {
     // 1.0 description
     // Regenerate using:
     // gz sdf -d -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -d -v 1.0");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+    EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
   
   {
@@ -611,7 +615,7 @@ TEST(gz, SDF)
     // gz sdf -d -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -d -v 1.2");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+    EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
   
   {
@@ -620,7 +624,7 @@ TEST(gz, SDF)
     // gz sdf -d -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -d -v 1.3");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "def35080dc002d79dde02d370906cccb744a837d");
+    EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
   
   {
@@ -629,7 +633,7 @@ TEST(gz, SDF)
     // gz sdf -o -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -o -v 1.0");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "sdf_doc_1_0");
+    EXPECT_EQ(shasum, "681f5be73178de73076ffe6571466e45fb86d44c");
   }
   
   {
@@ -638,7 +642,7 @@ TEST(gz, SDF)
     // gz sdf -o -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -o -v 1.2");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "sdf_doc_1_2");
+    EXPECT_EQ(shasum, "4f803940d155c42778f2fc4b2ccaa57f8a79b12e");
   }
   
   {
@@ -647,7 +651,7 @@ TEST(gz, SDF)
     // gz sdf -o -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output = custom_exec_str("gz sdf -o -v 1.3");
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "sdf_doc_1_3");
+    EXPECT_EQ(shasum, "05762541824fea8ce9ee56c6cad29c866bc83424");
   }
 
   path = TEST_PATH;
@@ -668,7 +672,7 @@ TEST(gz, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "sdf_print_empty_world_different_name");
+    EXPECT_EQ(shasum, "c8095b0510a12a6dcb3f0e50d57f7c757ee960e5");
   }
 
   path = PROJECT_BINARY_PATH;
