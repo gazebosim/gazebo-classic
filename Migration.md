@@ -13,6 +13,20 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **gazebo/gui/GuiIface.hh**
+    + ***Removed:*** void load() `ABI change`
+    + ***Replacement:*** bool load();
+    + ***Note:*** Changed return type from void to bool.
+1. **Functions in joint classes use unsigned int, instead of int**
+    + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
+1. **gazebo/sensors/Noise.hh** `ABI change`
+    + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Removed:*** void Noise::~Noise()
+    + ***Replacement:*** virtual void Noise::~Noise()
+    + ***Removed:*** void Noise::Apply() const
+    + ***Replacement:*** void Noise::Apply()
+    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class.
 1. **gazebo/transport/ConnectionManager.hh**
     + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
     + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
@@ -31,6 +45,10 @@
     + ***Replacement:*** event::ConnectionPtr ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
     + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
 
+1. **gazebo/physics/Collision.hh** `API change`
+    + ***Modified:*** SurfaceParamsPtr Collision::surface
+    + ***Note:*** Changed from `private` to `protected`
+
 1. **gazebo/physics/MultiRayShape.hh** `API change`
     + ***Removed:*** double MultiRayShape::GetRange(int _index)
     + ***Replacement:*** double MultiRayShape::GetRange(unsigned int _index)
@@ -39,6 +57,10 @@
     + ***Removed:*** double MultiRayShape::GetFiducial(int _index)
     + ***Replacement:*** double MultiRayShape::GetFiducial(unsigned int _index)
     + ***Note:*** Changed argument type from int to unsigned int.
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + ***Removed:*** void FillMsg(msgs::Surface &_msg)
+    + ***Replacement:*** virtual void FillMsg(msgs::Surface &_msg)
 
 1. **gazebo/sensors/RaySensor.hh** `API change`
     + ***Removed:*** double RaySensor::GetRange(int _index)
@@ -53,19 +75,83 @@
 
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
-    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
 
+1. **gazebo/physics/bullet/BulletSurfaceParams.hh**
+    + BulletSurfaceParams()
+    + virtual ~BulletSurfaceParams()
+    + virtual void Load(sdf::ElementPtr _sdf)
+    + virtual void FillMsg(msgs::Surface &_msg)
+    + virtual void ProcessMsg(msgs::Surface &_msg)
+    + double mu1
+    + double mu2
+
+1. **gazebo/physics/ode/ODESurfaceParams.hh**
+    + virtual void FillMsg(msgs::Surface &_msg)
+    + virtual void ProcessMsg(msgs::Surface &_msg)
+    + double bounce
+    + double bounce
+    + double bounceThreshold
+    + double kp
+    + double kd
+    + double cfm
+    + double erp
+    + double maxVel
+    + double minDepth
+    + double mu1
+    + double mu2
+    + double slip1
+    + double slip2
+    + math::Vector3 fdir1
+
+1. **gazebo/rendering/Light.hh**
+    + bool GetVisible() const
+
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
+
+1. **gazebo/sensors/Noise.hh**
+    + virtual double ApplyImpl(double _in)
+    + virtual void Fini()
+    + virtual void SetCustomNoiseCallback(boost::function<double (double)> _cb)
+
+1. **gazebo/sensors/Sensor.hh**
+    + NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/GaussianNoiseModel.hh**
 
 ### Deletions
 
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
+    
+1. **gazebo/sensors/Noise.hh**
+    + double Noise::GetMean() const
+    + double Noise::GetStdDev() const
+    + double Noise::GetBias() const
+    + ***Note:*** Moved gaussian noise functions to a new GaussianNoiseModel class
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + double bounce
+    + double bounce
+    + double bounceThreshold
+    + double kp
+    + double kd
+    + double cfm
+    + double erp
+    + double maxVel
+    + double minDepth
+    + double mu1
+    + double mu2
+    + double slip1
+    + double slip2
+    + math::Vector3 fdir1
+    + ***Note:*** These parameters were moved to ODESurfaceParams and BulletSurfaceParams.
+
 
 ## Gazebo 1.9 to 2.0
 

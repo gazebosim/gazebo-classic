@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -293,6 +293,8 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       {
         if (siter->first.topic() == req.data())
         {
+          if (!ti.has_msg_type() || ti.msg_type().empty())
+            ti.set_msg_type(siter->first.msg_type());
           msgs::Subscribe *sub = ti.add_subscriber();
           sub->CopyFrom(siter->first);
         }

@@ -1,4 +1,4 @@
-set (files 
+set (files
   actor.world
   actor_demo.world
   actor_circle.world
@@ -27,6 +27,9 @@ set (files
   presentation.world
   projector.world
   ray_cpu.world
+  robocup_3Dsim.world
+  robocup09_spl_field.world
+  robocup14_spl_field.world
   rubble.world
   shapes.world
   sphere_atlas_demo.world

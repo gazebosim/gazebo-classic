@@ -56,13 +56,6 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       public: Ogre::CompositorInstance *ssaoInstance;
 
-      /// \brief Gaussian noise compositor
-      public: Ogre::CompositorInstance *gaussianNoiseInstance;
-
-      /// \brief Gaussian noise compositor listener
-      public: boost::shared_ptr<GaussianNoiseCompositorListener>
-        gaussianNoiseCompositorListener;
-
       /// \brief Queue of move positions.
       public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
@@ -77,27 +70,6 @@ namespace gazebo
 
       /// \brief Yaw PID used to track a visual smoothly.
       public: common::PID trackVisualYawPID;
-
-      /// \brief Which noise type we support
-      public: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-      /// \brief If true, apply the noise model specified by other
-      /// noise parameters
-      public: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      public: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
-      /// distibution from which we sample
-      public: double noiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
-      /// devation of the distibution from which we sample
-      public: double noiseStdDev;
 
       /// \brief Communication Node
       public: transport::NodePtr node;

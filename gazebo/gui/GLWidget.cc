@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
@@ -63,7 +64,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
-//  setMinimumSize(320, 240);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);
@@ -635,8 +635,38 @@ void GLWidget::OnMouseReleaseNormal()
 //////////////////////////////////////////////////
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
+  std::string cameraBaseName = "gzclient_camera";
+  std::string cameraName = cameraBaseName;
+
+  transport::ConnectionPtr connection = transport::connectToMaster();
+  if (connection)
+  {
+    std::string topicData;
+    msgs::Packet packet;
+    msgs::Request request;
+    msgs::GzString_V topics;
+
+    request.set_id(0);
+    request.set_request("get_topics");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->Read(topicData);
+
+    packet.ParseFromString(topicData);
+    topics.ParseFromString(packet.serialized_data());
+
+    std::string searchable;
+    for (int i = 0; i < topics.data_size(); ++i)
+      searchable += topics.data(i);
+
+    int i = 0;
+    while (searchable.find(cameraName) != std::string::npos)
+    {
+      cameraName = cameraBaseName + boost::lexical_cast<std::string>(++i);
+    }
+  }
+
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera("gzclient_camera");
+    this->userCamera = _scene->CreateUserCamera(cameraName);
   else
     this->userCamera = _scene->GetUserCamera(0);
 
@@ -700,7 +730,7 @@ std::string GLWidget::GetOgreHandle() const
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint32_t>(info.screen()));
   ogreHandle += ":";
-  assert(q_parent);
+  GZ_ASSERT(q_parent, "q_parent is null");
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint64_t>(q_parent->winId()));
 #endif
