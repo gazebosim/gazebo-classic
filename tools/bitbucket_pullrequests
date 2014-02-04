@@ -31,12 +31,15 @@ class BitbucketPullRequests
     end
 
     def to_s
-      str = @id.to_s.rjust(5, ' ') + "    " +
+      @id.to_s.rjust(5, ' ') + "    " +
         DateTime.parse(@createdOn).strftime("%Y-%m-%d") + "    " +
         @source + "    " +
         @destination + "    " +
         @branch + "\n"
-      return [@createdOn, str]
+    end
+
+    def date_and_string
+      [@createdOn, self.to_s]
     end
   end
 
@@ -68,14 +71,14 @@ class BitbucketPullRequests
     # Hash of pull requests.
     pullrequests = {}
     jsonHash["values"].each { |pr|
-      date, str = Summary.new(pr).to_s
+      date, str = Summary.new(pr).date_and_string
       pullrequests[date] = str
     }
 
     while jsonHash.has_key? "next"
       jsonHash = getJson(jsonHash["next"])
       jsonHash["values"].each { |pr|
-        date, str = Summary.new(pr).to_s
+        date, str = Summary.new(pr).date_and_string
         pullrequests[date] = str
       }
     end
