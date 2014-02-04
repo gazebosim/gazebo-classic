@@ -178,7 +178,6 @@ TEST_F(NoiseTest, ApplyGaussian)
   biasMean = 0.0;
   biasStddev = 0.0;
   {
-
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
     NoNoise(noise, g_applyCount);
