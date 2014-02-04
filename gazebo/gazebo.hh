@@ -89,6 +89,7 @@ namespace gazebo
   void runWorld(gazebo::physics::WorldPtr _world, unsigned int _iterations);
 
   /// \brief Stop and cleanup simulation.
+  /// \return True if the simulation is shutdown; false otherwise.
   bool shutdown();
 }
 #endif
