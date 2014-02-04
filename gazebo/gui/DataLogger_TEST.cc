@@ -17,9 +17,9 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
-#include "gazebo/math/Rand.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
+#include "gazebo/math/Rand.hh"
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()

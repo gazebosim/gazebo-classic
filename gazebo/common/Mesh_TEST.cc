@@ -23,8 +23,8 @@
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
 #include "gazebo/math/Vector3.hh"
 #include "test/util.hh"
 

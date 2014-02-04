@@ -15,9 +15,9 @@
  *
 */
 
+#include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
-#include <gtest/gtest.h>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
