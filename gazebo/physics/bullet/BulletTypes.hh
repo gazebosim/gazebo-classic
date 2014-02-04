@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,17 @@ namespace gazebo
   {
     class BulletCollision;
     class BulletLink;
+    class BulletMotionState;
     class BulletPhysics;
     class BulletRayShape;
-    class BulletMotionState;
+    class BulletSurfaceParams;
 
-    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
     typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
-    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
     typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
+    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef boost::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{

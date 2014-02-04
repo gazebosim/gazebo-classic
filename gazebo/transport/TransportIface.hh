@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,10 @@ namespace gazebo
     /// \brief Get whether minimal comms has been enabled.
     /// \return True if minimal comms is enabled.
     bool getMinimalComms();
+
+    /// \brief Create a connection to master.
+    /// \return Connection to the master.
+    transport::ConnectionPtr connectToMaster();
 
     /// \}
   }

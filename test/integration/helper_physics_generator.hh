@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,22 @@
 #endif
 
 #define SIMBODY_SUPPORT
+#define DART_SUPPORT
 
 #ifdef HAVE_SIMBODY
 # undef SIMBODY_SUPPORT
 # define SIMBODY_SUPPORT , "simbody"
+#endif
+#ifdef HAVE_DART
+# undef DART_SUPPORT
+# define DART_SUPPORT , "dart"
 #endif
 
 /// \brief Helper macro to instantiate gtest for different physics engines
 #define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
   BULLET_SUPPORT \
   SIMBODY_SUPPORT \
+  DART_SUPPORT \
   )
 
 #endif

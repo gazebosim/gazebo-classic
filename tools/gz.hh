@@ -65,10 +65,6 @@ namespace gazebo
     /// \return True if transport should be initialized.
     protected: virtual bool TransportRequired();
 
-    /// \brief Create a connection to master.
-    /// \return Connection to the master.
-    protected: transport::ConnectionPtr ConnectToMaster();
-
     /// \brief Implementation of Run
     protected: virtual bool RunImpl() = 0;
 

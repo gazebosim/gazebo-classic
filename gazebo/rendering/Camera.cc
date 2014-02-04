@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,56 +45,6 @@ using namespace rendering;
 
 
 unsigned int CameraPrivate::cameraCounter = 0;
-
-namespace gazebo
-{
-namespace rendering
-{
-// We'll create an instance of this class for each camera, to be used to inject
-// random values on each render call.
-class GaussianNoiseCompositorListener
-  : public Ogre::CompositorInstance::Listener
-{
-  /// \brief Constructor, setting mean and standard deviation.
-  public: GaussianNoiseCompositorListener(double _mean, double _stddev):
-      mean(_mean), stddev(_stddev) {}
-
-  /// \brief Callback that OGRE will invoke for us on each render call
-  public: virtual void notifyMaterialRender(unsigned int _pass_id,
-                                            Ogre::MaterialPtr & _mat)
-  {
-    // modify material here (wont alter the base material!), called for
-    // every drawn geometry instance (i.e. compositor render_quad)
-
-    // Sample three values within the range [0,1.0] and set them for use in
-    // the fragment shader, which will interpret them as offsets from (0,0)
-    // to use when computing pseudo-random values.
-    Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0),
-                          math::Rand::GetDblUniform(0.0, 1.0));
-    // These calls are setting parameters that are declared in two places:
-    // 1. media/materials/scripts/gazebo.material, in
-    //    fragment_program Gazebo/GaussianCameraNoiseFS
-    // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("offsets", offsets);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("mean", (Ogre::Real)this->mean);
-    _mat->getTechnique(0)->getPass(_pass_id)->
-      getFragmentProgramParameters()->
-      setNamedConstant("stddev", (Ogre::Real)this->stddev);
-  }
-
-  /// \brief Mean that we'll pass down to the GLSL fragment shader.
-  private: double mean;
-  /// \brief Standard deviation that we'll pass down to the GLSL fragment
-  /// shader.
-  private: double stddev;
-};
-}  // namespace rendering
-}  // namespace gazebo
 
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_name, ScenePtr _scene,
@@ -232,30 +182,6 @@ void Camera::Load()
     this->SetHFOV(angle);
   }
 
-  // Handle noise model settings.
-  this->dataPtr->noiseActive = false;
-  if (this->sdf->HasElement("noise"))
-  {
-    sdf::ElementPtr noiseElem = this->sdf->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->dataPtr->noiseType = CameraPrivate::GAUSSIAN;
-      this->dataPtr->noiseMean = noiseElem->Get<double>("mean");
-      this->dataPtr->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->dataPtr->noiseActive = true;
-      this->dataPtr->gaussianNoiseCompositorListener.reset(new
-        GaussianNoiseCompositorListener(this->dataPtr->noiseMean,
-          this->dataPtr->noiseStdDev));
-      gzlog << "applying Gaussian noise model with mean "
-        << this->dataPtr->noiseMean <<
-        " and stddev " << this->dataPtr->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
-  }
-
   // Only create a command subscription for real cameras. Ignore camera's
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
@@ -296,12 +222,6 @@ void Camera::Fini()
   this->initialized = false;
   this->connections.clear();
   this->dataPtr->node.reset();
-
-  if (this->dataPtr->gaussianNoiseCompositorListener)
-  {
-    this->dataPtr->gaussianNoiseInstance->removeListener(
-      this->dataPtr->gaussianNoiseCompositorListener.get());
-  }
 
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
@@ -353,7 +273,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (this->TrackVisualImpl((*iter).data()))
+      if (!this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
     else if ((*iter).request() == "attach_visual")
@@ -480,16 +400,13 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    // Render, but don't swap buffers.
-    this->renderTarget->update(false);
+    this->renderTarget->update();
   }
 }
 
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  this->renderTarget->swapBuffers();
-
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
@@ -1432,24 +1349,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
-    // Noise
-    if (this->dataPtr->noiseActive)
-    {
-      switch (this->dataPtr->noiseType)
-      {
-        case CameraPrivate::GAUSSIAN:
-          this->dataPtr->gaussianNoiseInstance =
-            Ogre::CompositorManager::getSingleton().addCompositor(
-              this->viewport, "CameraNoise/Gaussian");
-          this->dataPtr->gaussianNoiseInstance->setEnabled(true);
-          // gaussianNoiseCompositorListener was allocated in Load()
-          this->dataPtr->gaussianNoiseInstance->addListener(
-            this->dataPtr->gaussianNoiseCompositorListener.get());
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
-    }
 
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
@@ -1571,6 +1470,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   // if (this->sceneNode->getParent())
   //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
+  bool result = false;
   if (_visual)
   {
     this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
@@ -1578,13 +1478,14 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
 
     this->dataPtr->trackedVisual = _visual;
+    result = true;
   }
   else
   {
     this->dataPtr->trackedVisual.reset();
   }
 
-  return true;
+  return result;
 }
 
 //////////////////////////////////////////////////

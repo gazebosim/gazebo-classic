@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-LinkPtr ODEJoint::GetJointLink(int _index) const
+LinkPtr ODEJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
   if (!this->jointId)
@@ -207,7 +207,7 @@ bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 
 //////////////////////////////////////////////////
 // child classes where appropriate
-double ODEJoint::GetParam(int /*parameter*/) const
+double ODEJoint::GetParam(unsigned int /*parameter*/) const
 {
   return 0;
 }
@@ -262,7 +262,7 @@ void ODEJoint::Detach()
 
 //////////////////////////////////////////////////
 // where appropriate
-void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
+void ODEJoint::SetParam(unsigned int /*parameter*/, double /*value*/)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -305,7 +305,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
+void ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
   switch (_index)
@@ -326,7 +326,7 @@ void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
+void ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
   switch (_index)
@@ -346,13 +346,13 @@ void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEJoint::GetHighStop(int _index)
+math::Angle ODEJoint::GetHighStop(unsigned int _index)
 {
   return this->GetUpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEJoint::GetLowStop(int _index)
+math::Angle ODEJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
 }
@@ -404,7 +404,7 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   // record axis in sdf element
   if (_index == 0)
@@ -416,7 +416,7 @@ void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
+void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
 {
   switch (_attr)
   {
@@ -516,7 +516,7 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAttribute(const std::string &_key, int _index,
+void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
                             const boost::any &_value)
 {
   if (_key == "fudge_factor")
@@ -1213,7 +1213,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-double ODEJoint::ApplyAdaptiveDamping(int _index, const double _damping)
+double ODEJoint::ApplyAdaptiveDamping(unsigned int _index,
+    const double _damping)
 {
   /// \TODO: hardcoded thresholds for now, make them params.
   static double vThreshold = 0.01;
@@ -1265,12 +1266,11 @@ void ODEJoint::CFMERPToKpKd(const double _dt,
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetDamping(int _index, double _damping)
+void ODEJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      this->stiffnessCoefficient[_index],
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
   }
   else
@@ -1283,12 +1283,11 @@ void ODEJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetStiffness(int _index, double _stiffness)
+void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      _stiffness,
+    this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
   }
   else
@@ -1383,23 +1382,25 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetForce(int _index, double _force)
+void ODEJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
   this->SetForceImpl(_index, force);
 
   // for engines that supports auto-disable of links
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SaveForce(int _index, double _force)
+void ODEJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {

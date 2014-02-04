@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
 
   this->collisionVisualId = physics::getUniqueId();
@@ -105,13 +104,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
-  }
-
-  // Force max correcting velocity to zero for certain collision entities
-  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->shape->HasType(Base::MAP_SHAPE))
-  {
-    this->surface->maxVel = 0.0;
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -58,61 +58,61 @@ void SimbodyBallJoint::Init()
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void SimbodyBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
-double SimbodyBallJoint::GetVelocity(int /*_index*/) const
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
-double SimbodyBallJoint::GetMaxForce(int /*_index*/)
+double SimbodyBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+double SimbodyBallJoint::GetMaxForce(unsigned int /*_index*/)
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
+
+/////////////////////////////////////////////////
+void SimbodyBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
   return;
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetHighStop(int /*_index*/,
+void SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetLowStop(int /*_index*/,
+void SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
   gzerr << "Not implemented\n";

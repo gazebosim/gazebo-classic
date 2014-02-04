@@ -164,54 +164,16 @@ bool Command::Run(int _argc, char **_argv)
   }
 
   if (!this->TransportInit())
+  {
+    std::cerr << "An instance of Gazebo is not running.\n";
     return false;
+  }
 
   bool result = this->RunImpl();
 
   this->TransportFini();
 
   return result;
-}
-
-/////////////////////////////////////////////////
-transport::ConnectionPtr Command::ConnectToMaster()
-{
-  std::string data, namespacesData, publishersData;
-  msgs::Packet packet;
-
-  std::string host;
-  unsigned int port;
-  transport::get_master_uri(host, port);
-
-  // Connect to the master
-  transport::ConnectionPtr connection(new transport::Connection());
-
-  if (connection->Connect(host, port))
-  {
-    try
-    {
-      // Read the verification message
-      connection->Read(data);
-      connection->Read(namespacesData);
-      connection->Read(publishersData);
-    }
-    catch(...)
-    {
-      gzerr << "Unable to read from master\n";
-      return transport::ConnectionPtr();
-    }
-
-    packet.ParseFromString(data);
-    if (packet.type() == "init")
-    {
-      msgs::GzString msg;
-      msg.ParseFromString(packet.serialized_data());
-      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
-        std::cerr << "Conflicting gazebo versions\n";
-    }
-  }
-
-  return connection;
 }
 
 /////////////////////////////////////////////////
@@ -256,20 +218,48 @@ bool WorldCommand::RunImpl()
   pub->WaitForConnection();
 
   msgs::WorldControl msg;
-  if (this->vm.count("pause"))
-    msg.set_pause(this->vm["pause"].as<bool>());
-  if (this->vm.count("step"))
-    msg.set_step(true);
-  if (this->vm.count("multi-step"))
-    msg.set_multi_step(this->vm["multi-step"].as<uint32_t>());
-  if (this->vm.count("reset-all"))
-    msg.mutable_reset()->set_all(true);
-  if (this->vm.count("reset-time"))
-    msg.mutable_reset()->set_time_only(true);
-  if (this->vm.count("reset-models"))
-    msg.mutable_reset()->set_model_only(true);
+  bool good = false;
 
-  pub->Publish(msg, true);
+  if (this->vm.count("pause"))
+  {
+    msg.set_pause(this->vm["pause"].as<bool>());
+    good = true;
+  }
+
+  if (this->vm.count("step"))
+  {
+    msg.set_step(true);
+    good = true;
+  }
+
+  if (this->vm.count("multi-step"))
+  {
+    msg.set_multi_step(this->vm["multi-step"].as<uint32_t>());
+    good = true;
+  }
+
+  if (this->vm.count("reset-all"))
+  {
+    msg.mutable_reset()->set_all(true);
+    good = true;
+  }
+
+  if (this->vm.count("reset-time"))
+  {
+    msg.mutable_reset()->set_time_only(true);
+    good = true;
+  }
+
+  if (this->vm.count("reset-models"))
+  {
+    msg.mutable_reset()->set_model_only(true);
+    good = true;
+  }
+
+  if (good)
+    pub->Publish(msg, true);
+  else
+    this->Help();
 
   return true;
 }
@@ -315,14 +305,25 @@ bool PhysicsCommand::RunImpl()
 
   msgs::Physics msg;
 
+  bool good = false;
+
   if (this->vm.count("step-size"))
+  {
     msg.set_max_step_size(this->vm["step-size"].as<double>());
+    good = true;
+  }
 
   if (this->vm.count("iters"))
+  {
     msg.set_iters(this->vm["iters"].as<double>());
+    good = true;
+  }
 
   if (this->vm.count("update-rate"))
+  {
     msg.set_real_time_update_rate(this->vm["update-rate"].as<double>());
+    good = true;
+  }
 
   if (this->vm.count("gravity"))
   {
@@ -333,9 +334,13 @@ bool PhysicsCommand::RunImpl()
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
     msg.mutable_gravity()->set_z(boost::lexical_cast<double>(values[2]));
+    good = true;
   }
 
-  pub->Publish(msg, true);
+  if (good)
+    pub->Publish(msg, true);
+  else
+    this->Help();
 
   return true;
 }
@@ -384,6 +389,7 @@ bool ModelCommand::RunImpl()
   {
     std::cerr << "A model name is required using the "
       << "(-m <model_name> command line argument)\n";
+    std::cerr << "For more information: gz help model.\n";
     return false;
   }
 
@@ -556,6 +562,7 @@ bool JointCommand::RunImpl()
   {
     std::cerr << "A model name is required using the "
       << "(-m <model_name> command line argument)\n";
+    std::cerr << "For more information: gz help joint.\n";
     return false;
   }
 
@@ -565,6 +572,7 @@ bool JointCommand::RunImpl()
   {
     std::cerr << "A joint name is required using the "
       << "(-j <joint_name> command line argument)\n";
+    std::cerr << "For more information: gz help joint.\n";
     return false;
   }
 
@@ -623,7 +631,9 @@ CameraCommand::CameraCommand()
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
-    ("camera-name,c", po::value<std::string>(), "Camera name.")
+    ("camera-name,c", po::value<std::string>(),
+     "Camera name. Use gz camera -l to get a list of camera names.")
+    ("list,l", "List all cameras")
     ("follow,f", po::value<std::string>(), "Model to follow.");
 }
 
@@ -646,12 +656,66 @@ bool CameraCommand::RunImpl()
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
 
+  if (this->vm.count("list"))
+  {
+    transport::ConnectionPtr connection = transport::connectToMaster();
+
+    if (connection)
+    {
+      msgs::Packet packet;
+      msgs::Request *request;
+      msgs::GzString_V topics;
+      std::string data;
+
+      request = msgs::CreateRequest("get_topics");
+      request->set_id(0);
+      connection->EnqueueMsg(msgs::Package("request", *request), true);
+      connection->Read(data);
+
+      packet.ParseFromString(data);
+      topics.ParseFromString(packet.serialized_data());
+
+      for (int i = 0; i < topics.data_size(); ++i)
+      {
+        request = msgs::CreateRequest("topic_info", topics.data(i));
+        connection->EnqueueMsg(msgs::Package("request", *request), true);
+
+        int j = 0;
+        do
+        {
+          connection->Read(data);
+          packet.ParseFromString(data);
+        } while (packet.type() != "topic_info_response" && ++j < 10);
+
+        msgs::TopicInfo topicInfo;
+
+        if (j <10)
+          topicInfo.ParseFromString(packet.serialized_data());
+        else
+        {
+          std::cerr << "Unable to get info for topic["
+                    << topics.data(i) << "]\n";
+        }
+
+        if (topicInfo.msg_type() == "gazebo.msgs.CameraCmd")
+        {
+          std::vector<std::string> parts;
+          boost::split(parts, topics.data(i), boost::is_any_of("/"));
+          std::cout << parts[parts.size()-2] << std::endl;
+        }
+      }
+    }
+    return true;
+  }
+
+
   if (this->vm.count("camera-name"))
     cameraName = this->vm["camera-name"].as<std::string>();
   else
   {
     std::cerr << "A camera name is required using the "
       << "(-c <camera_name> command line argument)\n";
+    std::cerr << "For more information: gz help camera\n";
     return false;
   }
 
