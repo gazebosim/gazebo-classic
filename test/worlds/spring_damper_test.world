@@ -37,15 +37,21 @@
       sprungMass, out float erp, out float cfm)
       {
                   float r = 2.0f * dampingCofficient * (float)Math.Sqrt(sprungMass
-      * springConstant);
+                            * springConstant);
                   float hk = Scene.OdeTimeStep * springConstant;
 
                   erp = hk / (hk + r);
                   cfm = 1.0f / (hk + r);
       }
       in the end,
-      erp = dt * kp / ( dt * kp + kd )
-      cfm = 1 / ( dt * kp + kd )
+
+        erp = dt * kp / ( dt * kp + kd )
+        cfm = 1 / ( dt * kp + kd )
+
+      or
+
+        kp = erp / (cfm * h)
+        kd = (1 - erp) / cfm
     -->
     <model name="model_0">
       <pose>0.0 0.0 1.1 0 0.0 0.0</pose>

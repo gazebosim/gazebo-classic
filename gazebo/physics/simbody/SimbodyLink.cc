@@ -44,6 +44,7 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
   this->staticLinkDirty = false;
   this->staticLink = false;
   this->simbodyPhysics.reset();
+  this->gravityModeDirty = false;
 }
 
 //////////////////////////////////////////////////
@@ -91,6 +92,10 @@ void SimbodyLink::Init()
   // Create a construction info object
   // Create the new rigid body
 
+  // change link's gravity mode if requested by user
+  this->gravityModeConnection = event::Events::ConnectWorldUpdateBegin(
+    boost::bind(&SimbodyLink::ProcessSetGravityMode, this));
+
   // lock or unlock the link if requested by user
   this->staticLinkConnection = event::Events::ConnectWorldUpdateEnd(
     boost::bind(&SimbodyLink::ProcessSetLinkStatic, this));
@@ -106,18 +111,33 @@ void SimbodyLink::Fini()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetElement("gravity")->Set(_mode);
-  this->gravityMode = _mode;
-  if (this->physicsInitialized)
+  if (!this->gravityModeDirty)
   {
-    this->simbodyPhysics->gravity.setBodyIsExcluded(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      this->masterMobod, !_mode);
+    this->gravityModeDirty = true;
+    this->gravityMode = _mode;
   }
   else
+    gzerr << "Trying to SetGravityMode before last setting is processed.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyLink::ProcessSetGravityMode()
+{
+  this->sdf->GetElement("gravity")->Set(this->gravityMode);
+  if (this->gravityModeDirty)
   {
-    gzlog << "SetGravityMode [" << _mode
-          << "], but physics not initialized, caching\n";
+    if (this->physicsInitialized)
+    {
+      this->simbodyPhysics->gravity.setBodyIsExcluded(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        this->masterMobod, !this->gravityMode);
+    }
+    else
+    {
+      gzlog << "SetGravityMode [" << this->gravityMode
+            << "], but physics not initialized, caching\n";
+    }
+    this->gravityModeDirty = false;
   }
 }
 

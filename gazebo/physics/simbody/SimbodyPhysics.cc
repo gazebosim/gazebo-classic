@@ -427,17 +427,20 @@ void SimbodyPhysics::UpdatePhysics()
   common::Time currTime =  this->world->GetRealTime();
 
 
-  while (integ->getTime() < this->world->GetSimTime().Double())
+  bool trying = true;
+  while (trying && integ->getTime() < this->world->GetSimTime().Double())
   {
-    // try
-    // {
+    try
+    {
       this->integ->stepTo(this->world->GetSimTime().Double(),
                          this->world->GetSimTime().Double());
-    // }
-    // catch (...)
-    // {
-    //   gzerr << "simbody step failed\n";
-    // }
+    }
+    catch(const std::exception& e)
+    {
+      gzerr << "simbody stepTo() failed with message:\n"
+            << e.what() << "\nWill stop trying now.\n";
+      trying = false;
+    }
   }
 
   this->simbodyPhysicsStepped = true;
@@ -1173,9 +1176,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
           (boost::dynamic_pointer_cast<physics::BoxShape>(
           (*ci)->GetShape()))->GetSize())/2;
 
-        /// \TODO: make collision resolution an adjustable parameter
+        /// \TODO: harcoded resolution, make collision resolution
+        /// an adjustable parameter (#980)
         // number times to chop the longest side.
-        const int resolution = 2;
+        const int resolution = 6;
         // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);
