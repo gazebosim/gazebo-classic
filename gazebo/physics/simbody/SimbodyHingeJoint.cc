@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,8 @@ void SimbodyHingeJoint::SetAxis(unsigned int /*_index*/,
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  gzdbg << "SimbodyHingeJoint::SetAxis: setting axis is "
-        << "not yet implemented.  The axis are set during joint construction "
-        << "in SimbodyPhysics.cc for now.\n";
+  gzdbg << "SetAxis: setting axis is not yet implemented.  The axis are set "
+        << " during joint construction in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
@@ -65,7 +64,7 @@ void SimbodyHingeJoint::SetVelocity(unsigned int _index, double _rate)
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
   else
-    gzerr << "SimbodyHingeJoint::SetVelocity _index too large.\n";
+    gzerr << "SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////
@@ -80,7 +79,7 @@ double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
         SimTK::MobilizerUIndex(_index));
     else
     {
-      gzdbg << "SimbodyHingeJoint::GetVelocity() simbody not yet initialized, "
+      gzdbg << "GetVelocity() simbody not yet initialized, "
             << "initial velocity should be zero until restart from "
             << "state has been implemented.\n";
       return 0.0;
@@ -88,7 +87,7 @@ double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
   }
   else
   {
-    gzerr << "SimbodyHingeJoint::Invalid index for joint, returning NaN\n";
+    gzerr << "Invalid index for joint, returning NaN\n";
     return SimTK::NaN;
   }
 }
@@ -96,13 +95,13 @@ double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
-  gzdbg << "SimbodyHingeJoint::SetMaxForce: doesn't make sense in simbody...\n";
+  gzdbg << "SetMaxForce: doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  gzdbg << "SimbodyHingeJoint::GetMaxForce: doesn't make sense in simbody...\n";
+  gzdbg << "GetMaxForce: doesn't make sense in simbody...\n";
   return 0;
 }
 
@@ -132,12 +131,11 @@ void SimbodyHingeJoint::SetHighStop(unsigned int _index,
     }
     else
     {
-      gzerr << "SimbodyHingeJoint::SetHighStop: State not "
-            << "initialized, SetLowStop failed.\n";
+      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
     }
   }
   else
-    gzerr << "SimbodyHingeJoint::SetHighStop: index out of bounds.\n";
+    gzerr << "SetHighStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
@@ -157,12 +155,11 @@ void SimbodyHingeJoint::SetLowStop(unsigned int _index,
     }
     else
     {
-      gzerr << "SimbodyHingeJoint::SetLowStop: State not "
-            << "initialized, SetLowStop failed.\n";
+      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
     }
   }
   else
-    gzerr << "SimbodyHingeJoint::SetLowStop: index out of bounds.\n";
+    gzerr << "SetLowStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
@@ -170,7 +167,7 @@ math::Angle SimbodyHingeJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "SimbodyHingeJoint::GetHighStop: Invalid joint index ["
+    gzerr << "GetHighStop: Invalid joint index ["
           << _index << "] when trying to get high stop\n";
     return math::Angle(0.0);  /// \TODO: should return NaN
   }
@@ -181,8 +178,7 @@ math::Angle SimbodyHingeJoint::GetHighStop(unsigned int _index)
   }
   else
   {
-    gzerr << "SimbodyHingeJoint::GetHighStop: Should not be here in code,"
-          << " GetAngleCount < 0.\n";
+    gzerr << "GetHighStop: Should not be here in code, GetAngleCount < 0.\n";
     return math::Angle(0.0);  /// \TODO: should return NaN
   }
 }
@@ -192,7 +188,7 @@ math::Angle SimbodyHingeJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "SimbodyHingeJoint::GetLowStop: Invalid joint index [" << _index
+    gzerr << "GetLowStop: Invalid joint index [" << _index
           << "] when trying to get low stop\n";
     return math::Angle(0.0);  /// \TODO: should return NaN
   }
@@ -203,8 +199,7 @@ math::Angle SimbodyHingeJoint::GetLowStop(unsigned int _index)
   }
   else
   {
-    gzerr << "SimbodyHingeJoint::GetLowStop: Should not be here in code,"
-          << " GetAngleCount < 0.\n";
+    gzerr << "GetLowStop: Should not be here in code, GetAngleCount < 0.\n";
     return math::Angle(0.0);  /// \TODO: should return NaN
   }
 }
@@ -234,8 +229,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
     }
     else
     {
-      gzdbg << "SimbodyHingeJoint::GetGlobalAxis() sibmody physics"
-            << " engine not initialized yet, "
+      gzdbg << "GetGlobalAxis() sibmody physics engine not initialized yet, "
             << "use local axis and initial pose to compute "
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
@@ -271,7 +265,7 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(unsigned int _index) const
         this->simbodyPhysics->integ->getState(), _index));
     else
     {
-      gzdbg << "SimbodyHingeJoint::GetAngleImpl() simbody not yet initialized, "
+      gzdbg << "GetAngleImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
       return math::Angle(0.0);

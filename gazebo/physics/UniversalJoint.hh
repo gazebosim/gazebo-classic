@@ -34,12 +34,19 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
-    /// \TODO: Document that axis1 and axis2 are space-fixed, i.e.
-    /// moving about axis1 does not change axis2, both axis are fixed
-    /// in inertial space.
+    /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
+    /// body and axis2 attached to child body.
     template<class T>
     class UniversalJoint : public T
     {
+      /// \enum AxisIndex
+      /// \brief Map joint axes to corresponding link.
+      public: enum AxisIndex
+      {
+        AXIS_PARENT = 0,
+        AXIS_CHILD  = 1
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include <boost/thread.hpp>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -164,13 +165,16 @@ void SimbodyLink::OnPoseChange()
   if (!this->simbodyPhysics->simbodyPhysicsInitialized)
     return;
 
-  /// \TODO: limited functionality for now.
-  /// Setting 6 dof pose of a link works in simbody only if
-  /// the inboard joint is a free joint to the ground for now.
-
   if (this->masterMobod.isEmptyHandle())
     return;
 
+  /// Limited functionality for now:
+  /// Setting 6 dof pose of a link works in simbody only if
+  /// the inboard joint is a free joint to the ground for now.
+  /// If the inboard joint is not free, simbody tries to project
+  /// target pose into available DOF's.
+
+  /// Only change pose if parent is ground, otherwise do nothing
   if (!this->masterMobod.isGround() &&
       this->masterMobod.getParentMobilizedBody().isGround())
   {
@@ -182,22 +186,6 @@ void SimbodyLink::OnPoseChange()
     this->simbodyPhysics->system.realize(
       this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
   }
-  else
-  {
-    /// \TODO: get parent link from parent joint, set relative pose
-    // this->masterMobod.setQToFitTransform(
-    //    this->simbodyPhysics->integ->updAdvancedState(),
-    //    SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
-
-    gzdbg << "Joint [" << this->GetScopedName()
-          << "] P[" << this->GetWorldPose() << "]\n";
-  }
-
-
-  /*
-  math::Pose pose = this->GetWorldPose();
-
-  */
 }
 
 //////////////////////////////////////////////////
@@ -528,7 +516,8 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    assert(_numFragments > 0);  // must be at least 1 for the master
+    GZ_ASSERT(_numFragments > 0,
+              "_numFragments must be at least 1 for the master");
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());

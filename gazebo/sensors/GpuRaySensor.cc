@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,11 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
-#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -103,23 +104,11 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->vertRangeCount = this->GetVerticalRangeCount();
 
   // Handle noise model settings.
-  this->noiseActive = false;
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->noiseActive = true;
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
-        " and stddev " << this->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+    this->noises.push_back(
+        NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
+        this->GetType()));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -605,21 +594,10 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       int index = j * this->GetRayCount() + i;
       double range = this->laserCam->GetLaserData()[index * 3];
 
-      if (this->noiseActive)
+      if (!this->noises.empty())
       {
-        switch (this->noiseType)
-        {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range += math::Rand::GetDblNormal(this->noiseMean,
-                this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range = math::clamp(range, this->GetRangeMin(),
-                this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
-        }
+        range = this->noises[0]->Apply(range);
+        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 
       if (add)

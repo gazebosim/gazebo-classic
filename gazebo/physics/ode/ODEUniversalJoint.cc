@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,9 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
-    if (_index == 1)
+    if (_index == UniversalJoint::AXIS_CHILD)
       dJointGetUniversalAxis1(this->jointId, result);
-    else if (_index == 0)
+    else if (_index == UniversalJoint::AXIS_PARENT)
       dJointGetUniversalAxis2(this->jointId, result);
     else
       gzerr << "Joint index out of bounds.\n";
@@ -108,10 +108,10 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
-    if (_index == 1)
+    if (_index == UniversalJoint::AXIS_CHILD)
       dJointSetUniversalAxis1(this->jointId,
         globalAxis.x, globalAxis.y, globalAxis.z);
-    else if (_index == 0)
+    else if (_index == UniversalJoint::AXIS_PARENT)
       dJointSetUniversalAxis2(this->jointId,
         globalAxis.x, globalAxis.y, globalAxis.z);
     else
@@ -129,9 +129,9 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
-    if (_index == 1)
+    if (_index == UniversalJoint::AXIS_CHILD)
       result = dJointGetUniversalAngle1(this->jointId);
-    else if (_index == 0)
+    else if (_index == UniversalJoint::AXIS_PARENT)
       result = dJointGetUniversalAngle2(this->jointId);
     else
       gzerr << "Joint index out of bounds.\n";
@@ -150,9 +150,9 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
-    if (_index == 1)
+    if (_index == UniversalJoint::AXIS_CHILD)
       result = dJointGetUniversalAngle1Rate(this->jointId);
-    else if (_index == 0)
+    else if (_index == UniversalJoint::AXIS_PARENT)
       result = dJointGetUniversalAngle2Rate(this->jointId);
     else
       gzerr << "Joint index out of bounds.\n";
@@ -167,9 +167,9 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
   // flipping axis 1 and 2 around
-  if (_index == 1)
+  if (_index == UniversalJoint::AXIS_CHILD)
     this->SetParam(dParamVel, _angle);
-  else if (_index == 0)
+  else if (_index == UniversalJoint::AXIS_PARENT)
     this->SetParam(dParamVel2, _angle);
   else
     gzerr << "Joint index out of bounds.\n";
@@ -181,9 +181,9 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
-    if (_index == 1)
+    if (_index == UniversalJoint::AXIS_CHILD)
       dJointAddUniversalTorques(this->jointId, _effort, 0);
-    else if (_index == 0)
+    else if (_index == UniversalJoint::AXIS_PARENT)
       dJointAddUniversalTorques(this->jointId, 0, _effort);
     else
       gzerr << "Joint index out of bounds.\n";
@@ -196,9 +196,9 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
 {
   // flipping axis 1 and 2 around
-  if (_index == 1)
+  if (_index == UniversalJoint::AXIS_CHILD)
     this->SetParam(dParamFMax, _t);
-  else if (_index == 0)
+  else if (_index == UniversalJoint::AXIS_PARENT)
     this->SetParam(dParamFMax2, _t);
   else
     gzerr << "Joint index out of bounds.\n";
@@ -208,12 +208,13 @@ void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
 double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
   // flipping axis 1 and 2 around
-  if (_index == 1)
+  if (_index == UniversalJoint::AXIS_CHILD)
     return this->GetParam(dParamFMax);
-  else if (_index == 0)
+  else if (_index == UniversalJoint::AXIS_PARENT)
     return this->GetParam(dParamFMax2);
-  else
-    gzerr << "Joint index out of bounds.\n";
+
+  gzerr << "Joint index out of bounds.\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////

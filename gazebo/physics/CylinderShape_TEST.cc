@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  *
 */
 
-#include "test/ServerFixture.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(CylinderShapeTest, Scale)
+class CylinderShapeTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(CylinderShapeTest, Scale)
 {
   std::ostringstream cylinderStr;
   cylinderStr << "<sdf version ='" << SDF_VERSION << "'>"

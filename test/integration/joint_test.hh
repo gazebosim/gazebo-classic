@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,45 +30,16 @@ using namespace gazebo;
 
 typedef std::tr1::tuple<const char *, const char *> std_string2;
 
-class Joint_TEST : public ServerFixture,
+class JointTest : public ServerFixture,
                    public ::testing::WithParamInterface<std_string2>
 {
-  protected: Joint_TEST() : ServerFixture(), spawnCount(0)
+  protected: JointTest() : ServerFixture(), spawnCount(0)
              {
              }
 
   /// \brief Test screw joint implementation
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void ScrewJoint1(const std::string &_physicsEngine);
-
-  /// \brief Test universal joint implementation
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void UniversalJoint1(const std::string &_physicsEngine);
-
-  /// \brief Load example world with a few joints
-  /// Measure / verify static force torques against analytical answers.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void ForceTorque1(const std::string &_physicsEngine);
-
-  /// \brief Load example world with a few joints
-  /// Measure / verify static force torques against analytical answers.
-  /// Change gravity to tip over the joints.
-  /// Wait until joint stops are hit and joint motion settles,
-  /// then check force torques values against analytical values.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void ForceTorque2(const std::string &_physicsEngine);
-
-  /// \brief Load example world with a few joints.
-  /// Servo the joints to a fixed target position using simple PID controller.
-  /// Measure / verify static force torques against analytical answers.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void GetForceTorqueWithAppliedForce(
-    const std::string &_physicsEngine);
-
-  /// \brief Create a hinge joint between link and world.
-  /// Apply force and check acceleration against analytical solution.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void JointTorqueTest(const std::string &_physicsEngine);
 
   /// \brief Test spring dampers
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -78,6 +49,7 @@ class Joint_TEST : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointCreationDestructionTest(const std::string &_physicsEngine);
 
+  // Documentation inherited.
   public: virtual void SetUp()
           {
             const ::testing::TestInfo *const test_info =
@@ -89,26 +61,6 @@ class Joint_TEST : public ServerFixture,
               this->jointType = std::tr1::get<1>(GetParam());
             }
           }
-
-  /// \brief Spawn model with each type of joint.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  /// \param[in] _jointType Type of joint to spawn and test.
-  public: void SpawnJointTypes(const std::string &_physicsEngine,
-                               const std::string &_jointType);
-
-  /// \brief Spawn model with rotational joints. Set velocity on parent
-  ///        and make sure child follows.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  /// \param[in] _jointType Type of joint to spawn and test.
-  public: void SpawnJointRotational(const std::string &_physicsEngine,
-                                    const std::string &_jointType);
-
-  /// \brief Spawn model with rotational joints. Attach to world and make
-  ///        sure it doesn't fall.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  /// \param[in] _jointType Type of joint to spawn and test.
-  public: void SpawnJointRotationalWorld(const std::string &_physicsEngine,
-                                         const std::string &_jointType);
 
   /// \brief Class to hold parameters for spawning joints.
   public: class SpawnJointOptions

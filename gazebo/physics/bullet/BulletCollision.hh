@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include "gazebo/physics/Collision.hh"
 */
 
+#include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 
@@ -91,6 +92,11 @@ namespace gazebo
 
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int _index);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to BulletSurfaceParams.
+      /// \return Dynamically casted pointer to BulletSurfaceParams.
+      public: BulletSurfaceParamsPtr GetBulletSurface() const;
 
       protected: btCollisionShape *collisionShape;
 

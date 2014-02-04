@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/MapShape.hh"
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
@@ -754,7 +755,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // There is no corresponding Gazebo joint for this mobilizer.
       // Create the joint and set its default position to be the default
       // pose of the base link relative to the Ground frame.
-      assert(type == "free");  // May add more types later
+      // Currently only `free` is allowed, we may add more types later
+      GZ_ASSERT(type == "free", "type is not 'free', not allowed.");
       if (type == "free")
       {
         MobilizedBody::Free freeJoint(
@@ -796,7 +798,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       const Transform& X_OM0 = isReversed ? gzJoint->xPA : gzJoint->xCB;
 
       const MobilizedBody::Direction direction =
-        isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
+          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
 
       if (type == "free")
       {
@@ -857,10 +859,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "universal")
       {
-        UnitVec3 axis1(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
-        UnitVec3 axis2(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(1)));
+        UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT)));
+        UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD)));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -921,8 +923,6 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             massProps,              X_OM,
             direction);
         mobod = pinJoint;
-
-        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
 
         double low = gzJoint->GetLowerLimit(0u).Radian();
         double high = gzJoint->GetUpperLimit(0u).Radian();
