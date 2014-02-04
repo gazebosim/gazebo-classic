@@ -63,6 +63,7 @@ set (headers
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
+  ModelDatabase.hh
   MouseEvent.hh
   PID.hh
   Plugin.hh

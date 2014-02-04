@@ -90,7 +90,12 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
     }
     catch(common::Exception &e)
     {
-      gzerr << "Failed to create a scene in the Rendering engine" << e;
+      gzerr << "Failed to create a scene in the Rendering engine"
+        << e << std::endl;
+    }
+    catch(...)
+    {
+      gzerr << "Faild to create a scene\n";
     }
   }
 

@@ -99,27 +99,6 @@ void transport::run()
   g_stopped = false;
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
-
-  std::list<std::string> namespaces;
-
-  // This chunk of code just waits until we get a list of topic namespaces.
-  unsigned int trys = 0;
-  unsigned int limit = 50;
-  while (namespaces.empty() && trys < limit)
-  {
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
-
-    if (namespaces.empty())
-    {
-      // 25 seconds max wait time
-      common::Time::MSleep(500);
-    }
-
-    trys++;
-  }
-
-  if (trys >= limit)
-    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
 /////////////////////////////////////////////////
@@ -351,3 +330,27 @@ bool transport::getMinimalComms()
   return g_minimalComms;
 }
 
+/////////////////////////////////////////////////
+bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
+{
+  std::list<std::string> namespaces;
+  gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
+
+  gazebo::common::Time waitTime = std::min(
+      gazebo::common::Time(0, 100000000), _maxWait / 10);
+
+  gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+      namespaces);
+
+  while (namespaces.empty() &&
+      gazebo::common::Time::GetWallTime() - startTime < _maxWait)
+  {
+    gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+        namespaces);
+    gazebo::common::Time::Sleep(waitTime);
+  }
+
+  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
+    return true;
+  return false;
+}

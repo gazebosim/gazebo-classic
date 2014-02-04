@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
