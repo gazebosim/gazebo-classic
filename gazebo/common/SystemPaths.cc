@@ -19,7 +19,6 @@
  * Date: 3 May 2008
  */
 
-#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
