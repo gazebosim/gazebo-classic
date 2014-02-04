@@ -20,6 +20,7 @@
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -367,18 +368,29 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
 
           // setup patch name for rt shader cache in tmp
           char *tmpdir;
+          boost::filesystem::path tempDir;
           char *user;
           std::ostringstream stream;
           std::ostringstream errStream;
           // Get the tmp dir
           tmpdir = getenv("TMP");
           if (!tmpdir)
-            tmpdir = const_cast<char*>("/tmp");
+          {
+            // Get a path suitable for temporary files
+            boost::system::error_code ec;
+            tempDir = boost::filesystem::temp_directory_path(ec);
+            if (ec != 0)
+            {
+              gzerr << "Fail creating tmp directory: " << ec.message() << "\n";
+              return false;
+            }
+            tmpdir = strdup(tempDir.c_str());
+          }
           // Get the user
           user = getenv("USER");
           if (!user)
             user = const_cast<char*>("nobody");
-          stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
+          stream << tempDir.string() << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
           // Create the directory
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)

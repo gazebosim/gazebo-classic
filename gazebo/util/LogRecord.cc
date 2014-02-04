@@ -50,6 +50,14 @@ LogRecord::LogRecord()
   this->firstUpdate = true;
   this->readyToStart = false;
 
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+  }
+
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
@@ -57,7 +65,7 @@ LogRecord::LogRecord()
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
-    this->logBasePath = boost::filesystem::path("/tmp/gazebo");
+    this->logBasePath = boost::filesystem::path(tmpDir / "gazebo");
   else
     this->logBasePath = boost::filesystem::path(homePath);
 

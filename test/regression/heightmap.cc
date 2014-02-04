@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
 #include <string.h>
 
 #include "gazebo/rendering/RenderingIface.hh"
@@ -30,6 +31,15 @@ class HeightmapTest : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, PhysicsLoad)
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
   Load("worlds/heightmap_test.world");
 
   // Make sure the render engine is available.
@@ -59,7 +69,7 @@ TEST_F(HeightmapTest, PhysicsLoad)
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
 
-  testImage.SavePNG("/tmp/test_shape.png");
+  testImage.SavePNG((tmpDir / "test_shape.png").string());
 
   EXPECT_EQ(trueImage.GetWidth(), testImage.GetWidth());
   EXPECT_EQ(trueImage.GetHeight(), testImage.GetHeight());

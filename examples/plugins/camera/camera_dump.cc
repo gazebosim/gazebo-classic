@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
+
 #include "gazebo/gazebo.hh"
 #include "plugins/CameraPlugin.hh"
 
@@ -35,7 +37,18 @@ namespace gazebo
         const std::string &_format)
     {
       char tmp[1024];
-      snprintf(tmp, sizeof(tmp), "/tmp/%s-%04d.jpg",
+
+      // Get a path suitable for temporary files
+      boost::system::error_code ec;
+      boost::filesystem::path tmpDir =
+          boost::filesystem::temp_directory_path(ec);
+      if (ec != 0)
+      {
+        gzerr << "Failed creating temp directory: " << ec.message() << "\n";
+        return();
+      }
+
+      snprintf(tmp, sizeof(tmp), tmpDir.c_str() + "/%s-%04d.jpg",
           this->parentSensor->GetCamera()->GetName().c_str(), this->saveCount);
 
       if (this->saveCount < 10)

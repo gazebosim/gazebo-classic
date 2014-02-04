@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
@@ -25,9 +27,18 @@ class PR2Test : public ServerFixture
 
 TEST_F(PR2Test, Load)
 {
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
+  boost::filesystem::create_directories(tmpDir / "gazebo_test");
 
   Load("worlds/empty.world");
   SpawnModel("model://pr2");
@@ -50,7 +61,7 @@ TEST_F(PR2Test, Load)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
+  while (!camSensor->SaveFrame((tmpDir / "gazebo_test/frame_10.jpg").string()))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -64,7 +75,7 @@ TEST_F(PR2Test, Load)
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(tmpDir / "gazebo_test");
 }
 
 ////////////////////////////////////////////////////////////////////////

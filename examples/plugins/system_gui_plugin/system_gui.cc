@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/filesystem.hpp>
+
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/gazebo.hh"
@@ -34,8 +36,17 @@ namespace gazebo
       // Enable saving frames
       this->userCam->EnableSaveFrame(true);
 
+      // Get a path suitable for temporary files
+      boost::system::error_code ec;
+      boost::filesystem::path tmp = boost::filesystem::temp_directory_path(ec);
+      if (ec != 0)
+      {
+        gzerr << "Failed creating temp directory: " << ec.message() << "\n";
+        return;
+      }
+
       // Specify the path to save frames into
-      this->userCam->SetSaveFramePathname("/tmp/gazebo_frames");
+      this->userCam->SetSaveFramePathname((tmp / "gazebo_frames").string());
     }
 
     private: rendering::UserCameraPtr userCam;

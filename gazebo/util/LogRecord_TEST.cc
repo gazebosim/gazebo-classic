@@ -32,7 +32,16 @@ TEST(LogRecord_TEST, Constructor)
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
 
-  boost::filesystem::path logPath = "/tmp/gazebo";
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    FAIL();
+  }
+
+  boost::filesystem::path logPath = tmpDir / "gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
   logPath /= "/.gazebo/log/";

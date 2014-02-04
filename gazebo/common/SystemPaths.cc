@@ -25,8 +25,8 @@
 #include <sys/types.h>
 
 #include <boost/filesystem.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 #include <sdf/sdf.hh>
@@ -50,8 +50,15 @@ SystemPaths::SystemPaths()
 
   char *homePath = getenv("HOME");
   std::string home;
+
+  // Get a path suitable for temporary files
+  boost::system::error_code ec;
+  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
+  if (ec != 0)
+    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+
   if (!homePath)
-    home = "/tmp/gazebo";
+    home = (tmpDir / "gazebo").string();
   else
     home = homePath;
 
@@ -63,7 +70,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
+    if (home != (tmpDir / "gazebo").string())
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -224,13 +231,14 @@ void SystemPaths::UpdateOgrePaths()
   std::string path;
 
   char *pathCStr = getenv("OGRE_RESOURCE_PATH");
+
   if (!pathCStr || *pathCStr == '\0')
   {
     // No env var; take the compile-time default.
     path = OGRE_RESOURCE_PATH;
   }
   else
-    path = pathCStr;
+    path = strdup(pathCStr);
 
   size_t pos1 = 0;
   size_t pos2 = path.find(delim);
