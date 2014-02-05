@@ -1365,8 +1365,6 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
-  gzerr << _key << "\n";
-
   ODEParam param;
 
   if (_key == "type")
