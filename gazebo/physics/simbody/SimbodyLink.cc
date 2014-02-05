@@ -64,12 +64,19 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("must_be_base_link"))
     this->mustBeBaseLink = _sdf->Get<bool>("must_be_base_link");
 
+  this->SetKinematic(_sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(_sdf->Get<bool>("gravity"));
+
   Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::Init()
 {
+  /// \TODO: implement following
+  // this->SetLinearDamping(this->GetLinearDamping());
+  // this->SetAngularDamping(this->GetAngularDamping());
+
   Link::Init();
 
   math::Vector3 cogVec = this->inertial->GetCoG();
@@ -117,27 +124,31 @@ void SimbodyLink::SetGravityMode(bool _mode)
     this->gravityMode = _mode;
   }
   else
-    gzerr << "Trying to SetGravityMode before last setting is processed.\n";
+    gzerr << "Trying to SetGravityMode for link [" << this->GetScopedName()
+          << "] before last setting is processed.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::ProcessSetGravityMode()
 {
-  this->sdf->GetElement("gravity")->Set(this->gravityMode);
   if (this->gravityModeDirty)
   {
     if (this->physicsInitialized)
     {
+      this->sdf->GetElement("gravity")->Set(this->gravityMode);
       this->simbodyPhysics->gravity.setBodyIsExcluded(
         this->simbodyPhysics->integ->updAdvancedState(),
         this->masterMobod, !this->gravityMode);
+      // realize system after changing gravity mode
+      this->simbodyPhysics->system.realize(
+        this->simbodyPhysics->integ->getState(), SimTK::Stage::Velocity);
+      this->gravityModeDirty = false;
     }
     else
     {
       gzlog << "SetGravityMode [" << this->gravityMode
             << "], but physics not initialized, caching\n";
     }
-    this->gravityModeDirty = false;
   }
 }
 
