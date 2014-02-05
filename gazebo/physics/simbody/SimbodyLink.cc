@@ -64,16 +64,15 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("must_be_base_link"))
     this->mustBeBaseLink = _sdf->Get<bool>("must_be_base_link");
 
+  this->SetKinematic(_sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(_sdf->Get<bool>("gravity"));
+
   Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::Init()
 {
-  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
-  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
-
   /// \TODO: implement following
   // this->SetLinearDamping(this->GetLinearDamping());
   // this->SetAngularDamping(this->GetAngularDamping());
