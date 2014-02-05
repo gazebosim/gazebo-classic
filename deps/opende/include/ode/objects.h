@@ -492,11 +492,32 @@ ODE_API void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
 ODE_API dReal dWorldGetQuickStepW (dWorldID);
 
 /**
- * @brief Get the RMS error of the quickstep step
+ * @brief Get the RMS of \Delta \lambda of the quickstep step
  * @ingroup world
  * @returns the rms error
  */
 ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
+
+/**
+ * @brief Get the RMS of Ax-b of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API dReal dWorldGetQuickStepConstraintResidual (dWorldID);
+
+/**
+ * @brief Get the max of Ax-b of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API dReal dWorldGetQuickStepBilateralResidual (dWorldID);
+
+/**
+ * @brief Get the min of Ax-b of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API dReal dWorldGetQuickStepContactResidual (dWorldID);
 
 /* World contact parameter functions */
 

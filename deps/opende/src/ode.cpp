@@ -2260,6 +2260,23 @@ dReal dWorldGetQuickStepRMSError (dWorldID w)
 	return w->qs.rms_error;
 }
 
+dReal dWorldGetQuickStepConstraintResidual (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.constraint_residual;
+}
+
+dReal dWorldGetQuickStepBilateralResidual (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.bilateral_residual;
+}
+
+dReal dWorldGetQuickStepContactResidual (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.contact_residual;
+}
 
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)
 {

@@ -103,6 +103,9 @@ struct dxQuickStepParameters {
   int num_overlap;		// divide rows but over lap this many rows
   dReal sor_lcp_tolerance;	// the stop if rms_error falls below this
   dReal rms_error;      	// rms_error for this time step
+  dReal constraint_residual;     // all constraint errors
+  dReal bilateral_residual;     // bilateral joint constraint errors
+  dReal contact_residual;     // contact constraint errors
 };
 
 // robust-step parameters

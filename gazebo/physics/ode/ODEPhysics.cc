@@ -1387,6 +1387,14 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "rms_error")
+    return dWorldGetQuickStepRMSError(this->worldId);
+  else if (_key == "constraint_residual")
+    return dWorldGetQuickStepConstraintResidual(this->worldId);
+  else if (_key == "bilateral_residual")
+    return dWorldGetQuickStepBilateralResidual(this->worldId);
+  else if (_key == "contact_residual")
+    return dWorldGetQuickStepContactResidual(this->worldId);
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;

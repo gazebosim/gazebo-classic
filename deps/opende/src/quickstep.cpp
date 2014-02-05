@@ -53,6 +53,7 @@
 //#define PENETRATION_JVERROR_CORRECTION
 //#define POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
 
+#define CHECK_VELOCITY_OBEYS_CONSTRAINT
 
 
 #ifdef USE_TPROW
@@ -2264,7 +2265,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
         lambdacurr += infom;
       }
     }
-  }
 
   {
     IFTIMING (dTimerNow ("compute velocity update"));
@@ -2300,7 +2300,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       //  (this check needs unmodified J)
       //  put residual into tmp
       dRealMutablePtr velcurr = vel;
-      //dxBody* const* bodyend = body + nb;
+      dxBody* const* bodyend = body + nb;
       for (dxBody* const* bodycurr = body; bodycurr != bodyend; velcurr += 6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
@@ -2311,12 +2311,25 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal *tmp = context->AllocateArray<dReal> (m);
       multiply_J (m,J,jb,vel,tmp);
 
+      dReal bilateral_error = 0;
+      dReal contact_error = 0;
       dReal error = 0;
-      for (int i=0; i<m; i++) error += dFabs(tmp[i]);
-      printf ("velocity error = %10.6e\n",error);
+      for (int i=0; i<m; i++)
+      {
+        error += dFabs(tmp[i]);
+        if (findex[i] == -1)
+          bilateral_error += dFabs(tmp[i]);
+        else if (findex[i] == -2 || findex[i] >= 0)
+          contact_error += dFabs(tmp[i]);
+      }
+      printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
+      world->qs.constraint_residual = error;
+      world->qs.bilateral_residual = bilateral_error;
+      world->qs.contact_residual = contact_error;
     }
   }
 #endif
+  } // keep "compute velocity update and check velocity obeys constraint
 
   {
     // update the position and orientation from the new linear/angular velocity
