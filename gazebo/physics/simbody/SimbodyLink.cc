@@ -125,27 +125,31 @@ void SimbodyLink::SetGravityMode(bool _mode)
     this->gravityMode = _mode;
   }
   else
-    gzerr << "Trying to SetGravityMode before last setting is processed.\n";
+    gzerr << "Trying to SetGravityMode for link [" << this->GetScopedName()
+          << "] before last setting is processed.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::ProcessSetGravityMode()
 {
-  if (this->physicsInitialized)
+  if (this->gravityModeDirty)
   {
-    if (this->gravityModeDirty)
+    if (this->physicsInitialized)
     {
       this->sdf->GetElement("gravity")->Set(this->gravityMode);
       this->simbodyPhysics->gravity.setBodyIsExcluded(
         this->simbodyPhysics->integ->updAdvancedState(),
         this->masterMobod, !this->gravityMode);
+      // realize system after changing gravity mode
+      this->simbodyPhysics->system.realize(
+        this->simbodyPhysics->integ->getState(), SimTK::Stage::Velocity);
+      this->gravityModeDirty = false;
     }
-    this->gravityModeDirty = false;
-  }
-  else
-  {
-    gzlog << "SetGravityMode [" << this->gravityMode
-          << "], but physics not initialized, caching\n";
+    else
+    {
+      gzlog << "SetGravityMode [" << this->gravityMode
+            << "], but physics not initialized, caching\n";
+    }
   }
 }
 

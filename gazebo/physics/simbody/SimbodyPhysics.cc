@@ -364,22 +364,8 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
   // initialize integrator from state
   this->integ->initialize(state);
 
-  // set gravity mode
-  Link_V links = _model->GetLinks();
-  for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
-  {
-    physics::SimbodyLinkPtr simbodyLink =
-      boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
-    if (simbodyLink)
-      simbodyLink->SetGravityMode(simbodyLink->GetGravityMode());
-    else
-      gzerr << "failed to cast link [" << (*li)->GetName()
-            << "] as simbody link\n";
-  }
-
-  this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
-
   // mark links as initialized
+  Link_V links = _model->GetLinks();
   for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
