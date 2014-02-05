@@ -29,6 +29,7 @@ set (plugins
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
+  RobocupRulesPlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin

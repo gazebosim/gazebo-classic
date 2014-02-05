@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Random number generator
- * Author: Nate Koenig
- * Date: 27 May 2009
- */
 
 #ifndef _RAND_HH_
 #define _RAND_HH_

@@ -38,8 +38,42 @@
     <include>
       <pose>0 0 0 0 0 0</pose>
       <uri>model://robocup_3Dsim_ball</uri>
+      <name>soccer_ball</name>
     </include>
 
+    <plugin name="robocup_rules" filename="libRobocupRulesPlugin.so">
+      <ball>soccer_ball</ball>
+
+      <team>
+        <name>red</name>
+        <member>red_bot1</member>
+        <member>red_bot2</member>
+        <member>red_bot3</member>
+        <member>red_bot4</member>
+        <member>red_bot5</member>
+        <member>red_bot6</member>
+        <member>red_bot7</member>
+        <member>red_bot8</member>
+        <member>red_bot9</member>
+        <member>red_bot10</member>
+        <member>red_bot11</member>
+      </team>
+
+      <team>
+        <name>blue</name>
+        <member>blue_bot1</member>
+        <member>blue_bot2</member>
+        <member>blue_bot3</member>
+        <member>blue_bot4</member>
+        <member>blue_bot5</member>
+        <member>blue_bot6</member>
+        <member>blue_bot7</member>
+        <member>blue_bot8</member>
+        <member>blue_bot9</member>
+        <member>blue_bot10</member>
+        <member>blue_bot11</member>
+      </team>
+
+    </plugin>
   </world>
 </sdf>
-

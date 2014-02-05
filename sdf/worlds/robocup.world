@@ -1,0 +1,192 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- Scene properties -->
+    <scene>
+      <grid>false</grid>
+    </scene>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot1</name>
+      <pose>1 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot2</name>
+      <pose>2 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot3</name>
+      <pose>3 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot4</name>
+      <pose>4 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot5</name>
+      <pose>5 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot6</name>
+      <pose>6 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot7</name>
+      <pose>7 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot8</name>
+      <pose>8 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot9</name>
+      <pose>9 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot10</name>
+      <pose>10 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>red_bot11</name>
+      <pose>11 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot1</name>
+      <pose>1 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot2</name>
+      <pose>2 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot3</name>
+      <pose>3 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot4</name>
+      <pose>4 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot5</name>
+      <pose>5 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot6</name>
+      <pose>6 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot7</name>
+      <pose>7 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot8</name>
+      <pose>8 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot9</name>
+      <pose>9 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot10</name>
+      <pose>10 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://nao</uri>
+      <name>blue_bot11</name>
+      <pose>11 2 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://soccer_ball</uri>
+      <name>soccer_ball</name>
+      <pose>0 0 0.02 0 0 0</pose>
+    </include>
+
+    <plugin name="robocup_rules" filename="libRobocupRulesPlugin.so">
+      <ball>soccer_ball</ball>
+
+      <team>
+        <name>red</name>
+        <member>red_bot1</member>
+        <member>red_bot2</member>
+        <member>red_bot3</member>
+        <member>red_bot4</member>
+        <member>red_bot5</member>
+        <member>red_bot6</member>
+        <member>red_bot7</member>
+        <member>red_bot8</member>
+        <member>red_bot9</member>
+        <member>red_bot10</member>
+        <member>red_bot11</member>
+      </team>
+
+      <team>
+        <name>blue</name>
+        <member>blue_bot1</member>
+        <member>blue_bot2</member>
+        <member>blue_bot3</member>
+        <member>blue_bot4</member>
+        <member>blue_bot5</member>
+        <member>blue_bot6</member>
+        <member>blue_bot7</member>
+        <member>blue_bot8</member>
+        <member>blue_bot9</member>
+        <member>blue_bot10</member>
+        <member>blue_bot11</member>
+      </team>
+
+    </plugin>
+  </world>
+</sdf>
