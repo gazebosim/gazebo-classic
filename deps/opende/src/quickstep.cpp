@@ -2333,7 +2333,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // for soft contact, as Jv is not necessarily zero here.
         // Better measure is compute the residual.  \\\ TODO
       }
-      printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
+      // printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
       world->qs.constraint_residual = error;
       world->qs.bilateral_residual = bilateral_error;
       world->qs.contact_residual = contact_error;
