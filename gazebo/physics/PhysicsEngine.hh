@@ -265,7 +265,7 @@ namespace gazebo
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(std::string _key) const;
+      public: virtual boost::any GetParam(const std::string &_key) const = 0;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

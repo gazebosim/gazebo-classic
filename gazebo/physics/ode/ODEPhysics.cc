@@ -1365,6 +1365,8 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
+  gzerr << _key << "\n";
+
   ODEParam param;
 
   if (_key == "type")
@@ -1392,7 +1394,10 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "constraint_residual")
     return dWorldGetQuickStepConstraintResidual(this->worldId);
   else if (_key == "bilateral_residual")
+  {
+    gzerr << dWorldGetQuickStepBilateralResidual(this->worldId) << "\n";
     return dWorldGetQuickStepBilateralResidual(this->worldId);
+  }
   else if (_key == "contact_residual")
     return dWorldGetQuickStepContactResidual(this->worldId);
   else if (_key == "num_contacts")

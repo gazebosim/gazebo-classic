@@ -1255,3 +1255,11 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 {
   return GetTypeString(physics::Base::EntityType(_type));
 }
+
+//////////////////////////////////////////////////
+boost::any SimbodyPhysics::GetParam(const std::string &_key) const
+{
+  gzwarn << "not supported, returning (int)0." << std::endl;
+  return 0;
+}
+

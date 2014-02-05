@@ -242,12 +242,6 @@ void PhysicsEngine::SetParam(std::string /*_key*/,
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
