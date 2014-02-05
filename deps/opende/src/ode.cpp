@@ -2278,6 +2278,12 @@ dReal dWorldGetQuickStepContactResidual (dWorldID w)
 	return w->qs.contact_residual;
 }
 
+int dWorldGetQuickStepNumContacts (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.num_contacts;
+}
+
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)
 {
 	dAASSERT(w);

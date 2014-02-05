@@ -1395,6 +1395,8 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     return dWorldGetQuickStepBilateralResidual(this->worldId);
   else if (_key == "contact_residual")
     return dWorldGetQuickStepContactResidual(this->worldId);
+  else if (_key == "num_contacts")
+    return dWorldGetQuickStepNumContacts(this->worldId);
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;

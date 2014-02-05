@@ -517,6 +517,13 @@ ODE_API dReal dWorldGetQuickStepBilateralResidual (dWorldID);
  * @ingroup world
  * @returns the rms error
  */
+ODE_API int dWorldGetQuickStepNumContacts (dWorldID);
+
+/**
+ * @brief Get the min of Ax-b of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
 ODE_API dReal dWorldGetQuickStepContactResidual (dWorldID);
 
 /* World contact parameter functions */

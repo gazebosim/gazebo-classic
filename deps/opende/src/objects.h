@@ -106,6 +106,7 @@ struct dxQuickStepParameters {
   dReal constraint_residual;     // all constraint errors
   dReal bilateral_residual;     // bilateral joint constraint errors
   dReal contact_residual;     // contact constraint errors
+  int num_contacts;
 };
 
 // robust-step parameters

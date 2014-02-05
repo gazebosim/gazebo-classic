@@ -114,6 +114,8 @@ public:
     { return dWorldGetQuickStepBilateralResidual (get_id()); }
   dReal getQuickStepContactResidual() const
     { return dWorldGetQuickStepContactResidual (get_id()); }
+  dReal getQuickStepNumContacts() const
+    { return dWorldGetQuickStepNumContacts (get_id()); }
 
   void  setAutoDisableLinearThreshold (dReal threshold) 
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }
