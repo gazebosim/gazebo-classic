@@ -22,10 +22,14 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include "test/ServerFixture.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/GaussianNoiseModel.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class NoiseTest : public gazebo::testing::AutoLogFixture { };
 
 const unsigned int g_applyCount = 100;
 
@@ -57,7 +61,7 @@ sdf::ElementPtr NoiseSdf(const std::string &_type, double _mean,
 
 //////////////////////////////////////////////////
 // Test constructor
-TEST(NoiseTest, Constructor)
+TEST_F(NoiseTest, Constructor)
 {
   // Construct and nothing else
   {
@@ -73,7 +77,7 @@ TEST(NoiseTest, Constructor)
 
 //////////////////////////////////////////////////
 // Test noise types
-TEST(NoiseTest, Types)
+TEST_F(NoiseTest, Types)
 {
   // NONE type
   {
@@ -153,7 +157,7 @@ void GaussianNoise(sensors::Noise &_noise, unsigned int _count)
 
 //////////////////////////////////////////////////
 // Test noise application
-TEST(NoiseTest, ApplyNone)
+TEST_F(NoiseTest, ApplyNone)
 {
   sensors::Noise noise;
   noise.Load(NoiseSdf("none", 0, 0, 0, 0, 0));
@@ -161,7 +165,7 @@ TEST(NoiseTest, ApplyNone)
   NoNoise(noise, g_applyCount);
 }
 
-TEST(NoiseTest, ApplyGaussian)
+TEST_F(NoiseTest, ApplyGaussian)
 {
   double mean, stddev, biasMean, biasStddev;
 
@@ -234,7 +238,7 @@ TEST(NoiseTest, ApplyGaussian)
   }
 }
 
-TEST(NoiseTest, ApplyGaussianQuantized)
+TEST_F(NoiseTest, ApplyGaussianQuantized)
 {
   double mean, stddev, biasMean, biasStddev, precision;
 

@@ -22,10 +22,13 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include "gazebo/common/SystemPaths.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(SystemPathsTest, SystemPaths)
+class SystemPathsTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(SystemPathsTest, SystemPaths)
 {
   std::vector<std::string> tmpstrings;
   std::string gazeboResourcePathBackup = "GAZEBO_RESOURCE_PATH=";

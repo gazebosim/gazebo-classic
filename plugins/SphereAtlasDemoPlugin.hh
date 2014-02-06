@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
-#define __GAZEBO_SPHERE_ATLAS_TEST_PLUGIN_HH__
+#ifndef _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
+#define _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
 
 #include <string>
 #include <vector>
@@ -26,9 +26,9 @@
 
 namespace gazebo
 {
-  class SphereAtlasTestPlugin : public ModelPlugin
+  class SphereAtlasDemoPlugin : public ModelPlugin
   {
-    public: SphereAtlasTestPlugin();
+    public: SphereAtlasDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
     public: virtual void Reset();

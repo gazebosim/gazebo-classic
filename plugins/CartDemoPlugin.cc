@@ -16,23 +16,15 @@
 */
 
 
-/*
- *  this plugin drives a four wheeled cart model forward and back
- *  by applying a small wheel torque.  Steering is controlled via
- *  a position pid.
- *  this is a test for general rolling contact stability.
- *  should refine the test to be more specific in the future.
-*/
-
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "plugins/CartTestPlugin.hh"
+#include "plugins/CartDemoPlugin.hh"
 
 using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(CartTestPlugin)
+GZ_REGISTER_MODEL_PLUGIN(CartDemoPlugin)
 
 /////////////////////////////////////////////////
-CartTestPlugin::CartTestPlugin()
+CartDemoPlugin::CartDemoPlugin()
 {
   for (int i = 0; i < NUM_JOINTS; i++)
   {
@@ -44,7 +36,7 @@ CartTestPlugin::CartTestPlugin()
 }
 
 /////////////////////////////////////////////////
-void CartTestPlugin::Load(physics::ModelPtr _model,
+void CartDemoPlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr _sdf)
 {
   this->model = _model;
@@ -102,23 +94,22 @@ void CartTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("left_eff")->Get<double>();
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&CartTestPlugin::OnUpdate, this));
+          boost::bind(&CartDemoPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
-void CartTestPlugin::Init()
+void CartDemoPlugin::Init()
 {
   // physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
   //   this->joints[0]->GetChild());
 }
 
 /////////////////////////////////////////////////
-void CartTestPlugin::OnUpdate()
+void CartDemoPlugin::OnUpdate()
 {
   common::Time currTime = this->model->GetWorld()->GetSimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
-
 
   for (int i = 0; i < 1; i++)
   {
