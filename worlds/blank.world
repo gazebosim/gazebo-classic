@@ -2,11 +2,10 @@
 <sdf version="1.4">
   <world name="default">
     <scene>
-      <ambient>.5 .5 .5 1</ambient>
-      <background>1 1 1 1</background>
-      <shadows>false</shadows>
+      <ambient>.8 .8 .8 1</ambient>
+      <background>0 0 0 1</background>
+      <shadows>true</shadows>
       <grid>false</grid>
-      <sky>false</sky>
     </scene>
   </world>
 </sdf>

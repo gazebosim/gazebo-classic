@@ -44,6 +44,8 @@ execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_resul
 execute_process(COMMAND cmake -E make_directory ${CMAKE_BINARY_DIR}/test_results)
 include_directories(${GTEST_INCLUDE_DIRS})
 
+add_subdirectory(plugins)
+
 set(TEST_TYPE "PERFORMANCE")
 add_subdirectory(performance)
 set(TEST_TYPE "INTEGRATION")

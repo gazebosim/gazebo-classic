@@ -17,6 +17,11 @@
       <direction>0.0 0.2 -8.0</direction>
       <cast_shadows>true</cast_shadows>
     </light>
-    <include filename="actor.model" />
+
+    <actor name="actor">
+      <static>true</static>
+      <skin filename="walk.dae" scale="1.0" />
+    </actor>
+
   </world>
 </sdf>

@@ -12,14 +12,14 @@ set (files
   empty_sky.world
   force_torque_demo.world
   force_torque_demo2.world
+  friction_demo.world
   joints.world
   heightmap.world
   lights.world
   model_nesting.world
   pioneer2dx.world
   openal.world
-  trimesh_test.world
-  cart_test.world
+  cart_demo.world
   double_pendulums.world
   mud.world
   plugin.world
