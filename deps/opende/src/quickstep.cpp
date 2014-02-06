@@ -70,12 +70,10 @@ typedef dReal *dRealMutablePtr;
 // configuration
 
 // for the SOR and CG methods:
-// uncomment the following line to use warm starting. this definitely
-// help for motor-driven joints. unfortunately it appears to hurt
-// with high-friction contacts using the SOR method. use with care
-
-#define WARM_STARTING 1
-
+// warm starting:
+// this definitely help for motor-driven joints.
+// unfortunately it appears to hurt with high-friction contacts
+// using the SOR method. use with care
 
 // for the SOR method:
 // uncomment the following line to determine a new constraint-solving
@@ -206,8 +204,8 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
   }
 }
 
+// warm starting
 // compute out = inv(M)*J'*in.
-#ifdef WARM_STARTING
 static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
@@ -227,7 +225,6 @@ static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
     iMJ_ptr += 6;
   }
 }
-#endif
 
 // compute out = J*in.
 
@@ -255,7 +252,7 @@ static void multiply_J (int m, dRealPtr J, int *jb,
 // compute out = (J*inv(M)*J' + cfm)*in.
 // use z as an nb*6 temporary.
 /* not used
-#ifdef WARM_STARTING
+// warm starting
 static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePtr iMJ, int *jb,
   dRealPtr cfm, dRealMutablePtr z, dRealMutablePtr in, dRealMutablePtr out)
 {
@@ -265,7 +262,6 @@ static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePt
   // add cfm
   for (int i=0; i<m; i++) out[i] += cfm[i] * in[i];
 }
-#endif
 */
 
 //***************************************************************************
@@ -324,14 +320,18 @@ static void CG_LCP (dxWorldProcessContext *context,
     Ad[i] = REAL(1.0) / (sum + cfm[i]);
   }
 
-#ifdef WARM_STARTING
-  // compute residual r = rhs - A*lambda
-  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
-  for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
-#else
-  dSetZero (lambda,m);
-  memcpy (r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
-#endif
+  if (qs->warm_start > 0)
+  {
+    // warm start
+    // compute residual r = rhs - A*lambda
+    multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
+    for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
+  }
+  else
+  {
+    dSetZero (lambda,m);
+    memcpy (r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
+  }
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
     for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];  // z = inv(M)*r
@@ -1149,9 +1149,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invMOI);
 
-#ifdef WARM_STARTING
   if (qs->warm_start > 0)
   {
+    // warm starting
     // compute cforce=(inv(M)*J')*lambda
     if (qs->precon_iterations > 0)
       multiply_invM_JT (m,nb,J,jb,lambda,cforce);
@@ -1162,7 +1162,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     multiply_invM_JT (m,nb,iMJ,jb,lambda_erp,caccel_erp);
   }
   else
-#endif
   {
     // no warm starting
     if (qs->precon_iterations > 0)
@@ -2154,9 +2153,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal *lambda = context->AllocateArray<dReal> (m);
     dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
-#ifdef WARM_STARTING
+    // initialize lambda and lambda_erp
     if (world->qs.warm_start > 0)
     {
+      // warm starting
       dReal *lambdacurr = lambda;
       dReal *lambda_erpcurr = lambda_erp;
       const dJointWithInfo1 *jicurr = jointiinfos;
@@ -2178,7 +2178,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
     else
-#endif
     {
       dSetZero (lambda,m);
       dSetZero (lambda_erp,m);
@@ -2200,8 +2199,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
-#ifdef WARM_STARTING
     {
+      // warm starting
       // save lambda for the next iteration
       //@@@ note that this doesn't work for contact joints yet, as they are
       // recreated every iteration
@@ -2218,7 +2217,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
         lambda_erpcurr += infom;
       }
     }
-#endif
 
     // note that the SOR method overwrites rhs and J at this point, so
     // they should not be used again.
