@@ -1676,6 +1676,16 @@ dxWorld * dWorldCreate()
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
   w->qs.sor_lcp_tolerance = 0;
+  w->qs.rms_error = 0;
+  w->qs.constraint_residual = 0;
+  w->qs.bilateral_residual = 0;
+  w->qs.contact_residual = 0;
+  w->qs.num_contacts = 0;
+  w->qs.dynamic_inertia_reduction = true;
+  w->qs.smooth_contacts = 0.01;
+  w->qs.row_reorder1 = true;
+  w->qs.warm_start = 0.5;
+  w->qs.friction_iterations = 10;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
