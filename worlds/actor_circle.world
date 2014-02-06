@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <sdf version="1.4">
   <world name="default">
     <model name="plane1_model" static="1">
