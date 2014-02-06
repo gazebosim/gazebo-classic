@@ -1288,6 +1288,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("Latitude"));
   item->setValue(_msg.latitude_deg());
@@ -1295,6 +1296,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("Longitude"));
   item->setValue(_msg.longitude_deg());
@@ -1302,6 +1304,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("Elevation"));
   item->setValue(_msg.elevation());
@@ -1309,6 +1312,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("Heading"));
   item->setValue(_msg.heading_deg());
@@ -1316,6 +1320,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
