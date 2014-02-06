@@ -19,10 +19,13 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(DiagnosticsTest, Diagnostics)
+class DiagnosticsTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(DiagnosticsTest, Diagnostics)
 {
 #ifdef ENABLE_DIAGNOSTICS
   util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
