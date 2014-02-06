@@ -620,7 +620,7 @@ static void ComputeRows(
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
-  int friction_iterations = 10;
+  int friction_iterations = 10;   // TEST
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
   dRealMutablePtr caccel_erp_ptr1;
@@ -938,7 +938,7 @@ static void ComputeRows(
                 printf("\n");
             }
 #endif
-            if (normal_index != -1)
+            if (normal_index != -1)  // TEST
             {
               // extra residual smoothing for contact constraints
               lambda[index] = (1.0 - SMOOTH)*lambda[index] + SMOOTH*old_lambda;
@@ -1274,6 +1274,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *delta_error = context->AllocateArray<dReal> (m);
 
 #ifndef REORDER_CONSTRAINTS
+  if (true)  // TEST
   {
     // -1 in front, followed by -2, lastly all the >0
     // Fill the array from both ends
@@ -1308,6 +1309,23 @@ static void SOR_LCP (dxWorldProcessContext *context,
       }
     }
     dIASSERT (back - front==1);
+  }
+  else
+  {
+    // make sure constraints with findex < 0 come first.
+    IndexError *orderhead = order, *ordertail = order + (m - 1);
+
+    // Fill the array from both ends
+    for (int i=0; i<m; i++) {
+      if (findex[i] < 0) {
+        orderhead->index = i; // Place them at the front
+        ++orderhead;
+      } else {
+        ordertail->index = i; // Place them at the end
+        --ordertail;
+      }
+    }
+    dIASSERT (orderhead-ordertail==1);
   }
 #endif
 
@@ -2317,26 +2335,26 @@ void dxQuickStepper (dxWorldProcessContext *context,
       int contacts = 0;
       for (int i=0; i<m; i++)
       {
-        error += dFabs(tmp[i]);
+        error += dFabs(tmp[i])*dFabs(tmp[i]);
         if (findex[i] == -1)
-          bilateral_error += dFabs(tmp[i]);
+          bilateral_error += dFabs(tmp[i])*dFabs(tmp[i]);
         else if (findex[i] == -2)
         {
           // contact error includes joint limits
-          contact_error += dFabs(tmp[i]);
+          contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
           contacts++;
         }
         else if (findex[i] >= 0)
-          contact_error += dFabs(tmp[i]);
+          contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
 
         // Note: This is not a good measure of constraint error
         // for soft contact, as Jv is not necessarily zero here.
         // Better measure is compute the residual.  \\\ TODO
       }
       // printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
-      world->qs.constraint_residual = error;
-      world->qs.bilateral_residual = bilateral_error;
-      world->qs.contact_residual = contact_error;
+      world->qs.constraint_residual = sqrt(error/(double)m);
+      world->qs.bilateral_residual = sqrt(bilateral_error/(double)m);
+      world->qs.contact_residual = sqrt(contact_error/(double)m);
       world->qs.num_contacts = contacts;
     }
   }
