@@ -101,7 +101,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->server = new gazebo::Server();
   this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
-  this->server->Init();
 
   this->SetPause(_paused);
 
@@ -110,9 +109,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
         gazebo::physics::get_world()->GetName(), false);
 
   this->server->Run();
-
-  if (_createScene)
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   this->server->Fini();
 

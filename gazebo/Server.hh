@@ -63,7 +63,6 @@ namespace gazebo
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
-    public: void Init();
     public: void Run();
     public: void Stop();
     public: void Fini();
@@ -101,6 +100,9 @@ namespace gazebo
 
     private: gazebo::common::StrStr_M params;
     private: po::variables_map vm;
+
+    /// \brief True when initialized.
+    private: bool initialized;
 
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;
