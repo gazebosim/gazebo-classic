@@ -2464,7 +2464,7 @@
       </joint>
       <pose>0 0 1.1 0 -0 0</pose>
       <!-- test pid controller joints -->
-      <plugin name='sphere_atlas_pid' filename='libSphereAtlasTestPlugin.so'/>
+      <plugin name='sphere_atlas_pid' filename='libSphereAtlasDemoPlugin.so'/>
     </model>
   </world>
 </sdf>

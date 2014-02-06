@@ -1,11 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
-    <scene>
-      <ambient>1.0 1.0 1.0 1</ambient>
-      <background>0 0 0 1.0</background>
-      <shadows>true</shadows>
-    </scene>
     <physics type="ode">
       <gravity>0 0 -10.0</gravity>
       <ode>
@@ -296,7 +291,8 @@
           </geometry>
           <surface>
             <friction>
-              <ode fdir="1 0 0">
+              <ode>
+                <fdir1>1 0 0</fdir1>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
@@ -350,7 +346,8 @@
           </geometry>
           <surface>
             <friction>
-              <ode fdir="1 0 0">
+              <ode>
+                <fdir1>1 0 0</fdir1>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
@@ -404,7 +401,8 @@
           </geometry>
           <surface>
             <friction>
-              <ode fdir="1 0 0">
+              <ode>
+                <fdir1>1 0 0</fdir1>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
@@ -462,7 +460,8 @@
           </geometry>
           <surface>
             <friction>
-              <ode fdir="1 0 0">
+              <ode>
+                <fdir1>1 0 0</fdir1>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
@@ -519,7 +518,8 @@
           </geometry>
           <surface>
             <friction>
-              <ode fdir="1 0 0">
+              <ode>
+                <fdir1>1 0 0</fdir1>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
@@ -604,7 +604,7 @@
           <xyz>0 0 1</xyz>
         </axis>
       </joint>
-      <plugin name="cart_test_plugin" filename="libCartTestPlugin.so">
+      <plugin name="cart_test_plugin" filename="libCartDemoPlugin.so">
         <steer>bar_2_joint</steer>
         <steer_pid>10 0.1 0.5</steer_pid>
         <steer_ilim>-10 10</steer_ilim>
