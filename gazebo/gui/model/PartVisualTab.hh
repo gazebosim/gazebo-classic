@@ -47,10 +47,26 @@ namespace gazebo
       /// \brief Widget that display visuals' properties.
       private: QTreeWidget *visualsTreeWidget;
 
-      /// \brief Qt callback when a visual is added.
+      /// \brief Counter for the number of visuals.
+      private: int counter;
+
+      /// \brief Qt signal mapper for mapping remove button signals.
+      private:  QSignalMapper *signalMapper;
+
+      /// \brief A map of visual items to their id.
+      private: std::map<int, QTreeWidgetItem *> visualItems;
+
+      /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();
 
+      /// \brief Qt callback when a visual is to be removed.
+      /// \param[in] _item Item to be removed.
+      private slots: void OnRemoveVisual(int);
 
+      /// \brief Received item selection user input.
+      /// \param[in] _item Item selected.
+      /// \param[in] _column Column index.
+      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
     };
   }
 }

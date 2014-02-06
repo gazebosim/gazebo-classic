@@ -648,7 +648,6 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     }
   }
   return false;
-
 }
 
 /////////////////////////////////////////////////

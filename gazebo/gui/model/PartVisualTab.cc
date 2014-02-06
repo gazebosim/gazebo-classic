@@ -15,6 +15,9 @@
  *
 */
 
+#include <iostream>
+
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/model/PartVisualTab.hh"
 
 using namespace gazebo;
@@ -31,17 +34,23 @@ PartVisualTab::PartVisualTab()
   this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->visualsTreeWidget->header()->hide();
 
+  this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
+  connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  QPushButton *addVisualButton = new QPushButton(tr("+ &Add Visual"));
+  QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
-//  buttonsLayout->addWidget(cancelButton);
 
   mainLayout->addWidget(this->visualsTreeWidget);
   mainLayout->addWidget(addVisualButton);
-
   this->setLayout(mainLayout);
 
+  this->counter = 0;
+  this->signalMapper = new QSignalMapper(this);
   this->OnAddVisual();
+
+  connect(this->signalMapper, SIGNAL(mapped(int)),
+     this, SLOT(OnRemoveVisual(int)));
 }
 
 /////////////////////////////////////////////////
@@ -53,14 +62,32 @@ PartVisualTab::~PartVisualTab()
 void PartVisualTab::OnAddVisual()
 {
   // Create a top-level tree item for the path
+  std::stringstream visualIndex;
+  visualIndex << "Visual " << counter;
+
   QTreeWidgetItem *visualItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Visual ")));
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
   this->visualsTreeWidget->addTopLevelItem(visualItem);
 
+  this->visualItems[counter] = visualItem;
+
+  QWidget *visualItemWidget = new QWidget;
+  QHBoxLayout *visualItemLayout = new QHBoxLayout;
+  QLabel *visualLabel = new QLabel(QString(visualIndex.str().c_str()));
+
+  QPushButton *removeVisualButton = new QPushButton(tr("Remove"));
+  connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
+      SLOT(map()));
+  this->signalMapper->setMapping(removeVisualButton, counter);
+  counter++;
+
+  visualItemLayout->addWidget(visualLabel);
+  visualItemLayout->addWidget(removeVisualButton);
+  visualItemWidget->setLayout(visualItemLayout);
+  this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
+
   QTreeWidgetItem *visualChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  visualItem->addChild(visualChildItem);
+    new QTreeWidgetItem(visualItem);
 
   QWidget *visualWidget = new QWidget;
   QVBoxLayout *visualLayout = new QVBoxLayout;
@@ -73,7 +100,7 @@ void PartVisualTab::OnAddVisual()
   geometryComboBox->addItem(tr("box"));
   geometryComboBox->addItem(tr("cylinder"));
   geometryComboBox->addItem(tr("sphere"));
-  geometryComboBox->addItem(tr("custom"));
+  // geometryComboBox->addItem(tr("custom"));
 
   QLabel *transparencyLabel = new QLabel(tr("Transparency:"));
   QDoubleSpinBox *transparencySpinBox = new QDoubleSpinBox;
@@ -165,10 +192,33 @@ void PartVisualTab::OnAddVisual()
 
   visualLayout->addLayout(visualGeneralLayout);
   visualLayout->addWidget(poseGroupBox);
-
   visualWidget->setLayout(visualLayout);
-  this->visualsTreeWidget->setItemWidget(visualChildItem, 0,
-    visualWidget);
+
+  this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
   visualItem->setExpanded(true);
   visualChildItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::OnItemSelection(QTreeWidgetItem *_item,
+                                         int /*_column*/)
+{
+  if (_item && _item->childCount() > 0)
+    _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::OnRemoveVisual(int _id)
+{
+  std::map<int, QTreeWidgetItem*>::iterator it = this->visualItems.find(_id);
+  if (it == this->visualItems.end())
+  {
+    gzerr << "No visual item found" << std::endl;
+    return;
+  }
+  QTreeWidgetItem *item = it->second;
+  int index = this->visualsTreeWidget->indexOfTopLevelItem(item);
+  this->visualsTreeWidget->takeTopLevelItem(index);
+
+  this->visualItems.erase(it);
 }
