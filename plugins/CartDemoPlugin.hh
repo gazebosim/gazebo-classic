@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef __GAZEBO_CART_TEST_PLUGIN_HH__
-#define __GAZEBO_CART_TEST_PLUGIN_HH__
+ */
+#ifndef _GAZEBO_CART_DEMO_PLUGIN_HH_
+#define _GAZEBO_CART_DEMO_PLUGIN_HH_
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
@@ -23,11 +23,17 @@
 #include "gazebo/gazebo.hh"
 
 #define NUM_JOINTS 3
+
 namespace gazebo
 {
-  class CartTestPlugin : public ModelPlugin
+  /// \brief This plugin drives a four wheeled cart model forward and back
+  /// by applying a small wheel torque.  Steering is controlled via
+  /// a position pid.
+  /// this is a test for general rolling contact stability.
+  /// should refine the test to be more specific in the future.
+  class CartDemoPlugin : public ModelPlugin
   {
-    public: CartTestPlugin();
+    public: CartDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
 

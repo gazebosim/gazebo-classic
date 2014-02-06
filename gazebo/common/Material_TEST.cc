@@ -17,10 +17,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Material.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(MaterialTest, Material)
+class MaterialTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(MaterialTest, Material)
 {
   common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(1.0, 0.5, 0.2, 1.0));
