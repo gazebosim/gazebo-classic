@@ -42,7 +42,7 @@ namespace gazebo
     public: virtual ~Command();
 
     /// \brief Print help information.
-    public: virtual void Help();
+    public: void Help();
 
     /// \brief Print detailed help.
     public: virtual void HelpDetailed() = 0;
@@ -228,6 +228,7 @@ namespace gazebo
     // Documentation inherited
     protected: virtual bool TransportRequired();
 
+    // Documnetaion inherited.
     private: void Help(const std::string &_command);
   };
 
