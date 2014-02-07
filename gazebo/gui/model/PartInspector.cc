@@ -83,7 +83,6 @@ PartVisualTab *PartInspector::GetVisual() const
   return this->visualTab;
 }
 
-
 /////////////////////////////////////////////////
 void PartInspector::OnCancel()
 {

@@ -79,6 +79,10 @@ void PartVisualTab::OnAddVisual()
   connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(removeVisualButton, counter);
+
+  VisualDataWidget *dataWidget = new VisualDataWidget;
+  dataWidget->id = counter;
+  this->dataWidgets.push_back(dataWidget);
   counter++;
 
   visualItemLayout->addWidget(visualLabel);
@@ -96,31 +100,31 @@ void PartVisualTab::OnAddVisual()
   QLabel *visualNameLabel = new QLabel(tr(""));
 
   QLabel *geometryLabel = new QLabel(tr("Geometry:"));
-  QComboBox *geometryComboBox = new QComboBox;
-  geometryComboBox->addItem(tr("box"));
-  geometryComboBox->addItem(tr("cylinder"));
-  geometryComboBox->addItem(tr("sphere"));
+  dataWidget->geometryComboBox = new QComboBox;
+  dataWidget->geometryComboBox->addItem(tr("unit_box"));
+  dataWidget->geometryComboBox->addItem(tr("unit_cylinder"));
+  dataWidget->geometryComboBox->addItem(tr("unit_sphere"));
   // geometryComboBox->addItem(tr("custom"));
 
   QLabel *transparencyLabel = new QLabel(tr("Transparency:"));
-  QDoubleSpinBox *transparencySpinBox = new QDoubleSpinBox;
-  transparencySpinBox->setRange(-1000, 1000);
-  transparencySpinBox->setSingleStep(0.01);
-  transparencySpinBox->setDecimals(3);
-  transparencySpinBox->setValue(0.000);
+  dataWidget->transparencySpinBox = new QDoubleSpinBox;
+  dataWidget->transparencySpinBox->setRange(-1000, 1000);
+  dataWidget->transparencySpinBox->setSingleStep(0.01);
+  dataWidget->transparencySpinBox->setDecimals(3);
+  dataWidget->transparencySpinBox->setValue(0.000);
 
   QLabel *materialLabel = new QLabel(tr("Material:"));
-  QLineEdit *materialLineEdit = new QLineEdit;
+  dataWidget->materialLineEdit = new QLineEdit;
 
   QGridLayout *visualGeneralLayout = new QGridLayout;
   visualGeneralLayout->addWidget(nameLabel, 0, 0);
   visualGeneralLayout->addWidget(visualNameLabel, 0, 1);
   visualGeneralLayout->addWidget(geometryLabel, 1, 0);
-  visualGeneralLayout->addWidget(geometryComboBox, 1, 1);
+  visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
   visualGeneralLayout->addWidget(transparencyLabel, 2, 0);
-  visualGeneralLayout->addWidget(transparencySpinBox, 2, 1);
+  visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 2, 1);
   visualGeneralLayout->addWidget(materialLabel, 3, 0);
-  visualGeneralLayout->addWidget(materialLineEdit, 3, 1);
+  visualGeneralLayout->addWidget(dataWidget->materialLineEdit, 3, 1);
 
   QLabel *posXLabel = new QLabel(tr("x: "));
   QLabel *posYLabel = new QLabel(tr("y: "));
@@ -129,63 +133,63 @@ void PartVisualTab::OnAddVisual()
   QLabel *rotPLabel = new QLabel(tr("pitch: "));
   QLabel *rotYLabel = new QLabel(tr("yaw: "));
 
-  QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
-  posXSpinBox->setRange(-1000, 1000);
-  posXSpinBox->setSingleStep(0.01);
-  posXSpinBox->setDecimals(3);
-  posXSpinBox->setValue(0.000);
+  dataWidget->posXSpinBox = new QDoubleSpinBox;
+  dataWidget->posXSpinBox->setRange(-1000, 1000);
+  dataWidget->posXSpinBox->setSingleStep(0.01);
+  dataWidget->posXSpinBox->setDecimals(3);
+  dataWidget->posXSpinBox->setValue(0.000);
 
-  QDoubleSpinBox *posYSpinBox = new QDoubleSpinBox;
-  posYSpinBox->setRange(-1000, 1000);
-  posYSpinBox->setSingleStep(0.01);
-  posYSpinBox->setDecimals(3);
-  posYSpinBox->setValue(0.000);
+  dataWidget->posYSpinBox = new QDoubleSpinBox;
+  dataWidget->posYSpinBox->setRange(-1000, 1000);
+  dataWidget->posYSpinBox->setSingleStep(0.01);
+  dataWidget->posYSpinBox->setDecimals(3);
+  dataWidget->posYSpinBox->setValue(0.000);
 
-  QDoubleSpinBox *posZSpinBox = new QDoubleSpinBox;
-  posZSpinBox->setRange(-1000, 1000);
-  posZSpinBox->setSingleStep(0.01);
-  posZSpinBox->setDecimals(3);
-  posZSpinBox->setValue(0.000);
+  dataWidget->posZSpinBox = new QDoubleSpinBox;
+  dataWidget->posZSpinBox->setRange(-1000, 1000);
+  dataWidget->posZSpinBox->setSingleStep(0.01);
+  dataWidget->posZSpinBox->setDecimals(3);
+  dataWidget->posZSpinBox->setValue(0.000);
 
-  QDoubleSpinBox *rotRSpinBox = new QDoubleSpinBox;
-  rotRSpinBox->setRange(-1000, 1000);
-  rotRSpinBox->setSingleStep(0.01);
-  rotRSpinBox->setDecimals(3);
-  rotRSpinBox->setValue(0.000);
+  dataWidget->rotRSpinBox = new QDoubleSpinBox;
+  dataWidget->rotRSpinBox->setRange(-1000, 1000);
+  dataWidget->rotRSpinBox->setSingleStep(0.01);
+  dataWidget->rotRSpinBox->setDecimals(3);
+  dataWidget->rotRSpinBox->setValue(0.000);
 
-  QDoubleSpinBox *rotPSpinBox = new QDoubleSpinBox;
-  rotPSpinBox->setRange(-1000, 1000);
-  rotPSpinBox->setSingleStep(0.01);
-  rotPSpinBox->setDecimals(3);
-  rotPSpinBox->setValue(0.000);
+  dataWidget->rotPSpinBox = new QDoubleSpinBox;
+  dataWidget->rotPSpinBox->setRange(-1000, 1000);
+  dataWidget->rotPSpinBox->setSingleStep(0.01);
+  dataWidget->rotPSpinBox->setDecimals(3);
+  dataWidget->rotPSpinBox->setValue(0.000);
 
-  QDoubleSpinBox *rotYSpinBox = new QDoubleSpinBox;
-  rotYSpinBox->setRange(-1000, 1000);
-  rotYSpinBox->setSingleStep(0.01);
-  rotYSpinBox->setDecimals(3);
-  rotYSpinBox->setValue(0.000);
+  dataWidget->rotYSpinBox = new QDoubleSpinBox;
+  dataWidget->rotYSpinBox->setRange(-1000, 1000);
+  dataWidget->rotYSpinBox->setSingleStep(0.01);
+  dataWidget->rotYSpinBox->setDecimals(3);
+  dataWidget->rotYSpinBox->setValue(0.000);
 
   QGridLayout *poseGroupLayout = new QGridLayout;
   poseGroupLayout->addWidget(posXLabel, 0, 0);
-  poseGroupLayout->addWidget(posXSpinBox, 0, 1);
+  poseGroupLayout->addWidget(dataWidget->posXSpinBox, 0, 1);
   poseGroupLayout->addWidget(posYLabel, 0, 2);
-  poseGroupLayout->addWidget(posYSpinBox, 0, 3);
+  poseGroupLayout->addWidget(dataWidget->posYSpinBox, 0, 3);
   poseGroupLayout->addWidget(posZLabel, 0, 4);
-  poseGroupLayout->addWidget(posZSpinBox, 0, 5);
+  poseGroupLayout->addWidget(dataWidget->posZSpinBox, 0, 5);
   poseGroupLayout->addWidget(rotRLabel, 1, 0);
-  poseGroupLayout->addWidget(rotRSpinBox, 1, 1);
+  poseGroupLayout->addWidget(dataWidget->rotRSpinBox, 1, 1);
   poseGroupLayout->addWidget(rotPLabel, 1, 2);
-  poseGroupLayout->addWidget(rotPSpinBox, 1, 3);
+  poseGroupLayout->addWidget(dataWidget->rotPSpinBox, 1, 3);
   poseGroupLayout->addWidget(rotYLabel, 1, 4);
-  poseGroupLayout->addWidget(rotYSpinBox, 1, 5);
+  poseGroupLayout->addWidget(dataWidget->rotYSpinBox, 1, 5);
 
   poseGroupLayout->setColumnStretch(1, 1);
-  poseGroupLayout->setAlignment(posXSpinBox, Qt::AlignLeft);
-  poseGroupLayout->setAlignment(posYSpinBox, Qt::AlignLeft);
-  poseGroupLayout->setAlignment(posZSpinBox, Qt::AlignLeft);
-  poseGroupLayout->setAlignment(rotRSpinBox, Qt::AlignLeft);
-  poseGroupLayout->setAlignment(rotPSpinBox, Qt::AlignLeft);
-  poseGroupLayout->setAlignment(rotYSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->posXSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->posYSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->posZSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->rotRSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->rotPSpinBox, Qt::AlignLeft);
+  poseGroupLayout->setAlignment(dataWidget->rotYSpinBox, Qt::AlignLeft);
 
   QGroupBox *poseGroupBox = new QGroupBox(tr("Pose"));
   poseGroupBox->setLayout(poseGroupLayout);
@@ -221,4 +225,124 @@ void PartVisualTab::OnRemoveVisual(int _id)
   this->visualsTreeWidget->takeTopLevelItem(index);
 
   this->visualItems.erase(it);
+
+  for (unsigned int i = 0; i < this->dataWidgets.size(); ++i)
+  {
+    if (this->dataWidgets[i]->id == _id)
+    {
+      this->dataWidgets.erase(this->dataWidgets.begin() + i);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetPose(unsigned int _index, const math::Pose &_pose)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+  }
+
+  this->dataWidgets[_index]->posXSpinBox->setValue(_pose.pos.x);
+  this->dataWidgets[_index]->posYSpinBox->setValue(_pose.pos.y);
+  this->dataWidgets[_index]->posZSpinBox->setValue(_pose.pos.z);
+
+  this->dataWidgets[_index]->rotRSpinBox->setValue(_pose.rot.GetAsEuler().x);
+  this->dataWidgets[_index]->rotPSpinBox->setValue(_pose.rot.GetAsEuler().y);
+  this->dataWidgets[_index]->rotYSpinBox->setValue(_pose.rot.GetAsEuler().z);
+}
+
+/////////////////////////////////////////////////
+math::Pose PartVisualTab::GetPose(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return math::Pose::Zero;
+  }
+
+  return math::Pose(this->dataWidgets[_index]->posXSpinBox->value(),
+      this->dataWidgets[_index]->posYSpinBox->value(),
+      this->dataWidgets[_index]->posZSpinBox->value(),
+      this->dataWidgets[_index]->rotRSpinBox->value(),
+      this->dataWidgets[_index]->rotPSpinBox->value(),
+      this->dataWidgets[_index]->rotYSpinBox->value());
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetTransparency(unsigned int _index, double _transparency)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+  }
+
+  this->dataWidgets[_index]->transparencySpinBox->setValue(_transparency);
+}
+
+/////////////////////////////////////////////////
+double PartVisualTab::GetTransparency(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return -1;
+  }
+
+  return this->dataWidgets[_index]->transparencySpinBox->value();
+}
+
+/////////////////////////////////////////////////
+std::string PartVisualTab::GetMaterial(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return "";
+  }
+
+  return this->dataWidgets[_index]->materialLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetMaterial(unsigned int _index,
+    const std::string &_material)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+  }
+
+  this->dataWidgets[_index]->materialLineEdit->setText(tr(_material.c_str()));
+}
+
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetGeometry(unsigned int _index,
+    const std::string &_geometry)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+  }
+  int dataIndex = this->dataWidgets[_index]->geometryComboBox->findText(
+      QString(tr(_geometry.c_str())));
+  if (dataIndex >= 0)
+  {
+    this->dataWidgets[_index]->geometryComboBox->setCurrentIndex(dataIndex);
+  }
+}
+
+/////////////////////////////////////////////////
+std::string PartVisualTab::GetGeometry(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return NULL;
+  }
+
+  int dataIndex = this->dataWidgets[_index]->geometryComboBox->currentIndex();
+  return this->dataWidgets[_index]->geometryComboBox->itemText(
+      dataIndex).toStdString();
 }

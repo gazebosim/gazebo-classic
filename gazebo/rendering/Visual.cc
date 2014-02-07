@@ -411,23 +411,23 @@ void Visual::Load()
   // Read the desired position and rotation of the mesh
   pose = this->sdf->Get<math::Pose>("pose");
 
-  std::string meshName = this->GetMeshName();
-  std::string subMeshName = this->GetSubMeshName();
+  std::string mesh = this->GetMeshName();
+  std::string subMesh = this->GetSubMeshName();
   bool centerSubMesh = this->GetCenterSubMesh();
 
-  if (!meshName.empty())
+  if (!mesh.empty())
   {
     try
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-      obj = this->AttachMesh(meshName, subMeshName, centerSubMesh,
+      obj = this->AttachMesh(mesh, subMesh, centerSubMesh,
           stream.str());
     }
     catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-      gzerr << "Unable to create a mesh from " <<  meshName << "\n";
+      gzerr << "Unable to create a mesh from " <<  mesh << "\n";
       return;
     }
   }
@@ -668,6 +668,8 @@ unsigned int Visual::GetAttachedObjectCount() const
 void Visual::DetachObjects()
 {
   this->sceneNode->detachAllObjects();
+  this->meshName = "";
+  this->subMeshName = "";
 }
 
 //////////////////////////////////////////////////
@@ -713,18 +715,21 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   if (_meshName.empty())
     return NULL;
 
+  this->meshName = _meshName;
+  this->subMeshName = _subMesh;
+
   Ogre::MovableObject *obj;
   std::string objName = _objName;
-  std::string meshName = _meshName;
-  meshName += _subMesh.empty() ? "" : "::" + _subMesh;
+  std::string entityMeshName = _meshName;
+  entityMeshName += _subMesh.empty() ? "" : "::" + _subMesh;
 
   if (objName.empty())
-    objName = this->sceneNode->getName() + "_ENTITY_" + meshName;
+    objName = this->sceneNode->getName() + "_ENTITY_" + entityMeshName;
 
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(objName, meshName));
+    (this->sceneNode->getCreator()->createEntity(objName, entityMeshName));
 
   this->AttachObject(obj);
   return obj;
@@ -2224,6 +2229,11 @@ bool Visual::IsPlane() const
 //////////////////////////////////////////////////
 std::string Visual::GetMeshName() const
 {
+  if (!this->meshName.empty())
+  {
+    return this->meshName;
+  }
+
   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
@@ -2262,6 +2272,11 @@ std::string Visual::GetMeshName() const
 //////////////////////////////////////////////////
 std::string Visual::GetSubMeshName() const
 {
+  if (!this->subMeshName.empty())
+  {
+    return this->subMeshName;
+  }
+
   std::string result;
 
   if (this->sdf->HasElement("geometry"))

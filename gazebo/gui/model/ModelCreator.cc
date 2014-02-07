@@ -30,7 +30,10 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Inertial.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -39,6 +42,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 
+#include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/PartGeneralTab.hh"
 #include "gazebo/gui/model/PartVisualTab.hh"
 #include "gazebo/gui/model/PartInspector.hh"
@@ -286,9 +290,10 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData;
-  part->name = _visual->GetName();
   part->visuals.push_back(_visual);
 
+  part->name = _visual->GetName();
+  part->pose = _visual->GetParent()->GetWorldPose();
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
@@ -298,7 +303,9 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
 
-  part->inertial = new physics::Inertial;
+  part->inertial.reset(new physics::Inertial);
+  CollisionData *collisionData = new CollisionData;
+  part->collisions.push_back(collisionData);
   part->sensorData = new SensorData;
 
   this->allParts[part->name] = part;
@@ -329,9 +336,16 @@ void ModelCreator::RemovePart(const std::string &_partName)
     if (visParent)
       scene->RemoveVisual(visParent);
   }
+  part->visuals.clear();
+
+  for (unsigned int i = 0; i < part->collisions.size(); ++i)
+  {
+    delete part->collisions[i];
+  }
+  part->collisions.clear();
 
   delete part->inspector;
-  delete part->inertial;
+  part->inertial.reset();
   delete part->sensorData;
 
   this->allParts.erase(_partName);
@@ -562,6 +576,16 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 
   if (this->mouseVisual)
   {
+    // set the part data pose
+    rendering::VisualPtr visVisual = this->mouseVisual->GetChild(0);
+    if (visVisual && this->allParts.find(visVisual->GetName()) !=
+        this->allParts.end())
+    {
+      PartData *part = this->allParts[visVisual->GetName()];
+      part->pose = this->mouseVisual->GetWorldPose();
+    }
+
+    // reset and return
     emit PartAdded();
     this->mouseVisual.reset();
     this->AddPart(PART_NONE);
@@ -636,12 +660,21 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
       general->SetGravity(part->gravity);
       general->SetSelfCollide(part->selfCollide);
       general->SetKinematic(part->kinematic);
-      general->SetPose(part->visuals[0]->GetParent()->GetWorldPose());
+      general->SetPose(part->pose);
       general->SetMass(part->inertial->GetMass());
       general->SetInertialPose(part->inertial->GetPose());
       general->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
           part->inertial->GetIZZ(), part->inertial->GetIXY(),
           part->inertial->GetIXZ(), part->inertial->GetIYZ());
+
+      PartVisualTab *visual = part->inspector->GetVisual();
+      for (unsigned int i = 0; i < part->visuals.size(); ++i)
+      {
+        visual->SetPose(i, part->visuals[i]->GetPose());
+        visual->SetTransparency(i, part->visuals[i]->GetTransparency());
+        visual->SetMaterial(i, part->visuals[i]->GetMaterialName());
+        visual->SetGeometry(i, part->visuals[i]->GetMeshName());
+      }
 
       part->inspector->show();
       return true;
@@ -795,6 +828,7 @@ void PartData::OnApply()
   this->selfCollide = general->GetSelfCollide();
   this->kinematic = general->GetKinematic();
 
+  // set inertial properties
   this->inertial->SetMass(general->GetMass());
   this->inertial->SetCoG(general->GetInertialPose());
   this->inertial->SetInertiaMatrix(
@@ -802,5 +836,27 @@ void PartData::OnApply()
       general->GetInertiaIZZ(), general->GetInertiaIXY(),
       general->GetInertiaIXZ(), general->GetInertiaIYZ());
   this->pose = general->GetPose();
-  this->visuals[0]->GetParent()->SetWorldPose(this->pose);
+
+  // set visual properties
+  if (!this->visuals.empty())
+  {
+    this->visuals[0]->GetParent()->SetWorldPose(this->pose);
+
+    PartVisualTab *visual = this->inspector->GetVisual();
+    for (unsigned int i = 0; i < this->visuals.size(); ++i)
+    {
+      if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
+      {
+        this->visuals[i]->DetachObjects();
+        this->visuals[i]->AttachMesh(visual->GetGeometry(i));
+        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
+      }
+      this->visuals[i]->SetPose(visual->GetPose(i));
+      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
+      if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
+      {
+        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
+      }
+    }
+  }
 }

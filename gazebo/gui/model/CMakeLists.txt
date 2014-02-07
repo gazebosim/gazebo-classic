@@ -20,6 +20,7 @@ set (qt_headers
   JointInspector.hh
   JointMaker.hh
   ModelCreator.hh
+  ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
   PartGeneralTab.hh

@@ -23,6 +23,7 @@
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model/ModelData.hh"
 
 namespace gazebo
 {
@@ -31,6 +32,41 @@ namespace gazebo
   {
     /// \addtogroup gazebo_gui
     /// \{
+
+    /// \class VisualDataWidget PartVisualTab.hh
+    /// \brief A class of widgets used for configuring visual properties.
+    class VisualDataWidget
+    {
+      /// \brief Unique id for this widget.
+      public: int id;
+
+      /// \brief Combo box for for specifying the geometry of the visual.
+      public: QComboBox *geometryComboBox;
+
+      /// \brief Spin box for configuring the transparency of the visual.
+      public: QDoubleSpinBox *transparencySpinBox;
+
+      /// \brief Editable line for specifying the material of the visual.
+      public: QLineEdit *materialLineEdit;
+
+      /// \brief Spin box for configuring the X position of the visual.
+      public: QDoubleSpinBox *posXSpinBox;
+
+      /// \brief Spin box for configuring the Y position of the part.
+      public: QDoubleSpinBox *posYSpinBox;
+
+      /// \brief Spin box for configuring the Z position of the part.
+      public: QDoubleSpinBox *posZSpinBox;
+
+      /// \brief Spin box for configuring the roll of the part.
+      public: QDoubleSpinBox *rotRSpinBox;
+
+      /// \brief Spin box for configuring the pitch of the part.
+      public: QDoubleSpinBox *rotPSpinBox;
+
+      /// \brief Spin box for configuring the yaw of the part.
+      public: QDoubleSpinBox *rotYSpinBox;
+    };
 
     /// \class PartVisualTab PartVisualTab.hh
     /// \brief A tab for configuring visual properties of a part.
@@ -43,6 +79,49 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~PartVisualTab();
+
+      /// \brief Set the pose of the visual.
+      /// \param[in] _index Index of visual
+      /// \param[in] _pose Pose to set the visual to.
+      public: void SetPose(unsigned int _index, const math::Pose &_pose);
+
+      /// \brief Get the pose of the visual.
+      /// \param[in] _index Index of visual
+      /// \return Pose of the visual.
+      public: math::Pose GetPose(unsigned int _index) const;
+
+      /// \brief Set the transparency of the visual.
+      /// \param[in] _index Index of visual
+      /// \param[in] _transparency Transparency of visual
+      public: void SetTransparency(unsigned int _index, double _transparency);
+
+      /// \brief Get the transparency of the visual.
+      /// \param[in] _index Index of visual.
+      public: double GetTransparency(unsigned int _index) const;
+
+      /// \brief Get the material of the visual.
+      /// \param[in] _index Index of visual.
+      /// \return Name of the material.
+      public: std::string GetMaterial(unsigned int _index) const;
+
+      /// \brief Set the material of the visual.
+      /// \param[in] _index Index of visual.
+      /// \param[in] _material Material name.
+      public: void SetMaterial(unsigned int _index,
+          const std::string &_material);
+
+      /// \brief Set the geometry of the visual.
+      /// \param[in] _index Index of visual
+      public: void SetGeometry(unsigned int _index,
+          const std::string &_geometry);
+
+      /// \brief Get the geometry of the visual.
+      /// \param[in] _index Index of visual
+      /// \return Geometry type.
+      public: std::string GetGeometry(unsigned int _index) const;
+
+      /// \brief List of visual widgets for configuring visual properties.
+      private: std::vector<VisualDataWidget *> dataWidgets;
 
       /// \brief Widget that display visuals' properties.
       private: QTreeWidget *visualsTreeWidget;

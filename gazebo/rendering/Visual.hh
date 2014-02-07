@@ -517,6 +517,12 @@ namespace gazebo
       /// \brief The original name for the visual's material.
       private: std::string origMaterialName;
 
+      /// \brief The visual's mesh name.
+      private: std::string meshName;
+
+      /// \brief The visual's submesh name.
+      private: std::string subMeshName;
+
       /// \brief Transparency value.
       private: float transparency;
 

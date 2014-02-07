@@ -26,7 +26,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -272,6 +271,20 @@ namespace gazebo
     };
     /// \}
 
+    /*/// \class VisualData VisualData.hh
+    /// \brief Helper class to store visual data
+    class CollisionData
+    {
+      /// \brief Name of sensor.
+      public: std::string name;
+
+      /// \brief Pose of sensor.
+      public: math::Vector3 pose;
+
+      /// \brief Sensor topic name.
+      public: std::string geometry;
+    };
+
     /// \class SensorData SensorData.hh
     /// \brief Helper class to store sensor data
     class SensorData
@@ -304,9 +317,6 @@ namespace gazebo
       /// \brief Name of part.
       public: std::string name;
 
-      /// \brief Visuals of the part.
-      public: std::vector<rendering::VisualPtr> visuals;
-
       /// \brief True to enable gravity on part.
       public: bool gravity;
 
@@ -319,22 +329,26 @@ namespace gazebo
       /// \brief Pose of part.
       public: math::Pose pose;
 
-      /// \brief Name of part.
-      public: physics::Inertial *inertial;
+      /// \brief Inertial properties.
+      public: physics::InertialPtr inertial;
 
-      /// \brief Name of part.
-      public: std::vector<physics::CollisionPtr> collisions;
+      /// \brief Visuals of the part.
+      public: std::vector<rendering::VisualPtr> visuals;
+
+      /// \brief Collisions of the part.
+      public: std::vector<CollisionData *> collisions;
+//      public: std::vector<physics::CollisionPtr> collisions;
 
       /// \brief Sensor data
       public: SensorData *sensorData;
 
       /// \brief Inspector for configuring part properties.
-      public: PartInspector *inspector; 
-      
+      public: PartInspector *inspector;
+
       /// \brief Qt Callback when part inspector configurations are to be
       /// applied.
-      private slots: void OnApply(); 
-    };
+      private slots: void OnApply();
+    };*/
   }
 }
 
