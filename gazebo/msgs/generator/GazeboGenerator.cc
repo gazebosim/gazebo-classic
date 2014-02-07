@@ -52,7 +52,8 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
-    printer.Print("#pragma GCC system_header", "name", "includes");
+    printer.Print("#pragma GCC system_header\n", "name", "includes");
+    printer.Print("#pragma clang system_header\n", "name", "includes");
   }
 
   // Add boost shared point include

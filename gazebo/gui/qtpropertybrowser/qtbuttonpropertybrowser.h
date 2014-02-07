@@ -38,6 +38,7 @@
  ****************************************************************************/
 
 #pragma GCC system_header
+#pragma clang system_header
 
 #ifndef QTBUTTONPROPERTYBROWSER_H
 #define QTBUTTONPROPERTYBROWSER_H

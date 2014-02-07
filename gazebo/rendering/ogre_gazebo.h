@@ -19,6 +19,7 @@
 
 // This disables warning messages for OGRE
 #pragma GCC system_header
+#pragma clang system_header
 #include <OGRE/Ogre.h>
 #include <OGRE/OgreImageCodec.h>
 #include <OGRE/OgreMovableObject.h>

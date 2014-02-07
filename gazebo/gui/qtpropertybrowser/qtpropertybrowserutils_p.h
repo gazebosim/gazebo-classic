@@ -50,6 +50,7 @@
 //
 
 #pragma GCC system_header
+#pragma clang system_header
 
 #ifndef QTPROPERTYBROWSERUTILS_H
 #define QTPROPERTYBROWSERUTILS_H

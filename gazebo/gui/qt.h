@@ -19,6 +19,7 @@
 #define GAZEBO_QT_HEADERS_H_
 
 #pragma GCC system_header
+#pragma clang system_header
 
 #include <QtGui>
 #include <QX11Info>

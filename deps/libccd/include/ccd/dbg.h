@@ -19,6 +19,7 @@
 #define __CCD_DBG_H__
 
 #pragma GCC system_header
+#pragma clang system_header
 
 /**
  * Some macros which can be used for printing debug info to stderr if macro

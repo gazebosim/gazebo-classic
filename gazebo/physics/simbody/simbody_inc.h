@@ -19,6 +19,7 @@
 #define _SIMBODY_INC_H_
 
 #pragma GCC system_header
+#pragma clang system_header
 #include <Simbody.h>
 // #include <SimTKcommon.h>
 // #include <SimTKsimbody.h>

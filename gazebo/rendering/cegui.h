@@ -19,6 +19,7 @@
 
 // This disables warning messages
 #pragma GCC system_header
+#pragma clang system_header
 
 #include "gazebo/gazebo_config.h"
 
