@@ -104,7 +104,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
 
   physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world);
-  world->StepWorld(100);
+  world->Step(100);
 
   // Sonar sensor name
   std::string sensorName = "sonar";
