@@ -244,8 +244,8 @@ bool Vector4::operator!=(const Vector4 &pt) const
 //////////////////////////////////////////////////
 bool Vector4::IsFinite() const
 {
-  return finite(this->x) && finite(this->y) && finite(this->z) &&
-         finite(this->w);
+  return std::isfinite(this->x) && std::isfinite(this->y) &&
+         std::isfinite(this->z) && std::isfinite(this->w);
 }
 
 //////////////////////////////////////////////////
