@@ -19,7 +19,6 @@
 #define GAZEBO_QT_TEST_HEADERS_H_
 
 #pragma GCC system_header
-#pragma clang system_header
 
 #include <QtTest/QtTest>
 #endif

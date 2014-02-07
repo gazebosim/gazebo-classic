@@ -20,7 +20,6 @@
 
 // This disables warning messages for Bullet
 #pragma GCC system_header
-#pragma clang system_header
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btTransform.h>
 

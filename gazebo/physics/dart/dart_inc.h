@@ -20,7 +20,6 @@
 
 // This disables warning messages for ODE
 #pragma GCC system_header
-#pragma clang system_header
 
 #include <dart/math/Helpers.h>
 #include <dart/math/Geometry.h>

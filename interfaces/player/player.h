@@ -18,7 +18,6 @@
 #ifndef GAZEBO_PLAYER_H_
 #define GAZEBO_PLAYER_H_
 #pragma GCC system_header
-#pragma clang system_header
 
 #include <libplayercore/playercore.h>
 #endif

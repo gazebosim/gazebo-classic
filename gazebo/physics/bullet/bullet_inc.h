@@ -20,7 +20,6 @@
 
 // This disables warning messages for ODE
 #pragma GCC system_header
-#pragma clang system_header
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
