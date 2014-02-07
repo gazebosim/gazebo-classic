@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,15 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      /// \brief Initialize the connection manager
-      /// \param[in] _masterHost Host where the master is running
-      /// \param[in] _masterPort Port where the master is running
+      /// \brief Initialize the connection manager.
+      /// \param[in] _masterHost Host where the master is running.
+      /// \param[in] _masterPort Port where the master is running.
+      /// \param[in] _timeoutIterations Number of times to wait for
+      /// a connection to master.
       /// \return true if initialization succeeded, false otherwise
       public: bool Init(const std::string &_masterHost,
-                        unsigned int _masterPort);
+                        unsigned int _masterPort,
+                        uint32_t _timeoutIterations = 30);
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
@@ -68,15 +71,11 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      /// \brief Pause or unpause the conneciton manager.
-      /// \param[in] _pause True to pause, false to unpause.
-      public: void Pause(bool _pause);
-
-      /// \brief Subscribe to a topic
-      /// \param[in] _topic The topic to subscribe to
-      /// \param[in] _msgType The type of the topic
+      /// \brief Subscribe to a topic.
+      /// \param[in] _topic The topic to subscribe to.
+      /// \param[in] _msgType The type of the topic.
       /// \param[in] _latching If true, latch the latest incoming message;
-      /// otherwise don't
+      /// otherwise don't.
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);
@@ -95,7 +94,7 @@ namespace gazebo
       /// \param[in] _topic The topic to advertise
       /// \param[in] _msgType The type of the topic
       public: void Advertise(const std::string &_topic,
-                             const std::string &_msgType);
+                              const std::string &_msgType);
 
       /// \brief Unadvertise a topic
       /// \param[in] _topic The topic to unadvertise
@@ -134,9 +133,6 @@ namespace gazebo
       /// \brief Inform the connection manager that it needs an update.
       public: void TriggerUpdate();
 
-      /// \brief Clear all message buffers.
-      public: void ClearBuffers();
-
       /// \brief Callback function called when we have read data from the
       /// master
       /// \param[in] _data String of incoming data
@@ -174,9 +170,6 @@ namespace gazebo
       private: bool initialized;
       private: bool stop, stopped;
 
-      /// \brief Control the paused state of the run loop.
-      private: bool pause;
-
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex listMutex;
 
@@ -191,50 +184,6 @@ namespace gazebo
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable namespaceCondition;
-
-      /// \brief A class to hold a pending subscription.
-      private: class PendingSubscription
-               {
-                 /// \brief Constructor.
-                 /// \param[in] _topic Name of the topic.
-                 /// \param[in] _msgType Type of message.
-                 /// \param[in] _latching True for latching topics.
-                 public:PendingSubscription(const std::string &_topic,
-                            const std::string &_msgType, bool _latching) :
-                   topic(_topic), msgType(_msgType), latching(_latching) {}
-
-                 /// \brief Name of the topic.
-                 public: std::string topic;
-
-                 /// \brief Name of the message type.
-                 public: std::string msgType;
-
-                 /// \brief True for latching topics.
-                 public: bool latching;
-               };
-
-      /// \brief A class to hold a pending advertisement.
-      private: class PendingAdvertisement
-               {
-                 /// \brief Constructor.
-                 /// \param[in] _topic Name of the topic.
-                 /// \param[in] _msgType Type of message.
-                 public:PendingAdvertisement(const std::string &_topic,
-                            const std::string &_msgType) :
-                   topic(_topic), msgType(_msgType) {}
-
-                 /// \brief Name of the topic.
-                 public: std::string topic;
-
-                 /// \brief Name of the message type.
-                 public: std::string msgType;
-               };
-
-      /// \brief List of all pending subscriptions.
-      private: std::list<PendingSubscription> pendingSubscriptions;
-
-      /// \brief List of all pending advertisements.
-      private: std::list<PendingAdvertisement> pendingAdvertisements;
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

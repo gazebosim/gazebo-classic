@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,6 +173,10 @@ namespace gazebo
       /// \brief Get the scale.
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
+
+      /// \brief Set whether or not to enable or disable lighting.
+      /// \param[in] _lighting True to enable lighting.
+      public: void SetLighting(bool _lighting);
 
       /// \brief Set the material.
       /// \param[in] _materialName The name of the material.
@@ -573,6 +577,9 @@ namespace gazebo
 
       /// \brief Scale of visual.
       private: math::Vector3 scale;
+
+      /// \brief True if lighting will be applied to this visual.
+      private: bool lighting;
     };
     /// \}
   }

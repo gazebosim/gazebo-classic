@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
  * Date: 13 Feb 2006
  */
 
+#include <boost/thread.hpp>
+
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -41,6 +44,7 @@ SimbodyLink::SimbodyLink(EntityPtr _parent)
   this->staticLinkDirty = false;
   this->staticLink = false;
   this->simbodyPhysics.reset();
+  this->gravityModeDirty = false;
 }
 
 //////////////////////////////////////////////////
@@ -60,12 +64,19 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("must_be_base_link"))
     this->mustBeBaseLink = _sdf->Get<bool>("must_be_base_link");
 
+  this->SetKinematic(_sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(_sdf->Get<bool>("gravity"));
+
   Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::Init()
 {
+  /// \TODO: implement following
+  // this->SetLinearDamping(this->GetLinearDamping());
+  // this->SetAngularDamping(this->GetAngularDamping());
+
   Link::Init();
 
   math::Vector3 cogVec = this->inertial->GetCoG();
@@ -88,6 +99,10 @@ void SimbodyLink::Init()
   // Create a construction info object
   // Create the new rigid body
 
+  // change link's gravity mode if requested by user
+  this->gravityModeConnection = event::Events::ConnectWorldUpdateBegin(
+    boost::bind(&SimbodyLink::ProcessSetGravityMode, this));
+
   // lock or unlock the link if requested by user
   this->staticLinkConnection = event::Events::ConnectWorldUpdateEnd(
     boost::bind(&SimbodyLink::ProcessSetLinkStatic, this));
@@ -103,18 +118,37 @@ void SimbodyLink::Fini()
 //////////////////////////////////////////////////
 void SimbodyLink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetElement("gravity")->Set(_mode);
-  this->gravityMode = _mode;
-  if (this->physicsInitialized)
+  if (!this->gravityModeDirty)
   {
-    this->simbodyPhysics->gravity.setBodyIsExcluded(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      this->masterMobod, !_mode);
+    this->gravityModeDirty = true;
+    this->gravityMode = _mode;
   }
   else
+    gzerr << "Trying to SetGravityMode for link [" << this->GetScopedName()
+          << "] before last setting is processed.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyLink::ProcessSetGravityMode()
+{
+  if (this->gravityModeDirty)
   {
-    gzlog << "SetGravityMode [" << _mode
-          << "], but physics not initialized, caching\n";
+    if (this->physicsInitialized)
+    {
+      this->sdf->GetElement("gravity")->Set(this->gravityMode);
+      this->simbodyPhysics->gravity.setBodyIsExcluded(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        this->masterMobod, !this->gravityMode);
+      // realize system after changing gravity mode
+      this->simbodyPhysics->system.realize(
+        this->simbodyPhysics->integ->getState(), SimTK::Stage::Velocity);
+      this->gravityModeDirty = false;
+    }
+    else
+    {
+      gzlog << "SetGravityMode [" << this->gravityMode
+            << "], but physics not initialized, caching\n";
+    }
   }
 }
 
@@ -162,29 +196,27 @@ void SimbodyLink::OnPoseChange()
   if (!this->simbodyPhysics->simbodyPhysicsInitialized)
     return;
 
-  /// \TODO: limited functionality for now.
-  /// Setting 6 dof pose of a link works in simbody only if
-  /// the inboard joint is a free joint to the ground for now.
-
   if (this->masterMobod.isEmptyHandle())
     return;
 
+  /// Limited functionality for now:
+  /// Setting 6 dof pose of a link works in simbody only if
+  /// the inboard joint is a free joint to the ground for now.
+  /// If the inboard joint is not free, simbody tries to project
+  /// target pose into available DOF's.
+
+  /// Only change pose if parent is ground, otherwise do nothing
   if (!this->masterMobod.isGround() &&
       this->masterMobod.getParentMobilizedBody().isGround())
   {
     this->masterMobod.setQToFitTransform(
        this->simbodyPhysics->integ->updAdvancedState(),
        SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+
+    // realize system after updating Q's
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
   }
-  // else
-  //   gzdbg << "Joint [" << this->GetScopedName()
-  //         << "] P[" << this->GetWorldPose() << "]\n";
-
-
-  /*
-  math::Pose pose = this->GetWorldPose();
-
-  */
 }
 
 //////////////////////////////////////////////////
@@ -291,9 +323,14 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
   math::Vector3 v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     v = SimbodyPhysics::Vec3ToVector3(
       this->masterMobod.findStationVelocityInGround(
       this->simbodyPhysics->integ->getState(), station));
+  }
   else
     gzwarn << "SimbodyLink::GetWorldLinearVel: simbody physics"
            << " not yet initialized\n";
@@ -313,6 +350,11 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
     SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
     SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
     SimTK::Vec3 p_W(R_WF * p_F);
+
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
     const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
       this->simbodyPhysics->integ->getState());
     SimTK::Vec3 p_B(~R_WL * p_W);
@@ -334,6 +376,9 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
+    // lock physics update mutex to ensure thread safety
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
        this->simbodyPhysics->integ->getState());
     v = SimbodyPhysics::Vec3ToVector3(
@@ -355,6 +400,9 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
+  // lock physics update mutex to ensure thread safety
+  boost::recursive_mutex::scoped_lock lock(
+    *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
   SimTK::Vec3 w =
     this->masterMobod.getBodyAngularVelocity(
     this->simbodyPhysics->integ->getState());
@@ -374,18 +422,35 @@ void SimbodyLink::SetForce(const math::Vector3 &_force)
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldForce() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+
+  // get translational component
+  SimTK::Vec3 f = sv[1];
+
+  return SimbodyPhysics::Vec3ToVector3(f);
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetTorque(const math::Vector3 &/*_torque*/)
+void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 {
+  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod, SimTK::SpatialVec(t, SimTK::Vec3(0)));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldTorque() const
 {
-  return math::Vector3();
+  SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+
+  // get rotational component
+  SimTK::Vec3 t = sv[0];
+
+  return SimbodyPhysics::Vec3ToVector3(t);
 }
 
 //////////////////////////////////////////////////
@@ -482,7 +547,8 @@ SimTK::MassProperties SimbodyLink::GetEffectiveMassProps(
   int _numFragments) const
 {
     SimTK::MassProperties massProps = this->GetMassProperties();
-    assert(_numFragments > 0);  // must be at least 1 for the master
+    GZ_ASSERT(_numFragments > 0,
+              "_numFragments must be at least 1 for the master");
     return SimTK::MassProperties(massProps.getMass()/_numFragments,
                           massProps.getMassCenter(),
                           massProps.getUnitInertia());

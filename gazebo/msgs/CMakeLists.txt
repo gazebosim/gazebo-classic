@@ -4,6 +4,7 @@ set (msgs
   axis.proto
   boxgeom.proto
   camerasensor.proto
+  camera_cmd.proto
   collision.proto
   color.proto
   contact.proto

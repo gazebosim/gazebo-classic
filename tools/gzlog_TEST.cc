@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@
 
 // This header file isn't needed if shasums are used
 // #include "test/data/pr2_state_log_expected.h"
-// Note that we are currently using a non-portable command-line tool
-// to compute SHA1 sums. Issue #837 is tracking the conversion
-// of this functionality to using a Boost library.
 #include "test_config.h"
 #include "gazebo/gazebo_config.h"
 

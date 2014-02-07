@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,16 @@ void Node::Fini()
 {
   if (!this->initialized)
     return;
-  this->initialized = false;
 
   // Unadvertise all the publishers.
   for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
        iter != this->publishers.end(); ++iter)
   {
+    (*iter)->Fini();
     TopicManager::Instance()->Unadvertise(*iter);
   }
 
-  // Remove ourself
+  this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 
   {
@@ -93,7 +93,7 @@ void Node::Init(const std::string &_space)
     else
       this->topicNamespace = namespaces.front();
   }
-  else if (_space[0] != '/')
+  else
     TopicManager::Instance()->RegisterTopicNamespace(_space);
 
   TopicManager::Instance()->AddNode(shared_from_this());
@@ -151,10 +151,8 @@ void Node::ProcessPublishers()
 /////////////////////////////////////////////////
 bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
-  {
-    boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-    this->incomingMsgs[_topic].push_back(_msg);
-  }
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  this->incomingMsgs[_topic].push_back(_msg);
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
 }
@@ -162,10 +160,8 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 /////////////////////////////////////////////////
 bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 {
-  {
-    boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-    this->incomingMsgsLocal[_topic].push_back(_msg);
-  }
+  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  this->incomingMsgsLocal[_topic].push_back(_msg);
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
 }
@@ -272,7 +268,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -290,7 +289,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleMessage(_msg);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -337,20 +339,5 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
         break;
       }
     }
-  }
-}
-
-/////////////////////////////////////////////////
-void Node::ClearBuffers()
-{
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
-
-  this->incomingMsgs.clear();
-  this->incomingMsgsLocal.clear();
-
-  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
-       iter != this->publishers.end(); ++iter)
-  {
-    (*iter)->ClearBuffers();
   }
 }

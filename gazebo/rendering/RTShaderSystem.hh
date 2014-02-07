@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,8 @@ namespace gazebo
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;
 
-      private: Ogre::PSSMShadowCameraSetup *pssmSetup;
+      /// \brief Parallel Split Shadow Map (PSSM) camera setup
+      private: Ogre::ShadowCameraSetupPtr pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

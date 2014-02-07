@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <list>
+#include <map>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -91,16 +92,6 @@ namespace gazebo
       /// \return The number of outgoing messages
       public: unsigned int GetOutgoingCount() const;
 
-      /// \brief Clear all buffers.
-      public: void ClearBuffers();
-
-      /// \brief Implementation of the Publish function.
-      /// \param[in] _message Message to be published
-      /// \param[in] _block Whether to block until the message is actually
-      /// written out
-      private: void PublishImpl(const google::protobuf::Message &_message,
-                                bool _block);
-
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
@@ -124,6 +115,16 @@ namespace gazebo
       /// \brief Get the previously published message
       /// \return The previously published message, if any
       public: MessagePtr GetPrevMsgPtr() const;
+
+      /// \brief Finalize the publisher.
+      public: void Fini();
+
+      /// \brief Implementation of Publish.
+      /// \param[in] _message Message to be published.
+      /// \param[in] _block Whether to block until the message is actually
+      /// written out.
+      private: void PublishImpl(const google::protobuf::Message &_message,
+                                bool _block);
 
       /// \brief Callback when a publish is completed
       /// \param[in] _id ID associated with the publication.
@@ -157,24 +158,23 @@ namespace gazebo
       /// one for debug.
       private: PublicationPtr publication;
 
-      /// \brief The previous message published. Used for latching topics.
-      private: MessagePtr prevMsg;
-
       /// \brief Pointer to our containing node.
       private: NodePtr node;
 
-      /// \brief Current time.
       private: common::Time currentTime;
-
-      /// \brief Time of the last publication.
       private: common::Time prevPublishTime;
-
-      /// \brief True if waiting to here back about a sent message.
-      private: bool waiting;
 
       /// \brief Current id of the sent message.
       private: uint32_t pubId;
-      private: std::list<uint32_t> pubIds;
+
+      /// \brief Current publication ids.
+      private: std::map<uint32_t, int> pubIds;
+
+      /// \brief Unique ID for this publisher.
+      private: uint32_t id;
+
+      /// \brief Counter to create unique ID for publishers.
+      private: static uint32_t idCounter;
     };
     /// \}
   }

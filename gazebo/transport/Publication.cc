@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,19 +52,19 @@ void Publication::AddSubscription(const NodePtr &_node)
 
   if (iter == endIter)
   {
-    {
-      boost::mutex::scoped_lock lock(this->nodeMutex);
-      this->nodes.push_back(_node);
-    }
+    boost::mutex::scoped_lock lock(this->nodeMutex);
+    this->nodes.push_back(_node);
+  }
 
-    boost::mutex::scoped_lock lock(this->callbackMutex);
+  boost::mutex::scoped_lock lock(this->callbackMutex);
 
-    std::vector<PublisherPtr>::iterator pubIter;
-    for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
-         ++pubIter)
+  // Send latched messages to the subscription.
+  for (std::map<uint32_t, MessagePtr>::iterator pubIter =
+      this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
+  {
+    if (pubIter->second)
     {
-      if ((*pubIter)->GetPrevMsgPtr())
-        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsgPtr());
+      _node->InsertLatchedMsg(this->topic, pubIter->second);
     }
   }
 }
@@ -83,15 +83,25 @@ void Publication::AddSubscription(const CallbackHelperPtr _callback)
 
     if (_callback->GetLatching())
     {
-      std::vector<PublisherPtr>::iterator pubIter;
-      for (pubIter = this->publishers.begin();
-           pubIter != this->publishers.end(); ++pubIter)
+      // Send latched messages to the subscription.
+      for (std::map<uint32_t, MessagePtr>::iterator pubIter =
+          this->prevMsgs.begin(); pubIter != this->prevMsgs.end(); ++pubIter)
       {
-        if ((*pubIter)->GetPrevMsgPtr())
-          _callback->HandleMessage((*pubIter)->GetPrevMsgPtr());
+        if (pubIter->second)
+        {
+          _callback->HandleMessage(pubIter->second);
+        }
       }
+      _callback->SetLatching(false);
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  this->prevMsgs[_pubId] = _msg;
 }
 
 //////////////////////////////////////////////////
@@ -268,9 +278,10 @@ void Publication::LocalPublish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
+int Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
     uint32_t _id)
 {
+  int result = 0;
   std::list<NodePtr>::iterator iter, endIter;
 
   {
@@ -305,19 +316,26 @@ void Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
       while (cbIter != this->callbacks.end())
       {
         if ((*cbIter)->HandleData(data, _cb, _id))
+        {
+          ++result;
           ++cbIter;
+        }
         else
           this->callbacks.erase(cbIter++);
       }
 
       if (this->callbacks.empty() && !_cb.empty())
+      {
         _cb(_id);
+      }
     }
     else if (!_cb.empty())
     {
       _cb(_id);
     }
   }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -464,4 +482,13 @@ void Publication::RemoveNodes()
       this->transports.clear();
     }
   }
+}
+
+//////////////////////////////////////////////////
+MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
+{
+  if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
+    return this->prevMsgs[_pubId];
+  else
+    return MessagePtr();
 }

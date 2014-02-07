@@ -130,8 +130,10 @@ gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
   gazebo_common
+  gazebo_msgs
   gazebo_skyx
   gazebo_selection_buffer
+  gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
