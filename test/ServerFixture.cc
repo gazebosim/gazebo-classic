@@ -398,11 +398,10 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 {
   _diffMax = 0;
   _diffSum = 0;
-  _diffAvg = 0;
 
-  for (unsigned int y = 0; y < _height; y++)
+  for (unsigned int y = 0; y < _height; ++y)
   {
-    for (unsigned int x = 0; x < _width*_depth; x++)
+    for (unsigned int x = 0; x < _width*_depth; ++x)
     {
       unsigned int a = _imageA[(y*_width*_depth)+x];
       unsigned int b = _imageB[(y*_width*_depth)+x];
