@@ -238,8 +238,8 @@ TEST(gzlog, RawFilterStamp)
       std::string("gzlog echo -r -s wall --filter pr2.pose.x ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
-  validEcho = std::string("1360301758 939690376 0.000000 \n")
-            + std::string("1360301758 947304437 0.000000");
+  validEcho = std::string("1360301758.939690 0.000000 \n")
+            + std::string("1360301758.947304 0.000000");
   EXPECT_EQ(validEcho, echo);
 }
 
