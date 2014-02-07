@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- */
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>

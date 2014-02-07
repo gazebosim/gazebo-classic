@@ -45,6 +45,7 @@ int imageCount0Right = 0;
 int imageCount1Right = 0;
 int imageCount2Right = 0;
 
+/////////////////////////////////////////////////
 void OnNewFrameTest(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
@@ -55,7 +56,7 @@ void OnNewFrameTest(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
-
+/////////////////////////////////////////////////
 TEST_F(MultiCameraSensor, CameraRotationTest)
 {
   Load("worlds/camera_rotation_test.world");
@@ -312,6 +313,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
   delete[] img2Right;
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
