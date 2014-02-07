@@ -30,10 +30,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Inertial.hh"
-#include "gazebo/physics/Collision.hh"
-#include "gazebo/physics/Link.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
