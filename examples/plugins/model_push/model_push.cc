@@ -15,12 +15,11 @@
  *
 */
 #include <boost/bind.hpp>
-#include "gazebo/physics/physics.hh"
-#include "gazebo/gazebo.hh"
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/common/common.hh>
+#include <stdio.h>
 
-/// \example examples/plugins/model_push.cc
-/// This example creates a ModelPlugin, and applies a force to a box to move
-/// it alone the ground plane.
 namespace gazebo
 {
   class ModelPush : public ModelPlugin
@@ -33,11 +32,11 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ModelPush::OnUpdate, this));
+          boost::bind(&ModelPush::OnUpdate, this, _1));
     }
 
     // Called by the world update start event
-    public: void OnUpdate()
+    public: void OnUpdate(const common::UpdateInfo & /*_info*/)
     {
       // Apply a small linear velocity to the model.
       this->model->SetLinearVel(math::Vector3(.03, 0, 0));
