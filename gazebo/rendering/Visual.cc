@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/rendering/CameraVisual.hh"

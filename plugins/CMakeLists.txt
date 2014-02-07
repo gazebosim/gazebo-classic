@@ -16,7 +16,7 @@ endif()
 set (plugins
   BreakableJointPlugin
   CameraPlugin
-  CartTestPlugin
+  CartDemoPlugin
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
@@ -24,7 +24,6 @@ set (plugins
   GpuRayPlugin
   JointTrajectoryPlugin
   ModelPropShop
-  ModelTrajectoryTestPlugin
   MudPlugin
   PressurePlugin
   RayPlugin
@@ -32,8 +31,7 @@ set (plugins
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
-  SpringTestPlugin
-  SphereAtlasTestPlugin
+  SphereAtlasDemoPlugin
   VehiclePlugin)
 
 set(GAZEBO_PLUGIN_INSTALL_DIR

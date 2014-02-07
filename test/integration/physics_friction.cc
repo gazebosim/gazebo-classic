@@ -109,7 +109,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/test_friction.world", true, _physicsEngine);
+  Load("worlds/friction_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 

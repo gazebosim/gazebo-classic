@@ -15,11 +15,14 @@
  *
 */
 
-#include "test/ServerFixture.hh"
+#include "gazebo/physics/CylinderShape.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(CylinderShapeTest, Scale)
+class CylinderShapeTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(CylinderShapeTest, Scale)
 {
   std::ostringstream cylinderStr;
   cylinderStr << "<sdf version ='" << SDF_VERSION << "'>"
