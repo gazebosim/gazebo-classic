@@ -40,6 +40,14 @@ namespace gazebo
       /// \brief Destructor
       public: ~PartInspector();
 
+      /// \brief Set the name of the part.
+      /// \param[in] Name to set the part to.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Get the name of the part.
+      /// \return Name of the part.
+      public: std::string GetName() const;
+
       /// \brief Get general properties of the part.
       /// \return Tab widget with general properties.
       public: PartGeneralTab *GetGeneral() const;

@@ -72,6 +72,18 @@ PartInspector::~PartInspector()
 }
 
 /////////////////////////////////////////////////
+void PartInspector::SetName(const std::string &_name)
+{
+  this->partNameLabel->setText(tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+std::string PartInspector::GetName() const
+{
+  return this->partNameLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 PartGeneralTab *PartInspector::GetGeneral() const
 {
   return this->generalTab;

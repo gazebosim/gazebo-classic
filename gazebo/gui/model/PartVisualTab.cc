@@ -47,7 +47,6 @@ PartVisualTab::PartVisualTab()
 
   this->counter = 0;
   this->signalMapper = new QSignalMapper(this);
-  this->OnAddVisual();
 
   connect(this->signalMapper, SIGNAL(mapped(int)),
      this, SLOT(OnRemoveVisual(int)));
@@ -56,6 +55,26 @@ PartVisualTab::PartVisualTab()
 /////////////////////////////////////////////////
 PartVisualTab::~PartVisualTab()
 {
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::AddVisual()
+{
+  this->OnAddVisual();
+}
+
+/////////////////////////////////////////////////
+unsigned int PartVisualTab::GetVisualCount() const
+{
+  return this->dataWidgets.size();
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::Reset()
+{
+  this->visualItems.clear();
+  this->dataWidgets.clear();
+  this->visualsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
@@ -97,7 +116,7 @@ void PartVisualTab::OnAddVisual()
   QVBoxLayout *visualLayout = new QVBoxLayout;
 
   QLabel *nameLabel = new QLabel(tr("Name:"));
-  QLabel *visualNameLabel = new QLabel(tr(""));
+  dataWidget->visualNameLabel = new QLabel(tr(""));
 
   QLabel *geometryLabel = new QLabel(tr("Geometry:"));
   dataWidget->geometryComboBox = new QComboBox;
@@ -118,7 +137,7 @@ void PartVisualTab::OnAddVisual()
 
   QGridLayout *visualGeneralLayout = new QGridLayout;
   visualGeneralLayout->addWidget(nameLabel, 0, 0);
-  visualGeneralLayout->addWidget(visualNameLabel, 0, 1);
+  visualGeneralLayout->addWidget(dataWidget->visualNameLabel, 0, 1);
   visualGeneralLayout->addWidget(geometryLabel, 1, 0);
   visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
   visualGeneralLayout->addWidget(transparencyLabel, 2, 0);
@@ -201,6 +220,8 @@ void PartVisualTab::OnAddVisual()
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
   visualItem->setExpanded(true);
   visualChildItem->setExpanded(true);
+
+  emit VisualAdded();
 }
 
 /////////////////////////////////////////////////
@@ -230,7 +251,10 @@ void PartVisualTab::OnRemoveVisual(int _id)
   {
     if (this->dataWidgets[i]->id == _id)
     {
+      emit VisualRemoved(
+          this->dataWidgets[i]->visualNameLabel->text().toStdString());
       this->dataWidgets.erase(this->dataWidgets.begin() + i);
+      break;
     }
   }
 }
@@ -345,4 +369,27 @@ std::string PartVisualTab::GetGeometry(unsigned int _index) const
   int dataIndex = this->dataWidgets[_index]->geometryComboBox->currentIndex();
   return this->dataWidgets[_index]->geometryComboBox->itemText(
       dataIndex).toStdString();
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetName(unsigned int _index, const std::string &_name)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+  }
+
+  this->dataWidgets[_index]->visualNameLabel->setText(tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+std::string PartVisualTab::GetName(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return "";
+  }
+
+  return this->dataWidgets[_index]->visualNameLabel->text().toStdString();
 }

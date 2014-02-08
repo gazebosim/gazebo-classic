@@ -287,18 +287,27 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData;
+
+  part->partVisual = _visual->GetParent();
   part->visuals.push_back(_visual);
 
-  part->name = _visual->GetName();
-  part->pose = _visual->GetParent()->GetWorldPose();
+  part->name = part->partVisual->GetName();
+  part->pose = part->partVisual->GetWorldPose();
   part->gravity = true;
   part->selfCollide = false;
   part->kinematic = false;
 
   part->inspector = new PartInspector;
+  part->inspector->SetName(part->name);
   part->inspector->setModal(false);
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
+
+  connect(part->inspector->GetVisual(), SIGNAL(VisualAdded()), part,
+      SLOT(OnAddVisual()));
+  connect(part->inspector->GetVisual(),
+      SIGNAL(VisualRemoved(const std::string &)), part,
+      SLOT(OnRemoveVisual(const std::string &)));
 
   part->inertial.reset(new physics::Inertial);
   CollisionData *collisionData = new CollisionData;
@@ -324,15 +333,13 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
+  rendering::ScenePtr scene = part->partVisual->GetScene();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
     rendering::VisualPtr vis = part->visuals[i];
-    rendering::VisualPtr visParent = vis->GetParent();
-    rendering::ScenePtr scene = vis->GetScene();
     scene->RemoveVisual(vis);
-    if (visParent)
-      scene->RemoveVisual(visParent);
   }
+  scene->RemoveVisual(part->partVisual);
   part->visuals.clear();
 
   for (unsigned int i = 0; i < part->collisions.size(); ++i)
@@ -525,7 +532,7 @@ void ModelCreator::Stop()
   if (this->addPartType != PART_NONE && this->mouseVisual)
   {
     for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemovePart(this->mouseVisual->GetChild(0)->GetName());
+        this->RemovePart(this->mouseVisual->GetName());
     this->mouseVisual.reset();
   }
   if (this->jointMaker)
@@ -574,11 +581,10 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
   if (this->mouseVisual)
   {
     // set the part data pose
-    rendering::VisualPtr visVisual = this->mouseVisual->GetChild(0);
-    if (visVisual && this->allParts.find(visVisual->GetName()) !=
+    if (this->allParts.find(this->mouseVisual->GetName()) !=
         this->allParts.end())
     {
-      PartData *part = this->allParts[visVisual->GetName()];
+      PartData *part = this->allParts[this->mouseVisual->GetName()];
       part->pose = this->mouseVisual->GetWorldPose();
     }
 
@@ -594,7 +600,7 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) !=
+    if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
       if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
@@ -603,9 +609,13 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
         if (this->selectedVis)
           this->selectedVis->SetHighlighted(false);
         else
+        {
+          // turn off model selection so we don't end up with
+          // both part and model selected at the same time
           event::Events::setSelectedEntity("", "normal");
+        }
 
-        this->selectedVis = vis;
+        this->selectedVis = vis->GetParent();
         this->selectedVis->SetHighlighted(true);
         return true;
       }
@@ -646,37 +656,46 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
 {
+  // open the part inspector on double click
  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
-  if (vis)
+  if (!vis)
+    return false;
+
+  if (this->allParts.find(vis->GetParent()->GetName()) !=
+      this->allParts.end())
   {
-    if (this->allParts.find(vis->GetName()) !=
-        this->allParts.end())
+    if (this->selectedVis)
+      this->selectedVis->SetHighlighted(false);
+
+    PartData *part = this->allParts[vis->GetParent()->GetName()];
+    PartGeneralTab *generalTab = part->inspector->GetGeneral();
+    generalTab->SetGravity(part->gravity);
+    generalTab->SetSelfCollide(part->selfCollide);
+    generalTab->SetKinematic(part->kinematic);
+    generalTab->SetPose(part->pose);
+    generalTab->SetMass(part->inertial->GetMass());
+    generalTab->SetInertialPose(part->inertial->GetPose());
+    generalTab->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
+        part->inertial->GetIZZ(), part->inertial->GetIXY(),
+        part->inertial->GetIXZ(), part->inertial->GetIYZ());
+
+    PartVisualTab *visualTab = part->inspector->GetVisual();
+
+    for (unsigned int i = 0; i < part->visuals.size(); ++i)
     {
-      PartData *part = this->allParts[vis->GetName()];
-      PartGeneralTab *general = part->inspector->GetGeneral();
-      general->SetGravity(part->gravity);
-      general->SetSelfCollide(part->selfCollide);
-      general->SetKinematic(part->kinematic);
-      general->SetPose(part->pose);
-      general->SetMass(part->inertial->GetMass());
-      general->SetInertialPose(part->inertial->GetPose());
-      general->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
-          part->inertial->GetIZZ(), part->inertial->GetIXY(),
-          part->inertial->GetIXZ(), part->inertial->GetIYZ());
-
-      PartVisualTab *visual = part->inspector->GetVisual();
-      for (unsigned int i = 0; i < part->visuals.size(); ++i)
-      {
-        visual->SetPose(i, part->visuals[i]->GetPose());
-        visual->SetTransparency(i, part->visuals[i]->GetTransparency());
-        visual->SetMaterial(i, part->visuals[i]->GetMaterialName());
-        visual->SetGeometry(i, part->visuals[i]->GetMeshName());
-      }
-
-      part->inspector->show();
-      return true;
+      if (i >= visualTab->GetVisualCount())
+        visualTab->AddVisual();
+      visualTab->SetName(i, part->visuals[i]->GetName());
+      visualTab->SetPose(i, part->visuals[i]->GetPose());
+      visualTab->SetTransparency(i, part->visuals[i]->GetTransparency());
+      visualTab->SetMaterial(i, part->visuals[i]->GetMaterialName());
+      visualTab->SetGeometry(i, part->visuals[i]->GetMeshName());
     }
+
+    part->inspector->show();
+    return true;
   }
+
   return false;
 }
 
@@ -815,45 +834,4 @@ void ModelCreator::GenerateSDF()
   // Model settings
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
-}
-
-/////////////////////////////////////////////////
-void PartData::OnApply()
-{
-  PartGeneralTab *general = this->inspector->GetGeneral();
-  this->gravity = general->GetGravity();
-  this->selfCollide = general->GetSelfCollide();
-  this->kinematic = general->GetKinematic();
-
-  // set inertial properties
-  this->inertial->SetMass(general->GetMass());
-  this->inertial->SetCoG(general->GetInertialPose());
-  this->inertial->SetInertiaMatrix(
-      general->GetInertiaIXX(), general->GetInertiaIYY(),
-      general->GetInertiaIZZ(), general->GetInertiaIXY(),
-      general->GetInertiaIXZ(), general->GetInertiaIYZ());
-  this->pose = general->GetPose();
-
-  // set visual properties
-  if (!this->visuals.empty())
-  {
-    this->visuals[0]->GetParent()->SetWorldPose(this->pose);
-
-    PartVisualTab *visual = this->inspector->GetVisual();
-    for (unsigned int i = 0; i < this->visuals.size(); ++i)
-    {
-      if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
-      {
-        this->visuals[i]->DetachObjects();
-        this->visuals[i]->AttachMesh(visual->GetGeometry(i));
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
-      }
-      this->visuals[i]->SetPose(visual->GetPose(i));
-      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
-      if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
-      {
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
-      }
-    }
-  }
 }

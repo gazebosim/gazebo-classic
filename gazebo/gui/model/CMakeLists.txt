@@ -7,6 +7,7 @@ set (sources
   JointInspector.cc
   JointMaker.cc
   ModelCreator.cc
+  ModelData.cc
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc

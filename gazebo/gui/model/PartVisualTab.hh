@@ -40,6 +40,9 @@ namespace gazebo
       /// \brief Unique id for this widget.
       public: int id;
 
+      /// \brief Label for displaying the visual's name.
+      public: QLabel *visualNameLabel;
+
       /// \brief Combo box for for specifying the geometry of the visual.
       public: QComboBox *geometryComboBox;
 
@@ -80,13 +83,33 @@ namespace gazebo
       /// \brief Destructor
       public: ~PartVisualTab();
 
+      /// \brief Add a visual widget to the tab.
+      public: void AddVisual();
+
+      /// \brief Reset the visual tab.
+      public: void Reset();
+
+      /// \brief Get the number of visuals.
+      /// \return Number of visuals.
+      public: unsigned int GetVisualCount() const;
+
+      /// \brief Set the name of the visual.
+      /// \param[in] _index Index of visual.
+      /// \param[in] _name Name of visual.
+      public: void SetName(unsigned int _index, const std::string &_name);
+
+      /// \brief Get the name of the visual.
+      /// \param[in] _index Index of visual.
+      /// \return Name of visual.
+      public: std::string GetName(unsigned int _index) const;
+
       /// \brief Set the pose of the visual.
-      /// \param[in] _index Index of visual
+      /// \param[in] _index Index of visual.
       /// \param[in] _pose Pose to set the visual to.
       public: void SetPose(unsigned int _index, const math::Pose &_pose);
 
       /// \brief Get the pose of the visual.
-      /// \param[in] _index Index of visual
+      /// \param[in] _index Index of visual.
       /// \return Pose of the visual.
       public: math::Pose GetPose(unsigned int _index) const;
 
@@ -134,6 +157,13 @@ namespace gazebo
 
       /// \brief A map of visual items to their id.
       private: std::map<int, QTreeWidgetItem *> visualItems;
+
+      /// \brief Qt signal emitted when a visual is removed.
+      /// \param[in] _name Name of visual removed.
+      Q_SIGNALS: void VisualRemoved(const std::string &_name);
+
+      /// \brief Qt signal emitted when a visual is added.
+      Q_SIGNALS: void VisualAdded();
 
       /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();

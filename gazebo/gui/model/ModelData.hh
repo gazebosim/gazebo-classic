@@ -90,6 +90,9 @@ namespace gazebo
       /// \brief Inertial properties.
       public: physics::InertialPtr inertial;
 
+      /// \brief Visual representing this part.
+      public: rendering::VisualPtr partVisual;
+
       /// \brief Visuals of the part.
       public: std::vector<rendering::VisualPtr> visuals;
 
@@ -106,6 +109,13 @@ namespace gazebo
       /// \brief Qt Callback when part inspector configurations are to be
       /// applied.
       private slots: void OnApply();
+
+      /// \brief Qt callback when a new visual is to be added.
+      private slots: void OnAddVisual();
+
+      /// \brief Qt callback when a visual is to be removed.
+      /// \param[in] _name Name of visual.
+      private slots: void OnRemoveVisual(const std::string &_name);
     };
   }
 }
