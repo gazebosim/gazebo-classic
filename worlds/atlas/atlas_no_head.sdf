@@ -1,0 +1,1472 @@
+<sdf version='1.4'>
+  <model name='drc_skeleton'>
+    <link name='pelvis'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.0111 0 0.0271 0 -0 0</pose>
+        <mass>14.2529</mass>
+        <inertia>
+          <ixx>0.1244</ixx>
+          <ixy>0.0008</ixy>
+          <ixz>-0.0007</ixz>
+          <iyy>0.0958</iyy>
+          <iyz>-0.0005</iyz>
+          <izz>0.1167</izz>
+        </inertia>
+      </inertial>
+      <collision name='pelvis_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>pelvis.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='pelvis_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>pelvis.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <link name='ltorso'>
+      <pose>-0.0125 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0.0112984 -3.15366e-06 0.0746835 0 -0 0</pose>
+        <mass>1.92</mass>
+        <inertia>
+          <ixx>0.0039092</ixx>
+          <ixy>-5.04491e-08</ixy>
+          <ixz>-0.000342157</ixz>
+          <iyy>0.00341694</iyy>
+          <iyz>4.87119e-07</iyz>
+          <izz>0.00174492</izz>
+        </inertia>
+      </inertial>
+      <collision name='ltorso_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>ltorso.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='ltorso_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>ltorso.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='back_lbz' type='revolute'>
+      <child>ltorso</child>
+      <parent>pelvis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.610865</lower>
+          <upper>0.610865</upper>
+          <effort>124.016</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='mtorso'>
+      <pose>-0.0125 0 0.09 0 -0 0</pose>
+      <inertial>
+        <pose>-0.00816266 -0.0131245 0.0305974 0 -0 0</pose>
+        <mass>0.55</mass>
+        <inertia>
+          <ixx>0.000454181</ixx>
+          <ixy>-6.10764e-05</ixy>
+          <ixz>3.94009e-05</ixz>
+          <iyy>0.000483282</iyy>
+          <iyz>5.27463e-05</iyz>
+          <izz>0.000444215</izz>
+        </inertia>
+      </inertial>
+      <collision name='mtorso_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>mtorso.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='mtorso_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>mtorso.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='back_mby' type='revolute'>
+      <child>mtorso</child>
+      <parent>ltorso</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.2</lower>
+          <upper>1.28</upper>
+          <effort>206.843</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='utorso'>
+      <pose>-0.0125 0 0.14 0 -0 0</pose>
+      <inertial>
+        <pose>0.02 -0.001 0.211 0 -0 0</pose>
+        <mass>18.484</mass>
+        <inertia>
+          <ixx>0.395</ixx>
+          <ixy>0</ixy>
+          <ixz>0.083</ixz>
+          <iyy>1.089</iyy>
+          <iyz>-0.003</iyz>
+          <izz>0.327</izz>
+        </inertia>
+      </inertial>
+      <collision name='utorso_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>utorso.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='utorso_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>utorso.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='back_ubx' type='revolute'>
+      <child>utorso</child>
+      <parent>mtorso</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.790809</lower>
+          <upper>0.790809</upper>
+          <effort>94.91</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_clav'>
+      <pose>0.0115 0.221 0.429 0 -0 0</pose>
+      <inertial>
+        <pose>0.014 0.058 0.029 1.0472 -0 0</pose>
+        <mass>2.369</mass>
+        <inertia>
+          <ixx>0.004</ixx>
+          <ixy>0.001</ixy>
+          <ixz>0</ixz>
+          <iyy>0.006</iyy>
+          <iyz>0</iyz>
+          <izz>0.007</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_clav_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_clav.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_clav_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_clav.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_usy' type='revolute'>
+      <child>l_clav</child>
+      <parent>utorso</parent>
+      <axis>
+        <xyz>0 0.5 0.866025</xyz>
+        <limit>
+          <lower>-1.9635</lower>
+          <upper>1.9635</upper>
+          <effort>212</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_scap'>
+      <pose>0.0115 0.296 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>-0.002 0.108 0 0 -0 0</pose>
+        <mass>2.707</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.005</iyy>
+          <iyz>0</iyz>
+          <izz>0.013</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_scap_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_scap.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_scap_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_scap.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_shx' type='revolute'>
+      <child>l_scap</child>
+      <parent>l_clav</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1.39626</lower>
+          <upper>1.74533</upper>
+          <effort>170</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_uarm'>
+      <pose>0.0115 0.481 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0.007 0.114 0.008 0 -0 0</pose>
+        <mass>1.881</mass>
+        <inertia>
+          <ixx>0.002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.003</iyy>
+          <iyz>0</iyz>
+          <izz>0.003</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_uarm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uarm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_uarm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uarm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_ely' type='revolute'>
+      <child>l_uarm</child>
+      <parent>l_scap</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>3.14159</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_larm'>
+      <pose>0.0115 0.602 0.478 0 -0 0</pose>
+      <inertial>
+        <pose>-0.003 0.099 -0.014 0 -0 0</pose>
+        <mass>2.148</mass>
+        <inertia>
+          <ixx>0.005</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.003</iyy>
+          <iyz>0</iyz>
+          <izz>0.006</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_larm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_larm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_larm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_larm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_elx' type='revolute'>
+      <child>l_larm</child>
+      <parent>l_uarm</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>2.35619</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_farm'>
+      <pose>0.0115 0.79 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0 0.041 0 0 -0 0</pose>
+        <mass>0.981</mass>
+        <inertia>
+          <ixx>0.003</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.003</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_farm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_farm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_farm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_farm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_uwy' type='revolute'>
+      <child>l_farm</child>
+      <parent>l_larm</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.571</lower>
+          <upper>1.571</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_hand'>
+      <pose>0.0115 0.848 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0 0.093 0 0 -0 0</pose>
+        <mass>2.263</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.002</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_hand_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_hand.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_hand_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_hand.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_arm_mwx' type='revolute'>
+      <child>l_hand</child>
+      <parent>l_farm</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.436</lower>
+          <upper>1.571</upper>
+          <effort>60</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_clav'>
+      <pose>0.0115 -0.221 0.429 0 -0 0</pose>
+      <inertial>
+        <pose>0.014 -0.058 0.029 -1.0472 0 0</pose>
+        <mass>2.369</mass>
+        <inertia>
+          <ixx>0.004</ixx>
+          <ixy>-0.001</ixy>
+          <ixz>0</ixz>
+          <iyy>0.006</iyy>
+          <iyz>0</iyz>
+          <izz>0.007</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_clav_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_clav.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_clav_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_clav.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_usy' type='revolute'>
+      <child>r_clav</child>
+      <parent>utorso</parent>
+      <axis>
+        <xyz>0 0.5 -0.866025</xyz>
+        <limit>
+          <lower>-1.9635</lower>
+          <upper>1.9635</upper>
+          <effort>212</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_scap'>
+      <pose>0.0115 -0.296 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>-0.002 -0.108 0 0 -0 0</pose>
+        <mass>2.707</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.005</iyy>
+          <iyz>0</iyz>
+          <izz>0.013</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_scap_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_scap.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_scap_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_scap.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_shx' type='revolute'>
+      <child>r_scap</child>
+      <parent>r_clav</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1.74533</lower>
+          <upper>1.39626</upper>
+          <effort>170</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_uarm'>
+      <pose>0.0115 -0.481 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0.007 -0.114 0.008 0 -0 0</pose>
+        <mass>1.881</mass>
+        <inertia>
+          <ixx>0.002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.003</iyy>
+          <iyz>0</iyz>
+          <izz>0.003</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_uarm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uarm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_uarm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uarm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_ely' type='revolute'>
+      <child>r_uarm</child>
+      <parent>r_scap</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>3.14159</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_larm'>
+      <pose>0.0115 -0.602 0.478 0 -0 0</pose>
+      <inertial>
+        <pose>-0.003 -0.099 -0.014 0 -0 0</pose>
+        <mass>2.148</mass>
+        <inertia>
+          <ixx>0.005</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.003</iyy>
+          <iyz>0</iyz>
+          <izz>0.006</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_larm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_larm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_larm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_larm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_elx' type='revolute'>
+      <child>r_larm</child>
+      <parent>r_uarm</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-2.35619</lower>
+          <upper>0</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_farm'>
+      <pose>0.0115 -0.79 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0 -0.041 0 0 -0 0</pose>
+        <mass>0.981</mass>
+        <inertia>
+          <ixx>0.003</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.003</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_farm_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_farm.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_farm_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_farm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_uwy' type='revolute'>
+      <child>r_farm</child>
+      <parent>r_larm</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.571</lower>
+          <upper>1.571</upper>
+          <effort>114</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_hand'>
+      <pose>0.0115 -0.848 0.465 0 -0 0</pose>
+      <inertial>
+        <pose>0 -0.093 0 0 -0 0</pose>
+        <mass>2.263</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>-0</ixz>
+          <iyy>0.002</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_hand_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_hand.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_hand_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_hand.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_arm_mwx' type='revolute'>
+      <child>r_hand</child>
+      <parent>r_farm</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1.571</lower>
+          <upper>0.436</upper>
+          <effort>60</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_uglut'>
+      <pose>0 0.089 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.00529262 -0.00344732 0.00313046 0 -0 0</pose>
+        <mass>0.5166</mass>
+        <inertia>
+          <ixx>0.00074276</ixx>
+          <ixy>-3.79607e-08</ixy>
+          <ixz>-2.79549e-05</ixz>
+          <iyy>0.000688179</iyy>
+          <iyz>-3.2735e-08</iyz>
+          <izz>0.00041242</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_uglut_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uglut.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_uglut_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uglut.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_uhz' type='revolute'>
+      <child>l_uglut</child>
+      <parent>pelvis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.32</lower>
+          <upper>1.14</upper>
+          <effort>110</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_lglut'>
+      <pose>0 0.089 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.0133341 0.0170484 -0.0312052 0 -0 0</pose>
+        <mass>0.69</mass>
+        <inertia>
+          <ixx>0.000691326</ixx>
+          <ixy>-2.24344e-05</ixy>
+          <ixz>2.50508e-06</ixz>
+          <iyy>0.00126856</iyy>
+          <iyz>0.000137862</iyz>
+          <izz>0.00106487</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_lglut_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_lglut.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_lglut_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_lglut.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_mhx' type='revolute'>
+      <child>l_lglut</child>
+      <parent>l_uglut</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.47</lower>
+          <upper>0.495</upper>
+          <effort>180</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_uleg'>
+      <pose>0.05 0.089 -0.05 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.21 0 -0 0</pose>
+        <mass>7.34</mass>
+        <inertia>
+          <ixx>0.09</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.09</iyy>
+          <iyz>0</iyz>
+          <izz>0.02</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_uleg_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uleg.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_uleg_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_uleg.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_lhy' type='revolute'>
+      <child>l_uleg</child>
+      <parent>l_lglut</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.75</lower>
+          <upper>0.524</upper>
+          <effort>260</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_lleg'>
+      <pose>0 0.089 -0.424 0 -0 0</pose>
+      <inertial>
+        <pose>0.001 0 -0.187 0 -0 0</pose>
+        <mass>4.367</mass>
+        <inertia>
+          <ixx>0.077</ixx>
+          <ixy>0</ixy>
+          <ixz>-0.003</ixz>
+          <iyy>0.076</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_lleg_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_lleg.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_lleg_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_lleg.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_kny' type='revolute'>
+      <child>l_lleg</child>
+      <parent>l_uleg</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>2.45</upper>
+          <effort>220</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_talus'>
+      <pose>0 0.089 -0.846 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>1.01674e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>8.42775e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.30101e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_talus_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_talus.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_talus_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_talus.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_uay' type='revolute'>
+      <child>l_talus</child>
+      <parent>l_lleg</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.698</lower>
+          <upper>0.698</upper>
+          <effort>220</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='l_foot'>
+      <pose>0 0.089 -0.846 0 -0 0</pose>
+      <inertial>
+        <pose>0.027 0 -0.067 0 -0 0</pose>
+        <mass>1.634</mass>
+        <inertia>
+          <ixx>0.002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.007</iyy>
+          <iyz>0</iyz>
+          <izz>0.008</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_foot_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_foot.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='l_foot_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>l_foot.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_leg_lax' type='revolute'>
+      <child>l_foot</child>
+      <parent>l_talus</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.436</lower>
+          <upper>0.436</upper>
+          <effort>90</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_uglut'>
+      <pose>0 -0.089 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.00529262 0.00344732 0.00313046 0 -0 0</pose>
+        <mass>0.5166</mass>
+        <inertia>
+          <ixx>0.00074276</ixx>
+          <ixy>3.79607e-08</ixy>
+          <ixz>-2.79549e-05</ixz>
+          <iyy>0.000688179</iyy>
+          <iyz>3.2735e-08</iyz>
+          <izz>0.00041242</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_uglut_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uglut.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_uglut_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uglut.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_uhz' type='revolute'>
+      <child>r_uglut</child>
+      <parent>pelvis</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.14</lower>
+          <upper>0.32</upper>
+          <effort>110</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_lglut'>
+      <pose>0 -0.089 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.0133341 -0.0170484 -0.0312052 0 -0 0</pose>
+        <mass>0.69</mass>
+        <inertia>
+          <ixx>0.000691326</ixx>
+          <ixy>2.24344e-05</ixy>
+          <ixz>2.50508e-06</ixz>
+          <iyy>0.00126856</iyy>
+          <iyz>-0.000137862</iyz>
+          <izz>0.00106487</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_lglut_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_lglut.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_lglut_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_lglut.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_mhx' type='revolute'>
+      <child>r_lglut</child>
+      <parent>r_uglut</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.495</lower>
+          <upper>0.47</upper>
+          <effort>180</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_uleg'>
+      <pose>0.05 -0.089 -0.05 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.21 0 -0 0</pose>
+        <mass>7.34</mass>
+        <inertia>
+          <ixx>0.09</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.09</iyy>
+          <iyz>0</iyz>
+          <izz>0.02</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_uleg_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uleg.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_uleg_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_uleg.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_lhy' type='revolute'>
+      <child>r_uleg</child>
+      <parent>r_lglut</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.745</lower>
+          <upper>0.524</upper>
+          <effort>260</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_lleg'>
+      <pose>0 -0.089 -0.424 0 -0 0</pose>
+      <inertial>
+        <pose>0.001 0 -0.187 0 -0 0</pose>
+        <mass>4.367</mass>
+        <inertia>
+          <ixx>0.077</ixx>
+          <ixy>-0</ixy>
+          <ixz>0.003</ixz>
+          <iyy>0.076</iyy>
+          <iyz>-0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_lleg_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_lleg.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_lleg_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_lleg.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_kny' type='revolute'>
+      <child>r_lleg</child>
+      <parent>r_uleg</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>2.45</upper>
+          <effort>220</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_talus'>
+      <pose>0 -0.089 -0.846 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>1.01674e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>8.42775e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.30101e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_talus_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_talus.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_talus_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_talus.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_uay' type='revolute'>
+      <child>r_talus</child>
+      <parent>r_lleg</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.698</lower>
+          <upper>0.698</upper>
+          <effort>220</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='r_foot'>
+      <pose>0 -0.089 -0.846 0 -0 0</pose>
+      <inertial>
+        <pose>0.027 0 -0.067 0 -0 0</pose>
+        <mass>1.634</mass>
+        <inertia>
+          <ixx>0.002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.007</iyy>
+          <iyz>0</iyz>
+          <izz>0.008</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_foot_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_foot.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='r_foot_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>r_foot.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_leg_lax' type='revolute'>
+      <child>r_foot</child>
+      <parent>r_talus</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.436</lower>
+          <upper>0.436</upper>
+          <effort>90</effort>
+          <velocity>12</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+  </model>
+</sdf>
