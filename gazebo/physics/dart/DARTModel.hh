@@ -54,9 +54,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      // Documentation inherited.
-      // public: void Reset();
-
       /// \brief
       public: void BackupState();
 
