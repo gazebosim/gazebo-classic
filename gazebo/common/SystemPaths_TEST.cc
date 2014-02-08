@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,13 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include "gazebo/common/SystemPaths.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(SystemPathsTest, SystemPaths)
+class SystemPathsTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(SystemPathsTest, SystemPaths)
 {
   std::vector<std::string> tmpstrings;
   std::string gazeboResourcePathBackup = "GAZEBO_RESOURCE_PATH=";

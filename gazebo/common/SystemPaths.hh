@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo configuration on this computer
- * Date: 3 May 2008
- */
-
 #ifndef _GAZEBO_SYSTEMPATHS_HH_
 #define _GAZEBO_SYSTEMPATHS_HH_
 

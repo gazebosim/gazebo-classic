@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,10 @@ ServerFixture::ServerFixture()
   path += "/../../build/plugins";
   gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
+  path = TEST_INTEGRATION_PATH;
+  path += "/../../build/test/plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 }
@@ -90,6 +94,7 @@ void ServerFixture::TearDown()
 /////////////////////////////////////////////////
 void ServerFixture::Unload()
 {
+  gzdbg << "ServerFixture::Unload" << std::endl;
   this->serverRunning = false;
   if (this->node)
     this->node->Fini();
@@ -139,9 +144,9 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/100.0
+         << static_cast<double>(waitCount)/10.0
          << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/100.0
+         << static_cast<double>(maxWaitCount)/10.0
          << " seconds\n";
 
   if (waitCount >= maxWaitCount)
@@ -217,7 +222,6 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                                            _physics));
   else
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-  ASSERT_NO_THROW(this->server->Init());
 
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
@@ -229,8 +233,6 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
   this->SetPause(_paused);
 
   this->server->Run();
-
-  rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   ASSERT_NO_THROW(this->server->Fini());
 
@@ -393,11 +395,10 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 {
   _diffMax = 0;
   _diffSum = 0;
-  _diffAvg = 0;
 
-  for (unsigned int y = 0; y < _height; y++)
+  for (unsigned int y = 0; y < _height; ++y)
   {
-    for (unsigned int x = 0; x < _width*_depth; x++)
+    for (unsigned int x = 0; x < _width*_depth; ++x)
     {
       unsigned int a = _imageA[(y*_width*_depth)+x];
       unsigned int b = _imageB[(y*_width*_depth)+x];

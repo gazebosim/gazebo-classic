@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /*
- * Desc: Contact Plugin
+ * Desc: Ray Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
@@ -29,7 +29,7 @@
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
+  /// \brief A Ray Sensor Plugin
   class RayPlugin : public SensorPlugin
   {
     /// \brief Constructor

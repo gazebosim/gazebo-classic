@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,10 +269,16 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == common::MouseEvent::LEFT)
   {
-    this->CreateTheEntity();
-    this->Stop();
+    // Place if not dragging, or if dragged for less than 50 pixels.
+    // The 50 pixels is used to account for accidental mouse movement
+    // when placing an object.
+    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    {
+      this->CreateTheEntity();
+      this->Stop();
+    }
   }
 }
 

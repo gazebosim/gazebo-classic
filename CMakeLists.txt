@@ -294,7 +294,7 @@ else (build_errors)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
-    add_subdirectory(sdf)
+    add_subdirectory(worlds)
   endif (BUILD_GAZEBO)
 
   ########################################

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,16 @@ namespace gazebo
 
       /// Documentation inherited
       public: virtual bool IsActive() const;
+
       /// Documentation inherited
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 

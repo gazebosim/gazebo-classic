@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,7 +358,8 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+        << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
 //////////////////////////////////////////////////
@@ -405,8 +406,8 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
     this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
-    /// \TODO: address multi-axis joints
-    this->damper.setDamping(
+    // set damper coefficient
+    this->damper[_index].setDamping(
       this->simbodyPhysics->integ->updAdvancedState(),
       _damping);
 
