@@ -721,6 +721,21 @@ double Joint::GetStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetSpringReferencePosition(unsigned int _index)
+{
+  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  {
+    return this->springReferencePosition[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get spring reference position.\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
 math::Angle Joint::GetLowerLimit(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())

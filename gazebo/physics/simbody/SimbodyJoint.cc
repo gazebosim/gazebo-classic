@@ -411,9 +411,13 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
       this->simbodyPhysics->integ->updAdvancedState(),
       _damping);
 
-    /// \TODO: add spring force element
-    gzdbg << "Joint [" << this->GetName()
-           << "] stiffness not implement in Simbody\n";
+    // set spring stiffness and reference position
+    this->spring[_index].setStiffness(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      _stiffness);
+    this->spring[_index].setQZero(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      _reference);
   }
   else
     gzerr << "SetStiffnessDamping _index too large.\n";

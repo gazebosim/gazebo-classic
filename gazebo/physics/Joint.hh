@@ -200,6 +200,11 @@ namespace gazebo
       /// \return Joint spring stiffness coefficient for this joint.
       public: double GetStiffness(unsigned int _index);
 
+      /// \brief Get joint spring reference position.
+      /// \param[in] _index Index of the axis to get.
+      /// \return Joint spring stiffness coefficient for this joint.
+      public: double GetSpringReferencePosition(unsigned int _index);
+
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
       /// \return Connection pointer, which must be kept in scope.

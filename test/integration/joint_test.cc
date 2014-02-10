@@ -157,12 +157,6 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     gzerr << "Aborting test for dart, see issue #975.\n";
     return;
   }
-  /// SpringDamper unimplemented for simbody
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for simbody, see issue #886.\n";
-    return;
-  }
   /// bullet collision parameters needs tweaking
   if (_physicsEngine == "bullet")
   {
