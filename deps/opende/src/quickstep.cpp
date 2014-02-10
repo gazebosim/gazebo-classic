@@ -600,6 +600,7 @@ static void ComputeRows(
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
 
+printf("\n\ndebug:%f, %d\n\n", smooth_contacts, friction_iterations);
 
   // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
   //       velocity update
