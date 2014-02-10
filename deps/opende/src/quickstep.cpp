@@ -600,7 +600,6 @@ static void ComputeRows(
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
 
-
   // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
   //       velocity update
   bool preconditioning;
@@ -2199,6 +2198,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
+    if (world->qs.warm_start > 0)
     {
       // warm starting
       // save lambda for the next iteration
