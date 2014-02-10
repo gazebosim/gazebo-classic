@@ -2199,6 +2199,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
+    if (world->qs.warm_start > 0)
     {
       // warm starting
       // save lambda for the next iteration
