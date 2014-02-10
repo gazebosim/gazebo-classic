@@ -108,7 +108,7 @@ struct dxQuickStepParameters {
   dReal contact_residual;     // contact constraint errors
   int num_contacts;           // for monitoring number of contacts
   bool dynamic_inertia_reduction;  // turn on/off quickstep inertia reduction.
-  bool smooth_contacts;  // control quickstep smoothing for contact solution.
+  dReal smooth_contacts;  // control quickstep smoothing for contact solution.
   bool row_reorder1;  // control quickstep row reordering
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
