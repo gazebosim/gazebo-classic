@@ -19,10 +19,9 @@
 #define _SONARVISUAL_HH_
 
 #include <string>
-#include <vector>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -30,8 +29,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
-
-    class DynamicLines;
 
     /// \class SonarVisual SonarVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.

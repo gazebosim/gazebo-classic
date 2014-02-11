@@ -14,21 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _COMVISUAL_HH_
 #define _COMVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
+#include <sdf/sdf.hh>
 
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -36,8 +33,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering Rendering
     /// \{
-
-    class DynamicLines;
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization

@@ -14,14 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Joint Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _JOINTVISUAL_HH_
 #define _JOINTVISUAL_HH_
 
 #include <string>
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo

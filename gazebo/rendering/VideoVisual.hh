@@ -14,24 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Video Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _VIDEO_VISUAL_HH_
 #define _VIDEO_VISUAL_HH_
 
 #include <string>
-#include <vector>
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Video;
-  }
-
   namespace rendering
   {
     /// \addtogroup gazebo_rendering
