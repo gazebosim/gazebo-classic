@@ -428,8 +428,8 @@ Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
 //////////////////////////////////////////////////
 bool Quaternion::IsFinite() const
 {
-  return finite(this->w) && finite(this->x) && finite(this->y) &&
-         finite(this->z);
+  return std::isfinite(this->w) && std::isfinite(this->x) &&
+         std::isfinite(this->y) && std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////
