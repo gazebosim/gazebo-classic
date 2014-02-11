@@ -149,8 +149,8 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   # Use pkg_check_modules and fallback to manual detection (needed, at least, for Macos)
-  pkg_check_modules(TINYXML tinyxml)
-  if (NOT TINYXML_FOUND)
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
       find_path (tinyxml_include_dirs tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
       find_library(tinyxml_libraries NAMES tinyxml)
       set (tinyxml_FAIL False) 
