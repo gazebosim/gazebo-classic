@@ -14,18 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc:
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
 
 #ifndef _RFIDTAGVISUAL_HH_
 #define _RFIDTAGVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {

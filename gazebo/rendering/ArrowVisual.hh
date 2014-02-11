@@ -14,20 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Arrow Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _ARROWVISUAL_HH_
 #define _ARROWVISUAL_HH_
 
 #include <string>
 #include "gazebo/rendering/Visual.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {

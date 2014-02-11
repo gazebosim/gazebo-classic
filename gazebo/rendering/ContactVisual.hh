@@ -14,22 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _CONTACTVISUAL_HH_
 #define _CONTACTVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
-
-namespace Ogre
-{
-  class Entity;
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -37,8 +29,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering Rendering
     /// \{
-
-    class DynamicLines;
 
     /// \class ContactVisual ContactVisual.hh rendering/rendering.hh
     /// \brief Contact visualization

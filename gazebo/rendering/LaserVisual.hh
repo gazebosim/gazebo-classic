@@ -14,19 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Laser Visualization Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
 #ifndef _LASERVISUAL_HH_
 #define _LASERVISUAL_HH_
 
 #include <string>
-#include <vector>
 
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/common/Color.hh"
 #include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -34,8 +30,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
-
-    class DynamicLines;
 
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.

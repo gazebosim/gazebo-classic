@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
-#ifndef CAMERAVISUAL_HH
-#define CAMERAVISUAL_HH
+#ifndef _CAMERAVISUAL_HH_
+#define _CAMERAVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo

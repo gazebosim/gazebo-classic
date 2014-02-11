@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: 3D Axis Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _AXISVISUAL_HH_
 #define _AXISVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo

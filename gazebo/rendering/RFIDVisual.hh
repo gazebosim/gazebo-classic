@@ -14,24 +14,19 @@
  * limitations under the License.
  *
  */
-/* Desc:
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
 
 #ifndef _RFIDVISUAL_HH_
 #define _RFIDVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class DynamicLines;
     /// \addtogroup gazebo_rendering
     /// \{
 

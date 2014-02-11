@@ -29,7 +29,11 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -41,10 +45,6 @@ namespace Ogre
 {
   class MovableObject;
   class SceneNode;
-  class StaticGeometry;
-  class RibbonTrail;
-  class AnimationState;
-  class SkeletonInstance;
 }
 
 namespace gazebo
@@ -52,7 +52,6 @@ namespace gazebo
   namespace rendering
   {
     class VisualPrivate;
-    class WireBox;
 
     /// \addtogroup gazebo_rendering
     /// \{
