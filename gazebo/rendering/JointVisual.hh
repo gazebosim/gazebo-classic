@@ -46,9 +46,6 @@ namespace gazebo
       /// \brief Load the visual based on a message
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
-
-      /// \brief The visual used to draw the joint.
-      private: AxisVisualPtr axisVisual;
     };
     /// \}
   }

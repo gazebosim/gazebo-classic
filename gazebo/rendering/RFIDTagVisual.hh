@@ -53,12 +53,6 @@ namespace gazebo
       /// \brief Callback triggered when new RFID data is received.
       /// \param[in] _msg Message containing RFID pose data
       private: void OnScan(ConstPosePtr &_msg);
-
-      /// \brief Node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber that receives RFID data.
-      private: transport::SubscriberPtr rfidSub;
     };
     /// \}
   }

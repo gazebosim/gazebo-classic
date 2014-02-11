@@ -54,7 +54,6 @@ namespace gazebo
       /// \brief Pre render connection.
       public: event::ConnectionPtr connection;
     };
-    /// \}
   }
 }
 #endif

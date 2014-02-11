@@ -125,6 +125,7 @@ namespace gazebo
       /// \brief Helper function to create translate visuals.
       private: void CreateTranslateVisual();
     };
+    /// \}
   }
 }
 

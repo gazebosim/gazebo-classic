@@ -51,21 +51,6 @@ namespace gazebo
 
       /// \brief PreRender event callback.
       private: void PreRender();
-
-      /// \brief Load a video
-      private: common::Video *video;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Texture to draw the video onto.
-      private: Ogre::TexturePtr texture;
-
-      /// \brief One frame of the viedeo.
-      private: unsigned char *imageBuffer;
-
-      /// \brief Width and height of the video.
-      private: int width, height;
     };
     /// \}
   }

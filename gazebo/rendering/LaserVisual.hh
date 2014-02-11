@@ -60,27 +60,6 @@ namespace gazebo
 
       /// \brief Update the Visual
       private: void Update();
-
-      /// \brief Pointer to a node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscription to the laser data.
-      private: transport::SubscriberPtr laserScanSub;
-
-      /// \brief Renders the laser data.
-      private: std::vector<DynamicLines *> rayFans;
-
-      /// \brief Mutex to protect the contact message.
-      private: boost::mutex mutex;
-
-      /// \brief True if we have received a message.
-      private: bool receivedMsg;
-
-      /// \brief The current contact message.
-      private: boost::shared_ptr<msgs::LaserScanStamped const> laserMsg;
-
-      /// \brief Pre render connection.
-      private: event::ConnectionPtr connection;
     };
     /// \}
   }

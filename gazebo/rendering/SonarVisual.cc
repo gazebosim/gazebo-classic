@@ -60,7 +60,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->coneNode->attachObject(coneObj);
   dPtr->coneNode->setPosition(0, 0, 0);
 
-  this->connections.push_back(
+  dPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&SonarVisual::Update, this)));
 }

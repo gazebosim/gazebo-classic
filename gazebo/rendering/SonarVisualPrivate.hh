@@ -57,7 +57,6 @@ namespace gazebo
       /// \brief True if we have received a message.
       public: bool receivedMsg;
     };
-    /// \}
   }
 }
 #endif

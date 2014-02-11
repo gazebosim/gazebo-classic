@@ -69,7 +69,6 @@ namespace gazebo
       /// \brief All the event connections.
       public: std::vector<event::ConnectionPtr> connections;
     };
-    /// \}
   }
 }
 #endif

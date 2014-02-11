@@ -34,7 +34,6 @@ namespace gazebo
       /// \brief Pointer to the transport::Subscriber for recieving data
       public: transport::SubscriberPtr rfidSub;
     };
-    /// \}
   }
 }
 #endif

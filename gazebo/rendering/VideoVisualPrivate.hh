@@ -52,7 +52,6 @@ namespace gazebo
       /// \brief Height of the video.
       public: int height;
     };
-    /// \}
   }
 }
 #endif

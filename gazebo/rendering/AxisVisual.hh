@@ -67,10 +67,6 @@ namespace gazebo
       /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
-
-      private: ArrowVisualPtr xAxis;
-      private: ArrowVisualPtr yAxis;
-      private: ArrowVisualPtr zAxis;
     };
     /// \}
   }

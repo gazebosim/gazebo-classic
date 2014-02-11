@@ -82,7 +82,7 @@ void LaserVisual::Update()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Skip the update if the user is moving the laser.
   if ((this->GetScene()->GetSelectedVisual() &&
