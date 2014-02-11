@@ -23,7 +23,6 @@
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -61,42 +60,6 @@ namespace gazebo
 
       /// \brief Update the wrench visual.
       private: void Update();
-
-      /// \brief Pointer to a node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscription to the sonar data.
-      private: transport::SubscriberPtr wrenchSub;
-
-      /// \brief Scene node for X torque visualization.
-      private: Ogre::SceneNode *coneXNode;
-
-      /// \brief Scene node for Y torque visualization.
-      private: Ogre::SceneNode *coneYNode;
-
-      /// \brief Scene node for Z torque visualization.
-      private: Ogre::SceneNode *coneZNode;
-
-      /// \brief Scene node for force visualization.
-      private: Ogre::SceneNode *forceNode;
-
-      /// \brief Line to visualize force
-      private: DynamicLines *forceLine;
-
-      /// \brief The current wrench message.
-      private: boost::shared_ptr<msgs::WrenchStamped const> wrenchMsg;
-
-      /// \brief True if we have received a message.
-      private: bool receivedMsg;
-
-      /// \brief True if this visualization is enabled.
-      private: bool enabled;
-
-      /// \brief Mutex to protect the contact message.
-      private: boost::mutex mutex;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}
   }

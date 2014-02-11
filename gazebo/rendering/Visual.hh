@@ -25,21 +25,17 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <utility>
-#include <list>
 #include <vector>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 namespace Ogre
 {
@@ -482,7 +478,7 @@ namespace gazebo
       /// \param[in] _parent Parent of the visual.
       /// \param[in] _useRTShader True if the visual should use the
       /// real-time shader system (RTShader).
-      protected: Visual(VisualPrivate *_dataPtr,
+      protected: Visual(VisualPrivate &_dataPtr,
                         const std::string &_name, VisualPtr _parent,
                         bool _useRTShader = true);
 
@@ -493,7 +489,7 @@ namespace gazebo
       /// \param[in] _scene Scene containing the visual.
       /// \param[in] _useRTShader True if the visual should use the
       /// real-time shader system (RTShader).
-      protected: Visual(VisualPrivate *_dataPtr,
+      protected: Visual(VisualPrivate &_dataPtr,
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
 

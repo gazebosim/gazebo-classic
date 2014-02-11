@@ -36,7 +36,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
                              const std::string &_topicName)
-: Visual(new ContactVisualPrivate, _name, _vis)
+: Visual(*new ContactVisualPrivate, _name, _vis)
 {
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);

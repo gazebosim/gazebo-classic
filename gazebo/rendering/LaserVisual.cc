@@ -34,7 +34,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
-: Visual(new LaserVisualPrivate, _name, _vis)
+: Visual(*new LaserVisualPrivate, _name, _vis)
 {
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);

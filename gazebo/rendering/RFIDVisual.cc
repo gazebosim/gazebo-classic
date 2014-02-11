@@ -33,7 +33,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 RFIDVisual::RFIDVisual(const std::string &_name, VisualPtr _vis,
                        const std::string &_topicName)
-  : Visual(new RFIDVisualPrivate, _name, _vis)
+  : Visual(*new RFIDVisualPrivate, _name, _vis)
 {
   RFIDVisualPrivate *dPtr =
       reinterpret_cast<RFIDVisualPrivate *>(this->dataPtr);

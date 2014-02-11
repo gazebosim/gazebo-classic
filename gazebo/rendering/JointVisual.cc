@@ -30,7 +30,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(new JointVisualPrivate, _name, _vis, false)
+  : Visual(*new JointVisualPrivate, _name, _vis, false)
 {
 }
 

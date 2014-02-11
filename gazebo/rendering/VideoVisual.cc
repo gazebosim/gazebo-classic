@@ -27,7 +27,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
-  : Visual(new VideoVisualPrivate, _name, _parent)
+  : Visual(*new VideoVisualPrivate, _name, _parent)
 {
   VideoVisualPrivate *dPtr =
       reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);

@@ -30,7 +30,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(new ArrowVisualPrivate, _name, _vis, false)
+  : Visual(*new ArrowVisualPrivate, _name, _vis, false)
 {
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);

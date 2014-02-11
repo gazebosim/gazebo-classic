@@ -27,7 +27,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
     const std::string &_topicName)
-    : Visual(new TransmitterVisualPrivate, _name, _vis)
+    : Visual(*new TransmitterVisualPrivate, _name, _vis)
 {
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);

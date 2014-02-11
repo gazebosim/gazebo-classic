@@ -30,7 +30,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
     const std::string &_topicName)
-  : Visual(new WrenchVisualPrivate, _name, _vis)
+  : Visual(*new WrenchVisualPrivate, _name, _vis)
 {
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
@@ -110,7 +110,7 @@ WrenchVisual::~WrenchVisual()
   dPtr->connections.clear();
 
   delete dPtr->forceLine;
-  this->forceLine = NULL;
+  dPtr->forceLine = NULL;
 
   delete dPtr->forceNode;
   dPtr->forceNode = NULL;
@@ -152,7 +152,7 @@ void WrenchVisual::Update()
       exp(-dPtr->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(this->wrenchMsg->wrench().force());
+  math::Vector3 force = msgs::Convert(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
       exp(force.GetSquaredLength() / magScale)) - offset;
 

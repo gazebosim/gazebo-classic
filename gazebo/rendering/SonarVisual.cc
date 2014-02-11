@@ -30,7 +30,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
-  : Visual(new SonarVisualPrivate, _name, _vis)
+  : Visual(*new SonarVisualPrivate, _name, _vis)
 {
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);

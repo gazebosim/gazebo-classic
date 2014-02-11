@@ -30,7 +30,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
-: Visual(new CameraVisualPrivate, _name, _vis)
+: Visual(*new CameraVisualPrivate, _name, _vis)
 {
 }
 

@@ -31,7 +31,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 SelectionObj::SelectionObj(const std::string &_name, VisualPtr _vis)
-  : Visual(new SelectionObjPrivate, _name, _vis, false)
+  : Visual(*new SelectionObjPrivate, _name, _vis, false)
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);

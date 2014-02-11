@@ -22,11 +22,8 @@
 #define _CONTACTVISUAL_HH_
 
 #include <string>
-#include <vector>
 
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace Ogre
 {

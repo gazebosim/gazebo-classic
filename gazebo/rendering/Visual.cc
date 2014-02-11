@@ -16,27 +16,27 @@
 */
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/CommonIface.hh"
-
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Skeleton.hh"
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Skeleton.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -59,18 +59,18 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(VisualPrivate *_dataPtr, const std::string &_name,
+Visual::Visual(VisualPrivate &_dataPtr, const std::string &_name,
     VisualPtr _parent, bool _useRTShader)
+    : dataPtr(&_dataPtr)
 {
-  this->dataPtr = _dataPtr;
   this->InitWithVisual(_name, _parent, _useRTShader);
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(VisualPrivate *_dataPtr, const std::string &_name,
+Visual::Visual(VisualPrivate &_dataPtr, const std::string &_name,
     ScenePtr _scene,  bool _useRTShader)
+    : dataPtr(&_dataPtr)
 {
-  this->dataPtr = _dataPtr;
   this->InitWithScene(_name, _scene, _useRTShader);
 }
 

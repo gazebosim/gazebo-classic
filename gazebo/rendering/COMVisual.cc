@@ -34,7 +34,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(new COMVisualPrivate, _name, _vis, false)
+  : Visual(*new COMVisualPrivate, _name, _vis, false)
 {
 }
 

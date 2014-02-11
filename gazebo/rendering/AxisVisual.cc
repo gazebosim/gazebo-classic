@@ -31,7 +31,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 AxisVisual::AxisVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(new AxisVisualPrivate, _name, _vis, false)
+  : Visual(*new AxisVisualPrivate, _name, _vis, false)
 {
 }
 

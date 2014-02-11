@@ -32,7 +32,7 @@ using namespace rendering;
 /////////////////////////////////////////////////
 RFIDTagVisual::RFIDTagVisual(const std::string &_name, VisualPtr _vis,
                              const std::string &_topicName)
-  : Visual(new RFIDTagVisualPrivate, _name, _vis)
+  : Visual(*new RFIDTagVisualPrivate, _name, _vis)
 {
   RFIDTagVisualPrivate *dPtr =
       reinterpret_cast<RFIDTagVisualPrivate *>(this->dataPtr);
