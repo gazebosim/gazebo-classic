@@ -57,12 +57,6 @@ namespace gazebo
 
       /// \brief Update the visual
       private: void Update();
-
-      /// \brief Event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Pointer to the camera.
-      private: CameraPtr camera;
     };
     /// \}
   }

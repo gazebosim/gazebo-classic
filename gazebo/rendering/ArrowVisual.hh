@@ -53,10 +53,6 @@ namespace gazebo
 
       /// \brief Show the rotation of the visual
       public: void ShowRotation();
-
-      private: Ogre::SceneNode *headNode;
-      private: Ogre::SceneNode *shaftNode;
-      private: Ogre::SceneNode *rotationNode;
     };
     /// \}
   }
