@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ namespace gazebo
     #define gzlog (gazebo::common::Console::log())
 
     /// \brief Initialize log file with filename given by _str.
+    /// If called twice, it will close currently in use and open a new
+    /// log file.
     /// \param[in] _str Name of log file for gzlog messages.
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
