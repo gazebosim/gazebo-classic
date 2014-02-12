@@ -24,6 +24,7 @@ endif()
 
 set(tests
   bandwidth.cc
+  multicamera_sensor.cc
   contact_sensor.cc
   factory.cc
   file_handling.cc
