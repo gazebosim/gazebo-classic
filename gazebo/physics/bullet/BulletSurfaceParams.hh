@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Friction pyramid parameters (mu1, mu2).
       // For further documentation, see:
-      // github.com/erwincoumans/bullet3/blob/master/src/BulletDynamics \
+      // github.com/erwincoumans/bullet3/blob/master/src/BulletDynamics
       // /ConstraintSolver/btSequentialImpulseConstraintSolver.cpp#L910
       FrictionPyramid frictionPyramid;
     };
