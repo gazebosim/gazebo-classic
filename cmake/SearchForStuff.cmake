@@ -148,37 +148,40 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  # Use pkg_check_modules and fallback to manual detection (needed, at least, for Macos)
-  pkg_check_modules(tinyxml tinyxml)
-  if (NOT tinyxml_FOUND)
-      find_path (tinyxml_include_dirs tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
-      find_library(tinyxml_libraries NAMES tinyxml)
-      set (tinyxml_FAIL False) 
-      if (NOT tinyxml_include_dirs)
-        message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
-      endif()
-      if (NOT tinyxml_libraries)
-        message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
-      endif()
-  endif()
-        
-  if (tinyxml_FAIL)
+  find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
+  if (NOT tinyxml_include_dir)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
-  endif()
+  else ()
+    message (STATUS "Looking for tinyxml.h - found")
+    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING
+      "tinyxml include paths. Use this to override automatic detection.")
+    set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
+  endif ()
 
   #################################################
   # Find libtar.
-  find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
-  if (NOT libtar_include_dir)
+  find_path (libtar_INCLUDE_DIRS libtar.h)
+  find_library(libtar_LIBRARIES tar)
+  set (LIBTAR_NOT_FOUND False)
+
+  if (NOT libtar_INCLUDE_DIRS)
     message (STATUS "Looking for libtar.h - not found")
-    BUILD_ERROR("Missing: libtar")
+    set (LIBTAR_NOT_FOUND True)
   else ()
     message (STATUS "Looking for libtar.h - found")
-    set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
+    include_directories(${LIBTAR_INCLUDE_DIRS})
   endif ()
+  if (NOT libtar_LIBRARIES)
+    message (STATUS "Looking for libtar.so - not found")
+    set (LIBTAR_NOT_FOUND False)
+  else ()
+    message (STATUS "Looking for libtar.so - found")
+  endif ()
+
+  if (LIBTAR_NOT_FOUND)
+     BUILD_ERROR("Missing: libtar")
+  endif()
 
   #################################################
   # Use internal CCD (built as libgazebo_ccd.so)
