@@ -30,12 +30,20 @@ class MultiCameraSensor : public ServerFixture
 {
 };
 
-unsigned char* img = NULL;
-unsigned char* img1 = NULL;
-unsigned char* img2 = NULL;
-int imageCount = 0;
-int imageCount1 = 0;
-int imageCount2 = 0;
+unsigned char* img0Left = NULL;
+unsigned char* imgt = NULL;
+unsigned char* img1Left = NULL;
+unsigned char* img2Left = NULL;
+unsigned char* img0Right = NULL;
+unsigned char* img1Right = NULL;
+unsigned char* img2Right = NULL;
+int imageCount0Left = 0;
+int imageCountt = 0;
+int imageCount1Left = 0;
+int imageCount2Left = 0;
+int imageCount0Right = 0;
+int imageCount1Right = 0;
+int imageCount2Right = 0;
 
 /////////////////////////////////////////////////
 void OnNewFrameTest(int* _imageCounter, unsigned char* _imageDest,
@@ -63,12 +71,17 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   // get two cameras, one with rotation and one without.
   std::string cameraUnrotated = "multicamera_sensor_unrotated";
+  std::string cameraTranslated = "multicamera_sensor_translated";
   std::string cameraRotated1 = "multicamera_sensor_rotated1";
   std::string cameraRotated2 = "multicamera_sensor_rotated2";
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraUnrotated);
   sensors::MultiCameraSensorPtr camSensorUnrotated =
     boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+
+  sensor = sensors::get_sensor(cameraTranslated);
+  sensors::CameraSensorPtr camSensorTranslated =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated1);
   sensors::MultiCameraSensorPtr camSensorRotated1 =
@@ -83,54 +96,153 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
   unsigned int depth = 3;
 
   // initialize global variables
-  imageCount = 0;
-  imageCount1 = 0;
-  imageCount2 = 0;
-  img = new unsigned char[width * height * depth];
-  img1 = new unsigned char[width * height * depth];
-  img2 = new unsigned char[width * height * depth];
+  imageCount0Left  = 0;
+  imageCountt  = 0;
+  imageCount1Left  = 0;
+  imageCount2Left  = 0;
+  imageCount0Right = 0;
+  imageCount1Right = 0;
+  imageCount2Right = 0;
+  img0Left = new unsigned char[width * height * depth];
+  imgt = new unsigned char[width * height * depth];
+  img1Left = new unsigned char[width * height * depth];
+  img2Left = new unsigned char[width * height * depth];
+  img0Right = new unsigned char[width * height * depth];
+  img1Right = new unsigned char[width * height * depth];
+  img2Right = new unsigned char[width * height * depth];
 
-  for (unsigned int i = 0; i < 2; ++i)
   {
     // connect to camera image updates
-    event::ConnectionPtr c =
-      camSensorUnrotated->GetCamera(i)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount, img,
+    event::ConnectionPtr c0Left =
+      camSensorUnrotated->GetCamera(0)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount0Left, img0Left,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c1 =
-      camSensorRotated1->GetCamera(i)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount1, img1,
+    event::ConnectionPtr ct =
+      camSensorTranslated->GetCamera()->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCountt, imgt,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c2 =
-      camSensorRotated2->GetCamera(i)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount2, img2,
+    event::ConnectionPtr c1Left =
+      camSensorRotated1->GetCamera(0)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount1Left, img1Left,
+            _1, _2, _3, _4, _5));
+    event::ConnectionPtr c2Left =
+      camSensorRotated2->GetCamera(0)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount2Left, img2Left,
+            _1, _2, _3, _4, _5));
+
+    event::ConnectionPtr c0Right =
+      camSensorUnrotated->GetCamera(1)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount0Right, img0Right,
+            _1, _2, _3, _4, _5));
+    event::ConnectionPtr c1Right =
+      camSensorRotated1->GetCamera(1)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount1Right, img1Right,
+            _1, _2, _3, _4, _5));
+    event::ConnectionPtr c2Right =
+      camSensorRotated2->GetCamera(1)->ConnectNewImageFrame(
+          boost::bind(&::OnNewFrameTest, &imageCount2Right, img2Right,
             _1, _2, _3, _4, _5));
 
     // activate camera
     camSensorUnrotated->SetActive(true);
+    camSensorTranslated->SetActive(true);
     camSensorRotated1->SetActive(true);
     camSensorRotated2->SetActive(true);
 
     // Get at least 10 images from each camera
     int waitCount = 0;
-    while (imageCount < 10 || imageCount1 < 10 || imageCount2 < 10)
+    while (imageCount0Left < 10 || imageCountt < 10 ||
+           imageCount1Left < 10 || imageCount2Left < 10 ||
+           imageCount0Right < 10 ||
+           imageCount1Right < 10 || imageCount2Right < 10)
     {
       // wait at most 10 seconds sim time.
       if (++waitCount >= 1000)
-        gzerr << "[" << imageCount
-              << "/10, " << imageCount1
-              << "/10, " << imageCount2
+        gzerr << "Err [" << imageCount0Left
+              << "/10, " << imageCountt
+              << "/10, " << imageCount1Left
+              << "/10, " << imageCount2Left
+              << "/10, " << imageCount0Right
+              << "/10, " << imageCount1Right
+              << "/10, " << imageCount2Right
               << "/10] images received from cameras\n";
       EXPECT_LT(waitCount, 1000);
 
       common::Time::MSleep(10);
     }
 
+    // compare unrotated left against translated left, both should be
+    // seeing the green block, if not, pose translation in <camera> tag
+    // is broken.
+    // Note, right camera of translated camera (imgtRight) should also
+    // see green block.
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = 0.0;
+
+      // compare left images
+      this->ImageCompare(img0Left, imgt, width, height, depth,
+                         diffMax, diffSum, diffAvg);
+
+      // We expect that there will be some non-zero difference between the two
+      // images.
+      EXPECT_EQ(diffSum, 0u);
+
+      // We expect that the average difference will be well within 3-sigma.
+      EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+    }
+
+    // compare unrotated left against translated left, both should be
+    // seeing the green block, if not, pose translation in <camera> tag
+    // is broken.
+    // Note, right camera of translated camera (imgtRight) should also
+    // see green block.
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = -1.0;
+
+      // compare right of translated camera to
+      // right of unrotated/untranslated camera images
+      // the result should differ as former sees green block and latter
+      // sees red block.
+      this->ImageCompare(img0Right, imgt, width, height, depth,
+                         diffMax, diffSum, diffAvg);
+
+      // use below to construct test for rotated2 left camera offset
+      // math::Quaternion a(1.2, 1.3, 1.4);
+      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
+
+      // We expect that there will be some non-zero difference between the two
+      // images.
+      EXPECT_GT(diffSum, 100u);
+
+      // We expect that the average difference will be well within 3-sigma.
+      EXPECT_GT(fabs(diffAvg)/255., 0.0549);
+    }
+
     // compare unrotated against rotated1
     {
       unsigned int diffMax = 0, diffSum = 0;
       double diffAvg = 0.0;
-      this->ImageCompare(img, img1, width, height, depth,
+
+      // compare left images
+      this->ImageCompare(img0Left, img1Left, width, height, depth,
+                         diffMax, diffSum, diffAvg);
+
+      // We expect that there will be some non-zero difference between the two
+      // images.
+      EXPECT_EQ(diffSum, 0u);
+
+      // We expect that the average difference will be well within 3-sigma.
+      EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+    }
+
+    // compare unrotated against rotated1
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = 0.0;
+      // compare right images
+      this->ImageCompare(img0Right, img1Right, width, height, depth,
                          diffMax, diffSum, diffAvg);
 
       // We expect that there will be some non-zero difference between the two
@@ -145,17 +257,27 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     {
       unsigned int diffMax = 0, diffSum = 0;
       double diffAvg = 0.0;
-      this->ImageCompare(img, img2, width, height, depth,
+
+      // compare left images
+      this->ImageCompare(img0Left, img2Left, width, height, depth,
                          diffMax, diffSum, diffAvg);
 
-      // for (unsigned j = 0; j < width * height * depth; ++j)
-      // {
-      //   unsigned int p = static_cast<unsigned int>(img[j]);
-      //   unsigned int p2 = static_cast<unsigned int>(img2[j]);
-      //   // if (p != p2)
-      //   if (p != p2)
-      //     gzerr << j << " " << p << " " << p2 << "\n";
-      // }
+      // We expect that there will be some non-zero difference between the two
+      // images.
+      EXPECT_EQ(diffSum, 0u);
+
+      // We expect that the average difference will be well within 3-sigma.
+      EXPECT_NEAR(diffAvg/255., 0.0, 1e-16);
+    }
+
+    // compare unrotated against rotated2
+    {
+      unsigned int diffMax = 0, diffSum = 0;
+      double diffAvg = 0.0;
+
+      // compare right images
+      this->ImageCompare(img0Right, img2Right, width, height, depth,
+                         diffMax, diffSum, diffAvg);
 
       // We expect that there will be some non-zero difference between the two
       // images.
@@ -167,19 +289,28 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
     // activate camera
     camSensorUnrotated->SetActive(false);
+    camSensorTranslated->SetActive(false);
     camSensorRotated1->SetActive(false);
     camSensorRotated2->SetActive(false);
 
     // disconnect callbacks
-    camSensorUnrotated->GetCamera(i)->DisconnectNewImageFrame(c);
-    camSensorRotated1->GetCamera(i)->DisconnectNewImageFrame(c1);
-    camSensorRotated2->GetCamera(i)->DisconnectNewImageFrame(c2);
+    camSensorUnrotated->GetCamera(0)->DisconnectNewImageFrame(c0Left);
+    camSensorTranslated->GetCamera()->DisconnectNewImageFrame(ct);
+    camSensorRotated1->GetCamera(0)->DisconnectNewImageFrame(c1Left);
+    camSensorRotated2->GetCamera(0)->DisconnectNewImageFrame(c2Left);
+    camSensorUnrotated->GetCamera(1)->DisconnectNewImageFrame(c0Right);
+    camSensorRotated1->GetCamera(1)->DisconnectNewImageFrame(c1Right);
+    camSensorRotated2->GetCamera(1)->DisconnectNewImageFrame(c2Right);
   }
 
   // cleanup
-  delete[] img;
-  delete[] img1;
-  delete[] img2;
+  delete[] img0Left;
+  delete[] imgt;
+  delete[] img1Left;
+  delete[] img2Left;
+  delete[] img0Right;
+  delete[] img1Right;
+  delete[] img2Right;
 }
 
 /////////////////////////////////////////////////

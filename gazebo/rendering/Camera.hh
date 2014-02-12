@@ -602,10 +602,11 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      /// \brief Scene nod that controls camera pitch.
+      /// \brief Legacy scene node that used to control camera pitch,
+      /// but it should remain NULL.
       protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
