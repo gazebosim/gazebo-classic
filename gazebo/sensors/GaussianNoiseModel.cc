@@ -82,7 +82,7 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::GaussianNoiseModel()
-  : Noise(),
+  : Noise(Noise::GAUSSIAN),
     mean(0.0),
     stdDev(0.0),
     bias(0.0),
@@ -123,11 +123,11 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("precision"))
   {
     this->precision = _sdf->Get<double>("precision");
-    if (math::equal(this->precision, 0.0, 1e-6) || this->precision < 0)
+    if (this->precision < 0)
     {
-      gzerr << "Noise precision cannot be less or equal to 0" << std::endl;
+      gzerr << "Noise precision cannot be less than 0" << std::endl;
     }
-    else
+    else if (!math::equal(this->precision, 0.0, 1e-6))
     {
       this->quantized = true;
     }
