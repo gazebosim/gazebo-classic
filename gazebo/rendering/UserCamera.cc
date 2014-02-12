@@ -442,7 +442,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
   Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
     pitchYawOnly.y, pitchYawOnly.z);
- 
 
   dir.Normalize();
 
