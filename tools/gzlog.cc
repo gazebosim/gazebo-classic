@@ -62,7 +62,11 @@ class FilterBase
               else if (this->stamp == "real")
                 _stream << _state.GetRealTime().Double() << " ";
               else if (this->stamp == "wall")
-                _stream << _state.GetWallTime().Double() << " ";
+              {
+                _stream << std::setiosflags(std::ios::fixed) <<
+                  _state.GetWallTime().Double() <<
+                  std::resetiosflags(std::ios::fixed) << " ";
+              }
             }
 
             return _stream;
