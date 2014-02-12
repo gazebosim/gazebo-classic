@@ -148,16 +148,26 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
-  if (NOT tinyxml_include_dir)
+  # Use pkg_check_modules and fallback to manual detection (needed, at least, for Macos)
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
+      find_path (tinyxml_include_dirs tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
+      find_library(tinyxml_libraries NAMES tinyxml)
+      set (tinyxml_FAIL False) 
+      if (NOT tinyxml_include_dirs)
+        message (STATUS "Looking for tinyxml headers - not found")
+        set (tinyxml_FAIL True) 
+      endif()
+      if (NOT tinyxml_libraries)
+        message (STATUS "Looking for tinyxml library - not found")
+        set (tinyxml_FAIL True) 
+      endif()
+  endif()
+        
+  if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
-  else ()
-    message (STATUS "Looking for tinyxml.h - found")
-    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING
-      "tinyxml include paths. Use this to override automatic detection.")
-    set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
-  endif ()
+  endif()
 
   #################################################
   # Find libtar.

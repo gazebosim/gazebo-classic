@@ -136,7 +136,7 @@ target_link_libraries(gazebo_common
   ${libtool_library}
   ${Boost_LIBRARIES}
   ${freeimage_LIBRARIES}
-  ${tinyxml_libraries}
+  ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${CURL_LIBRARIES}
