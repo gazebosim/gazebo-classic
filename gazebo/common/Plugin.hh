@@ -84,7 +84,9 @@ namespace gazebo
     public: virtual ~PluginT()
             {
 #ifdef HAVE_DL
+#ifndef __APPLE__
               dlclose(this->dlHandle);
+#endif  // ifndef __APPLE
 #endif
             }
 
