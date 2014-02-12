@@ -40,14 +40,15 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
-  transport.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   transceiver.cc
+  transport.cc
   world.cc
+  world_reset.cc
   )
 
 if (MANPAGES_SUPPORT)
