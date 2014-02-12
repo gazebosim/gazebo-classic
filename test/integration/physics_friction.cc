@@ -218,6 +218,11 @@ class PhysicsFrictionTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   public: void BoxDirectionRing(const std::string &_physicsEngine);
 
+  /// \brief Use frictionDirection parallel to normal to make sure
+  /// no NaN's are generated.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void DirectionNaN(const std::string &_physicsEngine);
+
   /// \brief Count of spawned models, used to ensure unique model names.
   private: unsigned int spawnCount;
 };
@@ -395,7 +400,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     }
   }
 
-  // Step forward 1 second.
+  // Step forward
   world->Step(1500);
   double t = world->GetSimTime().Double();
 
@@ -413,6 +418,73 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+// DirectionNaN:
+// Spawn box with vertical friction direction and make sure there's no NaN's
+void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test since there's an issue with simbody's friction"
+          << " parameters (#1045)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since there's an issue with simbody's friction"
+          << " parameters (#989)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test since there's an issue with dart's friction"
+          << " parameters (#1000)"
+          << std::endl;
+    return;
+  }
+
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // set the gravity vector
+  // small positive y component
+  math::Vector3 g(0.0, 1.5, -1.0);
+  physics->SetGravity(g);
+
+  // Spawn concentric semi-circles of boxes
+  double dx = 0.5;
+  double dy = 0.5;
+  double dz = 0.2;
+
+  // Set box size and anisotropic friction
+  SpawnFrictionBoxOptions opt;
+  opt.size.Set(dx, dy, dz);
+  opt.direction1 = math::Vector3(0.0, 0.0, 1.0);
+  opt.modelPose.pos.z = dz/2;
+
+  physics::ModelPtr model = SpawnBox(opt);
+  ASSERT_TRUE(model != NULL);
+
+  // Step forward
+  world->Step(1500);
+  double t = world->GetSimTime().Double();
+
+  gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
+  double velMag = (g.y+g.z) * t;
+  math::Vector3 vel = model->GetWorldLinearVel();
+  EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
+  EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
@@ -422,6 +494,12 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 TEST_P(PhysicsFrictionTest, BoxDirectionRing)
 {
   BoxDirectionRing(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, DirectionNaN)
+{
+  DirectionNaN(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,
