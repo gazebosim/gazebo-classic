@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Simulation Interface for Player
- * Author: Nate Koenig
- * Date: 2 March 2006
- */
 
 #include <time.h>
 
@@ -43,9 +39,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
     GazeboDriver *_driver, ConfigFile *_cf, int _section)
 : GazeboInterface(_addr, _driver, _cf, _section)
 {
-  gazebo::load();
-  gazebo::init();
-  gazebo::run();
+  gazebo::setupClient();
 
   worldName = _cf->ReadString(_section, "world_name", "default");
 
@@ -79,7 +73,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
-  gazebo::fini();
+  gazebo::shutdown();
   if (this->responseQueue)
   {
     delete this->responseQueue;
