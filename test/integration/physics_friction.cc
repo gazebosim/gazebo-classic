@@ -20,8 +20,12 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
+
+#ifdef HAVE_BULLET
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
@@ -58,6 +62,7 @@ class PhysicsFrictionTest : public ServerFixture,
                   // Average the mu1 and mu2 values
                   this->friction = (surface->mu1 + surface->mu2) / 2.0;
                 }
+#ifdef HAVE_BULLET
                 else if (physics->GetType() == "bullet")
                 {
                   physics::BulletSurfaceParamsPtr surface =
@@ -66,6 +71,7 @@ class PhysicsFrictionTest : public ServerFixture,
                   // Average the mu1 and mu2 values
                   this->friction = (surface->mu1 + surface->mu2) / 2.0;
                 }
+#endif
               }
             }
     public: ~FrictionBox() {}
@@ -101,7 +107,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/test_friction.world", true, _physicsEngine);
+  Load("worlds/friction_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 

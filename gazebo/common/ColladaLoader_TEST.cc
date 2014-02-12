@@ -19,11 +19,14 @@
 #include "test_config.h"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class ColladaLoader : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
-TEST(ColladaLoader, LoadBox)
+TEST_F(ColladaLoader, LoadBox)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
