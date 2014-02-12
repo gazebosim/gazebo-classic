@@ -48,14 +48,14 @@ uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   : dataPtr(new VisualPrivate)
 {
-  this->InitWithVisual(_name, _parent, _useRTShader);
+  this->Init(_name, _parent, _useRTShader);
 }
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   : dataPtr(new VisualPrivate)
 {
-  this->InitWithScene(_name, _scene, _useRTShader);
+  this->Init(_name, _scene, _useRTShader);
 }
 
 //////////////////////////////////////////////////
@@ -63,7 +63,7 @@ Visual::Visual(VisualPrivate &_dataPtr, const std::string &_name,
     VisualPtr _parent, bool _useRTShader)
     : dataPtr(&_dataPtr)
 {
-  this->InitWithVisual(_name, _parent, _useRTShader);
+  this->Init(_name, _parent, _useRTShader);
 }
 
 //////////////////////////////////////////////////
@@ -71,11 +71,11 @@ Visual::Visual(VisualPrivate &_dataPtr, const std::string &_name,
     ScenePtr _scene,  bool _useRTShader)
     : dataPtr(&_dataPtr)
 {
-  this->InitWithScene(_name, _scene, _useRTShader);
+  this->Init(_name, _scene, _useRTShader);
 }
 
 //////////////////////////////////////////////////
-void Visual::InitWithScene(const std::string &_name, ScenePtr _scene,
+void Visual::Init(const std::string &_name, ScenePtr _scene,
     bool _useRTShader)
 {
   this->dataPtr->id = this->dataPtr->visualIdCount--;
@@ -109,7 +109,7 @@ void Visual::InitWithScene(const std::string &_name, ScenePtr _scene,
 }
 
 //////////////////////////////////////////////////
-void Visual::InitWithVisual(const std::string &_name, VisualPtr _parent,
+void Visual::Init(const std::string &_name, VisualPtr _parent,
     bool _useRTShader)
 {
   this->dataPtr->id = this->dataPtr->visualIdCount--;

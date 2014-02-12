@@ -498,7 +498,7 @@ namespace gazebo
       /// \param[in] _scene Scene containing the visual.
       /// \param[in] _useRTShader True if the visual should use the
       /// real-time shader system (RTShader).
-      private: void InitWithScene(const std::string &_name, ScenePtr _scene,
+      private: void Init(const std::string &_name, ScenePtr _scene,
           bool _useRTShader);
 
       /// \brief Helper function for initializing the visual with a visual as
@@ -507,7 +507,7 @@ namespace gazebo
       /// \param[in] _scene Scene containing the visual.
       /// \param[in] _useRTShader True if the visual should use the
       /// real-time shader system (RTShader).
-      private: void InitWithVisual(const std::string &_name, VisualPtr _parent,
+      private: void Init(const std::string &_name, VisualPtr _parent,
           bool _useRTShader);
 
       /// \brief Load all plugins
