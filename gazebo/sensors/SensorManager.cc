@@ -461,7 +461,8 @@ void SensorManager::SensorContainer::RunLoop()
   boost::mutex::scoped_lock lock2(tmpMutex);
 
   // Wait for a sensor to be added.
-  if (this->sensors.empty())
+  // Use a while loop since world resets will notify the runCondition.
+  while (this->sensors.empty())
   {
     this->runCondition.wait(lock2);
     if (this->stop)
