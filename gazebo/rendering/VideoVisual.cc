@@ -15,36 +15,41 @@
  *
 */
 
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Video.hh"
-#include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/VideoVisualPrivate.hh"
+#include "gazebo/rendering/VideoVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
 VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
-  : Visual(_name, _parent)
+  : Visual(*new VideoVisualPrivate, _name, _parent)
 {
-  this->video = new common::Video();
-  this->video->Load("/home/nkoenig/Videos/pr2_risotto/risotto_robot.mp4");
+  VideoVisualPrivate *dPtr =
+      reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
-  this->width = this->video->GetWidth();
-  this->height = this->video->GetHeight();
-  double ratio = this->width / static_cast<double>(this->height);
+  dPtr->video = new common::Video();
+  dPtr->video->Load("/home/nkoenig/Videos/pr2_risotto/risotto_robot.mp4");
 
-  this->imageBuffer = new unsigned char[this->height * this->width * 3];
+  dPtr->width = dPtr->video->GetWidth();
+  dPtr->height = dPtr->video->GetHeight();
+  double ratio = dPtr->width / static_cast<double>(dPtr->height);
 
-  this->connections.push_back(event::Events::ConnectPreRender(
+  dPtr->imageBuffer = new unsigned char[dPtr->height * dPtr->width * 3];
+
+  dPtr->connections.push_back(event::Events::ConnectPreRender(
         boost::bind(&VideoVisual::PreRender, this)));
 
   // Create the texture
-  this->texture = Ogre::TextureManager::getSingleton().createManual(
+  dPtr->texture = Ogre::TextureManager::getSingleton().createManual(
     _name + "__VideoTexture__",
     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
     Ogre::TEX_TYPE_2D,
-    this->width, this->height,
+    dPtr->width, dPtr->height,
     0,
     Ogre::PF_BYTE_BGR,
     Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
@@ -81,7 +86,7 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
   mo.convertToMesh(_name + "__VideoMesh__");
 
   Ogre::MovableObject *obj = (Ogre::MovableObject*)
-    this->sceneNode->getCreator()->createEntity(_name + "__VideoEntity__",
+    dPtr->sceneNode->getCreator()->createEntity(_name + "__VideoEntity__",
                                                 _name + "__VideoMesh__");
   obj->setCastShadows(false);
   this->AttachObject(obj);
@@ -90,20 +95,26 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
 /////////////////////////////////////////////////
 VideoVisual::~VideoVisual()
 {
-  delete this->video;
-  this->video = NULL;
+  VideoVisualPrivate *dPtr =
+      reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
-  delete [] this->imageBuffer;
-  this->imageBuffer = NULL;
+  delete dPtr->video;
+  dPtr->video = NULL;
+
+  delete [] dPtr->imageBuffer;
+  dPtr->imageBuffer = NULL;
 }
 
 /////////////////////////////////////////////////
 void VideoVisual::PreRender()
 {
-  this->video->GetNextFrame(&this->imageBuffer);
+  VideoVisualPrivate *dPtr =
+      reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
+
+  dPtr->video->GetNextFrame(&dPtr->imageBuffer);
 
   // Get the pixel buffer
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = dPtr->texture->getBuffer();
 
   // Lock the pixel buffer and get a pixel box
   pixelBuffer->lock(Ogre::HardwareBuffer::HBL_DISCARD);
@@ -114,25 +125,25 @@ void VideoVisual::PreRender()
   // The request pixel format of the texture is not always the one that OGRE
   // creates.
   bool unusedAlpha = Ogre::PixelUtil::getNumElemBytes(
-      this->texture->getFormat()) > 3 ? true : false;
+      dPtr->texture->getFormat()) > 3 ? true : false;
 
   // If OGRE actually created a texture with no alpha channel, then we
   // can use memcpy
   if (!unusedAlpha)
   {
-    memcpy(pDest, this->imageBuffer, this->height*this->width*3);
+    memcpy(pDest, dPtr->imageBuffer, dPtr->height*dPtr->width*3);
   }
   else
   {
     int index;
-    for (int j = 0; j < this->height; ++j)
+    for (int j = 0; j < dPtr->height; ++j)
     {
-      for (int i = 0; i < this->width; ++i)
+      for (int i = 0; i < dPtr->width; ++i)
       {
-        index = j*(this->width*3) + (i*3);
-        *pDest++ = this->imageBuffer[index + 2];  // B
-        *pDest++ = this->imageBuffer[index + 1];  // G
-        *pDest++ = this->imageBuffer[index + 0];  // R
+        index = j*(dPtr->width*3) + (i*3);
+        *pDest++ = dPtr->imageBuffer[index + 2];  // B
+        *pDest++ = dPtr->imageBuffer[index + 1];  // G
+        *pDest++ = dPtr->imageBuffer[index + 0];  // R
         *pDest++ = 255;  // Alpha
       }
     }
