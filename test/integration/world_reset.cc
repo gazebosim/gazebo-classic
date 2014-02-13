@@ -22,19 +22,20 @@
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *, int> string_uint;
+typedef std::tr1::tuple<const char *, const char *, int> string2_int;
 
 class WorldResetTest : public ServerFixture,
-                       public ::testing::WithParamInterface<string_uint>
+                       public ::testing::WithParamInterface<string2_int>
 {
-  public: void Empty(const std::string &_physicsEngine, int _resets);
+  public: void WorldName(const std::string &_physicsEngine,
+                         const std::string &_world, int _resets);
 };
 
 /////////////////////////////////////////////////
-void WorldResetTest::Empty(const std::string &_physicsEngine,
-                                    int _resets)
+void WorldResetTest::WorldName(const std::string &_physicsEngine,
+                               const std::string &_world, int _resets)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load(_world, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -66,18 +67,24 @@ void WorldResetTest::Empty(const std::string &_physicsEngine,
 }
 
 /////////////////////////////////////////////////
-TEST_P(WorldResetTest, Empty)
+TEST_P(WorldResetTest, WorldName)
 {
   std::string physics = std::tr1::get<0>(GetParam());
-  int resets = std::tr1::get<1>(GetParam());
-  gzdbg << "Physics engine [" << physics << "], "
+  std::string worldName = std::tr1::get<1>(GetParam());
+  int resets = std::tr1::get<2>(GetParam());
+  gzdbg << "Physics engine [" << physics << "] "
+        << "world name [" << worldName << "] "
         << "reset count [" << resets << "]"
         << std::endl;
-  Empty(physics, resets);
+  WorldName(physics, worldName, resets);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values(
+    "worlds/empty.world"
+   ,"worlds/gps_test.world"
+  ),
   ::testing::Range(1, 4)));
 
 /////////////////////////////////////////////////
