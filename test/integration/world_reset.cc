@@ -81,11 +81,9 @@ TEST_P(WorldResetTest, WorldName)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values(
-    "worlds/empty.world"
-   ,"worlds/gps_test.world"
-  ),
-  ::testing::Range(1, 4)));
+  ::testing::Values("worlds/empty.world"
+                  , "worlds/pr2.world"),
+  ::testing::Range(1, 3)));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

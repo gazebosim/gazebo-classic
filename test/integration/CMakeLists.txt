@@ -48,7 +48,6 @@ set(tests
   transceiver.cc
   transport.cc
   world.cc
-  world_reset.cc
   )
 
 if (MANPAGES_SUPPORT)
@@ -80,6 +79,7 @@ set(dri_tests
   projector.cc
   rendering_sensor.cc
   speed_pr2.cc
+  world_reset.cc
 )
 
 gz_build_dri_tests(${dri_tests})
