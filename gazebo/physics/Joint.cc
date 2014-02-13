@@ -926,8 +926,12 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
   // Legacy support for specifying axis in parent model frame (#494)
   if (this->axisParentModelFrame[_index])
   {
+    // Use parent model frame
     if (this->parentLink)
       return this->parentLink->GetModel()->GetWorldPose().rot;
+
+    // Parent model is world, use world frame
+    return math::Quaternion();
   }
 
   return this->GetWorldPose().rot;

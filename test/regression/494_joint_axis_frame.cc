@@ -23,18 +23,19 @@ using namespace gazebo;
 
 class Issue494Test : public JointTest
 {
-  public: void JointAnchor(const std::string &_physicsEngine);
+  public: void CheckAxisFrame(const std::string &_physicsEngine,
+                              const std::string &_jointType);
 };
 
 
 /////////////////////////////////////////////////
 // \brief Test for issue #494
-void Issue494Test::JointAnchor(const std::string &_physicsEngine)
+void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
+                                  const std::string &_jointType)
 {
-  // Abort test for simbody, since SimbodyJoint::GetAnchor isn't implemented
-  if (_physicsEngine == "simbody")
+  if (!(_physicsEngine == "ode" && _jointType == "revolute"))
   {
-    gzerr << "Aborting test for Simbody, see issue #979.\n";
+    gzerr << "This test only works for ODEHingeJoint for now" << std::endl;
     return;
   }
 
@@ -48,42 +49,86 @@ void Issue494Test::JointAnchor(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  std::string _jointType = "revolute";
+  SpawnJointOptions opt;
+  opt.type = _jointType;
+  double Am = M_PI / 8;
+  double Al = M_PI / 8;
+  opt.modelPose.rot.SetFromEuler(0, 0, Am);
+  opt.childLinkPose.rot.SetFromEuler(0, 0, Al);
+  opt.axis.Set(1, 0, 0);
+
+  // i = 0: child parent
+  // i = 1: child world 
+  // i = 2: world parent
+  for (int i = 0; i < 3; ++i)
   {
-    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
-    SpawnJointOptions opt;
-    opt.type = _jointType;
-    opt.worldChild = false;
-    opt.worldParent = false;
-    opt.noLinkPose = true;
-    opt.modelPose = math::Pose(1, 2, 3, 0, 0, 0);
+    gzdbg << "SpawnJoint " << _jointType;
+    if (i / 2)
+    {
+      opt.worldChild = true;
+      std::cout << " world";
+    }
+    else
+    {
+      opt.worldChild = false;
+      std::cout << " child";
+    }
+    if (i % 2)
+    {
+      opt.worldParent = true;
+      std::cout << " world";
+    }
+    else
+    {
+      opt.worldParent = false;
+      std::cout << " parent";
+    }
+    std::cout << std::endl;
 
-    physics::JointPtr joint = SpawnJoint(opt);
-    ASSERT_TRUE(joint != NULL);
+    // parent model frame
+    {
+      opt.useParentModelFrame = true;
+      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
+      ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
-    // Check child and parent links
-    physics::LinkPtr child = joint->GetChild();
-    physics::LinkPtr parent = joint->GetParent();
-    ASSERT_TRUE(child != NULL);
-    EXPECT_EQ(child->GetParentJoints().size(), 1u);
-    EXPECT_EQ(child->GetChildJoints().size(), 0u);
-    ASSERT_TRUE(parent != NULL);
-    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
-    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+      if (opt.worldParent)
+      {
+        EXPECT_EQ(opt.axis, jointUseParentModelFrame->GetGlobalAxis(0));
+      }
+      else
+      {
+        math::Vector3 referenceAxis(cos(Am), sin(Am), 0);
+        EXPECT_EQ(referenceAxis, jointUseParentModelFrame->GetGlobalAxis(0));
+      }
+    }
 
-    // Check anchor location
-    EXPECT_EQ(joint->GetAnchor(0), opt.modelPose.pos);
+    // joint frame
+    {
+      opt.useParentModelFrame = false;
+      physics::JointPtr joint = SpawnJoint(opt);
+      ASSERT_TRUE(joint != NULL);
+
+      if (opt.worldChild)
+      {
+        EXPECT_EQ(opt.axis, joint->GetGlobalAxis(0));
+      }
+      else
+      {
+        math::Vector3 referenceAxis(cos(Am+Al), sin(Am+Al), 0);
+        EXPECT_EQ(referenceAxis, joint->GetGlobalAxis(0));
+      }
+    }
   }
 }
 
-TEST_P(Issue494Test, JointAnchor)
+TEST_P(Issue494Test, CheckAxisFrame)
 {
-  JointAnchor(this->physicsEngine);
+  CheckAxisFrame(this->physicsEngine, this->jointType);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("")));
+  ::testing::Values("revolute", "prismatic")));
 
 /////////////////////////////////////////////////
 /// Main
