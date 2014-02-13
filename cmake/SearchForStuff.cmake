@@ -189,7 +189,7 @@ if (PKG_CONFIG_FOUND)
     message (STATUS "Looking for libtar.so - found")
   endif ()
 
-  if (not LIBTAR_FOUND)
+  if (NOT LIBTAR_FOUND)
      BUILD_ERROR("Missing: libtar")
   endif()
 
