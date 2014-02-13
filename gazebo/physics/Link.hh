@@ -447,6 +447,11 @@ namespace gazebo
       /// \param[int] _name Name of the collision to remove.
       public: void RemoveCollision(const std::string &_name);
 
+      public: double GetWorldFramePotentialEnergy();
+      public: double GetWorldFrameKineticEnergy();
+      public: double GetWorldFrameEnergy();
+      public: double GetWorldFrameVibrationalKineticEnergy();
+
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.

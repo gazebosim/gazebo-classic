@@ -117,6 +117,18 @@ public:
   dReal getQuickStepNumContacts() const
     { return dWorldGetQuickStepNumContacts (get_id()); }
 
+  /* experimental PGS */
+  void setQuickStepInertiaRatioReduction(bool irr)
+    { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
+  void setQuickStepContactResidualSmoothing(dReal smoo)
+    { dWorldSetQuickStepContactResidualSmoothing (get_id(), smoo); }
+  void setQuickStepExperimentalRowReordering(bool order)
+    { dWorldSetQuickStepExperimentalRowReordering (get_id(), order); }
+  void setQuickStepWarmStartFactor(dReal warm)
+    { dWorldSetQuickStepWarmStartFactor (get_id(), warm); }
+  void setQuickStepExtraFrictionIterations(int iters)
+    { dWorldSetQuickStepExtraFrictionIterations (get_id(), iters); }
+
   void  setAutoDisableLinearThreshold (dReal threshold) 
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }
   dReal getAutoDisableLinearThreshold() const

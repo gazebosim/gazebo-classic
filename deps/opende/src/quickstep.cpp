@@ -721,6 +721,8 @@ static void ComputeRows(
       int index = order[i].index;
       int normal_index = findex[index];  // cache for efficiency
 
+      // check if we are doing extra friction_iterations, if so, only solve
+      // friction force constraints and nothing else.
       if (iteration >= num_iterations + precon_iterations && normal_index < 0)
         continue;
 
@@ -2313,7 +2315,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
   if (m > 0) {
-    BEGIN_STATE_SAVE(context, velstate) {
+    BEGIN_STATE_SAVE(context, rmsstate) {
       dReal *vel = context->AllocateArray<dReal>(nb*6);
 
       // CHECK THAT THE UPDATED VELOCITY OBEYS THE CONSTRAINT
@@ -2358,7 +2360,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       world->qs.bilateral_residual = sqrt(bilateral_error/(double)m);
       world->qs.contact_residual = sqrt(contact_error/(double)m);
       world->qs.num_contacts = contacts;
-    }
+    } END_STATE_SAVE(context, rmsstate);
   }
 #endif
   } // keep "compute velocity update and check velocity obeys constraint

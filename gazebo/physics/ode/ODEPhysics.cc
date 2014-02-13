@@ -1284,6 +1284,36 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "inertia_ratio_reduction")
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+        boost::any_cast<bool>(_value));
+    return;
+  }
+  else if (_key == "contact_residual_smoothing")
+  {
+    dWorldSetQuickStepContactResidualSmoothing (this->worldId,
+      boost::any_cast<double>(_value));
+    return;
+  }
+  else if (_key == "experimental_row_reordering")
+  {
+    dWorldSetQuickStepExperimentalRowReordering (this->worldId,
+      boost::any_cast<bool>(_value));
+    return;
+  }
+  else if (_key == "warm_start_factor")
+  {
+    dWorldSetQuickStepWarmStartFactor (this->worldId,
+      boost::any_cast<double>(_value));
+    return;
+  }
+  else if (_key == "extra_friction_iterations")
+  {
+    dWorldSetQuickStepExtraFrictionIterations (this->worldId,
+      boost::any_cast<int>(_value));
+    return;
+  }
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
