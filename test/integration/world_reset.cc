@@ -35,6 +35,19 @@ class WorldResetTest : public ServerFixture,
 void WorldResetTest::WorldName(const std::string &_physicsEngine,
                                const std::string &_world, int _resets)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
   Load(_world, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
