@@ -533,6 +533,52 @@ ODE_API dReal dWorldGetQuickStepContactResidual (dWorldID);
  * @ingroup world
  * @param irr set to tru to turn on inertia ratio reduction.
  */
+ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
+
+/**
+ * @brief Set friction residual exponential smoothing coefficient
+ * @ingroup world
+ * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
+ */
+ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
+
+/**
+ * @brief Turn on experimental row reordering, so within one sweep,
+ * follwoing ordering of constraints are used:
+ *   1. bilateral constrains
+ *   2. all contact normal constrains
+ *   3. all friction force constrains
+ * otherwise, use standard reordering
+ *   1. bilateral constrains
+ *   2. sweep each contact sequentially.  For each contact,
+ *      solve normal constraint followed by 2 friciton constraints.
+ * @ingroup world
+ * @param reorder set to true to turn on experimental row reordering
+ */
+ODE_API bool dWorldGetQuickStepExperimentalRowReordering (dWorldID);
+
+/**
+ * @brief Set warm start scaling coefficient
+ * @ingroup world
+ * @param warm 0: turn off warm starting, anything else is a scaling factor
+ * for lambda from previous time step.
+ */
+ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
+
+/**
+ * @brief Set extra friciton constraint iterations within each time step,
+ * to be done after initial sweeps.
+ * @ingroup world
+ * @param iterations extra constraint iterations for friction rows after
+ * default sweep.
+ */
+ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to tru to turn on inertia ratio reduction.
+ */
 ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
 
 /**

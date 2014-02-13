@@ -1427,6 +1427,16 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     return dWorldGetQuickStepContactResidual(this->worldId);
   else if (_key == "num_contacts")
     return dWorldGetQuickStepNumContacts(this->worldId);
+  else if (_key == "inertia_ratio_reduction")
+    return dWorldGetQuickStepInertiaRatioReduction(this->worldId);
+  else if (_key == "contact_residual_smoothing")
+    return dWorldGetQuickStepContactResidualSmoothing (this->worldId);
+  else if (_key == "experimental_row_reordering")
+    return dWorldGetQuickStepExperimentalRowReordering (this->worldId);
+  else if (_key == "warm_start_factor")
+    return dWorldGetQuickStepWarmStartFactor (this->worldId);
+  else if (_key == "extra_friction_iterations")
+    return dWorldGetQuickStepExtraFrictionIterations (this->worldId);
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;

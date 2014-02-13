@@ -118,6 +118,16 @@ public:
     { return dWorldGetQuickStepNumContacts (get_id()); }
 
   /* experimental PGS */
+  bool getQuickStepInertiaRatioReduction() const
+    { return dWorldGetQuickStepInertiaRatioReduction (get_id()); }
+  dReal getQuickStepContactResidualSmoothing() const
+    { return dWorldGetQuickStepContactResidualSmoothing (get_id()); }
+  bool getQuickStepExperimentalRowReordering() const
+    { return dWorldGetQuickStepExperimentalRowReordering (get_id()); }
+  dReal getQuickStepWarmStartFactor() const
+    { return dWorldGetQuickStepWarmStartFactor (get_id()); }
+  int getQuickStepExtraFrictionIterations() const
+    { return dWorldGetQuickStepExtraFrictionIterations (get_id()); }
   void setQuickStepInertiaRatioReduction(bool irr)
     { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
   void setQuickStepContactResidualSmoothing(dReal smoo)

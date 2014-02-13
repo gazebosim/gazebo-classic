@@ -2294,6 +2294,37 @@ int dWorldGetQuickStepNumContacts (dWorldID w)
 	return w->qs.num_contacts;
 }
 
+/* experimental PGS */
+bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.dynamic_inertia_reduction;
+}
+
+dReal  dWorldGetQuickStepContactResidualSmoothing (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.smooth_contacts;
+}
+
+bool  dWorldGetQuickStepExperimentalRowReordering (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.row_reorder1;
+}
+
+dReal  dWorldGetQuickStepWarmStartFactor (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.warm_start;
+}
+
+int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.friction_iterations;
+}
+
 void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
 {
 	dAASSERT(w);
@@ -2323,6 +2354,10 @@ void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
 	dAASSERT(w);
   w->qs.friction_iterations = iters;
 }
+
+
+
+
 
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)
 {
