@@ -15,35 +15,33 @@
  *
 */
 
-#ifndef _VIDEO_VISUAL_HH_
-#define _VIDEO_VISUAL_HH_
+#ifndef _COMVISUAL_PRIVATE_HH_
+#define _COMVISUAL_PRIVATE_HH_
 
 #include <string>
-#include "gazebo/rendering/Visual.hh"
+
+#include "gazebo/rendering/VisualPrivate.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
+    class DynamicLines;
 
-    /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
-    /// \brief A visual element that displays a video as a texture
-    class VideoVisual : public Visual
+    /// \brief Private data for the COM Visual class
+    class COMVisualPrivate : public VisualPrivate
     {
-      /// \brief Constructor
-      /// \param[in] _name Name of the video visual.
-      /// \param[in] _parent Parent of the video visual.
-      public: VideoVisual(const std::string &_name, VisualPtr _parent);
+      /// \brief Lines that make the cross marking the center of mass
+      public: DynamicLines *crossLines;
 
-      /// \brief Destructor
-      public: virtual ~VideoVisual();
-
-      /// \brief PreRender event callback.
-      private: void PreRender();
+      /// \brief Box that make the cross marking the center of mass
+      public: Ogre::SceneNode *boxNode;
     };
-    /// \}
   }
 }
 #endif

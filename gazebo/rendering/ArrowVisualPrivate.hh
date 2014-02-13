@@ -15,35 +15,28 @@
  *
 */
 
-#ifndef _VIDEO_VISUAL_HH_
-#define _VIDEO_VISUAL_HH_
+#ifndef _ARROWVISUAL_PRIVATE_HH_
+#define _ARROWVISUAL_PRIVATE_HH_
 
 #include <string>
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
-
-    /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
-    /// \brief A visual element that displays a video as a texture
-    class VideoVisual : public Visual
+    /// \brief Private data for the Arrow Visual class
+    class ArrowVisualPrivate : public VisualPrivate
     {
-      /// \brief Constructor
-      /// \param[in] _name Name of the video visual.
-      /// \param[in] _parent Parent of the video visual.
-      public: VideoVisual(const std::string &_name, VisualPtr _parent);
-
-      /// \brief Destructor
-      public: virtual ~VideoVisual();
-
-      /// \brief PreRender event callback.
-      private: void PreRender();
+      public: Ogre::SceneNode *headNode;
+      public: Ogre::SceneNode *shaftNode;
+      public: Ogre::SceneNode *rotationNode;
     };
-    /// \}
   }
 }
 #endif

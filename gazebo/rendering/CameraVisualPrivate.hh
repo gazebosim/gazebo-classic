@@ -15,35 +15,28 @@
  *
 */
 
-#ifndef _VIDEO_VISUAL_HH_
-#define _VIDEO_VISUAL_HH_
+#ifndef CAMERAVISUAL_PRIVATE_HH
+#define CAMERAVISUAL_PRIVATE_HH
 
-#include <string>
-#include "gazebo/rendering/Visual.hh"
+#include <vector>
+
+#include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
+    class Camera;
+    class VisualPrivate;
 
-    /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
-    /// \brief A visual element that displays a video as a texture
-    class VideoVisual : public Visual
+    class CameraVisualPrivate : public VisualPrivate
     {
-      /// \brief Constructor
-      /// \param[in] _name Name of the video visual.
-      /// \param[in] _parent Parent of the video visual.
-      public: VideoVisual(const std::string &_name, VisualPtr _parent);
+      /// \brief Event connections.
+      public: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Destructor
-      public: virtual ~VideoVisual();
-
-      /// \brief PreRender event callback.
-      private: void PreRender();
+      /// \brief Pointer to the camera.
+      public: CameraPtr camera;
     };
-    /// \}
   }
 }
 #endif
