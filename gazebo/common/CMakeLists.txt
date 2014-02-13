@@ -141,7 +141,7 @@ target_link_libraries(gazebo_common
   ${libavformat_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread
