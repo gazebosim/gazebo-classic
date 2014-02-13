@@ -212,6 +212,38 @@ TEST(gzlog, HzFilter)
 }
 
 /////////////////////////////////////////////////
+/// Check to raw filtering with time stamps
+TEST(gzlog, RawFilterStamp)
+{
+  std::string echo, validEcho;
+
+  // Sim time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s sim --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = "0.021344 0.000000 \n0.0289582 0.000000";
+  EXPECT_EQ(validEcho, echo);
+
+  // Real time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s real --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = "0.001 0.000000 \n0.002 0.000000";
+  EXPECT_EQ(validEcho, echo);
+
+  // Wall time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s wall --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = std::string("1360301758.939690 0.000000 \n")
+            + std::string("1360301758.947304 0.000000");
+  EXPECT_EQ(validEcho, echo);
+}
+
+/////////////////////////////////////////////////
 /// Check to make sure that 'gzlog step' returns correct information
 /// Just check number of characters returned for now
 TEST(gzlog, Step)
