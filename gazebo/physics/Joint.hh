@@ -488,6 +488,7 @@ namespace gazebo
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
       /// is used to determine the appropriate frame.
+      /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
