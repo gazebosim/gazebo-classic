@@ -613,7 +613,6 @@ void DARTLink::SetLinkStatic(bool _static)
     this->revConst = new dart::constraint::RevoluteJointConstraint(
           this->dtBodyNode, axis1, globalAxis1);
     GetDARTWorld()->getConstraintHandler()->addConstraint(revConst);
-
   }
   else
   {
