@@ -21,7 +21,6 @@
 #endif  // __MACH__
 
 #include <unistd.h>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
@@ -59,17 +58,6 @@ void QTestFixture::initTestCase()
 
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
-
-  // Get a path suitable for temporary files
-  try
-  {
-    tmpPath = boost::filesystem::temp_directory_path();
-  }
-  catch (const boost::system::error_code& ex)
-  {
-    gzerr << "Failed creating temp directory. Reason: "
-          << ex.message() << "\n";
-  }
 }
 
 /////////////////////////////////////////////////
@@ -212,10 +200,4 @@ void QTestFixture::GetMemInfo(double &_resident, double &_share)
   gzerr << "Unsupported architecture\n";
   return;
 #endif
-}
-
-/////////////////////////////////////////////////
-std::string QTestFixture::GetDefaultTestPath() const
-{
-  return (tmpPath / "gazebo_test").string();
 }

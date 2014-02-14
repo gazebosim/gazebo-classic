@@ -21,7 +21,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
 

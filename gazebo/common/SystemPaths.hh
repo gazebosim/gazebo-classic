@@ -89,7 +89,7 @@ namespace gazebo
       /// E.g.: /tmp (Linux).
       public: std::string GetTmpPath();
 
-      /// Returns an unique temporary file for this instance of SystemPath.
+      /// Returns a unique temporary file for this instance of SystemPath.
       /// \return a full path name to directory.
       /// E.g.: /tmp/gazebo_234123 (Linux).
       public: std::string GetTmpInstancePath();
