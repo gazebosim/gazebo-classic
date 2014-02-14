@@ -21,15 +21,15 @@
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/system/error_code.hpp>
 #include <iomanip>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Events.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Base64.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
@@ -49,15 +49,6 @@ LogRecord::LogRecord()
   this->firstUpdate = true;
   this->readyToStart = false;
 
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    return;
-  }
-
   // Get the user's home directory
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
@@ -65,7 +56,10 @@ LogRecord::LogRecord()
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
-    this->logBasePath = tmpDir / "gazebo";
+  {
+    common::SystemPaths *paths = common::SystemPaths::Instance();
+    this->logBasePath = paths->GetTmpPath() + "/gazebo";
+  }
   else
     this->logBasePath = boost::filesystem::path(homePath);
 

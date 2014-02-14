@@ -77,6 +77,11 @@ class QTestFixture : public QObject
   private: void RunServer(const std::string &_worldFilename, bool _paused,
                 bool _createScene);
 
+  /// Returns the default temporary test path.
+  /// \return a full path name to directory.
+  /// E.g.: /tmp/gazebo_test (Linux).
+  protected: std::string GetDefaultTestPath() const;
+
   /// \brief The Gazebo server, which is run in a thread.
   protected: gazebo::Server *server;
 
@@ -94,5 +99,8 @@ class QTestFixture : public QObject
 
   /// \brief Amount of shared memory at start.
   private: double shareStart;
+
+  /// \brief Path to the default temporary directory
+  private: boost::filesystem::path tmpPath;
 };
 #endif

@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "test/util.hh"
@@ -31,21 +31,13 @@ class LogRecord_TEST : public gazebo::testing::AutoLogFixture { };
 /// \brief Test LogRecord constructor and a few accessors
 TEST_F(LogRecord_TEST, Constructor)
 {
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    FAIL();
-  }
-
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
 
-  boost::filesystem::path logPath = tmpDir / "gazebo";
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::path logPath = paths->GetDefaultTestPath() + "/gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
   logPath /= "/.gazebo/log/";

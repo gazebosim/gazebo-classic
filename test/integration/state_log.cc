@@ -16,8 +16,8 @@
 */
 
 #include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
@@ -53,19 +53,11 @@ void onPoseInfo(ConstPose_VPtr &_msg)
 /// Record a log file
 TEST(StateLogTest, PR2Record)
 {
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    FAIL();
-  }
-
-  custom_exec(("gzserver -r --record_path " + (tmpDir / "gazebo_test").string()
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  custom_exec(("gzserver -r --record_path " + paths->GetDefaultTestPath()
     + " --iters 1000 --seed 12345 worlds/pr2.world").c_str());
 
-  boost::filesystem::path path = tmpDir / "gazebo_test/state.log";
+  boost::filesystem::path path = paths->GetDefaultTestPath() + "/state.log";
   EXPECT_TRUE(boost::filesystem::exists(path) != false);
 }
 
@@ -73,21 +65,13 @@ TEST(StateLogTest, PR2Record)
 // Playback a log file
 TEST(StateLogTest, PR2PlaybackZipped)
 {
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    FAIL();
-  }
-
   // Cleanup...not the best
   custom_exec("killall -9 gzserver");
 
   // Run playback
+  common::SystemPaths *paths = common::SystemPaths::Instance();
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-    ("gzserver -u -p " + (tmpDir / "gazebo_test/state.log").string()).c_str()));
+    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -141,15 +125,6 @@ TEST(StateLogTest, PR2PlaybackZipped)
 // Playback a log file
 TEST(StateLogTest, PR2PlaybackTxt)
 {
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    FAIL();
-  }
-
   // Cleanup...not the best
   custom_exec("killall -9 gzserver");
 
@@ -158,12 +133,13 @@ TEST(StateLogTest, PR2PlaybackTxt)
   g_msgCount = 0;
 
   // Convert the zipped state to txt and set a Hz filter.
-  custom_exec(("gzlog echo " + (tmpDir / "gazebo_test/state.log").string() +
-    " -z 30 > " + (tmpDir / "gazebo_test/state_txt.log").string()).c_str());
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  custom_exec(("gzlog echo " + paths->GetDefaultTestPath() + "/state.log" +
+    " -z 30 > " + paths->GetDefaultTestPath() + "/state_txt.log").c_str());
 
   // Run playback
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-    ("gzserver -u -p " + (tmpDir / "gazebo_test/state.log").string()).c_str()));
+    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -181,7 +157,6 @@ TEST(StateLogTest, PR2PlaybackTxt)
   // Subscribe to pose info
   gazebo::transport::SubscriberPtr sub = node->Subscribe(
       "/gazebo/default/pose/info", &onPoseInfo);
-
 
   // Unpause gzserver
   gazebo::msgs::WorldControl msg;
@@ -217,24 +192,16 @@ TEST(StateLogTest, PR2PlaybackTxt)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    GZ_ASSERT(false);
-  }
-
   // Cleanup test directory and create a new one.
-  boost::filesystem::remove_all(tmpDir / "gazebo_test");
-  boost::filesystem::create_directories(tmpDir / "gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
 
   ::testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(tmpDir / "gazebo_test");
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
   return result;
 }

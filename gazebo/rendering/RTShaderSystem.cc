@@ -20,12 +20,10 @@
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -339,15 +337,6 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   if (!this->initialized)
     return false;
 
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tempDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
-  {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
-    return false;
-  }
-
   Ogre::StringVector groupVector;
 
   // Setup the core libraries and shader cache path
@@ -389,7 +378,10 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           // Get the tmp dir
           tmpdir = getenv("TMP");
           if (!tmpdir)
-            tmpdir = const_cast<char*>(tempDir.c_str());
+          {
+            common::SystemPaths *paths = common::SystemPaths::Instance();
+            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+          }
           // Get the user
           user = getenv("USER");
           if (!user)

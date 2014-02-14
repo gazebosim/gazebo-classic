@@ -24,7 +24,6 @@
 #include <sys/types.h>
 
 #include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -48,19 +47,26 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
-  // Get a path suitable for temporary files
-  boost::system::error_code ec;
-  boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path(ec);
-  if (ec != 0)
+  try
   {
-    gzerr << "Failed creating temp directory. Reason: " << ec.message() << "\n";
+    // Get a path suitable for temporary files
+    this->tmpPath = boost::filesystem::temp_directory_path();
+
+    // Get a unique path suitable for temporary files. If there are multiple
+    // gazebo instances on the same machine, each one will have its own
+    // temporary directory
+    this->tmpInstancePath = boost::filesystem::unique_path("gazebo-%%%%%%");
+  }
+  catch (const boost::system::error_code& ex)
+  {
+    gzerr << "Failed creating temp directory. Reason: " << ex.message() << "\n";
     return;
   }
 
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = (tmpDir / "gazebo").string();
+    home = this->GetTmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -72,7 +78,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != (tmpDir / "gazebo").string())
+    if (home != this->GetTmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -143,6 +149,24 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
   if (this->ogrePathsFromEnv)
     this->UpdateOgrePaths();
   return this->ogrePaths;
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpPath()
+{
+  return this->tmpPath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->tmpInstancePath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetDefaultTestPath()
+{
+  return this->GetTmpPath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////
