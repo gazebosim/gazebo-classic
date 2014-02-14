@@ -137,7 +137,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.
-      public: dart::simulation::World *GetDARTWorld();
+      public: dart::simulation::SoftWorld *GetDARTWorld();
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -152,7 +152,7 @@ namespace gazebo
           const dart::dynamics::BodyNode *_dtBodyNode);
 
       /// \brief Pointer to DART World associated with this DART Physics.
-      private: dart::simulation::World *dtWorld;
+      private: dart::simulation::SoftWorld *dtWorld;
     };
 
   /// \}

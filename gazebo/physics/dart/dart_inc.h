@@ -25,7 +25,9 @@
 #include <dart/math/Geometry.h>
 
 #include <dart/collision/CollisionDetector.h>
+#include <dart/collision/SoftCollisionNode.h>
 #include <dart/collision/dart/DARTCollisionDetector.h>
+#include <dart/collision/fcl_mesh/SoftFCLMeshCollisionDetector.h>
 
 #include <dart/integration/Integrator.h>
 #include <dart/integration/EulerIntegrator.h>
@@ -40,6 +42,7 @@
 #include <dart/dynamics/GenCoord.h>
 #include <dart/dynamics/Joint.h>
 #include <dart/dynamics/MeshShape.h>
+#include <dart/dynamics/PointMass.h>
 #include <dart/dynamics/PrismaticJoint.h>
 #include <dart/dynamics/RevoluteJoint.h>
 #include <dart/dynamics/Shape.h>
@@ -47,10 +50,15 @@
 #include <dart/dynamics/ScrewJoint.h>
 #include <dart/dynamics/UniversalJoint.h>
 #include <dart/dynamics/WeldJoint.h>
+#include <dart/dynamics/SoftBodyNode.h>
+#include <dart/dynamics/SoftMeshShape.h>
+#include <dart/dynamics/SoftSkeleton.h>
 
 #include <dart/constraint/Constraint.h>
 #include <dart/constraint/ConstraintDynamics.h>
+#include <dart/constraint/SoftConstraintDynamics.h>
 
+#include <dart/simulation/SoftWorld.h>
 #include <dart/simulation/World.h>
 
 #endif

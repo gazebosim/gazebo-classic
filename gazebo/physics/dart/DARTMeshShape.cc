@@ -26,6 +26,25 @@
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
+// Constructor of aiScene is missing so we define it here.
+aiScene::aiScene()
+{
+    mFlags = 0;
+    mRootNode = NULL;
+    mNumMeshes = 0;
+    mMeshes = NULL;
+    mNumMaterials = 0;
+    mMaterials = NULL;
+    mNumAnimations = 0;
+    mAnimations = NULL;
+    mNumTextures = 0;
+    mTextures = NULL;
+    mNumLights = 0;
+    mLights = NULL;
+    mNumCameras = 0;
+    mCameras = NULL;
+}
 
 //////////////////////////////////////////////////
 DARTMeshShape::DARTMeshShape(CollisionPtr _parent) : MeshShape(_parent)
@@ -40,7 +59,7 @@ DARTMeshShape::~DARTMeshShape()
 //////////////////////////////////////////////////
 void DARTMeshShape::Update()
 {
-  gzwarn << "Not implemented!\n";
+  MeshShape::Update();
 }
 
 //////////////////////////////////////////////////
@@ -52,5 +71,61 @@ void DARTMeshShape::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTMeshShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  MeshShape::Init();
+
+  DARTCollisionPtr dartCollisionParent
+      = boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+
+  float *vertices = NULL;
+  int   *indices  = NULL;
+
+  unsigned int numVertices = this->mesh->GetVertexCount();
+  unsigned int numIndices  = this->mesh->GetIndexCount();
+
+  // Get all the vertex and index data
+  this->mesh->FillArrays(&vertices, &indices);
+
+  // Scale
+  math::Vector3 meshScale = this->sdf->Get<math::Vector3>("scale");
+
+  // Create new aiScene (aiMesh)
+  aiScene *assimpScene = new aiScene;
+  aiMesh *assimpMesh   = new aiMesh;
+  assimpScene->mNumMeshes = 1;
+  assimpScene->mMeshes    = new aiMesh*[1];
+  assimpScene->mMeshes[0] = assimpMesh;
+
+  // Set vertices and normals
+  assimpMesh->mNumVertices = numVertices;
+  assimpMesh->mVertices    = new aiVector3D[numVertices];
+  assimpMesh->mNormals     = new aiVector3D[numVertices];
+  aiVector3D itAIVector3d;
+  for (unsigned int i = 0; i < numVertices; ++i)
+  {
+    itAIVector3d.Set(vertices[i*3 + 0], vertices[i*3 + 1], vertices[i*3 + 2]);
+    assimpMesh->mVertices[i] = itAIVector3d;
+    assimpMesh->mNormals[i]  = itAIVector3d;
+  }
+
+  // Set faces
+  assimpMesh->mNumFaces = numIndices/3;
+  assimpMesh->mFaces    = new aiFace[assimpMesh->mNumFaces];
+  for (unsigned int i = 0; i < assimpMesh->mNumFaces; ++i)
+  {
+    aiFace* itAIFace = &assimpMesh->mFaces[i];
+    itAIFace->mNumIndices = 3;
+    itAIFace->mIndices    = new unsigned int[3];
+    itAIFace->mIndices[0] = indices[i*3 + 0];
+    itAIFace->mIndices[1] = indices[i*3 + 1];
+    itAIFace->mIndices[2] = indices[i*3 + 2];
+  }
+
+  dart::dynamics::MeshShape *dtMeshShape
+      = new dart::dynamics::MeshShape(
+        DARTTypes::ConvVec3(meshScale), assimpScene);
+  dartCollisionParent->GetDARTBodyNode()->addCollisionShape(dtMeshShape);
+  dartCollisionParent->SetDARTCollisionShape(dtMeshShape);
+
+  delete [] vertices;
+  delete [] indices;
 }

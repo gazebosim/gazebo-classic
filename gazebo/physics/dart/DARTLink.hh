@@ -153,7 +153,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
-      public: dart::simulation::World *GetDARTWorld(void) const;
+      public: dart::simulation::SoftWorld *GetDARTWorld(void) const;
 
       /// \brief Get pointer to DART Model associated with this link.
       /// \return Pointer to the DART Model.
