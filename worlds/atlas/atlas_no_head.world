@@ -22,6 +22,7 @@
       <uri>model://ground_plane</uri>
     </include>
   <model name='drc_skeleton'>
+    <pose>0 0 1.0 0 0 0</pose>
     <link name='pelvis'>
       <pose>0 0 0 0 -0 0</pose>
       <inertial>
@@ -41,7 +42,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>pelvis.stl</uri>
+            <uri>file://worlds/atlas/pelvis.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -50,7 +51,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>pelvis.dae</uri>
+            <uri>file://worlds/atlas/pelvis.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -78,7 +79,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>ltorso.stl</uri>
+            <uri>file://worlds/atlas/ltorso.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -87,7 +88,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>ltorso.dae</uri>
+            <uri>file://worlds/atlas/ltorso.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -131,7 +132,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>mtorso.stl</uri>
+            <uri>file://worlds/atlas/mtorso.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -140,7 +141,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>mtorso.dae</uri>
+            <uri>file://worlds/atlas/mtorso.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -184,7 +185,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>utorso.stl</uri>
+            <uri>file://worlds/atlas/utorso.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -193,7 +194,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>utorso.dae</uri>
+            <uri>file://worlds/atlas/utorso.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -237,7 +238,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_clav.stl</uri>
+            <uri>file://worlds/atlas/l_clav.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -246,7 +247,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_clav.dae</uri>
+            <uri>file://worlds/atlas/l_clav.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -290,7 +291,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_scap.stl</uri>
+            <uri>file://worlds/atlas/l_scap.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -299,7 +300,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_scap.dae</uri>
+            <uri>file://worlds/atlas/l_scap.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -343,7 +344,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uarm.stl</uri>
+            <uri>file://worlds/atlas/l_uarm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -352,7 +353,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uarm.dae</uri>
+            <uri>file://worlds/atlas/l_uarm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -396,7 +397,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_larm.stl</uri>
+            <uri>file://worlds/atlas/l_larm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -405,7 +406,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_larm.dae</uri>
+            <uri>file://worlds/atlas/l_larm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -449,7 +450,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_farm.stl</uri>
+            <uri>file://worlds/atlas/l_farm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -458,7 +459,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_farm.dae</uri>
+            <uri>file://worlds/atlas/l_farm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -502,7 +503,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_hand.stl</uri>
+            <uri>file://worlds/atlas/l_hand.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -511,7 +512,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_hand.dae</uri>
+            <uri>file://worlds/atlas/l_hand.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -555,7 +556,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_clav.stl</uri>
+            <uri>file://worlds/atlas/r_clav.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -564,7 +565,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_clav.dae</uri>
+            <uri>file://worlds/atlas/r_clav.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -608,7 +609,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_scap.stl</uri>
+            <uri>file://worlds/atlas/r_scap.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -617,7 +618,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_scap.dae</uri>
+            <uri>file://worlds/atlas/r_scap.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -661,7 +662,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uarm.stl</uri>
+            <uri>file://worlds/atlas/r_uarm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -670,7 +671,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uarm.dae</uri>
+            <uri>file://worlds/atlas/r_uarm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -714,7 +715,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_larm.stl</uri>
+            <uri>file://worlds/atlas/r_larm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -723,7 +724,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_larm.dae</uri>
+            <uri>file://worlds/atlas/r_larm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -767,7 +768,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_farm.stl</uri>
+            <uri>file://worlds/atlas/r_farm.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -776,7 +777,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_farm.dae</uri>
+            <uri>file://worlds/atlas/r_farm.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -820,7 +821,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_hand.stl</uri>
+            <uri>file://worlds/atlas/r_hand.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -829,7 +830,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_hand.dae</uri>
+            <uri>file://worlds/atlas/r_hand.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -873,7 +874,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uglut.stl</uri>
+            <uri>file://worlds/atlas/l_uglut.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -882,7 +883,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uglut.dae</uri>
+            <uri>file://worlds/atlas/l_uglut.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -926,7 +927,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_lglut.stl</uri>
+            <uri>file://worlds/atlas/l_lglut.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -935,7 +936,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_lglut.dae</uri>
+            <uri>file://worlds/atlas/l_lglut.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -979,7 +980,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uleg.stl</uri>
+            <uri>file://worlds/atlas/l_uleg.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -988,7 +989,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_uleg.dae</uri>
+            <uri>file://worlds/atlas/l_uleg.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1032,7 +1033,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_lleg.stl</uri>
+            <uri>file://worlds/atlas/l_lleg.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1041,7 +1042,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_lleg.dae</uri>
+            <uri>file://worlds/atlas/l_lleg.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1085,7 +1086,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_talus.stl</uri>
+            <uri>file://worlds/atlas/l_talus.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1094,7 +1095,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_talus.dae</uri>
+            <uri>file://worlds/atlas/l_talus.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1138,16 +1139,34 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_foot.stl</uri>
+            <uri>file://worlds/atlas/l_foot.stl</uri>
           </mesh>
         </geometry>
+      </collision>
+      <collision name='l_foot_collision_soft'>
+        <pose>0.05 0 -0.05 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.4 0.175 0.125</size>
+          </box>
+        </geometry>
+        <surface>
+          <soft_contact>
+            <dart>
+              <bone_attachment>5000.0</bone_attachment>
+              <stiffness>100.0</stiffness>
+              <damping>50.0</damping>
+              <flesh_mass_fraction>0.5</flesh_mass_fraction>
+            </dart>
+          </soft_contact>
+        </surface>
       </collision>
       <visual name='l_foot_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>l_foot.dae</uri>
+            <uri>file://worlds/atlas/l_foot.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1191,7 +1210,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uglut.stl</uri>
+            <uri>file://worlds/atlas/r_uglut.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1200,7 +1219,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uglut.dae</uri>
+            <uri>file://worlds/atlas/r_uglut.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1244,7 +1263,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_lglut.stl</uri>
+            <uri>file://worlds/atlas/r_lglut.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1253,7 +1272,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_lglut.dae</uri>
+            <uri>file://worlds/atlas/r_lglut.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1297,7 +1316,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uleg.stl</uri>
+            <uri>file://worlds/atlas/r_uleg.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1306,7 +1325,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_uleg.dae</uri>
+            <uri>file://worlds/atlas/r_uleg.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1350,7 +1369,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_lleg.stl</uri>
+            <uri>file://worlds/atlas/r_lleg.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1359,7 +1378,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_lleg.dae</uri>
+            <uri>file://worlds/atlas/r_lleg.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1403,7 +1422,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_talus.stl</uri>
+            <uri>file://worlds/atlas/r_talus.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -1412,7 +1431,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_talus.dae</uri>
+            <uri>file://worlds/atlas/r_talus.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1456,16 +1475,34 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_foot.stl</uri>
+            <uri>file://worlds/atlas/r_foot.stl</uri>
           </mesh>
         </geometry>
+      </collision>
+      <collision name='r_foot_collision_soft'>
+        <pose>0.05 0 -0.05 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.4 0.175 0.125</size>
+          </box>
+        </geometry>
+        <surface>
+          <soft_contact>
+            <dart>
+              <bone_attachment>5000.0</bone_attachment>
+              <stiffness>100.0</stiffness>
+              <damping>50.0</damping>
+              <flesh_mass_fraction>0.5</flesh_mass_fraction>
+            </dart>
+          </soft_contact>
+        </surface>
       </collision>
       <visual name='r_foot_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>r_foot.dae</uri>
+            <uri>file://worlds/atlas/r_foot.dae</uri>
           </mesh>
         </geometry>
       </visual>

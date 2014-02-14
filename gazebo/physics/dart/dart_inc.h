@@ -53,4 +53,16 @@
 
 #include <dart/simulation/World.h>
 
+#include <soft/collision/SoftCollisionNode.h>
+#include <soft/collision/fcl_mesh/SoftFCLMeshCollisionDetector.h>
+
+#include <soft/dynamics/PointMass.h>
+#include <soft/dynamics/SoftBodyNode.h>
+#include <soft/dynamics/SoftMeshShape.h>
+#include <soft/dynamics/SoftSkeleton.h>
+
+#include <soft/constraint/SoftConstraintDynamics.h>
+
+#include <soft/simulation/SoftWorld.h>
+
 #endif

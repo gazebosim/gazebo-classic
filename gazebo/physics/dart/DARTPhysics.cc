@@ -62,7 +62,7 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->dtWorld = new dart::simulation::World;
+  this->dtWorld = new dart::simulation::SoftWorld;
 //  this->dtWorld->getConstraintHandler()->setCollisionDetector(
 //        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
@@ -421,7 +421,7 @@ boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTPhysics::GetDARTWorld()
+dart::simulation::SoftWorld *DARTPhysics::GetDARTWorld()
 {
   return this->dtWorld;
 }
