@@ -14,24 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Video Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _VIDEO_VISUAL_HH_
 #define _VIDEO_VISUAL_HH_
 
 #include <string>
-#include <vector>
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Video;
-  }
-
   namespace rendering
   {
     /// \addtogroup gazebo_rendering
@@ -51,21 +42,6 @@ namespace gazebo
 
       /// \brief PreRender event callback.
       private: void PreRender();
-
-      /// \brief Load a video
-      private: common::Video *video;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Texture to draw the video onto.
-      private: Ogre::TexturePtr texture;
-
-      /// \brief One frame of the viedeo.
-      private: unsigned char *imageBuffer;
-
-      /// \brief Width and height of the video.
-      private: int width, height;
     };
     /// \}
   }
