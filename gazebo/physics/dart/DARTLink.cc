@@ -607,7 +607,7 @@ void DARTLink::SetLinkStatic(bool _static)
     GetDARTWorld()->getConstraintHandler()->addConstraint(ballConst);
 
     // Add revolute joint constraint to DART
-    Eigen::Vector3d axis1(0.0, 1.0, 0.0);
+    Eigen::Vector3d axis1(0.0, 0.0, 1.0);
     Eigen::Vector3d globalAxis1
         = this->dtBodyNode->getWorldTransform() * axis1 - target;
     this->revConst = new dart::constraint::RevoluteJointConstraint(
