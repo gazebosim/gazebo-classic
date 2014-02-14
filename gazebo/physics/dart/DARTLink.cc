@@ -32,9 +32,11 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent),
-    dtBodyNode(NULL)
+    dtBodyNode(NULL),
+    staticLink(false),
+    ballConst(NULL),
+    revConst(NULL)
 {
-  staticLink = false;
 }
 
 //////////////////////////////////////////////////
@@ -586,24 +588,42 @@ void DARTLink::SetAutoDisable(bool /*_disable*/)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetLinkStatic(bool /*_static*/)
+void DARTLink::SetLinkStatic(bool _static)
 {
-//  if (_static == staticLink)
-//    return;
+  std::cout << "BEGIN - DARTLink::SetLinkStatic(bool _static)" << std::endl;
 
-//  if (_static)
-//  {
-//    // Store the original joint
-//    this->dtDynamicJoint = this->dtBodyNode->getParentJoint();
+  if (_static == staticLink)
+    return;
 
-//    this->dtBodyNode->setParentJoint(this->dtStaticJoint);
-//  }
-//  else
-//  {
+  if (_static == true)
+  {
+    // DART still does not support weld joint contraint. We here do workaround
+    // that creating quasi-weld joint constraint by combining ball and revolute
+    // joint  contratint.
 
-//  }
+    // Add ball joint constraint to DART
+    Eigen::Vector3d offset(0.0, 0.0, 0.0);
+    Eigen::Vector3d target = this->dtBodyNode->getWorldTransform() * offset;
+    this->ballConst = new dart::constraint::BallJointConstraint(
+          this->dtBodyNode, offset, target);
+    GetDARTWorld()->getConstraintHandler()->addConstraint(ballConst);
 
-  gzwarn << "DART does not support DARTLink::SetLinkStatic() yet.\n";
+    // Add revolute joint constraint to DART
+    Eigen::Vector3d axis1(0.0, 1.0, 0.0);
+    Eigen::Vector3d globalAxis1
+        = this->dtBodyNode->getWorldTransform() * axis1 - target;
+    this->revConst = new dart::constraint::RevoluteJointConstraint(
+          this->dtBodyNode, axis1, globalAxis1);
+    GetDARTWorld()->getConstraintHandler()->addConstraint(revConst);
+  }
+  else
+  {
+    // Remove ball and revolute joint straints from DART
+    GetDARTWorld()->getConstraintHandler()->deleteConstraint(ballConst);
+    GetDARTWorld()->getConstraintHandler()->deleteConstraint(revConst);
+  }
+
+  std::cout << "END - DARTLink::SetLinkStatic(bool _static)" << std::endl;
 }
 
 //////////////////////////////////////////////////
