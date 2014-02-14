@@ -70,7 +70,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   opt.axis.Set(1, 0, 0);
 
   // i = 0: child parent
-  // i = 1: child world 
+  // i = 1: child world
   // i = 2: world parent
   for (int i = 0; i < 3; ++i)
   {
