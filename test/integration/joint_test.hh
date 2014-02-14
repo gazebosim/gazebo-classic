@@ -180,9 +180,14 @@ class JointTest : public ServerFixture,
               modelStr << "    <child>child</child>";
             modelStr
               << "    <axis>"
-              << "      <xyz>" << _opt.axis << "</xyz>"
-              << "      <use_parent_model_frame>" << _opt.useParentModelFrame
-              << "      </use_parent_model_frame>"
+              << "      <xyz>" << _opt.axis << "</xyz>";
+            if (!(SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5))
+            {
+              modelStr
+                << "      <use_parent_model_frame>" << _opt.useParentModelFrame
+                << "      </use_parent_model_frame>";
+            }
+            modelStr
               << "    </axis>";
             modelStr
               << "  </joint>"

@@ -33,6 +33,13 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
+  if (SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5)
+  {
+    gzerr << "SDF version [" << SDF_VERSION << "] detected, "
+          << "1.5 or greater required"
+          << std::endl;
+    return;
+  }
   if (!(_physicsEngine == "ode" && _jointType == "revolute"))
   {
     gzerr << "This test only works for ODEHingeJoint for now" << std::endl;
@@ -51,10 +58,12 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
   SpawnJointOptions opt;
   opt.type = _jointType;
-  double Am = M_PI / 8;
-  double Al = M_PI / 8;
+  double Am = M_PI / 12;
+  double Al = M_PI / 12;
+  double Aj = M_PI / 12;
   opt.modelPose.rot.SetFromEuler(0, 0, Am);
   opt.childLinkPose.rot.SetFromEuler(0, 0, Al);
+  opt.jointPose.rot.SetFromEuler(0, 0, Aj);
   opt.axis.Set(1, 0, 0);
 
   // i = 0: child parent
@@ -110,11 +119,12 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
       if (opt.worldChild)
       {
-        EXPECT_EQ(opt.axis, joint->GetGlobalAxis(0));
+        math::Vector3 referenceAxis(cos(Aj), sin(Aj), 0);
+        EXPECT_EQ(referenceAxis, joint->GetGlobalAxis(0));
       }
       else
       {
-        math::Vector3 referenceAxis(cos(Am+Al), sin(Am+Al), 0);
+        math::Vector3 referenceAxis(cos(Am+Al+Aj), sin(Am+Al+Aj), 0);
         EXPECT_EQ(referenceAxis, joint->GetGlobalAxis(0));
       }
     }
