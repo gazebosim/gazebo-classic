@@ -507,7 +507,7 @@ class ServerFixture : public testing::Test
   /// \brief Map of received poses.
   protected: std::map<std::string, math::Pose> poses;
 
-  /// \brief Mutex to protect data structures that store messages.dsddddddddddddddddddd
+  /// \brief Mutex to protect data structures that store messages.
   protected: boost::mutex receiveMutex;
 
   /// \brief Image data
