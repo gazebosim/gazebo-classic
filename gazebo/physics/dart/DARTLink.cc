@@ -590,8 +590,6 @@ void DARTLink::SetAutoDisable(bool /*_disable*/)
 //////////////////////////////////////////////////
 void DARTLink::SetLinkStatic(bool _static)
 {
-  std::cout << "BEGIN - DARTLink::SetLinkStatic(bool _static)" << std::endl;
-
   if (_static == staticLink)
     return;
 
@@ -599,7 +597,7 @@ void DARTLink::SetLinkStatic(bool _static)
   {
     // DART still does not support weld joint contraint. We here do workaround
     // that creating quasi-weld joint constraint by combining ball and revolute
-    // joint  contratint.
+    // joint contratint.
 
     // Add ball joint constraint to DART
     Eigen::Vector3d offset(0.0, 0.0, 0.0);
@@ -622,8 +620,6 @@ void DARTLink::SetLinkStatic(bool _static)
     GetDARTWorld()->getConstraintHandler()->deleteConstraint(ballConst);
     GetDARTWorld()->getConstraintHandler()->deleteConstraint(revConst);
   }
-
-  std::cout << "END - DARTLink::SetLinkStatic(bool _static)" << std::endl;
 }
 
 //////////////////////////////////////////////////
