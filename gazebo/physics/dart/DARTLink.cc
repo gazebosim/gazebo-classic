@@ -616,7 +616,7 @@ void DARTLink::SetLinkStatic(bool _static)
   }
   else
   {
-    // Remove ball and revolute joint straints from DART
+    // Remove ball and revolute joint constraints from DART
     GetDARTWorld()->getConstraintHandler()->deleteConstraint(ballConst);
     GetDARTWorld()->getConstraintHandler()->deleteConstraint(revConst);
   }
