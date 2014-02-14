@@ -40,9 +40,12 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
           << std::endl;
     return;
   }
-  if (!(_physicsEngine == "ode" && _jointType == "revolute"))
+  if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")
+      && _jointType == "revolute"))
   {
-    gzerr << "This test only works for ODEHingeJoint for now" << std::endl;
+    gzerr << "This test doesn't yet work for [" << _physicsEngine
+          << "] with joint type [" << _jointType << "]"
+          << std::endl;
     return;
   }
 
