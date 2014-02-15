@@ -44,10 +44,9 @@
 #undef REPORT_THREAD_TIMING
 #define USE_TPROW
 #undef TIMING
-#undef REPORT_MONITOR
+#undef DEBUG_CONVERGENCE_TOLERANCE
 #undef SHOW_CONVERGENCE
 #define SMOOTH_LAMBDA
-#undef RECOMPUTE_RMS
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
 //#define PENETRATION_JVERROR_CORRECTION
@@ -119,7 +118,6 @@ struct dxSORLCPParameters {
     dRealMutablePtr lambda;
     dRealMutablePtr lambda_erp;
     dRealMutablePtr iMJ;
-    dRealMutablePtr delta_error ;
     dRealMutablePtr rhs_precon ;
     dRealMutablePtr J_precon ;
     dRealMutablePtr J_orig ;
@@ -534,9 +532,6 @@ static void ComputeRows(
   dRealMutablePtr lambda       = params.lambda;
   dRealMutablePtr lambda_erp   = params.lambda_erp;
   dRealMutablePtr iMJ          = params.iMJ;
-#ifdef RECOMPUTE_RMS
-  dRealMutablePtr delta_error  = params.delta_error;
-#endif
   dRealMutablePtr rhs_precon   = params.rhs_precon;
   dRealMutablePtr J_precon     = params.J_precon;
   dRealMutablePtr J_orig       = params.J_orig;
@@ -593,28 +588,20 @@ static void ComputeRows(
   printf("\n");
   */
 
-  double rms_error = 0;
+  dReal rms_error[3];
+  dSetZero(rms_error, 3);
   int num_iterations = qs->num_iterations;
   int precon_iterations = qs->precon_iterations;
-  double sor_lcp_tolerance = qs->sor_lcp_tolerance;
+  dReal sor_lcp_tolerance = qs->sor_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
 
-  // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
-  //       velocity update
-  bool preconditioning;
-
 #ifdef SHOW_CONVERGENCE
-    if (1)
-    {
-      // show starting lambda
-      printf("lambda start: [");
-      for (int i=startRow; i<startRow+nRows; i++)
-      {
-        printf("%f, ", lambda[i]);
-      }
-      printf("]\n");
-    }
+    // show starting lambda
+    printf("lambda start: [");
+    for (int i=startRow; i<startRow+nRows; i++)
+      printf("%f, ", lambda[i]);
+    printf("]\n");
 #endif
 
 #ifdef PENETRATION_JVERROR_CORRECTION
@@ -626,12 +613,19 @@ static void ComputeRows(
   dRealMutablePtr caccel_erp_ptr2;
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
-
-    rms_error = 0;
-
-    if (iteration < precon_iterations) preconditioning = true;
-    else                               preconditioning = false;
+  int total_iterations = precon_iterations + num_iterations + 
+    friction_iterations;
+  for (int iteration = 0; iteration < total_iterations; ++iteration)
+  {
+    // reset rms_error at beginning of iteration
+    rms_error[2] = 0;
+    if (iteration < num_iterations + precon_iterations)
+    {
+      // skip resetting rms_error for bilateral constraints
+      // and contacct normals during extra friciton iterations.
+      rms_error[0] = 0;
+      rms_error[1] = 0;
+    }
 
 #ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
     // constraints with findex < 0 always come first.
@@ -719,11 +713,13 @@ static void ComputeRows(
       //     access pattern.
 
       int index = order[i].index;
-      int normal_index = findex[index];  // cache for efficiency
+      int constraint_index = findex[index];  // cache for efficiency
 
       // check if we are doing extra friction_iterations, if so, only solve
       // friction force constraints and nothing else.
-      if (iteration >= num_iterations + precon_iterations && normal_index < 0)
+      // i.e. skip bilateral and contact normal constraints.
+      if (iteration >= (num_iterations + precon_iterations) &&
+          constraint_index < 0)
         continue;
 
       dReal delta,delta_erp;
@@ -764,8 +760,10 @@ static void ComputeRows(
       //  Ad_precon is derived from diagonal of J J'
       //
       // caccel_erp is from the non-precon case with erp turned on
-      //
-      if (preconditioning) {
+      if (iteration < precon_iterations)
+      {
+        // preconditioning
+
         // update delta_precon
         delta_precon = rhs_precon[index] - old_lambda*Adcfm_precon[index];
 
@@ -785,8 +783,8 @@ static void ComputeRows(
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
         dReal hi_act, lo_act;
-        if (normal_index >= 0) {
-          hi_act = dFabs (hi[index] * lambda[normal_index]);
+        if (constraint_index >= 0) {
+          hi_act = dFabs (hi[index] * lambda[constraint_index]);
           lo_act = -hi_act;
         } else {
           hi_act = hi[index];
@@ -807,7 +805,8 @@ static void ComputeRows(
         }
 #else
         dReal nl = old_lambda+ delta_precon;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
         lambda[index] = nl;
         delta_precon = nl - old_lambda;
 #endif
@@ -815,7 +814,8 @@ static void ComputeRows(
         // update cforce (this is strictly for the precon case)
         {
           // for preconditioning case, compute cforce
-          J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
+          // FIXME: need un-altered unscaled J, not J_precon!!
+          J_ptr = J_orig + index*12;
 
           // update cforce.
           sum6(cforce_ptr1, delta_precon, J_ptr);
@@ -824,187 +824,186 @@ static void ComputeRows(
         }
 
         // record error (for the non-erp version)
-        rms_error += delta_precon*delta_precon;
-#ifdef RECOMPUTE_RMS
-        delta_error[index] = dFabs(delta_precon);
-#endif
+        if (constraint_index == -1)  // bilateral
+          rms_error[0] += delta_precon*delta_precon;
+        else if (constraint_index == -2)  // contact normal
+          rms_error[1] += delta_precon*delta_precon;
+        else  // friction forces
+          rms_error[2] += delta_precon*delta_precon;
+
         old_lambda_erp = old_lambda;
         lambda_erp[index] = lambda[index];
       }
-      else {
-        {
+      else
+      {
+        // NOTE:
+        // for this update, we need not throw away J*v(n+1)/h term from rhs
+        //   ...so adding it back, but remember rhs has already been
+        //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
+        //      but given that J is already scaled by Ad_i, we don't have
+        //      to do it explicitly here
 
-          // NOTE:
-          // for this update, we need not throw away J*v(n+1)/h term from rhs
-          //   ...so adding it back, but remember rhs has already been
-          //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
-          //      but given that J is already scaled by Ad_i, we don't have
-          //      to do it explicitly here
-
-          // delta: erp throttled by info.c_v_max or info.c
-          delta =
+        // delta: erp throttled by info.c_v_max or info.c
+        delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
-                 Jvnew_final +
+               Jvnew_final +
 #endif
-                rhs[index] - old_lambda*Adcfm[index];
-          dRealPtr J_ptr = J + index*12;
-          delta -= dot6(caccel_ptr1, J_ptr);
-          if (caccel_ptr2)
-            delta -= dot6(caccel_ptr2, J_ptr + 6);
+              rhs[index] - old_lambda*Adcfm[index];
+        dRealPtr J_ptr = J + index*12;
+        delta -= dot6(caccel_ptr1, J_ptr);
+        if (caccel_ptr2)
+          delta -= dot6(caccel_ptr2, J_ptr + 6);
 
-          // delta_erp: unthrottled version compute for rhs with custom erp
-          // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-          delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-          delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
-          if (caccel_erp_ptr2)
-            delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
+        // delta_erp: unthrottled version compute for rhs with custom erp
+        // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+        delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+        delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+        if (caccel_erp_ptr2)
+          delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
 
-          // set the limits for this constraint.
-          // this is the place where the QuickStep method differs from the
-          // direct LCP solving method, since that method only performs this
-          // limit adjustment once per time step, whereas this method performs
-          // once per iteration per constraint row.
-          // the constraints are ordered so that all lambda[] values needed have
-          // already been computed.
-          dReal hi_act, lo_act;
-          dReal hi_act_erp, lo_act_erp;
-          if (normal_index >= 0) {
-            // FOR erp throttled by info.c_v_max or info.c
-            hi_act = dFabs (hi[index] * lambda[normal_index]);
-            lo_act = -hi_act;
-            // for the unthrottled _erp version
-            hi_act_erp = dFabs (hi[index] * lambda_erp[normal_index]);
-            lo_act_erp = -hi_act_erp;
-          } else {
-            // FOR erp throttled by info.c_v_max or info.c
-            hi_act = hi[index];
-            lo_act = lo[index];
-            // for the unthrottled _erp version
-            hi_act_erp = hi[index];
-            lo_act_erp = lo[index];
-          }
-
-          // compute lambda and clamp it to [lo,hi].
-          // @@@ SSE not a win here
-  #if 1
+        // set the limits for this constraint.
+        // this is the place where the QuickStep method differs from the
+        // direct LCP solving method, since that method only performs this
+        // limit adjustment once per time step, whereas this method performs
+        // once per iteration per constraint row.
+        // the constraints are ordered so that all lambda[] values needed have
+        // already been computed.
+        dReal hi_act, lo_act;
+        dReal hi_act_erp, lo_act_erp;
+        if (constraint_index >= 0) {
           // FOR erp throttled by info.c_v_max or info.c
-          lambda[index] = old_lambda + delta;
-          if (lambda[index] < lo_act) {
-            delta = lo_act-old_lambda;
-            lambda[index] = lo_act;
-          }
-          else if (lambda[index] > hi_act) {
-            delta = hi_act-old_lambda;
-            lambda[index] = hi_act;
-          }
-
+          hi_act = dFabs (hi[index] * lambda[constraint_index]);
+          lo_act = -hi_act;
           // for the unthrottled _erp version
-          lambda_erp[index] = old_lambda_erp + delta_erp;
-          if (lambda_erp[index] < lo_act_erp) {
-            delta_erp = lo_act_erp-old_lambda_erp;
-            lambda_erp[index] = lo_act_erp;
-          }
-          else if (lambda_erp[index] > hi_act_erp) {
-            delta_erp = hi_act_erp-old_lambda_erp;
-            lambda_erp[index] = hi_act_erp;
-          }
-  #else
+          hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+          lo_act_erp = -hi_act_erp;
+        } else {
           // FOR erp throttled by info.c_v_max or info.c
-          dReal nl = old_lambda + delta;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-          lambda[index] = nl;
-          delta = nl - old_lambda;
-
+          hi_act = hi[index];
+          lo_act = lo[index];
           // for the unthrottled _erp version
-          dReal nl = old_lambda_erp + delta_erp;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-          lambda_erp[index] = nl;
-          delta_erp = nl - old_lambda_erp;
-  #endif
+          hi_act_erp = hi[index];
+          lo_act_erp = lo[index];
+        }
 
-          // option to smooth lambda
+        // compute lambda and clamp it to [lo,hi].
+        // @@@ SSE not a win here
+#if 1
+        // FOR erp throttled by info.c_v_max or info.c
+        lambda[index] = old_lambda + delta;
+        if (lambda[index] < lo_act) {
+          delta = lo_act-old_lambda;
+          lambda[index] = lo_act;
+        }
+        else if (lambda[index] > hi_act) {
+          delta = hi_act-old_lambda;
+          lambda[index] = hi_act;
+        }
+
+        // for the unthrottled _erp version
+        lambda_erp[index] = old_lambda_erp + delta_erp;
+        if (lambda_erp[index] < lo_act_erp) {
+          delta_erp = lo_act_erp-old_lambda_erp;
+          lambda_erp[index] = lo_act_erp;
+        }
+        else if (lambda_erp[index] > hi_act_erp) {
+          delta_erp = hi_act_erp-old_lambda_erp;
+          lambda_erp[index] = hi_act_erp;
+        }
+#else
+        // FOR erp throttled by info.c_v_max or info.c
+        dReal nl = old_lambda + delta;
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        lambda[index] = nl;
+        delta = nl - old_lambda;
+
+        // for the unthrottled _erp version
+        dReal nl = old_lambda_erp + delta_erp;
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        lambda_erp[index] = nl;
+        delta_erp = nl - old_lambda_erp;
+#endif
+
+        // option to smooth lambda
 #ifdef SMOOTH_LAMBDA
+        {
+          // smooth delta lambda
+          // equivalent to first order artificial dissipation on lambda update.
+
+          // debug smoothing
+          // if (i == 0)
+          //   printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
+          // if (i == 0)
+          //   printf("dlambda iter[%d]: ",iteration);
+          // printf(" %f ", lambda[index]-old_lambda);
+          // if (i == startRow + nRows - 1)
+          //   printf("\n");
+
+          if (constraint_index != -1)
           {
-            // smooth delta lambda
-            // equivalent to first order artificial dissipation on lambda update.
-#ifdef SHOW_CONVERGENCE
-            if (0)
-            {
-              if (i == 0)
-                printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
-              if (i == 0)
-                printf("dlambda iter[%d]: ",iteration);
-              printf(" %f ", lambda[index]-old_lambda);
-              if (i == startRow + nRows - 1)
-                printf("\n");
-            }
-#endif
-            if (normal_index != -1)
-            {
-              // extra residual smoothing for contact constraints
-              lambda[index] = (1.0 - smooth_contacts)*lambda[index]
-                + smooth_contacts*old_lambda;
-              // is filtering lambda_erp necessary?
-              // lambda_erp[index] = (1.0 - smooth_contacts)*lambda_erp[index]
-              //   + smooth_contacts*old_lambda_erp;
-            }
-          }
-#endif
-
-          // update caccel
-          {
-            // FOR erp throttled by info.c_v_max or info.c
-            dRealPtr iMJ_ptr = iMJ + index*12;
-
-            // update caccel.
-            sum6(caccel_ptr1, delta, iMJ_ptr);
-            if (caccel_ptr2)
-              sum6(caccel_ptr2, delta, iMJ_ptr + 6);
-
-            // update caccel_erp.
-            sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-            if (caccel_erp_ptr2)
-              sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-
-#ifdef PENETRATION_JVERROR_CORRECTION
-            // update vnew incrementally
-            //   add stepsize * delta_caccel to the body velocity
-            //   vnew = vnew + dt * delta_caccel
-            sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);;
-            if (caccel_ptr2)
-              sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
-
-            // COMPUTE Jvnew = J*vnew/h*Ad
-            //   but J is already scaled by Ad, and we multiply by h later
-            //   so it's just Jvnew = J*vnew here
-            if (iteration >= num_iterations-7) {
-              // check for non-contact bilateral constraints only
-              // I've set findex to -2 for contact normal constraint
-              if (normal_index == -1) {
-                dRealPtr J_ptr = J + index*12;
-                Jvnew = dot6(vnew_ptr1,J_ptr);
-                if (caccel_ptr2)
-                  Jvnew += dot6(vnew_ptr2,J_ptr+6);
-                //printf("iter [%d] findex [%d] Jvnew [%f] lo [%f] hi [%f]\n",
-                //       iteration, findex[index], Jvnew, lo[index], hi[index]);
-              }
-            }
-            //printf("iter [%d] vnew [%f,%f,%f,%f,%f,%f] Jvnew [%f]\n",
-            //       iteration,
-            //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
-            //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
-#endif
-
+            // extra residual smoothing for contact constraints
+            lambda[index] = (1.0 - smooth_contacts)*lambda[index]
+              + smooth_contacts*old_lambda;
+            // is filtering lambda_erp necessary?
+            // lambda_erp[index] = (1.0 - smooth_contacts)*lambda_erp[index]
+            //   + smooth_contacts*old_lambda_erp;
           }
         }
-        // record error (for the non-erp version)
-        rms_error += delta*delta;
-#ifdef RECOMPUTE_RMS
-        delta_error[index] = dFabs(delta);
 #endif
+
+        // update caccel
+        {
+          // FOR erp throttled by info.c_v_max or info.c
+          dRealPtr iMJ_ptr = iMJ + index*12;
+
+          // update caccel.
+          sum6(caccel_ptr1, delta, iMJ_ptr);
+          if (caccel_ptr2)
+            sum6(caccel_ptr2, delta, iMJ_ptr + 6);
+
+          // update caccel_erp.
+          sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+          if (caccel_erp_ptr2)
+            sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+          // update vnew incrementally
+          //   add stepsize * delta_caccel to the body velocity
+          //   vnew = vnew + dt * delta_caccel
+          sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);;
+          if (caccel_ptr2)
+            sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
+
+          // COMPUTE Jvnew = J*vnew/h*Ad
+          //   but J is already scaled by Ad, and we multiply by h later
+          //   so it's just Jvnew = J*vnew here
+          if (iteration >= num_iterations-7) {
+            // check for non-contact bilateral constraints only
+            // I've set findex to -2 for contact normal constraint
+            if (constraint_index == -1) {
+              dRealPtr J_ptr = J + index*12;
+              Jvnew = dot6(vnew_ptr1,J_ptr);
+              if (caccel_ptr2)
+                Jvnew += dot6(vnew_ptr2,J_ptr+6);
+              // printf("iter [%d] findex [%d] Jvnew [%f] lo [%f] hi [%f]\n",
+              //   iteration, constraint_index, Jvnew, lo[index], hi[index]);
+            }
+          }
+          //printf("iter [%d] vnew [%f,%f,%f,%f,%f,%f] Jvnew [%f]\n",
+          //       iteration,
+          //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
+          //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
+#endif
+        }
+
+        // record error (for the non-erp version)
+        if (constraint_index == -1)  // bilateral
+          rms_error[0] += delta*delta;
+        else if (constraint_index == -2)  // contact normal
+          rms_error[1] += delta*delta;
+        else  // friction forces
+          rms_error[2] += delta*delta;
       }
-
-
 
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
@@ -1019,30 +1018,11 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-#ifdef RECOMPUTE_RMS
-    // recompute rms_error to be sure swap is not corrupting arrays
-    rms_error = 0;
-    #ifdef USE_1NORM
-        //for (int i=startRow; i<startRow+nRows; i++)
-        for (int i=0; i<m; i++)
-        {
-          rms_error = dFabs(delta_error[order[i].index]) > rms_error ? dFabs(delta_error[order[i].index]) : rms_error; // 1norm test
-        }
-    #else // use 2 norm
-        //for (int i=startRow; i<startRow+nRows; i++)
-        for (int i=startRow; i<startRow+nRows; i++)  // use entire solution vector errors
-          rms_error += delta_error[order[i].index]*delta_error[order[i].index]; ///(dReal)nRows;
-        rms_error = sqrt(rms_error/(dReal)nRows);
-    #endif
-#else
-    rms_error = sqrt(rms_error/(dReal)nRows);
-#endif
+    qs->rms_error[0] = sqrt(rms_error[0]/(dReal)nRows);
+    qs->rms_error[1] = sqrt(rms_error[1]/(dReal)nRows);
+    qs->rms_error[2] = sqrt(rms_error[2]/(dReal)nRows);
 
-    //printf("------ %d %d %20.18f\n",thread_id,iteration,rms_error);
-
-    //for (int i=startRow; i<startRow+nRows; i++) printf("debug: %d %f\n",i,delta_error[i]);
-
-
+    // debugging mutex locking
     //{
     //  // verify
     //  boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
@@ -1052,65 +1032,65 @@ static void ComputeRows(
     //  printf("\n");
     //  for (int i=startRow+1; i<startRow+nRows; i++)
     //    printf(" %10d;",order[i].index);
-    //  printf("\n");
-    //  for (int i=startRow+1; i<startRow+nRows; i++)
-    //    printf(" %10.8f,",delta_error[i]);
-    //  printf("\n%f\n",rms_error);
+    //  printf("\n%f %f %f\n",
+    //    qs->rms_error[0],qs->rms_error[1],qs->rms_error[2]);
     //}
 
 #ifdef SHOW_CONVERGENCE
-    // show per iteration history
-    if (0)
-    {
-      printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
-    }
-    if (0)
-    {
-      for (int i=startRow; i<startRow+nRows; i++)
-      {
-        printf("%f, ", lambda[i]);
-      }
-      printf("\n");
-    }
+    /* uncomment for convergence information per row sweep (LOTS OF DATA!)
+    printf("MONITOR: thread(%d) iter(%d) rms(%20.18f %20.18f %20.18)f\n",
+      thread_id, iteration,
+      qs->rms_error[0], qs->rms_error[1], qs->rms_error[2]);
+
+    // print lambda
+    for (int i=startRow; i<startRow+nRows; i++)
+      printf("%f, ", lambda[i]);
+    printf("\n");
+    */
 #endif
 
-    if (rms_error < sor_lcp_tolerance)
+    // option to stop when tolerance has been met
+    if (iteration < precon_iterations &&
+        (qs->rms_error[0] + qs->rms_error[1] + qs->rms_error[2])
+        < sor_lcp_tolerance)
     {
-      #ifdef REPORT_MONITOR
-        printf("CONVERGED: id: %d steps: %d rms(%20.18f < %20.18f)\n",thread_id,iteration,rms_error,sor_lcp_tolerance);
+      #ifdef DEBUG_CONVERGENCE_TOLERANCE
+        printf("CONVERGED: id: %d steps: %d,"
+               " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
+          thread_id, iteration,
+          qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+          sor_lcp_tolerance);
       #endif
-      if (iteration < precon_iterations) iteration = precon_iterations; // goto non-precon step
-      else                               break;                         // finished
+      // tolerance satisfied, stop iterating
+      break;
     }
-    else if (iteration == num_iterations + precon_iterations -1)
+    else if (iteration >= total_iterations - 1)
     {
-      #ifdef REPORT_MONITOR
-        printf("WARNING: id: %d did not converge in %d steps, rms(%20.18f > %20.18f)\n",thread_id,num_iterations,rms_error,sor_lcp_tolerance);
+      #ifdef DEBUG_CONVERGENCE_TOLERANCE
+        printf("WARNING: id: %d did not converge in %d steps,"
+               " rms(%20.18f + %20.18f + %20.18f) > tol(%20.18f)\n",
+          thread_id, num_iterations,
+          qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+          sor_lcp_tolerance);
       #endif
     }
-
   } // end of for loop on iterations
 
 #ifdef SHOW_CONVERGENCE
-  if (1)
-  {
-    // show starting lambda
-    printf("lambda end: [");
-    for (int i=startRow; i<startRow+nRows; i++)
-    {
-      printf("%f, ", lambda[i]);
-    }
-    printf("]\n");
-    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,num_iterations,rms_error);
-  }
+  // show starting lambda
+  printf("final lambdas: [");
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("%f, ", lambda[i]);
+  printf("]\n");
+  printf("MONITOR: id: %d steps: %d,"
+         " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
+    thread_id, total_iterations,
+    qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+    sor_lcp_tolerance);
 #endif
   //printf("vnew: ");
   //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
   //printf("\n");
-
-
-
-  qs->rms_error          = rms_error;
 
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
@@ -1275,8 +1255,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
   IndexError *order = context->AllocateArray<IndexError> (m);
   int *tmpOrder = context->AllocateArray<int> (m);
 
-  dReal *delta_error = context->AllocateArray<dReal> (m);
-
 #ifndef REORDER_CONSTRAINTS
   if (qs->row_reorder1)
   {
@@ -1420,7 +1398,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].lambda = lambda;
     params[thread_id].lambda_erp = lambda_erp;
     params[thread_id].iMJ = iMJ;
-    params[thread_id].delta_error  = delta_error ;
     params[thread_id].rhs_precon  = rhs_precon ;
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
@@ -1431,8 +1408,9 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].last_lambda_erp  = last_lambda_erp ;
 #endif
 
-#ifdef REPORT_MONITOR
-    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",thread_id,i,m,chunk,nStart,nEnd);
+#ifdef DEBUG_CONVERGENCE_TOLERANCE
+    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+      thread_id,i,m,chunk,nStart,nEnd);
 #endif
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
@@ -1667,7 +1645,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
             // check per row, that sum of absolute values of off-diagonal elements
             // is less than absolute value of the diagonal element itself.
-            double newMOI1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+            dReal newMOI1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
             if (newMOI1 > sumAbsOffDiags1[row])
             {
               // modify inertia in the constrained direction,
@@ -1682,7 +1660,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               MOI_ptr1[si] = sumAbsOffDiags1[row];
             }
 
-            double newMOI2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
+            dReal newMOI2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
             if (newMOI2 > sumAbsOffDiags2[row])
             {
               // modify inertia in the constrained direction,
@@ -2356,9 +2334,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // Better measure is compute the residual.  \\\ TODO
       }
       // printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
-      world->qs.constraint_residual = sqrt(error/(double)m);
-      world->qs.bilateral_residual = sqrt(bilateral_error/(double)m);
-      world->qs.contact_residual = sqrt(contact_error/(double)m);
+      world->qs.constraint_residual = sqrt(error/(dReal)m);
+      world->qs.bilateral_residual = sqrt(bilateral_error/(dReal)m);
+      world->qs.contact_residual = sqrt(contact_error/(dReal)m);
       world->qs.num_contacts = contacts;
     } END_STATE_SAVE(context, rmsstate);
   }
@@ -2507,7 +2485,6 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad_precon
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm_precon
-  res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for delta_error
   res += dEFFICIENT_SIZE(sizeof(IndexError) * m); // for order
   res += dEFFICIENT_SIZE(sizeof(int) * m); // for tmpOrder
 #ifdef REORDER_CONSTRAINTS

@@ -630,7 +630,6 @@ void World::Update()
   }
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
-
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
@@ -667,6 +666,13 @@ void World::Update()
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
+
+    double *rmsError = boost::any_cast<double*>(
+      this->physicsEngine->GetParam("rms_error"));
+    gzerr << "rms [" << rmsError[0]
+          << ", " << rmsError[1]
+          << ", " << rmsError[2]
+          << "]\n";
 
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 

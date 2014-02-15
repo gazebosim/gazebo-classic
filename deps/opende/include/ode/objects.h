@@ -496,7 +496,7 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
  * @ingroup world
  * @returns the rms error
  */
-ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
+ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
 
 /**
  * @brief Get the RMS of Ax-b of the quickstep step

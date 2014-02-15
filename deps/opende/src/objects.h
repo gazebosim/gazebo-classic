@@ -102,7 +102,11 @@ struct dxQuickStepParameters {
   int num_chunks;		// divide rows to these many chunks
   int num_overlap;		// divide rows but over lap this many rows
   dReal sor_lcp_tolerance;	// the stop if rms_error falls below this
-  dReal rms_error;      	// rms_error for this time step
+  // rms_error for this time step
+  // rms_error[0]: bilateral constraints (findex = -1)
+  // rms_error[1]: contact normal constraints (findex = -2)
+  // rms_error[2]: friciton constraints (findex >= 0)
+  dReal rms_error[3];
   dReal constraint_residual;     // all constraint errors
   dReal bilateral_residual;     // bilateral joint constraint errors
   dReal contact_residual;     // contact constraint errors

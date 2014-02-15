@@ -1676,7 +1676,9 @@ dxWorld * dWorldCreate()
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
   w->qs.sor_lcp_tolerance = 0;
-  w->qs.rms_error = 0;
+  w->qs.rms_error[0] = 0;
+  w->qs.rms_error[1] = 0;
+  w->qs.rms_error[2] = 0;
   w->qs.constraint_residual = 0;
   w->qs.bilateral_residual = 0;
   w->qs.contact_residual = 0;
@@ -2264,7 +2266,7 @@ dReal dWorldGetQuickStepW (dWorldID w)
 	return w->qs.w;
 }
 
-dReal dWorldGetQuickStepRMSError (dWorldID w)
+dReal *dWorldGetQuickStepRMSError (dWorldID w)
 {
 	dAASSERT(w);
 	return w->qs.rms_error;

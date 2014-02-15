@@ -106,7 +106,7 @@ public:
     { dWorldSetQuickStepW (get_id(), over_relaxation); }
   dReal getQuickStepW() const
     { return dWorldGetQuickStepW (get_id()); }
-  dReal getQuickStepRMSError() const
+  dReal *getQuickStepRMSError() const
     { return dWorldGetQuickStepRMSError (get_id()); }
   dReal getQuickStepConstraintResidual() const
     { return dWorldGetQuickStepConstraintResidual (get_id()); }
