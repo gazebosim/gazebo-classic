@@ -1049,3 +1049,63 @@ size_t Model::GetGripperCount() const
 {
   return this->grippers.size();
 }
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyPotential()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergyPotential();
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKinetic()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergyKinetic();
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergy()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergy();
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKineticFiltered()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergyKineticFiltered();
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyFiltered()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergyFiltered();
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKineticVibrational()
+{
+  double e = 0;
+  for (Link_V::iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+    e += (*iter)->GetWorldEnergyKineticVibrational();
+  return e;
+}

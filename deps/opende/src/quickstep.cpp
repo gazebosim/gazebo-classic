@@ -939,9 +939,12 @@ static void ComputeRows(
           // if (i == startRow + nRows - 1)
           //   printf("\n");
 
-          if (constraint_index != -1)
+          // extra residual smoothing for contact constraints
+          // was smoothing both contact normal and friction constraints for VRC
+          // trying only friction direction
+          // if (constraint_index != -1)
+          if (constraint_index >= 0)
           {
-            // extra residual smoothing for contact constraints
             lambda[index] = (1.0 - smooth_contacts)*lambda[index]
               + smooth_contacts*old_lambda;
             // is filtering lambda_erp necessary?
