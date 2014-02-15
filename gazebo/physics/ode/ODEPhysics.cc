@@ -248,6 +248,14 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
+    physicsMsg.set_irr(
+        boost::any_cast<bool>(this->GetParam("inertia_ratio_reduction")));
+    physicsMsg.set_friction_iters(
+        boost::any_cast<int>(this->GetParam("extra_friction_iterations")));
+    physicsMsg.set_warm_start_factor(
+        boost::any_cast<double>(this->GetParam("warm_start_factor")));
+    physicsMsg.set_reorder(
+        boost::any_cast<bool>(this->GetParam("experimental_row_reordering")));
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -291,6 +299,15 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_irr())
     this->SetParam("inertia_ratio_reduction", _msg->irr());
+
+  if (_msg->has_friction_iters())
+    this->SetParam("extra_friction_iterations", _msg->friction_iters());
+
+  if (_msg->has_warm_start_factor())
+    this->SetParam("warm_start_factor", _msg->warm_start_factor());
+
+  if (_msg->has_reorder())
+    this->SetParam("experimental_row_reordering", _msg->reorder());
 
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());

@@ -597,6 +597,12 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
     {
       msg.set_irr(this->variantManager->value(
             this->GetChildItem((*iter), "irr")).toBool());
+      msg.set_friction_iters(this->variantManager->value(
+            this->GetChildItem((*iter), "extra friction iters")).toInt());
+      msg.set_warm_start_factor(this->variantManager->value(
+            this->GetChildItem((*iter), "warm start factor")).toDouble());
+      msg.set_reorder(this->variantManager->value(
+            this->GetChildItem((*iter), "row reorder")).toBool());
       msg.set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
       msg.set_sor(this->variantManager->value(
@@ -2294,7 +2300,26 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   this->propTreeBrowser->addProperty(solverItem);
 
   item = this->variantManager->addProperty(QVariant::Bool, tr("irr"));
-  if (_msg.has_iters())
+  if (_msg.has_irr())
+    item->setValue(_msg.iters());
+  solverItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Int, tr("friction_iters"));
+  if (_msg.has_friction_iters())
+    item->setValue(_msg.iters());
+  solverItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+    tr("warm start factor"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_warm_start_factor())
+    item->setValue(_msg.warm_start_factor());
+  solverItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("reorder"));
+  if (_msg.has_reorder())
     item->setValue(_msg.iters());
   solverItem->addSubProperty(item);
 
