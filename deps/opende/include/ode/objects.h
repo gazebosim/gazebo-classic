@@ -414,19 +414,25 @@ ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
  * @brief Set the tolerance of when sor lcp stops
  * @param num The default is 1 chunk
  */
-void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
+ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
+
+/**
+ * @brief Set the tolerance of when sor lcp stops
+ * @param num The default is 1 chunk
+ */
+ODE_API void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
 
 /**
  * @brief Set the number of chunks quickstep divide up constraint rows
  * @param num The default is 1 chunk
  */
-void dWorldSetQuickStepNumChunks (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumChunks (dWorldID, int num);
 
 /**
  * @brief Set the number of overlap when quickstep divide up constraint rows
  * @param num The default is 0 overlap
  */
-void dWorldSetQuickStepNumOverlap (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumOverlap (dWorldID, int num);
 
 /**
  * @brief Get the maximum number of iterations that the RobustStep method 

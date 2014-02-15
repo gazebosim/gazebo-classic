@@ -2199,6 +2199,12 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
         w->max_angular_speed = max_speed;
 }
 
+double dWorldGetQuickStepTolerance (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.sor_lcp_tolerance;
+}
+
 void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
 {
 	dAASSERT(w);

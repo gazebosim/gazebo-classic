@@ -102,6 +102,14 @@ public:
     { return dWorldGetQuickStepPreconIterations (get_id()); }
   int getQuickStepNumIterations() const
     { return dWorldGetQuickStepNumIterations (get_id()); }
+  dReal getQuickStepTolerance()
+    { return dWorldGetQuickStepTolerance (get_id()); }
+  void setQuickStepTolerance(dReal tol)
+    { dWorldSetQuickStepTolerance (get_id(), tol); }
+  void setQuickStepNumChunks (int num)
+    { dWorldSetQuickStepNumChunks (get_id(), num); }
+  void setQuickStepNumOverlap (dWorldID, int num)
+    { dWorldSetQuickStepNumOverlap (get_id(), num); }
   void setQuickStepW(dReal over_relaxation)
     { dWorldSetQuickStepW (get_id(), over_relaxation); }
   dReal getQuickStepW() const
