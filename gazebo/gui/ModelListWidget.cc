@@ -596,13 +596,13 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
       msg.set_irr(this->variantManager->value(
-            this->GetChildItem((*iter), "irr")).toBool());
+            this->GetChildItem((*iter), "inertia ratio reduction")).toBool());
       msg.set_friction_iters(this->variantManager->value(
             this->GetChildItem((*iter), "extra friction iters")).toInt());
       msg.set_warm_start_factor(this->variantManager->value(
             this->GetChildItem((*iter), "warm start factor")).toDouble());
       msg.set_reorder(this->variantManager->value(
-            this->GetChildItem((*iter), "row reorder")).toBool());
+            this->GetChildItem((*iter), "pgs row reorder")).toBool());
       msg.set_contact_residual_smoothing(this->variantManager->value(
             this->GetChildItem((*iter), "contact smoothing")).toDouble());
       msg.set_iters(this->variantManager->value(
@@ -2301,7 +2301,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
 
-  item = this->variantManager->addProperty(QVariant::Bool, tr("irr"));
+  item = this->variantManager->addProperty(QVariant::Bool,
+    tr("inertia ratio reduction"));
   if (_msg.has_irr())
     item->setValue(_msg.iters());
   solverItem->addSubProperty(item);
@@ -2321,7 +2322,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item->setValue(_msg.warm_start_factor());
   solverItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Bool, tr("reorder"));
+  item = this->variantManager->addProperty(QVariant::Bool,
+    tr("pgs row reorder"));
   if (_msg.has_reorder())
     item->setValue(_msg.iters());
   solverItem->addSubProperty(item);
