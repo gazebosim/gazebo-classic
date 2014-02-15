@@ -289,6 +289,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_precon_iters())
     this->SetSORPGSPreconIters(_msg->precon_iters());
 
+  if (_msg->has_irr())
+    this->SetParam("inertia_ratio_reduction", _msg->irr());
+
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());
 
@@ -1284,6 +1287,12 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "rms_error_tolerance")
+  {
+    dWorldSetQuickStepTolerance(this->worldId,
+        boost::any_cast<bool>(_value));
+    return;
+  }
   else if (_key == "inertia_ratio_reduction")
   {
     dWorldSetQuickStepInertiaRatioReduction(this->worldId,
@@ -1417,6 +1426,8 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "rms_error_tolerance")
+    return dWorldGetQuickStepTolerance(this->worldId);
   else if (_key == "rms_error")
     return dWorldGetQuickStepRMSError(this->worldId);
   else if (_key == "constraint_residual")

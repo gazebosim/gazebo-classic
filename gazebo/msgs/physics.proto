@@ -23,6 +23,7 @@ message Physics
   optional double min_step_size              = 3;
   optional int32 precon_iters                = 4;
   optional int32 iters                       = 5;
+  optional bool irr                          = 16;
   optional double sor                        = 6;
   optional double cfm                        = 7;
   optional double erp                        = 8;
