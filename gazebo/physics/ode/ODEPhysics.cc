@@ -256,6 +256,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
         boost::any_cast<double>(this->GetParam("warm_start_factor")));
     physicsMsg.set_reorder(
         boost::any_cast<bool>(this->GetParam("experimental_row_reordering")));
+    physicsMsg.set_contact_residual_smoothing(
+        boost::any_cast<double>(this->GetParam("contact_residual_smoothing")));
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
@@ -308,6 +310,10 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_reorder())
     this->SetParam("experimental_row_reordering", _msg->reorder());
+
+  if (_msg->has_contact_residual_smoothing())
+    this->SetParam("contact_residual_smoothing",
+    _msg->contact_residual_smoothing());
 
   if (_msg->has_iters())
     this->SetSORPGSIters(_msg->iters());
