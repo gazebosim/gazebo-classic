@@ -238,7 +238,7 @@ Scene::~Scene()
 
   for (unsigned int i = 0; i < this->cameras.size(); ++i)
     this->cameras[i].reset();
-   this->cameras.clear();
+  this->cameras.clear();
 
   for (unsigned int i = 0; i < this->userCameras.size(); ++i)
     this->userCameras[i].reset();
