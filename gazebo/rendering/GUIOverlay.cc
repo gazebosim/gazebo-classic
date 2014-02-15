@@ -62,7 +62,10 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   if (this->initialized)
     return;
 
-  CEGUI::System::getSingletonPtr();
+  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+
+  if (system)
+    return;
 
   std::string logPath = common::SystemPaths::Instance()->GetLogPath();
   logPath += "/cegui.log";

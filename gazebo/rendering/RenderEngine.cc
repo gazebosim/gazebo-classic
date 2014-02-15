@@ -354,6 +354,10 @@ void RenderEngine::Fini()
   delete this->logManager;
   this->logManager = NULL;
 
+  for (unsigned int i = 0; i < this->scenes.size(); ++i)
+    this->scenes[i].reset();
+  this->scenes.clear();
+
 #ifndef Q_OS_MAC
   if (this->dummyDisplay)
   {

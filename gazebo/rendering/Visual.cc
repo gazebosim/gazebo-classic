@@ -182,6 +182,7 @@ Visual::~Visual()
     this->dataPtr->sceneNode = NULL;
   }
 
+  this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
