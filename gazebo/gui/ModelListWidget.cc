@@ -2308,7 +2308,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
   item = this->variantManager->addProperty(QVariant::Int, tr("friction_iters"));
   if (_msg.has_friction_iters())
-    item->setValue(_msg.iters());
+    item->setValue(_msg.friction_iters());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double,
