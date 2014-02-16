@@ -588,8 +588,12 @@ static void ComputeRows(
   printf("\n");
   */
 
-  dReal rms_error[3];
-  dSetZero(rms_error, 3);
+  int m_rms_error[3];
+  m_rms_error[0] = 0;
+  m_rms_error[1] = 0;
+  m_rms_error[2] = 0;
+  dReal rms_error[4];
+  dSetZero(rms_error, 4);
   int num_iterations = qs->num_iterations;
   int precon_iterations = qs->precon_iterations;
   dReal sor_lcp_tolerance = qs->sor_lcp_tolerance;
@@ -619,12 +623,15 @@ static void ComputeRows(
   {
     // reset rms_error at beginning of iteration
     rms_error[2] = 0;
+    m_rms_error[2] = 0;
     if (iteration < num_iterations + precon_iterations)
     {
       // skip resetting rms_error for bilateral constraints
       // and contacct normals during extra friciton iterations.
       rms_error[0] = 0;
+      m_rms_error[0] = 0;
       rms_error[1] = 0;
+      m_rms_error[1] = 0;
     }
 
 #ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
@@ -825,11 +832,20 @@ static void ComputeRows(
 
         // record error (for the non-erp version)
         if (constraint_index == -1)  // bilateral
+        {
           rms_error[0] += delta_precon*delta_precon;
+          m_rms_error[0]++;
+        }
         else if (constraint_index == -2)  // contact normal
+        {
           rms_error[1] += delta_precon*delta_precon;
+          m_rms_error[1]++;
+        }
         else  // friction forces
+        {
           rms_error[2] += delta_precon*delta_precon;
+          m_rms_error[2]++;
+        }
 
         old_lambda_erp = old_lambda;
         lambda_erp[index] = lambda[index];
@@ -1001,11 +1017,20 @@ static void ComputeRows(
 
         // record error (for the non-erp version)
         if (constraint_index == -1)  // bilateral
+        {
           rms_error[0] += delta*delta;
+          m_rms_error[0]++;
+        }
         else if (constraint_index == -2)  // contact normal
+        {
           rms_error[1] += delta*delta;
+          m_rms_error[1]++;
+        }
         else  // friction forces
+        {
           rms_error[2] += delta*delta;
+          m_rms_error[2]++;
+        }
       }
 
       //@@@ a trick that may or may not help
@@ -1021,9 +1046,11 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-    qs->rms_error[0] = sqrt(rms_error[0]/(dReal)nRows);
-    qs->rms_error[1] = sqrt(rms_error[1]/(dReal)nRows);
-    qs->rms_error[2] = sqrt(rms_error[2]/(dReal)nRows);
+    qs->rms_dlambda[0] = sqrt(rms_error[0]/(dReal)m_rms_error[0]);
+    qs->rms_dlambda[1] = sqrt(rms_error[1]/(dReal)m_rms_error[1]);
+    qs->rms_dlambda[2] = sqrt(rms_error[2]/(dReal)m_rms_error[2]);
+    qs->rms_dlambda[3] =
+      qs->rms_dlambda[0] + qs->rms_dlambda[1] + qs->rms_dlambda[2];
 
     // debugging mutex locking
     //{
@@ -1036,14 +1063,14 @@ static void ComputeRows(
     //  for (int i=startRow+1; i<startRow+nRows; i++)
     //    printf(" %10d;",order[i].index);
     //  printf("\n%f %f %f\n",
-    //    qs->rms_error[0],qs->rms_error[1],qs->rms_error[2]);
+    //    qs->rms_dlambda[0],qs->rms_dlambda[1],qs->rms_dlambda[2]);
     //}
 
 #ifdef SHOW_CONVERGENCE
     /* uncomment for convergence information per row sweep (LOTS OF DATA!)
     printf("MONITOR: thread(%d) iter(%d) rms(%20.18f %20.18f %20.18)f\n",
       thread_id, iteration,
-      qs->rms_error[0], qs->rms_error[1], qs->rms_error[2]);
+      qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2]);
 
     // print lambda
     for (int i=startRow; i<startRow+nRows; i++)
@@ -1054,14 +1081,13 @@ static void ComputeRows(
 
     // option to stop when tolerance has been met
     if (iteration < precon_iterations &&
-        (qs->rms_error[0] + qs->rms_error[1] + qs->rms_error[2])
-        < sor_lcp_tolerance)
+        qs->rms_dlambda[3] < sor_lcp_tolerance)
     {
       #ifdef DEBUG_CONVERGENCE_TOLERANCE
         printf("CONVERGED: id: %d steps: %d,"
                " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
           thread_id, iteration,
-          qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+          qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
           sor_lcp_tolerance);
       #endif
       // tolerance satisfied, stop iterating
@@ -1073,7 +1099,7 @@ static void ComputeRows(
         printf("WARNING: id: %d did not converge in %d steps,"
                " rms(%20.18f + %20.18f + %20.18f) > tol(%20.18f)\n",
           thread_id, num_iterations,
-          qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+          qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
           sor_lcp_tolerance);
       #endif
     }
@@ -1088,7 +1114,7 @@ static void ComputeRows(
   printf("MONITOR: id: %d steps: %d,"
          " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
     thread_id, total_iterations,
-    qs->rms_error[0], qs->rms_error[1], qs->rms_error[2],
+    qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
     sor_lcp_tolerance);
 #endif
   //printf("vnew: ");
@@ -2314,33 +2340,49 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal *tmp = context->AllocateArray<dReal> (m);
       multiply_J (m,J,jb,vel,tmp);
 
+      int m_bilateral_error = 0;
+      int m_contact_error = 0;
+      int m_friction_error = 0;
       dReal bilateral_error = 0;
       dReal contact_error = 0;
-      dReal error = 0;
-      int contacts = 0;
+      dReal friction_error = 0;
       for (int i=0; i<m; i++)
       {
-        error += dFabs(tmp[i])*dFabs(tmp[i]);
         if (findex[i] == -1)
+        {
+          m_bilateral_error++;
           bilateral_error += dFabs(tmp[i])*dFabs(tmp[i]);
+        }
         else if (findex[i] == -2)
         {
           // contact error includes joint limits
           contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
-          contacts++;
+          m_contact_error++;
         }
         else if (findex[i] >= 0)
-          contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
+        {
+          m_friction_error++;
+          friction_error += dFabs(tmp[i])*dFabs(tmp[i]);
+        }
 
         // Note: This is not a good measure of constraint error
         // for soft contact, as Jv is not necessarily zero here.
         // Better measure is compute the residual.  \\\ TODO
       }
-      // printf ("error = %10.6e %10.6e %10.6e\n",error, bilateral_error, contact_error);
-      world->qs.constraint_residual = sqrt(error/(dReal)m);
-      world->qs.bilateral_residual = sqrt(bilateral_error/(dReal)m);
-      world->qs.contact_residual = sqrt(contact_error/(dReal)m);
-      world->qs.num_contacts = contacts;
+      // printf ("error = %10.6e %10.6e %10.6e\n",
+      //   error, bilateral_error, contact_error);
+      // world->qs.rms_constraint_residual[0] = sqrt(error/(dReal)m);
+      world->qs.rms_constraint_residual[0] = sqrt(bilateral_error/
+        (dReal)m_bilateral_error);
+      world->qs.rms_constraint_residual[1] =
+        sqrt(contact_error/(dReal)(m_contact_error));
+      world->qs.rms_constraint_residual[2] =
+        sqrt(friction_error/(dReal)(m_friction_error));
+      world->qs.rms_constraint_residual[3] =
+        world->qs.rms_constraint_residual[0] +
+        world->qs.rms_constraint_residual[1] +
+        world->qs.rms_constraint_residual[2];
+      world->qs.num_contacts = m_contact_error;
     } END_STATE_SAVE(context, rmsstate);
   }
 #endif

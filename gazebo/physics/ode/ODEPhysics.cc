@@ -1454,11 +1454,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "rms_error")
     return dWorldGetQuickStepRMSError(this->worldId);
   else if (_key == "constraint_residual")
-    return dWorldGetQuickStepConstraintResidual(this->worldId);
-  else if (_key == "bilateral_residual")
-    return dWorldGetQuickStepBilateralResidual(this->worldId);
-  else if (_key == "contact_residual")
-    return dWorldGetQuickStepContactResidual(this->worldId);
+    return dWorldGetQuickStepRMSConstraintResidual(this->worldId);
   else if (_key == "num_contacts")
     return dWorldGetQuickStepNumContacts(this->worldId);
   else if (_key == "inertia_ratio_reduction")

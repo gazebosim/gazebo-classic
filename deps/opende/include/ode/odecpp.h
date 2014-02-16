@@ -116,12 +116,8 @@ public:
     { return dWorldGetQuickStepW (get_id()); }
   dReal *getQuickStepRMSError() const
     { return dWorldGetQuickStepRMSError (get_id()); }
-  dReal getQuickStepConstraintResidual() const
-    { return dWorldGetQuickStepConstraintResidual (get_id()); }
-  dReal getQuickStepBilateralResidual() const
-    { return dWorldGetQuickStepBilateralResidual (get_id()); }
-  dReal getQuickStepContactResidual() const
-    { return dWorldGetQuickStepContactResidual (get_id()); }
+  dReal *getQuickStepRMSConstraintResidual() const
+    { return dWorldGetQuickStepRMSConstraintResidual (get_id()); }
   dReal getQuickStepNumContacts() const
     { return dWorldGetQuickStepNumContacts (get_id()); }
 

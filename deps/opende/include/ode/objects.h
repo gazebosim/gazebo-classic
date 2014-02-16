@@ -509,14 +509,7 @@ ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
  * @ingroup world
  * @returns the rms error
  */
-ODE_API dReal dWorldGetQuickStepConstraintResidual (dWorldID);
-
-/**
- * @brief Get the max of Ax-b of the quickstep step
- * @ingroup world
- * @returns the rms error
- */
-ODE_API dReal dWorldGetQuickStepBilateralResidual (dWorldID);
+ODE_API dReal *dWorldGetQuickStepRMSConstraintResidual (dWorldID);
 
 /**
  * @brief Get the min of Ax-b of the quickstep step
@@ -524,13 +517,6 @@ ODE_API dReal dWorldGetQuickStepBilateralResidual (dWorldID);
  * @returns the rms error
  */
 ODE_API int dWorldGetQuickStepNumContacts (dWorldID);
-
-/**
- * @brief Get the min of Ax-b of the quickstep step
- * @ingroup world
- * @returns the rms error
- */
-ODE_API dReal dWorldGetQuickStepContactResidual (dWorldID);
 
 /* PGS experimental parameters */
 

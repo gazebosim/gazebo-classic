@@ -1676,12 +1676,14 @@ dxWorld * dWorldCreate()
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
   w->qs.sor_lcp_tolerance = 0;
-  w->qs.rms_error[0] = 0;
-  w->qs.rms_error[1] = 0;
-  w->qs.rms_error[2] = 0;
-  w->qs.constraint_residual = 0;
-  w->qs.bilateral_residual = 0;
-  w->qs.contact_residual = 0;
+  w->qs.rms_dlambda[0] = 0;
+  w->qs.rms_dlambda[1] = 0;
+  w->qs.rms_dlambda[2] = 0;
+  w->qs.rms_dlambda[3] = 0;
+  w->qs.rms_constraint_residual[0] = 0;
+  w->qs.rms_constraint_residual[1] = 0;
+  w->qs.rms_constraint_residual[2] = 0;
+  w->qs.rms_constraint_residual[3] = 0;
   w->qs.num_contacts = 0;
   w->qs.dynamic_inertia_reduction = true;
   w->qs.smooth_contacts = 0.01;
@@ -2275,25 +2277,13 @@ dReal dWorldGetQuickStepW (dWorldID w)
 dReal *dWorldGetQuickStepRMSError (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.rms_error;
+	return w->qs.rms_dlambda;
 }
 
-dReal dWorldGetQuickStepConstraintResidual (dWorldID w)
+dReal* dWorldGetQuickStepRMSConstraintResidual (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.constraint_residual;
-}
-
-dReal dWorldGetQuickStepBilateralResidual (dWorldID w)
-{
-	dAASSERT(w);
-	return w->qs.bilateral_residual;
-}
-
-dReal dWorldGetQuickStepContactResidual (dWorldID w)
-{
-	dAASSERT(w);
-	return w->qs.contact_residual;
+	return w->qs.rms_constraint_residual;
 }
 
 int dWorldGetQuickStepNumContacts (dWorldID w)
