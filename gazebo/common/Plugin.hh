@@ -384,7 +384,7 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-  extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -395,7 +395,7 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-  extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -406,7 +406,7 @@ namespace gazebo
 /// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-  extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -417,7 +417,7 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-  extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -428,7 +428,7 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
-  extern "C" gazebo::VisualPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\
