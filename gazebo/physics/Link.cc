@@ -450,10 +450,6 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 #endif
 
-  // update filtered velocity for box
-  this->linVelFil.Update(this->GetWorldLinearVel());
-  this->angVelFil.Update(this->GetWorldAngularVel());
-
   // Apply our linear accel
   // this->SetForce(this->linearAccel);
 
@@ -1139,9 +1135,14 @@ double Link::GetWorldEnergy()
 /////////////////////////////////////////////////
 double Link::GetWorldEnergyKineticFiltered()
 {
+  // update filtered velocity for box
+  this->linVelFil.Update(this->GetWorldLinearVel());
+  this->angVelFil.Update(this->GetWorldAngularVel());
+
   // compute potential energy for link CG location
   math::Vector3 linVel = this->linVelFil.Get();
   math::Vector3 angVel = this->angVelFil.Get();
+
   double m = this->GetInertial()->GetMass();
   math::Matrix3 moi = this->GetInertial()->GetMOI();
 

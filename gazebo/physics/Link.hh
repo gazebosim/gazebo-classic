@@ -566,7 +566,7 @@ namespace gazebo
         MovingWindowFilter()
         {
           // for moving window smoothed velocity
-          this->velWindowSize = 10; /// \TODO FIXME hardcoded for now
+          this->velWindowSize = 4; /// \TODO FIXME hardcoded for now
           this->velHistory.resize(this->velWindowSize);
           this->velIter = this->velHistory.begin();
         }
@@ -574,16 +574,24 @@ namespace gazebo
         public: void Update(math::Vector3 _vel)
         {
           // update avg
-          // subtrace oldest one
           double n = 1.0/static_cast<double>(this->velWindowSize);
-          std::vector<math::Vector3>::iterator old = this->velIter++;
-          this->velFiltered -= n*(*old);
+          // std::vector<math::Vector3>::iterator old = this->velIter++;
 
-          // add new
+          // add new data
           if (this->velIter == this->velHistory.end())
             this->velIter = this->velHistory.begin();
           (*this->velIter) = _vel;
-          this->velFiltered += n*(*this->velIter);
+
+          // progressive add and subtrace oldest
+          // this->velFiltered += n*(*this->velIter - *old);
+
+          // sum and avg
+          this->velFiltered = math::Vector3(0, 0, 0);
+          for(std::vector<math::Vector3>::iterator it =
+            this->velHistory.begin(); 
+            it != this->velHistory.end(); ++it)
+            this->velFiltered += *it;
+          this->velFiltered *= n;
         }
 
         public: math::Vector3 Get()
