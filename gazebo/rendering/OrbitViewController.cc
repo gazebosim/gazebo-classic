@@ -378,7 +378,6 @@ void OrbitViewController::UpdateRefVisual()
 void OrbitViewController::Orbit(double _dy, double _dp)
 {
   Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
-  Ogre::SceneNode *pitchNode = this->camera->GetPitchNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
 
@@ -396,7 +395,6 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   // reference visual, which in turns rotates the camera.
   cameraNode->_setDerivedPosition(pos);
   cameraNode->setOrientation(Ogre::Quaternion());
-  pitchNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
   this->yaw = this->NormalizeYaw(this->yaw + _dy);
@@ -409,7 +407,7 @@ void OrbitViewController::Orbit(double _dy, double _dp)
     pos = cameraNode->_getDerivedPosition();
 
   // Store the new location of the camera
-  Ogre::Quaternion rot = pitchNode->_getDerivedOrientation();
+  Ogre::Quaternion rot = cameraNode->_getDerivedOrientation();
 
   // Detach the camera from the reference visual.
   this->refVisual->GetSceneNode()->removeChild(cameraNode);
