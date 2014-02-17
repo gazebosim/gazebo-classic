@@ -47,6 +47,7 @@
 using namespace gazebo;
 
 bool Server::stop = true;
+bool Server::initialized = false;
 
 /////////////////////////////////////////////////
 Server::Server()

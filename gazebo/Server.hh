@@ -63,6 +63,9 @@ namespace gazebo
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
+    /// \deprecated Init is deprecated for using outside of the class
+    /// \todo remove the method when releasing gazebo3
+    public: void Init();
     public: void Run();
     public: void Stop();
     public: void Fini();
@@ -102,7 +105,7 @@ namespace gazebo
     private: po::variables_map vm;
 
     /// \brief True when initialized.
-    private: bool initialized;
+    private: static bool initialized;
 
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;
