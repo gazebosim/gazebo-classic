@@ -53,7 +53,7 @@ Server::Server()
 {
   this->receiveMutex = new boost::mutex();
   // \todo part of the megahack of using masterThread as initialized
-  // set to false in this context. REMOVE it in gazebo3
+  // set to false in this context. REMOVE it in gazebo 3.0
   this->masterThread = NULL;
   // \todo remember to change when 
   // this->initialized = false;
@@ -65,7 +65,7 @@ Server::~Server()
   fflush(stdout);
   delete this->receiveMutex;
   // \todo part of the megahack of using masterThread as initialized
-  // free memory. REMOVE it in gazebo3
+  // free memory. REMOVE it in gazebo 3.0
   delete this->masterThread;
 }
 
@@ -278,10 +278,10 @@ void Server::Init()
 bool Server::GetInitialized() const
 {
   // \todo part of the megahack of using masterThread as initialized
-  // set to false in this context. REMOVE it in gazebo3
+  // set to false in this context. REMOVE it in gazebo 3.0
   return !this->stop && this->masterThread;
   // \todo REMOVE previous line and enable the one below 
-  // when gazebo3 is released
+  // when gazebo 3.0 is released
   // return !this->stop && this->initialized;
 }
 
@@ -478,9 +478,9 @@ void Server::Run()
   physics::run_worlds(iterations);
 
   // \todo part of the megahack of using masterThread as initialized
-  // set to true in this context. REMOVE it in gazebo3
+  // set to true in this context. REMOVE it in gazebo 3.0
   this->masterThread = new boost::thread();
-  // \todo enable the line below when gazebo3 is released
+  // \todo enable the line below when gazebo 3.0 is released
   // this->initialized = true;
 
   // Update the sensors.
