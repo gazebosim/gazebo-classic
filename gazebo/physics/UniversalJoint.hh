@@ -34,9 +34,19 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
+    /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
+    /// body and axis2 attached to child body.
     template<class T>
     class UniversalJoint : public T
     {
+      /// \enum AxisIndex
+      /// \brief Map joint axes to corresponding link.
+      public: enum AxisIndex
+      {
+        AXIS_PARENT = 0,
+        AXIS_CHILD  = 1
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
@@ -63,6 +73,12 @@ namespace gazebo
                     this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
                     */
               }
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
   }

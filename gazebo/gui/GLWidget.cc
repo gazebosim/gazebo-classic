@@ -16,6 +16,7 @@
 */
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
@@ -63,7 +64,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
-//  setMinimumSize(320, 240);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);
@@ -700,7 +700,7 @@ std::string GLWidget::GetOgreHandle() const
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint32_t>(info.screen()));
   ogreHandle += ":";
-  assert(q_parent);
+  GZ_ASSERT(q_parent, "q_parent is null");
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint64_t>(q_parent->winId()));
 #endif

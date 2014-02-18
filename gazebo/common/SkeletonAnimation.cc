@@ -17,6 +17,7 @@
 
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -141,7 +142,7 @@ math::Matrix4 NodeAnimation::GetFrameAt(double _time, bool _loop) const
   math::Matrix4 prevTrans = it2->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
-  assert(t >= 0.0 && t <= 1.0);
+  GZ_ASSERT(t >= 0.0 && t <= 1.0, "t is not in the range 0.0..1.0");
 
   math::Vector3 nextPos = nextTrans.GetTranslation();
   math::Vector3 prevPos = prevTrans.GetTranslation();

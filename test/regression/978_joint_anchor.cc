@@ -16,12 +16,12 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/physics/Joint_TEST.hh"
 #include "test/integration/helper_physics_generator.hh"
+#include "test/integration/joint_test.hh"
 
 using namespace gazebo;
 
-class Issue978Test : public Joint_TEST
+class Issue978Test : public JointTest
 {
   public: void JointAnchor(const std::string &_physicsEngine);
 };
