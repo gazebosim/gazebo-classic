@@ -105,7 +105,8 @@ namespace gazebo
     private: po::variables_map vm;
 
     /// \brief True when initialized.
-    private: static bool initialized;
+    /// \todo enable this member when gazebo3 is released
+    /// private: bool initialized;
 
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;
