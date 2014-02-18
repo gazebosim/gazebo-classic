@@ -265,6 +265,10 @@ bool Server::ParseArgs(int argc, char **argv)
 }
 
 /////////////////////////////////////////////////
+void Server::Init()
+{ }
+
+/////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
   return !this->stop && this->initialized;
