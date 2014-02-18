@@ -271,6 +271,10 @@ bool Server::ParseArgs(int argc, char **argv)
 }
 
 /////////////////////////////////////////////////
+void Server::Init()
+{ }
+
+/////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
   // \todo part of the megahack of using masterThread as initialized
