@@ -135,13 +135,13 @@ target_link_libraries(gazebo_common
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
-  ${freeimage_library}
+  ${freeimage_LIBRARIES}
   ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread
