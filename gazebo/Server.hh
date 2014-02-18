@@ -63,9 +63,9 @@ namespace gazebo
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
-    /// \deprecated Init is deprecated for using outside of the class
-    /// \todo remove the method when releasing gazebo3
-    public: void Init();
+    /// \todo remove the method when releasing gazebo 3.0
+    /// \brief Deprecated. Init is deprecated for use outside of the class.
+    public: void Init() GAZEBO_DEPRECATED(2.3);
     public: void Run();
     public: void Stop();
     public: void Fini();
