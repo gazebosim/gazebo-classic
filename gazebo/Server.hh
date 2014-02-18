@@ -63,6 +63,9 @@ namespace gazebo
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
+    /// \todo remove the method when releasing gazebo 3.0
+    /// \brief Deprecated. Do not need to call Init anymore.
+    public: void Init() GAZEBO_DEPRECATED(2.3);
     public: void Run();
     public: void Stop();
     public: void Fini();
@@ -102,7 +105,8 @@ namespace gazebo
     private: po::variables_map vm;
 
     /// \brief True when initialized.
-    private: bool initialized;
+    /// \todo Remove "static" in Gazebo 3.0
+    private: static bool initialized;
 
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;
