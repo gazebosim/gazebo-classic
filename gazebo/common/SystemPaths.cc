@@ -166,7 +166,7 @@ std::string SystemPaths::GetTmpInstancePath()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetDefaultTestPath()
 {
-  return this->GetTmpPath() + "/gazebo_test";
+  return this->GetTmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////
