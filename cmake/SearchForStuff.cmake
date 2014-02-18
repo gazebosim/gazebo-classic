@@ -302,6 +302,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
   else()
     include(${libswscale_INCLUDE_DIRS})
+    link_directories(${libswscale_LIBRARY_DIRS)}
   endif ()
 
   ########################################
@@ -311,6 +312,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
   else()
     include(${libavformat_INCLUDE_DIRS})
+    link_directories(${libavformat_LIBRARY_DIRS)}
   endif ()
 
   ########################################
@@ -320,6 +322,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   else()
     include(${libavcodec_INCLUDE_DIRS})
+    link_directories(${libavcodec_LIBRARY_DIRS)}
   endif ()
 
   if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
