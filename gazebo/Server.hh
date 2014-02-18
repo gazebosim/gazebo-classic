@@ -105,6 +105,7 @@ namespace gazebo
     private: po::variables_map vm;
 
     /// \brief True when initialized.
+    /// \todo Remove "static" in Gazebo 3.0
     private: static bool initialized;
 
     // save argc and argv for access by system plugins
