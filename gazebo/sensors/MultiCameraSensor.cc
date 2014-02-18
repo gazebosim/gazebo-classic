@@ -151,7 +151,7 @@ void MultiCameraSensor::Init()
     }
     else
     {
-      this->noises.push_back(NoisePtr(new Noise()));
+      this->noises.push_back(NoisePtr(new Noise(Noise::NONE)));
     }
 
     {

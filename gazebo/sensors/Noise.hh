@@ -57,12 +57,15 @@ namespace gazebo
       {
         NONE,
         CUSTOM,
-        GAUSSIAN,
-        GAUSSIAN_QUANTIZED
+        GAUSSIAN
       };
 
-      /// \brief Constructor.
-      public: Noise();
+      /// \brief Constructor. This should not be called directly unless creating
+      /// an empty noise model. Use NoiseFactory::NewNoiseModel to instantiate
+      /// a new noise model.
+      /// \param[in] _type Type of noise model.
+      /// \sa NoiseFactory::NewNoiseModel
+      public: explicit Noise(NoiseType _type);
 
       /// \brief Destructor.
       public: virtual ~Noise();
@@ -103,11 +106,11 @@ namespace gazebo
       /// \param[in] _camera Camera associated to an image sensor
       public: virtual void SetCamera(rendering::CameraPtr _camera);
 
-      /// \brief Noise sdf element.
-      private: sdf::ElementPtr sdf;
-
       /// \brief Which type of noise we're applying
       private: NoiseType type;
+
+      /// \brief Noise sdf element.
+      private: sdf::ElementPtr sdf;
 
       /// \brief Callback function for applying custom noise to sensor data.
       private: boost::function<double (double)> customNoiseCallback;

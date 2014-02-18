@@ -296,8 +296,12 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
-  _msg.add_visual()->CopyFrom(*this->visualMsg);
-  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+
+  if (!this->HasType(physics::Base::SENSOR_COLLISION))
+  {
+    _msg.add_visual()->CopyFrom(*this->visualMsg);
+    _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+  }
 }
 
 //////////////////////////////////////////////////
