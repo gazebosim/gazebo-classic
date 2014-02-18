@@ -26,6 +26,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/COMVisualPrivate.hh"
 #include "gazebo/rendering/COMVisual.hh"
 
 using namespace gazebo;
@@ -33,7 +34,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(_name, _vis, false)
+  : Visual(*new COMVisualPrivate, _name, _vis, false)
 {
 }
 
@@ -95,6 +96,9 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 void COMVisual::Load(const math::Pose &_pose,
                      const math::Vector3 &_scale)
 {
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+
   math::Vector3 p1(0, 0, -2*_scale.z);
   math::Vector3 p2(0, 0,  2*_scale.z);
   math::Vector3 p3(0, -2*_scale.y, 0);
@@ -114,30 +118,30 @@ void COMVisual::Load(const math::Pose &_pose,
   p5 = _pose.rot.RotateVector(p5);
   p6 = _pose.rot.RotateVector(p6);
 
-  this->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  this->crossLines->setMaterial("Gazebo/Green");
-  this->crossLines->AddPoint(p1);
-  this->crossLines->AddPoint(p2);
-  this->crossLines->AddPoint(p3);
-  this->crossLines->AddPoint(p4);
-  this->crossLines->AddPoint(p5);
-  this->crossLines->AddPoint(p6);
+  dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  dPtr->crossLines->setMaterial("Gazebo/Green");
+  dPtr->crossLines->AddPoint(p1);
+  dPtr->crossLines->AddPoint(p2);
+  dPtr->crossLines->AddPoint(p3);
+  dPtr->crossLines->AddPoint(p4);
+  dPtr->crossLines->AddPoint(p5);
+  dPtr->crossLines->AddPoint(p6);
 
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *boxObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__BOX__", "unit_box"));
   boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
-  this->boxNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
+  dPtr->boxNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
 
-  this->boxNode->attachObject(boxObj);
-  this->boxNode->setScale(_scale.x, _scale.y, _scale.z);
-  this->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-  this->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
+  dPtr->boxNode->attachObject(boxObj);
+  dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);
+  dPtr->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  dPtr->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
                                                  _pose.rot.y, _pose.rot.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
