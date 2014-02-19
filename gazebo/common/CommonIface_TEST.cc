@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,15 @@
 #include <sstream>
 
 #include "gazebo/common/CommonIface.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class CommonIface_TEST : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
 /// \brief Test CommonIface::GetSHA1
-TEST(CommonIface_TEST, GetSHA1)
+TEST_F(CommonIface_TEST, GetSHA1)
 {
   // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
   std::string precomputedSHA1;

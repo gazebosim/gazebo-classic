@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifdef  __APPLE__
 # include <QtCore/qglobal.h>
@@ -154,14 +150,48 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
-  this->scenes.push_back(scene);
-
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
+  if (!this->initialized)
+  {
     gzerr << "RenderEngine is not initialized\n";
+    return ScenePtr();
+  }
+
+  ScenePtr scene;
+
+  try
+  {
+    scene.reset(new Scene(_name, _enableVisualizations, _isServer));
+  }
+  catch(...)
+  {
+    gzerr << "Failed to instantiate a scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Load();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to load scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Init();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to initialize scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  this->scenes.push_back(scene);
 
   rendering::Events::createScene(_name);
 
@@ -249,8 +279,6 @@ void RenderEngine::Init()
   if (this->renderPathType == NONE)
     return;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -283,10 +311,6 @@ void RenderEngine::Fini()
 {
   if (!this->initialized)
     return;
-
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
 
   this->connections.clear();
 
@@ -322,7 +346,8 @@ void RenderEngine::Fini()
       delete this->root;
     }
     catch(...)
-    { }
+    {
+    }
   }
   this->root = NULL;
 

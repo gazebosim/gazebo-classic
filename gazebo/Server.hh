@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,9 +74,6 @@ namespace gazebo
     /// \return True on success.
     public: bool LoadString(const std::string &_sdfString);
 
-    /// \brief Initialized the Server.
-    public: void Init();
-
     /// \brief Run the Server.
     public: void Run();
 
@@ -145,6 +142,9 @@ namespace gazebo
 
     /// \brief Boost program options variable map.
     private: boost::program_options::variables_map vm;
+
+    /// \brief True when initialized.
+    private: bool initialized;
 
     /// \brief Save argc for access by system plugins.
     private: int systemPluginsArgc;

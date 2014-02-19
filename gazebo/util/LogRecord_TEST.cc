@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,13 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "test/util.hh"
+
+class LogRecord_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord constructor and a few accessors
-TEST(LogRecord_TEST, Constructor)
+TEST_F(LogRecord_TEST, Constructor)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
@@ -50,7 +53,7 @@ TEST(LogRecord_TEST, Constructor)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Start errors
-TEST(LogRecord_TEST, StartErrors)
+TEST_F(LogRecord_TEST, StartErrors)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
@@ -92,7 +95,7 @@ TEST(LogRecord_TEST, StartErrors)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start_bzip2)
+TEST_F(LogRecord_TEST, Start_bzip2)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
@@ -134,7 +137,7 @@ TEST(LogRecord_TEST, Start_bzip2)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start_zlib)
+TEST_F(LogRecord_TEST, Start_zlib)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 

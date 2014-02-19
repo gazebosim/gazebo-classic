@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class GaussianNoiseCompositorListener;
     class LensDistortionCompositorListener;
     class CameraPrivate;
 
@@ -336,9 +335,9 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
-      /// \brief Get the camera's pitch scene node
-      /// \return The pitch node the camera is attached to
-      public: Ogre::SceneNode *GetPitchNode() const;
+      /// \brief Deprecated: Get the camera's pitch scene node
+      /// \return NULL. Use GetSceheNode() instead.
+      public: Ogre::SceneNode *GetPitchNode() const GAZEBO_DEPRECATED(3.0);
 
       /// \brief Get a pointer to the image data
       ///
@@ -624,11 +623,8 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
-
-      /// \brief Scene nod that controls camera pitch.
-      protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
