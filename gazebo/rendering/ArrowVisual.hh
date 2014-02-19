@@ -14,20 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Arrow Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _ARROWVISUAL_HH_
 #define _ARROWVISUAL_HH_
 
 #include <string>
 #include "gazebo/rendering/Visual.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -53,10 +45,6 @@ namespace gazebo
 
       /// \brief Show the rotation of the visual
       public: void ShowRotation();
-
-      private: Ogre::SceneNode *headNode;
-      private: Ogre::SceneNode *shaftNode;
-      private: Ogre::SceneNode *rotationNode;
     };
     /// \}
   }

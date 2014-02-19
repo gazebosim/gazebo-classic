@@ -279,6 +279,8 @@ void Link::Fini()
   }
 
 #ifdef HAVE_OPENAL
+  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+      this->GetScopedName() + "/audio_collision");
   this->audioSink.reset();
 #endif
 

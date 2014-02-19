@@ -326,26 +326,26 @@ void World::Init()
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1, _2));
-
   this->prevStates[0].SetWorld(shared_from_this());
   this->prevStates[1].SetWorld(shared_from_this());
 
   this->prevStates[0].SetName(this->GetName());
   this->prevStates[1].SetName(this->GetName());
 
-  this->initialized = true;
-
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
   this->logPrevIteration = 0;
 
-  // Mark the world initialization
-  gzlog << "World::Init" << std::endl;
-
   util::DiagnosticManager::Instance()->Init(this->GetName());
+
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
+
+  this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "Init world[" << this->GetName() << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -356,6 +356,14 @@ void World::Run(uint64_t _steps, uint64_t _stepDelayMS)
   this->stepDelayMS = _stepDelayMS;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+}
+
+//////////////////////////////////////////////////
+void World::RunBlocking(unsigned int _iterations)
+{
+  this->stop = false;
+  this->stopIterations = _iterations;
+  this->RunLoop();
 }
 
 //////////////////////////////////////////////////
@@ -392,6 +400,7 @@ void World::RunLoop()
 
   // Get the first state
   this->prevStates[0] = WorldState(shared_from_this());
+  this->prevStates[1] = WorldState(shared_from_this());
   this->stateToggle = 0;
 
   this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
@@ -423,6 +432,10 @@ void World::RunLoop()
   if (this->logThread)
   {
     this->logCondition.notify_all();
+    {
+      boost::mutex::scoped_lock lock(this->logMutex);
+      this->logCondition.notify_all();
+    }
     this->logThread->join();
     delete this->logThread;
     this->logThread = NULL;

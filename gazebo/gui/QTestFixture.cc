@@ -22,16 +22,14 @@
 
 #include <unistd.h>
 
-#include "gazebo/physics/PhysicsIface.hh"
-
-#include "gazebo/rendering/RenderingIface.hh"
-
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
@@ -101,7 +99,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->server = new gazebo::Server();
   this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
-  this->server->Init();
 
   this->SetPause(_paused);
 
@@ -110,9 +107,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
         gazebo::physics::get_world()->GetName(), false);
 
   this->server->Run();
-
-  if (_createScene)
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   this->server->Fini();
 
