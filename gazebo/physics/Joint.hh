@@ -482,6 +482,8 @@ namespace gazebo
       public: math::Pose GetInitialAnchorPose() const;
 
       /// \brief Get pose of joint frame relative to world frame.
+      /// Note that the joint frame is defined with a fixed offset from
+      /// the child link frame.
       /// \return Pose of joint frame relative to world frame.
       public: math::Pose GetWorldPose() const;
 
