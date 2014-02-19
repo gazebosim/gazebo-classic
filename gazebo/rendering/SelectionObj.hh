@@ -194,8 +194,6 @@ namespace gazebo
 
       /// \brief Overlay material name for the z axis.
       private: std::string zAxisMatOverlay;
-
-      private: math::Vector3 parentBboxSize;
     };
   }
 }
