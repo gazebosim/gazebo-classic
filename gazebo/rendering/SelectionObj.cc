@@ -85,8 +85,6 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
 
-//  this->parentBboxSize = this->parent->GetBoundingBox().GetSize();
-
   this->UpdateSize();
 }
 
@@ -96,7 +94,7 @@ void SelectionObj::UpdateSize()
 
   VisualPtr vis = this->parent;
 
-  // don't include the selection obj visual itself when calculating the size
+  // don't include the selection obj itself when calculating the size.
   this->Detach();
   math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
       * vis->GetScale();
