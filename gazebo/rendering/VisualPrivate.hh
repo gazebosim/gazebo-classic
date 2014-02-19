@@ -139,6 +139,12 @@ namespace gazebo
 
       /// \brief A list of visual plugins.
       public: std::vector<VisualPluginPtr> plugins;
+
+      /// \brief The visual's mesh name.
+      public: std::string meshName;
+
+      /// \brief The visual's submesh name.
+      public: std::string subMeshName;
     };
     /// \}
   }

@@ -535,12 +535,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       protected: VisualPrivate *dataPtr;
-      /// \brief The visual's mesh name.
-      private: std::string meshName;
-
-      /// \brief The visual's submesh name.
-      private: std::string subMeshName;
-
     };
     /// \}
   }
