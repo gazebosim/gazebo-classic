@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
@@ -26,7 +27,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -43,6 +43,7 @@ namespace gazebo
   namespace gui
   {
     class PartData;
+    class ModelCreatorPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -201,132 +202,11 @@ namespace gazebo
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
 
-      /// \brief The model in SDF format.
-      private: sdf::SDFPtr modelSDF;
-
-      /// \brief A template SDF of a simple box model.
-      private: sdf::SDFPtr modelTemplateSDF;
-
-      /// \brief Name of the model.
-      private: std::string modelName;
-
-      /// \brief The root visual of the model.
-      private: rendering::VisualPtr modelVisual;
-
-      /// \brief The root visual of the model.
-      private: rendering::VisualPtr mouseVisual;
-
-      /// \brief The pose of the model.
-      private: math::Pose modelPose;
-
-      /// \brief True to create a static model.
-      private: bool isStatic;
-
-      /// \brief True to auto disable model when it is at rest.
-      private: bool autoDisable;
-
-      /// \brief A list of gui editor events connected to the model creator.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Counter for the number of boxes in the model.
-      private: int boxCounter;
-
-      /// \brief Counter for the number of cylinders in the model.
-      private: int cylinderCounter;
-
-      /// \brief Counter for the number of spheres in the model.
-      private: int sphereCounter;
-
-      /// \brief Counter for the number of custom parts in the model.
-      private: int customCounter;
-
-      /// \brief Counter for generating a unique model name.
-      private: int modelCounter;
-
-      /// \brief Type of part being added.
-      private: PartType addPartType;
-
-      /// \brief A map of model part names to and their visuals.
-      private: boost::unordered_map<std::string, PartData *> allParts;
-
-      /// \brief Transport node
-      private: transport::NodePtr node;
-
-      /// \brief Publisher that publishes msg to the server once the model is
-      /// created.
-      private: transport::PublisherPtr makerPub;
-
-      /// \brief Publisher that publishes delete entity msg to remove the
-      /// editor visual.
-      private: transport::PublisherPtr requestPub;
-
-      /// \brief Joint maker.
-      private: JointMaker *jointMaker;
-
-      /// \brief origin of the model.
-      private: math::Pose origin;
-
-      /// \brief Selected partv visual;
-      private: rendering::VisualPtr selectedVis;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelCreatorPrivate *dataPtr;
     };
     /// \}
-
-    /// \class SensorData SensorData.hh
-    /// \brief Helper class to store sensor data
-    class SensorData
-    {
-      /// \brief Name of sensor.
-      public: std::string name;
-
-      /// \brief Type of sensor.
-      public: std::string type;
-
-      /// \brief Pose of sensor.
-      public: math::Vector3 pose;
-
-      /// \brief True to visualize sensor.
-      public: bool visualize;
-
-      /// \brief True to set sensor to be always on.
-      public: bool alwaysOn;
-
-      /// \brief Sensor topic name.
-      public: std::string topicName;
-    };
-
-    /// \class PartData PartData.hh
-    /// \brief Helper class to store part data
-    class PartData : public QObject
-    {
-      Q_OBJECT
-
-      /// \brief Name of part.
-      public: std::string name;
-
-      /// \brief Visuals of the part.
-      public: std::vector<rendering::VisualPtr> visuals;
-
-      /// \brief True to enable gravity on part.
-      public: bool gravity;
-
-      /// \brief True to allow self collision.
-      public: bool selfCollide;
-
-      /// \brief True to make part kinematic.
-      public: bool kinematic;
-
-      /// \brief Pose of part.
-      public: math::Pose pose;
-
-      /// \brief Name of part.
-      public: physics::Inertial *inertial;
-
-      /// \brief Name of part.
-      public: std::vector<physics::CollisionPtr> collisions;
-
-      /// \brief Sensor data
-      public: SensorData *sensorData;
-    };
   }
 }
 #endif

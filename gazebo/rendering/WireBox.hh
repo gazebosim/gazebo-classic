@@ -21,12 +21,13 @@
 
 #include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/DynamicLines.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
+    class WireBoxPrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -57,11 +58,9 @@ namespace gazebo
       /// \return The wireframe box.
       public: math::Box GetBox() const;
 
-      /// \brief The lines which outline the box.
-      private: DynamicLines *lines;
-
-      /// \brief The visual which this box is attached to.
-      private: VisualPtr parent;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: WireBoxPrivate *dataPtr;
     };
     /// \}
   }
