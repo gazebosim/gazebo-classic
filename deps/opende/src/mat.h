@@ -35,18 +35,18 @@ class dMatrix {
 
 public:
   // constructors, destructors
-  dMatrix();    		// make default 0x0 matrix
+  dMatrix();        // make default 0x0 matrix
   dMatrix (int rows, int cols);    // construct zero matrix of given size
   dMatrix (const dMatrix &);    // construct copy of given matrix
   // create copy of given data - element (i,j) is data[i*rowskip+j*colskip]
   dMatrix (int rows, int cols, dReal *_data, int rowskip, int colskip);
-  ~dMatrix();    		// destructor
+  ~dMatrix();        // destructor
 
   // data movement
   dReal & operator () (int i, int j);  // reference an element
   void operator= (const dMatrix &);  // matrix = matrix
   void operator= (dReal);    // matrix = scalar
-  dMatrix transpose();    	// return transposed matrix
+  dMatrix transpose();      // return transposed matrix
   // return a permuted submatrix of this matrix, made up of the rows in p
   // and the columns in q. p has np elements, q has nq elements.
   dMatrix select (int np, int *p, int nq, int *q);
@@ -63,7 +63,7 @@ public:
   void clearUpperTriangle();
   void clearLowerTriangle();
   void makeRandom (dReal range);
-  void print (char *fmt = static_cast<char*>("%10.4f "), FILE *f=stdout);
+  void print (char *fmt = const_cast<char*>("%10.4f "), FILE *f=stdout);
   dReal maxDifference (const dMatrix &);
 };
 
