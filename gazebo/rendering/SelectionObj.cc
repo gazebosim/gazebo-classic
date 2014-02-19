@@ -91,7 +91,6 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void SelectionObj::UpdateSize()
 {
-
   VisualPtr vis = this->parent;
 
   // don't include the selection obj itself when calculating the size.
