@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #ifndef _MODEL_EDITOR_PALETTE_HH_
 #define _MODEL_EDITOR_PALETTE_HH_
 
-#include <string>
-
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
-  namespace rendering
-  {
-  }
-
   namespace gui
   {
-    class JointMaker;
-    class ModelCreator;
+    class ModelEditorPalettePrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
-    /// \brief A palette of building items which can be added to the editor.
+    /// \brief A palette of items which can be added to the editor.
     class ModelEditorPalette : public QWidget
     {
       Q_OBJECT
@@ -119,42 +108,9 @@ namespace gazebo
       /// \brief Qt callback when model editing is complete.
       private slots: void OnDone();
 
-      /// \brief Widget that display model properties.
-      private: QTreeWidget *modelTreeWidget;
-
-      /// \brief Model settings item in the tree widget.
-      private: QTreeWidgetItem *modelSettingsItem;
-
-      /// \brief Model parts item in the tree widget.
-      private: QTreeWidgetItem *modelItem;
-
-      /// \brief Plugin item in the tree widget.
-      private: QTreeWidgetItem *pluginItem;
-
-      /// \brief Parts and Joints button group.
-      private: QButtonGroup *partJointsButtonGroup;
-
-      /// \brief Model creator.
-      private: ModelCreator *modelCreator;
-
-      /// \brief Save button.
-      private: QPushButton *saveButton;
-
-      /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
-
-      /// \brief Path to where the model is saved.
-      private: std::string saveLocation;
-
-      /// \brief Name of model being edited.
-      private: std::string modelName;
-
-      /// \brief Static checkbox, true to create a static model.
-      private: QCheckBox *staticCheck;
-
-      /// \brief Auto disable checkbox, true to allow model to auto-disable at
-      /// rest.
-      private: QCheckBox *autoDisableCheck;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelEditorPalettePrivate *dataPtr;
     };
   }
 }

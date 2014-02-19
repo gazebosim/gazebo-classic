@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
+
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -27,77 +28,83 @@
 #include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/ModelEditorPalette.hh"
+#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/ModelEditorPalettePrivate.hh"
+#include "gazebo/gui/model/ModelEditorPalette.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
-    : QWidget(_parent)
+    : QWidget(_parent), dataPtr(new ModelEditorPalettePrivate)
 {
   this->setObjectName("modelEditorPalette");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->modelTreeWidget->header()->hide();
-  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  this->dataPtr->modelTreeWidget = new QTreeWidget();
+  this->dataPtr->modelTreeWidget->setColumnCount(1);
+  this->dataPtr->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->dataPtr->modelTreeWidget->header()->hide();
+  this->dataPtr->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
 
-  this->modelTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+  this->dataPtr->modelTreeWidget->setSelectionMode(
+      QAbstractItemView::NoSelection);
+  connect(this->dataPtr->modelTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   // Create a top-level tree item for the path
-  this->modelSettingsItem =
+  this->dataPtr->modelSettingsItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Model Settings")));
-  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+  this->dataPtr->modelTreeWidget->addTopLevelItem(
+      this->dataPtr->modelSettingsItem);
 
   QTreeWidgetItem *modelSettingsChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelSettingsItem->addChild(modelSettingsChildItem);
+  this->dataPtr->modelSettingsItem->addChild(modelSettingsChildItem);
 
   QWidget *modelSettingsWidget = new QWidget;
   QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
   QGridLayout *dynamicsLayout = new QGridLayout;
 
   QLabel *staticLabel = new QLabel(tr("Static:"));
-  this->staticCheck = new QCheckBox;
-  this->staticCheck->setText(tr("False"));
-  this->staticCheck->setChecked(false);
-  connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
+  this->dataPtr->staticCheck = new QCheckBox;
+  this->dataPtr->staticCheck->setText(tr("False"));
+  this->dataPtr->staticCheck->setChecked(false);
+  connect(this->dataPtr->staticCheck, SIGNAL(clicked()),
+      this, SLOT(OnStatic()));
 
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
-  this->autoDisableCheck = new QCheckBox;
-  this->autoDisableCheck->setText(tr("True"));
-  this->autoDisableCheck->setChecked(true);
-  connect(this->autoDisableCheck, SIGNAL(clicked()), this,
+  this->dataPtr->autoDisableCheck = new QCheckBox;
+  this->dataPtr->autoDisableCheck->setText(tr("True"));
+  this->dataPtr->autoDisableCheck->setChecked(true);
+  connect(this->dataPtr->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
 
   dynamicsLayout->addWidget(staticLabel, 0, 0);
-  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
+  dynamicsLayout->addWidget(this->dataPtr->staticCheck, 0, 1);
   dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
-  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
+  dynamicsLayout->addWidget(this->dataPtr->autoDisableCheck, 1, 1);
 
   modelSettingsLayout->addLayout(dynamicsLayout);
   modelSettingsWidget->setLayout(modelSettingsLayout);
-  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
+  this->dataPtr->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
     modelSettingsWidget);
-  this->modelSettingsItem->setExpanded(true);
+  this->dataPtr->modelSettingsItem->setExpanded(true);
   modelSettingsChildItem->setExpanded(true);
 
-  this->modelItem =
+  this->dataPtr->modelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Parts and Joints")));
-  this->modelTreeWidget->addTopLevelItem(this->modelItem);
+  this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->modelItem);
 
   QTreeWidgetItem *modelChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelItem->addChild(modelChildItem);
+  this->dataPtr->modelItem->addChild(modelChildItem);
 
   // Parts and joints buttons
   QWidget *modelWidget = new QWidget;
@@ -181,18 +188,18 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   ballJointButton->setChecked(false);
   connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
 
-  partJointsButtonGroup = new QButtonGroup;
-  this->partJointsButtonGroup->addButton(cylinderButton);
-  this->partJointsButtonGroup->addButton(sphereButton);
-  this->partJointsButtonGroup->addButton(boxButton);
-  this->partJointsButtonGroup->addButton(customButton);
-  this->partJointsButtonGroup->addButton(fixedJointButton);
-  this->partJointsButtonGroup->addButton(sliderJointButton);
-  this->partJointsButtonGroup->addButton(hingeJointButton);
-  this->partJointsButtonGroup->addButton(hinge2JointButton);
-  this->partJointsButtonGroup->addButton(screwJointButton);
-  this->partJointsButtonGroup->addButton(universalJointButton);
-  this->partJointsButtonGroup->addButton(ballJointButton);
+  this->dataPtr->partJointsButtonGroup = new QButtonGroup;
+  this->dataPtr->partJointsButtonGroup->addButton(cylinderButton);
+  this->dataPtr->partJointsButtonGroup->addButton(sphereButton);
+  this->dataPtr->partJointsButtonGroup->addButton(boxButton);
+  this->dataPtr->partJointsButtonGroup->addButton(customButton);
+  this->dataPtr->partJointsButtonGroup->addButton(fixedJointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(sliderJointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(hingeJointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(hinge2JointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(screwJointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(universalJointButton);
+  this->dataPtr->partJointsButtonGroup->addButton(ballJointButton);
 
   jointsLayout->addWidget(jointsLabel, 0, 0);
 //  jointsLayout->addWidget(fixedJointButton, 1, 0);
@@ -206,41 +213,42 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   modelLayout->addLayout(partsLayout);
   modelLayout->addLayout(jointsLayout);
   modelWidget->setLayout(modelLayout);
-  this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
-  this->modelItem->setExpanded(true);
+  this->dataPtr->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
+  this->dataPtr->modelItem->setExpanded(true);
   modelChildItem->setExpanded(true);
 
   // plugin
-  this->pluginItem =
+  this->dataPtr->pluginItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Plugin")));
-  // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
+  // this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->pluginItem);
 
   // save buttons
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
 
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+  this->dataPtr->saveButton = new QPushButton(tr("Save As"));
+  connect(this->dataPtr->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
 
   QPushButton *doneButton = new QPushButton(tr("Done"));
   connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(this->saveButton);
+  buttonsLayout->addWidget(this->dataPtr->saveButton);
   buttonsLayout->addWidget(doneButton);
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
-  this->modelCreator = new ModelCreator();
+  this->dataPtr->modelCreator = new ModelCreator();
 
-  connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
-      SLOT(OnJointAdded()));
-  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
+  connect(this->dataPtr->modelCreator->GetJointMaker(), SIGNAL(JointAdded()),
+      this, SLOT(OnJointAdded()));
+  connect(this->dataPtr->modelCreator, SIGNAL(PartAdded()), this,
+      SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->modelTreeWidget, 0);
+  frameLayout->addWidget(this->dataPtr->modelTreeWidget, 0);
   frameLayout->addLayout(buttonsLayout);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
@@ -250,9 +258,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default";
+  this->dataPtr->saved = false;
+  this->dataPtr->saveLocation = QDir::homePath().toStdString();
+  this->dataPtr->modelName = "default";
 
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
@@ -261,6 +269,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -274,19 +284,19 @@ void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
-  this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
+  this->dataPtr->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
-  this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
+  this->dataPtr->modelCreator->AddPart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
-  this->modelCreator->AddPart(ModelCreator::PART_BOX);
+  this->dataPtr->modelCreator->AddPart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -296,7 +306,7 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    this->modelCreator->AddCustom(importDialog.GetImportPath());
+    this->dataPtr->modelCreator->AddCustom(importDialog.GetImportPath());
   }
   else
   {
@@ -309,77 +319,77 @@ void ModelEditorPalette::OnCustom()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHingeJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnHinge2Joint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSliderJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnScrewJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnUniversalJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBallJoint()
 {
-  this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
+  this->dataPtr->modelCreator->AddJoint(JointMaker::JOINT_BALL);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointAdded()
 {
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
+  this->dataPtr->partJointsButtonGroup->setExclusive(false);
+  if (this->dataPtr->partJointsButtonGroup->checkedButton())
+    this->dataPtr->partJointsButtonGroup->checkedButton()->setChecked(false);
+  this->dataPtr->partJointsButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnPartAdded()
 {
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
+  this->dataPtr->partJointsButtonGroup->setExclusive(false);
+  if (this->dataPtr->partJointsButtonGroup->checkedButton())
+    this->dataPtr->partJointsButtonGroup->checkedButton()->setChecked(false);
+  this->dataPtr->partJointsButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnAutoDisable()
 {
-  std::string text = this->autoDisableCheck->isChecked() ? "True" : "False";
-  this->autoDisableCheck->setText(tr(text.c_str()));
-  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
+  std::string text = this->dataPtr->autoDisableCheck->isChecked() ? "True" : "False";
+  this->dataPtr->autoDisableCheck->setText(tr(text.c_str()));
+  this->dataPtr->modelCreator->SetAutoDisable(this->dataPtr->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnStatic()
 {
-  std::string text = this->staticCheck->isChecked() ? "True" : "False";
-  this->staticCheck->setText(tr(text.c_str()));
-  this->modelCreator->SetStatic(this->staticCheck->isChecked());
+  std::string text = this->dataPtr->staticCheck->isChecked() ? "True" : "False";
+  this->dataPtr->staticCheck->setText(tr(text.c_str()));
+  this->dataPtr->modelCreator->SetStatic(this->dataPtr->staticCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
@@ -388,17 +398,17 @@ void ModelEditorPalette::OnSave()
   SaveDialog saveDialog;
   saveDialog.deleteLater();
   saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
+  saveDialog.SetSaveName(this->dataPtr->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
   saveDialog.SetFileExtension("sdf");
   if (saveDialog.exec() == QDialog::Accepted)
   {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->saveButton->setText("&Save");
+    this->dataPtr->modelName = saveDialog.GetSaveName();
+    this->dataPtr->saveLocation = saveDialog.GetSaveLocation();
+    this->dataPtr->modelCreator->SetModelName(this->dataPtr->modelName);
+    this->dataPtr->modelCreator->GenerateSDF();
+    this->dataPtr->modelCreator->SaveToSDF(this->dataPtr->saveLocation);
+    this->dataPtr->saveButton->setText("&Save");
   }
 }
 
@@ -415,9 +425,9 @@ void ModelEditorPalette::OnDiscard()
   switch (ret)
   {
     case QMessageBox::Discard:
-      this->modelCreator->Reset();
-      this->saveButton->setText("&Save As");
-      this->saveLocation = QDir::homePath().toStdString();
+      this->dataPtr->modelCreator->Reset();
+      this->dataPtr->saveButton->setText("&Save As");
+      this->dataPtr->saveLocation = QDir::homePath().toStdString();
       break;
     case QMessageBox::Cancel:
       // Do nothing
@@ -432,17 +442,17 @@ void ModelEditorPalette::OnDone()
 {
   SaveDialog saveDialog;
   saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
+  saveDialog.SetSaveName(this->dataPtr->modelCreator->GetModelName());
   saveDialog.SetSaveLocation(QDir::homePath().toStdString());
   saveDialog.SetFileExtension("sdf");
   if (saveDialog.exec() == QDialog::Accepted)
   {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->modelCreator->FinishModel();
+    this->dataPtr->modelName = saveDialog.GetSaveName();
+    this->dataPtr->saveLocation = saveDialog.GetSaveLocation();
+    this->dataPtr->modelCreator->SetModelName(this->dataPtr->modelName);
+    this->dataPtr->modelCreator->GenerateSDF();
+    this->dataPtr->modelCreator->SaveToSDF(this->dataPtr->saveLocation);
+    this->dataPtr->modelCreator->FinishModel();
     gui::model::Events::finishModel();
   }
 }
@@ -452,7 +462,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
-    // this->modelCreator->Stop();
+    // this->dataPtr->modelCreator->Stop();
     // call the slots to uncheck the buttons
     this->OnPartAdded();
     this->OnJointAdded();
