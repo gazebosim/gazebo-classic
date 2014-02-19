@@ -47,6 +47,7 @@
 using namespace gazebo;
 
 bool Server::stop = true;
+bool Server::initialized = false;
 
 /////////////////////////////////////////////////
 Server::Server()
@@ -262,6 +263,10 @@ bool Server::ParseArgs(int argc, char **argv)
 
   return true;
 }
+
+/////////////////////////////////////////////////
+void Server::Init()
+{ }
 
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const

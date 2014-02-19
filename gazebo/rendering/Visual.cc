@@ -147,6 +147,7 @@ Visual::~Visual()
     this->sceneNode = NULL;
   }
 
+  this->scene.reset();
   this->sdf->Reset();
   this->sdf.reset();
   this->parent.reset();
