@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
