@@ -32,6 +32,7 @@
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/Image.hh"
 
 namespace gazebo
 {
