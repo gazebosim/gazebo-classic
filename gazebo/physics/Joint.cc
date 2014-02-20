@@ -67,6 +67,10 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
+  // these flags are related to issue #494
+  // set default to true for backward compatibility
+  this->axisParentModelFrame[0] = true;
+  this->axisParentModelFrame[1] = true;
 
   if (!this->sdfJoint)
   {
@@ -130,6 +134,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
+    {
+      std::string param = "use_parent_model_frame";
+      // Check if "use_parent_model_frame" element exists.
+      // It has `required=1`, so if it does not exist, then SDF is old,
+      // and we should assume support for backwards compatibility
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -142,6 +156,13 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
+    {
+      std::string param = "use_parent_model_frame";
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -873,7 +894,7 @@ void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopStiffness(unsigned int _index)
+double Joint::GetStopStiffness(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -888,7 +909,7 @@ double Joint::GetStopStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopDissipation(unsigned int _index)
+double Joint::GetStopDissipation(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -903,7 +924,39 @@ double Joint::GetStopDissipation(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetInitialAnchorPose()
+math::Pose Joint::GetInitialAnchorPose() const
 {
   return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetWorldPose() const
+{
+  if (this->childLink)
+    return this->anchorPose + this->childLink->GetWorldPose();
+  return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // Use parent model frame
+    if (this->parentLink)
+      return this->parentLink->GetModel()->GetWorldPose().rot;
+
+    // Parent model is world, use world frame
+    return math::Quaternion();
+  }
+
+  return this->GetWorldPose().rot;
 }
