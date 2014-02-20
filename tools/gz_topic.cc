@@ -323,13 +323,11 @@ void TopicCommand::Bw(const std::string &_topic)
 /////////////////////////////////////////////////
 void TopicCommand::View(const std::string &_topic)
 {
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
   {
     printf("load error\n");
     return;
   }
-
-  gazebo::run();
 
   QApplication *app = new QApplication(this->argc, this->argv);
 
@@ -367,13 +365,7 @@ void TopicCommand::View(const std::string &_topic)
       gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 
-  if (!gazebo::init())
-  {
-    gzerr << "Unable to initialize Gazebo\n";
-    return;
-  }
-
   app->exec();
 
-  gazebo::fini();
+  gazebo::shutdown();
 }
