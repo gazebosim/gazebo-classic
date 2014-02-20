@@ -114,14 +114,6 @@ void ModelPropShop::Init()
       "/gazebo/server/control");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->factoryPub->WaitForConnection();
-
-  if (this->sdf)
-  {
-    msgs::Factory msg;
-    msg.set_sdf(this->sdf->ToString());
-    this->factoryPub->Publish(msg, true);
-  }
 }
 
 /////////////////////////////////////////////
@@ -131,6 +123,13 @@ void ModelPropShop::Update()
   // capture images.
   if (!this->scene)
   {
+    this->factoryPub->WaitForConnection();
+    if (this->sdf)
+    {
+      msgs::Factory msg;
+      msg.set_sdf(this->sdf->ToString());
+      this->factoryPub->Publish(msg, true);
+    }
     rendering::load();
     rendering::init();
 
