@@ -14,22 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _COMVISUAL_HH_
 #define _COMVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/msgs/msgs.hh"
+#include <sdf/sdf.hh>
 
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -37,8 +33,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering Rendering
     /// \{
-
-    class DynamicLines;
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
@@ -65,12 +59,6 @@ namespace gazebo
       /// \param[in] _scale Scale factor for the COM visual.
       private: void Load(const math::Pose &_pose,
                const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
-
-      /// \brief Lines that make the cross marking the center of mass
-      private: DynamicLines *crossLines;
-
-      /// \brief Box that make the cross marking the center of mass
-      private: Ogre::SceneNode *boxNode;
     };
     /// \}
   }

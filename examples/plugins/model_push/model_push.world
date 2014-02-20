@@ -1,7 +1,8 @@
 <?xml version="1.0"?> 
-<gazebo version="1.2">
+<sdf version="1.4">
   <world name="default">
 
+    <!-- Ground Plane -->
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -9,8 +10,8 @@
     <include>
       <uri>model://sun</uri>
     </include>
-   
-    <model name="box_model">
+
+    <model name="box">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
@@ -19,13 +20,6 @@
               <size>1 1 1</size>
             </box>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0</mu><mu2>0</mu2>
-              </ode>
-            </friction>
-          </surface>
         </collision>
 
         <visual name="visual">
@@ -37,8 +31,7 @@
         </visual>
       </link>
 
-      <plugin name="model_push" filename="libmodel_push.so"/>
-    </model>
-
+      <plugin name="model_push" filename="build/libmodel_push.so"/>
+    </model>        
   </world>
-</gazebo>
+</sdf>

@@ -36,6 +36,7 @@ namespace gazebo
     /// \brief Output a line of data.
     /// \param[in] _stream The output stream.
     /// \param[in] _state Current state.
+    /// \return Reference to the output stream.
     public: std::ostringstream &Out(std::ostringstream &_stream,
                 const gazebo::physics::State &_state);
 
@@ -44,6 +45,7 @@ namespace gazebo
     /// \param[in] _xmlName Name of the xml tag.
     /// \param[in] _filter The filter string [x,y,z,r,p,a].
     /// \param[in] _state Current state.
+    /// \return Filtered pose string.
     public: std::string FilterPose(const gazebo::math::Pose &_pose,
                 const std::string &_xmlName,
                 std::string _filter,
@@ -61,6 +63,7 @@ namespace gazebo
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
+    /// \param[in] _stamp Type of stamp to apply.
     public: JointFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Initialize the filter.
@@ -70,6 +73,7 @@ namespace gazebo
     /// \brief Filter joint parts (angle)
     /// \param[in] _state Link state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
+    /// \return Filtered joint string.
     public: std::string FilterParts(gazebo::physics::JointState &_state,
                 std::list<std::string>::iterator _partIter);
 
@@ -88,6 +92,7 @@ namespace gazebo
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
+    /// \param[in] _stamp Type of stamp to apply.
     public: LinkFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Initialize the filter.
@@ -97,6 +102,7 @@ namespace gazebo
     /// \brief Filter link parts (pose, velocity, acceleration, wrench)
     /// \param[in] _state Link state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
+    /// \return Filtered string
     public: std::string FilterParts(gazebo::physics::LinkState &_state,
                 std::list<std::string>::iterator _partIter);
 
@@ -115,6 +121,7 @@ namespace gazebo
   {
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
+    /// \param[in] _stamp Type of stamp to apply.
     public: ModelFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Destructor.
@@ -127,6 +134,7 @@ namespace gazebo
     /// \brief Filter model parts (pose)
     /// \param[in] _state Model state to filter.
     /// \param[in] _partIter Iterator to the filtered string parts.
+    /// \return Filtered string
     public: std::string FilterParts(gazebo::physics::ModelState &_state,
                 std::list<std::string>::iterator _partIter);
 
@@ -151,6 +159,7 @@ namespace gazebo
   {
     /// \brief Constructor
     /// \param[in] _xmlOutput True to format output as XML
+    /// \param[in] _stamp Type of stamp to apply.
     public: StateFilter(bool _xmlOutput, const std::string &_stamp,
                 double _hz = 0);
 
@@ -160,6 +169,7 @@ namespace gazebo
 
     /// \brief Perform filtering
     /// \param[in] _stateString The string to filter.
+    /// \return Filtered string
     public: std::string Filter(const std::string &_stateString);
 
     /// \brief Filter for a model.
@@ -188,15 +198,22 @@ namespace gazebo
     protected: virtual bool TransportRequired();
 
     /// \brief Output information about a log file.
+    /// \param[in] _filename Name of the file to parse.
     private: void Info(const std::string &_filename);
 
     /// \brief Dump the contents of a log file to screen
     /// \param[in] _filter Filter string
+    /// \param[in] _raw True to output data without xml formatting.
+    /// \param[in] _stamp Type of stamp to apply.
+    /// \param[in] _hz Hertz rate.
     private: void Echo(const std::string &_filter,
                  bool _raw, const std::string &_stamp, double _hz);
 
     /// \brief Step through a log file.
     /// \param[in] _filter Filter string
+    /// \param[in] _raw True to output data without xml formatting.
+    /// \param[in] _stamp Type of stamp to apply.
+    /// \param[in] _hz Hertz rate.
     private: void Step(const std::string &_filter, bool _raw,
                  const std::string &_stamp, double _hz);
 
@@ -204,8 +221,9 @@ namespace gazebo
     /// \param[in] _start True to start logging
     private: void Record(bool _start);
 
-    /// \brief Get a character from the terminal. This bypasses the need to wait
-    /// for the 'enter' key.
+    /// \brief Get a character from the terminal.
+    /// This bypasses the need to wait for the 'enter' key.
+    /// \return The characater read from the terminal.
     private: int GetChar();
 
     /// \brief Get the size of file.

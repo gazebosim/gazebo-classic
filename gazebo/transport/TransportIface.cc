@@ -402,3 +402,28 @@ transport::ConnectionPtr transport::connectToMaster()
 
   return connection;
 }
+
+/////////////////////////////////////////////////
+bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
+{
+  std::list<std::string> namespaces;
+  gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
+
+  gazebo::common::Time waitTime = std::min(
+      gazebo::common::Time(0, 100000000), _maxWait / 10);
+
+  gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+      namespaces);
+
+  while (namespaces.empty() &&
+      gazebo::common::Time::GetWallTime() - startTime < _maxWait)
+  {
+    gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+        namespaces);
+    gazebo::common::Time::Sleep(waitTime);
+  }
+
+  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
+    return true;
+  return false;
+}

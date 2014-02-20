@@ -87,9 +87,6 @@ namespace gazebo
       /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
 
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
-
       /// \brief True if the sensor was rendered.
       private: bool rendered;
     };

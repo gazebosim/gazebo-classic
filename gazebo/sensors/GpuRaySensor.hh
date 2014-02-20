@@ -286,9 +286,6 @@ namespace gazebo
       /// \brief GPU laser rendering.
       private: rendering::GpuLaserPtr laserCam;
 
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
-
       /// \brief Mutex to protect getting ranges.
       private: boost::mutex mutex;
 

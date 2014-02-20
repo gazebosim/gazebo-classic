@@ -59,6 +59,7 @@ namespace gazebo
     /// \brief Process signal interrupt.
     public: static void Signal();
 
+    /// \brief List all the command options.
     public: void ListOptions();
 
     /// \brief Return true if transport is need for the command.
@@ -66,12 +67,15 @@ namespace gazebo
     protected: virtual bool TransportRequired();
 
     /// \brief Implementation of Run
+    /// \return True on success
     protected: virtual bool RunImpl() = 0;
 
     /// \brief Initialize transport.
+    /// \return True on success
     protected: bool TransportInit();
 
     /// \brief Finalized transport.
+    /// \return True on success
     protected: bool TransportFini();
 
     /// \brief Name of the command.
