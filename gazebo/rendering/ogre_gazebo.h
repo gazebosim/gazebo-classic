@@ -19,6 +19,10 @@
 
 // This disables warning messages for OGRE
 #pragma GCC system_header
+
+// This prevents some deprecation #warning messages on OSX 10.9
+#pragma clang diagnostic ignored "-W#warnings"
+
 #include <OGRE/Ogre.h>
 #include <OGRE/OgreImageCodec.h>
 #include <OGRE/OgreMovableObject.h>

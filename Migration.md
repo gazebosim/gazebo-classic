@@ -73,6 +73,11 @@
 
 ### Additions
 
+1. **gazebo/physics/ContactManager.hh**
+    + unsigned int GetFilterCount()
+    + bool HasFilter(const std::string &_name);
+    + void RemoveFilter(const std::string &_name);
+
 1. **gazebo/physics/Joint.hh**
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
@@ -128,7 +133,7 @@
 
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
-    
+
 1. **gazebo/sensors/Noise.hh**
     + double Noise::GetMean() const
     + double Noise::GetStdDev() const
@@ -157,6 +162,29 @@
 
 ### New Deprecations
 
+1. **gazebo/gazebo.hh**
+    + ***Deprecation*** void fini()
+    + ***Deprecation*** void stop()
+    + ***Replacement*** bool shutdown()
+    + ***Note*** Replace fini and stop with shutdown
+    ---
+    + ***Deprecation*** bool load()
+    + ***Deprecation*** bool init()
+    + ***Deprecation*** bool run()
+    + ***Replacement*** bool setupClient()
+        + Use this function to setup gazebo for use as a client
+    + ***Replacement*** bool setupServer()
+        + Use this function to setup gazebo for use as a server
+    + ***Note*** Replace load+init+run with setupClient/setupServer
+    ---
+    + ***Deprecation*** std::string find_file(const std::string &_file)
+    + ***Replacement*** std::string common::find_file(const std::string &_file)
+    ---
+    + ***Deprecation*** void add_plugin(const std::string &_filename)
+    + ***Replacement*** void addPlugin(const std::string &_filename)
+    ---
+    + ***Deprecation*** void print_version()
+    + ***Replacement*** void printVersion()
 1. **gazebo/physics/World.hh**
     + ***Deprecation*** void World::StepWorld(int _steps)
     + ***Replacement*** void World::Step(unsigned int _steps)

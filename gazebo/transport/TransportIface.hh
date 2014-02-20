@@ -150,6 +150,10 @@ namespace gazebo
     /// \return True if minimal comms is enabled.
     bool getMinimalComms();
 
+    /// \brief Blocks while waiting for topic namespaces from the Master.
+    /// This function will wait a maximum of _maxWait.
+    /// \return True if namespaces were found before _maxWait time.
+    bool waitForNamespaces(const gazebo::common::Time &_maxWait);
     /// \}
   }
 }

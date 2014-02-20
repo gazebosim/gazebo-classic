@@ -65,12 +65,15 @@ namespace gazebo
       /// \brief Callback for pushing entity with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// \brief Callback for releasing mouse button
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// \brief Callback for dragging with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// \brief Callback when moving mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
