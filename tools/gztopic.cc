@@ -498,13 +498,11 @@ void hz()
 /////////////////////////////////////////////////
 void view(int _argc, char **_argv)
 {
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
   {
     printf("load error\n");
     return;
   }
-
-  gazebo::run();
 
   QApplication *app = new QApplication(_argc, _argv);
 
@@ -542,15 +540,9 @@ void view(int _argc, char **_argv)
       gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 
-  if (!gazebo::init())
-  {
-    gzerr << "Unable to initialize Gazebo\n";
-    return;
-  }
-
   app->exec();
 
-  gazebo::fini();
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////

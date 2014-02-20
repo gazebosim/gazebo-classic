@@ -364,22 +364,8 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
   // initialize integrator from state
   this->integ->initialize(state);
 
-  // set gravity mode
-  Link_V links = _model->GetLinks();
-  for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
-  {
-    physics::SimbodyLinkPtr simbodyLink =
-      boost::dynamic_pointer_cast<physics::SimbodyLink>(*li);
-    if (simbodyLink)
-      simbodyLink->SetGravityMode(simbodyLink->GetGravityMode());
-    else
-      gzerr << "failed to cast link [" << (*li)->GetName()
-            << "] as simbody link\n";
-  }
-
-  this->system.realize(this->integ->getAdvancedState(), Stage::Velocity);
-
   // mark links as initialized
+  Link_V links = _model->GetLinks();
   for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
     physics::SimbodyLinkPtr simbodyLink =
@@ -427,17 +413,20 @@ void SimbodyPhysics::UpdatePhysics()
   common::Time currTime =  this->world->GetRealTime();
 
 
-  while (integ->getTime() < this->world->GetSimTime().Double())
+  bool trying = true;
+  while (trying && integ->getTime() < this->world->GetSimTime().Double())
   {
-    // try
-    // {
+    try
+    {
       this->integ->stepTo(this->world->GetSimTime().Double(),
                          this->world->GetSimTime().Double());
-    // }
-    // catch (...)
-    // {
-    //   gzerr << "simbody step failed\n";
-    // }
+    }
+    catch(const std::exception& e)
+    {
+      gzerr << "simbody stepTo() failed with message:\n"
+            << e.what() << "\nWill stop trying now.\n";
+      trying = false;
+    }
   }
 
   this->simbodyPhysicsStepped = true;
@@ -1173,9 +1162,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
           (boost::dynamic_pointer_cast<physics::BoxShape>(
           (*ci)->GetShape()))->GetSize())/2;
 
-        /// \TODO: make collision resolution an adjustable parameter
+        /// \TODO: harcoded resolution, make collision resolution
+        /// an adjustable parameter (#980)
         // number times to chop the longest side.
-        const int resolution = 2;
+        const int resolution = 6;
         // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
         const PolygonalMesh mesh = PolygonalMesh::
             createBrickMesh(hsz, resolution);

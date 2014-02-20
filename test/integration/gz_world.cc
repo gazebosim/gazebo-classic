@@ -57,8 +57,14 @@ TEST_F(GzWorld, Step)
 
   EXPECT_TRUE(world->IsPaused());
 
-  // Pause
+  EXPECT_EQ(world->GetIterations(), 0);
+
+  // Step the world one iteration.
   custom_exec("gz world -s 1");
+
+  EXPECT_EQ(world->GetIterations(), 1);
+
+  EXPECT_TRUE(world->IsPaused());
 }
 
 /////////////////////////////////////////////////
