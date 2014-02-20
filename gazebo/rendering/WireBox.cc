@@ -49,6 +49,11 @@ WireBox::~WireBox()
 /////////////////////////////////////////////////
 void WireBox::Init(const math::Box &_box)
 {
+  if (this->dataPtr->box == _box)
+    return;
+
+  this->dataPtr->box = _box;
+
   math::Vector3 max = _box.max;
   math::Vector3 min = _box.min;
 
