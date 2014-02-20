@@ -37,7 +37,7 @@ namespace gazebo
     class WireBox
     {
       /// \brief Constructor
-      /// \param[in] _box Dimenision of the box to draw.
+      /// \param[in] _box Dimension of the box to draw.
       public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
 
       /// \brief Destructor.
