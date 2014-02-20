@@ -19,7 +19,6 @@
 #define _CAMERAVISUAL_HH_
 
 #include <string>
-#include <vector>
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
