@@ -28,8 +28,9 @@
   #define GetCurrentDir getcwd
 #endif
 
-#include <string>
+#include <boost/filesystem.hpp>
 #include <list>
+#include <string>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -78,6 +79,21 @@ namespace gazebo
       /// Returns the world path extension.
       /// \return Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
+
+      /// Returns the default path suitable for temporary files.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp (Linux).
+      public: std::string GetTmpPath();
+
+      /// Returns a unique temporary file for this instance of SystemPath.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_234123 (Linux).
+      public: std::string GetTmpInstancePath();
+
+      /// Returns the default temporary test path.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_test (Linux).
+      public: std::string GetDefaultTestPath();
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
@@ -164,6 +180,12 @@ namespace gazebo
       public: bool ogrePathsFromEnv;
 
       private: friend class SingletonT<SystemPaths>;
+
+      /// \brief Path to the default temporary directory
+      private: boost::filesystem::path tmpPath;
+
+      /// \brief Path to the instance temporary directory
+      private: boost::filesystem::path tmpInstancePath;
     };
     /// \}
   }
