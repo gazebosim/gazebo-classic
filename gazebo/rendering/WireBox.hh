@@ -18,8 +18,6 @@
 #ifndef _WIREBOX_HH_
 #define _WIREBOX_HH_
 
-#include <string>
-
 #include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -38,6 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.
+      /// \param[in] _parent Parent visual of the box.
       public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
 
       /// \brief Destructor.

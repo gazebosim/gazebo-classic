@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/math/Vector3.hh"
+
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/WireBoxPrivate.hh"
 #include "gazebo/rendering/WireBox.hh"
