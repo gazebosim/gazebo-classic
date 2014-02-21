@@ -712,8 +712,6 @@ void ModelCreator::GenerateSDF()
 {
   sdf::ElementPtr modelElem;
   sdf::ElementPtr linkElem;
-  sdf::ElementPtr visualElem;
-  sdf::ElementPtr collisionElem;
 
   this->modelSDF.reset(new sdf::SDF);
   this->modelSDF->SetFromString(this->GetTemplateSDFString());
@@ -740,8 +738,7 @@ void ModelCreator::GenerateSDF()
       ++partsIt)
   {
     PartData *part = partsIt->second;
-    rendering::VisualPtr visual = part->visuals[0];
-    mid += visual->GetParent()->GetWorldPose().pos;
+    mid += part->pose.pos;
   }
   mid /= this->allParts.size();
   this->origin.pos = mid;
@@ -755,13 +752,9 @@ void ModelCreator::GenerateSDF()
     collisionNameStream.str("");
 
     PartData *part = partsIt->second;
-    rendering::VisualPtr visual = part->visuals[0];
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
-    visualElem = newLinkElem->GetElement("visual");
-    collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
-    newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose()
-        - this->origin);
+    newLinkElem->GetAttribute("name")->Set(part->name);
+    newLinkElem->GetElement("pose")->Set(part->pose - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
     newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
     newLinkElem->GetElement("kinematic")->Set(part->kinematic);
@@ -777,47 +770,58 @@ void ModelCreator::GenerateSDF()
     inertiaElem->GetElement("iyz")->Set(part->inertial->GetIYZ());
 
     modelElem->InsertElement(newLinkElem);
+    newLinkElem->ClearElements();
 
-    visualElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_visual");
-    collisionElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_collision");
-    visualElem->GetElement("pose")->Set(visual->GetPose());
-    collisionElem->GetElement("pose")->Set(visual->GetPose());
+    for (unsigned int i = 0; i < part->visuals.size(); ++i)
+    {
+      sdf::ElementPtr visualElem = templateVisualElem->Clone();
+      sdf::ElementPtr collisionElem = templateCollisionElem->Clone();
 
-    sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-    geomElem->ClearElements();
+      rendering::VisualPtr visual = part->visuals[i];
 
-    math::Vector3 scale = visual->GetScale();
-    if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
-    {
-      sdf::ElementPtr boxElem = geomElem->AddElement("box");
-      (boxElem->GetElement("size"))->Set(scale);
+      visualElem->GetAttribute("name")->Set(visual->GetName());
+      collisionElem->GetAttribute("name")->Set(
+          visual->GetName() + "_collision");
+      visualElem->GetElement("pose")->Set(visual->GetPose());
+      collisionElem->GetElement("pose")->Set(visual->GetPose());
+
+      sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
+      geomElem->ClearElements();
+
+      math::Vector3 scale = visual->GetScale();
+      if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
+      {
+        sdf::ElementPtr boxElem = geomElem->AddElement("box");
+        (boxElem->GetElement("size"))->Set(scale);
+      }
+      else if (visual->GetParent()->GetName().find("unit_cylinder")
+         != std::string::npos)
+      {
+        sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
+        (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
+        (cylinderElem->GetElement("length"))->Set(scale.z);
+      }
+      else if (visual->GetParent()->GetName().find("unit_sphere")
+          != std::string::npos)
+      {
+        sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
+        (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
+      }
+      else if (visual->GetParent()->GetName().find("custom")
+          != std::string::npos)
+      {
+        sdf::ElementPtr customElem = geomElem->AddElement("mesh");
+        (customElem->GetElement("scale"))->Set(scale);
+        (customElem->GetElement("uri"))->Set(visual->GetMeshName());
+      }
+      sdf::ElementPtr geomElemClone = geomElem->Clone();
+      geomElem =  collisionElem->GetElement("geometry");
+      geomElem->ClearElements();
+      geomElem->InsertElement(geomElemClone->GetFirstElement());
+
+      newLinkElem->InsertElement(visualElem);
+      newLinkElem->InsertElement(collisionElem);
     }
-    else if (visual->GetParent()->GetName().find("unit_cylinder")
-       != std::string::npos)
-    {
-      sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-      (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
-      (cylinderElem->GetElement("length"))->Set(scale.z);
-    }
-    else if (visual->GetParent()->GetName().find("unit_sphere")
-        != std::string::npos)
-    {
-      sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
-      (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
-    }
-    else if (visual->GetParent()->GetName().find("custom")
-        != std::string::npos)
-    {
-      sdf::ElementPtr customElem = geomElem->AddElement("mesh");
-      (customElem->GetElement("scale"))->Set(scale);
-      (customElem->GetElement("uri"))->Set(visual->GetMeshName());
-    }
-    sdf::ElementPtr geomElemClone = geomElem->Clone();
-    geomElem =  collisionElem->GetElement("geometry");
-    geomElem->ClearElements();
-    geomElem->InsertElement(geomElemClone->GetFirstElement());
   }
 
   // Add joint sdf elements

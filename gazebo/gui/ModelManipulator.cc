@@ -445,9 +445,10 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    rendering::VisualPtr rootVis = vis->GetRootVisual();
+    if (gui::get_entity_id(rootVis->GetName()))
     {
-      vis = vis->GetRootVisual();
+      vis = rootVis;
     }
 
     this->mouseMoveVisStartPose = vis->GetWorldPose();
