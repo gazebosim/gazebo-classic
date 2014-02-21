@@ -67,6 +67,8 @@ namespace gazebo
 
     private: math::Vector3 goalPos;
 
+    private: bool useCollisionFrame;
+
     private: KDL::ChainFkSolverPos_recursive *fkSolver;
     private: KDL::ChainIkSolverVel_wdls *iksolverVel;
     private: KDL::Chain chain;

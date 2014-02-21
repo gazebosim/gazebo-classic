@@ -53,6 +53,9 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->goalModel = this->model->GetLink(_sdf->Get<std::string>("goal_model"));
   this->baseLink = this->model->GetLink(_sdf->Get<std::string>("base_link"));
 
+  //bool useCollisionFrame = _sdf->Get<bool>("use_collision_frame");
+  this->useCollisionFrame = true;
+
   this->jointController = this->model->GetJointController();
 
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");
@@ -66,8 +69,25 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   math::Vector3 frame;
-  frame = (joints[0]->GetChild()->GetRelativePose() -
-           this->baseLink->GetRelativePose()).pos;
+
+  math::Pose child, parent;
+  unsigned int colIndex = 0;  
+  if (useCollisionFrame 
+      && joints[0]->GetChild()->GetCollisions().size() > 0
+      && this->baseLink->GetCollisions().size() > 0)
+  {
+    child = joints[0]->GetChild()->GetCollision(colIndex)->GetRelativePose() + 
+        joints[0]->GetChild()->GetRelativePose();
+    parent = this->baseLink->GetCollision(colIndex)->GetRelativePose() +
+        this->baseLink->GetRelativePose();
+  }
+  else
+  {
+    child = joints[0]->GetChild()->GetRelativePose();
+    parent = this->baseLink->GetRelativePose();
+  }
+  frame = (child-parent).pos;  
+  
 
   this->chain.addSegment(KDL::Segment(
           KDL::Joint(KDL::Joint::None),
@@ -79,6 +99,22 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       frame = (joints[i+1]->GetChild()->GetRelativePose() -
               joints[i]->GetChild()->GetRelativePose()).pos;
+      if (useCollisionFrame 
+          && joints[i]->GetChild()->GetCollisions().size() > 0
+          && joints[i+1]->GetChild()->GetCollisions().size() > 0)
+      {
+        child = joints[i+1]->GetChild()->GetCollision(colIndex)->GetRelativePose() + 
+            joints[i+1]->GetChild()->GetRelativePose();
+            
+        parent = joints[i]->GetChild()->GetCollision(colIndex)->GetRelativePose() + 
+            joints[i]->GetChild()->GetRelativePose();
+      }
+      else
+      {
+        child = joints[i+1]->GetChild()->GetRelativePose();
+        parent = joints[i]->GetChild()->GetRelativePose();
+      }
+      frame = (child-parent).pos; 
     }
     else
       frame = _sdf->Get<math::Vector3>("ef_pos");
@@ -159,7 +195,7 @@ void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
     this->goalPos = this->goalModel->GetRelativePose().pos;
     this->goalPos = this->goalPos - basePos;
 
-    for(unsigned int i = 0; i < 6; ++i)
+    for(unsigned int i = 0; i < this->joints.size(); ++i)
     {
       (*this->jointpositions)(i) = 0;
     }
@@ -171,7 +207,7 @@ void SimpleIKPlugin::Update(const common::UpdateInfo & /*_info*/)
 
     this->jointController->Reset();
 
-    for(unsigned int i = 0; i < 6; ++i)
+    for(unsigned int i = 0; i < this->joints.size(); ++i)
     {
       this->jointController->SetJointPosition(
           this->joints[i]->GetScopedName(), qResult(i));
