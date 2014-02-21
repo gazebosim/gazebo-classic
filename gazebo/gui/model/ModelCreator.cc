@@ -603,24 +603,15 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
-      if (gui::get_active_camera()->GetScene()->GetSelectedVisual())
-      {
-          std::cerr << " scene selected vis " <<
-              gui::get_active_camera()->GetScene()->GetSelectedVisual()
-              ->GetName() << std::endl;
-       }
       if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
           == this->modelVisual || this->selectedVis)
       {
         if (this->selectedVis)
         {
-          std::cerr << " selected vis " <<
-              this->selectedVis->GetName() << std::endl;
           this->selectedVis->SetHighlighted(false);
         }
         else
         {
-          std::cerr << " set selected event " <<std::endl;
           // turn off model selection so we don't end up with
           // both part and model selected at the same time
           event::Events::setSelectedEntity("", "normal");
@@ -628,8 +619,6 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 
         this->selectedVis = vis->GetParent();
         this->selectedVis->SetHighlighted(true);
-          std::cerr << " set new selected vis " <<
-              this->selectedVis->GetName() << std::endl;
         return true;
       }
     }
