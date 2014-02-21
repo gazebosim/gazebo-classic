@@ -38,19 +38,15 @@ void OnNewLaserFrame(int *_scanCounter, float *_scanDest,
 /// \brief Test Creation of a Ray sensor
 TEST_F(GPURaySensor_TEST, CreateLaser)
 {
-  printf("A\n");
   Load("worlds/gpu_laser2.world");
 
-  printf("B\n");
   // Create the Ray sensor
   std::string sensorName = "default::model_1::link_1::laser_sensor";
 
-  printf("C\n");
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::GpuRaySensor>(GetSensor(sensorName));
 
-  printf("D\n");
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);
 
@@ -65,13 +61,11 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   EXPECT_EQ(sensor->GetRayCount(), 640);
   EXPECT_EQ(sensor->GetRangeCount(), 640);
 
-  printf("E\n");
   EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
   EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
   EXPECT_EQ(sensor->GetVerticalAngleMin(), 0.0);
   EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.0);
 
-  printf("F\n");
   EXPECT_TRUE(sensor->IsActive());
   EXPECT_TRUE(sensor->IsHorizontal());
 
@@ -84,7 +78,6 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
         boost::bind(&::OnNewLaserFrame, &scanCount, scan,
           _1, _2, _3, _4, _5));
 
-  printf("G\n");
   // wait for a few laser scans
   int i = 0;
   while (scanCount < 10 && i < 300)
@@ -94,12 +87,10 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   }
   EXPECT_LT(i, 300);
 
-  printf("H\n");
   // Get all the range values
   std::vector<double> ranges;
   sensor->GetRanges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(640));
-  printf("I\n");
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
@@ -110,7 +101,6 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
     EXPECT_EQ(sensor->GetFiducial(i), -1);
   }
 
-  printf("J\n");
   delete [] scan;
 }
 

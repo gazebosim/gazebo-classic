@@ -70,6 +70,23 @@ namespace gazebo
       /// \param[in]  _box Box to add to this box
       public: void Merge(const Box &_box);
 
+      /// \brief Test box intersection
+      /// \param[in] _box Box to check for intersection with this box.
+      /// \return True if this box intersects _box.
+      public: bool Intersects(const Box &_box) const;
+
+      /// \brief Test point inclusion.
+      /// \param[in] _pt The x,y,z values to check for inclusion.
+      /// \return True if the given point is inside the box.
+      public: bool Inside(const Vector3 &_pt) const;
+
+      /// \brief Test point inclusion.
+      /// \param[in] _x The x value to check for inclusion.
+      /// \param[in] _y The y value to check for inclusion.
+      /// \param[in] _z The z value to check for inclusion.
+      /// \return True if the given point is inside the box.
+      public: bool Inside(double _x, double _y, double _z) const;
+
       /// \brief Assignment operator. Set this box to the parameter
       /// \param[in]  _b Box to copy
       /// \return The new box.
@@ -125,6 +142,3 @@ namespace gazebo
 }
 
 #endif
-
-
-

@@ -4,11 +4,9 @@ package gazebo.msgs;
 /// \interface LogPlayStatus
 /// \brief A message that contains information about data log playbak
 
-import "time.proto";
-
 message LogPlayStatus
 {
   required uint64 chunks     = 1;
   required uint64 segments   = 2;
-  required uint64 step       = 4;
+  required uint64 step       = 3;
 }

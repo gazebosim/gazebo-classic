@@ -45,6 +45,7 @@ set (sources
   SaveDialog.cc
   SphereMaker.cc
   TimePanel.cc
+  TimeLine.cc
   ToolsWidget.cc
   TopicSelector.cc
 )
@@ -64,6 +65,7 @@ set (qt_headers
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
+  TimeLine.hh
   ToolsWidget.hh
   TopicSelector.hh
 )

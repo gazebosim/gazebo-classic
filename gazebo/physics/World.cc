@@ -340,7 +340,7 @@ void World::Init()
   util::DiagnosticManager::Instance()->Init(this->GetName());
 
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
+      boost::bind(&World::OnLog, this, _1, _2));
 
   this->initialized = true;
 
@@ -1957,7 +1957,10 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_paused(this->IsPaused());
 
   if (this->statPub && this->statPub->HasConnections())
+  {
+    printf("Here\n");
     this->statPub->Publish(this->worldStatsMsg);
+  }
   this->prevStatTime = common::Time::GetWallTime();
 }
 

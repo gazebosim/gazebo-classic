@@ -86,7 +86,6 @@ TimePanel::TimePanel(QWidget *_parent)
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
   playToolbar->addWidget(stepToolBarLabel);
   playToolbar->addWidget(this->stepButton);
 

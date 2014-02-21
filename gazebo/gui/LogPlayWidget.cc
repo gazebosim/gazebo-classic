@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->jumpForwardButton->setObjectName("logStepButton");
   */
 
-  this->scrubber = new QSlider(this);
+  this->scrubber = new TimeLine(this);
   this->scrubber->setTickInterval(1);
   this->scrubber->setOrientation(Qt::Horizontal);
   this->scrubber->setValue(0);
@@ -136,6 +136,9 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
 
+  this->statsSub = this->node->Subscribe("~/world_stats",
+      &LogPlayWidget::OnStats, this);
+
   this->statusSub = this->node->Subscribe("/gazebo/log/play/status",
       &LogPlayWidget::OnStatusMsg, this, true);
 
@@ -147,7 +150,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 LogPlayWidget::~LogPlayWidget()
 {
-  printf("Detel log player\n");
 }
 
 /////////////////////////////////////////////////
@@ -164,6 +166,13 @@ void LogPlayWidget::OnScrubber(int _value)
   msg.set_target_step(_value);
 
   this->controlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  printf("OnStats\n");
+  this->scrubber->SetTime(msgs::Convert(_msg->sim_time()));
 }
 
 /////////////////////////////////////////////////

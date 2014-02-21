@@ -157,3 +157,40 @@ Box Box::operator-(const Vector3 &_v)
 {
   return Box(this->min - _v, this->max - _v);
 }
+
+//////////////////////////////////////////////////
+bool Box::Intersects(const Box &_box) const
+{
+  // Check the six separating planes.
+  if (this->max.x < _box.min.x)
+    return false;
+  if (this->max.y < _box.min.y)
+    return false;
+  if (this->max.z < _box.min.z)
+    return false;
+
+  if (this->min.x > _box.max.x)
+    return false;
+  if (this->min.y > _box.max.y)
+    return false;
+  if (this->min.z > _box.max.z)
+    return false;
+
+  // Otherwise the two boxes must intersect
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Box::Inside(const Vector3 &_pt) const
+{
+  return this->Inside(_pt.x, _pt.y, _pt.z);
+}
+
+//////////////////////////////////////////////////
+bool Box::Inside(double _x, double _y, double _z) const
+{
+  return _x >= this->min.x && _x <= this->max.x &&
+         _y >= this->min.y && _y <= this->max.y &&
+         _z >= this->min.z && _z <= this->max.z;
+  return true;
+}

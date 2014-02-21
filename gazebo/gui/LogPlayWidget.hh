@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gui/TimeLine.hh"
 #include "gazebo/gui/qt.h"
 
 class QLineEdit;
@@ -64,16 +65,24 @@ namespace gazebo
       private slots: void OnPlay(bool _toggle);
 
       /// \brief Callback for status messages.
+      /// \param[in] _msg The log play status message.
       private: void OnStatusMsg(ConstLogPlayStatusPtr &_msg);
 
+      /// \brief Callback for world stats messages.
+      /// \param[in] _msg The world stats message.
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
+
       /// \brief Slidder to scrub through a log file.
-      private: QSlider *scrubber;
+      private: TimeLine *scrubber;
 
       /// \brief Node for communication.
       private: transport::NodePtr node;
 
       /// \brief Subscribs to status messages.
       private: transport::SubscriberPtr statusSub;
+
+      /// \brief Subscribs to world stats messages.
+      private: transport::SubscriberPtr statsSub;
 
       /// \brief Publish log play control messages.
       private: transport::PublisherPtr controlPub;

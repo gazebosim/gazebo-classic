@@ -465,6 +465,11 @@ class ServerFixture : public testing::Test
   protected: void LoadPlugin(const std::string &_filename,
                              const std::string &_name);
 
+  /// \brief Get a pointer to a sensor.
+  /// \param[in] _name Name of the sensor to retrieve.
+  /// \return Pointer to the sensor, or NULL if the sensor was not found.
+  protected: sensors::SensorPtr GetSensor(const std::string &_name);
+
   /// \brief Get a pointer to a model.
   /// \param[in] _name Name of the model to get.
   /// \return Pointer to the model, or NULL if the model was not found.
