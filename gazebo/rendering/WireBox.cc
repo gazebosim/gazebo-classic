@@ -33,8 +33,6 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
   this->dataPtr->parent->AttachObject(this->dataPtr->lines);
   this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  this->dataPtr->box = _box;
   this->Init(_box);
 }
 

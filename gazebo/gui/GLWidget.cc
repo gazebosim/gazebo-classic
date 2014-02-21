@@ -833,6 +833,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   if (this->selectedVis)
   {
+    std::cerr << " glwidget set selected visual false " << std::endl;
     this->selectedVis->SetHighlighted(false);
   }
 
