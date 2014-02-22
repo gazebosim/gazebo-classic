@@ -103,9 +103,6 @@ namespace gazebo
       /// \brief Pointer to the camera.
       private: rendering::CameraPtr camera;
 
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
-
       /// \brief Publisher of image messages.
       private: transport::PublisherPtr imagePub;
 
