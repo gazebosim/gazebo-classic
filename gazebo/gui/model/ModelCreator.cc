@@ -753,6 +753,7 @@ void ModelCreator::GenerateSDF()
 
     PartData *part = partsIt->second;
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
+    newLinkElem->ClearElements();
     newLinkElem->GetAttribute("name")->Set(part->name);
     newLinkElem->GetElement("pose")->Set(part->pose - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
@@ -770,7 +771,6 @@ void ModelCreator::GenerateSDF()
     inertiaElem->GetElement("iyz")->Set(part->inertial->GetIYZ());
 
     modelElem->InsertElement(newLinkElem);
-    newLinkElem->ClearElements();
 
     for (unsigned int i = 0; i < part->visuals.size(); ++i)
     {
