@@ -132,6 +132,74 @@ void MainWindow_TEST::Wireframe()
 
   // Removing the grey ground plane should change the image.
   QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::NonDefaultWorld()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  boost::filesystem::path path = TEST_PATH;
+  path = path / "worlds" / "empty_different_name.world";
+  this->Load(path.string(), false, false, true);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera, and tell it to save frames
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+
+  if (!cam)
+    return;
+
+  cam->SetCaptureData(true);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the image data
+  const unsigned char *image = cam->GetImageData();
+  unsigned int height = cam->GetImageHeight();
+  unsigned int width = cam->GetImageWidth();
+  unsigned int depth = 3;
+
+  unsigned int sum = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*depth; ++x)
+    {
+      unsigned int a = image[(y*width*depth)+x];
+      sum += a;
+    }
+  }
+
+  QVERIFY(sum > 0);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test

@@ -19,6 +19,7 @@
     + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
+    + Add const to Joint::GetInitialAnchorPose(), Joint::GetStopDissipation(), Joint::GetStopStiffness()
 1. **gazebo/sensors/Noise.hh** `ABI change`
     + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
     + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
@@ -79,9 +80,12 @@
     + void RemoveFilter(const std::string &_name);
 
 1. **gazebo/physics/Joint.hh**
+    + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+    + bool axisParentModelFrame[MAX_JOINT_AXIS]
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
