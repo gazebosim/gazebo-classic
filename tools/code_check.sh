@@ -68,6 +68,7 @@ echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
+echo "missingIncludeSystem" >> $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
@@ -86,7 +87,7 @@ CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
 # provides many functions that Gazebo does not use internally
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
 CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-" $CPPCHECK_INCLUDES --check-config"
+" $CPPCHECK_INCLUDES"
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
   ($CPPCHECK_BASE --xml $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
@@ -133,7 +134,7 @@ else
   $CPPCHECK_BASE $CPPCHECK_CMD1 2>&1
 
   # Check the configuration
-  $CPPCHECK_BASE $CPPCHECK_CMD3 2>&1
+  # $CPPCHECK_BASE $CPPCHECK_CMD3 2>&1
 fi
 
 # cpplint

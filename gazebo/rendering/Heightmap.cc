@@ -179,7 +179,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
       "Invalid number of terrain divisions (it should be 4 or 16)");
 
   int count = 0;
-  int tileIndex = 0;
   int width = sqrt(_heightmap.size());
   int newWidth = 1 + (width - 1) / sqrt(_n);
 
@@ -188,7 +187,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 
   for (int tileR = 0; tileR < sqrt(_n); ++tileR)
   {
-    tileIndex = tileR * sqrt(_n);
+    int tileIndex = tileR * sqrt(_n);
     for (int row = 0; row < newWidth - 1; ++row)
     {
       for (int tileC = 0; tileC < sqrt(_n); ++tileC)
