@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -35,25 +36,25 @@ FrictionPyramid::~FrictionPyramid()
 }
 
 //////////////////////////////////////////////////
-double GetMuPrimary()
+double FrictionPyramid::GetMuPrimary()
 {
   return this->GetMu(0);
 }
 
 //////////////////////////////////////////////////
-double GetMuSecondary()
+double FrictionPyramid::GetMuSecondary()
 {
   return this->GetMu(1);
 }
 
 //////////////////////////////////////////////////
-void SetMuPrimary(double _mu)
+void FrictionPyramid::SetMuPrimary(double _mu)
 {
   this->SetMu(0, _mu);
 }
 
 //////////////////////////////////////////////////
-void SetMuSecondary(double _mu)
+void FrictionPyramid::SetMuSecondary(double _mu)
 {
   this->SetMu(1, _mu);
 }
@@ -61,29 +62,22 @@ void SetMuSecondary(double _mu)
 //////////////////////////////////////////////////
 double FrictionPyramid::GetMu(unsigned int _index)
 {
-  if (_index >= 2)
-  {
-    gzerr << "Invalid index [" << _index << "]: should be "
-          << "0 or 1 for FrictionPyramid::GetMu."
-          << std::endl;
-    return -1;
-  }
+  GZ_ASSERT(_index < 2, "Invalid _index to GetMu");
   return this->mu[_index];
 }
 
 //////////////////////////////////////////////////
 void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 {
-  if (_index >= 2)
-  {
-    gzerr << "Invalid index [" << _index << "]: should be "
-          << "0 or 1 for FrictionPyramid::SetMu."
-          << std::endl;
-    return;
-  }
-  this->mu[_index] = _mu;
+  GZ_ASSERT(_index < 2, "Invalid _index to SetMu");
   if (_mu < 0)
+  {
     this->mu[_index] = GZ_FLT_MAX;
+  }
+  else
+  {
+    this->mu[_index] = _mu;
+  }
 }
 
 //////////////////////////////////////////////////
