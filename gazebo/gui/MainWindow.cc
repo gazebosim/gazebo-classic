@@ -77,6 +77,10 @@ MainWindow::MainWindow()
   this->inputStepSize = 1;
   this->requestMsg = NULL;
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  gui::set_world(this->node->GetTopicNamespace());
+
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
@@ -181,10 +185,6 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  gui::set_world(this->node->GetTopicNamespace());
-
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 }
 
