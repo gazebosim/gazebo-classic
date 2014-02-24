@@ -26,6 +26,8 @@
 using namespace gazebo;
 using namespace transport;
 
+bool FOUND = false;
+
 /// \brief Class to facilitate parallel processing of nodes.
 class NodeProcess_TBB
 {
@@ -51,6 +53,7 @@ class NodeProcess_TBB
 //////////////////////////////////////////////////
 TopicManager::TopicManager()
 {
+  gzerr << "Topic Manager constructor" << std::endl;
   this->pauseIncoming = false;
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
@@ -63,6 +66,7 @@ TopicManager::~TopicManager()
 //////////////////////////////////////////////////
 void TopicManager::Init()
 {
+  gzwarn << "Call to Init()" << std::endl;
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
   this->subscribedNodes.clear();
@@ -72,6 +76,7 @@ void TopicManager::Init()
 //////////////////////////////////////////////////
 void TopicManager::Fini()
 {
+  gzwarn << "Call to Fini()" << std::endl;
   // These two lines make sure that pending messages get sent out
   this->ProcessNodes(true);
   // ConnectionManager::Instance()->RunUpdate();
@@ -99,6 +104,7 @@ void TopicManager::AddNode(NodePtr _node)
 //////////////////////////////////////////////////
 void TopicManager::RemoveNode(unsigned int _id)
 {
+  gzwarn << "Call to RemoveNode()" << std::endl;
   std::vector<NodePtr>::iterator iter;
   boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
 
@@ -199,6 +205,7 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
     boost::function<void(uint32_t)> _cb, uint32_t _id)
 {
+  gzwarn << "Call to publish: " << _topic << std::endl;
   PublicationPtr pub = this->FindPublication(_topic);
 
   if (pub)
@@ -210,6 +217,21 @@ void TopicManager::Publish(const std::string &_topic, MessagePtr _message,
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 {
+
+  gzwarn << "call to find_publication " << std::endl;
+  typedef PublicationPtr_M::const_iterator MapIterator;
+  for (MapIterator iter = this->advertisedTopics.begin(); 
+                   iter != this->advertisedTopics.end();
+                   iter++)
+  {
+      // if (iter->first == "/gazebo/default/request")
+      gzwarn << " - Key: " << iter->first << std::endl;
+      FOUND = true;
+  }
+
+  if (FOUND)
+    assert (! this->advertisedTopics.empty());
+
   PublicationPtr_M::iterator iter = this->advertisedTopics.find(_topic);
   if (iter != this->advertisedTopicsEnd)
     return iter->second;
@@ -220,9 +242,16 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 //////////////////////////////////////////////////
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
+  gzwarn << "Subscribed : " << _ops.GetTopic() << std::endl;
+  this->FindPublication(_ops.GetTopic());
+  if (_ops.GetTopic() == "/gazebo/server/control")
+    gzwarn << "Control subscribed " << std::endl;
+
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
   // Create a subscription (essentially a callback that gets
   // fired every time a Publish occurs on the corresponding
   // topic
+
   this->subscribedNodes[_ops.GetTopic()].push_back(_ops.GetNode());
 
   // The object that gets returned to the caller of this
@@ -246,6 +275,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_node)
 {
+  gzwarn << "Unsubscribed : " << _topic << std::endl;
   boost::mutex::scoped_lock lock(this->subscriberMutex);
 
   PublicationPtr publication = this->FindPublication(_topic);
@@ -271,6 +301,7 @@ void TopicManager::ConnectPubToSub(const std::string &_topic,
 void TopicManager::DisconnectPubFromSub(const std::string &topic,
     const std::string &host, unsigned int port)
 {
+  gzwarn << "DisconnectPubFromSub: " << topic << std::endl;
   PublicationPtr publication = this->FindPublication(topic);
   publication->RemoveSubscription(host, port);
 }
@@ -279,6 +310,7 @@ void TopicManager::DisconnectPubFromSub(const std::string &topic,
 void TopicManager::DisconnectSubFromPub(const std::string &topic,
     const std::string &host, unsigned int port)
 {
+  gzwarn << "DisconnectSubFromPub: " << topic << std::endl;
   PublicationPtr publication = this->FindPublication(topic);
   if (publication)
     publication->RemoveTransport(host, port);
@@ -287,6 +319,7 @@ void TopicManager::DisconnectSubFromPub(const std::string &topic,
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
+  gzwarn << "Connect subscribers: " << _topic << std::endl;
   SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_topic);
 
   if (nodeIter != this->subscribedNodes.end())
@@ -313,6 +346,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 {
+  gzwarn << "Call to SubToPub()" << std::endl; 
   boost::mutex::scoped_lock lock(this->subscriberMutex);
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
@@ -359,6 +393,10 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType)
 {
+  gzwarn << "call to UpdatePublications(): " << _topic << std::endl;
+  if (_topic == "/gazebo/default/request")
+    gzwarn << "Here!" << std::endl;
+
   // Find a current publication on this topic
   PublicationPtr pub = this->FindPublication(_topic);
 
@@ -371,6 +409,7 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
   else
   {
     pub = PublicationPtr(new Publication(_topic, _msgType));
+    gzwarn << "Add new topic to adversitedTopics: " << _topic << std::endl;
     this->advertisedTopics[_topic] =  pub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
