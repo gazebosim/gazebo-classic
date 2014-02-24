@@ -92,6 +92,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
       return;
     dPtr->parent->DetachVisual(shared_from_this());
   }
+
   dPtr->parent = _vis;
   dPtr->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
@@ -105,8 +106,15 @@ void SelectionObj::UpdateSize()
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  math::Vector3 bboxSize = dPtr->parent->GetBoundingBox().GetSize()
-      * dPtr->parent->GetScale();
+  VisualPtr vis = dPtr->parent;
+
+  // don't include the selection obj itself when calculating the size.
+  this->Detach();
+  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
+      * vis->GetScale();
+  dPtr->parent = vis;
+  dPtr->parent->AttachVisual(shared_from_this());
+
   double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
 
   max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
