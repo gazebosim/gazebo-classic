@@ -109,9 +109,6 @@ namespace gazebo
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
 
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
-
       /// \brief The images msg.
       private: msgs::ImagesStamped msg;
 
