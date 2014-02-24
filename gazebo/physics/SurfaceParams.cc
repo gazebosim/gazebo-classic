@@ -35,6 +35,30 @@ FrictionPyramid::~FrictionPyramid()
 }
 
 //////////////////////////////////////////////////
+double GetMuPrimary()
+{
+  return this->GetMu(0);
+}
+
+//////////////////////////////////////////////////
+double GetMuSecondary()
+{
+  return this->GetMu(1);
+}
+
+//////////////////////////////////////////////////
+void SetMuPrimary(double _mu)
+{
+  this->SetMu(0, _mu);
+}
+
+//////////////////////////////////////////////////
+void SetMuSecondary(double _mu)
+{
+  this->SetMu(1, _mu);
+}
+
+//////////////////////////////////////////////////
 double FrictionPyramid::GetMu(unsigned int _index)
 {
   if (_index >= 2)

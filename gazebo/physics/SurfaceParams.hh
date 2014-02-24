@@ -39,12 +39,28 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~FrictionPyramid();
 
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      public: double GetMuPrimary();
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      public: double GetMuSecondary();
+
+      /// \brief Set the friction coefficient in the primary direction.
+      /// \param[in] _mu Friction coefficient.
+      public: void SetMuPrimary(double _mu);
+
+      /// \brief Set the friction coefficient in the secondary direction.
+      /// \param[in] _mu Friction coefficient.
+      public: void SetMuSecondary(double _mu);
+
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      public: double GetMu(unsigned int _index);
+      private: double GetMu(unsigned int _index);
 
       /// \brief Set the friction coefficient in a single direction.
       /// If a negative value is supplied, use an astronomically high
@@ -52,7 +68,7 @@ namespace gazebo
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
       /// \param[in] _mu Friction coefficient.
-      public: void SetMu(unsigned int _index, double _mu);
+      private: void SetMu(unsigned int _index, double _mu);
 
       /// \brief Vector for specifying the primary friction direction,
       /// relative to the parent collision frame. The component of this

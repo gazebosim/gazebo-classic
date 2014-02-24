@@ -912,7 +912,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// surface with smaller mu1.
   math::Vector3 fd2 = surf2->frictionPyramid.direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        surf1->frictionPyramid.GetMu(0) > surf2->frictionPyramid.GetMu(0)))
+        surf1->frictionPyramid.GetMuPrimary() >
+        surf2->frictionPyramid.GetMuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -935,10 +936,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(surf1->frictionPyramid.GetMu(0),
-                                surf2->frictionPyramid.GetMu(0));
-  contact.surface.mu2 = std::min(surf1->frictionPyramid.GetMu(1),
-                                 surf2->frictionPyramid.GetMu(1));
+  contact.surface.mu = std::min(surf1->frictionPyramid.GetMuPrimary(),
+                                surf2->frictionPyramid.GetMuPrimary());
+  contact.surface.mu2 = std::min(surf1->frictionPyramid.GetMuSecondary(),
+                                 surf2->frictionPyramid.GetMuSecondary());
 
 
   // Set the slip values

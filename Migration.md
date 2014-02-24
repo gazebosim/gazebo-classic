@@ -93,10 +93,11 @@
 1. **gazebo/physics/SurfaceParams.hh**
     + FrictionPyramid()
     + ~FrictionPyramid()
-    + double GetMu(unsigned int _index)
-    + void SetMu(unsigned int _index, double _mu)
+    + double GetMuPrimary()
+    + double GetMuSecondary()
+    + void SetMuPrimary(double _mu)
+    + void SetMuSecondary(double _mu)
     + math::Vector3 direction1
-    + double mu[2]
     + ***Note:*** Replaces mu, m2, fdir1 variables
 
 1. **gazebo/physics/bullet/BulletSurfaceParams.hh**

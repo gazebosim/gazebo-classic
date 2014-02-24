@@ -83,8 +83,10 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           gzerr << "Surface friction ode sdf member is NULL" << std::endl;
         else
         {
-          this->frictionPyramid.SetMu(0, frictionOdeElem->Get<double>("mu"));
-          this->frictionPyramid.SetMu(1, frictionOdeElem->Get<double>("mu2"));
+          this->frictionPyramid.SetMuPrimary(
+            frictionOdeElem->Get<double>("mu"));
+          this->frictionPyramid.SetMuSecondary(
+            frictionOdeElem->Get<double>("mu2"));
           this->frictionPyramid.direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 
@@ -121,8 +123,8 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMu(0));
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMu(1));
+  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
@@ -147,9 +149,9 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->frictionPyramid.SetMu(0, _msg.friction().mu());
+      this->frictionPyramid.SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->frictionPyramid.SetMu(1, _msg.friction().mu2());
+      this->frictionPyramid.SetMuSecondary(_msg.friction().mu2());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
