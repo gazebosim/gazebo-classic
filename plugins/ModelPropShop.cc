@@ -105,6 +105,9 @@ void ModelPropShop::Load(int _argc, char **_argv)
 /////////////////////////////////////////////
 void ModelPropShop::Init()
 {
+  this->worldCreatedConn = event::Events::ConnectWorldCreated(
+        boost::bind(&ModelPropShop::OnWorldCreated, this));
+
   this->updateConn = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this));
 
@@ -114,6 +117,11 @@ void ModelPropShop::Init()
       "/gazebo/server/control");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+}
+
+/////////////////////////////////////////////
+void ModelPropShop::OnWorldCreated()
+{
   this->factoryPub->WaitForConnection();
 
   if (this->sdf)
@@ -245,6 +253,9 @@ void ModelPropShop::Update()
       this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame((this->savePath / "5.png").string());
+
+      event::Events::DisconnectWorldCreated(this->worldCreatedConn);
+      this->worldCreatedConn.reset();
 
       event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
