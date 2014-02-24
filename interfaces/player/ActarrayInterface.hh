@@ -25,10 +25,11 @@
 #include <string>
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 namespace libgazebo
@@ -38,10 +39,10 @@ namespace libgazebo
 /// \defgroup actarray_player Actarray Interface
 /// \brief Interface for controller an actuator array
 /// \{
-  class ActarrayIface;
+  class GAZEBO_VISIBLE ActarrayIface;
 
   /// \brief Actarray interface
-  class ActarrayInterface : public GazeboInterface
+  class GAZEBO_VISIBLE ActarrayInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: ActarrayInterface(player_devaddr_t addr, GazeboDriver *driver,

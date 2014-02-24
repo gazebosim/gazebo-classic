@@ -23,10 +23,11 @@
 #define POSITION3DINTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
-  class recursive_mutex;
+  class GAZEBO_VISIBLE recursive_mutex;
 }
 
 // Forward declarations
@@ -38,10 +39,10 @@ namespace libgazebo
 /// \brief Position3d interface
 /// \{
 
-  class PositionIface;
+  class GAZEBO_VISIBLE PositionIface;
 
   /// \brief Position3d interface
-  class Position3dInterface : public GazeboInterface
+  class GAZEBO_VISIBLE Position3dInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: Position3dInterface(player_devaddr_t addr, GazeboDriver *driver,
