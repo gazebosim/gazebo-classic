@@ -28,6 +28,9 @@ class MainWindow_TEST : public QTestFixture
   /// \brief Test that trigger of the view wireframe action creates an
   /// appropriate request.
   private slots: void Wireframe();
+
+  /// \brief Test creating a main window with non-default world
+  private slots: void NonDefaultWorld();
 };
 
 #endif

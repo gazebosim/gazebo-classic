@@ -324,6 +324,9 @@ bool Node::HasLatchedSubscriber(const std::string &_topic) const
 /////////////////////////////////////////////////
 void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 {
+  if (!this->initialized)
+    return;
+
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
 
   // Find the topic list in the map.

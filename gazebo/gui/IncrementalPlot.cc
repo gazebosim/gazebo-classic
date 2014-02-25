@@ -301,12 +301,10 @@ void IncrementalPlot::Clear(const QString &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-  CurveData *curveData = NULL;
-
   for (CurveMap::iterator iter = this->curves.begin();
        iter != this->curves.end(); ++iter)
   {
-    curveData = static_cast<CurveData *>(iter->second->data());
+    CurveData *curveData = static_cast<CurveData *>(iter->second->data());
     curveData->Clear();
     delete iter->second;
   }

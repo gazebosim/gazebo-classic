@@ -50,17 +50,11 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
-      /// \brief Dry friction coefficient in the primary friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector constrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
-      public: double mu1;
-
-      /// \brief Dry friction coefficient in the second friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector constrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
-      public: double mu2;
+      /// \brief Friction pyramid parameters (mu1, mu2).
+      // For further documentation, see:
+      // github.com/erwincoumans/bullet3/blob/master/src/BulletDynamics
+      // /ConstraintSolver/btSequentialImpulseConstraintSolver.cpp#L910
+      FrictionPyramid frictionPyramid;
     };
     /// \}
   }
