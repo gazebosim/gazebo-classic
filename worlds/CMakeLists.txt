@@ -4,8 +4,10 @@ set (files
   blank.world
   camera.world
   cart_demo.world
+  contact.world
   depth_camera.world
   empty_1_0.world
+  empty_bullet.world
   empty_sky.world
   empty.world
   everything.world
@@ -13,12 +15,12 @@ set (files
   friction_demo.world
   gearbox.world
   gripper.world
-  heightmap.world
   heightmap_dem.world
+  heightmap.world
   joint_damping_demo.world
   joints.world
   lights.world
-  model_nesting.world
+  mud_bitmask
   mud.world
   openal.world
   pioneer2dx.world
@@ -35,6 +37,8 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  simple_gripper.world
+  sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
   trigger.world
