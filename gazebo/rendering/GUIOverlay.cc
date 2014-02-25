@@ -95,7 +95,8 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   CEGUI::FontManager::getSingleton().create("DejaVuSans-10.font");
 
   // clearing this queue actually make sure it's created
-  this->dataPtr->guiRenderer->getDefaultRenderingRoot().clearGeometry(CEGUI::RQ_OVERLAY);
+  this->dataPtr->guiRenderer->getDefaultRenderingRoot().clearGeometry(
+      CEGUI::RQ_OVERLAY);
 
   // Create a root window, and set it as the root window
   CEGUI::Window *rootWindow =
