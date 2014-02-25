@@ -70,3 +70,8 @@ add_library(RobonautPlugin SHARED RobonautPlugin.cc)
 target_link_libraries(RobonautPlugin libgazebo gazebo_sensors ${ogre_libraries} ${Orocos-KDL_LIBRARIES})
 install (TARGETS RobonautPlugin DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
 gz_install_includes("plugins" RobonautPlugin.hh)
+
+add_library(SimpleArmPlugin SHARED SimpleArmPlugin.cc)
+target_link_libraries(SimpleArmPlugin libgazebo gazebo_sensors ${ogre_libraries} ${Orocos-KDL_LIBRARIES})
+install (TARGETS SimpleArmPlugin DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
+gz_install_includes("plugins" SimpleArmPlugin.hh)

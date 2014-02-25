@@ -72,7 +72,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   math::Pose child, parent;
   unsigned int colIndex = 0;  
-  if (useCollisionFrame 
+  /*if (useCollisionFrame 
       && joints[0]->GetChild()->GetCollisions().size() > 0
       && this->baseLink->GetCollisions().size() > 0)
   {
@@ -80,9 +80,15 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         joints[0]->GetChild()->GetRelativePose();
     parent = this->baseLink->GetCollision(colIndex)->GetRelativePose() +
         this->baseLink->GetRelativePose();
+    std::cerr << " child " << joints[0]->GetChild()->GetName() 
+        << " " << child << std::endl;
+		std::cerr << " parent " << this->baseLink->GetName() 
+		    << " " << parent << std::endl;
   }
-  else
+  else*/
   {
+    joints[0]->GetChild();
+
     child = joints[0]->GetChild()->GetRelativePose();
     parent = this->baseLink->GetRelativePose();
   }
@@ -99,17 +105,28 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       frame = (joints[i+1]->GetChild()->GetRelativePose() -
               joints[i]->GetChild()->GetRelativePose()).pos;
-      if (useCollisionFrame 
-          && joints[i]->GetChild()->GetCollisions().size() > 0
-          && joints[i+1]->GetChild()->GetCollisions().size() > 0)
+      /*if (useCollisionFrame 
+          && (joints[i]->GetChild()->GetCollisions().size() > 0
+          || joints[i+1]->GetChild()->GetCollisions().size() > 0))
       {
-        child = joints[i+1]->GetChild()->GetCollision(colIndex)->GetRelativePose() + 
-            joints[i+1]->GetChild()->GetRelativePose();
+        if (joints[i+1]->GetChild()->GetCollisions().size() > 0)
+          child = 
+              joints[i+1]->GetChild()->GetCollision(colIndex)->GetRelativePose()
+              + joints[i+1]->GetChild()->GetRelativePose();
             
-        parent = joints[i]->GetChild()->GetCollision(colIndex)->GetRelativePose() + 
-            joints[i]->GetChild()->GetRelativePose();
+        if (joints[i]->GetChild()->GetCollisions().size() > 0)
+        parent = 
+            joints[i]->GetChild()->GetCollision(colIndex)->GetRelativePose()
+             + joints[i]->GetChild()->GetRelativePose();
+            
+        if (joints[i+1]->GetChild()->GetCollisions().size() > 0)
+		      std::cerr << " child " << joints[i+1]->GetChild()->GetName() 
+		          << " " << child << std::endl;
+		    if (joints[i]->GetChild()->GetCollisions().size() > 0)
+			    std::cerr << " parent " << joints[i]->GetParent()->GetName() 
+			    << " " << parent << std::endl;
       }
-      else
+      else*/
       {
         child = joints[i+1]->GetChild()->GetRelativePose();
         parent = joints[i]->GetChild()->GetRelativePose();
@@ -172,7 +189,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         this->joints[i]->GetScopedName(), qResult(i));
 
     this->jointController->SetPositionPID(this->joints[i]->GetScopedName(),
-        common::PID(100, 0.01, 10.0));
+        common::PID(1000, 0.01, 1));
   }
   this->fkSolver->JntToCart(qResult, cartpos);
 

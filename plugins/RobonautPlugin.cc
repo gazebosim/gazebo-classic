@@ -174,7 +174,7 @@ void RobonautPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   this->pinJoint->SetModel(this->model);
 
-  this->pinJoint->Load(this->pinLink, this->model->GetLink("/r2/waist_center"),
+  this->pinJoint->Load(this->pinLink, this->model->GetLink("base"),
       math::Pose());
   this->pinJoint->SetUpperLimit(0,0);
   this->pinJoint->SetLowerLimit(0,0);
@@ -279,12 +279,14 @@ void RobonautPlugin::Update(const common::UpdateInfo & /*_info*/)
         rightPose.rot * this->resetPoseRight.rot.GetInverse() *
         this->basePoseRight.rot);
 
-   gzerr << " ----- " << std::endl;
-   gzerr << " right pose " << rightPose.pos << std::endl;
-   gzerr << " reset pose right " << resetPoseRight.pos << std::endl;
-   gzerr << " right - reset " << rightPose.pos - this->resetPoseRight.pos << std::endl;
-   gzerr << " base pose right " << basePoseRight.pos << std::endl;
-   gzerr << " model rot " << this->model->GetRelativePose().rot.GetAsEuler() << std::endl;
+   /*std::cerr << " ----- " << std::endl;
+   std::cerr << " right pose " << rightPose.pos << std::endl;
+   std::cerr << " reset pose right " << resetPoseRight.pos << std::endl;
+   std::cerr << " right - reset " << rightPose.pos - this->resetPoseRight.pos << std::endl;
+   std::cerr << " base pose right " << basePoseRight.pos << std::endl;
+   std::cerr << " model rot " << this->model->GetRelativePose().rot.GetAsEuler() << std::endl;
+   std::cerr << " right adjust " << rightAdjust.pos << std::endl;*/
+   
 
 
    //gzerr << " right adjust " << rightAdjust.pos << " vs " << this->model->GetRelativePose().rot*rightAdjust.pos << std::endl;
