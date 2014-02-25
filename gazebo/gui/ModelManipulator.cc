@@ -476,7 +476,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     }
     else
     {
-      this->dataPtr->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+      this->dataPtr->selectionObj->SetMode(
+          rendering::SelectionObj::SELECTION_NONE);
       this->dataPtr->selectionObj->Detach();
     }
   }
@@ -647,7 +648,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
         this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
       if (vis && vis->IsPlane())
       {
-        this->dataPtr->selectionObj->SetMode(rendering::SelectionObj::SELECTION_NONE);
+        this->dataPtr->selectionObj->SetMode(
+            rendering::SelectionObj::SELECTION_NONE);
         this->dataPtr->selectionObj->Detach();
       }
     }
