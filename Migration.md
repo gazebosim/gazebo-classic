@@ -80,12 +80,15 @@
     + void RemoveFilter(const std::string &_name);
 
 1. **gazebo/physics/Joint.hh**
+    + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + math::Pose GetParentWorldPose() const
     + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
     + bool axisParentModelFrame[MAX_JOINT_AXIS]
+    + protected: math::Pose parentAnchorPose
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
