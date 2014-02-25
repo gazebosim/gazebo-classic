@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,7 +236,12 @@ Scene::~Scene()
     delete this->grids[i];
   this->grids.clear();
 
+  for (unsigned int i = 0; i < this->cameras.size(); ++i)
+    this->cameras[i].reset();
   this->cameras.clear();
+
+  for (unsigned int i = 0; i < this->userCameras.size(); ++i)
+    this->userCameras[i].reset();
   this->userCameras.clear();
 
   if (this->manager)
@@ -300,7 +305,14 @@ void Scene::Init()
 
   // Create Sky. This initializes SkyX, and makes it invisible. A Sky
   // message must be received (via a scene message or on the ~/sky topic).
-  this->SetSky();
+  try
+  {
+    this->SetSky();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to create the sky\n";
+  }
 
   // Create Fog
   if (this->sdf->HasElement("fog"))

@@ -18,8 +18,11 @@
 #include <gtest/gtest.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Event.hh>
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class EventTest : public gazebo::testing::AutoLogFixture { };
 
 int g_callback = 0;
 int g_callback1 = 0;
@@ -37,7 +40,7 @@ void callback1()
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, SignalOnce)
+TEST_F(EventTest, SignalOnce)
 {
   g_callback = 0;
 
@@ -49,7 +52,7 @@ TEST(EventTest, SignalOnce)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, SignalTwice)
+TEST_F(EventTest, SignalTwice)
 {
   g_callback = 0;
 
@@ -62,7 +65,7 @@ TEST(EventTest, SignalTwice)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, SignalN)
+TEST_F(EventTest, SignalN)
 {
   g_callback = 0;
 
@@ -76,7 +79,7 @@ TEST(EventTest, SignalN)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, Disconnect)
+TEST_F(EventTest, Disconnect)
 {
   g_callback = 0;
 
@@ -91,7 +94,7 @@ TEST(EventTest, Disconnect)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, MultiCallback)
+TEST_F(EventTest, MultiCallback)
 {
   g_callback = 0;
   g_callback1 = 0;
@@ -107,7 +110,7 @@ TEST(EventTest, MultiCallback)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, MultiCallbackDisconnect)
+TEST_F(EventTest, MultiCallbackDisconnect)
 {
   g_callback = 0;
   g_callback1 = 0;
@@ -124,7 +127,7 @@ TEST(EventTest, MultiCallbackDisconnect)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, MultiCallbackReconnect)
+TEST_F(EventTest, MultiCallbackReconnect)
 {
   g_callback = 0;
   g_callback1 = 0;
@@ -142,7 +145,7 @@ TEST(EventTest, MultiCallbackReconnect)
 }
 
 /////////////////////////////////////////////////
-TEST(EventTest, ManyChanges)
+TEST_F(EventTest, ManyChanges)
 {
   g_callback = 0;
   g_callback1 = 0;

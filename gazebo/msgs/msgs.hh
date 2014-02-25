@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/Image.hh"
 
 namespace gazebo
 {
@@ -166,6 +168,13 @@ namespace gazebo
     /// \param[out] _p A msgs::Time pointer
     /// \param[in] _v A common::Time reference
     void Set(msgs::Time *_t, const common::Time &_v);
+
+    /// \brief Set a msgs::SphericalCoordinates from
+    /// a common::SphericalCoordinates object.
+    /// \param[out] _p A msgs::SphericalCoordinates pointer.
+    /// \param[in] _v A common::SphericalCoordinates reference
+    void Set(msgs::SphericalCoordinates *_s,
+             const common::SphericalCoordinates &_v);
 
     /// \brief Set a msgs::Plane from a math::Plane
     /// \param[out] _p A msgs::Plane pointer

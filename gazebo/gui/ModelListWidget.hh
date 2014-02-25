@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,6 +160,13 @@ namespace gazebo
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with spherical coordinates info.
+      /// \param[in] _msg The spherical coordinates message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
+                                     QtProperty *_parent);
+
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
       private: void ProcessRemoveEntity();
@@ -200,6 +207,7 @@ namespace gazebo
       private: QTreeWidgetItem *physicsItem;
       private: QTreeWidgetItem *modelsItem;
       private: QTreeWidgetItem *lightsItem;
+      private: QTreeWidgetItem *sphericalCoordItem;
 
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
@@ -228,6 +236,7 @@ namespace gazebo
       private: msgs::Joint jointMsg;
       private: msgs::Physics physicsMsg;
       private: msgs::Light lightMsg;
+      private: msgs::SphericalCoordinates sphericalCoordMsg;
 
       private: bool fillPropertyTree;
       private: std::deque<std::string> fillTypes;

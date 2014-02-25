@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ void help()
   << "  -h [ --help ]                 Produce this help message.\n"
   << "  -u [ --pause ]                Start the server in a paused state.\n"
   << "  -e [ --physics ] arg          Specify a physics engine "
-  << "(ode|bullet|simbody).\n"
+  << "(ode|bullet|dart|simbody).\n"
   << "  -p [ --play ] arg             Play a log file.\n"
   << "  -r [ --record ]               Record state data.\n"
   << "  --record_encoding arg (=zlib) Compression encoding format for log "

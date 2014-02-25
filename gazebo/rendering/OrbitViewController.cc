@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,8 +178,10 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // Turn on the reference visual.
   this->refVisual->SetVisible(true);
 
-  // Middle mouse button is used to Orbit.
-  if (_event.buttons & common::MouseEvent::MIDDLE && _event.dragging)
+  // Middle mouse button or Shift + Left button is used to Orbit.
+  if (_event.dragging &&
+      (_event.buttons & common::MouseEvent::MIDDLE ||
+      (_event.buttons & common::MouseEvent::LEFT && _event.shift)))
   {
     // Compute the delta yaw and pitch.
     double dy = this->NormalizeYaw(drag.x * _event.moveScale * -0.4);
@@ -376,7 +378,6 @@ void OrbitViewController::UpdateRefVisual()
 void OrbitViewController::Orbit(double _dy, double _dp)
 {
   Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
-  Ogre::SceneNode *pitchNode = this->camera->GetPitchNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
 
@@ -394,7 +395,6 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   // reference visual, which in turns rotates the camera.
   cameraNode->_setDerivedPosition(pos);
   cameraNode->setOrientation(Ogre::Quaternion());
-  pitchNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
   this->yaw = this->NormalizeYaw(this->yaw + _dy);
@@ -407,7 +407,7 @@ void OrbitViewController::Orbit(double _dy, double _dp)
     pos = cameraNode->_getDerivedPosition();
 
   // Store the new location of the camera
-  Ogre::Quaternion rot = pitchNode->_getDerivedOrientation();
+  Ogre::Quaternion rot = cameraNode->_getDerivedOrientation();
 
   // Detach the camera from the reference visual.
   this->refVisual->GetSceneNode()->removeChild(cameraNode);
