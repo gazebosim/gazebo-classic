@@ -30,7 +30,6 @@ namespace gazebo
 {
   namespace gui
   {
-
     /// \brief Private data for the ModelManipulator class
     class ModelManipulatorPrivate
     {
