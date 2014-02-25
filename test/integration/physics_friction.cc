@@ -324,7 +324,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Aborting test since there's an issue with simbody's friction"
+    gzerr << "Aborting test since there's an issue with bullet's friction"
           << " parameters (#1045)"
           << std::endl;
     return;
