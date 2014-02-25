@@ -93,9 +93,9 @@ CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
 
 # Checking for missing includes is very time consuming. This is disabled
 # for now
-CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-" $CPPCHECK_INCLUDES"
-# CPPCHECK_CMD3=""
+# CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
+# " $CPPCHECK_INCLUDES"
+CPPCHECK_CMD3=""
 
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
