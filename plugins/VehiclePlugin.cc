@@ -235,15 +235,13 @@ void VehiclePlugin::OnUpdate()
   math::Vector3 hingePoint;
   math::Vector3 axis;
 
-  double displacement;
-
   for (int ix = 0; ix < 4; ++ix)
   {
     hingePoint = this->joints[ix]->GetAnchor(0);
     bodyPoint = this->joints[ix]->GetAnchor(1);
 
     axis = this->joints[ix]->GetGlobalAxis(0).Round();
-    displacement = (bodyPoint - hingePoint).Dot(axis);
+    double displacement = (bodyPoint - hingePoint).Dot(axis);
 
     float amt = displacement * this->swayForce;
     if (displacement > 0)
