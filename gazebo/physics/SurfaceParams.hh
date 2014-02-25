@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
     /// \brief Parameters used for friction pyramid model.
-    class FrictionPyramid
+    class GAZEBO_VISIBLE FrictionPyramid
     {
       /// \brief Constructor.
       public: FrictionPyramid();
