@@ -1520,7 +1520,8 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(*iter);
     }
   }
-  if (this->modelMsgs.size())
+
+  if (!this->modelMsgs.empty())
   {
     this->EnableAllModels();
     this->modelMsgs.clear();
