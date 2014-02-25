@@ -98,19 +98,12 @@ namespace gazebo
       ///        (http://www.ode.org/ode-latest-userguide.html#sec_5_2_0)
       public: double minDepth;
 
-      /// \brief Dry friction coefficient in the primary friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector constrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
+      /// \brief Friction pyramid parameters (mu1, mu2).
+      /// Note that the primary friction pyramid direction can be specified
+      /// by fdir1, otherwise a vector constrained to be perpendicular to the
+      /// contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double mu1;
-
-      /// \brief Dry friction coefficient in the second friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector constrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double mu2;
+      public: FrictionPyramid frictionPyramid;
 
       /// \brief Artificial contact slip in the primary friction direction.
       /// \sa    See dContactSlip1 in
@@ -121,13 +114,6 @@ namespace gazebo
       /// \sa    See dContactSlip2 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
-
-      /// \brief Primary friction direction for dry friction coefficient
-      ///        (SurfaceParams::mu1) of the friction pyramid.
-      ///        If undefined, a vector consstrained to be perpendicular
-      ///        to the contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: math::Vector3 fdir1;
     };
     /// \}
   }
