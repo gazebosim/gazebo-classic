@@ -21,11 +21,12 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 #define NUM_JOINTS 3
 namespace gazebo
 {
-  class CartTestPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE CartTestPlugin : public ModelPlugin
   {
     public: CartTestPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);

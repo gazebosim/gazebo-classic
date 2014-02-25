@@ -25,12 +25,13 @@
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief A plugin for a contact sensor. Inherit from this class to make
   /// your own contact plugin.
-  class ContactPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE ContactPlugin : public SensorPlugin
   {
     /// \brief Constructor.
     public: ContactPlugin();
