@@ -24,7 +24,7 @@
 #include "test_config.h"
 
 const std::string BeginCheckSdf = "#BEGIN_CHECK_SDF";
-const std::string EndCheckSdf  = "#END_CHECK_SDF";
+const std::string EndCheckSdf   = "#END_CHECK_SDF";
 
 /////////////////////////////////////////////////
 std::string customExec(std::string _cmd)
