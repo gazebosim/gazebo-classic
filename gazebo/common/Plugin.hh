@@ -400,6 +400,7 @@ namespace gazebo
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
   extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -411,6 +412,7 @@ namespace gazebo
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
   extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -422,6 +424,7 @@ namespace gazebo
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
   extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -433,6 +436,7 @@ namespace gazebo
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
   extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -444,6 +448,7 @@ namespace gazebo
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
   extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\
