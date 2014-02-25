@@ -49,12 +49,12 @@ TEST(WorldsInstalled, checkWorlds)
 {
   // Setup the path containing the worlds.
   boost::filesystem::path worldsPath(PROJECT_SOURCE_PATH);
-  worldsPath /= "worlds";
+  worldsPath /= "world";
 
   if (!boost::filesystem::exists(worldsPath) ||
       !boost::filesystem::is_directory(worldsPath))
   {
-    std::cerr << "The worlds directory [ " << worldsPath
+    std::cerr << "The worlds directory [" << worldsPath
               << "] does not exist or it's not a directory." << std::endl;
     FAIL();
   }
