@@ -1,6 +1,4 @@
 set (files
-
-#BEGIN_CHECK_SDF
   blank.world
   camera.world
   cart_demo.world
@@ -44,8 +42,6 @@ set (files
   trigger.world
   willowgarage.world
   wireless_sensors.world
-#END_CHECK_SDF
-
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)

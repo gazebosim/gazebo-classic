@@ -48,79 +48,39 @@ std::string customExec(std::string _cmd)
   return result;
 }
 
-/////////////////////////////////////////////////
-bool hasSdfLabels(const std::string &_path)
-{
-  std::string line;
-  bool beginLabelFound = false;
-  bool endLabelFound = false;
-
-  std::ifstream file(_path.c_str());
-  if (!file.is_open())
-    return false;
-
-  while (getline(file, line))
-  {
-    if (line == BeginCheckSdf)
-      beginLabelFound = true;
-    else if (line == EndCheckSdf)
-      endLabelFound = true;
-
-    if (beginLabelFound && endLabelFound)
-      break;
-  }
-
-  file.close();
-  return beginLabelFound && endLabelFound;
-}
 
 /////////////////////////////////////////////////
 TEST(WorldsInstalled, checkWorlds)
 {
-  // Setup some paths
+  // Setup the path containing the worlds.
   boost::filesystem::path worldsPath(PROJECT_SOURCE_PATH);
   worldsPath /= "worlds";
 
-  boost::filesystem::path worldsCmakePath(worldsPath);
-  worldsCmakePath /= "CMakeLists.txt";
-
-  // Open the CMakeLists.txt containing the worlds to be installed.
-  std::ifstream worldsCmakeFile(worldsCmakePath.c_str());
-  ASSERT_TRUE(worldsCmakeFile.is_open());
-
-  // Make sure that the SDF check labels exist in the CMakeLists.txt .
-  if (!hasSdfLabels(worldsCmakePath.string()))
+  if (!boost::filesystem::exists(worldsPath) ||
+      !boost::filesystem::is_directory(worldsPath))
   {
-    std::cerr << "Check [" << BeginCheckSdf << "] and [" << EndCheckSdf
-              << "] labels in [" << worldsCmakePath << "]. Labels not found.\n";
+    std::cerr << "The worlds directory [ " << worldsPath
+              << "] does not exist or it's not a directory." << std::endl;
     FAIL();
   }
 
-  // Ignore all the lines until the BeginCheckSdf label.
-  std::string line;
-  while (getline(worldsCmakeFile, line))
-    if (line == BeginCheckSdf)
-      break;
-
-  // Check the SDF of all the world files until EndCheckSdf label.
-  while (getline(worldsCmakeFile, line))
+  // Iterate over the list of world files.
+  boost::filesystem::directory_iterator end_iter;
+  for (boost::filesystem::directory_iterator dir_itr(worldsPath);
+          dir_itr != end_iter; ++dir_itr )
   {
-    if (line == EndCheckSdf)
-      break;
+    if (dir_itr->path().filename().extension() == ".world")
+    {
+      std::string cmd = "gzsdf check " + dir_itr->path().string();
+      std::string result = customExec(cmd);
 
-    boost::algorithm::erase_all(line, " ");
-    boost::filesystem::path worldPath = worldsPath / line;
-    std::string cmd = "gzsdf check " + worldPath.string();
-    std::string result = customExec(cmd);
-
-    bool success = boost::algorithm::find_first(result, "Success");
-    EXPECT_TRUE(success);
-    if (!success)
-      std::cerr << "World file [" << worldPath.string() << "] is going to be "
-                << "installed but it is not SDF compliant." << std::endl;
+      bool success = boost::algorithm::find_first(result, "Success");
+      EXPECT_TRUE(success);
+      if (!success)
+        std::cerr << "World file [" << dir_itr->path()
+                  << "] is going to be installed but it's not SDF compliant.\n";
+      }
   }
-
-  worldsCmakeFile.close();
 }
 
 /////////////////////////////////////////////////
