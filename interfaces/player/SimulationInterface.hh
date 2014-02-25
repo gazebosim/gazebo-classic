@@ -32,7 +32,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 /// \addtogroup player_iface
@@ -56,7 +56,7 @@ namespace boost
 ///
 
 /// \brief The Simulation interface
-class SimulationInterface : public GazeboInterface
+class GAZEBO_VISIBLE SimulationInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: SimulationInterface(player_devaddr_t addr, GazeboDriver *driver,

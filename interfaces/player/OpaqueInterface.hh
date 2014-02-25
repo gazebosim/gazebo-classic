@@ -27,7 +27,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace libgazebo
@@ -41,7 +41,7 @@ namespace libgazebo
 class OpaqueIface;
 
 /// \brief Opaque Player interface
-class OpaqueInterface : public GazeboInterface
+class GAZEBO_VISIBLE OpaqueInterface : public GazeboInterface
 {
   /// \brief Constructor
     public: OpaqueInterface(player_devaddr_t addr, GazeboDriver *driver,

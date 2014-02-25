@@ -27,7 +27,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 
@@ -35,7 +35,7 @@ namespace boost
 typedef struct gz_gps gz_gps_t;
 
 /// \brief GPS interface
-class GpsInterface : public GazeboInterface
+class GAZEBO_VISIBLE GpsInterface : public GazeboInterface
 {
   /// @brief Constructor
   public: GpsInterface(player_devaddr_t addr, GazeboDriver *driver,

@@ -27,7 +27,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace libgazebo
@@ -41,7 +41,7 @@ namespace libgazebo
 class IRIface;
 
 /// \brief Plugin Player interface for a Gazebo laser
-class IRInterface : public GazeboInterface
+class GAZEBO_VISIBLE IRInterface : public GazeboInterface
 {
   /// \brief Constructor
   /// \param addr Plaer device address
