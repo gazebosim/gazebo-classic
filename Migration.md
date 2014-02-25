@@ -142,6 +142,9 @@
 
 ### Deletions
 
+1. **Removed libtool**
+    + Libtool used to be an option for loading plugins. Now, only libdl is supported.
+
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
 
