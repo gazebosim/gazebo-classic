@@ -17,8 +17,6 @@
 #cmakedefine HAVE_CEGUI 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
-#cmakedefine HAVE_LTDL 1
-#cmakedefine HAVE_DL 1
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
 #cmakedefine HAVE_SIMBODY 1
