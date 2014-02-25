@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-#include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/filesystem.hpp>
-#include <fstream>
 #include <string>
 #include <gtest/gtest.h>
 
 #include "test_config.h"
-
-const std::string BeginCheckSdf = "#BEGIN_CHECK_SDF";
-const std::string EndCheckSdf   = "#END_CHECK_SDF";
 
 /////////////////////////////////////////////////
 std::string customExec(std::string _cmd)
