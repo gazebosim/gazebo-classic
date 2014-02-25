@@ -27,17 +27,14 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
+  class UserCameraPrivate;
+
   namespace rendering
   {
-    class OrbitViewController;
-    class FPSViewController;
-    class Visual;
     class GUIOverlay;
-    class SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -223,30 +220,9 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
-      /// \brief The visual used to render the camera's appearance.
-      private: Visual *visual;
-
-      /// \brief The currently active view controller.
-      private: ViewController *viewController;
-
-      /// \brief An orbit view controller.
-      private: OrbitViewController *orbitViewController;
-
-      /// \brief A FPS view controller.
-      private: FPSViewController *fpsViewController;
-
-      /// \brief The GUI overlay.
-      private: GUIOverlay *gui;
-
-      /// \brief Draws a 3D axis in the viewport.
-      // private: Ogre::SceneNode *axisNode;
-
-      /// \brief Used to select objects from mouse clicks.
-      private: SelectionBuffer *selectionBuffer;
-
-      /// \brief Flag to detect if the user changed the camera pose in the
-      /// world file.
-      private: bool isCameraSetInWorldFile;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: UserCameraPrivate *dataPtr;
     };
     /// \}
   }
