@@ -3,33 +3,43 @@ set (files
 #BEGIN_CHECK_SDF
   blank.world
   camera.world
-  gripper.world
-  joint_damping_demo.world
+  cart_demo.world
   depth_camera.world
-  empty.world
+  empty_1_0.world
   empty_sky.world
+  empty.world
+  everything.world
   force_torque_demo.world
   friction_demo.world
-  joints.world
+  gearbox.world
+  gripper.world
   heightmap.world
+  heightmap_dem.world
+  joint_damping_demo.world
+  joints.world
   lights.world
   model_nesting.world
-  pioneer2dx.world
-  openal.world
-  cart_demo.world
   mud.world
+  openal.world
+  pioneer2dx.world
   plugin.world
   pr2.world
   presentation.world
+  pressure_sensor.world
   projector.world
   ray_cpu.world
-  robocup_3Dsim.world
+  ray_noise_plugin.world
+  road.world
   robocup09_spl_field.world
   robocup14_spl_field.world
+  robocup_3Dsim.world
   rubble.world
   shapes.world
   sphere_atlas_demo.world
+  stacks.world
+  trigger.world
   willowgarage.world
+  wireless_sensors.world
 #END_CHECK_SDF
 
 )
