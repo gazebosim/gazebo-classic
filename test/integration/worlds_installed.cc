@@ -16,10 +16,10 @@
 */
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/find.hpp>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <string>
 #include <gtest/gtest.h>
-#include "gazebo/common/Console.hh"
 
 #include "test_config.h"
 
@@ -49,7 +49,7 @@ std::string customExec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
-bool hasCheckSdfLabels(const std::string &_path)
+bool hasSdfLabels(const std::string &_path)
 {
   std::string line;
   bool beginLabelFound = false;
@@ -77,15 +77,19 @@ bool hasCheckSdfLabels(const std::string &_path)
 /////////////////////////////////////////////////
 TEST(WorldsInstalled, checkWorlds)
 {
-  // Open the CMakeLists.txt containing the worlds to be installed.
-  std::string worldsPath = std::string(PROJECT_SOURCE_PATH) + "/worlds/";
-  std::string worldsCmakePath = worldsPath + "/CMakeLists.txt";
+  // Setup some paths
+  boost::filesystem::path worldsPath(PROJECT_SOURCE_PATH);
+  worldsPath /= "worlds";
 
+  boost::filesystem::path worldsCmakePath(worldsPath);
+  worldsCmakePath /= "CMakeLists.txt";
+
+  // Open the CMakeLists.txt containing the worlds to be installed.
   std::ifstream worldsCmakeFile(worldsCmakePath.c_str());
   ASSERT_TRUE(worldsCmakeFile.is_open());
 
   // Make sure that the SDF check labels exist in the CMakeLists.txt .
-  if (!hasCheckSdfLabels(worldsCmakePath))
+  if (!hasSdfLabels(worldsCmakePath.string()))
   {
     std::cerr << "Check [" << BeginCheckSdf << "] and [" << EndCheckSdf
               << "] labels in [" << worldsCmakePath << "]. Labels not found.\n";
@@ -105,14 +109,15 @@ TEST(WorldsInstalled, checkWorlds)
       break;
 
     boost::algorithm::erase_all(line, " ");
-    std::string cmd = "gzsdf check " + worldsPath + line;
+    boost::filesystem::path worldPath = worldsPath / line;
+    std::string cmd = "gzsdf check " + worldPath.string();
     std::string result = customExec(cmd);
 
     bool success = boost::algorithm::find_first(result, "Success");
     EXPECT_TRUE(success);
     if (!success)
-      std::cerr << "World file [" << line << "] is going to be installed "
-                << "but it is not SDF compliant." << std::endl;
+      std::cerr << "World file [" << worldPath.string() << "] is going to be "
+                << "installed but it is not SDF compliant." << std::endl;
   }
 
   worldsCmakeFile.close();
