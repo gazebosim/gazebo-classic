@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh);
+          TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
       /// \param[in] _xml Animation XML instance

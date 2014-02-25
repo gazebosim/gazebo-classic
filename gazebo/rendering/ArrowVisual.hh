@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Arrow Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _ARROWVISUAL_HH_
 #define _ARROWVISUAL_HH_
@@ -24,11 +21,6 @@
 #include <string>
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -54,10 +46,6 @@ namespace gazebo
 
       /// \brief Show the rotation of the visual
       public: void ShowRotation();
-
-      private: Ogre::SceneNode *headNode;
-      private: Ogre::SceneNode *shaftNode;
-      private: Ogre::SceneNode *rotationNode;
     };
     /// \}
   }

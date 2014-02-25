@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,38 +25,34 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <utility>
-#include <list>
 #include <vector>
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class MovableObject;
   class SceneNode;
-  class StaticGeometry;
-  class RibbonTrail;
-  class AnimationState;
-  class SkeletonInstance;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class WireBox;
+    class VisualPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -463,21 +459,6 @@ namespace gazebo
       /// \brief Set the id associated with this visual
       public: void SetId(uint32_t _id);
 
-      /// \brief Load all plugins
-      ///
-      /// Load all plugins specified in the SDF for the model.
-      private: void LoadPlugins();
-
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
-
-      private: std::vector<VisualPluginPtr> plugins;
-
-      /// \brief Helper function to get the bounding box for a visual.
-      /// \param[in] _node Pointer to the Ogre Node to process.
-      /// \param[in] _box Current bounding box information.
-      private: void GetBoundsHelper(Ogre::SceneNode *_node,
-                                    math::Box &_box) const;
-
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
@@ -490,14 +471,57 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
-      /// \brief Pointer to the visual's scene.
-      protected: ScenePtr scene;
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _parent Parent of the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, VisualPtr _parent,
+                        bool _useRTShader = true);
 
-      /// \brief Pointer to the visual's scene node in Ogre.
-      protected: Ogre::SceneNode *sceneNode;
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, ScenePtr _scene,
+                        bool _useRTShader = true);
 
-      /// \brief Parent visual.
-      protected: VisualPtr parent;
+      /// \brief Helper function for initializing the visual with a scene as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, ScenePtr _scene,
+          bool _useRTShader);
+
+      /// \brief Helper function for initializing the visual with a visual as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, VisualPtr _parent,
+          bool _useRTShader);
+
+      /// \brief Load all plugins
+      /// Load all plugins specified in the SDF for the model.
+      private: void LoadPlugins();
+
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      /// \brief Helper function to get the bounding box for a visual.
+      /// \param[in] _node Pointer to the Ogre Node to process.
+      /// \param[in] _box Current bounding box information.
+      private: void GetBoundsHelper(Ogre::SceneNode *_node,
+                                    math::Box &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted
@@ -509,78 +533,9 @@ namespace gazebo
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
 
-      /// \brief The SDF element for the visual.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief The unique name for the visual's material.
-      private: std::string myMaterialName;
-
-      /// \brief The original name for the visual's material.
-      private: std::string origMaterialName;
-
-      /// \brief Transparency value.
-      private: float transparency;
-
-      /// \brief True if the visual is static, which allows Ogre to improve
-      /// performance.
-      private: bool isStatic;
-
-      /// \brief Pointer to the static geometry.
-      private: Ogre::StaticGeometry *staticGeom;
-
-      /// \brief True if rendered.
-      private: bool visible;
-
-      /// \brief The ribbon train created by the visual.
-      private: Ogre::RibbonTrail *ribbonTrail;
-
-      /// \brief The visual's skeleton, used only for person simulation.
-      private: Ogre::SkeletonInstance *skeleton;
-
-      /// \brief Connection for the pre render event.
-      private: event::ConnectionPtr preRenderConnection;
-
-      /// \brief List of all the lines created.
-      private: std::list<DynamicLines*> lines;
-
-      /// \brief Lines and their vertices connected to this visual.
-      private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
-
-      /// \brief Name of the visual.
-      private: std::string name;
-
-      /// \brief Children visuals.
-      private: std::vector<VisualPtr> children;
-
-      /// \brief Used to animate the visual.
-      private: Ogre::AnimationState *animState;
-
-      /// \brief Time of the previous animation step.
-      private: common::Time prevAnimTime;
-
-      /// \brief Callback for the animation complete event.
-      private: boost::function<void()> onAnimationComplete;
-
-      /// \brief True to use RT shader system.
-      private: bool useRTShader;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief A wire frame bounding box.
-      private: WireBox *boundingBox;
-
-      /// \brief Unique id of this visual.
-      private: uint32_t id;
-
-      /// \brief Counter used to create unique ids.
-      private: static uint32_t visualIdCount;
-
-      /// \brief Scale of visual.
-      private: math::Vector3 scale;
-
-      /// \brief True if lighting will be applied to this visual.
-      private: bool lighting;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: VisualPrivate *dataPtr;
     };
     /// \}
   }

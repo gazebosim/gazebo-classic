@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -499,13 +499,11 @@ void hz()
 /////////////////////////////////////////////////
 void view(int _argc, char **_argv)
 {
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
   {
     printf("load error\n");
     return;
   }
-
-  gazebo::run();
 
   QApplication *app = new QApplication(_argc, _argv);
 
@@ -543,15 +541,9 @@ void view(int _argc, char **_argv)
       gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 
-  if (!gazebo::init())
-  {
-    gzerr << "Unable to initialize Gazebo\n";
-    return;
-  }
-
   app->exec();
 
-  gazebo::fini();
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////

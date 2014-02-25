@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -244,6 +244,13 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issue #916)" << std::endl;
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   double avgSignalLevelEmpty = 0.0;
@@ -410,6 +417,12 @@ INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
 INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
     ::testing::Values("bullet"));
 #endif  // HAVE_BULLET
+
+/////////////////////////////////////////////////
+#ifdef HAVE_DART
+INSTANTIATE_TEST_CASE_P(TestTransceiverDART, TransceiverTest,
+    ::testing::Values("dart"));
+#endif  // HAVE_DART
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

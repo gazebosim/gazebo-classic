@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,10 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   if (this->initialized)
     return;
 
-  CEGUI::System::getSingletonPtr();
+  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+
+  if (system)
+    return;
 
   std::string logPath = common::SystemPaths::Instance()->GetLogPath();
   logPath += "/cegui.log";

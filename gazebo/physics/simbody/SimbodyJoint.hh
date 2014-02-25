@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual void Reset();
 
       // Documentation inherited.
-      public: virtual LinkPtr GetJointLink(int _index) const;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
@@ -58,21 +58,23 @@ namespace gazebo
       public: virtual void Detach();
 
       // Documentation inherited.
-      public: virtual void SetAnchor(int _index,
+      public: virtual void SetAnchor(unsigned int _index,
                   const gazebo::math::Vector3 &_anchor);
 
       // Documentation inherited.
-      public: virtual void SetDamping(int _index, const double _damping);
+      public: virtual void SetDamping(unsigned int _index,
+                                      const double _damping);
 
       // Documentation inherited.
-      public: virtual void SetStiffness(int _index, const double _stiffness);
+      public: virtual void SetStiffness(unsigned int _index,
+                                        const double _stiffness);
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
@@ -81,11 +83,13 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, int _index, double _value);
+      public: virtual void SetAttribute(Attribute, unsigned int _index,
+                                        double _value);
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key,
-                                        int _index, const boost::any &_value);
+                                        unsigned int _index,
+                                        const boost::any &_value);
 
       // Documentation inherited.
       public: virtual double GetAttribute(const std::string &_key,
@@ -98,13 +102,14 @@ namespace gazebo
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       // Documentation inherited.
-      public: virtual void SetForce(int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force);
 
       // Documentation inherited.
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
@@ -119,12 +124,13 @@ namespace gazebo
       /// \param[in] _force Force value.
       /// internal force, e.g. damping forces.  This way, Joint::appliedForce
       /// keep track of external forces only.
-      protected: virtual void SetForceImpl(int _index, double _force) = 0;
+      protected: virtual void SetForceImpl(unsigned int _index,
+                                           double _force) = 0;
 
       /// \brief Save external forces applied to this Joint.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      private: void SaveForce(int _index, double _force);
+      private: void SaveForce(unsigned int _index, double _force);
 
       // Documentation inherited.
       public: virtual void CacheForceTorque();
@@ -146,17 +152,16 @@ namespace gazebo
 
       /// \brief: for enforcing joint damping forces.
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearDamper damper;
+      public: SimTK::Force::MobilityLinearDamper damper[MAX_JOINT_AXIS];
 
       /// \brief: for enforcing joint stops
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearStop limitForce;
+      /// Assuming this is not used for BallJoints it's ok here for now.
+      public: SimTK::Force::MobilityLinearStop limitForce[MAX_JOINT_AXIS];
 
       /// \brief Use isValid() if we used a mobilizer
       /// Set when we build the Simbody model.
@@ -190,6 +195,9 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       /// This is used by Bullet to store external force applied by the user.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom dampers for special joints like ball joints.
+      /// Assuming this is not used for BallJoints it's ok here for now.
       private: double forceApplied[MAX_JOINT_AXIS];
 
       /// \brief Save time at which force is applied by user

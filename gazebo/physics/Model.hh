@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,8 +213,8 @@ namespace gazebo
       /// \param[in] _onComplete Callback function for when the animation
       /// completes.
       public: void SetJointAnimation(
-                 const std::map<std::string, common::NumericAnimationPtr> _anim,
-                 boost::function<void()> _onComplete = NULL);
+               const std::map<std::string, common::NumericAnimationPtr> &_anims,
+               boost::function<void()> _onComplete = NULL);
 
       /// \brief Stop the current animations.
       public: virtual void StopAnimation();
@@ -359,9 +359,6 @@ namespace gazebo
 
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
-
-      /// \brief Previous time of the animation update.
-      private: common::Time prevAnimationTime;
 
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;

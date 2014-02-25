@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,38 @@ TEST(gzlog, HzFilter)
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
+  EXPECT_EQ(validEcho, echo);
+}
+
+/////////////////////////////////////////////////
+/// Check to raw filtering with time stamps
+TEST(gzlog, RawFilterStamp)
+{
+  std::string echo, validEcho;
+
+  // Sim time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s sim --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = "0.021344 0.000000 \n0.0289582 0.000000";
+  EXPECT_EQ(validEcho, echo);
+
+  // Real time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s real --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = "0.001 0.000000 \n0.002 0.000000";
+  EXPECT_EQ(validEcho, echo);
+
+  // Wall time
+  echo = custom_exec(
+      std::string("gzlog echo -r -s wall --filter pr2.pose.x ") +
+      PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
+  boost::trim_right(echo);
+  validEcho = std::string("1360301758.939690 0.000000 \n")
+            + std::string("1360301758.947304 0.000000");
   EXPECT_EQ(validEcho, echo);
 }
 

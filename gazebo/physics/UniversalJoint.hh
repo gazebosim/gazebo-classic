@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,19 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
+    /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
+    /// body and axis2 attached to child body.
     template<class T>
     class GAZEBO_VISIBLE UniversalJoint : public T
     {
+      /// \enum AxisIndex
+      /// \brief Map joint axes to corresponding link.
+      public: enum AxisIndex
+      {
+        AXIS_PARENT = 0,
+        AXIS_CHILD  = 1
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
@@ -64,6 +74,12 @@ namespace gazebo
                     this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
                     */
               }
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
   }

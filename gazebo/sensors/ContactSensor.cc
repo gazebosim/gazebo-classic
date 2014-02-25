@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,6 +203,16 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    std::string entityName =
+        this->world->GetEntity(this->parentName)->GetScopedName();
+
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(entityName);
+  }
+
   this->contactSub.reset();
   this->contactsPub.reset();
   Sensor::Fini();

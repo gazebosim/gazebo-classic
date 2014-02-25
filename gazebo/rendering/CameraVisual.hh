@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
-#ifndef CAMERAVISUAL_HH
-#define CAMERAVISUAL_HH
+#ifndef _CAMERAVISUAL_HH_
+#define _CAMERAVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -56,7 +54,8 @@ namespace gazebo
       /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
 
-      private: CameraPtr camera;
+      /// \brief Update the visual
+      private: void Update();
     };
     /// \}
   }

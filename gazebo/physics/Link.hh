@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -519,9 +519,6 @@ namespace gazebo
 
       /// \brief Link data message
       private: msgs::LinkData linkDataMsg;
-
-      /// \brief Event connections
-      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief True to publish data, false otherwise
       private: bool publishData;

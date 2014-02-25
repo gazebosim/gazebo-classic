@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,10 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
+  // these flags are related to issue #494
+  // set default to true for backward compatibility
+  this->axisParentModelFrame[0] = true;
+  this->axisParentModelFrame[1] = true;
 
   if (!this->sdfJoint)
   {
@@ -130,6 +134,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
+    {
+      std::string param = "use_parent_model_frame";
+      // Check if "use_parent_model_frame" element exists.
+      // It has `required=1`, so if it does not exist, then SDF is old,
+      // and we should assume support for backwards compatibility
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -142,6 +156,13 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
+    {
+      std::string param = "use_parent_model_frame";
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -301,7 +322,7 @@ void Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Joint::GetLocalAxis(int _index) const
+math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
   math::Vector3 vec;
 
@@ -327,9 +348,9 @@ void Joint::SetEffortLimit(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetEffortLimit(int _index)
+double Joint::GetEffortLimit(unsigned int _index)
 {
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
     return this->effortLimit[_index];
 
   gzerr << "GetEffortLimit index[" << _index << "] out of range\n";
@@ -337,9 +358,9 @@ double Joint::GetEffortLimit(int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetVelocityLimit(int _index)
+double Joint::GetVelocityLimit(unsigned int _index)
 {
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
     return this->velocityLimit[_index];
 
   gzerr << "GetVelocityLimit index[" << _index << "] out of range\n";
@@ -494,7 +515,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
 }
 
 //////////////////////////////////////////////////
-math::Angle Joint::GetAngle(int _index) const
+math::Angle Joint::GetAngle(unsigned int _index) const
 {
   if (this->model->IsStatic())
     return this->staticAngle;
@@ -503,7 +524,7 @@ math::Angle Joint::GetAngle(int _index) const
 }
 
 //////////////////////////////////////////////////
-void Joint::SetHighStop(int _index, const math::Angle &_angle)
+void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
@@ -524,7 +545,7 @@ void Joint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetLowStop(int _index, const math::Angle &_angle)
+void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   if (_index == 0)
@@ -545,7 +566,7 @@ void Joint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(int _index, math::Angle _angle)
+void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 {
   if (this->model->IsStatic())
     this->staticAngle = _angle;
@@ -564,9 +585,9 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-double Joint::CheckAndTruncateForce(int _index, double _effort)
+double Joint::CheckAndTruncateForce(unsigned int _index, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "Calling Joint::SetForce with an index ["
           << _index << "] out of range\n";
@@ -691,9 +712,9 @@ double Joint::GetInertiaRatio(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetDamping(int _index)
+double Joint::GetDamping(unsigned int _index)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     return this->dissipationCoefficient[_index];
   }
@@ -849,7 +870,7 @@ void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopStiffness(unsigned int _index)
+double Joint::GetStopStiffness(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -864,7 +885,7 @@ double Joint::GetStopStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopDissipation(unsigned int _index)
+double Joint::GetStopDissipation(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -879,7 +900,39 @@ double Joint::GetStopDissipation(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetInitialAnchorPose()
+math::Pose Joint::GetInitialAnchorPose() const
 {
   return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetWorldPose() const
+{
+  if (this->childLink)
+    return this->anchorPose + this->childLink->GetWorldPose();
+  return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // Use parent model frame
+    if (this->parentLink)
+      return this->parentLink->GetModel()->GetWorldPose().rot;
+
+    // Parent model is world, use world frame
+    return math::Quaternion();
+  }
+
+  return this->GetWorldPose().rot;
 }

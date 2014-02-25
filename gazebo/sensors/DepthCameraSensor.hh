@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,9 +87,6 @@ namespace gazebo
 
       /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
-
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

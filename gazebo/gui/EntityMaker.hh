@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,15 @@ namespace gazebo
       /// \brief Callback for pushing entity with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// \brief Callback for releasing mouse button
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// \brief Callback for dragging with mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// \brief Callback when moving mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);

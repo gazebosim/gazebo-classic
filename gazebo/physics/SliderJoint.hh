@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,13 @@ namespace gazebo
       /// \brief Set the anchor.
       /// \param[in] _index Index of the axis. Not used.
       /// \param[in] _anchor Anchor for the axis.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
 
       /// \brief Get the anchor.
       /// \param[in] _index Index of the axis. Not used.
       /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;
@@ -71,11 +72,12 @@ namespace gazebo
     /// \}
 
     template<class T>
-    void SliderJoint<T>::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
+    void SliderJoint<T>::SetAnchor(unsigned int /*_index*/,
+        const math::Vector3 &_anchor)
     {this->fakeAnchor = _anchor;}
 
     template<class T>
-    math::Vector3 SliderJoint<T>::GetAnchor(int /*_index*/) const
+    math::Vector3 SliderJoint<T>::GetAnchor(unsigned int /*_index*/) const
     {return this->fakeAnchor;}
   }
 }
