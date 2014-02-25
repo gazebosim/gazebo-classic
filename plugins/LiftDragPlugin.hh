@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _LIFT_DRAG_PLUGIN_HH_
-#define _LIFT_DRAG_PLUGIN_HH_
+#ifndef _GAZEBO_LIFT_DRAG_PLUGIN_HH_
+#define _GAZEBO_LIFT_DRAG_PLUGIN_HH_
 
 #include <string>
 #include <vector>
@@ -27,6 +27,7 @@
 
 namespace gazebo
 {
+  /// \brief A plugin that simulates lift and drag.
   class LiftDragPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -126,4 +127,4 @@ namespace gazebo
     private: sdf::ElementPtr sdf;
   };
 }
-#endif  // ifndef _LIFT_DRAG_PLUGIN_HH_
+#endif
