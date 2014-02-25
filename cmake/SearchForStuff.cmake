@@ -443,12 +443,6 @@ else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()
 
-if (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL TRUE)
-else (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL FALSE)
-endif ()
-
 ########################################
 # Find gdal
 include (FindGDAL)
