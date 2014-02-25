@@ -423,38 +423,13 @@ ELSE (HAVE_FFMPEG)
   SET (LIBAVCODEC_PATH /usr/include)
 ENDIF (HAVE_FFMPEG)
 
-########################################
-# Find libtool
-find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
-if (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - not found")
-  BUILD_WARNING ("ltdl.h not found")
-  set (libtool_include_dir /usr/include)
-else (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - found")
-endif (NOT libtool_include_dir)
-
-find_library(libtool_library ltdl /usr/lib /usr/local/lib)
-if (NOT libtool_library)
-  message (STATUS "Looking for libltdl - not found")
-else (NOT libtool_library)
-  message (STATUS "Looking for libltdl - found")
-endif (NOT libtool_library)
-
-if (libtool_library AND libtool_include_dir)
-  set (HAVE_LTDL TRUE)
-else ()
-  set (HAVE_LTDL FALSE)
-  set (libtool_library "" CACHE STRING "" FORCE)
-endif ()
-
 
 ########################################
 # Find libdl
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
 if (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - not found")
-  BUILD_WARNING ("dlfcn.h not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
   set (libdl_include_dir /usr/include)
 else (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - found")
@@ -463,7 +438,7 @@ endif ()
 find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
-  BUILD_WARNING ("libdl not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()

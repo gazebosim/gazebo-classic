@@ -22,11 +22,7 @@
 #include <sys/stat.h>
 
 #include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
@@ -146,7 +142,6 @@ namespace gazebo
               if (!found)
                 fullname = filename;
 
-#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
@@ -170,55 +165,6 @@ namespace gazebo
               // Register the new controller.
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
-
-#elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-              result->dlHandle = NULL;
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
 
               result->handle = _handle;
               result->filename = filename;
