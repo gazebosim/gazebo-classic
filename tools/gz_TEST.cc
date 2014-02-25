@@ -608,7 +608,7 @@ TEST(gz, SDF)
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
-  
+
   {
     // 1.2 description
     // Regenerate using:
@@ -617,7 +617,7 @@ TEST(gz, SDF)
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
-  
+
   {
     // 1.3 description
     // Regenerate using:
@@ -626,7 +626,7 @@ TEST(gz, SDF)
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "a917916d211b711c6cba42ffd6811f9a659fce75");
   }
-  
+
   {
     // 1.0 doc
     // Regenerate using:
@@ -635,7 +635,7 @@ TEST(gz, SDF)
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "681f5be73178de73076ffe6571466e45fb86d44c");
   }
-  
+
   {
     // 1.2 doc
     // Regenerate using:
@@ -644,7 +644,7 @@ TEST(gz, SDF)
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "4f803940d155c42778f2fc4b2ccaa57f8a79b12e");
   }
-  
+
   {
     // 1.3 doc
     // Regenerate using:
@@ -663,7 +663,7 @@ TEST(gz, SDF)
       custom_exec_str(std::string("gz sdf -k ") + path.string());
     EXPECT_EQ(output, "Check complete\n");
   }
-  
+
   {
     // Print empty.world
     // Regenerate using:
