@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- */
-
 #include <time.h>
 
 #include <tbb/parallel_for.h>
