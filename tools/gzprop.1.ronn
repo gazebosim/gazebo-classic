@@ -7,7 +7,7 @@ gzprop -- Package a model for thepropshop.org
 
 ## DESCRIPTION
 
-Package an existing model directory into a tarball suitable for upload to thepropshop.org. A working instance of Gazebo >= 2.3 is required.
+Package an existing model directory into a tarball suitable for upload to thepropshop.org. A working instance of Gazebo >= 3.0 is required.
 
 ## OPTIONS
 
