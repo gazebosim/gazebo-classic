@@ -18,7 +18,7 @@ set (files
   joint_damping_demo.world
   joints.world
   lights.world
-  mud_bitmask
+  mud_bitmask.world
   mud.world
   openal.world
   pioneer2dx.world
