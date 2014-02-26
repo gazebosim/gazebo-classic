@@ -64,6 +64,35 @@ TEST_F(WorldTest, Clear)
 }
 
 /////////////////////////////////////////////////
+TEST_F(WorldTest, ModifyLight)
+{
+  Load("worlds/empty.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+  msgs::Scene sceneMsg = world->GetSceneMsg();
+
+  EXPECT_EQ(sceneMsg.light_size(), 1);
+  EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "sun");
+
+  transport::PublisherPtr lightPub = this->node->Advertise<msgs::Light>(
+        "~/light");
+
+  msgs::Light lightMsg;
+  lightMsg.set_name("sun");
+  msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 1, 0));
+  lightPub->Publish(lightMsg);
+
+  world->Step(10);
+
+  msgs::Scene sceneMsg2 = world->GetSceneMsg();
+  EXPECT_EQ(sceneMsg2.light_size(), 1);
+  EXPECT_STREQ(sceneMsg2.light(1).name().c_str(), "sun");
+  EXPECT_EQ(sceneMsg2.light(1).diffuse().r(), 0);
+  EXPECT_EQ(sceneMsg2.light(1).diffuse().g(), 1);
+  EXPECT_EQ(sceneMsg2.light(1).diffuse().b(), 0);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

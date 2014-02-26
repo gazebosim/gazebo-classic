@@ -204,6 +204,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
+  this->lightSub = this->node->Subscribe("~/light", &World::OnLightMsg, this);
+
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
@@ -1995,4 +1997,35 @@ void World::RemoveModel(const std::string &_name)
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void World::OnLightMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+
+  bool lightExists = false;
+
+  // Find the light by name, and copy the new parameters.
+  for (int i = 0; i < this->sceneMsg.light_size(); ++i)
+  {
+    if (this->sceneMsg.light(i).name() == _msg->name())
+    {
+      lightExists = true;
+      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      break;
+    }
+  }
+
+  // Add a new light if the light doesn't exist.
+  if (!lightExists)
+  {
+    this->sceneMsg.add_light()->CopyFrom(*_msg);
+  }
+}
+
+/////////////////////////////////////////////////
+msgs::Scene World::GetSceneMsg() const
+{
+  return this->sceneMsg;
 }
