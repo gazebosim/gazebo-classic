@@ -24,8 +24,8 @@ if ARGV.empty?
   abort("")
 end
 
-# Get the model directory
-modelFile = ARGV[0]
+# Get the model file name
+modelFile = File.absolute_path(ARGV[0])
 
 modelParts = modelFile.split('/')
 modelDir = modelParts[0, modelParts.size()-1].join('/')
@@ -38,28 +38,24 @@ end
 # Get the name of the model (last part of the directory name)
 modelName = modelParts[-2]
 
-metaDir = File.join(modelDir, "meta")
-
-# Create the meta directory
-if RUBY_VERSION < "1.9"
-  if Dir[modelDir].empty?
-    Dir.mkdir(metaDir)
-  end
-else
-  if !Dir.exists?(metaDir)
-    Dir.mkdir(metaDir)
-  end
-end
-
-# Create a set of images
-`gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
-
 ## Make a temporary directory
 Dir.mktmpdir { |dir|
 
-  # Copy the model information into a temp directory
-  `cp -r "#{modelDir}" #{dir}`
+  metaDir = File.join(dir, modelName, "meta")
 
+  # Copy the model information into a temp directory
+ `cp -r "#{modelDir}" #{dir}`
+ 
+  # Create the meta directory
+  if RUBY_VERSION < "1.9"
+    Dir.mkdir(metaDir)
+  else
+    Dir.mkdir(metaDir)
+  end
+
+  # Create a set of images
+  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
+  
   # Create a tarball for the model
   `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
 }
