@@ -23,6 +23,9 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/MsgFactory.hh"
 #include "test_config.h"
+#include "test/util.hh"
+
+class MsgFactory : public gazebo::testing::AutoLogFixture { };
 
 std::string custom_exec(const std::string &_cmd)
 {
@@ -46,7 +49,7 @@ std::string custom_exec(const std::string &_cmd)
 
 /////////////////////////////////////////////////
 /// Check for null when asked for a bad message type
-TEST(MsgFactory, BadMsgType)
+TEST_F(MsgFactory, BadMsgType)
 {
   boost::shared_ptr<google::protobuf::Message> msg =
     gazebo::msgs::MsgFactory::NewMsg("bad");
@@ -55,7 +58,7 @@ TEST(MsgFactory, BadMsgType)
 
 /////////////////////////////////////////////////
 /// Check to make sure that NewMsg works properly
-TEST(MsgFactory, NewMsg)
+TEST_F(MsgFactory, NewMsg)
 {
   gazebo::msgs::Vector3d goodMsg;
   goodMsg.set_x(1.1);
@@ -77,7 +80,7 @@ TEST(MsgFactory, NewMsg)
 
 /////////////////////////////////////////////////
 /// Check to make sure that all the proto files have been registered
-TEST(MsgFactory, AllTypes)
+TEST_F(MsgFactory, AllTypes)
 {
   std::vector<std::string> types;
   gazebo::msgs::MsgFactory::GetMsgTypes(types);

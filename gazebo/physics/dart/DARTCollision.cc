@@ -20,6 +20,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/physics/SurfaceParams.hh"
+
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
@@ -35,6 +37,7 @@ DARTCollision::DARTCollision(LinkPtr _link)
     dtCollisionShape(NULL)
 {
   this->SetName("DART_Collision");
+  this->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////

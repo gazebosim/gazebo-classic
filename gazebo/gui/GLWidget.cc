@@ -16,6 +16,7 @@
 */
 #include <math.h>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 
@@ -63,7 +64,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
-//  setMinimumSize(320, 240);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);

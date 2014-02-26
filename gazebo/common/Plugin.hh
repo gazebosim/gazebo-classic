@@ -22,11 +22,7 @@
 #include <sys/stat.h>
 
 #include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
@@ -83,9 +79,11 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-#ifdef HAVE_DL
+// The following ifdef is a workaround for #1026.
+// \todo Figure out the right thing to do.
+#ifndef __APPLE__
               dlclose(this->dlHandle);
-#endif
+#endif  // ifndef __APPLE
             }
 
     /// \brief Get the name of the handler
@@ -112,15 +110,26 @@ namespace gazebo
               // PluginPtr result;
               struct stat st;
               bool found = false;
-              std::string fullname;
+              std::string fullname, filename(_filename);
               std::list<std::string>::iterator iter;
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
 
+#ifdef __APPLE__
+              // This is a hack to work around issue #800,
+              // error loading plugin libraries with different extensions
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                if (soSuffix != std::string::npos)
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+              }
+#endif  // ifdef __APPLE__
+
               for (iter = pluginPaths.begin();
                    iter!= pluginPaths.end(); ++iter)
               {
-                fullname = (*iter)+std::string("/")+_filename;
+                fullname = (*iter)+std::string("/")+filename;
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
@@ -129,9 +138,8 @@ namespace gazebo
               }
 
               if (!found)
-                fullname = _filename;
+                fullname = filename;
 
-#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
@@ -156,57 +164,8 @@ namespace gazebo
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
-#elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-              result->dlHandle = NULL;
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
-
               result->handle = _handle;
-              result->filename = _filename;
+              result->filename = filename;
 
               return result;
             }
