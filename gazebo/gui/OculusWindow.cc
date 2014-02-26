@@ -4,6 +4,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/WindowManager.hh"
 
 using namespace gazebo;
@@ -47,6 +48,8 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
 /////////////////////////////////////////////////
 OculusWindow::~OculusWindow()
 {
+  this->attachCameraThread->join();
+  delete this->attachCameraThread;
 }
 
 /////////////////////////////////////////////////
@@ -79,23 +82,45 @@ void OculusWindow::resizeEvent(QResizeEvent *_e)
 }
 
 /////////////////////////////////////////////////
-void OculusWindow::showEvent(QShowEvent *_event)
+void OculusWindow::AttachCameraToVisual()
 {
-  this->scene = rendering::get_scene();
-
-  this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
-
-  this->oculusCamera->AttachToVisual(this->visualName, true);
-
-  math::Vector3 camPos(0.1, 0, 0);
+  if (!this->scene)
+  {
+    gzerr << "Scene is NULL!" << std::endl;
+    return;
+  }
+  while (!this->scene->GetVisual(this->visualName))
+  {
+    common::Time::MSleep(100);
+  }
+ 
+  this->oculusCamera->AttachToVisual(this->visualName, true); 
+  
+  math::Vector3 camPos(0.1, 0, 0);  
   math::Vector3 lookAt(0, 0, 0);
   math::Vector3 delta = lookAt - camPos;
 
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->oculusCamera->SetWorldPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
+  
+  this->oculusCamera->SetWorldPose(math::Pose(
+        camPos, math::Vector3(0, pitch, yaw)));  
+}
+
+/////////////////////////////////////////////////
+void OculusWindow::showEvent(QShowEvent *_event)
+{
+  this->scene = rendering::get_scene();
+  
+  if (!this->oculusCamera)
+  {
+    this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+  
+    this->attachCameraThread = new boost::thread(
+        boost::bind(&OculusWindow::AttachCameraToVisual, this));
+  }
+  //this->oculusCamera->AttachToVisual(this->visualName, true);
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(this->GetOgreHandle(), this->width(), this->height());

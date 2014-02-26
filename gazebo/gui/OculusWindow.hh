@@ -1,3 +1,5 @@
+#include <boost/thread.hpp>
+
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -30,6 +32,8 @@ namespace gazebo
       protected: void keyPressEvent(QKeyEvent *_event);
 
       private: std::string GetOgreHandle() const;
+      
+      private: void AttachCameraToVisual();
 
       private: QFrame *renderFrame;
 
@@ -43,6 +47,9 @@ namespace gazebo
       private: int xPos;
       private: int yPos;
       private: std::string visualName;
+      
+      /// \brief Thread to attach oculus camera to visual
+      private: boost::thread *attachCameraThread;
     };
   }
 }

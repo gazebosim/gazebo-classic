@@ -189,7 +189,7 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         this->joints[i]->GetScopedName(), qResult(i));
 
     this->jointController->SetPositionPID(this->joints[i]->GetScopedName(),
-        common::PID(1000, 0.01, 1));
+        common::PID(820, 1, 25));
   }
   this->fkSolver->JntToCart(qResult, cartpos);
 
