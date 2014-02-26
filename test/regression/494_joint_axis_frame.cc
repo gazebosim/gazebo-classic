@@ -51,7 +51,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     return;
   }
   if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")
-      && _jointType == "revolute"))
+      && (_jointType == "revolute" || _jointType == "prismatic")))
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine
           << "] with joint type [" << _jointType << "]"
