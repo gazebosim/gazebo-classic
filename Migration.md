@@ -128,6 +128,7 @@
 
 1. **gazebo/rendering/Light.hh**
     + bool GetVisible() const
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
 
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
