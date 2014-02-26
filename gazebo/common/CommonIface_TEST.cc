@@ -21,12 +21,15 @@
 #include <sstream>
 
 #include "gazebo/common/CommonIface.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class CommonIface_TEST : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
 /// \brief Test CommonIface::GetSHA1
-TEST(CommonIface_TEST, GetSHA1)
+TEST_F(CommonIface_TEST, GetSHA1)
 {
   // Do not forget to update 'precomputedSHA1' if you modify the SHA1 input.
   std::string precomputedSHA1;

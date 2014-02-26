@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
-#ifndef CAMERAVISUAL_HH
-#define CAMERAVISUAL_HH
+#ifndef _CAMERAVISUAL_HH_
+#define _CAMERAVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
@@ -55,7 +53,8 @@ namespace gazebo
       /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
 
-      private: CameraPtr camera;
+      /// \brief Update the visual
+      private: void Update();
     };
     /// \}
   }

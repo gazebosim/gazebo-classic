@@ -76,6 +76,7 @@ MainWindow::MainWindow()
 
   this->inputStepSize = 1;
   this->requestMsg = NULL;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
@@ -139,8 +140,7 @@ MainWindow::MainWindow()
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
-  std::string title = "Gazebo : ";
-  title += gui::get_world();
+  std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
@@ -193,13 +193,21 @@ void MainWindow::Init()
 {
   this->renderWidget->show();
 
-  // Set the initial size of the window to 0.75 the desktop size,
-  // with a minimum value of 1024x768.
-  QSize winSize = QApplication::desktop()->size() * 0.75;
-  winSize.setWidth(std::max(1024, winSize.width()));
-  winSize.setHeight(std::max(768, winSize.height()));
+  // Default window size is entire desktop.
+  QSize winSize = QApplication::desktop()->size();
 
-  this->resize(winSize);
+  // Get the size properties from the INI file.
+  int winWidth = getINIProperty<int>("geometry.width", winSize.width());
+  int winHeight = getINIProperty<int>("geometry.height", winSize.height());
+
+  winWidth = winWidth < 0 ? winSize.width() : winWidth;
+  winHeight = winHeight < 0 ? winSize.height() : winHeight;
+
+  // Get the position properties from the INI file.
+  int winXPos = getINIProperty<int>("geometry.x", 0);
+  int winYPos = getINIProperty<int>("geometry.y", 0);
+
+  this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
@@ -230,7 +238,6 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
   this->toolsWidget->hide();
@@ -238,6 +245,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -307,6 +316,31 @@ void MainWindow::Import()
     else
       gzerr << "Unable to import mesh[" << filename << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SaveINI()
+{
+  char *home = getenv("HOME");
+  if (!home)
+  {
+    gzerr << "HOME environment variable not found. "
+      "Unable to save configuration file\n";
+    return;
+  }
+
+  boost::filesystem::path path = home;
+  path = path / ".gazebo" / "gui.ini";
+
+  // When/if the configuration gets more complex, create a
+  // configuration manager class so that all key-value pairs are kept
+  // in a centralized place with error checking.
+  setINIProperty("geometry.width", this->width());
+  setINIProperty("geometry.height", this->height());
+  setINIProperty("geometry.x", this->x());
+  setINIProperty("geometry.y", this->y());
+
+  gui::saveINI(path);
 }
 
 /////////////////////////////////////////////////
@@ -797,6 +831,10 @@ void MainWindow::CreateActions()
   g_saveAsAct->setStatusTip(tr("Save world to new file"));
   connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
+  g_saveCfgAct = new QAction(tr("Save &Configuration"), this);
+  g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
+  connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1072,6 +1110,8 @@ void MainWindow::CreateMenuBar()
   // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
+  fileMenu->addSeparator();
+  fileMenu->addAction(g_saveCfgAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 

@@ -46,9 +46,6 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
-
-      // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
@@ -59,7 +56,7 @@ namespace gazebo
       public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetVelocity(unsigned int _index, double _angle);
+      public: virtual void SetVelocity(unsigned int _index, double _rate);
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

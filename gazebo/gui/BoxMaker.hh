@@ -53,12 +53,16 @@ namespace gazebo
 
       /// Documentation inherited
       public: virtual bool IsActive() const;
+
       /// Documentation inherited
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 

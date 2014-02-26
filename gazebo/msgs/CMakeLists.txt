@@ -79,6 +79,7 @@ set (msgs
   shadows.proto
   sky.proto
   spheregeom.proto
+  spherical_coordinates.proto
   subscribe.proto
   surface.proto
   tactile.proto
