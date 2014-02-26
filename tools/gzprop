@@ -44,7 +44,7 @@ Dir.mktmpdir { |dir|
   metaDir = File.join(dir, modelName, "meta")
 
   # Copy the model information into a temp directory
- `cp -r "#{modelDir}" #{dir}`
+  `cp -r "#{modelDir}" #{dir}`
  
   # Create the meta directory
   if RUBY_VERSION < "1.9"
