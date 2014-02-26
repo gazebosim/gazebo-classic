@@ -21,15 +21,25 @@
 
 using namespace gazebo;
 
+const double g_tolerance = 1e-4;
 class Issue494Test : public JointTest
 {
+  /// \brief Test for issue #494, using proper joint axis frame.
+  /// Also test basic joint properties.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  /// \param[in] _jointType Type of joint to test.
   public: void CheckAxisFrame(const std::string &_physicsEngine,
                               const std::string &_jointType);
+
+  /// \brief Check joint properties.
+  /// \param[in] _joint Joint to check.
+  /// \param[in] _axis Expected axis vector in global frame.
+  public: void CheckJointProperties(physics::JointPtr _joint,
+                                    const math::Vector3 &_axis);
 };
 
 
 /////////////////////////////////////////////////
-// \brief Test for issue #494
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
@@ -58,6 +68,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
 
   SpawnJointOptions opt;
   opt.type = _jointType;
@@ -105,12 +118,12 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
       if (opt.worldParent)
       {
-        EXPECT_EQ(opt.axis, jointUseParentModelFrame->GetGlobalAxis(0));
+        this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
       }
       else
       {
-        math::Vector3 referenceAxis(cos(Am), sin(Am), 0);
-        EXPECT_EQ(referenceAxis, jointUseParentModelFrame->GetGlobalAxis(0));
+        this->CheckJointProperties(jointUseParentModelFrame,
+          math::Vector3(cos(Am), sin(Am), 0));
       }
     }
 
@@ -122,15 +135,83 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
       if (opt.worldChild)
       {
-        math::Vector3 referenceAxis(cos(Aj), sin(Aj), 0);
-        EXPECT_EQ(referenceAxis, joint->GetGlobalAxis(0));
+        this->CheckJointProperties(joint,
+          math::Vector3(cos(Aj), sin(Aj), 0));
       }
       else
       {
-        math::Vector3 referenceAxis(cos(Am+Al+Aj), sin(Am+Al+Aj), 0);
-        EXPECT_EQ(referenceAxis, joint->GetGlobalAxis(0));
+        this->CheckJointProperties(joint,
+          math::Vector3(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
+                                        const math::Vector3 &_axis)
+{
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  bool isOde = physics->GetType().compare("ode") == 0;
+  double dt = physics->GetMaxStepSize();
+
+  // Check that Joint::GetGlobalAxis matches _axis
+  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0));
+
+  if (!_joint->GetChild())
+  {
+    gzerr << "The rest of this test fails without a child link" << std::endl;
+    return;
+  }
+
+  double velocityMagnitude = 1.0;
+  double maxForce = velocityMagnitude / dt * 10.1;
+  std::vector<double> velocities;
+  velocities.push_back(velocityMagnitude);
+  velocities.push_back(0.0);
+  velocities.push_back(-velocityMagnitude);
+  for (std::vector<double>::iterator iter = velocities.begin();
+       iter != velocities.end(); ++iter)
+  {
+    // Use Joint::SetVelocity with different values
+    double vel = *iter;
+    _joint->SetVelocity(0, vel);
+
+    // ODE requires maxForce to be non-zero for SetVelocity to work
+    // See issue #964 for discussion of consistent API
+    if (isOde)
+      _joint->SetMaxForce(0, maxForce);
+
+    // Take a step and verify that Joint::GetVelocity returns the same value
+    world->Step(1);
+    EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
+
+    // Also verify that relative body motions match expected joint behavior
+    math::Vector3 childVelocity, parentVelocity;
+    {
+      physics::LinkPtr child = _joint->GetChild();
+      if (child)
+      {
+        if (_joint->HasType(physics::Base::HINGE_JOINT))
+          childVelocity = child->GetWorldAngularVel();
+        else if (_joint->HasType(physics::Base::SLIDER_JOINT))
+          childVelocity = child->GetWorldLinearVel();
+      }
+    }
+    {
+      physics::LinkPtr parent = _joint->GetParent();
+      if (parent)
+      {
+        if (_joint->HasType(physics::Base::HINGE_JOINT))
+          parentVelocity = parent->GetWorldAngularVel();
+        else if (_joint->HasType(physics::Base::SLIDER_JOINT))
+          parentVelocity = parent->GetWorldLinearVel();
+      }
+    }
+    EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
   }
 }
 
