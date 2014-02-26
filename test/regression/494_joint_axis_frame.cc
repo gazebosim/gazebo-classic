@@ -141,7 +141,7 @@ TEST_P(Issue494Test, CheckAxisFrame)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("revolute", "prismatic")));
+  ::testing::Values("revolute", "prismatic", "screw")));
 
 /////////////////////////////////////////////////
 /// Main
