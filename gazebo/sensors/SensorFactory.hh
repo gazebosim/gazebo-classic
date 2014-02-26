@@ -86,10 +86,11 @@ namespace gazebo
   /// @param name Sensor type name, as it appears in the world file.
   /// @param classname C++ class name for the sensor.
   #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
-  Sensor *New##classname() \
+  GAZEBO_VISIBLE Sensor *New##classname() \
   { \
     return new gazebo::sensors::classname(); \
   } \
+  GAZEBO_VISIBLE \
   void Register##classname() \
   {\
     SensorFactory::RegisterSensor(name, New##classname);\
