@@ -38,11 +38,17 @@ namespace gazebo
     /// \brief Initialize the plugin.
     private: void Init();
 
+    /// \brief Callback triggered when the world has been created.
+    private: void OnWorldCreated();
+
     /// \brief Update the plugin.
     private: void Update();
 
-    /// \brief The connections.
+    /// \brief The update connection.
     private: event::ConnectionPtr updateConn;
+
+    /// \brief The world created connection.
+    private: event::ConnectionPtr worldCreatedConn;
 
     /// \brief Node for communication.
     private: transport::NodePtr node;
@@ -58,6 +64,9 @@ namespace gazebo
 
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
+
+    /// \brief Pointer to the light.
+    private: rendering::LightPtr light;
 
     /// \brief Pointer to the sdf document.
     private: boost::shared_ptr<sdf::SDF> sdf;
