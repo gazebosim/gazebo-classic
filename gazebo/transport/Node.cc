@@ -139,6 +139,9 @@ unsigned int Node::GetId() const
 /////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
+  if (!this->initialized)
+    return;
+
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
 

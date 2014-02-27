@@ -15,11 +15,6 @@
  *
 */
 
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -133,85 +128,85 @@ void Light::Update()
 }
 
 //////////////////////////////////////////////////
-void Light::UpdateSDFFromMsg(ConstLightPtr &_msg)
+void Light::UpdateSDFFromMsg(const msgs::Light &_msg)
 {
-  this->sdf->GetAttribute("name")->Set(_msg->name());
+  this->sdf->GetAttribute("name")->Set(_msg.name());
 
-  if (_msg->has_type() && _msg->type() == msgs::Light::POINT)
+  if (_msg.has_type() && _msg.type() == msgs::Light::POINT)
     this->sdf->GetAttribute("type")->Set("point");
-  else if (_msg->has_type() && _msg->type() == msgs::Light::SPOT)
+  else if (_msg.has_type() && _msg.type() == msgs::Light::SPOT)
     this->sdf->GetAttribute("type")->Set("spot");
-  else if (_msg->has_type() && _msg->type() == msgs::Light::DIRECTIONAL)
+  else if (_msg.has_type() && _msg.type() == msgs::Light::DIRECTIONAL)
     this->sdf->GetAttribute("type")->Set("directional");
 
-  if (_msg->has_diffuse())
+  if (_msg.has_diffuse())
   {
     this->sdf->GetElement("diffuse")->Set(
-        msgs::Convert(_msg->diffuse()));
+        msgs::Convert(_msg.diffuse()));
   }
 
-  if (_msg->has_specular())
+  if (_msg.has_specular())
   {
     this->sdf->GetElement("specular")->Set(
-        msgs::Convert(_msg->specular()));
+        msgs::Convert(_msg.specular()));
   }
 
-  if (_msg->has_direction())
+  if (_msg.has_direction())
   {
     this->sdf->GetElement("direction")->Set(
-        msgs::Convert(_msg->direction()));
+        msgs::Convert(_msg.direction()));
   }
 
-  if (_msg->has_attenuation_constant())
+  if (_msg.has_attenuation_constant())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("constant")->Set(_msg->attenuation_constant());
+    elem->GetElement("constant")->Set(_msg.attenuation_constant());
   }
 
-  if (_msg->has_attenuation_linear())
+  if (_msg.has_attenuation_linear())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("linear")->Set(_msg->attenuation_linear());
+    elem->GetElement("linear")->Set(_msg.attenuation_linear());
   }
 
-  if (_msg->has_attenuation_quadratic())
+  if (_msg.has_attenuation_quadratic())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("quadratic")->Set(_msg->attenuation_quadratic());
+    elem->GetElement("quadratic")->Set(_msg.attenuation_quadratic());
   }
 
-  if (_msg->has_range())
+  if (_msg.has_range())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
-    elem->GetElement("range")->Set(_msg->range());
+    elem->GetElement("range")->Set(_msg.range());
   }
 
-  if (_msg->has_cast_shadows())
-    this->sdf->GetElement("cast_shadows")->Set(_msg->cast_shadows());
+  if (_msg.has_cast_shadows())
+    this->sdf->GetElement("cast_shadows")->Set(_msg.cast_shadows());
 
-  if (_msg->has_spot_inner_angle())
+  if (_msg.has_spot_inner_angle())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("inner_angle")->Set(_msg->spot_inner_angle());
+    elem->GetElement("inner_angle")->Set(_msg.spot_inner_angle());
   }
 
-  if (_msg->has_spot_outer_angle())
+  if (_msg.has_spot_outer_angle())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("outer_angle")->Set(_msg->spot_outer_angle());
+    elem->GetElement("outer_angle")->Set(_msg.spot_outer_angle());
   }
 
-  if (_msg->has_spot_falloff())
+  if (_msg.has_spot_falloff())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    elem->GetElement("falloff")->Set(_msg->spot_falloff());
+    elem->GetElement("falloff")->Set(_msg.spot_falloff());
   }
 }
 
 //////////////////////////////////////////////////
 void Light::UpdateFromMsg(ConstLightPtr &_msg)
 {
-  this->UpdateSDFFromMsg(_msg);
+  this->UpdateSDFFromMsg(*_msg);
 
   this->Update();
 
@@ -220,14 +215,20 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void Light::LoadFromMsg(ConstLightPtr &_msg)
+void Light::LoadFromMsg(const msgs::Light &_msg)
 {
   this->UpdateSDFFromMsg(_msg);
 
   this->Load();
 
-  if (_msg->has_pose())
-    this->SetPosition(msgs::Convert(_msg->pose().position()));
+  if (_msg.has_pose())
+    this->SetPosition(msgs::Convert(_msg.pose().position()));
+}
+
+//////////////////////////////////////////////////
+void Light::LoadFromMsg(ConstLightPtr &_msg)
+{
+  this->LoadFromMsg(*_msg);
 }
 
 //////////////////////////////////////////////////

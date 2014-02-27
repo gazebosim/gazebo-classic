@@ -74,6 +74,9 @@
 
 ### Additions
 
+1. **gazebo/rendering/Light.hh**
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
+
 1. **gazebo/physics/ContactManager.hh**
     + unsigned int GetFilterCount()
     + bool HasFilter(const std::string &_name);
