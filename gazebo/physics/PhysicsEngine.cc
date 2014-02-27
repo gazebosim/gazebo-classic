@@ -216,7 +216,7 @@ void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(int /*_maxContacts*/)
+void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
 {
 }
 

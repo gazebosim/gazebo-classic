@@ -200,7 +200,7 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(int _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -254,7 +254,7 @@ namespace gazebo
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Maximum number of allows contacts.
-      public: virtual int GetMaxContacts() {return 0;}
+      public: virtual unsigned int GetMaxContacts() {return 0;}
 
       /// \brief Set a parameter of the physics engine
       /// \param[in] _key String key
