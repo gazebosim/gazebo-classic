@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@
  * limitations under the License.
  *
 */
+#ifndef _WIREBOX_PRIVATE_HH_
+#define _WIREBOX_PRIVATE_HH_
 
-#ifndef _MAINWINDOW_TEST_HH_
-#define _MAINWINDOW_TEST_HH_
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/DynamicLines.hh"
 
-#include "gazebo/gui/QTestFixture.hh"
-
-/// \brief A test class for the DataLogger widget.
-class MainWindow_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
+  namespace rendering
+  {
+    /// \brief Private data for the WireBox class
+    class WireBoxPrivate
+    {
+      /// \brief The lines which outline the box.
+      public: DynamicLines *lines;
 
-  /// \brief Test that trigger of the view wireframe action creates an
-  /// appropriate request.
-  private slots: void Wireframe();
-
-  /// \brief Test creating a main window with non-default world
-  private slots: void NonDefaultWorld();
-};
-
+      /// \brief The visual which this box is attached to.
+      public: VisualPtr parent;
+    };
+  }
+}
 #endif

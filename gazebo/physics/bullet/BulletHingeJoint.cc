@@ -189,15 +189,8 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
   if (this->bulletHinge == NULL)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-
-    /// \TODO: currently we assume joint axis is specified in model frame,
-    /// this is incorrect, and should be corrected to be
-    /// joint frame which is specified in child link frame.
-    if (this->parentLink)
-      this->initialWorldAxis =
-        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-    else
-      this->initialWorldAxis = _axis;
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -217,8 +210,6 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
   math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getHingeAngle() - this->angleOffset;
-  else
-    gzwarn << "bulletHinge does not exist, returning default angle\n";
   return result;
 }
 
@@ -347,7 +338,8 @@ math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
+
   if (this->bulletHinge)
   {
     // I have not verified the following math, though I based it on internal
@@ -357,7 +349,6 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
       bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
     result = BulletTypes::ConvertVector3(vec);
   }
-  else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+
   return result;
 }

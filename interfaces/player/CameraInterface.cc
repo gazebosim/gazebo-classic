@@ -128,34 +128,34 @@ void CameraInterface::Unsubscribe()
 }
 
 /////////////////////////////////////////////////
-void CameraInterface::SaveFrame(const char * /*filename*/) const
-{
-  /*
-  int width, height;
-  FILE *file;
-
-  file = fopen(filename, "w+");
-  if (!file)
-    return;
-
-  width = this->data.width;
-  height = this->data.height;
-
-  int pixelSize = 3;
-  int rowSize = width * pixelSize;
-
-  if (this->data.format == PLAYER_CAMERA_FORMAT_RGB888)
-  {
-    // Write ppm
-    fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
-    for (int i = 0; i < height; i++)
-      fwrite(this->data.image + i * rowSize, rowSize, 1, file);
-  }
-  else
-  {
-    PLAYER_WARN("unsupported format for saving");
-  }
-
-  fclose(file);
-  */
-}
+// void CameraInterface::SaveFrame(const char * /*filename*/) const
+// {
+//   /*
+//   int width, height;
+//   FILE *file;
+//
+//   file = fopen(filename, "w+");
+//   if (!file)
+//     return;
+//
+//   width = this->data.width;
+//   height = this->data.height;
+//
+//   int pixelSize = 3;
+//   int rowSize = width * pixelSize;
+//
+//   if (this->data.format == PLAYER_CAMERA_FORMAT_RGB888)
+//   {
+//     // Write ppm
+//     fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
+//     for (int i = 0; i < height; i++)
+//       fwrite(this->data.image + i * rowSize, rowSize, 1, file);
+//   }
+//   else
+//   {
+//     PLAYER_WARN("unsupported format for saving");
+//   }
+//
+//   fclose(file);
+//   */
+// }

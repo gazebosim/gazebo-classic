@@ -63,11 +63,14 @@ echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:161" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
+
+# The follow suppression is useful when checking for missing includes.
+# It's disable for now because checking for missing includes is very
+# time consuming. See CPPCHECK_CMD3.
+echo "missingIncludeSystem" >> $SUPPRESS
 
 #cppcheck
 CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
@@ -85,8 +88,13 @@ CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
 # This command used to be part of the script but was removed since our API
 # provides many functions that Gazebo does not use internally
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
-CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-" $CPPCHECK_INCLUDES --check-config"
+
+# Checking for missing includes is very time consuming. This is disabled
+# for now
+# CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
+# " $CPPCHECK_INCLUDES"
+CPPCHECK_CMD3=""
+
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
   ($CPPCHECK_BASE --xml $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
