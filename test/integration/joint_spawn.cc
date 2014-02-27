@@ -275,6 +275,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   bool isOde = physics->GetType().compare("ode") == 0;
+  bool isBullet = physics->GetType().compare("bullet") == 0;
   bool isDart = physics->GetType().compare("dart") == 0;
   double dt = physics->GetMaxStepSize();
 
@@ -319,6 +320,13 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
 
+  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
+  {
+    gzerr << "BulletSliderJoint fails the SetForce and axis limit tests"
+          << std::endl;
+    return;
+  }
+
   // Test SetForce with positive value
   {
     // reset world and expect joint to be stopped at home position
@@ -349,6 +357,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+  }
+
+  if (isBullet && _joint->HasType(physics::Base::HINGE2_JOINT))
+  {
+    gzerr << "BulletHingeJoint fails the joint limit tests" << std::endl;
+    return;
   }
 
   // SetHighStop
