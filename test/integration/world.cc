@@ -73,7 +73,7 @@ TEST_F(WorldTest, ModifyLight)
 
   // Make sure there is only one light, and it is named "sun"
   EXPECT_EQ(sceneMsg.light_size(), 1);
-  EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "sun");
+  EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
 
   transport::PublisherPtr lightPub = this->node->Advertise<msgs::Light>(
         "~/light");
@@ -101,6 +101,9 @@ TEST_F(WorldTest, ModifyLight)
   msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 0, 1));
   lightMsg.set_type(msgs::Light::POINT);
   lightPub->Publish(lightMsg);
+
+  // Allow the world time to process the messages
+  world->Step(10);
 
   sceneMsg2 = world->GetSceneMsg();
   EXPECT_EQ(sceneMsg2.light_size(), 2);
