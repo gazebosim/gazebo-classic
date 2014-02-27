@@ -50,8 +50,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
           << std::endl;
     return;
   }
-  if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")
-      && (_jointType == "revolute" || _jointType == "prismatic")))
+  if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")))
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine
           << "] with joint type [" << _jointType << "]"
@@ -197,8 +196,11 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT))
           childVelocity = child->GetWorldAngularVel();
-        else if (_joint->HasType(physics::Base::SLIDER_JOINT))
+        else if (_joint->HasType(physics::Base::SLIDER_JOINT)
+              || _joint->HasType(physics::Base::SCREW_JOINT))
+        {
           childVelocity = child->GetWorldLinearVel();
+        }
       }
     }
     {
@@ -207,8 +209,11 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT))
           parentVelocity = parent->GetWorldAngularVel();
-        else if (_joint->HasType(physics::Base::SLIDER_JOINT))
+        else if (_joint->HasType(physics::Base::SLIDER_JOINT)
+              || _joint->HasType(physics::Base::SCREW_JOINT))
+        {
           parentVelocity = parent->GetWorldLinearVel();
+        }
       }
     }
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
@@ -222,7 +227,8 @@ TEST_P(Issue494Test, CheckAxisFrame)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("revolute", "prismatic", "screw")));
+  ::testing::Values("revolute")));
+//  ::testing::Values("revolute", "prismatic", "screw")));
 
 /////////////////////////////////////////////////
 /// Main
