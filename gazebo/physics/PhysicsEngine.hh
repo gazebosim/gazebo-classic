@@ -200,7 +200,7 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -259,13 +259,13 @@ namespace gazebo
       /// \brief Set a parameter of the physics engine
       /// \param[in] _key String key
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(std::string _key,
+      public: virtual void SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(std::string _key) const;
+      public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

@@ -592,7 +592,7 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
+void ODEPhysics::SetMaxContacts(int _maxContacts)
 {
   this->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);

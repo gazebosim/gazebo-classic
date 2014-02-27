@@ -77,7 +77,7 @@ namespace gazebo
       public: virtual ~GpuLaser();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
       public: virtual void Load();

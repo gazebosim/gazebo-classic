@@ -167,7 +167,7 @@ namespace gazebo
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
       // Documentation inherited
-      public: virtual void SetMaxContacts(unsigned int max_contacts);
+      public: virtual void SetMaxContacts(int max_contacts);
 
       // Documentation inherited
       public: virtual double GetWorldCFM();

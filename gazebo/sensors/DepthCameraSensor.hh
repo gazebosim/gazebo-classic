@@ -52,7 +52,7 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       protected: virtual void Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf);
+                                   sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
