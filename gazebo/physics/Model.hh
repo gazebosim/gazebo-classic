@@ -84,6 +84,7 @@ namespace gazebo
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Reset the model.
       public: void Reset();
@@ -364,9 +365,6 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
-
-      /// \brief True if plugins have been loaded.
-      private: bool pluginsLoaded;
     };
     /// \}
   }

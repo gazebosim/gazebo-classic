@@ -89,6 +89,7 @@ namespace gazebo
       /// \brief Update the collision.
       /// \param[in] _info Update information.
       public: void Update(const common::UpdateInfo &_info);
+      using Base::Update;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale to set the link to.
@@ -399,6 +400,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
