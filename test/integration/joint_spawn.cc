@@ -359,7 +359,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
   }
 
-  if (isBullet && _joint->HasType(physics::Base::HINGE2_JOINT))
+  if (isBullet && _joint->HasType(physics::Base::HINGE_JOINT))
   {
     gzerr << "BulletHingeJoint fails the joint limit tests" << std::endl;
     return;
