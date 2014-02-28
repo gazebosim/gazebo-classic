@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,13 @@ TEST_F(ImuSensor_TEST, BasicImuSensorCheckBullet)
 }
 #endif
 
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckDART)
+{
+  BasicImuSensorCheck("dart");
+}
+#endif
+
 // Drop a model with imu sensor and measure its linear acceleration
 void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 {
@@ -123,11 +130,11 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 
   // step world and verify imu's linear acceleration is zero on free fall
-  world->StepWorld(200);
+  world->Step(200);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
-  world->StepWorld(1);
+  world->Step(1);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
@@ -139,7 +146,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   double steps = ceil(dtHit / stepSize);
   EXPECT_GT(steps, 0);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Issue #848
   if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)
@@ -159,6 +166,13 @@ TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
 TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
 {
   LinearAccelerationTest("bullet");
+}
+#endif
+
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, LinearAccelerationTestDART)
+{
+  LinearAccelerationTest("dart");
 }
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,20 @@
 #include <gtest/gtest.h>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(MsgsTest, Msg)
+class MsgsTest : public gazebo::testing::AutoLogFixture { };
+
+void TimeTest(const common::Time &_t, const msgs::Time &_msg)
+{
+  EXPECT_LE(_t.sec, _msg.sec());
+  if (_t.sec == _msg.sec())
+    EXPECT_LE(_t.nsec, _msg.nsec());
+}
+
+TEST_F(MsgsTest, Msg)
 {
   common::Time t = common::Time::GetWallTime();
 
@@ -29,13 +39,12 @@ TEST(MsgsTest, Msg)
   msgs::Init(msg, "_test_");
   msgs::Init(msg2);
 
-  EXPECT_TRUE(msg.header().has_stamp());
-  EXPECT_TRUE(msg2.header().has_stamp());
-
-  EXPECT_EQ(t.sec, msg.header().stamp().sec());
-  EXPECT_TRUE(t.nsec <= msg.header().stamp().nsec());
+  ASSERT_TRUE(msg.header().has_stamp());
+  TimeTest(t, msg.header().stamp());
   EXPECT_STREQ("_test_", msg.header().str_id().c_str());
 
+  ASSERT_TRUE(msg2.header().has_stamp());
+  TimeTest(t, msg2.header().stamp());
   EXPECT_FALSE(msg2.header().has_str_id());
 
   msgs::Header *header = msgs::GetHeader(msg);
@@ -47,7 +56,7 @@ TEST(MsgsTest, Msg)
   EXPECT_STREQ("_hello_", header->str_id().c_str());
 }
 
-TEST(MsgsTest, Request)
+TEST_F(MsgsTest, Request)
 {
   msgs::Request *request = msgs::CreateRequest("help", "me");
   EXPECT_STREQ("help", request->request().c_str());
@@ -55,27 +64,25 @@ TEST(MsgsTest, Request)
   EXPECT_GT(request->id(), 0);
 }
 
-TEST(MsgsTest, Time)
+TEST_F(MsgsTest, Time)
 {
   common::Time t = common::Time::GetWallTime();
   msgs::Time msg;
   msgs::Stamp(&msg);
-  EXPECT_EQ(t.sec, msg.sec());
-  EXPECT_TRUE(t.nsec <= msg.nsec());
+  TimeTest(t, msg);
 }
 
 
-TEST(MsgsTest, TimeFromHeader)
+TEST_F(MsgsTest, TimeFromHeader)
 {
   common::Time t = common::Time::GetWallTime();
   msgs::Header msg;
   msgs::Stamp(&msg);
-  EXPECT_EQ(t.sec, msg.stamp().sec());
-  EXPECT_TRUE(t.nsec <= msg.stamp().nsec());
+  TimeTest(t, msg.stamp());
 }
 
 
-TEST(MsgsTest, Packet)
+TEST_F(MsgsTest, Packet)
 {
   msgs::GzString msg;
   msg.set_data("test_string");
@@ -89,13 +96,13 @@ TEST(MsgsTest, Packet)
   EXPECT_STREQ("test_string", msg.data().c_str());
 }
 
-TEST(MsgsTest, BadPackage)
+TEST_F(MsgsTest, BadPackage)
 {
   msgs::GzString msg;
   EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
 }
 
-TEST(MsgsTest, CovertMathVector3ToMsgs)
+TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
   msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
@@ -103,7 +110,7 @@ TEST(MsgsTest, CovertMathVector3ToMsgs)
   EXPECT_DOUBLE_EQ(3, msg.z());
 }
 
-TEST(MsgsTest, ConvertMsgsVector3dToMath)
+TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 {
   msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
   math::Vector3 v    = msgs::Convert(msg);
@@ -112,7 +119,7 @@ TEST(MsgsTest, ConvertMsgsVector3dToMath)
   EXPECT_DOUBLE_EQ(3, v.z);
 }
 
-TEST(MsgsTest, ConvertMathQuaterionToMsgs)
+TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
   msgs::Quaternion msg =
     msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
@@ -123,7 +130,7 @@ TEST(MsgsTest, ConvertMathQuaterionToMsgs)
   EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
 }
 
-TEST(MsgsTest, ConvertMsgsQuaterionToMath)
+TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 {
   msgs::Quaternion msg =
     msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
@@ -136,7 +143,7 @@ TEST(MsgsTest, ConvertMsgsQuaterionToMath)
   EXPECT_TRUE(math::equal(v.w, 0.27059805007309851));
 }
 
-TEST(MsgsTest, ConvertPoseMathToMsgs)
+TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
   msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
@@ -151,7 +158,7 @@ TEST(MsgsTest, ConvertPoseMathToMsgs)
   EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
 }
 
-TEST(MsgsTest, ConvertMsgPoseToMath)
+TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
   msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
         math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
@@ -166,7 +173,7 @@ TEST(MsgsTest, ConvertMsgPoseToMath)
   EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
 }
 
-TEST(MsgsTest, ConvertCommonColorToMsgs)
+TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
@@ -176,7 +183,7 @@ TEST(MsgsTest, ConvertCommonColorToMsgs)
   EXPECT_TRUE(math::equal(1.0f, msg.a()));
 }
 
-TEST(MsgsTest, ConvertMsgsColorToCommon)
+TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
   common::Color v = msgs::Convert(msg);
@@ -187,7 +194,7 @@ TEST(MsgsTest, ConvertMsgsColorToCommon)
   EXPECT_TRUE(math::equal(1.0f, v.a));
 }
 
-TEST(MsgsTest, ConvertCommonTimeToMsgs)
+TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 {
   msgs::Time msg = msgs::Convert(common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
@@ -198,7 +205,7 @@ TEST(MsgsTest, ConvertCommonTimeToMsgs)
   EXPECT_EQ(123, v.nsec);
 }
 
-TEST(MsgsTest, ConvertMathPlaneToMsgs)
+TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
   msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
         math::Vector2d(123, 456), 1.0));
@@ -211,7 +218,7 @@ TEST(MsgsTest, ConvertMathPlaneToMsgs)
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 }
 
-TEST(MsgsTest, ConvertMsgsPlaneToMath)
+TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
   msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
         math::Vector2d(123, 456), 1.0));
@@ -227,7 +234,7 @@ TEST(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
-TEST(MsgsTest, SetVector3)
+TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
   msgs::Set(&msg, math::Vector3(1, 2, 3));
@@ -236,7 +243,7 @@ TEST(MsgsTest, SetVector3)
   EXPECT_DOUBLE_EQ(3, msg.z());
 }
 
-TEST(MsgsTest, SetVector2d)
+TEST_F(MsgsTest, SetVector2d)
 {
   msgs::Vector2d msg;
   msgs::Set(&msg, math::Vector2d(1, 2));
@@ -244,7 +251,7 @@ TEST(MsgsTest, SetVector2d)
   EXPECT_DOUBLE_EQ(2, msg.y());
 }
 
-TEST(MsgsTest, SetQuaternion)
+TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
   msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
@@ -254,7 +261,7 @@ TEST(MsgsTest, SetQuaternion)
   EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
 }
 
-TEST(MsgsTest, SetPose)
+TEST_F(MsgsTest, SetPose)
 {
   msgs::Pose msg;
   msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
@@ -270,7 +277,7 @@ TEST(MsgsTest, SetPose)
   EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
 }
 
-TEST(MsgsTest, SetColor)
+TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
   msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
@@ -280,7 +287,7 @@ TEST(MsgsTest, SetColor)
   EXPECT_TRUE(math::equal(1.0f, msg.a()));
 }
 
-TEST(MsgsTest, SetTime)
+TEST_F(MsgsTest, SetTime)
 {
   msgs::Time msg;
   msgs::Set(&msg, common::Time(2, 123));
@@ -288,7 +295,7 @@ TEST(MsgsTest, SetTime)
   EXPECT_EQ(123, msg.nsec());
 }
 
-TEST(MsgsTest, SetPlane)
+TEST_F(MsgsTest, SetPlane)
 {
   msgs::PlaneGeom msg;
   msgs::Set(&msg, math::Plane(math::Vector3(0, 0, 1),
@@ -304,7 +311,27 @@ TEST(MsgsTest, SetPlane)
   EXPECT_TRUE(math::equal(1.0, msg.d()));
 }
 
-TEST(MsgsTest, GUIFromSDF)
+TEST_F(MsgsTest, Initialization)
+{
+  {
+    msgs::Vector3d msg;
+    EXPECT_DOUBLE_EQ(0, msg.x());
+    EXPECT_DOUBLE_EQ(0, msg.y());
+    EXPECT_DOUBLE_EQ(0, msg.z());
+  }
+
+  {
+    msgs::Wrench msg;
+    EXPECT_DOUBLE_EQ(0, msg.force().x());
+    EXPECT_DOUBLE_EQ(0, msg.force().y());
+    EXPECT_DOUBLE_EQ(0, msg.force().z());
+    EXPECT_DOUBLE_EQ(0, msg.torque().x());
+    EXPECT_DOUBLE_EQ(0, msg.torque().y());
+    EXPECT_DOUBLE_EQ(0, msg.torque().z());
+  }
+}
+
+TEST_F(MsgsTest, GUIFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
@@ -325,7 +352,7 @@ TEST(MsgsTest, GUIFromSDF)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
-TEST(MsgsTest, GUIFromSDF_EmptyTrackVisual)
+TEST_F(MsgsTest, GUIFromSDF_EmptyTrackVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
@@ -346,7 +373,7 @@ TEST(MsgsTest, GUIFromSDF_EmptyTrackVisual)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
-TEST(MsgsTest, GUIFromSDF_WithEmptyCamera)
+TEST_F(MsgsTest, GUIFromSDF_WithEmptyCamera)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
@@ -360,7 +387,7 @@ TEST(MsgsTest, GUIFromSDF_WithEmptyCamera)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
-TEST(MsgsTest, GUIFromSDF_WithoutCamera)
+TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
@@ -372,7 +399,7 @@ TEST(MsgsTest, GUIFromSDF_WithoutCamera)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
-TEST(MsgsTest, LightFromSDF_ListDirectional)
+TEST_F(MsgsTest, LightFromSDF_ListDirectional)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
@@ -395,7 +422,7 @@ TEST(MsgsTest, LightFromSDF_ListDirectional)
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
-TEST(MsgsTest, LightFromSDF_LightSpot)
+TEST_F(MsgsTest, LightFromSDF_LightSpot)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
@@ -422,7 +449,7 @@ TEST(MsgsTest, LightFromSDF_LightSpot)
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
-TEST(MsgsTest, LightFromSDF_LightPoint)
+TEST_F(MsgsTest, LightFromSDF_LightPoint)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
@@ -443,7 +470,7 @@ TEST(MsgsTest, LightFromSDF_LightPoint)
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
-TEST(MsgsTest, LightFromSDF_LighBadType)
+TEST_F(MsgsTest, LightFromSDF_LighBadType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
@@ -456,7 +483,7 @@ TEST(MsgsTest, LightFromSDF_LighBadType)
 }
 
 // Plane visual
-TEST(MsgsTest, VisualFromSDF_PlaneVisual)
+TEST_F(MsgsTest, VisualFromSDF_PlaneVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -473,7 +500,7 @@ TEST(MsgsTest, VisualFromSDF_PlaneVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_BoxVisual)
+TEST_F(MsgsTest, VisualFromSDF_BoxVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -490,7 +517,7 @@ TEST(MsgsTest, VisualFromSDF_BoxVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_SphereVisual)
+TEST_F(MsgsTest, VisualFromSDF_SphereVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -511,7 +538,7 @@ TEST(MsgsTest, VisualFromSDF_SphereVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_CylinderVisual)
+TEST_F(MsgsTest, VisualFromSDF_CylinderVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -530,7 +557,7 @@ TEST(MsgsTest, VisualFromSDF_CylinderVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_MeshVisual)
+TEST_F(MsgsTest, VisualFromSDF_MeshVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -549,7 +576,7 @@ TEST(MsgsTest, VisualFromSDF_MeshVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_ImageVisual)
+TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -580,7 +607,7 @@ TEST(MsgsTest, VisualFromSDF_ImageVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_HeigthmapVisual)
+TEST_F(MsgsTest, VisualFromSDF_HeigthmapVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -604,7 +631,7 @@ TEST(MsgsTest, VisualFromSDF_HeigthmapVisual)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_NoGeometry)
+TEST_F(MsgsTest, VisualFromSDF_NoGeometry)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -617,7 +644,7 @@ TEST(MsgsTest, VisualFromSDF_NoGeometry)
       common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_ShaderTypeThrow)
+TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -639,7 +666,7 @@ TEST(MsgsTest, VisualFromSDF_ShaderTypeThrow)
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadGeometryVisual)
+TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -658,7 +685,7 @@ TEST(MsgsTest, VisualFromSDF_BadGeometryVisual)
                common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadGeometryType)
+TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
@@ -688,7 +715,7 @@ TEST(MsgsTest, VisualFromSDF_BadGeometryType)
       common::Exception);
 }
 
-TEST(MsgsTest, VisualFromSDF_BadFogType)
+TEST_F(MsgsTest, VisualFromSDF_BadFogType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -706,7 +733,7 @@ TEST(MsgsTest, VisualFromSDF_BadFogType)
   EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_A)
+TEST_F(MsgsTest, VisualSceneFromSDF_A)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -723,7 +750,7 @@ TEST(MsgsTest, VisualSceneFromSDF_A)
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_B)
+TEST_F(MsgsTest, VisualSceneFromSDF_B)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -740,7 +767,7 @@ TEST(MsgsTest, VisualSceneFromSDF_B)
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_C)
+TEST_F(MsgsTest, VisualSceneFromSDF_C)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -759,7 +786,7 @@ TEST(MsgsTest, VisualSceneFromSDF_C)
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_CEmpty)
+TEST_F(MsgsTest, VisualSceneFromSDF_CEmpty)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -771,7 +798,7 @@ TEST(MsgsTest, VisualSceneFromSDF_CEmpty)
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
-TEST(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
+TEST_F(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
@@ -785,7 +812,7 @@ TEST(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
 }
 
 /////////////////////////////////////////////////
-TEST(MsgsTest, MeshFromSDF)
+TEST_F(MsgsTest, MeshFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("geometry.sdf", sdf);

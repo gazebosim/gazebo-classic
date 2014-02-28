@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -642,7 +638,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   if (this->GetJoint(joint->GetScopedName()) != NULL)
   {
     gzerr << "can't have two joint with the same name\n";
-    gzthrow("can't have two joint with the same name");
+    gzthrow("can't have two joints with the same name ["+
+      joint->GetScopedName() + "]\n");
   }
 
   this->joints.push_back(joint);
@@ -827,7 +824,7 @@ void Model::FillMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (!(_msg.has_id() && _msg.id() == this->GetId()))
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
@@ -859,7 +856,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);

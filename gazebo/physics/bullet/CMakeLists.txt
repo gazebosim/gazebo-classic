@@ -9,26 +9,27 @@ link_directories(${BULLET_LIBRARY_DIRS})
 add_definitions(${BULLET_CFLAGS})
 
 set (sources
-  BulletPhysics.cc
-  BulletLink.cc
-  BulletCollision.cc
-  BulletMotionState.cc
-  BulletMeshShape.cc
-  BulletJoint.cc
-  BulletHingeJoint.cc
-  BulletSliderJoint.cc
-  BulletUniversalJoint.cc
   BulletBallJoint.cc
-  BulletHinge2Joint.cc
-  BulletScrewJoint.cc
-  BulletRayShape.cc
-  BulletMultiRayShape.cc
+  BulletCollision.cc
   BulletHeightmapShape.cc
+  BulletHinge2Joint.cc
+  BulletHingeJoint.cc
+  BulletJoint.cc
+  BulletLink.cc
+  BulletMeshShape.cc
+  BulletMotionState.cc
+  BulletMultiRayShape.cc
+  BulletPhysics.cc
+  BulletRayShape.cc
+  BulletScrewJoint.cc
+  BulletSliderJoint.cc
+  BulletSurfaceParams.cc
+  BulletUniversalJoint.cc
 )
 
 set (headers
   bullet_inc.h
-  bullet_math.h
+  bullet_math_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
@@ -38,6 +39,7 @@ set (headers
   BulletHingeJoint.hh
   BulletJoint.hh
   BulletLink.hh
+  BulletMeshShape.hh
   BulletMotionState.hh
   BulletMultiRayShape.hh
   BulletPhysics.hh
@@ -47,7 +49,7 @@ set (headers
   BulletScrewJoint.hh
   BulletSliderJoint.hh
   BulletSphereShape.hh
-  BulletMeshShape.hh
+  BulletSurfaceParams.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
 )
