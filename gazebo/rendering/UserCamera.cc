@@ -316,34 +316,40 @@ void UserCamera::SetViewController(const std::string &type,
 //////////////////////////////////////////////////
 unsigned int UserCamera::GetImageWidth() const
 {
-  return this->viewport->getActualWidth();
+  if (!this->viewports.empty() && this->viewports[0])
+    return this->viewports[0]->getActualWidth();
+  else
+    return Camera::GetImageWidth();
 }
 
 //////////////////////////////////////////////////
 unsigned int UserCamera::GetImageHeight() const
 {
-  return this->viewport->getActualHeight();
+  if (!this->viewports.empty() && this->viewports[0])
+    return this->viewports[0]->getActualHeight();
+  else
+    return Camera::GetImageHeight();
 }
 
 //////////////////////////////////////////////////
 void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
-  if (this->viewport)
+  if (this->viewports[0])
   {
-    this->viewport->setDimensions(0, 0, 1, 1);
-    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
+    this->viewports[0]->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewports[0]->getActualWidth()) /
+                   static_cast<double>(this->viewports[0]->getActualHeight());
 
     double hfov =
       this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->cameras[0]->setAspectRatio(ratio);
+    this->cameras[0]->setFOVy(Ogre::Radian(vfov));
 
     if (this->gui)
     {
-      this->gui->Resize(this->viewport->getActualWidth(),
-                        this->viewport->getActualHeight());
+      this->gui->Resize(this->viewports[0]->getActualWidth(),
+                        this->viewports[0]->getActualHeight());
     }
 
     delete [] this->saveFrameBuffer;
@@ -355,7 +361,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
                                        float /*w_*/, float /*h_*/)
 {
-  // this->viewport->setDimensions(x, y, w, h);
+  // this->viewports[0]->setDimensions(x, y, w, h);
 }
 
 //////////////////////////////////////////////////
@@ -440,7 +446,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
+  double scale = maxSize / tan(this->GetHFOV().Radian()/2.0);
 
   end = mid + dir*(dist - scale);
 
@@ -505,15 +511,15 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewports[0]->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   if (this->gui)
-    this->gui->Init(this->renderTarget);
+    this->gui->Init(this->renderTargets[0]);
 
   this->initialized = true;
 
-  this->selectionBuffer = new SelectionBuffer(this->name,
-      this->scene->GetManager(), this->renderTarget);
+  this->selectionBuffer = new SelectionBuffer(this->cameras[0]->getName(),
+      this->scene->GetManager(), this->renderTargets[0]);
 }
 
 //////////////////////////////////////////////////

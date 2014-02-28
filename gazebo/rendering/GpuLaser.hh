@@ -147,10 +147,6 @@ namespace gazebo
       /// \return True if horizontal, false if not
       public: bool IsHorizontal() const;
 
-      /// \brief Get the horizontal field of view of the laser sensor.
-      /// \return The horizontal field of view of the laser sensor.
-      public: double GetHorzFOV() const;
-
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
       public: double GetCosHorzFOV() const;
@@ -187,17 +183,9 @@ namespace gazebo
       /// \param[in] _far far clip distance
       public: void SetFarClip(double _far);
 
-      /// \brief Set the horizontal fov
-      /// \param[in] _hfov horizontal fov
-      public: void SetHorzFOV(double _hfov);
-
       /// \brief Set the vertical fov
       /// \param[in] _vfov vertical fov
       public: void SetVertFOV(double _vfov);
-
-      /// \brief Get the number of cameras required
-      /// \return Number of cameras needed to generate the rays
-      public: double GetCameraCount() const;
 
       /// \brief Set the number of cameras required
       /// \param[in] _cameraCount The number of cameras required to generate
@@ -263,9 +251,6 @@ namespace gazebo
 
       /// \brief Ray count ratio.
       protected: double rayCountRatio;
-
-      /// \brief Horizontal field-of-view.
-      protected: double hfov;
 
       /// \brief Vertical field-of-view.
       protected: double vfov;

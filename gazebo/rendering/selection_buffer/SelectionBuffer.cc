@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
@@ -27,10 +28,12 @@ using namespace rendering;
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_mgr), renderTarget(_renderTarget), texture(0),
+: sceneMgr(_mgr), renderTarget(_renderTarget), texture(0), renderTexture(0),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);
+  GZ_ASSERT(this->camera, "Unable to get camera for selection buffer");
+
   this->materialSwitchListener = new MaterialSwitcher();
   this->selectionTargetListener = new SelectionRenderListener(
       this->materialSwitchListener);

@@ -170,6 +170,9 @@ void GUIOverlay::CreateWindow(const std::string &/*_type*/,
 bool GUIOverlay::HandleKeyPressEvent(const std::string &_key)
 {
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
+  if (!system)
+    return false;
+
   int unicode = static_cast<int>(_key[0]);
   if (unicode >= 32 && unicode <= 126)
     system->injectChar(unicode);

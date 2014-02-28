@@ -167,8 +167,9 @@ void GpuRaySensor::Init()
     this->laserCam->SetNearClip(this->GetRangeMin());
     this->laserCam->SetFarClip(this->GetRangeMax());
 
-    this->laserCam->SetHorzFOV(
-      (this->GetAngleMax() - this->GetAngleMin()).Radian());
+    this->laserCam->SetHFOV(
+        (this->GetAngleMax() - this->GetAngleMin()).Radian());
+
     this->laserCam->SetVertFOV((this->GetVerticalAngleMax()
             - this->GetVerticalAngleMin()).Radian());
 
@@ -178,30 +179,16 @@ void GpuRaySensor::Init()
     this->laserCam->SetVertHalfAngle((this->GetVerticalAngleMax()
             + this->GetVerticalAngleMin()).Radian() / 2.0);
 
-    if (this->GetHorzFOV() > 2 * M_PI)
-      this->laserCam->SetHorzFOV(2*M_PI);
+    this->horzRayCount /= this->laserCam->GetCameraCount();
 
-    this->laserCam->SetCameraCount(1);
-
-    if (this->GetHorzFOV() > 2.8)
-    {
-      if (this->GetHorzFOV() > 5.6)
-        this->laserCam->SetCameraCount(3);
-      else
-        this->laserCam->SetCameraCount(2);
-    }
-
-    this->laserCam->SetHorzFOV(this->GetHorzFOV() / this->GetCameraCount());
-    this->horzRayCount /= this->GetCameraCount();
-
-    if (this->GetVertFOV() > M_PI / 2)
+    if (this->laserCam->GetVertFOV() > M_PI / 2)
     {
       gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
       this->laserCam->SetVertFOV(M_PI / 2);
       this->SetVerticalAngleMin(this->laserCam->GetVertHalfAngle() -
-                                (this->GetVertFOV() / 2));
+                                (this->laserCam->GetVertFOV() / 2));
       this->SetVerticalAngleMax(this->laserCam->GetVertHalfAngle() +
-                                (this->GetVertFOV() / 2));
+                                (this->laserCam->GetVertFOV() / 2));
     }
 
     if ((this->horzRayCount * this->vertRayCount) <
@@ -211,48 +198,63 @@ void GpuRaySensor::Init()
       this->vertRayCount = std::max(this->vertRayCount, this->vertRangeCount);
     }
 
+    double hfov = this->laserCam->GetCameraHFOV().Radian();
+
     if (this->laserCam->IsHorizontal())
     {
       if (this->vertRayCount > 1)
       {
         this->laserCam->SetCosHorzFOV(
-          2 * atan(tan(this->GetHorzFOV()/2) / cos(this->GetVertFOV()/2)));
-        this->laserCam->SetCosVertFOV(this->GetVertFOV());
+          2 * atan(tan(hfov/2) / cos(this->laserCam->GetVertFOV()/2)));
+        this->laserCam->SetCosVertFOV(this->laserCam->GetVertFOV());
         this->laserCam->SetRayCountRatio(
-          tan(this->GetCosHorzFOV()/2.0) / tan(this->GetVertFOV()/2.0));
+          tan(this->laserCam->GetCosHorzFOV()/2.0) /
+          tan(this->laserCam->GetVertFOV()/2.0));
 
-        if ((this->horzRayCount / this->GetRayCountRatio()) >
+        if ((this->horzRayCount / this->laserCam->GetRayCountRatio()) >
             this->vertRayCount)
-          this->vertRayCount = this->horzRayCount / this->GetRayCountRatio();
+        {
+          this->vertRayCount = this->horzRayCount /
+            this->laserCam->GetRayCountRatio();
+        }
         else
-          this->horzRayCount = this->vertRayCount * this->GetRayCountRatio();
+        {
+          this->horzRayCount = this->vertRayCount *
+            this->laserCam->GetRayCountRatio();
+        }
       }
       else
       {
-        this->laserCam->SetCosHorzFOV(this->GetHorzFOV());
-        this->laserCam->SetCosVertFOV(this->GetVertFOV());
+        this->laserCam->SetCosHorzFOV(hfov);
+        this->laserCam->SetCosVertFOV(this->laserCam->GetVertFOV());
       }
     }
     else
     {
       if (this->horzRayCount > 1)
       {
-        this->laserCam->SetCosHorzFOV(this->GetHorzFOV());
+        this->laserCam->SetCosHorzFOV(hfov);
         this->laserCam->SetCosVertFOV(
-          2 * atan(tan(this->GetVertFOV()/2) / cos(this->GetHorzFOV()/2)));
+          2 * atan(tan(this->laserCam->GetVertFOV()/2) / cos(hfov/2)));
         this->laserCam->SetRayCountRatio(
-          tan(this->GetHorzFOV()/2.0) / tan(this->GetCosVertFOV()/2.0));
+          tan(hfov/2.0) / tan(this->laserCam->GetCosVertFOV()/2.0));
 
-        if ((this->horzRayCount / this->GetRayCountRatio()) >
+        if ((this->horzRayCount / this->laserCam->GetRayCountRatio()) >
             this->vertRayCount)
-          this->vertRayCount = this->horzRayCount / this->GetRayCountRatio();
+        {
+          this->vertRayCount = this->horzRayCount /
+            this->laserCam->GetRayCountRatio();
+        }
         else
-          this->horzRayCount = this->vertRayCount * this->GetRayCountRatio();
+        {
+          this->horzRayCount = this->vertRayCount *
+            this->laserCam->GetRayCountRatio();
+        }
       }
       else
       {
-        this->laserCam->SetCosHorzFOV(this->GetHorzFOV());
-        this->laserCam->SetCosVertFOV(this->GetVertFOV());
+        this->laserCam->SetCosHorzFOV(hfov);
+        this->laserCam->SetCosVertFOV(this->laserCam->GetVertFOV());
       }
     }
 
@@ -260,7 +262,8 @@ void GpuRaySensor::Init()
     this->cameraElem.reset(new sdf::Element);
     sdf::initFile("camera.sdf", this->cameraElem);
 
-    this->cameraElem->GetElement("horizontal_fov")->Set(this->GetCosHorzFOV());
+    this->cameraElem->GetElement("horizontal_fov")->Set(
+        this->laserCam->GetCosHorzFOV());
 
     sdf::ElementPtr ptr = this->cameraElem->GetElement("image");
     ptr->GetElement("width")->Set(this->horzRayCount);
@@ -318,6 +321,12 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 }
 
 //////////////////////////////////////////////////
+const rendering::GpuLaserPtr GpuRaySensor::GetCamera() const
+{
+  return this->laserCam;
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
 {
   this->laserCam->DisconnectNewLaserFrame(_conn);
@@ -350,7 +359,7 @@ double GpuRaySensor::GetVertHalfAngle() const
 //////////////////////////////////////////////////
 double GpuRaySensor::GetHorzFOV() const
 {
-  return this->laserCam->GetHorzFOV();
+  return this->laserCam->GetCameraHFOV().Radian();
 }
 
 //////////////////////////////////////////////////

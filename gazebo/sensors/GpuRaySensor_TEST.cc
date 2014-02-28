@@ -69,7 +69,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.7554);
 
   EXPECT_TRUE(sensor->IsActive());
-  EXPECT_TRUE(sensor->IsHorizontal());
+  ASSERT_TRUE(sensor->GetCamera());
+  EXPECT_TRUE(sensor->GetCamera()->IsHorizontal());
 
   // listen to new laser frames
   float *scan = new float[sensor->GetRayCount()

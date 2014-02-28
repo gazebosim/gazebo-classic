@@ -136,10 +136,7 @@ namespace gazebo
       /// \param[in] _visualName Name of the visual to move the camera to.
       public: void MoveToVisual(const std::string &_visualName);
 
-      /// \brief Set to true to enable rendering
-      ///
-      /// Use this only if you really know what you're doing.
-      /// \param[in] _target The new rendering target.
+      // Documentation inherited.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
       /// \brief Get the GUI overlay

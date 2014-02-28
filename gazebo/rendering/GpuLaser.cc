@@ -96,8 +96,8 @@ void GpuLaser::Fini()
 //////////////////////////////////////////////////
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
-  this->camera->yaw(Ogre::Radian(this->horzHalfAngle));
-  this->camera->pitch(Ogre::Radian(this->vertHalfAngle));
+  this->cameras[0]->yaw(Ogre::Radian(this->horzHalfAngle));
+  this->cameras[0]->pitch(Ogre::Radian(this->vertHalfAngle));
 
   this->CreateOrthoCam();
 
@@ -105,17 +105,17 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   if (this->textureCount == 2)
   {
-    cameraYaws[0] = -this->hfov/2;
-    cameraYaws[1] = +this->hfov;
-    cameraYaws[2] = 0;
-    cameraYaws[3] = -this->hfov/2;
+    this->cameraYaws[0] = -(this->cameraFOV/2.0).Radian();
+    this->cameraYaws[1] = +this->cameraFOV.Radian();
+    this->cameraYaws[2] = 0;
+    this->cameraYaws[3] = -(this->cameraFOV/2.0).Radian();
   }
   else
   {
-    cameraYaws[0] = -this->hfov;
-    cameraYaws[1] = +this->hfov;
-    cameraYaws[2] = +this->hfov;
-    cameraYaws[3] = -this->hfov;
+    this->cameraYaws[0] = -this->cameraFOV.Radian();
+    this->cameraYaws[1] = +this->cameraFOV.Radian();
+    this->cameraYaws[2] = +this->cameraFOV.Radian();
+    this->cameraYaws[3] = -this->cameraFOV.Radian();
   }
 
   for (unsigned int i = 0; i < this->textureCount; ++i)
@@ -355,7 +355,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(this->currentTarget);
   autoParamDataSource.setCurrentSceneManager(this->scene->GetManager());
-  autoParamDataSource.setCurrentCamera(this->camera, true);
+  autoParamDataSource.setCurrentCamera(this->cameras[0], true);
 
   pass->_updateAutoParams(&autoParamDataSource,
       Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
@@ -400,7 +400,7 @@ void GpuLaser::RenderImpl()
     this->currentTarget = this->firstPassTargets[i];
 
     this->UpdateRenderTarget(this->firstPassTargets[i],
-                  this->matFirstPass, this->camera);
+                  this->matFirstPass, this->cameras[0]);
     this->firstPassTargets[i]->update(false);
   }
 
@@ -493,7 +493,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   {
     // Setup the viewport to use the texture
     this->firstPassViewports[_index] =
-      this->firstPassTargets[_index]->addViewport(this->camera);
+      this->firstPassTargets[_index]->addViewport(this->cameras[0]);
     this->firstPassViewports[_index]->setClearEveryFrame(true);
     this->firstPassViewports[_index]->setOverlaysEnabled(false);
     this->firstPassViewports[_index]->setShadowsEnabled(false);
@@ -505,8 +505,8 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   }
   if (_index == 0)
   {
-    this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
+    this->cameras[0]->setAspectRatio(this->rayCountRatio);
+    this->cameras[0]->setFOVy(Ogre::Radian(this->vfov));
   }
 }
 
@@ -584,8 +584,8 @@ void GpuLaser::CreateMesh()
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + vAngMin;
     for (unsigned int i = 0; i < this->w2nd; ++i)
     {
-      double thfov = this->textureCount * this->hfov;
-      double theta = this->hfov / 2;
+      double thfov = this->textureCount * (*this->cameraFOV);
+      double theta = (*this->cameraFOV) / 2.0;
       double delta = ((thfov / (this->w2nd - 1)) * i);
 
       unsigned int texture = delta / (theta*2);
@@ -708,21 +708,9 @@ bool GpuLaser::IsHorizontal() const
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetHorzFOV() const
-{
-  return this->hfov;
-}
-
-//////////////////////////////////////////////////
 double GpuLaser::GetVertFOV() const
 {
   return this->vfov;
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::SetHorzFOV(double _hfov)
-{
-  this->hfov = _hfov;
 }
 
 //////////////////////////////////////////////////
@@ -779,17 +767,6 @@ void GpuLaser::SetFarClip(double _far)
   this->far = _far;
 }
 
-//////////////////////////////////////////////////
-double GpuLaser::GetCameraCount() const
-{
-  return this->cameraCount;
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::SetCameraCount(double _cameraCount)
-{
-  this->cameraCount = _cameraCount;
-}
 //////////////////////////////////////////////////
 double GpuLaser::GetRayCountRatio() const
 {

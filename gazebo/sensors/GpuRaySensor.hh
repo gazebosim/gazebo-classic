@@ -187,21 +187,32 @@ namespace gazebo
       /// \return Fiducial value of ray
       public: int GetFiducial(int _index) const;
 
-      /// \brief Gets the camera count
-      /// \return Number of cameras
-      public: unsigned int GetCameraCount() const;
+      /// Deprecated
+      public: unsigned int GetCameraCount() const GAZEBO_DEPRECATED(1.10);
 
-      /// \brief Gets if sensor is horizontal
-      /// \return True if horizontal, false if not
-      public: bool IsHorizontal() const;
+      /// Deprecated
+      public: bool IsHorizontal() const GAZEBO_DEPRECATED(1.10);
 
-      /// \brief Return the ratio of horizontal ray count to vertical ray
-      /// count.
-      ///
-      /// A ray count is the number of simulated rays. Whereas a range count
-      /// is the total number of data points returned. When range count
-      /// != ray count, then values are interpolated between rays.
-      public: double GetRayCountRatio() const;
+      /// Deprecated
+      public: double GetRayCountRatio() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetHorzFOV() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetCosHorzFOV() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetVertFOV() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetCosVertFOV() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetHorzHalfAngle() const GAZEBO_DEPRECATED(1.10);
+
+      /// Deprecated
+      public: double GetVertHalfAngle() const GAZEBO_DEPRECATED(1.10);
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -211,28 +222,6 @@ namespace gazebo
       /// != ray count, then values are interpolated between rays.
       public: double GetRangeCountRatio() const;
 
-      /// \brief Get the horizontal field of view of the laser sensor.
-      /// \return The horizontal field of view of the laser sensor.
-      public: double GetHorzFOV() const;
-
-      /// \brief Get Cos Horz field-of-view
-      /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
-      public: double GetCosHorzFOV() const;
-
-      /// \brief Get the vertical field-of-view.
-      public: double GetVertFOV() const;
-
-      /// \brief Get Cos Vert field-of-view
-      /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
-      public: double GetCosVertFOV() const;
-
-      /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
-      /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
-      public: double GetHorzHalfAngle() const;
-
-      /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \return (vertical_max_angle + vertical_min_angle) * 0.5
-      public: double GetVertHalfAngle() const;
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.
@@ -246,6 +235,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive();
+
+      /// \brief Get a pointer to the camera used to render the laser data.
+      /// \return Pointer to a rendering::GpuLaser camera.
+      public: const rendering::GpuLaserPtr GetCamera() const;
 
       /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;

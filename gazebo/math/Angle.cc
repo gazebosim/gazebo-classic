@@ -109,6 +109,24 @@ Angle Angle::operator/(const Angle &angle) const
 }
 
 //////////////////////////////////////////////////
+Angle Angle::operator/(const double &_angle) const
+{
+  return this->value / _angle;
+}
+
+//////////////////////////////////////////////////
+Angle Angle::operator-() const
+{
+  return -this->value;
+}
+
+//////////////////////////////////////////////////
+Angle Angle::operator+() const
+{
+  return +this->value;
+}
+
+//////////////////////////////////////////////////
 Angle Angle::operator-=(const Angle &angle)
 {
   this->value -= angle.value;
@@ -134,6 +152,12 @@ Angle Angle::operator/=(const Angle &angle)
 {
   this->value /= angle.value;
   return *this;
+}
+
+//////////////////////////////////////////////////
+bool Angle::operator ==(const double &_angle) const
+{
+  return equal(this->value, _angle, 0.001);
 }
 
 //////////////////////////////////////////////////
@@ -164,6 +188,12 @@ bool Angle::operator<=(const Angle &angle) const
 bool Angle::operator>(const Angle &angle) const
 {
   return this->value > angle.value;
+}
+
+//////////////////////////////////////////////////
+bool Angle::operator>(const double &_value) const
+{
+  return this->value > _value;
 }
 
 //////////////////////////////////////////////////

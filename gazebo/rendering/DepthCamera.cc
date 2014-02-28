@@ -139,7 +139,9 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
     this->pcdTarget = this->pcdTexture->getBuffer()->getRenderTarget();
     this->pcdTarget->setAutoUpdated(false);
 
-    this->pcdViewport = this->pcdTarget->addViewport(this->camera);
+    /// \todo: This is set to work with only one of the cameras. Which means
+    /// that the DepthCamera is limited to a FoV < 180 degrees.
+    this->pcdViewport = this->pcdTarget->addViewport(this->cameras[0]);
     this->pcdViewport->setClearEveryFrame(true);
     this->pcdViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
@@ -151,7 +153,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());
 
     this->pcdMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(
-              this->renderTexture->getName());
+              this->renderTextures[0]->getName());
 
     this->pcdMaterial->load();
   }
@@ -258,7 +260,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  this->GetOgreCamera()->setFarClipDistance(this->GetFarClip());
+  this->GetOgreCamera(0)->setFarClipDistance(this->GetFarClip());
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -277,15 +279,15 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(_target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
-  autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+  autoParamDataSource.setCurrentCamera(this->GetOgreCamera(0), true);
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
 
   // These two lines don't seem to do anything useful
   renderSys->_setProjectionMatrix(
-      this->GetOgreCamera()->getProjectionMatrixRS());
-  renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
+      this->GetOgreCamera(0)->getProjectionMatrixRS());
+  renderSys->_setViewMatrix(this->GetOgreCamera(0)->getViewMatrix(true));
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   pass->_updateAutoParamsNoLights(&autoParamDataSource);
@@ -374,7 +376,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
   if (this->depthTarget)
   {
     // Setup the viewport to use the texture
-    this->depthViewport = this->depthTarget->addViewport(this->camera);
+    this->depthViewport = this->depthTarget->addViewport(this->cameras[0]);
     this->depthViewport->setClearEveryFrame(true);
     this->depthViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
@@ -387,7 +389,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->cameras[0]->setAspectRatio(ratio);
+    this->cameras[0]->setFOVy(Ogre::Radian(vfov));
   }
 }

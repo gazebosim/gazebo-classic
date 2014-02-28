@@ -64,8 +64,8 @@ TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
     laserCam->SetIsHorizontal(false);
     EXPECT_FALSE(laserCam->IsHorizontal());
 
-    laserCam->SetHorzFOV(2.4);
-    EXPECT_NEAR(laserCam->GetHorzFOV(), 2.4, 1e-6);
+    laserCam->SetHFOV(2.4);
+    EXPECT_NEAR(laserCam->GetHFOV().Radian(), 2.4, 1e-6);
 
     laserCam->SetVertFOV(1.0);
     EXPECT_NEAR(laserCam->GetVertFOV(), 1.0, 1e-6);
@@ -78,9 +78,6 @@ TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
 
     laserCam->SetRayCountRatio(0.344);
     EXPECT_NEAR(laserCam->GetRayCountRatio(), 0.344, 1e-6);
-
-    laserCam->SetCameraCount(4);
-    EXPECT_EQ(static_cast<int>(laserCam->GetCameraCount()), 4);
   }
 }
 

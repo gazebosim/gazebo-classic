@@ -109,6 +109,7 @@ void CameraSensor::Init()
       }
     }
 
+    printf("CameraSensor CreateCamera\n");
     this->camera = this->scene->CreateCamera(
         this->sdf->Get<std::string>("name"), false);
 
@@ -120,6 +121,8 @@ void CameraSensor::Init()
     this->camera->SetCaptureData(true);
 
     sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+
+    printf("CameraSensor LoadCamera\n");
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks
@@ -129,7 +132,10 @@ void CameraSensor::Init()
       gzthrow("image has zero size");
     }
 
+    printf("CameraSensor InitCamera\n");
     this->camera->Init();
+
+    printf("CameraSensor CreateRenderTexture\n");
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))

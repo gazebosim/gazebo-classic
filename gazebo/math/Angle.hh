@@ -24,6 +24,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <boost/math/special_functions/round.hpp>
 
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
@@ -99,9 +100,14 @@ namespace gazebo
     /// \brief Normalize the angle in the range -Pi to Pi
     public: void Normalize();
 
+    // public: operator double() const { return value; }
+
+    // public: operator int() const { return boost::math::round(value); }
+
     /// \brief Dereference operator
     /// \return Double containing the angle's radian value
     public: inline double operator*() const { return value; }
+
     /// \brief Substraction, result = this - _angle
     /// \param[in] _angle Angle for substraction
     /// \return the new angle
@@ -121,6 +127,19 @@ namespace gazebo
     /// \param[in] _angle Angle for division
     /// \return the new angle
     public: Angle operator/(const Angle &_angle) const;
+
+    /// \brief Division, result = this / _angle
+    /// \param[in] _angle Angle for division
+    /// \return the new angle
+    public: Angle operator/(const double &_angle) const;
+
+    /// \brief Negative unary operator.
+    /// \return Negation of current angle value.
+    public: Angle operator-() const;
+
+    /// \brief Positive unary operator.
+    /// \return Postive of current angle value.
+    public: Angle operator+() const;
 
     /// \brief Subtraction set, this = this - _angle
     /// \param[in] _angle Angle for subtraction
@@ -147,6 +166,11 @@ namespace gazebo
     /// \return true if this == _angle
     public: bool operator ==(const Angle &_angle) const;
 
+    /// \brief Equality operator, result = this == _angle.
+    /// \param[in] _angle Angle, in radians, to check for equality.
+    /// \return true if this == _angle.
+    public: bool operator ==(const double &_angle) const;
+
     /// \brief Inequality
     /// \param[in] _angle Angle to check for inequality
     /// \return true if this != _angle
@@ -166,6 +190,11 @@ namespace gazebo
     /// \param[in] _angle Angle to check
     /// \return true if this > _angle
     public: bool operator>(const Angle &_angle) const;
+
+    /// \brief Greater than operator.
+    /// \param[in] _value Angle to check in radians.
+    /// \return true if this > _angle.
+    public: bool operator>(const double &_value) const;
 
     /// \brief Greater or equal operator
     /// \param[in] _angle Angle to check

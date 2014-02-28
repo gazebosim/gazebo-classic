@@ -61,6 +61,13 @@ namespace gazebo
     public: Quaternion(const double &_roll, const double &_pitch,
                         const double &_yaw);
 
+    /// \brief Constructor from Euler angles in radians
+    /// \param[in] _roll  roll
+    /// \param[in] _pitch pitch
+    /// \param[in] _yaw   yaw
+    public: Quaternion(const math::Angle &_roll, const math::Angle &_pitch,
+                        const math::Angle &_yaw);
+
     /// \brief Constructor from axis angle
     /// \param[in] _axis the rotation axis
     /// \param[in] _angle the rotation angle in radians

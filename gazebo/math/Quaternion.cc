@@ -48,6 +48,13 @@ Quaternion::Quaternion(const double &_roll, const double &_pitch,
 }
 
 //////////////////////////////////////////////////
+Quaternion::Quaternion(const math::Angle &_roll, const math::Angle &_pitch,
+                       const math::Angle &_yaw)
+{
+  this->SetFromEuler(Vector3(_roll.Radian(), _pitch.Radian(), _yaw.Radian()));
+}
+
+//////////////////////////////////////////////////
 Quaternion::Quaternion(const Vector3 &_rpy)
 {
   this->SetFromEuler(_rpy);

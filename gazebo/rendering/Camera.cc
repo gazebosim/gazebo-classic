@@ -34,6 +34,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -123,14 +124,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   stream << _namePrefix << "(" << this->cameraCounter++ << ")";
   this->name = stream.str();
 
-  this->renderTarget = NULL;
-  this->renderTexture = NULL;
-
   this->captureData = false;
   this->captureDataOnce = false;
-
-  this->camera = NULL;
-  this->viewport = NULL;
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
@@ -155,6 +150,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
+  
+  this->cameraCount = 1;
 }
 
 //////////////////////////////////////////////////
@@ -166,16 +163,12 @@ Camera::~Camera()
   this->pitchNode = NULL;
   this->sceneNode = NULL;
 
-  if (this->renderTexture && this->scene->GetInitialized())
-    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
-  this->renderTexture = NULL;
-  this->renderTarget = NULL;
-
-  if (this->camera)
+  for (std::vector<Ogre::Camera *>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter)
   {
-    this->scene->GetManager()->destroyCamera(this->name);
-    this->camera = NULL;
+    this->scene->GetManager()->destroyCamera((*iter)->getName());
   }
+  this->cameras.clear();
 
   this->connections.clear();
 
@@ -220,7 +213,7 @@ void Camera::Load()
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
     double angle = elem->Get<double>();
-    if (angle < 0.01 || angle > M_PI)
+    if (angle < 0.01)
     {
       gzthrow("Camera horizontal field of view invalid.");
     }
@@ -257,15 +250,19 @@ void Camera::Init()
       this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
         this->GetName() + "_SceneNode"));
 
-  this->CreateCamera();
+  this->CreateCameras();
 
   // Create a scene node to control pitch motion
   this->pitchNode =
     this->sceneNode->createChildSceneNode(this->name + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
 
-  this->pitchNode->attachObject(this->camera);
-  this->camera->setAutoAspectRatio(true);
+  for (std::vector<Ogre::Camera*>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter)
+  {
+    this->pitchNode->attachObject(*iter);
+    (*iter)->setAutoAspectRatio(true);
+  }
 
   this->sceneNode->setInheritScale(false);
   this->pitchNode->setInheritScale(false);
@@ -284,10 +281,33 @@ void Camera::Fini()
       this->gaussianNoiseCompositorListener.get());
   }
 
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  for (std::vector<Ogre::Viewport*>::iterator iter = this->viewports.begin();
+      iter != this->viewports.end(); ++iter)
+  {
+    RTShaderSystem::DetachViewport(*iter, this->scene);
+  }
 
-  if (this->renderTarget && this->scene->GetInitialized())
-    this->renderTarget->removeAllViewports();
+  if (this->scene->GetInitialized())
+  {
+    for (std::vector<Ogre::RenderTarget *>::iterator iter =
+        this->renderTargets.begin(); iter != this->renderTargets.end();
+        ++iter)
+    {
+      if (*iter)
+        (*iter)->removeAllViewports();
+    }
+
+    for (std::vector<Ogre::Texture *>::iterator iter =
+        this->renderTextures.begin(); iter != this->renderTextures.end();
+        ++iter)
+    {
+      if (*iter)
+        Ogre::TextureManager::getSingleton().remove((*iter)->getName());
+    }
+  }
+
+  this->renderTextures.clear();
+  this->renderTargets.clear();
 
   this->connections.clear();
 }
@@ -430,13 +450,16 @@ void Camera::Render()
 //////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
-  if (this->renderTarget)
+  for (std::vector<Ogre::RenderTarget *>::iterator iter =
+      this->renderTargets.begin(); iter != this->renderTargets.end();
+      ++iter)
   {
     // Render, but don't swap buffers.
-    this->renderTarget->update(false);
-
-    this->lastRenderWallTime = common::Time::GetWallTime();
+    (*iter)->update(false);
   }
+
+  if (!this->renderTargets.empty())
+    this->lastRenderWallTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -448,8 +471,43 @@ common::Time Camera::GetLastRenderWallTime()
 //////////////////////////////////////////////////
 void Camera::PostRender()
 {
-  this->renderTarget->swapBuffers();
+  size_t size;
+  unsigned int width = this->cameraImageWidth;
+  unsigned int height = this->cameraImageHeight;
 
+  // Get access to the buffer and make an image and write it to file
+  size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+      static_cast<Ogre::PixelFormat>(this->imageFormat));
+
+  // Allocate buffer
+  if (!this->saveFrameBuffer)
+    this->saveFrameBuffer = new unsigned char[size];
+
+  int i = 0;
+  for (std::vector<Ogre::RenderTarget *>::iterator iter =
+      this->renderTargets.begin(); iter != this->renderTargets.end();
+      ++iter, ++i)
+  {
+    (*iter)->swapBuffers();
+
+    memset(this->saveFrameBuffer, 128, size);
+
+    Ogre::PixelBox box(width, height, 1,
+        static_cast<Ogre::PixelFormat>(this->imageFormat),
+        this->saveFrameBuffer);
+
+    /// \todo: Fix the line below.
+    this->viewports[i]->getTarget()->copyContentsToMemory(box);
+
+    std::string filename = str(boost::format("/tmp/camera/frame_%d_%d.jpg")
+        % this->saveCount % i);
+
+    this->SaveFrame(this->saveFrameBuffer, this->cameraImageWidth,
+        this->cameraImageHeight,this->GetImageDepth(),this->GetImageFormat(),
+        filename);
+  }
+
+  /*
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
@@ -470,7 +528,8 @@ void Camera::PostRender()
         static_cast<Ogre::PixelFormat>(this->imageFormat),
         this->saveFrameBuffer);
 
-    this->viewport->getTarget()->copyContentsToMemory(box);
+    /// \todo: Fix the line below.
+    this->viewports[0]->getTarget()->copyContentsToMemory(box);
 
     if (this->captureDataOnce)
     {
@@ -504,7 +563,10 @@ void Camera::PostRender()
 
     this->newImageFrame(buffer, width, height, this->GetImageDepth(),
                     this->GetImageFormat());
-  }
+  }*/
+
+  /// \todo: Remove this line when submittin pull request for fisheye.
+  this->saveCount++;
 
   this->newData = false;
 }
@@ -595,17 +657,17 @@ void Camera::RotatePitch(math::Angle _angle)
 void Camera::SetClipDist()
 {
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+
   if (!clipElem)
     gzthrow("Camera has no <clip> tag.");
 
-  if (this->camera)
+  for (std::vector<Ogre::Camera*>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter)
   {
-    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
-    this->camera->setRenderingDistance(clipElem->Get<double>("far"));
+    (*iter)->setNearClipDistance(clipElem->Get<double>("near"));
+    (*iter)->setFarClipDistance(clipElem->Get<double>("far"));
+    (*iter)->setRenderingDistance(clipElem->Get<double>("far"));
   }
-  else
-    gzerr << "Setting clip distances failed -- no camera yet\n";
 }
 
 //////////////////////////////////////////////////
@@ -622,6 +684,27 @@ void Camera::SetClipDist(float _near, float _far)
 //////////////////////////////////////////////////
 void Camera::SetHFOV(math::Angle _angle)
 {
+  if (_angle > M_PI * 2)
+    _angle = M_PI * 2;
+
+  // Compute the number of cameras required to render the field of view
+  if (_angle.Radian() >= 5.6)
+    this->cameraCount = 3;
+  else if (_angle.Radian() >=2.8)
+    this->cameraCount = 2;
+  else
+    this->cameraCount = 1;
+
+  this->cameraFOV = _angle.Radian() / this->cameraCount;
+
+  /// \todo: This will likely cause rounding issues
+  this->cameraImageWidth = this->GetImageWidth() / this->cameraCount;
+  this->cameraImageHeight = this->GetImageHeight();// / this->cameraCount;
+
+  std::cout << "HFOV[" << _angle << "] CameraCount["
+    << this->cameraCount << "] CameraFOV[" << this->cameraFOV << "] WxH["
+    << this->cameraImageWidth << " " << this->cameraImageHeight << "]\n";
+
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
 }
 
@@ -632,9 +715,19 @@ math::Angle Camera::GetHFOV() const
 }
 
 //////////////////////////////////////////////////
+math::Angle Camera::GetCameraHFOV() const
+{
+  return this->cameraFOV;
+}
+
+//////////////////////////////////////////////////
 math::Angle Camera::GetVFOV() const
 {
-  return math::Angle(this->camera->getFOVy().valueRadians());
+  if (!this->cameras.empty() && this->cameras[0])
+    return math::Angle(this->cameras[0]->getFOVy().valueRadians());
+  else
+    gzerr << "Cameras have not been created\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -661,33 +754,15 @@ void Camera::SetImageHeight(unsigned int _h)
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  unsigned int width = 0;
-  if (this->viewport)
-  {
-    width = this->viewport->getActualWidth();
-  }
-  else
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("image");
-    width = elem->Get<int>("width");
-  }
-  return width;
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  return elem->Get<int>("width");
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  unsigned int height = 0;
-  if (this->viewport)
-  {
-    height = this->viewport->getActualHeight();
-  }
-  else
-  {
-    sdf::ElementPtr elem = this->sdf->GetElement("image");
-    height = elem->Get<int>("height");
-  }
-  return height;
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  return elem->Get<int>("height");
 }
 
 //////////////////////////////////////////////////
@@ -721,15 +796,29 @@ std::string Camera::GetImageFormat() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Camera::GetTextureWidth() const
+unsigned int Camera::GetTextureWidth(unsigned int _i) const
 {
-  return this->renderTexture->getBuffer(0, 0)->getWidth();
+  unsigned int result = 0;
+
+  if (_i < this->renderTextures.size())
+    result = this->renderTextures[_i]->getBuffer(0, 0)->getWidth();
+  else
+    gzerr << "Invalid texture index[" << _i << "]\n";
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-unsigned int Camera::GetTextureHeight() const
+unsigned int Camera::GetTextureHeight(unsigned int _i) const
 {
-  return this->renderTexture->getBuffer(0, 0)->getHeight();
+  unsigned int result = 0;
+
+  if (_i < this->renderTextures.size())
+    result = this->renderTextures[_i]->getBuffer(0, 0)->getHeight();
+  else
+    gzerr << "Invalid texture index[" << _i << "]\n";
+
+  return result;
 }
 
 
@@ -810,22 +899,32 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
 }
 
 //////////////////////////////////////////////////
-Ogre::Camera *Camera::GetOgreCamera() const
+Ogre::Camera *Camera::GetOgreCamera(unsigned int _i) const
 {
-  return this->camera;
+  if (_i < this->cameras.size())
+    return this->cameras[_i];
+  else
+    gzerr << "Invalid camera index[" << _i << "]\n";
+
+  return NULL;
 }
 
 //////////////////////////////////////////////////
-Ogre::Viewport *Camera::GetViewport() const
+Ogre::Viewport *Camera::GetViewport(unsigned int _i) const
 {
-  return this->viewport;
+  if (_i < this->viewports.size())
+    return this->viewports[_i];
+  else
+    gzerr << "Invalid viewport index[" << _i << "]\n";
+
+  return NULL;
 }
 
 //////////////////////////////////////////////////
 double Camera::GetNearClip()
 {
-  if (this->camera)
-    return this->camera->getNearClipDistance();
+  if (!this->cameras.empty() && this->cameras[0])
+    return this->cameras[0]->getNearClipDistance();
   else
     return 0;
 }
@@ -833,8 +932,8 @@ double Camera::GetNearClip()
 //////////////////////////////////////////////////
 double Camera::GetFarClip()
 {
-  if (this->camera)
-    return this->camera->getFarClipDistance();
+  if (!this->cameras.empty() && this->cameras[0])
+    return this->cameras[0]->getFarClipDistance();
   else
     return 0;
 }
@@ -842,10 +941,10 @@ double Camera::GetFarClip()
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportWidth() const
 {
-  if (this->renderTarget)
-    return this->renderTarget->getViewport(0)->getActualWidth();
-  else if (this->camera && this->camera->getViewport())
-    return this->camera->getViewport()->getActualWidth();
+  if (!this->renderTargets.empty() && this->renderTargets[0])
+    return this->renderTargets[0]->getViewport(0)->getActualWidth();
+  else if (this->cameras[0] && this->cameras[0]->getViewport())
+    return this->cameras[0]->getViewport()->getActualWidth();
   else
     return 0;
 }
@@ -853,37 +952,53 @@ unsigned int Camera::GetViewportWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportHeight() const
 {
-  if (this->renderTarget)
-    return this->renderTarget->getViewport(0)->getActualHeight();
-  else if (this->camera && this->camera->getViewport())
-    return this->camera->getViewport()->getActualHeight();
+  if (!this->renderTargets.empty() && this->renderTargets[0])
+    return this->renderTargets[0]->getViewport(0)->getActualHeight();
+  else if (this->cameras[0] && this->cameras[0]->getViewport())
+    return this->cameras[0]->getViewport()->getActualHeight();
   else
     return 0;
 }
 
 //////////////////////////////////////////////////
-void Camera::SetAspectRatio(float ratio)
+void Camera::SetAspectRatio(float _ratio)
 {
-  this->camera->setAspectRatio(ratio);
+  for (std::vector<Ogre::Camera*>::iterator iter = this->cameras.begin();
+       iter != this->cameras.end(); ++iter)
+  {
+    (*iter)->setAspectRatio(_ratio);
+  }
 }
 
 //////////////////////////////////////////////////
 float Camera::GetAspectRatio() const
 {
-  return this->camera->getAspectRatio();
+  if (!this->cameras.empty() && this->cameras[0])
+    return this->cameras[0]->getAspectRatio();
+  else
+    gzerr << "Camera's have not been created\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Camera::GetUp()
 {
-  Ogre::Vector3 up = this->camera->getRealUp();
+  Ogre::Vector3 up(0, 0, 1);
+
+  if (!this->cameras.empty() && this->cameras[0])
+    up = this->cameras[0]->getRealUp();
+
   return math::Vector3(up.x, up.y, up.z);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Camera::GetRight()
 {
-  Ogre::Vector3 right = this->camera->getRealRight();
+  Ogre::Vector3 right(0, 1, 0);
+  
+  if (!this->cameras.empty() && this->cameras[0])
+    right = this->cameras[0]->getRealRight();
+
   return math::Vector3(right.x, right.y, right.z);
 }
 
@@ -1027,42 +1142,51 @@ bool Camera::SaveFrame(const unsigned char *_image,
 //////////////////////////////////////////////////
 void Camera::ToggleShowWireframe()
 {
-  if (this->camera)
+  if (!this->cameras.empty() && this->cameras[0])
   {
-    if (this->camera->getPolygonMode() == Ogre::PM_WIREFRAME)
-      this->camera->setPolygonMode(Ogre::PM_SOLID);
+    if (this->cameras[0]->getPolygonMode() == Ogre::PM_WIREFRAME)
+      this->cameras[0]->setPolygonMode(Ogre::PM_SOLID);
     else
-      this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
+      this->cameras[0]->setPolygonMode(Ogre::PM_WIREFRAME);
   }
 }
 
 //////////////////////////////////////////////////
 void Camera::ShowWireframe(bool s)
 {
-  if (this->camera)
+  if (!this->cameras.empty() && this->cameras[0])
   {
     if (s)
     {
-      this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
+      this->cameras[0]->setPolygonMode(Ogre::PM_WIREFRAME);
     }
     else
     {
-      this->camera->setPolygonMode(Ogre::PM_SOLID);
+      this->cameras[0]->setPolygonMode(Ogre::PM_SOLID);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
+bool Camera::GetCameraToViewportRay(int _screenx, int _screeny,
                                     math::Vector3 &_origin,
                                     math::Vector3 &_dir)
 {
-  Ogre::Ray ray = this->camera->getCameraToViewportRay(
-      static_cast<float>(_screenx) / this->GetViewportWidth(),
-      static_cast<float>(_screeny) / this->GetViewportHeight());
+  bool result = false;
 
-  _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
-  _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+  if (!this->cameras.empty() && this->cameras[0])
+  {
+    Ogre::Ray ray;
+    ray = this->cameras[0]->getCameraToViewportRay(
+        static_cast<float>(_screenx) / this->GetViewportWidth(),
+        static_cast<float>(_screeny) / this->GetViewportHeight());
+
+    _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+    _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+    result = true;
+  }
+
+  return result;
 }
 
 
@@ -1185,20 +1309,61 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::CreateRenderTexture(const std::string &textureName)
+void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  // Create the render texture
-  this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName,
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(),
-      this->GetImageHeight(),
-      0,
-      (Ogre::PixelFormat)this->imageFormat,
-      Ogre::TU_RENDERTARGET)).getPointer();
+  GZ_ASSERT(!_textureName.empty(), "Texture name cannot be empty");
 
-  this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+  // Create the render texture
+  this->renderTextures.push_back(
+    (Ogre::TextureManager::getSingleton().createManual(
+        _textureName,
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(),
+        this->GetImageHeight(),
+        0,
+        (Ogre::PixelFormat)this->imageFormat,
+        Ogre::TU_RENDERTARGET)).getPointer());
+
+  std::cout << "Camera::CreateRenderTexture WH[" << 
+      this->GetImageWidth() << " " << this->GetImageHeight() << "]\n";
+
+  // Create a render texure and render target for each OGRE camera.
+  for (unsigned int i = 0; i < this->cameraCount; ++i)
+  {
+    this->SetRenderTarget(
+        this->renderTextures[i]->getBuffer()->getRenderTarget());
+  }
+
+  // If multiple cameras are required in order to render the entire field of
+  // view, then we need a second pass texture that will hold the combined
+  // camera images.
+  if (this->cameraCount > 1)
+  {
+    printf("Create second texture\n");
+    this->renderTextures.push_back(
+        Ogre::TextureManager::getSingleton().createManual(
+          _textureName + "second_pass",
+          "General",
+          Ogre::TEX_TYPE_2D,
+          this->GetImageWidth(), this->GetImageHeight(), 0,
+          Ogre::PF_FLOAT32_RGB,
+          Ogre::TU_RENDERTARGET).getPointer());
+
+    /*
+    this->viewports.push_back(
+        this->renderTextures.back()->addViewport(this->orthoCam));
+    this->viewports.back()->setClearEveryFrame(true);
+    this->viewports.back()->setOverlaysEnabled(false);
+    this->viewports.back()->setShadowsEnabled(false);
+    this->viewports.back()->setSkiesEnabled(false);
+    this->viewports.back()->setBackgroundColour(
+        Ogre::ColourValue(0.0, 1.0, 0.0));
+    this->viewports.back()->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        */
+  }
+
   this->initialized = true;
 }
 
@@ -1211,15 +1376,35 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-  this->camera = this->scene->GetManager()->createCamera(this->name);
+  this->CreateCameras();
+}
 
-  // Use X/Y as horizon, Z up
-  this->camera->pitch(Ogre::Degree(90));
+//////////////////////////////////////////////////
+void Camera::CreateCameras()
+{
+  Ogre::Camera *camera;
 
-  // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  math::Angle yaw = (this->cameraFOV - this->GetHFOV()) / 2.0;
 
-  this->camera->setDirection(1, 0, 0);
+  for (unsigned int i = 0; i < this->cameraCount; ++i)
+  {
+    camera = this->scene->GetManager()->createCamera(
+        this->name + boost::lexical_cast<std::string>(i));
+
+    // Use X/Y as horizon, Z up
+    camera->pitch(Ogre::Degree(90));
+
+    // Don't yaw along variable axis, causes leaning
+    camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+
+    camera->setDirection(1, 0, 0);
+
+    std::cout << "Camera[" << i << "] Yaw[" << yaw << "]\n";
+    camera->yaw(Ogre::Radian(yaw.Radian()));
+
+    this->cameras.push_back(camera);
+    yaw += this->cameraFOV.Radian();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1246,87 +1431,100 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 //////////////////////////////////////////////////
 void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
-  this->renderTarget = _target;
+  //if (_index > this->renderTargets.size())
+  //  gzerr << "Invalid render target index[" << _index << "]\n";
 
-  if (this->renderTarget)
+  //if (_index == this->renderTargets.size())
+    this->renderTargets.push_back(_target);
+  //else
+  //  this->renderTargets[_index] = _target;
+
+  if (this->renderTargets[0])
   {
-    // Setup the viewport to use the texture
-    this->viewport = this->renderTarget->addViewport(this->camera);
-    this->viewport->setClearEveryFrame(true);
-    this->viewport->setShadowsEnabled(true);
-
-    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
-
-    this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
-    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
-
-    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
-
-    double hfov = this->GetHFOV().Radian();
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
-
-    // Setup Deferred rendering for the camera
-    if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+    for (unsigned int i = 0; i < this->cameraCount; ++i)
     {
-      // Deferred shading GBuffer compositor
-      this->dsGBufferInstance =
-        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-            "DeferredShading/GBuffer");
+      // Setup the viewport to use the texture
+      this->viewports.push_back(this->renderTargets[0]->addViewport(
+            this->cameras[i],
+            i/static_cast<double>(this->cameraCount), 0, 0.5, 1.0));
+      this->viewports[i]->setClearEveryFrame(true);
+      this->viewports[i]->setShadowsEnabled(true);
 
-      // Deferred lighting GBuffer compositor
-      this->dlGBufferInstance =
-        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-            "DeferredLighting/GBuffer");
+      RTShaderSystem::AttachViewport(this->viewports[i], this->GetScene());
 
-      // Deferred shading: Merging compositor
-      this->dsMergeInstance =
-        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-            "DeferredShading/ShowLit");
+      this->viewports[i]->setBackgroundColour(
+          Conversions::Convert(this->scene->GetBackgroundColor()));
+      this->viewports[i]->setVisibilityMask(
+          GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-      // Deferred lighting: Merging compositor
-      this->dlMergeInstance =
-        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-            "DeferredLighting/ShowLit");
+      double ratio =
+        static_cast<double>(this->viewports[i]->getActualWidth()) /
+        static_cast<double>(this->viewports[i]->getActualHeight());
 
-      // Screen space ambient occlusion
-      // this->ssaoInstance =
-      //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-      //      "DeferredShading/SSAO");
+      double hfov = this->cameraFOV.Radian();
+      double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+      this->cameras[i]->setAspectRatio(ratio);
+      this->cameras[i]->setFOVy(Ogre::Radian(vfov));
 
-      this->dsGBufferInstance->setEnabled(false);
-      this->dsMergeInstance->setEnabled(false);
-
-      this->dlGBufferInstance->setEnabled(true);
-      this->dlMergeInstance->setEnabled(true);
-
-      // this->ssaoInstance->setEnabled(false);
-    }
-
-    // Noise
-    if (this->noiseActive)
-    {
-      switch (this->noiseType)
+      // Setup Deferred rendering for the camera
+      if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
       {
-        case GAUSSIAN:
-          this->gaussianNoiseInstance =
-            Ogre::CompositorManager::getSingleton().addCompositor(
-              this->viewport, "CameraNoise/Gaussian");
-          this->gaussianNoiseInstance->setEnabled(true);
-          // gaussianNoiseCompositorListener was allocated in Load()
-          this->gaussianNoiseInstance->addListener(
-            this->gaussianNoiseCompositorListener.get());
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
+        // Deferred shading GBuffer compositor
+        this->dsGBufferInstance =
+          Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewports[i], "DeferredShading/GBuffer");
+
+        // Deferred lighting GBuffer compositor
+        this->dlGBufferInstance =
+          Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewports[i], "DeferredLighting/GBuffer");
+
+        // Deferred shading: Merging compositor
+        this->dsMergeInstance =
+          Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewports[i], "DeferredShading/ShowLit");
+
+        // Deferred lighting: Merging compositor
+        this->dlMergeInstance =
+          Ogre::CompositorManager::getSingleton().addCompositor(
+              this->viewports[i], "DeferredLighting/ShowLit");
+
+        // Screen space ambient occlusion
+        // this->ssaoInstance =
+        //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+        //      "DeferredShading/SSAO");
+
+        this->dsGBufferInstance->setEnabled(false);
+        this->dsMergeInstance->setEnabled(false);
+
+        this->dlGBufferInstance->setEnabled(true);
+        this->dlMergeInstance->setEnabled(true);
+
+        // this->ssaoInstance->setEnabled(false);
+      }
+
+      // Noise
+      if (this->noiseActive)
+      {
+        switch (this->noiseType)
+        {
+          case GAUSSIAN:
+            this->gaussianNoiseInstance =
+              Ogre::CompositorManager::getSingleton().addCompositor(
+                  this->viewports[i], "CameraNoise/Gaussian");
+            this->gaussianNoiseInstance->setEnabled(true);
+            // gaussianNoiseCompositorListener was allocated in Load()
+            this->gaussianNoiseInstance->addListener(
+                this->gaussianNoiseCompositorListener.get());
+            break;
+          default:
+            GZ_ASSERT(false, "Invalid noise model type");
+        }
       }
     }
 
     if (this->GetScene()->skyx != NULL)
-      this->renderTarget->addListener(this->GetScene()->skyx);
+      this->renderTargets[0]->addListener(this->GetScene()->skyx);
   }
 }
 
@@ -1422,28 +1620,45 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
 }
 
 //////////////////////////////////////////////////
-Ogre::Texture *Camera::GetRenderTexture() const
+Ogre::Texture *Camera::GetRenderTexture(unsigned int _i) const
 {
-  return this->renderTexture;
+  if (_i < this->renderTextures.size())
+    return this->renderTextures[_i];
+  else
+    gzerr << "Invalid render texture index[" << _i << "]\n";
+  return NULL;
 }
 
 /////////////////////////////////////////////////
-math::Vector3 Camera::GetDirection() const
+math::Vector3 Camera::GetDirection(unsigned int _i) const
 {
-  return Conversions::Convert(this->camera->getDerivedDirection());
+  math::Vector3 result;
+  if (_i < this->cameras.size())
+    result = Conversions::Convert(this->cameras[_i]->getDerivedDirection());
+  else
+    gzerr << "Invalid camera index[" << _i << "]\n";
+
+  return result;
 }
 
 /////////////////////////////////////////////////
 bool Camera::IsVisible(VisualPtr _visual)
 {
-  if (this->camera && _visual)
+  if (_visual)
   {
-    math::Box bbox = _visual->GetBoundingBox();
+    math::Box bbox;
     Ogre::AxisAlignedBox box;
-    box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
-    box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
 
-    return this->camera->isVisible(box);
+    for (std::vector<Ogre::Camera*>::iterator iter = this->cameras.begin();
+         iter != this->cameras.end(); ++iter)
+    {
+      bbox = _visual->GetBoundingBox();
+      box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
+      box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
+
+      if ((*iter)->isVisible(box))
+        return true;
+    }
   }
 
   return false;
@@ -1629,4 +1844,10 @@ bool Camera::IsInitialized() const
 bool Camera::GetInitialized() const
 {
   return this->initialized && this->scene->GetInitialized();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::GetCameraCount() const
+{
+  return this->cameraCount;
 }

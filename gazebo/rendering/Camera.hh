@@ -218,8 +218,9 @@ namespace gazebo
       public: virtual unsigned int GetImageWidth() const;
 
       /// \brief Get the width of the off-screen render texture
+      /// \param[in] _i Index of the render texture.
       /// \return Render texture width
-      public: unsigned int GetTextureWidth() const;
+      public: unsigned int GetTextureWidth(unsigned int _i=0) const;
 
       /// \brief Get the height of the image
       /// \return Image height
@@ -234,8 +235,9 @@ namespace gazebo
       public: std::string GetImageFormat() const;
 
       /// \brief Get the height of the off-screen render texture
+      /// \param[in] _i Index of the render texture.
       /// \return Render texture height
-      public: unsigned int GetTextureHeight() const;
+      public: unsigned int GetTextureHeight(unsigned int _i=0) const;
 
       /// \brief Get the image size in bytes
       /// \return Size in bytes
@@ -278,13 +280,15 @@ namespace gazebo
       /// \return True if saving was successful
       public: bool SaveFrame(const std::string &_filename);
 
-      /// \brief Get a pointer to the ogre camera
-      /// \return Pointer to the OGRE camera
-      public: Ogre::Camera *GetOgreCamera() const;
+      /// \brief Get a pointer to the ogre camera.
+      /// \param[in] _i Index of the camera.
+      /// \return Pointer to the OGRE camera, NULL if _i is invalid.
+      public: Ogre::Camera *GetOgreCamera(unsigned int _i=0) const;
 
-      /// \brief Get a pointer to the Ogre::Viewport
-      /// \return Pointer to the Ogre::Viewport
-      public: Ogre::Viewport *GetViewport() const;
+      /// \brief Get a pointer to the Ogre::Viewport.
+      /// \param[in] _i Index of the viewport.
+      /// \return Pointer to the Ogre::Viewport, NULL if _i is invalid.
+      public: Ogre::Viewport *GetViewport(unsigned int _i = 0) const;
 
       /// \brief Get the viewport width in pixels
       /// \return The viewport width
@@ -359,7 +363,8 @@ namespace gazebo
       /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
-      public: void GetCameraToViewportRay(int _screenx, int _screeny,
+      /// \return True if successful.
+      public: bool GetCameraToViewportRay(int _screenx, int _screeny,
                                           math::Vector3 &_origin,
                                           math::Vector3 &_dir);
 
@@ -387,7 +392,7 @@ namespace gazebo
       public: bool GetWorldPointOnPlane(int _x, int _y,
                   const math::Plane &_plane, math::Vector3 &_result);
 
-      /// \brief Set the camera's render target
+      /// \brief Set the camera's render target.
       /// \param[in] _target Pointer to the render target
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
@@ -407,13 +412,15 @@ namespace gazebo
       /// \param[in] _visualName Name of the visual to track
       public: void TrackVisual(const std::string &_visualName);
 
-      /// \brief Get the render texture
-      /// \return Pointer to the render texture
-      public: Ogre::Texture *GetRenderTexture() const;
+      /// \brief Get the render texture.
+      /// \param[in] _i Index of the render texture.
+      /// \return Pointer to the render texture, NULL if _i is invalid.
+      public: Ogre::Texture *GetRenderTexture(unsigned int _i = 0) const;
 
       /// \brief Get the camera's direction vector
+      /// \param[in] _i Index of the camera.
       /// \return Direction the camera is facing
-      public: math::Vector3 GetDirection() const;
+      public: math::Vector3 GetDirection(unsigned int _i = 0) const;
 
       /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
@@ -483,6 +490,13 @@ namespace gazebo
       /// \return Path to saved screenshots.
       public: std::string GetScreenshotPath() const;
 
+      /// \brief Get the number of OGRE cameras.
+      public: unsigned int GetCameraCount() const;
+
+      /// \brief Get the horizontal field of view for each OGRE camera.
+      /// \return Horizontal field of view for each OGRE camera.
+      public: math::Angle GetCameraHFOV() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -551,9 +565,11 @@ namespace gazebo
       /// \return Integer representation of the Ogre image format
       private: static int GetOgrePixelFormat(const std::string &_format);
 
+      /// \brief Deprecated.
+      private: void CreateCamera() GAZEBO_DEPRECATED(1.10);
 
-      /// \brief Create the ogre camera.
-      private: void CreateCamera();
+      /// \brief Create the ogre cameras.
+      private: void CreateCameras();
 
       /// \brief Name of the camera.
       protected: std::string name;
@@ -570,11 +586,11 @@ namespace gazebo
       /// \brief Height of the render texture.
       protected: unsigned int textureHeight;
 
-      /// \brief The OGRE camera
-      protected: Ogre::Camera *camera;
+      /// \brief The OGRE cameras
+      protected: std::vector<Ogre::Camera *> cameras;
 
       /// \brief Viewport the ogre camera uses.
-      protected: Ogre::Viewport *viewport;
+      protected: std::vector<Ogre::Viewport *> viewports;
 
       /// \brief Scene node that controls camera position.
       protected: Ogre::SceneNode *sceneNode;
@@ -604,10 +620,10 @@ namespace gazebo
       protected: int imageHeight;
 
       /// \brief Target that renders frames.
-      protected: Ogre::RenderTarget *renderTarget;
+      protected: std::vector<Ogre::RenderTarget *> renderTargets;
 
       /// \brief Texture that receives results from rendering.
-      protected: Ogre::Texture *renderTexture;
+      protected: std::vector<Ogre::Texture *> renderTextures;
 
       /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
@@ -646,6 +662,18 @@ namespace gazebo
 
       /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
+
+      /// \brief Number of cameras required to render the view.
+      protected: unsigned int cameraCount;
+
+      /// \brief Field of view for each camera.
+      protected: math::Angle cameraFOV;
+
+      /// \brief Width in pixels of the image for each camera.
+      protected: uint32_t cameraImageWidth;
+
+      /// \brief Height in pixels of the image for each camera.
+      protected: uint32_t cameraImageHeight;
 
       /// \brief Pointer to image SDF element.
       private: sdf::ElementPtr imageElem;
