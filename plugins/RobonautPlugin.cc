@@ -84,33 +84,83 @@ void RobonautPlugin::Restart()
 /////////////////////////////////////////////////
 void RobonautPlugin::SetRightFingers(double _angle)
 {
-  /*this->jointController->SetPositionTarget("atlas::right_f0_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::right_f0_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::right_f1_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::right_f1_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::right_f2_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::right_f2_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::right_f3_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::right_f3_j2", _angle);*/
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/index/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/index/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/index/joint2", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/right_arm/hand/index/joint3", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/middle/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/middle/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/middle/joint2", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/right_arm/hand/middle/joint3", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/little/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/little/joint1", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/right_arm/hand/little/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/ring/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/ring/joint1", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/right_arm/hand/ring/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/thumb/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/thumb/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/thumb/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/right_arm/hand/thumb/joint3", _angle);
 }
 
 /////////////////////////////////////////////////
 void RobonautPlugin::SetLeftFingers(double _angle)
 {
-  /*this->jointController->SetPositionTarget("atlas::left_f0_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::left_f0_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::left_f1_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::left_f1_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::left_f2_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::left_f2_j2", _angle);
-
-  this->jointController->SetPositionTarget("atlas::left_f3_j1", _angle);
-  this->jointController->SetPositionTarget("atlas::left_f3_j2", _angle);*/
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/index/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/index/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/index/joint2", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/left_arm/hand/index/joint3", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/middle/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/middle/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/middle/joint2", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/left_arm/hand/middle/joint3", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/little/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/little/joint1", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/left_arm/hand/little/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/ring/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/ring/joint1", _angle);
+  //this->jointController->SetPositionTarget(
+  //    "r2::/r2/left_arm/hand/ring/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/thumb/joint0", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/thumb/joint1", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/thumb/joint2", _angle);
+  this->jointController->SetPositionTarget(
+      "r2::/r2/left_arm/hand/thumb/joint3", _angle);
 }
 
 /////////////////////////////////////////////////
@@ -180,51 +230,78 @@ void RobonautPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->pinJoint->SetLowerLimit(0,0);
   this->pinJoint->Init();
 
-  /*std::vector<std::string> rightHandJoints;
-  rightHandJoints.push_back("right_f0_j0");
-  rightHandJoints.push_back("right_f0_j1");
-  rightHandJoints.push_back("right_f0_j2");
-  rightHandJoints.push_back("right_f1_j0");
-  rightHandJoints.push_back("right_f1_j1");
-  rightHandJoints.push_back("right_f1_j2");
-  rightHandJoints.push_back("right_f2_j0");
-  rightHandJoints.push_back("right_f2_j1");
-  rightHandJoints.push_back("right_f2_j2");
-  rightHandJoints.push_back("right_f3_j0");
-  rightHandJoints.push_back("right_f3_j1");
-  rightHandJoints.push_back("right_f3_j2");
-
+  std::vector<std::string> rightHandJoints;
+  rightHandJoints.push_back("/r2/right_arm/hand/index/joint0");
+  rightHandJoints.push_back("/r2/right_arm/hand/index/joint1");
+  rightHandJoints.push_back("/r2/right_arm/hand/index/joint2");
+  rightHandJoints.push_back("/r2/right_arm/hand/index/joint3");
+  rightHandJoints.push_back("/r2/right_arm/hand/middle/joint0");
+  rightHandJoints.push_back("/r2/right_arm/hand/middle/joint1");
+  rightHandJoints.push_back("/r2/right_arm/hand/middle/joint2");
+  rightHandJoints.push_back("/r2/right_arm/hand/middle/joint3");
+  rightHandJoints.push_back("/r2/right_arm/hand/little/joint0");
+  rightHandJoints.push_back("/r2/right_arm/hand/little/joint1");
+  rightHandJoints.push_back("/r2/right_arm/hand/little/joint2");
+  rightHandJoints.push_back("/r2/right_arm/hand/ring/joint0");
+  rightHandJoints.push_back("/r2/right_arm/hand/ring/joint1");
+  rightHandJoints.push_back("/r2/right_arm/hand/ring/joint2");
+  rightHandJoints.push_back("/r2/right_arm/hand/thumb/joint0");
+  rightHandJoints.push_back("/r2/right_arm/hand/thumb/joint1");
+  rightHandJoints.push_back("/r2/right_arm/hand/thumb/joint2");
+  rightHandJoints.push_back("/r2/right_arm/hand/thumb/joint3");
+  
   std::vector<std::string> leftHandJoints;
-  leftHandJoints.push_back("left_f0_j0");
-  leftHandJoints.push_back("left_f0_j1");
-  leftHandJoints.push_back("left_f0_j2");
-  leftHandJoints.push_back("left_f1_j0");
-  leftHandJoints.push_back("left_f1_j1");
-  leftHandJoints.push_back("left_f1_j2");
-  leftHandJoints.push_back("left_f2_j0");
-  leftHandJoints.push_back("left_f2_j1");
-  leftHandJoints.push_back("left_f2_j2");
-  leftHandJoints.push_back("left_f3_j0");
-  leftHandJoints.push_back("left_f3_j1");
-  leftHandJoints.push_back("left_f3_j2");
+  leftHandJoints.push_back("/r2/left_arm/hand/index/joint0");
+  leftHandJoints.push_back("/r2/left_arm/hand/index/joint1");
+  leftHandJoints.push_back("/r2/left_arm/hand/index/joint2");
+  leftHandJoints.push_back("/r2/left_arm/hand/index/joint3");
+  leftHandJoints.push_back("/r2/left_arm/hand/middle/joint0");
+  leftHandJoints.push_back("/r2/left_arm/hand/middle/joint1");
+  leftHandJoints.push_back("/r2/left_arm/hand/middle/joint2");
+  leftHandJoints.push_back("/r2/left_arm/hand/middle/joint3");
+  leftHandJoints.push_back("/r2/left_arm/hand/little/joint0");
+  leftHandJoints.push_back("/r2/left_arm/hand/little/joint1");
+  leftHandJoints.push_back("/r2/left_arm/hand/little/joint2");
+  leftHandJoints.push_back("/r2/left_arm/hand/ring/joint0");
+  leftHandJoints.push_back("/r2/left_arm/hand/ring/joint1");
+  leftHandJoints.push_back("/r2/left_arm/hand/ring/joint2");
+  leftHandJoints.push_back("/r2/left_arm/hand/thumb/joint0");
+  leftHandJoints.push_back("/r2/left_arm/hand/thumb/joint1");
+  leftHandJoints.push_back("/r2/left_arm/hand/thumb/joint2");
+  leftHandJoints.push_back("/r2/left_arm/hand/thumb/joint3");
 
   for (std::vector<std::string>::iterator iter = rightHandJoints.begin();
       iter != rightHandJoints.end(); ++iter)
   {
-    this->jointController->SetPositionPID("atlas::" + *iter,
-        common::PID(80.5, 0.1, 2.1));
+    this->jointController->SetPositionPID("r2::" + *iter,
+        common::PID(3.0, 0.0, 0.1));
 
-    this->jointController->SetPositionTarget("atlas::" + *iter, 0);
+    this->jointController->SetPositionTarget("r2::" + *iter, 0);
   }
 
   for (std::vector<std::string>::iterator iter = leftHandJoints.begin();
       iter != leftHandJoints.end(); ++iter)
   {
-    this->jointController->SetPositionPID("atlas::" + *iter,
-        common::PID(80.5, 0.1, 2.1));
+    this->jointController->SetPositionPID("r2::" + *iter,
+        common::PID(3.0, 0.0, 0.1));
 
-    this->jointController->SetPositionTarget("atlas::" + *iter, 0);
-  }*/
+    this->jointController->SetPositionTarget("r2::" + *iter, 0);
+  }
+
+  this->jointController->SetPositionPID(
+      "r2::/r2/right_arm/hand/thumb/joint1",
+      common::PID(0.5, 0.0, 0.1));
+  this->jointController->SetPositionPID(
+      "r2::/r2/left_arm/hand/thumb/joint1",
+      common::PID(0.5, 0.0, 0.1));
+   this->jointController->SetPositionPID(
+      "r2::/r2/right_arm/hand/thumb/joint2",
+      common::PID(0.5, 0.0, 0.1));
+  this->jointController->SetPositionPID(
+      "r2::/r2/left_arm/hand/thumb/joint2",
+      common::PID(0.5, 0.0, 0.1));
+ 
+
 
   this->rightBumper = false;
   this->leftBumper = false;
