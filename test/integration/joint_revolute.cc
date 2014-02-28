@@ -130,7 +130,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
 
   // Step forward 0.75 seconds
   double dt = physics->GetMaxStepSize();
-  EXPECT_GT(dt, 0);
+  ASSERT_GT(dt, 0);
   int steps = ceil(0.75 / dt);
   world->Step(steps);
 
