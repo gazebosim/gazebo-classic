@@ -474,17 +474,44 @@ namespace gazebo
       /// \brief Get joint stop stiffness.
       /// \param[in] _index joint axis index.
       /// \return joint stop stiffness coefficient.
-      public: double GetStopStiffness(unsigned int _index);
+      public: double GetStopStiffness(unsigned int _index) const;
 
       /// \brief Get joint stop dissipation.
       /// \param[in] _index joint axis index.
       /// \return joint stop dissipation coefficient.
-      public: double GetStopDissipation(unsigned int _index);
+      public: double GetStopDissipation(unsigned int _index) const;
 
       /// \brief Get initial Anchor Pose specified by model
       /// <joint><pose>...</pose></joint>
       /// \return Joint::anchorPose, initial joint anchor pose.
-      public: math::Pose GetInitialAnchorPose();
+      public: math::Pose GetInitialAnchorPose() const;
+
+      /// \brief Get pose of joint frame relative to world frame.
+      /// Note that the joint frame is defined with a fixed offset from
+      /// the child link frame.
+      /// \return Pose of joint frame relative to world frame.
+      public: math::Pose GetWorldPose() const;
+
+      /// \brief Get anchor pose on parent link relative to world frame.
+      /// When there is zero joint error, this should match the value
+      /// returned by Joint::GetWorldPose() for the constrained degrees
+      /// of freedom.
+      /// \return Anchor pose on parent link in world frame.
+      public: math::Pose GetParentWorldPose() const;
+
+      /// \brief Get pose offset between anchor pose on child and parent,
+      /// expressed in the parent link frame. This can be used to compute
+      /// the bilateral constraint error.
+      /// \return Pose offset between anchor pose on child and parent,
+      /// in parent link frame.
+      public: math::Pose GetAnchorErrorPose() const;
+
+      /// \brief Get orientation of reference frame for specified axis,
+      /// relative to world frame. The value of axisParentModelFrame
+      /// is used to determine the appropriate frame.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to world frame.
+      public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -520,6 +547,9 @@ namespace gazebo
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
       protected: math::Pose anchorPose;
+
+      /// \brief Anchor pose relative to parent link frame.
+      protected: math::Pose parentAnchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
@@ -565,6 +595,11 @@ namespace gazebo
       /// Deprecated, pushing this flag into individual physics engine,
       /// for example: ODEJoint::useImplicitSpringDamper.
       protected: bool useCFMDamping;
+
+      /// \brief Flags that are set to true if an axis value is expressed
+      /// in the parent model frame. Otherwise use the joint frame.
+      /// See issue #494.
+      protected: bool axisParentModelFrame[MAX_JOINT_AXIS];
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

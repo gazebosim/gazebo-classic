@@ -216,7 +216,6 @@ bool Video::GetNextFrame(unsigned char **_buffer)
 
   if (packet.stream_index == this->videoStream)
   {
-    int processedLength = 0;
     tmpPacket.data = packet.data;
     tmpPacket.size = packet.size;
 
@@ -224,7 +223,7 @@ bool Video::GetNextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
-      processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
+      int processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
           &frameAvailable, &tmpPacket);
       if (processedLength < 0)
       {

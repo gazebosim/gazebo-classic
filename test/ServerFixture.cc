@@ -61,28 +61,26 @@ ServerFixture::ServerFixture()
       TEST_INTEGRATION_PATH);
 
   // Add local search paths
-  std::string path = TEST_INTEGRATION_PATH;
-  path += "/../..";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  boost::filesystem::path path;
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../sdf";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../gazebo";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  path /= "gazebo";
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../build/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+  path = PROJECT_BINARY_PATH;
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../build/test/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+  path = PROJECT_BINARY_PATH;
+  path /= "test";
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
   path = TEST_PATH;
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 }
 
 /////////////////////////////////////////////////
@@ -347,13 +345,12 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
     unsigned int _sampleCount, float &_diffMax,
     float &_diffSum, float &_diffAvg)
 {
-  float diff;
   _diffMax = 0;
   _diffSum = 0;
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
+    double diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
@@ -369,13 +366,12 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     unsigned int _sampleCount, double &_diffMax,
     double &_diffSum, double &_diffAvg)
 {
-  double diff;
   _diffMax = 0;
   _diffSum = 0;
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
+    double diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)

@@ -201,6 +201,13 @@ void SonarSensor::Init()
 //////////////////////////////////////////////////
 void SonarSensor::Fini()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(this->sonarCollision->GetScopedName());
+  }
+
   this->sonarPub.reset();
   this->contactSub.reset();
   Sensor::Fini();

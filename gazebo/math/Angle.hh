@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Angle class
- * Author: Nate Koenig
- * Date: 18 Aug 2008
- */
 
 #ifndef _ANGLE_HH_
 #define _ANGLE_HH_
