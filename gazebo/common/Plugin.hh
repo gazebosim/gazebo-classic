@@ -79,12 +79,12 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-               // dlclose has been disabled due to segfaults in the test suite
-               // This workaround is detailed in #1026 and #1066. After the test
-               // or gazebo execution the plugin is not loaded in memory anymore
-               // \todo Figure out the right thing to do.
+              // dlclose has been disabled due to segfaults in the test suite
+              // This workaround is detailed in #1026 and #1066. After the test
+              // or gazebo execution the plugin is not loaded in memory anymore
+              // \todo Figure out the right thing to do.
 
-               // dlclose(this->dlHandle);
+              // dlclose(this->dlHandle);
             }
 
     /// \brief Get the name of the handler
