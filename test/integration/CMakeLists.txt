@@ -56,6 +56,7 @@ set(tests
   surface_properties.cc
   transceiver.cc
   world.cc
+  worlds_installed.cc
   )
 
 if (MANPAGES_SUPPORT)
