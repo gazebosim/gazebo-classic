@@ -88,6 +88,9 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, false);
@@ -321,6 +324,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // Take a step and verify that Joint::GetVelocity returns the same value
     world->Step(1);
+    EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
+
+    // Take more steps and verify that it keeps spinning at same speed
+    world->Step(50);
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
 
