@@ -49,8 +49,11 @@ namespace gazebo
     private: void UpdateStates(const common::UpdateInfo &_info);
 
 
-    private: void FixLink(physics::LinkPtr link);
-    private: void UnfixLink();
+    // This function is commented out because it is not used.
+    // private: void FixLink(physics::LinkPtr link);
+
+    // This function is commented out because it is not used.
+    // private: void UnfixLink();
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;

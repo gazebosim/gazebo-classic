@@ -488,6 +488,20 @@ namespace gazebo
       /// \return Pose of joint frame relative to world frame.
       public: math::Pose GetWorldPose() const;
 
+      /// \brief Get anchor pose on parent link relative to world frame.
+      /// When there is zero joint error, this should match the value
+      /// returned by Joint::GetWorldPose() for the constrained degrees
+      /// of freedom.
+      /// \return Anchor pose on parent link in world frame.
+      public: math::Pose GetParentWorldPose() const;
+
+      /// \brief Get pose offset between anchor pose on child and parent,
+      /// expressed in the parent link frame. This can be used to compute
+      /// the bilateral constraint error.
+      /// \return Pose offset between anchor pose on child and parent,
+      /// in parent link frame.
+      public: math::Pose GetAnchorErrorPose() const;
+
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
       /// is used to determine the appropriate frame.
@@ -529,6 +543,9 @@ namespace gazebo
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
       protected: math::Pose anchorPose;
+
+      /// \brief Anchor pose relative to parent link frame.
+      protected: math::Pose parentAnchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;

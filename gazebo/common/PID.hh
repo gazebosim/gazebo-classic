@@ -129,6 +129,12 @@ namespace gazebo
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
                 this->cmdMax = _p.cmdMax;
+                this->cmdMin = _p.cmdMin;
+                this->pErrLast = _p.pErrLast;
+                this->pErr = _p.pErr;
+                this->iErr = _p.iErr;
+                this->dErr = _p.dErr;
+                this->cmd = _p.cmd;
 
                 this->Reset();
                 return *this;

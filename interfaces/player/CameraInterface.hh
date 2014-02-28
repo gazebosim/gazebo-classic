@@ -59,7 +59,8 @@ class GAZEBO_VISIBLE CameraInterface : public GazeboInterface
   private: void OnImage(ConstImageStampedPtr &_msg);
 
   /// Save a camera frame
-  private: void SaveFrame(const char *filename) const;
+  /// This function is commented out because it's not used.
+  /// private: void SaveFrame(const char *filename) const;
 
   /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: std::string cameraName;

@@ -340,6 +340,7 @@ void MapShape::BuildTree(QuadNode *_node)
     float newX, newY;
     float newW, newH;
 
+    newX = _node->x;
     newY = _node->y;
     newW = _node->width / 2.0;
     newH = _node->height / 2.0;
