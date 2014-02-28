@@ -104,21 +104,21 @@ void BulletMeshShape::Init()
   }
 
   size_t clusters = 4;
-  size_t concavity = 200;
+  size_t concavity = 150;
   // bool invert = false;
   bool addExtraDistPoints = false;
   bool addFacesPoints = false;
   double ccConnectDist = 30;
   size_t targetNTrianglesDecimatedMesh = 0;
 
-  HACD::HeapManager *heapManager = HACD::createHeapManager(65536*(1000));
+  HACD::HeapManager *heapManager = HACD::createHeapManager(65536*(10000));
   HACD::HACD *const myHACD = HACD::CreateHACD(heapManager);
 
   myHACD->SetPoints(&points[0]);
   myHACD->SetNPoints(points.size());
   myHACD->SetTriangles(&triangles[0]);
   myHACD->SetNTriangles(triangles.size());
-  myHACD->SetCompacityWeight(0.001);
+  myHACD->SetCompacityWeight(0.01);
   myHACD->SetVolumeWeight(0.0);
 
   // if two connected components are seperated by distance < ccConnectDist
@@ -130,7 +130,7 @@ void BulletMeshShape::Init()
   myHACD->SetNClusters(clusters);
 
   // max of 100 vertices per convex-hull
-  myHACD->SetNVerticesPerCH(100);
+  myHACD->SetNVerticesPerCH(64);
 
   // maximum concavity
   myHACD->SetConcavity(concavity);
@@ -142,17 +142,22 @@ void BulletMeshShape::Init()
   myHACD->SetNTargetTrianglesDecimatedMesh(targetNTrianglesDecimatedMesh);
 
   // Get debug output during processing
-  // myHACD->SetCallBack(&HACDCallback);
+  myHACD->SetCallBack(&HACDCallback);
 
   myHACD->SetAddExtraDistPoints(addExtraDistPoints);
   myHACD->SetAddFacesPoints(addFacesPoints);
 
+  printf("COmputing\n");
   // Do the decomposition.
   myHACD->Compute();
+  printf("Done Computing\n");
 
   // Use a compound shape to store all the convex meshes.
   btCompoundShape *compoundShape = new btCompoundShape();
 
+  clusters = myHACD->GetNClusters();
+
+  std::cout << "Clusters[" << clusters << "]\n";
   for (size_t c = 0; c < clusters; ++c)
   {
     // Debug output
@@ -166,15 +171,15 @@ void BulletMeshShape::Init()
     myHACD->GetCH(c, pointsCH, trianglesCH);
 
     // Debug output
-    // std::cout << "Points " << numPoints << std::endl;
-    // for(size_t v = 0; v < numPoints; ++v)
-    // {
-    //   std::cout << v << "\t"
-    //     << pointsCH[v].X() << "\t"
-    //     << pointsCH[v].Y() << "\t"
-    //     << pointsCH[v].Z() << std::endl;
-    // }
-    // std::cout << "Triangles " << numTriangles << std::endl;
+    std::cout << "Points " << numPoints << std::endl;
+    for(size_t v = 0; v < numPoints; ++v)
+    {
+      std::cout << v << "\t"
+        << pointsCH[v].X() << "\t"
+        << pointsCH[v].Y() << "\t"
+        << pointsCH[v].Z() << std::endl;
+    }
+    std::cout << "Triangles " << numTriangles << std::endl;
 
     for (size_t f = 0; f < numTriangles; ++f)
     {
