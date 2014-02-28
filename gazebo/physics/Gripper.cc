@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Link.hh"
@@ -43,11 +47,20 @@ Gripper::Gripper(ModelPtr _model)
   this->attached = false;
 
   this->updateRate = common::Time(0, common::Time::SecToNano(0.75));
+
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(this->GetName());
+  }
+
   this->model.reset();
   this->physics.reset();
   this->world.reset();
@@ -57,12 +70,15 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
+  this->node->Init(this->world->GetName());
+
+  this->name = _sdf->Get<std::string>("name");
   this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
 
-  sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
-  this->min_contact_count = grasp_check->Get<unsigned int>("min_contact_count");
-  this->attachSteps = grasp_check->Get<int>("attach_steps");
-  this->detachSteps = grasp_check->Get<int>("detach_steps");
+  sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
+  this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
+  this->attachSteps = graspCheck->Get<int>("attach_steps");
+  this->detachSteps = graspCheck->Get<int>("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
@@ -83,13 +99,25 @@ void Gripper::Load(sdf::ElementPtr _sdf)
         = this->collisions.find(collision->GetScopedName());
       if (collIter != this->collisions.end())
         continue;
-      collision->SetContactsEnabled(true);
 
       this->collisions[collision->GetScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
   }
 
+  if (!this->collisions.empty())
+  {
+    // request the contact manager to publish messages to a custom topic for
+    // this sensor
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    std::string topic = mgr->CreateFilter(this->GetName(), this->collisions);
+    if (!this->contactSub)
+    {
+      this->contactSub = this->node->Subscribe(topic,
+          &Gripper::OnContacts, this);
+    }
+  }
   this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
           boost::bind(&Gripper::OnUpdate, this)));
 }
@@ -110,7 +138,7 @@ void Gripper::OnUpdate()
     return;
 
   // @todo: should package the decision into a function
-  if (this->contacts.size() >= this->min_contact_count)
+  if (this->contacts.size() >= this->minContactCount)
   {
     this->posCount++;
     this->zeroCount = 0;
@@ -145,8 +173,8 @@ void Gripper::HandleAttach()
 
   for (unsigned int i = 0; i < this->contacts.size(); ++i)
   {
-    std::string name1 = this->contacts[i].collision1->GetScopedName();
-    std::string name2 = this->contacts[i].collision2->GetScopedName();
+    std::string name1 = this->contacts[i].collision1();
+    std::string name2 = this->contacts[i].collision2();
 
     if (this->collisions.find(name1) == this->collisions.end())
     {
@@ -209,22 +237,21 @@ void Gripper::HandleDetach()
 }
 
 /////////////////////////////////////////////////
-void Gripper::OnContact(const std::string &/*_collisionName*/,
-                        const physics::Contact &_contact)
+void Gripper::OnContacts(ConstContactsPtr &_msg)
 {
-  CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1->GetScopedName()));
-
-  CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision2->GetScopedName()));
-
-  if ((collision1 && collision1->IsStatic()) ||
-      (collision2 && collision2->IsStatic()))
+  for (int i = 0; i < _msg->contact_size(); ++i)
   {
-    return;
-  }
+    CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
+        this->world->GetEntity(_msg->contact(i).collision1()));
+    CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
+        this->world->GetEntity(_msg->contact(i).collision2()));
 
-  this->contacts.push_back(_contact);
+    if ((collision1 && !collision1->IsStatic()) &&
+        (collision2 && !collision2->IsStatic()))
+    {
+      this->contacts.push_back(_msg->contact(i));
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -232,4 +259,16 @@ void Gripper::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
     this->diffs[i] = GZ_DBL_MAX;
+}
+
+/////////////////////////////////////////////////
+std::string Gripper::GetName() const
+{
+  return this->name;
+}
+
+/////////////////////////////////////////////////
+bool Gripper::IsAttached() const
+{
+  return this->attached;
 }

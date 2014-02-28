@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
+math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
 {
   dVector3 result;
 
@@ -69,7 +69,8 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -83,7 +84,7 @@ void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -113,7 +114,7 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
+math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -126,7 +127,7 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
+math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -142,7 +143,7 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetVelocity(int _index) const
+double ODEHinge2Joint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
 
@@ -160,7 +161,7 @@ double ODEHinge2Joint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetVelocity(int _index, double _angle)
+void ODEHinge2Joint::SetVelocity(unsigned int _index, double _angle)
 {
   if (_index == 0)
     this->SetParam(dParamVel, _angle);
@@ -169,7 +170,7 @@ void ODEHinge2Joint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetMaxForce(int _index)
+double ODEHinge2Joint::GetMaxForce(unsigned int _index)
 {
   if (_index == 0)
     return this->GetParam(dParamFMax);
@@ -179,7 +180,7 @@ double ODEHinge2Joint::GetMaxForce(int _index)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetMaxForce(int _index, double _t)
+void ODEHinge2Joint::SetMaxForce(unsigned int _index, double _t)
 {
   if (_index == 0)
     this->SetParam(dParamFMax, _t);
@@ -189,35 +190,8 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetForce(int _index, double _effort)
+void ODEHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling BulletHingeJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort,
-      -this->effortLimit[_index], this->effortLimit[_index]);
-
-  ODEJoint::SetForce(_index, _effort);
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
-
   if (this->jointId)
   {
     if (_index == 0)
@@ -230,7 +204,7 @@ void ODEHinge2Joint::SetForce(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetParam(int _parameter) const
+double ODEHinge2Joint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -243,7 +217,7 @@ double ODEHinge2Joint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetParam(int _parameter, double _value)
+void ODEHinge2Joint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
   if (this->jointId)

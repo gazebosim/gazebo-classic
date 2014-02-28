@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,7 @@
 #include <sys/stat.h>
 
 #include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
@@ -74,13 +70,29 @@ namespace gazebo
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
-            /// \brief Get the name of the handler
+    /// \brief Constructor
+    public: PluginT()
+            {
+              this->dlHandle = NULL;
+            }
+
+    /// \brief Destructor
+    public: virtual ~PluginT()
+            {
+// The following ifdef is a workaround for #1026.
+// \todo Figure out the right thing to do.
+#ifndef __APPLE__
+              dlclose(this->dlHandle);
+#endif  // ifndef __APPLE
+            }
+
+    /// \brief Get the name of the handler
     public: std::string GetFilename() const
             {
               return this->filename;
             }
 
-            /// \brief Get the short name of the handler
+    /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
               return this->handle;
@@ -98,15 +110,26 @@ namespace gazebo
               // PluginPtr result;
               struct stat st;
               bool found = false;
-              std::string fullname;
+              std::string fullname, filename(_filename);
               std::list<std::string>::iterator iter;
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
 
+#ifdef __APPLE__
+              // This is a hack to work around issue #800,
+              // error loading plugin libraries with different extensions
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                if (soSuffix != std::string::npos)
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+              }
+#endif  // ifdef __APPLE__
+
               for (iter = pluginPaths.begin();
                    iter!= pluginPaths.end(); ++iter)
               {
-                fullname = (*iter)+std::string("/")+_filename;
+                fullname = (*iter)+std::string("/")+filename;
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
@@ -115,21 +138,20 @@ namespace gazebo
               }
 
               if (!found)
-                fullname = _filename;
+                fullname = filename;
 
-#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
-              void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-              if (!handle)
+              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              if (!dlHandle)
               {
                 gzerr << "Failed to load plugin " << fullname << ": "
                   << dlerror() << "\n";
                 return result;
               }
 
-              registerFunc.ptr = dlsym(handle, registerName.c_str());
+              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
 
               if (!registerFunc.ptr)
               {
@@ -140,56 +162,10 @@ namespace gazebo
 
               // Register the new controller.
               result.reset(registerFunc.func());
-
-#elif HAVE_LTDL
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
+              result->dlHandle = dlHandle;
 
               result->handle = _handle;
-              result->filename = _filename;
+              result->filename = filename;
 
               return result;
             }
@@ -216,6 +192,9 @@ namespace gazebo
                T *(*func)();
                void *ptr;
              } fptr_union_t;
+
+    /// \brief Handle used for closing the dynamic library.
+    private: void *dlHandle;
   };
 
   /// \class WorldPlugin Plugin.hh common/common.hh

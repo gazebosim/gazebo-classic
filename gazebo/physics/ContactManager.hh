@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include <boost/unordered/unordered_set.hpp>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -131,6 +133,29 @@ namespace gazebo
       public: std::string CreateFilter(const std::string &_topic,
                   const std::string &_collision);
 
+      /// \brief Create a filter for contacts. A new publisher will be created
+      /// that publishes contacts associated to the input collision.
+      /// param[in] _name Filter name.
+      /// param[in] _collisions A map of collision name to collision
+      /// object.
+      /// \return New topic where filtered messages will be published to.
+      public: std::string CreateFilter(const std::string &_name,
+                  const std::map<std::string, physics::CollisionPtr>
+                  &_collisions);
+
+      /// \brief Remove a contacts filter and the associated custom publisher
+      /// param[in] _name Filter name.
+      public: void RemoveFilter(const std::string &_name);
+
+      /// \brief Get the number of filters in the contact manager.
+      /// return Number of filters
+      public: unsigned int GetFilterCount();
+
+      /// \brief Check if a filter with the specified name exists.
+      /// param[in] _name Name of filter.
+      /// return True if the filter exists.
+      public: bool HasFilter(const std::string &_name);
+
       private: std::vector<Contact*> contacts;
 
       private: unsigned int contactIndex;
@@ -148,6 +173,9 @@ namespace gazebo
       /// messages to the specified topic
       private: boost::unordered_map<std::string, ContactPublisher *>
           customContactPublishers;
+
+      /// \brief Mutex to protect the list of custom publishers.
+      private: boost::recursive_mutex *customMutex;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,7 @@
 using namespace gazebo;
 using namespace transport;
 
-//////////////////////////////////////////////////
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool /*_latch*/)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
-{
-  this->queueLimitWarned = false;
-  this->updatePeriod = 0;
-  this->waiting = false;
-}
+uint32_t Publisher::idCounter = 0;
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
@@ -46,18 +38,13 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
-  this->waiting = false;
   this->pubId = 0;
+  this->id = ++idCounter;
 }
 
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
-  if (!this->messages.empty())
-    this->SendMessage();
-
-  if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
 }
 
 //////////////////////////////////////////////////
@@ -128,10 +115,10 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   MessagePtr msgPtr(_message.New());
   msgPtr->CopyFrom(_message);
 
+  this->publication->SetPrevMsg(this->id, msgPtr);
+
   {
     boost::mutex::scoped_lock lock(this->mutex);
-    if (this->prevMsg == NULL)
-      this->prevMsg = msgPtr;
 
     this->messages.push_back(msgPtr);
 
@@ -177,7 +164,7 @@ void Publisher::SendMessage()
     for (unsigned int i = 0; i < this->messages.size(); ++i)
     {
       this->pubId = (this->pubId + 1) % 10000;
-      this->pubIds.push_back(this->pubId);
+      this->pubIds[this->pubId] = 0;
       localIds.push_back(this->pubId);
     }
 
@@ -196,35 +183,17 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->publication->Publish(*iter,
+      this->pubIds[*pubIter] = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+
+      if (this->pubIds[*pubIter] <= 0)
+        this->pubIds.erase(*pubIter);
     }
 
     // Clear the local buffer.
     localBuffer.clear();
     localIds.clear();
   }
-
-
-  /*MessagePtr msg;
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-    if (!this->messages.empty() && !this->waiting)
-    {
-      msg = this->messages.front();
-      this->waiting = true;
-      this->pubId = (this->pubId + 1) % 10000;
-      this->pubIds.insert(this->pubId);
-    }
-  }
-
-  // Send the latest message.
-  if (msg && this->publication)
-  {
-    this->publication->Publish(msg,
-        boost::bind(&Publisher::OnPublishComplete, this, _1), this->pubId);
-  }
-  */
 }
 
 //////////////////////////////////////////////////
@@ -257,20 +226,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  std::list<uint32_t>::iterator iter =
-    std::find(this->pubIds.begin(), this->pubIds.end(), _id);
-  if (iter != this->pubIds.end())
-  {
+  std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+  if (iter != this->pubIds.end() && (--iter->second) <= 0)
     this->pubIds.erase(iter);
-    this->waiting = false;
-  }
-}
-
-//////////////////////////////////////////////////
-void Publisher::SetPublication(PublicationPtr &_publication, int _i)
-{
-  if (_i == 0)
-    this->publication = _publication;
 }
 
 //////////////////////////////////////////////////
@@ -280,26 +238,45 @@ void Publisher::SetPublication(PublicationPtr _publication)
 }
 
 //////////////////////////////////////////////////
-bool Publisher::GetLatching() const
+void Publisher::Fini()
 {
-  return false;
+  if (!this->messages.empty())
+    this->SendMessage();
+
+  if (!this->topic.empty())
+    TopicManager::Instance()->Unadvertise(this->topic);
+
+  common::Time slept;
+
+  // Wait for the message to be published
+  while (!this->pubIds.empty() && slept < common::Time(1, 0))
+  {
+    common::Time::MSleep(10);
+    slept += common::Time(0, 10000000);
+  }
+
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
 std::string Publisher::GetPrevMsg() const
 {
   std::string result;
-  boost::mutex::scoped_lock lock(this->mutex);
-  if (this->prevMsg)
-    this->prevMsg->SerializeToString(&result);
+  if (this->publication)
+  {
+    MessagePtr msg = this->publication->GetPrevMsg(this->id);
+    if (msg)
+      msg->SerializeToString(&result);
+  }
+
   return result;
 }
 
 //////////////////////////////////////////////////
 MessagePtr Publisher::GetPrevMsgPtr() const
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  if (this->prevMsg)
-    return this->prevMsg;
-  return MessagePtr();
+  if (this->publication)
+    return this->publication->GetPrevMsg(this->id);
+  else
+    return MessagePtr();
 }

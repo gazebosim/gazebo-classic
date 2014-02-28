@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::ODE;
   else if (_physicsEngine == "bullet")
     type = msgs::Physics::BULLET;
+  else if (_physicsEngine == "dart")
+    type = msgs::Physics::DART;
   else
     type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
@@ -103,6 +105,13 @@ TEST_F(PhysicsEngineTest, PhysicsEngineParamBullet)
   PhysicsEngineParam("bullet");
 }
 #endif  // HAVE_BULLET
+
+#ifdef HAVE_DART
+TEST_F(PhysicsEngineTest, PhysicsEngineParamDART)
+{
+  PhysicsEngineParam("dart");
+}
+#endif  // HAVE_DART
 
 int main(int argc, char **argv)
 {

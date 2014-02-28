@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,21 +105,9 @@ math::Vector3 MeshShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-std::string MeshShape::GetFilename() const
-{
-  return this->GetMeshURI();
-}
-
-//////////////////////////////////////////////////
 std::string MeshShape::GetMeshURI() const
 {
   return this->sdf->Get<std::string>("uri");
-}
-
-//////////////////////////////////////////////////
-void MeshShape::SetFilename(const std::string &_filename)
-{
-  this->SetMesh(_filename);
 }
 
 //////////////////////////////////////////////////

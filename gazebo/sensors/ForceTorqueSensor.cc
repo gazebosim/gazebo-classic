@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,12 @@ void ForceTorqueSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+physics::JointPtr ForceTorqueSensor::GetJoint() const
+{
+  return this->parentJoint;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetForce() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().force());
@@ -102,7 +108,7 @@ math::Vector3 ForceTorqueSensor::GetTorque() const
 }
 
 //////////////////////////////////////////////////
-void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -121,6 +127,8 @@ void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 
   if (this->wrenchPub)
     this->wrenchPub->Publish(this->wrenchMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

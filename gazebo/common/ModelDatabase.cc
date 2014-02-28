@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabasePrivate.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
 using namespace gazebo;
@@ -61,8 +62,9 @@ size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
 
 /////////////////////////////////////////////////
 ModelDatabase::ModelDatabase()
-  : updateCacheThread(NULL)
+  : dataPtr(new ModelDatabasePrivate)
 {
+  this->dataPtr->updateCacheThread = NULL;
   this->Start();
 }
 
@@ -70,20 +72,22 @@ ModelDatabase::ModelDatabase()
 ModelDatabase::~ModelDatabase()
 {
   this->Fini();
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void ModelDatabase::Start(bool _fetchImmediately)
 {
-  boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
+  boost::recursive_mutex::scoped_lock lock(this->dataPtr->startCacheMutex);
 
-  if (!this->updateCacheThread)
+  if (!this->dataPtr->updateCacheThread)
   {
-    this->stop = false;
+    this->dataPtr->stop = false;
 
     // Create the thread that is used to update the model cache. This
     // retreives online data in the background to improve startup times.
-    this->updateCacheThread = new boost::thread(
+    this->dataPtr->updateCacheThread = new boost::thread(
         boost::bind(&ModelDatabase::UpdateModelCache, this, _fetchImmediately));
   }
 }
@@ -91,19 +95,19 @@ void ModelDatabase::Start(bool _fetchImmediately)
 /////////////////////////////////////////////////
 void ModelDatabase::Fini()
 {
-  this->callbacks.clear();
+  this->dataPtr->deprecatedCallbacks.clear();
 
   // Stop the update thread.
-  this->stop = true;
-  this->updateCacheCompleteCondition.notify_all();
-  this->updateCacheCondition.notify_all();
+  this->dataPtr->stop = true;
+  this->dataPtr->updateCacheCompleteCondition.notify_all();
+  this->dataPtr->updateCacheCondition.notify_all();
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->startCacheMutex);
-    if (this->updateCacheThread)
-      this->updateCacheThread->join();
-    delete this->updateCacheThread;
-    this->updateCacheThread = NULL;
+    boost::recursive_mutex::scoped_lock lock(this->dataPtr->startCacheMutex);
+    if (this->dataPtr->updateCacheThread)
+      this->dataPtr->updateCacheThread->join();
+    delete this->dataPtr->updateCacheThread;
+    this->dataPtr->updateCacheThread = NULL;
   }
 }
 
@@ -135,9 +139,13 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
 
   // Make sure there is a URI separator
   if (uriSeparator == std::string::npos)
+  {
+    gzerr << "No URI separator \"://\" in [" << _modelURI << "]\n";
     return false;
+  }
 
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
+  uri = uri.substr(0, uri.find("/", ModelDatabase::GetURI().size()));
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
 
@@ -147,6 +155,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
     if (iter->first == uri)
       return true;
   }
+
   return false;
 }
 
@@ -180,12 +189,6 @@ std::string ModelDatabase::GetModelConfig(const std::string &_uri)
   }
 
   return xmlString;
-}
-
-/////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest(const std::string &_uri)
-{
-  return this->GetModelConfig(_uri);
 }
 
 /////////////////////////////////////////////////
@@ -243,7 +246,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
 
     TiXmlElement *uriElem;
     for (uriElem = modelsElem->FirstChildElement("uri");
-         uriElem != NULL && !this->stop;
+         uriElem != NULL && !this->dataPtr->stop;
          uriElem = uriElem->NextSiblingElement("uri"))
     {
       std::string uri = uriElem->GetText();
@@ -258,7 +261,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
       std::string fullURI = ModelDatabase::GetURI() + suffix;
       std::string modelName = ModelDatabase::GetModelName(fullURI);
 
-      this->modelCache[fullURI] = modelName;
+      this->dataPtr->modelCache[fullURI] = modelName;
     }
   }
 
@@ -268,19 +271,19 @@ bool ModelDatabase::UpdateModelCacheImpl()
 /////////////////////////////////////////////////
 void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
 {
-  boost::mutex::scoped_lock lock(this->updateMutex);
+  boost::mutex::scoped_lock lock(this->dataPtr->updateMutex);
 
   // Continually update the model cache when requested.
-  while (!this->stop)
+  while (!this->dataPtr->stop)
   {
     // Wait for an update request.
     if (!_fetchImmediately)
-      this->updateCacheCondition.wait(lock);
+      this->dataPtr->updateCacheCondition.wait(lock);
     else
       _fetchImmediately = false;
 
     // Exit if notified and stopped.
-    if (this->stop)
+    if (this->dataPtr->stop)
       break;
 
     // Update the model cache.
@@ -288,18 +291,23 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
       gzerr << "Unable to download model manifests\n";
     else
     {
-      for (std::list<CallbackFunc>::iterator iter = this->callbacks.begin();
-           iter != this->callbacks.end(); ++iter)
+      boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
+
+      for (std::list<ModelDatabasePrivate::CallbackFunc>::iterator iter =
+          this->dataPtr->deprecatedCallbacks.begin();
+          iter != this->dataPtr->deprecatedCallbacks.end(); ++iter)
       {
-        (*iter)(this->modelCache);
+        (*iter)(this->dataPtr->modelCache);
       }
-      this->callbacks.clear();
+      this->dataPtr->deprecatedCallbacks.clear();
+
+      this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
-    this->updateCacheCompleteCondition.notify_all();
+    this->dataPtr->updateCacheCompleteCondition.notify_all();
   }
 
   // Make sure no one is waiting on us.
-  this->updateCacheCompleteCondition.notify_all();
+  this->dataPtr->updateCacheCompleteCondition.notify_all();
 }
 
 /////////////////////////////////////////////////
@@ -308,51 +316,53 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
   size_t size = 0;
 
   {
-    boost::recursive_mutex::scoped_lock startLock(this->startCacheMutex);
-    if (!this->updateCacheThread)
+    boost::recursive_mutex::scoped_lock startLock(
+        this->dataPtr->startCacheMutex);
+    if (!this->dataPtr->updateCacheThread)
     {
-      boost::mutex::scoped_lock lock(this->updateMutex);
+      boost::mutex::scoped_lock lock(this->dataPtr->updateMutex);
       this->Start(true);
-      this->updateCacheCompleteCondition.wait(lock);
+      this->dataPtr->updateCacheCompleteCondition.wait(lock);
     }
     else
     {
-      boost::mutex::scoped_try_lock lock(this->updateMutex);
+      boost::mutex::scoped_try_lock lock(this->dataPtr->updateMutex);
       if (!lock)
       {
         gzmsg << "Waiting for model database update to complete...\n";
-        boost::mutex::scoped_lock lock2(this->updateMutex);
+        boost::mutex::scoped_lock lock2(this->dataPtr->updateMutex);
       }
     }
 
-    size = this->modelCache.size();
+    size = this->dataPtr->modelCache.size();
   }
 
   if (size != 0)
-    return this->modelCache;
+    return this->dataPtr->modelCache;
   else
   {
     gzwarn << "Getting models from[" << GetURI()
            << "]. This may take a few seconds.\n";
 
-    boost::mutex::scoped_lock lock(this->updateMutex);
+    boost::mutex::scoped_lock lock(this->dataPtr->updateMutex);
 
     // Tell the background thread to grab the models from online.
-    this->updateCacheCondition.notify_all();
+    this->dataPtr->updateCacheCondition.notify_all();
 
     // Wait for the thread to finish.
-    this->updateCacheCompleteCondition.wait(lock);
+    this->dataPtr->updateCacheCompleteCondition.wait(lock);
   }
 
-  return this->modelCache;
+  return this->dataPtr->modelCache;
 }
 
 /////////////////////////////////////////////////
-void ModelDatabase::GetModels(
+event::ConnectionPtr ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
-  this->callbacks.push_back(_func);
-  this->updateCacheCondition.notify_one();
+  boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
+  this->dataPtr->updateCacheCondition.notify_one();
+  return this->dataPtr->modelDBUpdated.Connect(_func);
 }
 
 /////////////////////////////////////////////////
@@ -429,9 +439,10 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     size_t modelNameLen = endIndex == std::string::npos ? std::string::npos :
       endIndex - startIndex;
 
-    modelName = modelName.substr(startIndex, modelNameLen);
     if (endIndex != std::string::npos)
-      suffix = _uri.substr(endIndex, std::string::npos);
+      suffix = modelName.substr(endIndex, std::string::npos);
+
+    modelName = modelName.substr(startIndex, modelNameLen);
 
     // Store downloaded .tar.gz and intermediate .tar files in temp location
     boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();
@@ -541,17 +552,13 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
 {
   boost::filesystem::path manifestPath = _path;
 
-  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-  // exist, try to get the deprecated version.
+  // Get the GZ_MODEL_MANIFEST_FILENAME.
   if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << _path << "\n";
-
-    manifestPath /= "manifest.xml";
   }
 
   TiXmlDocument xmlDoc;
@@ -598,17 +605,13 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
 
   boost::filesystem::path manifestPath = path;
 
-  // First try to get the GZ_MODEL_MANIFEST_FILENAME. If that file doesn't
-  // exist, try to get the deprecated version.
+  // Get the GZ_MODEL_MANIFEST_FILENAME.
   if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzwarn << "The manifest.xml for a Gazebo model is deprecated. "
-      << "Please rename manifest.xml to " << GZ_MODEL_MANIFEST_FILENAME
+    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << manifestPath << "\n";
-
-    manifestPath /= "manifest.xml";
   }
 
   TiXmlDocument xmlDoc;

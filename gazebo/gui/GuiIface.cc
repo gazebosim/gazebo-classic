@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 
 #include <signal.h>
 #include <boost/program_options.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -35,6 +38,8 @@ char **g_argv;
 
 namespace po = boost::program_options;
 po::variables_map vm;
+
+boost::property_tree::ptree g_propTree;
 
 using namespace gazebo;
 
@@ -59,22 +64,17 @@ void print_usage()
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
-  gazebo::stop();
   gazebo::gui::stop();
+  gazebo::shutdown();
 }
 
 //////////////////////////////////////////////////
 bool parse_args(int _argc, char **_argv)
 {
-  if (signal(SIGINT, signal_handler) == SIG_ERR)
-  {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
-    return false;
-  }
-
   po::options_description v_desc("Options");
   v_desc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
@@ -92,6 +92,12 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
+  if (vm.count("version"))
+  {
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
+    return false;
+  }
+
   if (vm.count("help"))
   {
     print_usage();
@@ -99,11 +105,11 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  if (!vm.count("quiet"))
-    gazebo::print_version();
-  else
-    gazebo::common::Console::Instance()->SetQuiet(true);
-
+  if (vm.count("verbose"))
+  {
+    gazebo::printVersion();
+    gazebo::common::Console::SetQuiet(false);
+  }
 
   /// Load all the plugins specified on the command line
   if (vm.count("gui-plugin"))
@@ -114,7 +120,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 
@@ -136,6 +142,9 @@ namespace gazebo
     /////////////////////////////////////////////////
     void fini()
     {
+      // Cleanup model database.
+      common::ModelDatabase::Instance()->Fini();
+
       gui::clear_active_camera();
       rendering::fini();
       fflush(stdout);
@@ -146,13 +155,59 @@ namespace gazebo
 /////////////////////////////////////////////////
 void gui::init()
 {
+  g_modelRightMenu->Init();
   g_main_win->show();
   g_main_win->Init();
 }
 
 /////////////////////////////////////////////////
-void gui::load()
+bool gui::loadINI(const boost::filesystem::path &_file)
 {
+  bool result = true;
+
+  // Create the gui.ini file if it doesn't exist.
+  if (!boost::filesystem::exists(_file))
+  {
+    gui::setINIProperty("geometry.x", 0);
+    gui::setINIProperty("geometry.y", 0);
+    gui::saveINI(_file);
+  }
+
+  try
+  {
+    // Read all configuration properties
+    boost::property_tree::ini_parser::read_ini(_file.string(), g_propTree);
+  }
+  catch(...)
+  {
+    gzerr << "Unable to read configuration file " << _file << "\n";
+    result = false;
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool gui::load()
+{
+  bool result = true;
+
+  // Get the HOME path
+  char *home = getenv("HOME");
+  if (home)
+  {
+    // Construct the path to gui.ini
+    boost::filesystem::path path = home;
+    path = path / ".gazebo" / "gui.ini";
+    result = gui::loadINI(path);
+  }
+  else
+  {
+    gzerr << "HOME environment variable not found. "
+      "Unable to read ~/.gazebo/gui.ini file.\n";
+    result = false;
+  }
+
   g_modelRightMenu = new gui::ModelRightMenu();
 
   rendering::load();
@@ -172,6 +227,8 @@ void gui::load()
 
   g_main_win->Load();
   g_main_win->resize(1024, 768);
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -184,33 +241,43 @@ unsigned int gui::get_entity_id(const std::string &_name)
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gazebo::common::Console::Instance()->Init("gzclient.log");
+  gzLogInit("gzclient.log");
+
+  // Make sure the model database has started
+  gazebo::common::ModelDatabase::Instance()->Start();
 
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
     return false;
 
-  gazebo::run();
+  if (!gazebo::gui::load())
+    return false;
 
-  gazebo::gui::load();
   gazebo::gui::init();
 
-  if (!gazebo::init())
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = signal_handler;
+  if (sigaction(SIGINT, &sigact, NULL))
+  {
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return false;
+  }
 
   g_app->exec();
 
-  gazebo::fini();
   gazebo::gui::fini();
+  gazebo::shutdown();
   return true;
 }
 
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  gazebo::stop();
+  gazebo::shutdown();
   g_active_camera.reset();
   g_app->quit();
 }
@@ -249,4 +316,20 @@ rendering::UserCameraPtr gui::get_active_camera()
 bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
+}
+
+/////////////////////////////////////////////////
+bool gui::saveINI(const boost::filesystem::path &_file)
+{
+  bool result = true;
+  try
+  {
+    boost::property_tree::ini_parser::write_ini(_file.string(), g_propTree);
+  }
+  catch(...)
+  {
+    gzerr << "Unable to save INI file[" << _file << "]\n";
+    result = false;
+  }
+  return result;
 }

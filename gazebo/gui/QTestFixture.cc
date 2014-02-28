@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@
 
 #include <unistd.h>
 
-#include "gazebo/physics/PhysicsIface.hh"
-
-#include "gazebo/rendering/RenderingIface.hh"
-
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
@@ -46,7 +44,7 @@ void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gazebo::common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
 
   // Initialize the data logger. This will log state information.
   gazebo::util::LogRecord::Instance()->Init("test");
@@ -55,7 +53,7 @@ void QTestFixture::initTestCase()
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(PROJECT_SOURCE_PATH);
 
   std::string path = PROJECT_SOURCE_PATH;
-  path += "/sdf/worlds";
+  path += "/worlds";
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
 
   path = TEST_PATH;
@@ -101,7 +99,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->server = new gazebo::Server();
   this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
-  this->server->Init();
 
   this->SetPause(_paused);
 
@@ -110,9 +107,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
         gazebo::physics::get_world()->GetName(), false);
 
   this->server->Run();
-
-  if (_createScene)
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   this->server->Fini();
 
@@ -129,7 +123,7 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
-  // gazebo::rendering::fini();
+  gazebo::gui::stop();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);

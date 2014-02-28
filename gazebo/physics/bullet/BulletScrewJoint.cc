@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletScrewJoint::Init()
 {
-  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
+  ScrewJoint<BulletJoint>::Init();
 
-  ScrewJoint<BulletJoint>::Attach(_one, _two);
+  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -136,10 +136,13 @@ void BulletScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
+
+  // Setup Joint force and torque feedback
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
-double BulletScrewJoint::GetVelocity(int /*_index*/) const
+double BulletScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
   if (this->bulletScrew)
@@ -148,27 +151,22 @@ double BulletScrewJoint::GetVelocity(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetVelocity(int /*_index*/, double _angle)
+void BulletScrewJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   gzerr << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetDamping(int /*index*/, double _damping)
-{
-  if (this->bulletScrew)
-    this->bulletScrew->setDampingDirLin(_damping);
-}
-
-//////////////////////////////////////////////////
-void BulletScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
+void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
+    double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";
 }
@@ -181,27 +179,29 @@ double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
+void BulletScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 {
-  gzerr << "Not implemented\n";
+  gzlog << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
+void BulletScrewJoint::SetHighStop(unsigned int /*_index*/,
+    const math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
+void BulletScrewJoint::SetLowStop(unsigned int /*_index*/,
+    const math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetHighStop(int /*_index*/)
+math::Angle BulletScrewJoint::GetHighStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletScrew)
@@ -210,7 +210,7 @@ math::Angle BulletScrewJoint::GetHighStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetLowStop(int /*_index*/)
+math::Angle BulletScrewJoint::GetLowStop(unsigned int /*_index*/)
 {
   math::Angle result;
   if (this->bulletScrew)
@@ -219,14 +219,14 @@ math::Angle BulletScrewJoint::GetLowStop(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetMaxForce(int /*_index*/, double _force)
+void BulletScrewJoint::SetMaxForce(unsigned int /*_index*/, double _force)
 {
   if (this->bulletScrew)
     this->bulletScrew->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
-double BulletScrewJoint::GetMaxForce(int /*index*/)
+double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
 {
   double result = 0;
   if (this->bulletScrew)
@@ -235,7 +235,7 @@ double BulletScrewJoint::GetMaxForce(int /*index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletScrewJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   math::Vector3 result;
   if (this->bulletScrew)
@@ -253,7 +253,7 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletScrew)

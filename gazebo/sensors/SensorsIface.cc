@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,14 @@
 
 using namespace gazebo;
 
+bool g_disable = false;
+
 /////////////////////////////////////////////////
 bool sensors::load()
 {
+  if (g_disable)
+    return true;
+
   // Register all the sensor types
   sensors::SensorFactory::RegisterAll();
 
@@ -41,6 +46,9 @@ bool sensors::load()
 /////////////////////////////////////////////////
 bool sensors::init()
 {
+  if (g_disable)
+    return true;
+
   // The rendering engine will run headless
   if (!gazebo::rendering::init())
   {
@@ -56,6 +64,9 @@ bool sensors::init()
 /////////////////////////////////////////////////
 bool sensors::fini()
 {
+  if (g_disable)
+    return true;
+
   sensors::SensorManager::Instance()->Fini();
   rendering::fini();
   return true;
@@ -66,43 +77,70 @@ std::string sensors::create_sensor(sdf::ElementPtr _elem,
                                    const std::string &_worldName,
                                    const std::string &_parentName)
 {
+  if (g_disable)
+    return "";
+
+  SensorPtr parentSensor = get_sensor(_parentName);
+  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
+
+  return create_sensor(_elem, _worldName, _parentName, parentSensor->GetId());
+}
+
+/////////////////////////////////////////////////
+std::string sensors::create_sensor(sdf::ElementPtr _elem,
+                                   const std::string &_worldName,
+                                   const std::string &_parentName,
+                                   uint32_t _parentId)
+{
+  if (g_disable)
+    return "";
+
   return sensors::SensorManager::Instance()->CreateSensor(_elem, _worldName,
-                                                          _parentName);
+      _parentName, _parentId);
 }
 
 /////////////////////////////////////////////////
 void sensors::remove_sensor(const std::string &_sensorName)
 {
-  sensors::SensorManager::Instance()->RemoveSensor(_sensorName);
-}
+  if (g_disable)
+    return;
 
-/////////////////////////////////////////////////
-void sensors::run()
-{
-  sensors::run_threads();
+  sensors::SensorManager::Instance()->RemoveSensor(_sensorName);
 }
 
 /////////////////////////////////////////////////
 void sensors::run_threads()
 {
+  if (g_disable)
+    return;
+
   sensors::SensorManager::Instance()->RunThreads();
 }
 
 /////////////////////////////////////////////////
 void sensors::run_once(bool _force)
 {
+  if (g_disable)
+    return;
+
   sensors::SensorManager::Instance()->Update(_force);
 }
 
 /////////////////////////////////////////////////
 void sensors::stop()
 {
+  if (g_disable)
+    return;
+
   sensors::SensorManager::Instance()->Stop();
 }
 
 /////////////////////////////////////////////////
 bool sensors::remove_sensors()
 {
+  if (g_disable)
+    return true;
+
   sensors::SensorManager::Instance()->RemoveSensors();
   return true;
 }
@@ -110,5 +148,20 @@ bool sensors::remove_sensors()
 /////////////////////////////////////////////////
 sensors::SensorPtr sensors::get_sensor(const std::string &_name)
 {
+  if (g_disable)
+    return sensors::SensorPtr();
+
   return sensors::SensorManager::Instance()->GetSensor(_name);
+}
+
+/////////////////////////////////////////////////
+void sensors::disable()
+{
+  g_disable = true;
+}
+
+/////////////////////////////////////////////////
+void sensors::enable()
+{
+  g_disable = false;
 }

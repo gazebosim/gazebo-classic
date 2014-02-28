@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,6 @@ ModelRightMenu::ModelRightMenu()
 {
   KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
         boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelRightMenu::OnRequest, this);
 
   this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
@@ -104,6 +99,17 @@ ModelRightMenu::ModelRightMenu()
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+}
+
+//////////////////////////////////////////////////
+bool ModelRightMenu::Init()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelRightMenu::OnRequest, this);
+
+  return true;
 }
 
 /////////////////////////////////////////////////

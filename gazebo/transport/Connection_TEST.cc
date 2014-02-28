@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@
 #include <stdlib.h>
 
 #include "gazebo/transport/Connection.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class Connection : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
-TEST(Connection, IPWhiteList)
+TEST_F(Connection, IPWhiteList)
 {
   transport::Connection *connection = new transport::Connection();
   EXPECT_TRUE(connection->GetIPWhiteList().empty());
