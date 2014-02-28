@@ -501,7 +501,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // check velocity / energy
     math::Vector3 vel = link->GetWorldLinearVel();
     math::Pose pos = link->GetWorldPose();
-    double pe = 9.81 * m * pos.pos.z;
+    double pe = g * m * pos.pos.z;
     double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
     e_start = pe + ke;
     // gzdbg << "total energy [" << e_start
@@ -526,7 +526,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
         math::Pose pos = link->GetWorldPose();
-        double pe = 9.81 * m * pos.pos.z;
+        double pe = g * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
@@ -576,7 +576,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
         math::Pose pos = link->GetWorldPose();
-        double pe = 9.81 * m * pos.pos.z;
+        double pe = g * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
