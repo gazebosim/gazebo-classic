@@ -202,13 +202,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->Get<math::Pose>("pose");
-  this->LoadImpl(this->anchorPose);
+  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
 }
 
 /////////////////////////////////////////////////
 void Joint::LoadImpl(const math::Pose &_pose)
 {
+  this->anchorPose = _pose;
+
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
@@ -221,11 +222,14 @@ void Joint::LoadImpl(const math::Pose &_pose)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
-  if (this->childLink)
-    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
-  // otherwise set anchor relative to world frame
+  math::Pose worldPose = this->GetWorldPose();
+  this->anchorPos = worldPose.pos;
+
+  // Compute anchor pose relative to parent frame.
+  if (this->parentLink)
+    this->parentAnchorPose = worldPose - this->parentLink->GetWorldPose();
   else
-    this->anchorPos = _pose.pos;
+    this->parentAnchorPose = worldPose;
 
   if (this->sdf->HasElement("sensor"))
   {
@@ -911,6 +915,20 @@ math::Pose Joint::GetWorldPose() const
   if (this->childLink)
     return this->anchorPose + this->childLink->GetWorldPose();
   return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetParentWorldPose() const
+{
+  if (this->parentLink)
+    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+  return this->parentAnchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetAnchorErrorPose() const
+{
+  return this->GetWorldPose() - this->GetParentWorldPose();
 }
 
 //////////////////////////////////////////////////
