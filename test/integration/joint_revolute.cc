@@ -80,7 +80,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   linkNames.push_back("lower_link");
   linkNames.push_back("upper_link");
 
-  // Link names
+  // Joint names
   std::vector<std::string> jointNames;
   jointNames.push_back("lower_joint");
   jointNames.push_back("upper_joint");
