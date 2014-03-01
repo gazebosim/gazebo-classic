@@ -285,11 +285,15 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     // gzdbg << cyclesContact << " : "
     //       << linkContact->GetWorldLinearVel() << "\n";
   }
-  EXPECT_EQ(cyclesPrismatic,      17);
-  EXPECT_EQ(cyclesRevolute,       17);
+  if (_physicsEngine.compare("ode") == 0)
+  {
+    gzdbg << "Extra tests for ode" << std::endl;
+    EXPECT_EQ(cyclesPrismatic,      17);
+    EXPECT_EQ(cyclesRevolute,       17);
+    EXPECT_EQ(cyclesContact,        17);
+  }
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
-  EXPECT_EQ(cyclesContact,        17);
 }
 
 //////////////////////////////////////////////////
