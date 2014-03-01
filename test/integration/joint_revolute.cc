@@ -44,7 +44,6 @@ class JointTestRevolute : public JointTest
 };
 
 ////////////////////////////////////////////////////////////
-// Test for spawning each joint type
 void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 {
   /// \TODO: bullet hinge angles are wrapped (#1074)
