@@ -67,6 +67,10 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
+  // these flags are related to issue #494
+  // set default to true for backward compatibility
+  this->axisParentModelFrame[0] = true;
+  this->axisParentModelFrame[1] = true;
 
   if (!this->sdfJoint)
   {
@@ -130,6 +134,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
+    {
+      std::string param = "use_parent_model_frame";
+      // Check if "use_parent_model_frame" element exists.
+      // It has `required=1`, so if it does not exist, then SDF is old,
+      // and we should assume support for backwards compatibility
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -142,6 +156,13 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
+    {
+      std::string param = "use_parent_model_frame";
+      if (axisElem->HasElement(param))
+      {
+        this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+      }
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -181,13 +202,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->Get<math::Pose>("pose");
-  this->LoadImpl(this->anchorPose);
+  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
 }
 
 /////////////////////////////////////////////////
 void Joint::LoadImpl(const math::Pose &_pose)
 {
+  this->anchorPose = _pose;
+
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
@@ -200,11 +222,14 @@ void Joint::LoadImpl(const math::Pose &_pose)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
-  if (this->childLink)
-    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
-  // otherwise set anchor relative to world frame
+  math::Pose worldPose = this->GetWorldPose();
+  this->anchorPos = worldPose.pos;
+
+  // Compute anchor pose relative to parent frame.
+  if (this->parentLink)
+    this->parentAnchorPose = worldPose - this->parentLink->GetWorldPose();
   else
-    this->anchorPos = _pose.pos;
+    this->parentAnchorPose = worldPose;
 
   if (this->sdf->HasElement("sensor"))
   {
@@ -864,7 +889,7 @@ void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopStiffness(unsigned int _index)
+double Joint::GetStopStiffness(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -879,7 +904,7 @@ double Joint::GetStopStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::GetStopDissipation(unsigned int _index)
+double Joint::GetStopDissipation(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -894,7 +919,53 @@ double Joint::GetStopDissipation(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetInitialAnchorPose()
+math::Pose Joint::GetInitialAnchorPose() const
 {
   return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetWorldPose() const
+{
+  if (this->childLink)
+    return this->anchorPose + this->childLink->GetWorldPose();
+  return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetParentWorldPose() const
+{
+  if (this->parentLink)
+    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+  return this->parentAnchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetAnchorErrorPose() const
+{
+  return this->GetWorldPose() - this->GetParentWorldPose();
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // Use parent model frame
+    if (this->parentLink)
+      return this->parentLink->GetModel()->GetWorldPose().rot;
+
+    // Parent model is world, use world frame
+    return math::Quaternion();
+  }
+
+  return this->GetWorldPose().rot;
 }

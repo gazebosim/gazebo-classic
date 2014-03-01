@@ -22,6 +22,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/JointVisualPrivate.hh"
 #include "gazebo/rendering/JointVisual.hh"
 
 using namespace gazebo;
@@ -29,19 +30,25 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(_name, _vis, false)
+  : Visual(*new JointVisualPrivate, _name, _vis, false)
 {
 }
 
 /////////////////////////////////////////////////
 JointVisual::~JointVisual()
 {
-  this->axisVisual.reset();
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  dPtr->axisVisual.reset();
 }
 
 /////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg)
 {
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
   Visual::Load();
 
   // joint axis is in the model frame so set up the scene node to be
@@ -53,20 +60,20 @@ void JointVisual::Load(ConstJointPtr &_msg)
     this->GetSceneNode()->_setDerivedOrientation(Conversions::Convert(quat));
   }
 
-  this->axisVisual.reset(
+  dPtr->axisVisual.reset(
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
-  this->axisVisual->Load();
+  dPtr->axisVisual->Load();
 
   this->SetPosition(msgs::Convert(_msg->pose().position()));
   this->SetRotation(this->GetRotation() *
       msgs::Convert(_msg->pose().orientation()));
 
   if (math::equal(_msg->axis1().xyz().x(), 1.0))
-    this->axisVisual->ShowRotation(0);
+    dPtr->axisVisual->ShowRotation(0);
 
   if (math::equal(_msg->axis1().xyz().y(), 1.0))
-    this->axisVisual->ShowRotation(1);
+    dPtr->axisVisual->ShowRotation(1);
 
   if (math::equal(_msg->axis1().xyz().z(), 1.0))
-    this->axisVisual->ShowRotation(2);
+    dPtr->axisVisual->ShowRotation(2);
 }

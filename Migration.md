@@ -19,6 +19,7 @@
     + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
+    + Add const to Joint::GetInitialAnchorPose(), Joint::GetStopDissipation(), Joint::GetStopStiffness()
 1. **gazebo/sensors/Noise.hh** `ABI change`
     + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
     + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
@@ -73,13 +74,36 @@
 
 ### Additions
 
+1. **gazebo/physics/World.hh**
+    +  msgs::Scene GetSceneMsg() const
+1. **gazebo/physics/ContactManager.hh**
+    + unsigned int GetFilterCount()
+    + bool HasFilter(const std::string &_name);
+    + void RemoveFilter(const std::string &_name);
+
 1. **gazebo/physics/Joint.hh**
+    + math::Pose GetAnchorErrorPose() const
+    + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + math::Pose GetParentWorldPose() const
+    + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+    + bool axisParentModelFrame[MAX_JOINT_AXIS]
+    + protected: math::Pose parentAnchorPose
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + FrictionPyramid()
+    + ~FrictionPyramid()
+    + double GetMuPrimary()
+    + double GetMuSecondary()
+    + void SetMuPrimary(double _mu)
+    + void SetMuSecondary(double _mu)
+    + math::Vector3 direction1
+    + ***Note:*** Replaces mu, m2, fdir1 variables
 
 1. **gazebo/physics/bullet/BulletSurfaceParams.hh**
     + BulletSurfaceParams()
@@ -87,8 +111,7 @@
     + virtual void Load(sdf::ElementPtr _sdf)
     + virtual void FillMsg(msgs::Surface &_msg)
     + virtual void ProcessMsg(msgs::Surface &_msg)
-    + double mu1
-    + double mu2
+    + FrictionPyramid frictionPyramid
 
 1. **gazebo/physics/ode/ODESurfaceParams.hh**
     + virtual void FillMsg(msgs::Surface &_msg)
@@ -102,14 +125,13 @@
     + double erp
     + double maxVel
     + double minDepth
-    + double mu1
-    + double mu2
+    + FrictionPyramid frictionPyramid
     + double slip1
     + double slip2
-    + math::Vector3 fdir1
 
 1. **gazebo/rendering/Light.hh**
     + bool GetVisible() const
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
 
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
@@ -126,9 +148,12 @@
 
 ### Deletions
 
+1. **Removed libtool**
+    + Libtool used to be an option for loading plugins. Now, only libdl is supported.
+
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd
-    
+
 1. **gazebo/sensors/Noise.hh**
     + double Noise::GetMean() const
     + double Noise::GetStdDev() const
@@ -150,7 +175,8 @@
     + double slip1
     + double slip2
     + math::Vector3 fdir1
-    + ***Note:*** These parameters were moved to ODESurfaceParams and BulletSurfaceParams.
+    + ***Note:*** These parameters were moved to FrictionPyramid,
+      ODESurfaceParams, and BulletSurfaceParams.
 
 
 ## Gazebo 1.9 to 2.0

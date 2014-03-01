@@ -68,7 +68,8 @@ class JointTest : public ServerFixture,
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
               wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0))
+              noLinkPose(false), axis(math::Vector3(1, 0, 0)),
+              useParentModelFrame(false)
             {
             }
 
@@ -107,6 +108,9 @@ class JointTest : public ServerFixture,
 
     /// \brief Axis value for spawned joint.
     public: math::Vector3 axis;
+
+    /// \brief Use parent model frame (#494)
+    public: bool useParentModelFrame;
   };
 
   /// \brief Spawn a model with a joint connecting to the world. The function
@@ -180,7 +184,14 @@ class JointTest : public ServerFixture,
               modelStr << "    <child>child</child>";
             modelStr
               << "    <axis>"
-              << "      <xyz>" << _opt.axis << "</xyz>"
+              << "      <xyz>" << _opt.axis << "</xyz>";
+            if (!(SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5))
+            {
+              modelStr
+                << "      <use_parent_model_frame>" << _opt.useParentModelFrame
+                << "      </use_parent_model_frame>";
+            }
+            modelStr
               << "    </axis>";
             modelStr
               << "  </joint>"
