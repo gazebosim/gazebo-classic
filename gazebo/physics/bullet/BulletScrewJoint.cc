@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A bullet screw or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -27,6 +23,57 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletScrewJoint.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    class btScrewConstraint : public btSliderConstraint
+    {
+      public: btScrewConstraint(btRigidBody &_rbA, btRigidBody &_rbB,
+          const btTransform &_frameInA, const btTransform &_frameInB,
+          bool _useLinearReferenceFrameA)
+          : btSliderConstraint(_rbA, _rbB, _frameInA, _frameInB,
+              _useLinearReferenceFrameA) {};
+
+      public: btScrewConstraint(btRigidBody &_rbB,
+          const btTransform &_frameInB, bool _useLinearReferenceFrameA)
+          : btSliderConstraint(_rbB, _frameInB, _useLinearReferenceFrameA) {};
+
+      public: virtual void getInfo2(btConstraintInfo2 *_info)
+      {
+        this->_getInfo2NonVirtual(
+            _info,
+            m_rbA.getCenterOfMassTransform(),
+            m_rbB.getCenterOfMassTransform(),
+            m_rbA.getLinearVelocity(),
+            m_rbB.getLinearVelocity(),
+            m_rbA.getInvMass(),
+            m_rbB.getInvMass());
+      }
+
+      public: void _getInfo2NonVirtual(
+          btConstraintInfo2* info,
+          const btTransform& transA,
+          const btTransform& transB,
+          const btVector3& linVelA,
+          const btVector3& linVelB,
+          btScalar rbAinvMass,btScalar rbBinvMass);
+
+      public: virtual void setThreadPitch(double _threadPitch)
+      {
+        this->threadPitch = _threadPitch;
+      }
+
+      public: virtual double getThreadPitch() const
+      {
+        return this->threadPitch;
+      }
+
+      private: double threadPitch;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
@@ -63,25 +110,44 @@ void BulletScrewJoint::Init()
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
+  // Get axis unit vector (expressed in world frame).
+  math::Vector3 axis = this->initialWorldAxis;
+  if (axis == math::Vector3::Zero)
+  {
+    gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+    axis.Set(0, 0, 1);
+  }
 
-  btTransform frame1, frame2;
-  frame1 = btTransform::getIdentity();
-  frame2 = btTransform::getIdentity();
-
-  math::Vector3 pivotA, pivotB;
+  // Local variables used to compute pivots and axes in body-fixed frames
+  // for the parent and child links.
+  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
   math::Pose pose;
+  btTransform frameParent, frameChild;
+  btVector3 axis2, axis3;
 
-  pivotA = this->anchorPos;
-  pivotB = this->anchorPos;
+  // Initialize pivots to anchorPos, which is expressed in the
+  // world coordinate frame.
+  pivotParent = this->anchorPos;
+  pivotChild = this->anchorPos;
+
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
     pose = this->parentLink->GetWorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotA -= pose.pos;
+    pivotParent -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotA = pose.rot.RotateVectorReverse(pivotA);
+    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
+    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = axisParent.Normalize();
+    // The following math is based on btHingeConstraint.cpp:95-115
+    btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), axis2, axis3);
+    frameParent.getBasis().setValue(
+      axisParent.x, axis2.x(), axis3.x(),
+      axisParent.y, axis2.y(), axis3.y(),
+      axisParent.z, axis2.z(), axis3.z());
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
@@ -89,44 +155,58 @@ void BulletScrewJoint::Init()
     // Compute relative pose between joint anchor and CoG of child link.
     pose = this->childLink->GetWorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotB -= pose.pos;
+    pivotChild -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotB = pose.rot.RotateVectorReverse(pivotB);
+    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
+    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = axisChild.Normalize();
+    // The following math is based on btHingeConstraint.cpp:95-115
+    btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), axis2, axis3);
+    frameChild.getBasis().setValue(
+      axisChild.x, axis2.x(), axis3.x(),
+      axisChild.y, axis2.y(), axis3.y(),
+      axisChild.z, axis2.z(), axis3.z());
   }
-
-  frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
-  frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
-
-  frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
-  frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
-    this->bulletScrew = new btSliderConstraint(
+    this->bulletScrew = new btScrewConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),
-        frame1, frame2, true);
+        frameParent, frameChild, true);
   }
   // If only the child exists, then create a joint between the child
   // and the world.
   else if (bulletChildLink)
   {
-    this->bulletScrew = new btSliderConstraint(
-        *bulletChildLink->GetBulletLink(), frame2, true);
+    this->bulletScrew = new btScrewConstraint(
+        *bulletChildLink->GetBulletLink(), frameChild, true);
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
   else if (bulletParentLink)
   {
-    this->bulletScrew = new btSliderConstraint(
-        *bulletParentLink->GetBulletLink(), frame1, true);
+    this->bulletScrew = new btScrewConstraint(
+        *bulletParentLink->GetBulletLink(), frameParent, true);
   }
   // Throw an error if no links are given.
   else
   {
     gzthrow("joint without links\n");
   }
+
+  if (!this->bulletScrew)
+    gzthrow("unable to create bullet screw joint\n");
+
+  // Apply joint translation limits here.
+  // TODO: velocity and effort limits.
+  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  sdf::ElementPtr limitElem;
+  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
+  this->bulletScrew->setLowerLinLimit(limitElem->Get<double>("lower"));
+  this->bulletScrew->setUpperLinLimit(limitElem->Get<double>("upper"));
 
   this->constraint = this->bulletScrew;
 
@@ -145,37 +225,58 @@ void BulletScrewJoint::Init()
 double BulletScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  if (this->bulletScrew)
-    result = this->bulletScrew->getTargetLinMotorVelocity();
+  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  if (this->childLink)
+    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+  if (this->parentLink)
+    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
   return result;
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetVelocity(unsigned int /*_index*/, double _angle)
+void BulletScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  if (this->bulletScrew)
-    this->bulletScrew->setTargetLinMotorVelocity(_angle);
+  math::Vector3 desiredVel;
+  if (this->parentLink)
+    desiredVel = this->parentLink->GetWorldLinearVel();
+  desiredVel += _vel * this->GetGlobalAxis(_index);
+  if (this->childLink)
+    this->childLink->SetLinearVel(desiredVel);
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const math::Vector3 &_axis)
 {
-  gzerr << "Not implemented in bullet\n";
+  // Note that _axis is given in a world frame,
+  // but bullet uses a body-fixed frame
+  if (!this->bulletScrew)
+  {
+    // this hasn't been initialized yet, store axis in initialWorldAxis
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
+  }
+  else
+  {
+    gzerr << "SetAxis for existing joint is not implemented\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
-    double /*_threadPitch*/)
+    double _threadPitch)
 {
-  gzerr << "Not implemented\n";
+  if (this->bulletScrew)
+    this->bulletScrew->setThreadPitch(_threadPitch);
 }
 
 //////////////////////////////////////////////////
 double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "Not implemented\n";
-  return 0;
+  double result = this->threadPitch;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getThreadPitch();
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -237,7 +338,7 @@ double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
   if (this->bulletScrew)
   {
     // I have not verified the following math, though I based it on internal
@@ -259,4 +360,16 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
   if (this->bulletScrew)
     result = this->bulletScrew->getLinearPos();
   return result;
+}
+
+//////////////////////////////////////////////////
+void btScrewConstraint::_getInfo2NonVirtual(
+    btConstraintInfo2* info,
+    const btTransform& transA,
+    const btTransform& transB,
+    const btVector3& linVelA,
+    const btVector3& linVelB,
+    btScalar rbAinvMass,btScalar rbBinvMass)
+{
+  ///TODO set up screw constraints;
 }
