@@ -203,7 +203,7 @@ namespace gazebo
       /// \brief Get joint spring reference position.
       /// \param[in] _index Index of the axis to get.
       /// \return Joint spring stiffness coefficient for this joint.
-      public: double GetSpringReferencePosition(unsigned int _index);
+      public: double GetSpringReferencePosition(unsigned int _index) const;
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
