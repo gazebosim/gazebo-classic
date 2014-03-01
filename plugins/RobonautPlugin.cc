@@ -349,10 +349,10 @@ void RobonautPlugin::Update(const common::UpdateInfo & /*_info*/)
 
 
 
-    rightAdjust = math::Pose(this->model->GetRelativePose().GetInverse().rot *
+    rightAdjust = math::Pose(this->modelStartPose.GetInverse().rot *
         (rightPose.pos - this->resetPoseRight.pos) +
         this->basePoseRight.pos,
-        this->model->GetRelativePose().GetInverse().rot *
+        this->modelStartPose.GetInverse().rot *
         rightPose.rot * this->resetPoseRight.rot.GetInverse() *
         this->basePoseRight.rot);
 
@@ -370,10 +370,10 @@ void RobonautPlugin::Update(const common::UpdateInfo & /*_info*/)
 
    // gzerr << " right adjust " << this->model->GetRelativePose().rot.GetAsEuler() << std::endl;
 
-    leftAdjust = math::Pose(this->model->GetRelativePose().GetInverse().rot *
+    leftAdjust = math::Pose(this->modelStartPose.GetInverse().rot *
         (leftPose.pos - this->resetPoseLeft.pos) +
         this->basePoseLeft.pos,
-        this->model->GetRelativePose().GetInverse().rot *
+        this->modelStartPose.GetInverse().rot *
         leftPose.rot * this->resetPoseLeft.rot.GetInverse() *
         this->basePoseLeft.rot);
 
