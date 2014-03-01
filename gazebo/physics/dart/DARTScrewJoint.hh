@@ -52,8 +52,14 @@ namespace gazebo
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 
+      ///  \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(double _threadPitch);
+
       // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      ///  \copydoc ScrewJoint::GetThreadPitch
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

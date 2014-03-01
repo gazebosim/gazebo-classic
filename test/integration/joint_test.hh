@@ -37,10 +37,6 @@ class JointTest : public ServerFixture,
              {
              }
 
-  /// \brief Test screw joint implementation
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void ScrewJoint1(const std::string &_physicsEngine);
-
   /// \brief Test spring dampers
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpringDamperTest(const std::string &_physicsEngine);

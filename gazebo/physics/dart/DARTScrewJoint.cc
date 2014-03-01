@@ -129,6 +129,12 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
+void DARTScrewJoint::SetThreadPitch(double _threadPitch)
+{
+  this->SetThreadPitch(0, _threadPitch);
+}
+
+//////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
   double result = 0.0;
@@ -139,6 +145,12 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
 
   return result;
+}
+
+//////////////////////////////////////////////////
+double DARTScrewJoint::GetThreadPitch()
+{
+  return this->GetThreadPitch(0);
 }
 
 //////////////////////////////////////////////////
