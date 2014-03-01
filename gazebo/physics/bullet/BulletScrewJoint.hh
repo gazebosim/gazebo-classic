@@ -25,12 +25,12 @@
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 
-class btSliderConstraint;
-
 namespace gazebo
 {
   namespace physics
   {
+    class btScrewConstraint;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
@@ -53,11 +53,11 @@ namespace gazebo
       /// \brief Set the axis of motion
       public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
 
-      /// \copydoc ScrewJoint::SetThreadPitch
+      // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 
-      /// \copydoc ScrewJoint::GetThreadPitch
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
 
       /// \brief Set the high stop of an axis(index).
@@ -96,7 +96,11 @@ namespace gazebo
       protected: virtual void SetForceImpl(unsigned int _index, double _force);
 
       /// \brief Pointer to bullet screw constraint
-      private: btSliderConstraint *bulletScrew;
+      private: btScrewConstraint *bulletScrew;
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      ///        in world frame.
+      private: math::Vector3 initialWorldAxis;
     };
     /// \}
   }
