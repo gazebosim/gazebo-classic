@@ -55,13 +55,7 @@ namespace gazebo
                   double _threadPitch);
 
       // Documentation inherited
-      public: virtual void SetThreadPitch(double _threadPitch);
-
-      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
-
-      // Documentation inherited
-      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
@@ -83,14 +77,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
-
-      // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
-                                        const boost::any &_value);
-
-      // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                                                unsigned int _index);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
