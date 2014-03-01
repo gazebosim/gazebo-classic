@@ -283,12 +283,6 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     gzerr << "Aborting test for dart, see issue #975.\n";
     return;
   }
-  /// SpringDamper unimplemented for simbody
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for simbody, see issue #886.\n";
-    return;
-  }
   /// bullet collision parameters needs tweaking
   if (_physicsEngine == "bullet")
   {
@@ -417,11 +411,15 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     // gzdbg << cyclesContact << " : "
     //       << linkContact->GetWorldLinearVel() << "\n";
   }
-  EXPECT_EQ(cyclesPrismatic,      17);
-  EXPECT_EQ(cyclesRevolute,       17);
+  if (_physicsEngine.compare("ode") == 0)
+  {
+    gzdbg << "Extra tests for ode" << std::endl;
+    EXPECT_EQ(cyclesPrismatic,      17);
+    EXPECT_EQ(cyclesRevolute,       17);
+    EXPECT_EQ(cyclesContact,        17);
+  }
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
-  EXPECT_EQ(cyclesContact,        17);
 }
 
 //////////////////////////////////////////////////
