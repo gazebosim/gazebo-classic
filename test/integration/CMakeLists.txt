@@ -35,7 +35,6 @@ set(tests
   gripper.cc
   imu.cc
   joint_force_torque.cc
-  joint_revolute.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
