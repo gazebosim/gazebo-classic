@@ -320,6 +320,7 @@ void ModelListWidget::ProcessModelMsgs()
 
           linkItem->setData(0, Qt::UserRole, QVariant(linkName.c_str()));
           linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+          linkItem->setData(2, Qt::UserRole, QVariant("Link"));
           this->modelTreeWidget->addTopLevelItem(linkItem);
         }
 
@@ -336,6 +337,7 @@ void ModelListWidget::ProcessModelMsgs()
                   QString::fromStdString(jointNameShort))));
 
           jointItem->setData(0, Qt::UserRole, QVariant(jointName.c_str()));
+          jointItem->setData(2, Qt::UserRole, QVariant("Joint"));
           this->modelTreeWidget->addTopLevelItem(jointItem);
         }
       }
@@ -520,19 +522,20 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     return;
 
   if (this->selectedProperty != _item || this->fillingPropertyTree)
-  {
     return;
-  }
 
-  if (this->modelsItem->indexOfChild(
-        this->modelTreeWidget->currentItem()) != -1)
+  QTreeWidgetItem *currentItem = this->modelTreeWidget->currentItem();
+  if (!currentItem)
+    return;
+
+  if (this->modelsItem->indexOfChild(currentItem) != -1 ||
+      this->modelsItem->indexOfChild(currentItem->parent()) != -1)
     this->ModelPropertyChanged(_item);
-  else if (this->lightsItem->indexOfChild(
-        this->modelTreeWidget->currentItem()) != -1)
+  else if (this->lightsItem->indexOfChild(currentItem) != -1)
     this->LightPropertyChanged(_item);
-  else if (this->modelTreeWidget->currentItem() == this->sceneItem)
+  else if (currentItem == this->sceneItem)
     this->ScenePropertyChanged(_item);
-  else if (this->modelTreeWidget->currentItem() == this->physicsItem)
+  else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
 }
 
@@ -669,11 +672,35 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 {
   msgs::Model msg;
 
-  msg.set_id(this->modelMsg.id());
-  msg.set_name(this->modelMsg.name());
+  google::protobuf::Message *fillMsg = &msg;
 
-  const google::protobuf::Descriptor *descriptor = msg.GetDescriptor();
-  const google::protobuf::Reflection *reflection = msg.GetReflection();
+  QTreeWidgetItem *currentItem = this->modelTreeWidget->currentItem();
+
+  // check if it's a link
+  if (currentItem->data(2, Qt::UserRole).toString().toStdString() == "Link")
+  {
+    // this->modelMsg may not have been set
+    // so get the model name from the current item
+    msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
+
+    // set link id and strip link name.
+    msgs::Link *linkMsg = msg.add_link();
+    linkMsg->set_id(this->linkMsg.id());
+    std::string linkName = this->linkMsg.name();
+    size_t index = linkName.find_last_of("::");
+    if (index != std::string::npos)
+      linkName = linkName.substr(index+1);
+    linkMsg->set_name(linkName);
+    fillMsg = linkMsg;
+  }
+  else
+  {
+    msg.set_id(this->modelMsg.id());
+    msg.set_name(this->modelMsg.name());
+  }
+
+  const google::protobuf::Descriptor *descriptor = fillMsg->GetDescriptor();
+  const google::protobuf::Reflection *reflection = fillMsg->GetReflection();
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -692,19 +719,19 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     {
       if (field->is_repeated())
       {
-        this->FillMsg((*iter), reflection->AddMessage(&msg, field),
+        this->FillMsg((*iter), reflection->AddMessage(fillMsg, field),
             field->message_type(), _item);
       }
       else
       {
         this->FillMsg((*iter),
-            reflection->MutableMessage(&msg, field),
+            reflection->MutableMessage(fillMsg, field),
             field->message_type(), _item);
       }
     }
     else if (field)
     {
-      this->FillMsgField((*iter), &msg, reflection, field);
+      this->FillMsgField((*iter), fillMsg, reflection, field);
     }
     else
     {
@@ -714,7 +741,9 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
   }
 
   // \todo Renable when modifying a model is fixed.
-  // this->modelPub->Publish(msg);
+  this->modelPub->Publish(msg);
+
+  std::cerr << msg.DebugString() << std::endl;
   gzwarn << "Model modification is currently disabled. "
          << "Look for this feature in Gazebo 2.0\n";
 }
@@ -1337,6 +1366,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   // Pose value
   topItem = this->variantManager->addProperty(
@@ -1345,6 +1375,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
     _parent->addSubProperty(topItem);
   else
     this->propTreeBrowser->addProperty(topItem);
+  topItem->setEnabled(false);
+
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Angle
@@ -1358,6 +1390,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       _parent->addSubProperty(item);
     else
       this->propTreeBrowser->addProperty(item);
+    item->setEnabled(false);
   }
 
   if (_msg.has_axis1())
@@ -1369,42 +1402,50 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       _parent->addSubProperty(topItem);
     else
       this->propTreeBrowser->addProperty(topItem);
+    topItem->setEnabled(false);
 
     /// XYZ of the axis
     QtProperty *xyzItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(), tr("xyz"));
     topItem->addSubProperty(xyzItem);
+    xyzItem->setEnabled(false);
     this->FillVector3dProperty(_msg.axis1().xyz(), xyzItem);
 
     // lower limit
     item = this->variantManager->addProperty(QVariant::Double, tr("lower"));
     item->setValue(_msg.axis1().limit_lower());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
 
     // upper limit
     item = this->variantManager->addProperty(QVariant::Double, tr("upper"));
     item->setValue(_msg.axis1().limit_upper());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
 
     // limit effort
     item = this->variantManager->addProperty(QVariant::Double, tr("effort"));
     item->setValue(_msg.axis1().limit_effort());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
 
     // limit velocity
     item = this->variantManager->addProperty(QVariant::Double, tr("velocity"));
     item->setValue(_msg.axis1().limit_velocity());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
 
     // damping
     item = this->variantManager->addProperty(QVariant::Double, tr("damping"));
     item->setValue(_msg.axis1().damping());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
 
     // friction
     item = this->variantManager->addProperty(QVariant::Double, tr("friction"));
     item->setValue(_msg.axis1().friction());
     topItem->addSubProperty(item);
+    item->setEnabled(false);
   }
 }
 
