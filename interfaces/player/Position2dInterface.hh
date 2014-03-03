@@ -23,7 +23,6 @@
 #define GAZEBO_POSITION2DINTERFACE_HH
 
 #include <string>
-
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface

@@ -24,6 +24,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
+
 #include "gazebo/sensors/Noise.hh"
 
 namespace Ogre

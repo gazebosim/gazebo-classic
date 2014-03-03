@@ -18,7 +18,6 @@
 #ifndef _BUILDING_ITEM_HH_
 #define _BUILDING_ITEM_HH_
 
-
 namespace gazebo
 {
   namespace gui

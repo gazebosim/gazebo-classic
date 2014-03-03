@@ -99,7 +99,6 @@
 #include <ou/platform.h>
 
 
-
 /**
  *	\typedef atomicord32
  *	\brief An uniform type for 32-bit values to be used as atomic operations' arguments.

@@ -24,7 +24,6 @@
 #include <iomanip>
 #include <sstream>
 
-
 namespace gazebo
 {
   namespace common

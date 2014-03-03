@@ -22,7 +22,6 @@
 #ifndef _SINGLETONT_HH_
 #define _SINGLETONT_HH_
 
-
 /// \addtogroup gazebo_common Common
 /// \{
 
