@@ -22,11 +22,7 @@
 #include <sys/stat.h>
 
 #include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
@@ -83,7 +79,14 @@ namespace gazebo
 
     /// \brief Destructor
     public: virtual ~PluginT()
-            { }
+            {
+              // dlclose has been disabled due to segfaults in the test suite
+              // This workaround is detailed in #1026 and #1066. After the test
+              // or gazebo execution the plugin is not loaded in memory anymore
+              // \todo Figure out the right thing to do.
+
+              // dlclose(this->dlHandle);
+            }
 
     /// \brief Get the name of the handler
     public: std::string GetFilename() const
@@ -139,7 +142,6 @@ namespace gazebo
               if (!found)
                 fullname = filename;
 
-#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
@@ -163,55 +165,6 @@ namespace gazebo
               // Register the new controller.
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
-
-#elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-              result->dlHandle = NULL;
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
 
               result->handle = _handle;
               result->filename = filename;
@@ -248,7 +201,7 @@ namespace gazebo
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins"
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
@@ -273,7 +226,7 @@ namespace gazebo
   };
 
   /// \brief A plugin with access to physics::Model.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins"
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
@@ -302,7 +255,7 @@ namespace gazebo
 
   /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins"
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
@@ -330,7 +283,7 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins"
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
@@ -359,7 +312,7 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins"
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
