@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class GAZEBO_VISIBLE TopicManager : public SingletonT<TopicManager>
+    class TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();

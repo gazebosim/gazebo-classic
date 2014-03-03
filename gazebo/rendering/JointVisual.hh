@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class JointVisual JointVisual.hh rendering/rendering.hh
     /// \brief Visualization for joints
-    class GAZEBO_VISIBLE JointVisual : public Visual
+    class JointVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual

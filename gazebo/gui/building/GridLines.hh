@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class GridLines GridLines.hh
     /// \brief 2D grid lines.
-    class GAZEBO_VISIBLE GridLines : public  QGraphicsItem
+    class GridLines : public  QGraphicsItem
     {
       /// \brief Constructor
       /// \param[in] _width Width of grid lines in pixels.

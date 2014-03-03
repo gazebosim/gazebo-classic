@@ -83,7 +83,7 @@ namespace gazebo
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class GAZEBO_VISIBLE DeleteAction : public QAction
+    class DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor

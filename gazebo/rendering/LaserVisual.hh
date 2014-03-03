@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class LaserVisual LaserVisual.hh rendering/rendering.hh
     /// \brief Visualization for laser data.
-    class GAZEBO_VISIBLE LaserVisual : public Visual
+    class LaserVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

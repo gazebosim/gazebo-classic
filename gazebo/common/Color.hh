@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
-    class GAZEBO_VISIBLE Color
+    class Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;

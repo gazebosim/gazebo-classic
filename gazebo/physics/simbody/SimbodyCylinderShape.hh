@@ -30,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Cylinder collision
-    class GAZEBO_VISIBLE SimbodyCylinderShape : public CylinderShape
+    class SimbodyCylinderShape : public CylinderShape
     {
       /// \brief Constructor
       public: SimbodyCylinderShape(CollisionPtr _parent)

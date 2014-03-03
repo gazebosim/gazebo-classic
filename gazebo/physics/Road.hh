@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class Road Road.hh physics/physics.hh
     /// \brief for building a Road from SDF
-    class GAZEBO_VISIBLE Road : public Base
+    class Road : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of this road object.

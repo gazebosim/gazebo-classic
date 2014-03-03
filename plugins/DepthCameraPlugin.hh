@@ -28,7 +28,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE DepthCameraPlugin : public SensorPlugin
+  class DepthCameraPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: DepthCameraPlugin();

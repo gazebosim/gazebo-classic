@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
-    class GAZEBO_VISIBLE Inertial
+    class Inertial
     {
       /// \brief Default Constructor
       public: Inertial();

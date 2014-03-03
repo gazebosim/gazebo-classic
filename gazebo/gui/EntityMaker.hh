@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class EntityMaker EntityMaker.hh gui/gui.hh
     /// \brief to make an entity base class
-    class GAZEBO_VISIBLE EntityMaker
+    class EntityMaker
     {
       /// \def CreateCallback
       /// \brief boost::function with vector3 pos and vector3 scale

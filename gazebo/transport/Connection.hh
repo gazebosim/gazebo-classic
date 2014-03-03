@@ -52,7 +52,7 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class GAZEBO_VISIBLE ConnectionReadTask : public tbb::task
+    class ConnectionReadTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -96,7 +96,7 @@ namespace gazebo
     ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class GAZEBO_VISIBLE Connection : public boost::enable_shared_from_this<Connection>
+    class Connection : public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();

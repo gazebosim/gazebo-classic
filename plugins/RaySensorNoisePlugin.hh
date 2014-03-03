@@ -26,7 +26,7 @@
 namespace gazebo
 {
   /// \brief A Ray Sensor Noise Plugin
-  class GAZEBO_VISIBLE RaySensorNoisePlugin : public SensorPlugin
+  class RaySensorNoisePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: RaySensorNoisePlugin();

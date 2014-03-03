@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class ColladaLoader ColladaLoader.hh common/common.hh
     /// \brief Class used to load Collada mesh files
-    class GAZEBO_VISIBLE ColladaLoader : public MeshLoader
+    class ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class EditorItem EditorItem.hh
     /// \brief Base class of an item in the editor.
-    class GAZEBO_VISIBLE EditorItem : public QObject
+    class EditorItem : public QObject
     {
       Q_OBJECT
 

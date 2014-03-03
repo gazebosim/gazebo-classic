@@ -24,7 +24,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE specific version of MultiRayShape
-    class GAZEBO_VISIBLE ODEMultiRayShape : public MultiRayShape
+    class ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

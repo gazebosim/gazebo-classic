@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class GpsSensor GpsSensor.hh sensors/sensors.hh
     /// \brief GpsSensor to provide position measurement.
-    class GAZEBO_VISIBLE GpsSensor: public Sensor
+    class GpsSensor: public Sensor
     {
       /// \brief Constructor.
       public: GpsSensor();

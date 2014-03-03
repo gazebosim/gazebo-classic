@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief A single axis hinge joint
-    class GAZEBO_VISIBLE BulletHingeJoint : public HingeJoint<BulletJoint>
+    class BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
       public: BulletHingeJoint(btDynamicsWorld *world, BasePtr _parent);

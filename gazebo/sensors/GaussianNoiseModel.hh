@@ -39,7 +39,7 @@ namespace gazebo
   {
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class
-    class GAZEBO_VISIBLE GaussianNoiseModel : public Noise
+    class GaussianNoiseModel : public Noise
     {
         /// \brief Constructor.
         public: GaussianNoiseModel();
@@ -89,7 +89,7 @@ namespace gazebo
 
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class for image sensors
-    class GAZEBO_VISIBLE ImageGaussianNoiseModel : public GaussianNoiseModel
+    class ImageGaussianNoiseModel : public GaussianNoiseModel
     {
       /// \brief Constructor.
       public: ImageGaussianNoiseModel();

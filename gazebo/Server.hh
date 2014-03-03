@@ -41,7 +41,7 @@ namespace gazebo
   /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
-  class GAZEBO_VISIBLE Server
+  class Server
   {
     /// \brief Constructor.
     public: Server();

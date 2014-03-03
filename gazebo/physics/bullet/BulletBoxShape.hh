@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet box collision
-    class GAZEBO_VISIBLE BulletBoxShape : public BoxShape
+    class BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}

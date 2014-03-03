@@ -33,7 +33,7 @@
 /// \{
 
 /// \brief Plugin Player interface for a Gazebo laser
-class GAZEBO_VISIBLE LaserInterface : public GazeboInterface
+class LaserInterface : public GazeboInterface
 {
   /// \brief Constructor
   /// \param addr Plaer device address

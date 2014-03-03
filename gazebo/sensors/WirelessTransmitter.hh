@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class WirelessTransmitter WirelessTransmitter.hh sensors/sensors.hh
     /// \brief Transmitter to send wireless signals
-    class GAZEBO_VISIBLE WirelessTransmitter: public WirelessTransceiver
+    class WirelessTransmitter: public WirelessTransceiver
     {
       /// \brief Constant used in the propagation model when there are no
       /// obstacles between transmitter and receiver

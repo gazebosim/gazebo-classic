@@ -31,7 +31,7 @@ namespace gazebo
     /// \class DynamicRenderable DynamicRenderable.hh rendering/rendering.hh
     /// \brief Abstract base class providing mechanisms for dynamically
     /// growing hardware buffers.
-    class GAZEBO_VISIBLE DynamicRenderable : public Ogre::SimpleRenderable
+    class DynamicRenderable : public Ogre::SimpleRenderable
     {
       /// \brief Constructor
       public: DynamicRenderable();

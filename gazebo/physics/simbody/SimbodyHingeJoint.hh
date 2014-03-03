@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief A single axis hinge joint
-    class GAZEBO_VISIBLE SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
+    class SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
     {
       ///  Constructor
       public: SimbodyHingeJoint(SimTK::MultibodySystem *world, BasePtr _parent);

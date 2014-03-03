@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class Road Road.hh rendering/rendering.hh
     /// \brief Used to render a strip of road.
-    class GAZEBO_VISIBLE Road2d
+    class Road2d
     {
       /// \brief Constructor
       public: Road2d();

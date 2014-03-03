@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A DART sphere shape
-    class GAZEBO_VISIBLE DARTSphereShape : public SphereShape
+    class DARTSphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

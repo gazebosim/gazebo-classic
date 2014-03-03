@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class GAZEBO_VISIBLE PhysicsEngine
+    class PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.

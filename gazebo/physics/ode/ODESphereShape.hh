@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A ODE sphere shape
-    class GAZEBO_VISIBLE ODESphereShape : public SphereShape
+    class ODESphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

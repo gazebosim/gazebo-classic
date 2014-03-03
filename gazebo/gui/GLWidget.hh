@@ -46,7 +46,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE GLWidget : public QWidget
+    class GLWidget : public QWidget
     {
       Q_OBJECT
 

@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class HeightmapData HeightmapData.hh common/common.hh
     /// \brief Encapsulates a generic heightmap data file.
-    class GAZEBO_VISIBLE HeightmapData
+    class HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() {}

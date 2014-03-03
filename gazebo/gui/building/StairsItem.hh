@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class StairsItem StairsItem.hh
     /// \brief 2D representation of a staircase.
-    class GAZEBO_VISIBLE StairsItem :  public RectItem, public BuildingItem
+    class StairsItem :  public RectItem, public BuildingItem
     {
       Q_OBJECT
 

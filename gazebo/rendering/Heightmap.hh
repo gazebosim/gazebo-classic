@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
     /// \brief Pretends to provide procedural page content to avoid page loading
-    class GAZEBO_VISIBLE DummyPageProvider : public Ogre::PageProvider
+    class DummyPageProvider : public Ogre::PageProvider
     {
       /// \brief Give a provider the opportunity to prepare page content
       /// procedurally. The parameters are not used.
@@ -84,7 +84,7 @@ namespace gazebo
 
     /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
-    class GAZEBO_VISIBLE Heightmap
+    class Heightmap
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
@@ -345,7 +345,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GAZEBO_VISIBLE GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
+    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
       public: GzTerrainMatGen();

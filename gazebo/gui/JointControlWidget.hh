@@ -35,7 +35,7 @@ namespace gazebo
     /// gui/JointControlWidget.hh
     /// \brief Widget to control joints via application of force, position
     /// PID controller, or velocity PID controller.
-    class GAZEBO_VISIBLE JointControlWidget : public QWidget
+    class JointControlWidget : public QWidget
     {
       Q_OBJECT
 
@@ -164,7 +164,7 @@ namespace gazebo
 
     /// \class JointForceControl JointForceControl gui/JointForceControl.hh
     /// \brief Widget to control joints via application of force
-    class GAZEBO_VISIBLE JointForceControl : public QWidget
+    class JointForceControl : public QWidget
     {
       Q_OBJECT
 
@@ -202,7 +202,7 @@ namespace gazebo
     /// \class JointPIDPosControl JointPIDPosControlgui/JointPIDPosControl.hh
     /// \brief Widget to control joints via application of position
     /// PID controller.
-    class GAZEBO_VISIBLE JointPIDPosControl : public QWidget
+    class JointPIDPosControl : public QWidget
     {
       Q_OBJECT
 
@@ -276,7 +276,7 @@ namespace gazebo
     /// \class JointPIDVelControl JointPIDVelControl gui/JointPIDVelControl.hh
     /// \brief Widget to control joints via application of a
     /// velocity PID controller.
-    class GAZEBO_VISIBLE JointPIDVelControl : public QWidget
+    class JointPIDVelControl : public QWidget
     {
       Q_OBJECT
 

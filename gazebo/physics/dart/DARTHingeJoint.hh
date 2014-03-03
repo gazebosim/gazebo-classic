@@ -29,7 +29,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class GAZEBO_VISIBLE DARTHingeJoint : public HingeJoint<DARTJoint>
+    class DARTHingeJoint : public HingeJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint

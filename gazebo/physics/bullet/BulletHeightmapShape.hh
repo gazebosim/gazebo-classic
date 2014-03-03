@@ -38,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Height map collision
-    class GAZEBO_VISIBLE BulletHeightmapShape : public HeightmapShape
+    class BulletHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
       public: BulletHeightmapShape(CollisionPtr _parent);

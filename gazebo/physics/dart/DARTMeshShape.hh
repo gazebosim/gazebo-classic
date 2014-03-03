@@ -25,7 +25,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
+    class DARTMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.

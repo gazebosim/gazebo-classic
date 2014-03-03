@@ -26,7 +26,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace libgazebo
@@ -36,10 +36,10 @@ namespace libgazebo
   /// \defgroup gripper_player Gripper Interface
   /// \brief Gripper Player interface
   /// \{
-  class GAZEBO_VISIBLE GripperIface;
+  class GripperIface;
 
   /// \brief Gripper interface
-  class GAZEBO_VISIBLE GripperInterface : public GazeboInterface
+  class GripperInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: GripperInterface(player_devaddr_t addr, GazeboDriver *driver,

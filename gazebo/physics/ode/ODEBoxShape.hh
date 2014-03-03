@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE Box shape
-    class GAZEBO_VISIBLE ODEBoxShape : public BoxShape
+    class ODEBoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

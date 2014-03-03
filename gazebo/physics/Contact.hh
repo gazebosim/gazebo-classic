@@ -50,7 +50,7 @@ namespace gazebo
     /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
     /// a number of contact points
-    class GAZEBO_VISIBLE Contact
+    class Contact
     {
       /// \brief Constructor.
       public: Contact();

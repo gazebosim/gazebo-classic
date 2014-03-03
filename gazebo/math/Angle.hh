@@ -48,7 +48,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
-  class GAZEBO_VISIBLE Angle
+  class Angle
   {
     /// \brief math::Angle(0)
     public: static const Angle Zero;

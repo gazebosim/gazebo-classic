@@ -24,7 +24,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE DiffDrivePlugin : public ModelPlugin
+  class DiffDrivePlugin : public ModelPlugin
   {
     public: DiffDrivePlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);

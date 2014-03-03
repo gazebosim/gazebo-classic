@@ -46,7 +46,7 @@ BEGIN_NAMESPACE_OU()
  *	knowledge in field, of course).
  */
 
-class GAZEBO_VISIBLE CAtomicFlags
+class CAtomicFlags
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CAtomicFlags():

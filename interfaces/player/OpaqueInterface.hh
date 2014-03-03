@@ -40,7 +40,7 @@ namespace libgazebo
 class OpaqueIface;
 
 /// \brief Opaque Player interface
-class GAZEBO_VISIBLE OpaqueInterface : public GazeboInterface
+class OpaqueInterface : public GazeboInterface
 {
   /// \brief Constructor
     public: OpaqueInterface(player_devaddr_t addr, GazeboDriver *driver,

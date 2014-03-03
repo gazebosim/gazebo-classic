@@ -33,7 +33,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief DART Box shape
-    class GAZEBO_VISIBLE DARTBoxShape : public BoxShape
+    class DARTBoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

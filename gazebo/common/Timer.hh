@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class GAZEBO_VISIBLE Timer
+    class Timer
     {
       /// \brief Constructor
       public: Timer();

@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class TopicSelector TopicSelector.hh gui/TopicSelector.hh
     /// \brief A widget that provides a list of topics to select from.
-    class GAZEBO_VISIBLE TopicSelector : public QDialog
+    class TopicSelector : public QDialog
     {
       Q_OBJECT
 

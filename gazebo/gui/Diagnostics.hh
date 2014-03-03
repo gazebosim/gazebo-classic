@@ -35,7 +35,7 @@ namespace gazebo
     class IncrementalPlot;
 
     /// \brief Plot diagnostic information
-    class GAZEBO_VISIBLE Diagnostics : public QDialog
+    class Diagnostics : public QDialog
     {
       Q_OBJECT
 

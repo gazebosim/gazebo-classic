@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
-    class GAZEBO_VISIBLE DynamicLines : public DynamicRenderable
+    class DynamicLines : public DynamicRenderable
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line

@@ -29,7 +29,7 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-class GAZEBO_VISIBLE SingletonT
+class SingletonT
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()

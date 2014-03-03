@@ -28,7 +28,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace libgazebo
@@ -38,10 +38,10 @@ namespace libgazebo
 /// \defgroup actarray_player Actarray Interface
 /// \brief Interface for controller an actuator array
 /// \{
-  class GAZEBO_VISIBLE ActarrayIface;
+  class ActarrayIface;
 
   /// \brief Actarray interface
-  class GAZEBO_VISIBLE ActarrayInterface : public GazeboInterface
+  class ActarrayInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: ActarrayInterface(player_devaddr_t addr, GazeboDriver *driver,

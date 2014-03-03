@@ -31,7 +31,7 @@ namespace gazebo
 
   namespace gui
   {
-    class GAZEBO_VISIBLE SphereMaker : public EntityMaker
+    class SphereMaker : public EntityMaker
     {
       public: SphereMaker();
       public: virtual ~SphereMaker();

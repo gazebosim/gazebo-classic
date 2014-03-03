@@ -31,7 +31,7 @@ namespace gazebo
   namespace common
   {
     /// \brief Private class attributes for ModelDatabase.
-    class GAZEBO_VISIBLE ModelDatabasePrivate
+    class ModelDatabasePrivate
     {
       /// \brief Thread to update the model cache.
       public: boost::thread *updateCacheThread;

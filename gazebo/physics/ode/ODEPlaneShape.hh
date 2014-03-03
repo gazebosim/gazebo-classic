@@ -25,7 +25,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An ODE Plane shape.
-    class GAZEBO_VISIBLE ODEPlaneShape : public PlaneShape
+    class ODEPlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

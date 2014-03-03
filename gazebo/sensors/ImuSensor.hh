@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor.
-    class GAZEBO_VISIBLE ImuSensor: public Sensor
+    class ImuSensor: public Sensor
     {
       /// \brief Constructor.
       public: ImuSensor();

@@ -68,7 +68,7 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
+    class Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _class

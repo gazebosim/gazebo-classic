@@ -38,7 +38,7 @@ namespace gazebo
     /// specific time during a simulation run.
     ///
     /// State of a Collision is its Pose.
-    class GAZEBO_VISIBLE CollisionState : public State
+    class CollisionState : public State
     {
       /// \brief Default constructor
       public: CollisionState();

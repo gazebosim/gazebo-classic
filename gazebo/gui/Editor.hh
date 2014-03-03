@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor.
-    class GAZEBO_VISIBLE Editor : public QObject
+    class Editor : public QObject
     {
       Q_OBJECT
 

@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
+    class BuildingMaker : public EntityMaker
     {
       /// \brief Constructor
       public: BuildingMaker();

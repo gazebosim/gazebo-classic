@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class Plane Plane.hh math/gzmath.hh
     /// \brief A plane and related functions.
-    class GAZEBO_VISIBLE Plane
+    class Plane
     {
       /// \brief Constructor
       public: Plane();

@@ -29,7 +29,7 @@ namespace gazebo
     /// \class BuildingItem BuildingItem.hh
     /// \brief Base class of a items that have building level properties such as
     /// the level number and level height.
-    class GAZEBO_VISIBLE BuildingItem
+    class BuildingItem
     {
         /// \brief Constructor
         public: BuildingItem();

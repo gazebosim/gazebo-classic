@@ -28,7 +28,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief DART cylinder shape
-    class GAZEBO_VISIBLE DARTCylinderShape : public CylinderShape
+    class DARTCylinderShape : public CylinderShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

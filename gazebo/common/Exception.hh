@@ -41,7 +41,7 @@ namespace gazebo
 
     /// \class Exception Exception.hh common/common.hh
     /// \brief Class for generating exceptions
-    class GAZEBO_VISIBLE Exception
+    class Exception
     {
       /// \brief Constructor
       public: Exception();
@@ -91,7 +91,7 @@ namespace gazebo
     /// \brief Class for generating Internal Gazebo Errors:
     ///        those errors which should never happend and
     ///        represent programming bugs.
-    class GAZEBO_VISIBLE InternalError : public Exception
+    class InternalError : public Exception
     {
       /// \brief Constructor
       public: InternalError();
@@ -112,7 +112,7 @@ namespace gazebo
     ///        gazebo assertions. They include information about the
     ///        assertion expression violated, function where problem
     ///        appeared and assertion debug message.
-    class GAZEBO_VISIBLE AssertionInternalError : public InternalError
+    class AssertionInternalError : public InternalError
     {
       /// \brief Constructor for assertions
       /// \param[in] _file File name

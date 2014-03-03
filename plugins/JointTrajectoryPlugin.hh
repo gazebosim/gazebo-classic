@@ -32,7 +32,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE JointTrajectoryPlugin : public ModelPlugin
+  class JointTrajectoryPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: JointTrajectoryPlugin();

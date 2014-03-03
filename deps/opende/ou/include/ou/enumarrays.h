@@ -70,7 +70,7 @@ struct CTypeStandardLess
  */
 
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementEqualType=CTypeStandardEqual<ElementType> >
-class GAZEBO_VISIBLE CEnumUnsortedElementArray
+class CEnumUnsortedElementArray
 {
 public:
 	_OU_CONVENTION_METHOD CEnumUnsortedElementArray()
@@ -154,7 +154,7 @@ private:
  */
 
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementLessType=CTypeStandardLess<ElementType> >
-class GAZEBO_VISIBLE CEnumSortedElementArray
+class CEnumSortedElementArray
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CEnumSortedElementArray()

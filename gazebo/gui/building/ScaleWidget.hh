@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class ScaleWidget ScaleWidget.hh
     /// \brief Widget that displays the scale (zoom level) of the editor
-    class GAZEBO_VISIBLE ScaleWidget : public QWidget
+    class ScaleWidget : public QWidget
     {
       Q_OBJECT
 

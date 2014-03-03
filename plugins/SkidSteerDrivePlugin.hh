@@ -32,7 +32,7 @@ namespace gazebo
   /// \brief A gazebo model plugin that controls a four wheel skid-steer
   ///        robot via a gazebo topic. See the Pioneer3AT model in the
   ///        OSRF model database for an example use case.
-  class GAZEBO_VISIBLE SkidSteerDrivePlugin : public ModelPlugin
+  class SkidSteerDrivePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
     public: SkidSteerDrivePlugin();

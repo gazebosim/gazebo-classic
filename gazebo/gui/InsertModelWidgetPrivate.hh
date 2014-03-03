@@ -32,7 +32,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private class attributes for InsertModelWidget.
-    class GAZEBO_VISIBLE InsertModelWidgetPrivate
+    class InsertModelWidgetPrivate
     {
       /// \brief Widget that display all the models that can be inserted.
       public: QTreeWidget *fileTreeWidget;

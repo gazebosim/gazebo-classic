@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class CallbackHelper CallbackHelper.hh transport/transport.hh
     /// \brief A helper class to handle callbacks when messages arrive
-    class GAZEBO_VISIBLE CallbackHelper
+    class CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
@@ -103,7 +103,7 @@ namespace gazebo
     /// \class CallbackHelperT CallbackHelper.hh transport/transport.hh
     /// \brief Callback helper Template
     template<class M>
-    class GAZEBO_VISIBLE CallbackHelperT : public CallbackHelper
+    class CallbackHelperT : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
@@ -167,7 +167,7 @@ namespace gazebo
     /// \brief Used to connect publishers to subscribers, where the
     /// subscriber wants the raw data from the publisher. Raw means that the
     /// data has not been converted into a protobuf message.
-    class GAZEBO_VISIBLE RawCallbackHelper : public CallbackHelper
+    class RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages

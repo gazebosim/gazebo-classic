@@ -34,7 +34,7 @@
 class GazeboInterface;
 
 /// \brief Gazebo player driver
-class GAZEBO_VISIBLE GazeboDriver : public Driver
+class GazeboDriver : public Driver
 {
   /// \brief Constructor
   public: GazeboDriver(ConfigFile *_cf, int _section);

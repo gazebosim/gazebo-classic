@@ -34,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Cylinder collision
-    class GAZEBO_VISIBLE BulletCylinderShape : public CylinderShape
+    class BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
       public: BulletCylinderShape(CollisionPtr _parent)

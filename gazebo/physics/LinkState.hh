@@ -45,7 +45,7 @@ namespace gazebo
     ///
     /// State of a Link includes the state of itself all its child Collision
     /// entities.
-    class GAZEBO_VISIBLE LinkState : public State
+    class LinkState : public State
     {
       /// \brief Default constructor
       public: LinkState();

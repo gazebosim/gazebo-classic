@@ -155,7 +155,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // API declaration
 
-class GAZEBO_VISIBLE CThreadLocalStorage
+class CThreadLocalStorage
 {
 public: // Safe methods
 	/*
@@ -260,7 +260,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // Initialization/finalization
 
-class GAZEBO_VISIBLE CTLSInitialization
+class CTLSInitialization
 {
 public:
 	enum EINITIALIZATIONFLAGS

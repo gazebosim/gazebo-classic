@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief A simbody universal joint class
-    class GAZEBO_VISIBLE SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
+    class SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the Simbody world.

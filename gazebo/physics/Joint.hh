@@ -51,7 +51,7 @@ namespace gazebo
 
     /// \class Joint Joint.hh physics/physics.hh
     /// \brief Base class for all joints
-    class GAZEBO_VISIBLE Joint : public Base
+    class Joint : public Base
     {
       /// \enum Attribute
       /// \brief Joint attribute types.

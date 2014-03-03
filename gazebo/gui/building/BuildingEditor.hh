@@ -28,7 +28,7 @@ namespace gazebo
 
     /// \class TerrainEditor TerrainEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GAZEBO_VISIBLE BuildingEditor : public Editor
+    class BuildingEditor : public Editor
     {
       Q_OBJECT
 

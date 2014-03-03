@@ -32,7 +32,7 @@ namespace gazebo
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
     /// the state of a system and a user specified target state.
-    class GAZEBO_VISIBLE PID
+    class PID
     {
       /// \brief Constructor, zeros out Pid values when created and
       /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].

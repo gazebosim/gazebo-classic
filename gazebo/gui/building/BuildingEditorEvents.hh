@@ -26,7 +26,7 @@ namespace gazebo
   {
     namespace editor
     {
-      class GAZEBO_VISIBLE Events
+      class Events
       {
         /// \brief Connect a boost::slot to the create editor item signal
         /// \param[in] _subscriber the subscriber to this event

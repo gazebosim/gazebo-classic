@@ -34,7 +34,7 @@ namespace gazebo
   {
     class ImageViewPrivate;
 
-    class GAZEBO_VISIBLE ImageView : public TopicView
+    class ImageView : public TopicView
     {
       Q_OBJECT
 

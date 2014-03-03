@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class Projector Projector.hh rendering/rendering.hh
     /// \brief Projects a material onto surface, light a light projector.
-    class GAZEBO_VISIBLE Projector
+    class Projector
     {
       /// \brief Constructor.
       /// \param[in] _parent Name of the parent visual.

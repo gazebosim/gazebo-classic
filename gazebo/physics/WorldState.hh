@@ -42,7 +42,7 @@ namespace gazebo
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
     /// children.
-    class GAZEBO_VISIBLE WorldState : public State
+    class WorldState : public State
     {
       /// \brief Default constructor
       public: WorldState();

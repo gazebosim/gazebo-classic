@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class DARTModel
     /// \brief DART model class
-    class GAZEBO_VISIBLE DARTModel : public Model
+    class DARTModel : public Model
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.

@@ -36,7 +36,7 @@ namespace gazebo
   {
     class BuildingEditorWidget;
 
-    class GAZEBO_VISIBLE RenderWidget : public QWidget
+    class RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);

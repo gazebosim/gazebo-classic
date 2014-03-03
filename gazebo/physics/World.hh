@@ -55,7 +55,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
+    class World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.

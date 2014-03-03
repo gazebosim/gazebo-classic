@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class ImageHeightmap ImageHeightmap.hh common/common.hh
     /// \brief Encapsulates an image that will be interpreted as a heightmap.
-    class GAZEBO_VISIBLE ImageHeightmap
+    class ImageHeightmap
       : public gazebo::common::HeightmapData
     {
       /// \brief Constructor

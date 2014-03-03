@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class RotationSpline RotationSpline.hh math/gzmath.hh
     /// \brief Spline for rotations
-    class GAZEBO_VISIBLE  RotationSpline
+    class  RotationSpline
     {
         /// \brief Constructor. Sets the autoCalc to true
         public: RotationSpline();

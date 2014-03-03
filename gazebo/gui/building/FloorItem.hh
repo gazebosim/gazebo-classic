@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GAZEBO_VISIBLE FloorItem : public RectItem, public BuildingItem
+    class FloorItem : public RectItem, public BuildingItem
     {
       Q_OBJECT
 

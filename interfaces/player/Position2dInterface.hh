@@ -32,7 +32,7 @@
 /// \brief Position2d Player interface
 /// \{
 /// \brief Position2d Player interface
-class GAZEBO_VISIBLE Position2dInterface : public GazeboInterface
+class Position2dInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: Position2dInterface(player_devaddr_t _addr, GazeboDriver *_driver,

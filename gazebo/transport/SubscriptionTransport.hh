@@ -34,7 +34,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Handles sending data over the wire to
     /// remote subscribers
-    class GAZEBO_VISIBLE SubscriptionTransport : public CallbackHelper
+    class SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
       public: SubscriptionTransport();

@@ -28,7 +28,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet specific version of MultiRayShape
-    class GAZEBO_VISIBLE BulletMultiRayShape : public MultiRayShape
+    class BulletMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
       public: BulletMultiRayShape(CollisionPtr parent);

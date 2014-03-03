@@ -32,7 +32,7 @@ namespace gazebo
 
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelMaker : public EntityMaker
+    class ModelMaker : public EntityMaker
     {
       public: ModelMaker();
       public: virtual ~ModelMaker();

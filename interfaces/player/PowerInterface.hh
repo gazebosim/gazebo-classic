@@ -29,7 +29,7 @@ typedef struct gz_power gz_power_t;
 
 
 /// \brief Power interface
-class GAZEBO_VISIBLE PowerInterface : public GazeboInterface
+class PowerInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: PowerInterface(player_devaddr_t addr, GazeboDriver *driver,

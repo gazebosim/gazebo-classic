@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class Material Material.hh common/common.hh
     /// \brief Encapsulates description of a material
-    class GAZEBO_VISIBLE Material
+    class Material
     {
       public: enum ShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
       public: static std::string ShadeModeStr[SHADE_COUNT];

@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class DoorItem DoorItem.hh
     /// \brief 2D representation of a door
-    class GAZEBO_VISIBLE DoorItem : public RectItem, public BuildingItem
+    class DoorItem : public RectItem, public BuildingItem
     {
       Q_OBJECT
 

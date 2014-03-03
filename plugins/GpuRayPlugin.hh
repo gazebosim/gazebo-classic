@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE GpuRayPlugin : public SensorPlugin
+  class GpuRayPlugin : public SensorPlugin
   {
     public: GpuRayPlugin();
 

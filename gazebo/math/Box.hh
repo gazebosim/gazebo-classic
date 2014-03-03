@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
-    class GAZEBO_VISIBLE Box
+    class Box
     {
       /// \brief Default constructor
       public: Box();

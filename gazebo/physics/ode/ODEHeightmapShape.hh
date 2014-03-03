@@ -33,7 +33,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE Height map collision.
-    class GAZEBO_VISIBLE ODEHeightmapShape : public HeightmapShape
+    class ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.

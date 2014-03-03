@@ -50,7 +50,7 @@ namespace gazebo
   {
     class ModelEditWidget;
 
-    class GAZEBO_VISIBLE ModelListWidget : public QWidget
+    class ModelListWidget : public QWidget
     {
       Q_OBJECT
       public: ModelListWidget(QWidget *_parent = 0);
@@ -247,7 +247,7 @@ namespace gazebo
       private: msgs::Physics_Type physicsType;
     };
 
-    class GAZEBO_VISIBLE ModelListSheetDelegate: public QItemDelegate
+    class ModelListSheetDelegate: public QItemDelegate
     {
       Q_OBJECT
       public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);

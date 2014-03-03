@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief A bullet universal joint class
-    class GAZEBO_VISIBLE BulletUniversalJoint : public UniversalJoint<BulletJoint>
+    class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);

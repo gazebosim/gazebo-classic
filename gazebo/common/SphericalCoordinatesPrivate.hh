@@ -34,7 +34,7 @@ namespace gazebo
     /// \class SphericalCoordinatesPrivate SphericalCoordinatesPrivate.hh
     ///        commmon/common.hh
     /// \brief Private data for the SphericalCoordinates class.
-    class GAZEBO_VISIBLE SphericalCoordinatesPrivate
+    class SphericalCoordinatesPrivate
     {
       /// \brief Type of surface being used.
       public: SphericalCoordinates::SurfaceType surfaceType;

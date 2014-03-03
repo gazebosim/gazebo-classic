@@ -39,7 +39,7 @@ namespace libgazebo
   class BumperIface;
 
   /// \brief Bumper interface
-  class GAZEBO_VISIBLE BumperInterface : public GazeboInterface
+  class BumperInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: BumperInterface(player_devaddr_t addr, GazeboDriver *driver,

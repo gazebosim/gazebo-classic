@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE MudPlugin : public ModelPlugin
+  class MudPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: MudPlugin();

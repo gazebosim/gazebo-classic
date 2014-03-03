@@ -57,7 +57,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class GAZEBO_VISIBLE Link : public Entity
+    class Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.

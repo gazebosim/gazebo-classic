@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief DART joint interface
-    class GAZEBO_VISIBLE DARTJoint : public Joint
+    class DARTJoint : public Joint
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.

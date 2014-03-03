@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class BoxMaker BoxMaker.hh gui/gui.hh
     /// \brief to make a box
-    class GAZEBO_VISIBLE BoxMaker : public EntityMaker
+    class BoxMaker : public EntityMaker
     {
       /// \brief Constructor
       public: BoxMaker();

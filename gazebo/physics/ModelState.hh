@@ -46,7 +46,7 @@ namespace gazebo
     ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
-    class GAZEBO_VISIBLE ModelState : public State
+    class ModelState : public State
     {
       /// \brief Default constructor.
       public: ModelState();

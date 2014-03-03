@@ -29,7 +29,7 @@
 typedef struct gz_sonar gz_sonar_t;
 
 /// \brief Sonar interface
-class GAZEBO_VISIBLE SonarInterface : public GazeboInterface
+class SonarInterface : public GazeboInterface
 {
   /// @brief Constructor
   public: SonarInterface(player_devaddr_t addr, GazeboDriver *driver,

@@ -43,7 +43,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class GAZEBO_VISIBLE ODEJointFeedback
+    class ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -58,7 +58,7 @@ namespace gazebo
     };
 
     /// \brief ODE physics engine.
-    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
+    class ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.

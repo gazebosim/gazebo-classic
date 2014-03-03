@@ -26,7 +26,7 @@
 
 namespace boost
 {
-  class GAZEBO_VISIBLE recursive_mutex;
+  class recursive_mutex;
 }
 
 namespace libgazebo
@@ -36,10 +36,10 @@ namespace libgazebo
   /// \defgroup ptz_player PTZ Interface
   /// \brief Interface for controling a ptz
   /// \{
-  class GAZEBO_VISIBLE PTZIface;
+  class PTZIface;
 
   /// \brief PTZ Interface
-  class GAZEBO_VISIBLE PTZInterface : public GazeboInterface
+  class PTZInterface : public GazeboInterface
   {
     /// \brief Constructor
     public: PTZInterface(player_devaddr_t addr, GazeboDriver *driver,

@@ -46,7 +46,7 @@ namespace gazebo
 
     /// \class OpenAL OpenAL.hh util/util.hh
     /// \brief 3D audio setup and playback.
-    class GAZEBO_VISIBLE OpenAL : public SingletonT<OpenAL>
+    class OpenAL : public SingletonT<OpenAL>
     {
       /// \brief Constructor
       private: OpenAL();
@@ -87,7 +87,7 @@ namespace gazebo
 
     /// \class OpenALSink OpenALSink.hh util/util.hh
     /// \brief OpenAL Listener. This can be thought of as a microphone.
-    class GAZEBO_VISIBLE OpenALSink
+    class OpenALSink
     {
       /// \brief Constructor
       public: OpenALSink();
@@ -108,7 +108,7 @@ namespace gazebo
 
     /// \class OpenALSource OpenALSource.hh util/util.hh
     /// \brief OpenAL Source. This can be thought of as a speaker.
-    class GAZEBO_VISIBLE OpenALSource
+    class OpenALSource
     {
       /// \brief Constructor.
       public: OpenALSource();

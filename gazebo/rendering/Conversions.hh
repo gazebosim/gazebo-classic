@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Conversions Conversions.hh rendering/Conversions.hh
     /// \brief A set of utility function to convert between Gazebo and Ogre
     /// data types
-    class GAZEBO_VISIBLE Conversions
+    class Conversions
     {
       /// \brief Return the equivalent ogre color
       /// \param[in] _clr Gazebo color to convert

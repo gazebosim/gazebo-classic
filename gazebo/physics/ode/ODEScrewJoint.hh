@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A screw joint.
-    class GAZEBO_VISIBLE ODEScrewJoint : public ScrewJoint<ODEJoint>
+    class ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.

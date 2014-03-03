@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE Events
+    class Events
     {
       /////////////////////////////////////////////////
       /// \brief Connect a boost::slot the add entity signal

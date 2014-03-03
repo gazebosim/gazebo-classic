@@ -36,7 +36,7 @@ namespace gazebo
     ///
     /// Each physics engine should implement this class.
     template< class T>
-    class GAZEBO_VISIBLE BallJoint : public T
+    class BallJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent link.

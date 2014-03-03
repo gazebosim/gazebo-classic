@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class NodeAnimation SkeletonAnimation.hh common/common.hh
     /// \brief Node animation
-    class GAZEBO_VISIBLE NodeAnimation
+    class NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
@@ -117,7 +117,7 @@ namespace gazebo
     };
 
     /// \brief Skeleton animation
-    class GAZEBO_VISIBLE SkeletonAnimation
+    class SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

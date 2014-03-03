@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class GAZEBO_VISIBLE UserCamera : public Camera
+    class UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.

@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE TimePanel : public QWidget
+    class TimePanel : public QWidget
     {
       Q_OBJECT
 

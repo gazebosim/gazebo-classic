@@ -33,7 +33,7 @@ namespace gazebo
   /// \brief A ROS Master-like manager that directs gztopic connections, enables
   ///        each gazebo network client to locate one another for peer-to-peer
   ///        communication.
-  class GAZEBO_VISIBLE Master
+  class Master
   {
     /// \def Map of unique id's to connections.
     typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;

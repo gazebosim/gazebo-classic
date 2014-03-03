@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class OrbitViewController OrbitVeiwController.hh rendering/rendering.hh
     /// \brief Orbit view controller
-    class GAZEBO_VISIBLE OrbitViewController : public ViewController
+    class OrbitViewController : public ViewController
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.

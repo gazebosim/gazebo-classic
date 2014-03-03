@@ -36,7 +36,7 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    class MainWindow : public QMainWindow
     {
       Q_OBJECT
 

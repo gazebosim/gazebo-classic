@@ -37,7 +37,7 @@ namespace gazebo
     /// \class MsgFactory MsgFactory.hh msgs/msgs.hh
     /// \brief A factory that generates protobuf message based on a string
     /// type.
-    class GAZEBO_VISIBLE MsgFactory
+    class MsgFactory
     {
       /// \brief Register a message.
       /// \param[in] _msgType Type of message to register.
@@ -72,7 +72,7 @@ namespace gazebo
       return boost::shared_ptr<gazebo::msgs::_classname>(\
           new gazebo::msgs::_classname); \
     } \
-    class GAZEBO_VISIBLE Msg##_classname \
+    class Msg##_classname \
     { \
       public: Msg##_classname() \
       { \

@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An ODEBallJoint
-    class GAZEBO_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
+    class ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.

@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class DemPrivate DemPrivate.hh common/common.hh
     /// \brief Private data for the Dem class.
-    class GAZEBO_VISIBLE DemPrivate
+    class DemPrivate
     {
       /// \brief A set of associated raster bands.
       public: GDALDataset *dataSet;

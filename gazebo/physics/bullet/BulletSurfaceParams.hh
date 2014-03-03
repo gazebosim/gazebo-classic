@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet surface parameters.
-    class GAZEBO_VISIBLE BulletSurfaceParams : public SurfaceParams
+    class BulletSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: BulletSurfaceParams();

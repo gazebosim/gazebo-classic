@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class WallItem WallItem.hh
     /// \brief 2D representation of a wall.
-    class GAZEBO_VISIBLE WallItem : public PolylineItem, public BuildingItem
+    class WallItem : public PolylineItem, public BuildingItem
     {
       Q_OBJECT
 

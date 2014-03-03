@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class CylinderMaker CylinderMaker.hh
     /// \brief to make a cylinder
-    class GAZEBO_VISIBLE CylinderMaker : public EntityMaker
+    class CylinderMaker : public EntityMaker
     {
       /// \brief Constructor
       public: CylinderMaker();

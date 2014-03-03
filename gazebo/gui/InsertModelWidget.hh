@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Private
     class InsertModelWidgetPrivate;
 
-    class GAZEBO_VISIBLE InsertModelWidget : public QWidget
+    class InsertModelWidget : public QWidget
     {
       Q_OBJECT
 

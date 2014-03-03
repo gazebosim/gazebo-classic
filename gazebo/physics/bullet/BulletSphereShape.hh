@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet sphere collision
-    class GAZEBO_VISIBLE BulletSphereShape : public SphereShape
+    class BulletSphereShape : public SphereShape
     {
       /// \brief Constructor
       public: BulletSphereShape(CollisionPtr _parent) : SphereShape(_parent) {}

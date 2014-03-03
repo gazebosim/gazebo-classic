@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief A screw joint
-    class GAZEBO_VISIBLE BulletScrewJoint : public ScrewJoint<BulletJoint>
+    class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletScrewJoint(btDynamicsWorld *world, BasePtr _parent);

@@ -41,7 +41,7 @@ namespace gazebo
 
   /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
-  class GAZEBO_VISIBLE Quaternion
+  class Quaternion
   {
     /// \brief Default Constructor
     public: Quaternion();

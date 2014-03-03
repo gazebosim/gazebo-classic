@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART Link class
-    class GAZEBO_VISIBLE DARTLink : public Link
+    class DARTLink : public Link
     {
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);

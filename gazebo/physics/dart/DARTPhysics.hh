@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART physics engine
-    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
+    class DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.

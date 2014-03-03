@@ -29,7 +29,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody specific version of MultiRayShape
-    class GAZEBO_VISIBLE SimbodyMultiRayShape : public MultiRayShape
+    class SimbodyMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
       public: SimbodyMultiRayShape(CollisionPtr parent);

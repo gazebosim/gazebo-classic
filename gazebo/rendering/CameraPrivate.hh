@@ -33,7 +33,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Private data for the Camera class
-    class GAZEBO_VISIBLE CameraPrivate
+    class CameraPrivate
     {
       /// \brief Visual that the camera is tracking.
       public: VisualPtr trackedVisual;

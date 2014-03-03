@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class STLLoader STLLoader.hh common/common.hh
     /// \brief Class used to load STL mesh files
-    class GAZEBO_VISIBLE STLLoader : public MeshLoader
+    class STLLoader : public MeshLoader
     {
       /// \brief Constructor
       public: STLLoader();

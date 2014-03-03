@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class GAZEBO_VISIBLE WindowManager
+    class WindowManager
     {
       /// \brief Constructor
       public: WindowManager();

@@ -26,7 +26,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A slider joint
-    class GAZEBO_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
+    class DARTSliderJoint : public SliderJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the Link that is the joint' parent

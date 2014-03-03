@@ -52,7 +52,7 @@ namespace gazebo
     /// \class BulletTypes BulletTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and bullet.
-    class GAZEBO_VISIBLE BulletTypes {
+    class BulletTypes {
       /// \brief Convert a bullet btVector3 to a gazebo Vector3.
       /// \param[in] _bt Bullet Vector3.
       /// \return Gazebo Vector3.

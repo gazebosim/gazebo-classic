@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class NoiseFactory Noise.hh sensors/sensors.hh
     /// \brief Use this noise manager for creating and loading noise models.
-    class GAZEBO_VISIBLE NoiseFactory
+    class NoiseFactory
     {
       /// \brief Load a noise model based on the input sdf parameters and
       /// sensor type.
@@ -50,7 +50,7 @@ namespace gazebo
 
     /// \class Noise Noise.hh
     /// \brief Noise models for sensor output signals.
-    class GAZEBO_VISIBLE Noise
+    class Noise
     {
       /// \brief Which noise types we support
       public: enum NoiseType

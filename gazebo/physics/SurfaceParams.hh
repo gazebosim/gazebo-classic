@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
     /// \brief Parameters used for friction pyramid model.
-    class GAZEBO_VISIBLE FrictionPyramid
+    class FrictionPyramid
     {
       /// \brief Constructor.
       public: FrictionPyramid();
@@ -89,7 +89,7 @@ namespace gazebo
     /// \brief SurfaceParams defines various Surface contact parameters.
     /// These parameters defines the properties of a
     /// physics::Contact constraint.
-    class GAZEBO_VISIBLE SurfaceParams
+    class SurfaceParams
     {
       /// \brief Constructor.
       public: SurfaceParams();

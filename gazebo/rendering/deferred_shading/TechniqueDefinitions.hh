@@ -23,7 +23,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE NullTechnique
+    class NullTechnique
     {
       protected: std::string GetMaterialPrefix() const
                  {return "NullTechnique";}
@@ -32,7 +32,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return true;}
     };
-    class GAZEBO_VISIBLE DeferredShading
+    class DeferredShading
     {
       protected: std::string GetMaterialPrefix() const
                  {return "DeferredShading";}
@@ -41,7 +41,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return true;}
     };
-    class GAZEBO_VISIBLE DeferredLighting
+    class DeferredLighting
     {
       protected: std::string GetMaterialPrefix() const
                  {return "DeferredLighting";}
@@ -50,7 +50,7 @@ namespace gazebo
       protected: bool UseMaterialProperties() const
                  {return false;}
     };
-    class GAZEBO_VISIBLE InferredLighting
+    class InferredLighting
     {
       protected: std::string GetMaterialPrefix() const
                  {return "InferredLighting";}

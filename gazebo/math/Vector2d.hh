@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class Vector2d Vector2D.hh math/gzmath.hh
     /// \brief Generic double x, y vector
-    class GAZEBO_VISIBLE Vector2d
+    class Vector2d
     {
       /// \brief Constructor
       public: Vector2d();

@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE Link class.
-    class GAZEBO_VISIBLE ODELink : public Link
+    class ODELink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
