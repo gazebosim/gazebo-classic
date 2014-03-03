@@ -25,7 +25,7 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/Noise.hh"
-#include <gazebo/util/system.hh>
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

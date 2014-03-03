@@ -22,11 +22,10 @@
 #include <string>
 
 #include <sdf/sdf.hh>
-#include "gazebo/util/system.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include <gazebo/util/system.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

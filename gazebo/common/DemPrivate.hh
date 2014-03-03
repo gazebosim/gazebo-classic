@@ -19,7 +19,7 @@
 #define _GAZEBO_DEM_PRIVATE_HH_
 
 #include <gazebo/gazebo_config.h>
-#include "gazebo/util/system.hh"
+#include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
 # include <gdal/gdal_priv.h>

@@ -21,7 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
-#include <gazebo/util/system.hh>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
