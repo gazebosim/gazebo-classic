@@ -27,7 +27,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/TopicManager.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

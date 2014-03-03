@@ -19,7 +19,6 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

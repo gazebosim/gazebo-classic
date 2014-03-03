@@ -28,7 +28,6 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

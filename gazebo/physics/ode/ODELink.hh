@@ -24,7 +24,6 @@
 #include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/Link.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

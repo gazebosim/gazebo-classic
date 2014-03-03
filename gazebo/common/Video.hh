@@ -18,7 +18,6 @@
 #define _VIDEO_HH_
 
 #include <string>
-#include "gazebo/util/system.hh"
 
 struct AVFormatContext;
 struct AVCodecContext;

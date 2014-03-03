@@ -28,7 +28,6 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

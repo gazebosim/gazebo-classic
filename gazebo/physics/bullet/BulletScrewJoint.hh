@@ -24,7 +24,6 @@
 
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
-#include "gazebo/util/system.hh"
 
 class btSliderConstraint;
 

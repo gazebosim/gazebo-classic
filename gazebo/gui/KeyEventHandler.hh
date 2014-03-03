@@ -23,7 +23,6 @@
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

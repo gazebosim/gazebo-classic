@@ -36,7 +36,6 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector2i.hh"
-#include "gazebo/util/system.hh"
 
 namespace SkyX
 {

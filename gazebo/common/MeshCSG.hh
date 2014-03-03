@@ -18,7 +18,6 @@
 #define _MESHCSG_HH_
 
 #include "gazebo/math/Pose.hh"
-#include "gazebo/util/system.hh"
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;

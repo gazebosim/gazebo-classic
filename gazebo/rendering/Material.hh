@@ -18,7 +18,6 @@
 #define _RENDERING_MATERIAL_HH_
 
 #include "gazebo/common/Material.hh"
-#include "gazebo/util/system.hh"
 
 /// \cond
 namespace gazebo

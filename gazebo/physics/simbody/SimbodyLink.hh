@@ -24,7 +24,6 @@
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

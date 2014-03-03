@@ -24,7 +24,6 @@
 
 #include <string>
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface Interfaces

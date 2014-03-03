@@ -33,7 +33,6 @@
 #include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

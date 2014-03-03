@@ -19,7 +19,6 @@
 
 #include <string>
 #include "gazebo/common/Event.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

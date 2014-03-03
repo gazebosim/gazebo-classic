@@ -19,7 +19,6 @@
 #define _BUILDING_EDITOR_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

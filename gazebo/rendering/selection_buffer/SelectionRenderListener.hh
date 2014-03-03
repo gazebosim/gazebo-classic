@@ -18,7 +18,6 @@
 #define _SELECTIONRENDERLISTENER_HH_
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

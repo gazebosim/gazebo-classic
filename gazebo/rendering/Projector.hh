@@ -32,7 +32,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

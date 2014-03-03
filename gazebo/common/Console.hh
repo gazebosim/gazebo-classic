@@ -26,7 +26,6 @@
 #include <boost/thread.hpp>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "gazebo/gui/GuiTypes.hh"
-#include "gazebo/util/system.hh"
 
 class QWidget;
 

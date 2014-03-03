@@ -17,7 +17,6 @@
 #ifndef _KEYEVENT_HH_
 #define _KEYEVENT_HH_
 
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -30,7 +30,6 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Contact.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

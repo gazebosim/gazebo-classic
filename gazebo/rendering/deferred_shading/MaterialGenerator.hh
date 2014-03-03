@@ -22,7 +22,6 @@
 #include <map>
 
 #include <string>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

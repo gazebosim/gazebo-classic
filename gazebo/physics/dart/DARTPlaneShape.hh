@@ -19,7 +19,6 @@
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

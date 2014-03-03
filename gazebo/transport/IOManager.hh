@@ -19,7 +19,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

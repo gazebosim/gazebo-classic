@@ -19,7 +19,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

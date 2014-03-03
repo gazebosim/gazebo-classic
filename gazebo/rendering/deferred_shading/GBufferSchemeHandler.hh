@@ -22,7 +22,6 @@
 #include <string>
 
 #include "gazebo/rendering/deferred_shading/GBufferMaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

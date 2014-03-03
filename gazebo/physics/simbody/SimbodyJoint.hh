@@ -23,7 +23,6 @@
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

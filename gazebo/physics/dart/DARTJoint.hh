@@ -25,7 +25,6 @@
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

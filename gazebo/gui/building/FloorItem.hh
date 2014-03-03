@@ -22,7 +22,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

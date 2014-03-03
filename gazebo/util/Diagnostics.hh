@@ -37,7 +37,6 @@
 #include "gazebo/common/Timer.hh"
 
 #include "gazebo/util/UtilTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

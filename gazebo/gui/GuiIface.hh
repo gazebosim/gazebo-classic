@@ -21,7 +21,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
 #include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/util/system.hh"
 
 extern GAZEBO_VISIBLE boost::property_tree::ptree g_propTree;
 namespace gazebo

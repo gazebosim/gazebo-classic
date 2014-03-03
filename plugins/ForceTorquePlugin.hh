@@ -21,7 +21,6 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

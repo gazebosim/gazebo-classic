@@ -29,7 +29,6 @@
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

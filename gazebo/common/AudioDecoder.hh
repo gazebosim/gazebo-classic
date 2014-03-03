@@ -20,7 +20,6 @@
 
 #include <stdint.h>
 #include <string>
-#include "gazebo/util/system.hh"
 
 struct AVFormatContext;
 struct AVCodecContext;

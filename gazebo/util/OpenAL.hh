@@ -27,7 +27,6 @@
 #include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/util/system.hh"
 
 #ifdef HAVE_OPENAL
 

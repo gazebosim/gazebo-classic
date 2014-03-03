@@ -27,7 +27,6 @@
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Collision.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

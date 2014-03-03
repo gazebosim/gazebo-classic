@@ -29,7 +29,6 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

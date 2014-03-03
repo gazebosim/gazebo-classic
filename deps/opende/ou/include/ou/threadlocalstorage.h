@@ -42,7 +42,6 @@
 #else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
 
 #include <pthread.h>
-#include <gazebo/util/system.hh>
 
 
 #endif // #if _OU_TARGET_OS == ...

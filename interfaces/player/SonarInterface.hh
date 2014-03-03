@@ -22,7 +22,6 @@
 #ifndef SONARINTERFACE_HH
 #define SONARINTERFACE_HH
 
-#include "gazebo/util/system.hh"
 
 #include "GazeboInterface.hh"
 

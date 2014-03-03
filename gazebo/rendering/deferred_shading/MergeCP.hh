@@ -19,7 +19,6 @@
 
 #include <OgreCompositorInstance.h>
 #include <OgreCustomCompositionPass.h>
-#include "gazebo/util/system.hh"
 
 
 namespace gazebo

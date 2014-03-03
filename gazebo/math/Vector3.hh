@@ -27,7 +27,6 @@
 #include <fstream>
 
 #include "gazebo/math/Helpers.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

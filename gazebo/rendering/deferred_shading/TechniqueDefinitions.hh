@@ -18,7 +18,6 @@
 #define _TECHNIQUEDEFINITIONS_HH_
 
 #include <string>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -27,7 +27,6 @@
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/util/system.hh"
 
 class btHinge2Constraint;
 

@@ -20,7 +20,6 @@
 #include <OgreSimpleRenderable.h>
 
 #include "gazebo/rendering/deferred_shading/GeomUtils.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

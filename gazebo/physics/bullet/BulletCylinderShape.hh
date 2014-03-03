@@ -24,7 +24,6 @@
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

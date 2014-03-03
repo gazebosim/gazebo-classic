@@ -21,7 +21,6 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -30,7 +30,6 @@
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
 #include "gazebo/physics/JointState.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

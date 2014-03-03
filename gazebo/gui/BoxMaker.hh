@@ -20,7 +20,6 @@
 #include <string>
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

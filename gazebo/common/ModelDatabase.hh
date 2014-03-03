@@ -24,7 +24,6 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/util/system.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"

@@ -23,7 +23,6 @@
 #define _RAND_HH_
 
 #include <boost/random.hpp>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

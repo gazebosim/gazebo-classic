@@ -19,7 +19,6 @@
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

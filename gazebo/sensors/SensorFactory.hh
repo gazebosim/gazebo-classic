@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

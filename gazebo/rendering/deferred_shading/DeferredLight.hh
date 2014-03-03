@@ -22,7 +22,6 @@
 #include <OgreTechnique.h>
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

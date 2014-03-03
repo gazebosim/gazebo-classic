@@ -19,7 +19,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include <google/protobuf/message.h>
-#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_transport

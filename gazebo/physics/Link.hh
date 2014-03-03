@@ -36,7 +36,6 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

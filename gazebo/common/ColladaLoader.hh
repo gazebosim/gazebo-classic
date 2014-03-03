@@ -24,7 +24,6 @@
 
 #include "gazebo/common/MeshLoader.hh"
 #include "gazebo/math/MathTypes.hh"
-#include "gazebo/util/system.hh"
 
 class TiXmlElement;
 

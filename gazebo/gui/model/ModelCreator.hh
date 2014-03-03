@@ -32,7 +32,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

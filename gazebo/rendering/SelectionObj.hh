@@ -20,7 +20,6 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

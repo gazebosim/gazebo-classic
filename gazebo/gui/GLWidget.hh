@@ -41,7 +41,6 @@
 #include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

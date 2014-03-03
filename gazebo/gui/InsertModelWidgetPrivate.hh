@@ -22,7 +22,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Event.hh"
-#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;

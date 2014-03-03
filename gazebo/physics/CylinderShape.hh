@@ -23,7 +23,6 @@
 #define _CYLINDERSHAPE_HH_
 
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -25,7 +25,6 @@
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

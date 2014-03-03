@@ -21,7 +21,6 @@
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/SphereShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

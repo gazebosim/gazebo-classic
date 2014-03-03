@@ -20,7 +20,6 @@
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

@@ -18,7 +18,6 @@
 #define _BASE_64_HH_
 
 #include <string>
-#include "gazebo/util/system.hh"
 
 /// \brief Encode a binary string into base 64.
 /// \param[in] _bytesToEncode String of bytes to encode.

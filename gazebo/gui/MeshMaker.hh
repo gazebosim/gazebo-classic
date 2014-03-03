@@ -19,7 +19,6 @@
 
 #include <string>
 #include "gazebo/gui/EntityMaker.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

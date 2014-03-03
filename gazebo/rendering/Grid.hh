@@ -27,7 +27,6 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

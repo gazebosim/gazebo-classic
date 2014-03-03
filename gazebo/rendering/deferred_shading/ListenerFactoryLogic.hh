@@ -20,7 +20,6 @@
 #include <OgreCompositorInstance.h>
 #include <OgreCompositorLogic.h>
 #include <map>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

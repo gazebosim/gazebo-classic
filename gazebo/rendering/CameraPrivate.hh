@@ -22,7 +22,6 @@
 #include <list>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

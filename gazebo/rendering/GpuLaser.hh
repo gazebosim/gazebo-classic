@@ -37,7 +37,6 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

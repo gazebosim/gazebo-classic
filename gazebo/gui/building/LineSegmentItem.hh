@@ -19,7 +19,6 @@
 #define _LINE_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

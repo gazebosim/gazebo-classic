@@ -20,7 +20,6 @@
 
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

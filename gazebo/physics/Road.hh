@@ -22,7 +22,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

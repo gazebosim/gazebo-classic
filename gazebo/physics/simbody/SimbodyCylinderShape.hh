@@ -20,7 +20,6 @@
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

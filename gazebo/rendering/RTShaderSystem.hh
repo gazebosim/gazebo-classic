@@ -31,7 +31,6 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -22,7 +22,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

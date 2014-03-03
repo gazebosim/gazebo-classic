@@ -27,7 +27,6 @@
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

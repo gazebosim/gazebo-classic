@@ -24,7 +24,6 @@
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

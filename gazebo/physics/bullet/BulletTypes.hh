@@ -23,7 +23,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector4.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics

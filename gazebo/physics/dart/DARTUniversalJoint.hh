@@ -20,7 +20,6 @@
 
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

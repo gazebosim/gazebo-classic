@@ -23,7 +23,6 @@
 
 #include "gazebo/transport/Connection.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

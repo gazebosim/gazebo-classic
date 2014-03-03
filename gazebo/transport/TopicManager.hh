@@ -37,7 +37,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/Subscriber.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

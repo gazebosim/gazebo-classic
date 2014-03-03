@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "player.h"
-#include "gazebo/util/system.hh"
 
 /// \addtogroup player
 /// \brief Gazebo player driver

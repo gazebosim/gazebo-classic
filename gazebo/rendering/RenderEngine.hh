@@ -30,7 +30,6 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

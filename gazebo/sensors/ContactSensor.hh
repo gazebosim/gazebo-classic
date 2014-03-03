@@ -32,7 +32,6 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -19,7 +19,6 @@
 #define _GRID_LINES_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

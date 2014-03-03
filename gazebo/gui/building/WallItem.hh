@@ -21,7 +21,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/PolylineItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

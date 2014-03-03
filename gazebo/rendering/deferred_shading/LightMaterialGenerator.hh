@@ -32,7 +32,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/rendering/deferred_shading/TechniqueDefinitions.hh"
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

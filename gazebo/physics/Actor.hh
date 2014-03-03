@@ -25,7 +25,6 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

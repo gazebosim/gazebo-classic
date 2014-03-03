@@ -23,7 +23,6 @@
 #define _SLIDERJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

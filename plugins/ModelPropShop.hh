@@ -20,7 +20,6 @@
 #include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/gazebo.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

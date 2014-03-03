@@ -22,7 +22,6 @@
 #include <map>
 
 #include "gazebo/rendering/deferred_shading/ListenerFactoryLogic.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

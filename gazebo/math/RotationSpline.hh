@@ -19,7 +19,6 @@
 
 #include <vector>
 #include "gazebo/math/Quaternion.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

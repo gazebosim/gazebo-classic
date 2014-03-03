@@ -37,7 +37,6 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

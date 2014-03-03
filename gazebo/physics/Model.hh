@@ -31,7 +31,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
-#include "gazebo/util/system.hh"
 
 namespace boost
 {

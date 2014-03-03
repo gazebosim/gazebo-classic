@@ -31,7 +31,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

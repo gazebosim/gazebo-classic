@@ -26,7 +26,6 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;

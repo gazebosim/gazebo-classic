@@ -24,7 +24,6 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

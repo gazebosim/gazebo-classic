@@ -23,7 +23,6 @@
 #define _BOXSHAPE_HH_
 
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

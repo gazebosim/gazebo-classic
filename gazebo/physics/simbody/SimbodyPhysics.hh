@@ -28,7 +28,6 @@
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

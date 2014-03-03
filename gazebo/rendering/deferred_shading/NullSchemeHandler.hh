@@ -18,7 +18,6 @@
 #define _NULLSCHEMEHANDLER_HH_
 
 #include <OgreMaterialManager.h>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -22,7 +22,6 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

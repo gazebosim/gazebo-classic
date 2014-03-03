@@ -18,7 +18,6 @@
 #define _GBUFFER_MATERIAL_GENERATOR_HH_
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

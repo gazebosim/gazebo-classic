@@ -19,7 +19,6 @@
 #define _SIMBODY_PLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

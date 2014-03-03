@@ -25,7 +25,6 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -28,7 +28,6 @@
 #include <iostream>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

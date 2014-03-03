@@ -19,7 +19,6 @@
 #define _GAZEBO_DARTMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

@@ -20,7 +20,6 @@
 
 #include <math.h>
 #include <iostream>
-#include "gazebo/util/system.hh"
 
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians

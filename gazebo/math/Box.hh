@@ -19,7 +19,6 @@
 
 #include <iostream>
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

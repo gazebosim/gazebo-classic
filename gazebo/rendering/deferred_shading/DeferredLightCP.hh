@@ -28,7 +28,6 @@
 #include "gazebo/rendering/deferred_shading/DeferredLight.hh"
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
 #include "gazebo/rendering/deferred_shading/AmbientLight.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

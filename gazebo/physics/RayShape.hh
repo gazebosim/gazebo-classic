@@ -26,7 +26,6 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

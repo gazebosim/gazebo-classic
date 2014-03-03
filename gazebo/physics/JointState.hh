@@ -26,7 +26,6 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

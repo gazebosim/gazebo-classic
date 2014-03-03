@@ -22,7 +22,6 @@
 #include <vector>
 
 #include <gazebo/gazebo.hh>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

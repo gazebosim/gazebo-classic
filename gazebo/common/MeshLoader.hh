@@ -18,7 +18,6 @@
 #define MESHLOADER_HH
 
 #include <string>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

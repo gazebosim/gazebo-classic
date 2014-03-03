@@ -22,7 +22,6 @@
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
-#include <gazebo/util/system.hh>
 
 namespace gazebo
 {

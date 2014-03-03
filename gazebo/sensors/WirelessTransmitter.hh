@@ -22,7 +22,6 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -19,7 +19,6 @@
 #define _SIMBODY_MODEL_HH_
 
 #include "gazebo/physics/Model.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

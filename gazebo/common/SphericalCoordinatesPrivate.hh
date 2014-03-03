@@ -20,7 +20,6 @@
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/Angle.hh"
-#include "gazebo/util/system.hh"
 
 
 namespace gazebo

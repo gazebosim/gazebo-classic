@@ -22,7 +22,6 @@
 
 #include "Connection.hh"
 #include "CallbackHelper.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

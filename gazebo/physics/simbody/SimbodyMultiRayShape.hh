@@ -19,7 +19,6 @@
 #define _SIMBODY_MULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

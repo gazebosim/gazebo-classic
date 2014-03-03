@@ -34,7 +34,6 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -31,7 +31,6 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
 #include <gazebo/math/Helpers.hh>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

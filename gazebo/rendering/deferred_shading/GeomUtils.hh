@@ -19,7 +19,6 @@
 
 #include <OgreString.h>
 #include <OgreVertexIndexData.h>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -25,7 +25,6 @@
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/util/system.hh"
 
 class btUniversalConstraint;
 

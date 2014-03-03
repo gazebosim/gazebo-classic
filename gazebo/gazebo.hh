@@ -19,7 +19,6 @@
 
 #include <gazebo/gazebo_core.hh>
 #include <string>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

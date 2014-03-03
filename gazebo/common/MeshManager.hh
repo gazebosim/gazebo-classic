@@ -27,7 +27,6 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Plane.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

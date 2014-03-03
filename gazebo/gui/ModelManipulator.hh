@@ -25,7 +25,6 @@
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

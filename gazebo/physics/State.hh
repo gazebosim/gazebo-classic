@@ -27,7 +27,6 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

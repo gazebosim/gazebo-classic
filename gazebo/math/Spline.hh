@@ -23,7 +23,6 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix4.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -34,7 +34,6 @@
 #include <ou/namespace.h>
 
 #include <stddef.h>
-#include <gazebo/util/system.hh>
 
 
 BEGIN_NAMESPACE_OU()

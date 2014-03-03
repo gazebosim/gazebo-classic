@@ -21,7 +21,6 @@
 #include <string>
 
 #include "gazebo/common/MeshLoader.hh"
-#include "gazebo/util/system.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000

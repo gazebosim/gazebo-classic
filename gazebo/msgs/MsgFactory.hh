@@ -23,7 +23,6 @@
 #include <vector>
 #include <google/protobuf/message.h>
 #include <boost/shared_ptr.hpp>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

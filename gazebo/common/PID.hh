@@ -19,7 +19,6 @@
 #define _GAZEBO_PID_HH_
 
 #include "gazebo/common/Time.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

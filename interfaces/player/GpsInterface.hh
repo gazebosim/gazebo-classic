@@ -23,7 +23,6 @@
 #define GPSINTERFACE_HH
 
 #include "GazeboInterface.hh"
-#include "gazebo/util/system.hh"
 
 namespace boost
 {

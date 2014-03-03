@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "gazebo/rendering/deferred_shading/MergeMaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

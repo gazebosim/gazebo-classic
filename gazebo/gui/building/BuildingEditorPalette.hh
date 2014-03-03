@@ -24,7 +24,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Events.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

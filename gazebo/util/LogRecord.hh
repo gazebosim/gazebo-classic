@@ -37,7 +37,6 @@
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/util/system.hh"
 
 #define GZ_LOG_VERSION "1.0"
 

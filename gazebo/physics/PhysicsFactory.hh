@@ -27,7 +27,6 @@
 #include <map>
 
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

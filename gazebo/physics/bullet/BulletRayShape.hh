@@ -24,7 +24,6 @@
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

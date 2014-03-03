@@ -19,7 +19,6 @@
 
 #include <string>
 #include "gazebo/common/Time.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

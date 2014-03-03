@@ -18,7 +18,6 @@
 #define _MERGEMATERIALGENERATOR_HH_
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

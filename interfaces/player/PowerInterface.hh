@@ -22,7 +22,6 @@
 #ifndef POWERINTERFACE_HH
 #define POWERINTERFACE_HH
 
-#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 // Forward declarations

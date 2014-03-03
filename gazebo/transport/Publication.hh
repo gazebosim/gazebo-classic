@@ -29,7 +29,6 @@
 #include "gazebo/transport/CallbackHelper.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/PublicationTransport.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

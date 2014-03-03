@@ -29,7 +29,6 @@
 #include <string>
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

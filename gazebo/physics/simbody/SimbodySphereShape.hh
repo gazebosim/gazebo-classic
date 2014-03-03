@@ -19,7 +19,6 @@
 #define _SIMBODY_SPHERE_SHAPE_HH_
 
 #include "gazebo/physics/SphereShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

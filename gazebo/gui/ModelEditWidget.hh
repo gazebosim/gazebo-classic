@@ -20,7 +20,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 

@@ -24,7 +24,6 @@
 #include <iomanip>
 #include <sstream>
 
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -24,7 +24,6 @@
 
 #include <string>
 
-#include "gazebo/util/system.hh"
 
 /// \addtogroup player
 /// \brief Gazebo client handler

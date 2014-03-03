@@ -22,7 +22,6 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/SonarSensor.hh"
 #include "gazebo/gazebo.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

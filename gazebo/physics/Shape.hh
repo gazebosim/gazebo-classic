@@ -26,7 +26,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Base.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

@@ -29,7 +29,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

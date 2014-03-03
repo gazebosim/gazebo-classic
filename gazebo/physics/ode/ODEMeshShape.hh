@@ -23,7 +23,6 @@
 #define _ODEMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

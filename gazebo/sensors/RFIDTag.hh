@@ -29,7 +29,6 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

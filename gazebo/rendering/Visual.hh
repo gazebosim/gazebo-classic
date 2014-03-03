@@ -40,7 +40,6 @@
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace Ogre
 {

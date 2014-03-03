@@ -24,7 +24,6 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/system.hh"
 #include "gazebo/gazebo_config.h"
 
 GAZEBO_VISIBLE

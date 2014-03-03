@@ -25,7 +25,6 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

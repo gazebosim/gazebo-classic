@@ -25,7 +25,6 @@
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/Link.hh"
-#include "gazebo/util/system.hh"
 
 class btRigidBody;
 

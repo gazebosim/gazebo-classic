@@ -25,7 +25,6 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
