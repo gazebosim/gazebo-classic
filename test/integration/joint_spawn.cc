@@ -51,6 +51,7 @@ class JointSpawningTest : public JointTest
                                          const std::string &_jointType);
 
   /// \brief Check joint properties.
+  /// \param[in] _index Joint angle index.
   /// \param[in] _joint Joint to check.
   public: void CheckJointProperties(unsigned int _index,
                                     physics::JointPtr _joint);
