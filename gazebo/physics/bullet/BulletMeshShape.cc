@@ -60,11 +60,17 @@ void BulletMeshShape::Init()
 
   btTriangleMesh *mTriMesh = new btTriangleMesh();
 
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
+  unsigned int numVertices = this->submesh ? this->submesh->GetVertexCount() :
+    this->mesh->GetVertexCount();
+
+  unsigned int numIndices = this->submesh ? this->submesh->GetIndexCount() :
+    this->mesh->GetIndexCount();
 
   // Get all the vertex and index data
-  this->mesh->FillArrays(&vertices, &indices);
+  if (!this->submesh)
+    this->mesh->FillArrays(&vertices, &indices);
+  else
+    this->submesh->FillArrays(&vertices, &indices);
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)
