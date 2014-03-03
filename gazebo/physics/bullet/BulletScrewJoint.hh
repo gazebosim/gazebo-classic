@@ -47,6 +47,13 @@ namespace gazebo
       /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
+
       // Documentation inherited.
       public: virtual void Init();
 

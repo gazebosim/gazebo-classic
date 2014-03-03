@@ -53,6 +53,34 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
+{
+  dVector3 result;
+
+  if (this->jointId)
+    dJointGetScrewAnchor(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
+{
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
+
+  if (this->jointId)
+    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
