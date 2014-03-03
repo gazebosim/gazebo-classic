@@ -129,7 +129,7 @@ namespace gazebo
     /// should only be used when sending a message very infrequently.
     /// \param[in] _topic The topic to advertise
     /// \param[in] _message Message to be published
-    template<typename M> 
+    template<typename M>
     GAZEBO_VISIBLE
     void publish(const std::string &_topic,
                  const google::protobuf::Message &_message)
