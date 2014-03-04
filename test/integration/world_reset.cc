@@ -60,7 +60,7 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
   unsigned int steps = 250;
 
   // Step forward, verify time increasing
-  world->StepWorld(steps);
+  world->Step(steps);
   double simTime = world->GetSimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
@@ -73,7 +73,7 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
     EXPECT_NEAR(simTime, 0.0, dt);
 
     // Step forward, verify time increasing
-    world->StepWorld(steps);
+    world->Step(steps);
     simTime = world->GetSimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
   }
