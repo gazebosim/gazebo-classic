@@ -548,9 +548,6 @@ namespace gazebo
       /// \brief Link data message
       private: msgs::LinkData linkDataMsg;
 
-      /// \brief Event connections
-      private: std::vector<event::ConnectionPtr> connections;
-
       /// \brief True to publish data, false otherwise
       private: bool publishData;
 

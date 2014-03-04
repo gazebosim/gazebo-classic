@@ -83,9 +83,9 @@ void GpsSensor::Load(const std::string &_worldName)
   // Load velocity noise parameters
   {
     sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
-    this->horizontalPositionNoise = NoiseFactory::NewNoiseModel(
+    this->horizontalVelocityNoise = NoiseFactory::NewNoiseModel(
       velElem->GetElement("horizontal")->GetElement("noise"));
-    this->verticalPositionNoise = NoiseFactory::NewNoiseModel(
+    this->verticalVelocityNoise = NoiseFactory::NewNoiseModel(
       velElem->GetElement("vertical")->GetElement("noise"));
   }
 }

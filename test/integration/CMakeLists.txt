@@ -35,6 +35,7 @@ set(tests
   gripper.cc
   imu.cc
   joint_force_torque.cc
+  joint_revolute.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
@@ -56,6 +57,7 @@ set(tests
   surface_properties.cc
   transceiver.cc
   world.cc
+  worlds_installed.cc
   )
 
 if (MANPAGES_SUPPORT)

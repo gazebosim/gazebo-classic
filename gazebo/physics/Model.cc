@@ -856,7 +856,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
