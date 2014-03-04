@@ -126,13 +126,14 @@ void OculusWindow::showEvent(QShowEvent *_event)
   {
     this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
       CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+    if (this->oculusCamera)
+      rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+          this->windowId, this->oculusCamera);      
   }
 
   QWidget::showEvent(_event);
 
-  if (this->oculusCamera)
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->oculusCamera);
+
 
   this->setFocus();
 
