@@ -74,9 +74,8 @@
 
 ### Additions
 
-1. **gazebo/rendering/Light.hh**
-    + virtual void LoadFromMsg(const msgs::Light &_msg)
-
+1. **gazebo/physics/World.hh**
+    +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
     + unsigned int GetFilterCount()
     + bool HasFilter(const std::string &_name);
@@ -132,6 +131,7 @@
 
 1. **gazebo/rendering/Light.hh**
     + bool GetVisible() const
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
 
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
