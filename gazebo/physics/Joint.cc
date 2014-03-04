@@ -54,8 +54,6 @@ Joint::Joint(BasePtr _parent)
   this->lowerLimit[1] = -1e16;
   this->upperLimit[0] =  1e16;
   this->upperLimit[1] =  1e16;
-  this->inertiaRatio[0] = 0;
-  this->inertiaRatio[1] = 0;
   this->dissipationCoefficient[0] = 0;
   this->dissipationCoefficient[1] = 0;
   this->stiffnessCoefficient[0] = 0;
@@ -320,37 +318,6 @@ void Joint::Init()
   // Set parent name: if parentLink is NULL, it's name be the world
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
-
-  // for debugging only
-  gzerr << this->GetName();
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-  {
-    math::Vector3 axis = this->GetGlobalAxis(i);
-    this->ComputeInertiaRatio(i, axis);
-    gzerr << ", dof[" << i
-          << "], axis[0]"
-          << ", " << this->inertiaRatio[i];
-
-    // find 2 orthogonal axis to axis
-    math::Vector3 axis1, axis2;
-    if (axis != math::Vector3(1, 0, 0))
-    {
-      axis1 = axis.Cross(math::Vector3(1, 0, 0));
-      axis2 = axis.Cross(axis1);
-    }
-    else
-    {
-      axis1 = axis.Cross(math::Vector3(0, 1, 0));
-      axis2 = axis.Cross(axis1);
-    }
-    this->ComputeInertiaRatio(i, axis1);
-    gzerr << "], axis[1]"
-          << ", " << this->inertiaRatio[i];
-    this->ComputeInertiaRatio(i, axis2);
-    gzerr << "], axis[2]"
-          << ", " << this->inertiaRatio[i]
-          << "\n";
-  }
 }
 
 //////////////////////////////////////////////////
@@ -674,7 +641,7 @@ void Joint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-void Joint::ComputeInertiaRatio(unsigned int _i, math::Vector3 _axis)
+double Joint::GetInertiaRatio(math::Vector3 _axis) const
 {
   if (this->parentLink && this->childLink)
   {
@@ -716,25 +683,45 @@ void Joint::ComputeInertiaRatio(unsigned int _i, math::Vector3 _axis)
     double piam = pia.GetLength();
     double ciam = cia.GetLength();
 
-    // should we flip? sure, so the measure of ratio is between [1, +inf]
-    if (piam > ciam)
-      this->inertiaRatio[_i] = piam/ciam;
-    else
-      this->inertiaRatio[_i] = ciam/piam;
+    // return ratio of child MOI to parent MOI.
+    return ciam/piam;
+  }
+  else
+  {
+    gzerr << "Either parent or child link is missing or static, "
+          << "cannot compute inertia ratio.  Returning 0.\n";
+    return 0;
   }
 }
 
 //////////////////////////////////////////////////
 double Joint::GetInertiaRatio(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (this->parentLink && this->childLink)
   {
-    return this->inertiaRatio[_index];
+    if (_index < this->GetAngleCount())
+    {
+      // get parent model pose
+      math::Pose pose = this->model->GetWorldPose();
+
+      // rotate joint axis in local frame into global frame
+      math::Vector3 axis = this->GetLocalAxis(_index);
+      axis = pose.rot.RotateVectorReverse(axis);
+
+      // compute ratio about axis
+      return this->GetInertiaRatio(axis);
+    }
+    else
+    {
+      gzerr << "Invalid joint index [" << _index
+            << "] when trying to get inertia ratio across joint.\n";
+      return 0;
+    }
   }
   else
   {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get inertia ratio across joint.\n";
+    gzerr << "Either parent or child link is missing or static, "
+          << "cannot compute inertia ratio.  Returning 0.\n";
     return 0;
   }
 }
