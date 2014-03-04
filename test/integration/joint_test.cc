@@ -26,8 +26,23 @@
 
 using namespace gazebo;
 
+class JointTests : public JointTest
+{
+  /// \brief Test spring dampers
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SpringDamperTest(const std::string &_physicsEngine);
+
+  /// \brief Create and destroy joints repeatedly, monitors memory usage.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
+
+  /// \brief Create joints dynamically and verify that they will be visualized.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void DynamicJointVisualization(const std::string &_physicsEngine);
+};
+
 //////////////////////////////////////////////////
-void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
+void JointTests::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   /// \TODO: Disable for now until functionality is implemented
   /// bullet collision parameters needs tweaking
@@ -149,7 +164,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-void JointTest::SpringDamperTest(const std::string &_physicsEngine)
+void JointTests::SpringDamperTest(const std::string &_physicsEngine)
 {
   /// SpringDamper implemented not yet released for dart
   if (_physicsEngine == "dart")
@@ -299,7 +314,61 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-TEST_F(JointTest, joint_SDF14)
+void JointTests::DynamicJointVisualization(const std::string &_physicsEngine)
+{
+  // Load empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Spawn two boxes
+  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
+      math::Vector3::Zero, false);
+  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
+      math::Vector3::Zero, false);
+  physics::ModelPtr model  = world->GetModel("box1");
+  physics::ModelPtr model2 = world->GetModel("box2");
+  ASSERT_TRUE(model  != NULL);
+  ASSERT_TRUE(model2 != NULL);
+
+  // Get link pointers
+  physics::LinkPtr parent = model->GetLink();
+  physics::LinkPtr child  = model2->GetLink();
+
+  // Create dynamic joint
+  std::string name = "dynamic_joint_unique";
+  physics::JointPtr joint;
+  joint = physics->CreateJoint("revolute", model);
+  joint->Load(parent, child, math::Pose(0, 0, 0.5, 0, 0, 0));
+  joint->Attach(parent, child);
+  joint->SetModel(model);
+  joint->Init();
+  joint->SetName(name);
+
+  // Get model joints (used for visualization)
+  physics::Joint_V joints = model->GetJoints();
+  physics::Joint_V::iterator iter;
+  bool jointFound = false;
+  for (iter = joints.begin(); iter != joints.end(); ++iter)
+  {
+    if ((*iter)->GetName() == name)
+    {
+      jointFound = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(jointFound);
+}
+
+//////////////////////////////////////////////////
+TEST_F(JointTests, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
 
@@ -340,17 +409,22 @@ TEST_F(JointTest, joint_SDF14)
   EXPECT_EQ(child->GetName(), "body1");
 }
 
-TEST_P(JointTest, JointCreationDestructionTest)
+TEST_P(JointTests, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
 }
 
-TEST_P(JointTest, SpringDamperTest)
+TEST_P(JointTests, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,
+TEST_P(JointTests, DynamicJointVisualization)
+{
+  DynamicJointVisualization(this->physicsEngine);
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTests,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("")));
 
