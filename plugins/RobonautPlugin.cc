@@ -396,6 +396,9 @@ void RobonautPlugin::Update(const common::UpdateInfo & /*_info*/)
 
     math::Vector3 rpy = this->dolly->GetWorldPose().rot.GetAsEuler();
     rpy.z = yaw;
+    rpy.x = this->dollyStartPose.rot.x;
+    rpy.y = this->dollyStartPose.rot.y;
+    //std::cerr << " rpy x y " << rpy.x << " " << rpy.y << std::endl;
 
     this->dollyPinJoint->Detach();
     math::Vector3 dollyPos = this->dolly->GetWorldPose().pos + dPose.pos;
