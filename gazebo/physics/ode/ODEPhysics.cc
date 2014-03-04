@@ -1324,25 +1324,25 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else if (_key == "contact_residual_smoothing")
   {
-    dWorldSetQuickStepContactResidualSmoothing (this->worldId,
+    dWorldSetQuickStepContactResidualSmoothing(this->worldId,
       boost::any_cast<double>(_value));
     return;
   }
   else if (_key == "experimental_row_reordering")
   {
-    dWorldSetQuickStepExperimentalRowReordering (this->worldId,
+    dWorldSetQuickStepExperimentalRowReordering(this->worldId,
       boost::any_cast<bool>(_value));
     return;
   }
   else if (_key == "warm_start_factor")
   {
-    dWorldSetQuickStepWarmStartFactor (this->worldId,
+    dWorldSetQuickStepWarmStartFactor(this->worldId,
       boost::any_cast<double>(_value));
     return;
   }
   else if (_key == "extra_friction_iterations")
   {
-    dWorldSetQuickStepExtraFrictionIterations (this->worldId,
+    dWorldSetQuickStepExtraFrictionIterations(this->worldId,
       boost::any_cast<int>(_value));
     return;
   }
