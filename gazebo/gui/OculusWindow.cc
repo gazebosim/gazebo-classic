@@ -122,8 +122,11 @@ void OculusWindow::showEvent(QShowEvent *_event)
   }
   //this->oculusCamera->AttachToVisual(this->visualName, true);
 
-  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+  if (this->windowId == -1)
+  {
+    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+      CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+  }
 
   QWidget::showEvent(_event);
 

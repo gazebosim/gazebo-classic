@@ -169,14 +169,18 @@ void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
   std::cout << "Main OgreHandle[" << this->GetOgreHandle() << "]\n";
-  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+  if (this->windowId < 0)
+  {
+    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+    if (this->userCamera)
+      rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
+  }
 
   QWidget::showEvent(_event);
 
-  if (this->userCamera)
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
+
   this->setFocus();
 }
 
