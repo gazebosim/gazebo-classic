@@ -563,7 +563,8 @@ namespace gazebo
         MovingWindowFilter()
         {
           // for moving window smoothed velocity
-          this->velWindowSize = 4; /// \TODO FIXME hardcoded for now
+          /// \TODO FIXME hardcoded for now
+          this->velWindowSize = 4;
           this->velHistory.resize(this->velWindowSize);
           this->velIter = this->velHistory.begin();
         }
@@ -584,8 +585,8 @@ namespace gazebo
 
           // sum and avg
           this->velFiltered = math::Vector3(0, 0, 0);
-          for(std::vector<math::Vector3>::iterator it =
-            this->velHistory.begin(); 
+          for (std::vector<math::Vector3>::iterator it =
+            this->velHistory.begin();
             it != this->velHistory.end(); ++it)
             this->velFiltered += *it;
           this->velFiltered *= n;
