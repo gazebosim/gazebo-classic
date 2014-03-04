@@ -691,8 +691,9 @@ math::Matrix3 Link::GetWorldInertiaMatrix() const
   math::Matrix3 moi;
   if (this->inertial)
   {
+    math::Vector3 pos = this->inertial->GetPose().pos;
     math::Quaternion rot = this->GetWorldPose().rot;
-    moi = this->inertial->GetMOI(math::Pose(math::Vector3(), rot));
+    moi = this->inertial->GetMOI(math::Pose(pos, rot));
   }
   return moi;
 }
