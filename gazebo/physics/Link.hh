@@ -281,6 +281,15 @@ namespace gazebo
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
 
+      /// \brief Get the world pose of the link inertia (cog position
+      /// and Moment of Inertia frame).
+      /// \return Inertial pose in world frame.
+      public: math::Pose GetWorldInertialPose() const;
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame.
+      public: math::Matrix3 GetWorldInertiaMatrix() const;
+
       /// \cond
       /// This is an internal function
       /// \brief Get a collision by id.

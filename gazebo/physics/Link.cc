@@ -677,6 +677,27 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 }
 
 //////////////////////////////////////////////////
+math::Pose Link::GetWorldInertialPose() const
+{
+  math::Pose inertialPose;
+  if (this->inertial)
+    inertialPose = this->inertial->GetPose();
+  return inertialPose + this->GetWorldPose();
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Link::GetWorldInertiaMatrix() const
+{
+  math::Matrix3 moi;
+  if (this->inertial)
+  {
+    math::Quaternion rot = this->GetWorldPose().rot;
+    moi = this->inertial->GetMOI(math::Pose(math::Vector3(), rot));
+  }
+  return moi;
+}
+
+//////////////////////////////////////////////////
 void Link::AddParentJoint(JointPtr _joint)
 {
   this->parentJoints.push_back(_joint);
