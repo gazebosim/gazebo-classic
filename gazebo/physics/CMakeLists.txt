@@ -130,7 +130,5 @@ set (gtest_sources
   Inertial_TEST.cc
   Joint_TEST.cc
   PhysicsEngine_TEST.cc
-  SphereShape_TEST.cc
-  World_TEST.cc
-)
+  SphereShape_TEST.cc)
 gz_build_tests(${gtest_sources})

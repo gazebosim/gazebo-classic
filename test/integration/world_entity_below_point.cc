@@ -21,14 +21,15 @@
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
-class World_TEST : public ServerFixture
+class WorldTest : public ServerFixture
 {
+  /// \brief Test World::GetEntityBelowPoint
+  /// \param[in] _physicsEngine Type of physics engine to test.
   public: void GetEntityBelowPoint(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-/// \brief Test World::GetEntityBelowPoint
-void World_TEST::GetEntityBelowPoint(const std::string &_physicsEngine)
+void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 {
   // Load in a world with lasers
   Load("worlds/shapes.world", false, _physicsEngine);
@@ -103,17 +104,14 @@ void World_TEST::GetEntityBelowPoint(const std::string &_physicsEngine)
   EXPECT_TRUE(entity == NULL);
 }
 
-TEST_F(World_TEST, GetEntityBelowPointODE)
+/////////////////////////////////////////////////
+TEST_P(WorldTest, GetEntityBelowPoint)
 {
-  GetEntityBelowPoint("ode");
+  GetEntityBelowPoint(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(World_TEST, GetEntityBelowPointBullet)
-{
-  GetEntityBelowPoint("bullet");
-}
-#endif  // HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
