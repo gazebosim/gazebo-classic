@@ -53,9 +53,10 @@ SystemPaths::SystemPaths()
     // temporary directory
     this->tmpInstancePath = boost::filesystem::unique_path("gazebo-%%%%%%");
   }
-  catch (const boost::system::error_code& ex)
+  catch(const boost::system::error_code &_ex)
   {
-    gzerr << "Failed creating temp directory. Reason: " << ex.message() << "\n";
+    gzerr << "Failed creating temp directory. Reason: "
+          << _ex.message() << "\n";
     return;
   }
 

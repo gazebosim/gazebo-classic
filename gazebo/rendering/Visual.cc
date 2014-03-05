@@ -1570,7 +1570,7 @@ math::Pose Visual::GetPose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose _pose)
+void Visual::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);

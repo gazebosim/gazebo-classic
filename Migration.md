@@ -74,18 +74,23 @@
 
 ### Additions
 
+1. **gazebo/physics/World.hh**
+    +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
     + unsigned int GetFilterCount()
     + bool HasFilter(const std::string &_name);
     + void RemoveFilter(const std::string &_name);
 
 1. **gazebo/physics/Joint.hh**
+    + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + math::Pose GetParentWorldPose() const
     + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
     + bool axisParentModelFrame[MAX_JOINT_AXIS]
+    + protected: math::Pose parentAnchorPose
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
@@ -126,6 +131,7 @@
 
 1. **gazebo/rendering/Light.hh**
     + bool GetVisible() const
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
 
 1. **gazebo/sensors/ForceTorqueSensor.hh**
     + physics::JointPtr GetJoint() const
@@ -141,6 +147,9 @@
 1. **gazebo/sensors/GaussianNoiseModel.hh**
 
 ### Deletions
+
+1. **Removed libtool**
+    + Libtool used to be an option for loading plugins. Now, only libdl is supported.
 
 1. **gazebo/physics/Base.hh**
     + Base_V::iterator childrenEnd

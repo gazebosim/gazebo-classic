@@ -202,13 +202,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->anchorPose = _sdf->Get<math::Pose>("pose");
-  this->LoadImpl(this->anchorPose);
+  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
 }
 
 /////////////////////////////////////////////////
 void Joint::LoadImpl(const math::Pose &_pose)
 {
+  this->anchorPose = _pose;
+
   BasePtr myBase = shared_from_this();
 
   if (this->parentLink)
@@ -221,11 +222,14 @@ void Joint::LoadImpl(const math::Pose &_pose)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
-  if (this->childLink)
-    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
-  // otherwise set anchor relative to world frame
+  math::Pose worldPose = this->GetWorldPose();
+  this->anchorPos = worldPose.pos;
+
+  // Compute anchor pose relative to parent frame.
+  if (this->parentLink)
+    this->parentAnchorPose = worldPose - this->parentLink->GetWorldPose();
   else
-    this->anchorPos = _pose.pos;
+    this->parentAnchorPose = worldPose;
 
   if (this->sdf->HasElement("sensor"))
   {
@@ -265,7 +269,7 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->sdf->HasElement("axis"))
+  if (this->GetAngleCount() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
@@ -289,7 +293,7 @@ void Joint::Init()
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->GetAngleCount() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
@@ -526,43 +530,13 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set high stop\n";
-  }
+  this->SetUpperLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////
 void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set low stop\n";
-  }
+  this->SetLowerLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -911,6 +885,20 @@ math::Pose Joint::GetWorldPose() const
   if (this->childLink)
     return this->anchorPose + this->childLink->GetWorldPose();
   return this->anchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetParentWorldPose() const
+{
+  if (this->parentLink)
+    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+  return this->parentAnchorPose;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetAnchorErrorPose() const
+{
+  return this->GetWorldPose() - this->GetParentWorldPose();
 }
 
 //////////////////////////////////////////////////

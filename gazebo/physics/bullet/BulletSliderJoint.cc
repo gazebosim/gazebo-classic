@@ -204,15 +204,8 @@ void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-
-    /// \TODO: currently we assume joint axis is specified in model frame,
-    /// this is incorrect, and should be corrected to be
-    /// joint frame which is specified in child link frame.
-    if (this->parentLink)
-      this->initialWorldAxis =
-        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-    else
-      this->initialWorldAxis = _axis;
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -315,18 +308,17 @@ double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
+
   if (this->bulletSlider)
   {
-    // I have not verified the following math, though I based it on internal
-    // bullet code at line 250 of btHingeConstraint.cpp
+    // bullet uses x-axis for slider
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
-      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(2);
+      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
     result = BulletTypes::ConvertVector3(vec);
   }
-  else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+
   return result;
 }
 

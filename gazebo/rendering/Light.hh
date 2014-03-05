@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifndef _LIGHT_HH_
 #define _LIGHT_HH_
 
@@ -74,6 +68,10 @@ namespace gazebo
       /// \brief Load from a light message.
       /// \param[in] _msg Containing the light information.
       public: void LoadFromMsg(ConstLightPtr &_msg);
+
+      /// \brief Load from a light message.
+      /// \param[in] _msg Message containing the light information.
+      public: void LoadFromMsg(const msgs::Light &_msg);
 
       /// \brief Set the name of the visual.
       /// \param[in] _name Name of the light source.
@@ -186,7 +184,7 @@ namespace gazebo
 
       /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
+      private: void UpdateSDFFromMsg(const msgs::Light &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;
