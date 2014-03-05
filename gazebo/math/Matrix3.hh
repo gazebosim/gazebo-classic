@@ -138,6 +138,17 @@ namespace gazebo
       /// \return True if equal (using the default tolerance of 1e-6)
       public: bool operator==(const Matrix3 &_m) const;
 
+      /// \brief Matrix times Vector3 operator
+      /// \param[in] _v a Vector3
+      /// \return this * _v
+      public: inline math::Vector3 operator*(const math::Vector3 &_v) const
+              {
+                return math::Vector3(
+                  this->m[0][0]*_v.x + this->m[0][1]*_v.y + this->m[0][2]*_v.z,
+                  this->m[1][0]*_v.x + this->m[1][1]*_v.y + this->m[1][2]*_v.z,
+                  this->m[2][0]*_v.x + this->m[2][1]*_v.y + this->m[2][2]*_v.z);
+              }
+
       /// \brief Array subscript operator
       /// \param[in] _row row index
       /// \return a pointer to the row
