@@ -83,7 +83,6 @@ void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
   EXPECT_NEAR(raySensor->GetRange(17), 10, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(18), 10, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(19), 10, 1e-2);
-
 }
 
 /////////////////////////////////////////////////
