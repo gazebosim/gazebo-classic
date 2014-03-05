@@ -52,6 +52,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     model = world->GetModel(*iter);
     ASSERT_TRUE(model != NULL);
     pos = model->GetWorldPose().pos;
+    pos.z += 10;
 
     entity = world->GetEntityBelowPoint(pos);
     if (entity)
@@ -59,7 +60,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
       gzdbg << "hit: " << entity->GetScopedName()
             << ", expected: " << model->GetScopedName()
             << std::endl;
-      EXPECT_EQ(entity->GetParentModel(), model);
+      EXPECT_EQ(entity->GetParentModel()->GetName(), model->GetName());
     }
     else
     {
@@ -109,11 +110,18 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 TEST_P(WorldTest, GetEntityBelowPoint)
 {
-  GetEntityBelowPoint(GetParam());
+  if (std::string(GetParam()) != "ode" &&
+      std::string(GetParam()) != "bullet")
+  {
+    gzerr << "GetEntityBelowPoint not implemented for " << GetParam() << "\n";
+  }
+  else
+  {
+    GetEntityBelowPoint(GetParam());
+  }
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest,
-                        PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
