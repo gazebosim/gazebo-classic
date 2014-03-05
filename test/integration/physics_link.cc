@@ -79,7 +79,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
   // Step forward and check velocity again
-  world->Step(444);
+  world->Step(44);
   double time = world->GetSimTime().Double();
   EXPECT_EQ(vel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
@@ -88,7 +88,8 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   math::Vector3 pos = link->GetWorldPose().pos;
   if (_physicsEngine.compare("bullet") == 0)
   {
-    gzerr << "Bullet seems to be off by one time step" << std::endl;
+    gzerr << "Bullet seems to be off by one time step (#1081)"
+          << std::endl;
     time -= dt;
   }
   EXPECT_EQ(pos0 + time*vel, pos);
@@ -117,6 +118,18 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_NEAR(vel3.x, 0.0, g_tolerance);
   EXPECT_NEAR(vel3.y, 1.0, g_tolerance);
   EXPECT_NEAR(vel3.z, 0.0, g_tolerance);
+
+  // check rotation
+  if (_physicsEngine.compare("bullet") == 0)
+  {
+    gzerr << "Bullet seems to be off by one time step (#1081)"
+          << std::endl;
+    world->Step(1);
+  }
+  math::Vector3 rpy = link->GetWorldPose().rot.GetAsEuler();
+  EXPECT_NEAR(rpy.x, 0.0, g_tolerance);
+  EXPECT_NEAR(rpy.y, vel2.y*dt, g_tolerance);
+  EXPECT_NEAR(rpy.z, 0.0, g_tolerance);
 }
 
 /////////////////////////////////////////////////
