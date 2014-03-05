@@ -291,6 +291,10 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
+
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
@@ -300,6 +304,10 @@ namespace gazebo
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
       public: uint32_t GetIterations() const;
+
+      /// \brief Get the current scene in message form.
+      /// \return The scene state as a protobuf message.
+      public: msgs::Scene GetSceneMsg() const;
 
       /// \cond
       /// This is an internal function.
@@ -436,9 +444,9 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
-      /// \brief Remove all entities from the world. Implementation of
-      /// World::Clear
-      public: void ClearModels();
+      /// \brief Callback when a light message is received.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -520,6 +528,9 @@ namespace gazebo
 
       /// \brief Subscriber to joint messages.
       private: transport::SubscriberPtr jointSub;
+
+      /// \brief Subscriber to light messages.
+      private: transport::SubscriberPtr lightSub;
 
       /// \brief Subscriber to model messages.
       private: transport::SubscriberPtr modelSub;
