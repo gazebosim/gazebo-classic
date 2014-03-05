@@ -87,7 +87,6 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
   else*/
   {
-    joints[0]->GetChild();
 
     child = joints[0]->GetChild()->GetRelativePose();
     parent = this->baseLink->GetRelativePose();
