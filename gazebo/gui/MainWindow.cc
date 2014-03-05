@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ MainWindow::MainWindow()
 
   this->inputStepSize = 1;
   this->requestMsg = NULL;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
@@ -138,8 +139,7 @@ MainWindow::MainWindow()
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
-  std::string title = "Gazebo : ";
-  title += gui::get_world();
+  std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
@@ -229,7 +229,6 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
   this->toolsWidget->hide();
@@ -237,6 +236,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -856,6 +857,7 @@ void MainWindow::CreateActions()
   g_arrowAct->setStatusTip(tr("Move camera"));
   g_arrowAct->setCheckable(true);
   g_arrowAct->setChecked(true);
+  g_arrowAct->setToolTip(tr("Selection Mode (Esc)"));
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
@@ -972,8 +974,8 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 int imageCount = 0;
 int imageCount2 = 0;
+
+/////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
@@ -44,6 +46,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, CheckThrottle)
 {
   Load("worlds/empty_test.world");
@@ -92,6 +95,7 @@ TEST_F(CameraSensor, CheckThrottle)
   delete img;
 }
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, UnlimitedTest)
 {
   Load("worlds/empty_test.world");
@@ -140,6 +144,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   delete img;
 }
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, MultiSenseHigh)
 {
   // This test is disabled because it does not work on machines with
@@ -194,6 +199,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   */
 }
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, MultiSenseLow)
 {
   // This test is disabled because it does not work on machines with
@@ -249,6 +255,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   */
 }
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, CheckNoise)
 {
   Load("worlds/empty_test.world");
@@ -317,6 +324,9 @@ TEST_F(CameraSensor, CheckNoise)
 
 int main(int argc, char **argv)
 {
+  // Set a specific seed to avoid occasional test failures due to
+  // statistically unlikely, but possible results.
+  math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,7 +408,7 @@ void Link::SetCollideMode(const std::string &_mode)
 }
 
 //////////////////////////////////////////////////
-bool Link::GetSelfCollide()
+bool Link::GetSelfCollide() const
 {
   GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
   if (this->sdf->HasElement("self_collide"))

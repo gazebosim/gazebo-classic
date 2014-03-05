@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -595,4 +595,10 @@ void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 void BulletLink::SetAutoDisable(bool /*_disable*/)
 {
   gzlog << "BulletLink::SetAutoDisable not yet implemented." << std::endl;
+}
+
+//////////////////////////////////////////////////
+void BulletLink::SetLinkStatic(bool /*_static*/)
+{
+  gzlog << "To be implemented\n";
 }

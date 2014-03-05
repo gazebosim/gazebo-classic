@@ -123,7 +123,7 @@ QToolButton
   padding: 2px;
   margin: 2px;
   width: 20px;
-
+  height: 24px;
   border-radius: 8px;
   border: 0px solid #808080;
 }
@@ -570,6 +570,7 @@ QTabWidget::tab
 
 QTabWidget::tab-bar
 {
+  alignment: left;
 }
 
 QWidget#modelList,

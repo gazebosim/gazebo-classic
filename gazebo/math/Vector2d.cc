@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ bool Vector2d::operator ==(const Vector2d &pt) const
 //////////////////////////////////////////////////
 bool Vector2d::IsFinite() const
 {
-  return finite(this->x) && finite(this->y);
+  return std::isfinite(this->x) && std::isfinite(this->y);
 }
 
 //////////////////////////////////////////////////

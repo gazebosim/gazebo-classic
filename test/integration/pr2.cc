@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,19 @@ class PR2Test : public ServerFixture,
 
 void PR2Test::Load(std::string _physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
   // Cleanup test directory.
   boost::filesystem::remove_all("/tmp/gazebo_test");
   boost::filesystem::create_directories("/tmp/gazebo_test");
@@ -83,6 +96,19 @@ TEST_P(PR2Test, Load)
 ////////////////////////////////////////////////////////////////////////
 void PR2Test::StaticPR2(std::string _physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
   ServerFixture::Load("worlds/static_pr2.world", true, _physicsEngine);
 
   // The body of this is copied from PhysicsTest::EmptyWorld

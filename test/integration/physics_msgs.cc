@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,11 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
         common::Time::MSleep(1);
       }
 
+      // Take a few steps to verify the correct model pose.
+      // dart has a failure mode that was not exposed without
+      // this change to the test.
+      world->StepWorld(10);
+
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
   }
@@ -265,6 +270,14 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
   world->StepWorld(steps);
+
+  // Issue #856, simbody doesn't support shape resizes.
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since simbody doesn't support shape resizes (#856)"
+          << std::endl;
+    return;
+  }
 
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be

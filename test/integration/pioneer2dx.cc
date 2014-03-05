@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,21 @@ class Pioneer2dx : public ServerFixture,
 /////////////////////////////////////////////////
 void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not handle pioneer2dx model yet, "
+          << "Please see issue #866.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
+          << "Please see issue #912. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/912)\n";
+    return;
+  }
+
   Load("worlds/pioneer2dx.world", false, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");

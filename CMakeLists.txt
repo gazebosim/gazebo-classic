@@ -10,12 +10,12 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
-set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 9)
+set (GAZEBO_MAJOR_VERSION 2)
+set (GAZEBO_MINOR_VERSION 2)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 2)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -137,6 +137,12 @@ if(NOT DEFINED USE_LOW_MEMORY_TESTS)
 else()
   set (USE_LOW_MEMORY_TEST TRUE)
   message (STATUS "High memory tests: disabled, low memory versions will be used")
+endif()
+
+######################################
+# Enable screen tests by default
+if(NOT DEFINED ENABLE_SCREEN_TESTS)
+  set(ENABLE_SCREEN_TESTS TRUE)
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
@@ -303,6 +309,7 @@ else (build_errors)
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(PKG_LIBRARIES
+    gazebo
     gazebo_ccd
     gazebo_common
     gazebo_gimpact

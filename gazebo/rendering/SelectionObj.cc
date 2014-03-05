@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,12 @@ void SelectionObj::Load()
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   if (this->parent)
+  {
+    if (this->parent == _vis)
+      return;
     this->parent->DetachVisual(shared_from_this());
+  }
+
   this->parent = _vis;
   this->parent->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
@@ -86,8 +91,15 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void SelectionObj::UpdateSize()
 {
-  math::Vector3 bboxSize = this->parent->GetBoundingBox().GetSize()
-      * this->parent->GetScale();
+  VisualPtr vis = this->parent;
+
+  // don't include the selection obj itself when calculating the size.
+  this->Detach();
+  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
+      * vis->GetScale();
+  this->parent = vis;
+  this->parent->AttachVisual(shared_from_this());
+
   double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
 
   max = std::min(std::max(this->minScale, max), this->maxScale);

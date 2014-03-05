@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,9 +159,11 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   if (this->parentLink)
     this->parentLink->AddChildJoint(boost::static_pointer_cast<Joint>(myBase));
-  else if (this->childLink)
+
+  if (this->childLink)
     this->childLink->AddParentJoint(boost::static_pointer_cast<Joint>(myBase));
-  else
+
+  if (!this->parentLink && !this->childLink)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
@@ -277,6 +279,18 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
+}
+
+//////////////////////////////////////////////////
+void Joint::SetEffortLimit(unsigned int _index, double _effort)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->effortLimit[_index] = _effort;
+    return;
+  }
+
+  gzerr << "SetEffortLimit index[" << _index << "] out of range" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -546,6 +560,12 @@ double Joint::GetForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
+double Joint::GetDampingCoefficient() const
+{
+  return this->dampingCoefficient;
+}
+
+//////////////////////////////////////////////////
 void Joint::ApplyDamping()
 {
   gzerr << "Joint::ApplyDamping should be overloaded by physics engines.\n";
@@ -651,4 +671,10 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 void Joint::SetProvideFeedback(bool _enable)
 {
   this->provideFeedback = _enable;
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::GetInitialAnchorPose()
+{
+  return this->anchorPose;
 }

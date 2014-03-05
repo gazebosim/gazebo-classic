@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,14 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
-      &LaserVisual::OnScan, this);
-
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->laserScanSub = this->node->Subscribe(_topicName,
+      &LaserVisual::OnScan, this);
 
   this->connection = event::Events::ConnectPreRender(
         boost::bind(&LaserVisual::Update, this));
@@ -56,8 +56,11 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 LaserVisual::~LaserVisual()
 {
-  delete this->rayFan;
-  this->rayFan = NULL;
+  if (this->rayFan)
+  {
+    this->DeleteDynamicLine(this->rayFan);
+    this->rayFan = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -74,9 +77,9 @@ void LaserVisual::Update()
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Skip the update if the user is moving the laser.
-  if (this->GetScene()->GetSelectedVisual() &&
+  if (!this->rayFan || (this->GetScene()->GetSelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName())
+      this->GetScene()->GetSelectedVisual()->GetName()))
   {
     return;
   }

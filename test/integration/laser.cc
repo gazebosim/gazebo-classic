@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,14 @@ class LaserTest : public ServerFixture,
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "ray_model";
@@ -153,6 +161,21 @@ TEST_P(LaserTest, EmptyWorld)
 
 void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support ray sensor, "
+          << "Please see issue #867.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test ray sensor with 3 boxes in the world.
   // First place 2 of 3 boxes within range and verify range values, one of them
   // being a static model to verify collision filtering is working,
@@ -170,6 +193,11 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   unsigned int samples = 320;
   math::Pose testPose(math::Vector3(0, 0, 0),
       math::Quaternion(0, 0, 0));
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION >= 2.82)
+  {
+    testPose.pos.z = 0.1;
+    gzwarn << "Raising sensor for bullet as workaround for #934" << std::endl;
+  }
 
   SpawnRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
@@ -242,6 +270,14 @@ TEST_P(LaserTest, LaserBox)
 
 void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray shape and sensor, "
+          << "Please see issue #911. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+    return;
+  }
+
   // Test ray sensor with noise applied
 
   Load("worlds/empty.world", true, _physicsEngine);
@@ -304,6 +340,9 @@ INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
+  // Set a specific seed to avoid occasional test failures due to
+  // statistically unlikely, but possible results.
+  math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

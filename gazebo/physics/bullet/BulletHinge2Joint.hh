@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       /// \brief Set the torque
-      protected: void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(int _index, double _torque);
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
