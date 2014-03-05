@@ -515,10 +515,10 @@ namespace gazebo
             geomElem->Get<math::Vector3>("pos"));
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
-        msgs::HeightmapGeom::Texture *tex;
         while (textureElem)
         {
-          tex = result.mutable_heightmap()->add_texture();
+          msgs::HeightmapGeom::Texture *tex =
+            result.mutable_heightmap()->add_texture();
           tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
           tex->set_normal(textureElem->Get<std::string>("normal"));
           tex->set_size(textureElem->Get<double>("size"));
@@ -526,10 +526,10 @@ namespace gazebo
         }
 
         sdf::ElementPtr blendElem = geomElem->GetElement("blend");
-        msgs::HeightmapGeom::Blend *blend;
         while (blendElem)
         {
-          blend = result.mutable_heightmap()->add_blend();
+          msgs::HeightmapGeom::Blend *blend =
+            result.mutable_heightmap()->add_blend();
 
           blend->set_min_height(blendElem->Get<double>("min_height"));
           blend->set_fade_dist(blendElem->Get<double>("fade_dist"));

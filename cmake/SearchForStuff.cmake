@@ -300,6 +300,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libswscale libswscale)
   if (NOT libswscale_FOUND)
     BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libswscale_INCLUDE_DIRS})
+    link_directories(${libswscale_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -307,6 +310,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
     BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavformat_INCLUDE_DIRS})
+    link_directories(${libavformat_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -314,6 +320,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavcodec libavcodec)
   if (NOT libavcodec_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavcodec_INCLUDE_DIRS})
+    link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
   if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
@@ -387,66 +396,6 @@ if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
-########################################
-# Find avformat and avcodec
-IF (HAVE_FFMPEG)
-  SET (libavformat_search_path
-    /usr/include /usr/include/libavformat /usr/local/include
-    /usr/local/include/libavformat /usr/include/ffmpeg
-  )
-
-  SET (libavcodec_search_path
-    /usr/include /usr/include/libavcodec /usr/local/include
-    /usr/local/include/libavcodec /usr/include/ffmpeg
-  )
-
-  FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
-  IF (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - not found")
-    BUILD_WARNING ("avformat.h not found. audio/video will not be built")
-    SET (LIBAVFORMAT_PATH /usr/include)
-  ELSE (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - found")
-  ENDIF (NOT LIBAVFORMAT_PATH)
-
-  FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
-  IF (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - not found")
-    BUILD_WARNING ("avcodec.h not found. audio/video will not be built")
-    SET (LIBAVCODEC_PATH /usr/include)
-  ELSE (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - found")
-  ENDIF (NOT LIBAVCODEC_PATH)
-
-ELSE (HAVE_FFMPEG)
-  SET (LIBAVFORMAT_PATH /usr/include)
-  SET (LIBAVCODEC_PATH /usr/include)
-ENDIF (HAVE_FFMPEG)
-
-########################################
-# Find libtool
-find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
-if (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - not found")
-  BUILD_WARNING ("ltdl.h not found")
-  set (libtool_include_dir /usr/include)
-else (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - found")
-endif (NOT libtool_include_dir)
-
-find_library(libtool_library ltdl /usr/lib /usr/local/lib)
-if (NOT libtool_library)
-  message (STATUS "Looking for libltdl - not found")
-else (NOT libtool_library)
-  message (STATUS "Looking for libltdl - found")
-endif (NOT libtool_library)
-
-if (libtool_library AND libtool_include_dir)
-  set (HAVE_LTDL TRUE)
-else ()
-  set (HAVE_LTDL FALSE)
-  set (libtool_library "" CACHE STRING "" FORCE)
-endif ()
 
 
 ########################################
@@ -454,7 +403,7 @@ endif ()
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
 if (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - not found")
-  BUILD_WARNING ("dlfcn.h not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
   set (libdl_include_dir /usr/include)
 else (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - found")
@@ -463,15 +412,9 @@ endif ()
 find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
-  BUILD_WARNING ("libdl not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
-endif ()
-
-if (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL TRUE)
-else (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL FALSE)
 endif ()
 
 ########################################

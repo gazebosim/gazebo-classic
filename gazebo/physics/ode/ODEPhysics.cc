@@ -172,7 +172,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
@@ -649,7 +649,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 }
 
 //////////////////////////////////////////////////
-int ODEPhysics::GetMaxContacts()
+unsigned int ODEPhysics::GetMaxContacts()
 {
   return this->maxContacts;
 }
@@ -820,23 +820,21 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
   }*/
 
-  int numc = 0;
+  unsigned int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
-  int maxCollide = MAX_CONTACT_JOINTS;
+  unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
   if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
 
   // over-ride with minimum of max_contacts from both collisions
-  if (_collision1->GetMaxContacts() >= 0 &&
-      _collision1->GetMaxContacts() < maxCollide)
+  if (_collision1->GetMaxContacts() < maxCollide)
     maxCollide = _collision1->GetMaxContacts();
 
-  if (_collision2->GetMaxContacts() >= 0 &&
-      _collision2->GetMaxContacts() < maxCollide)
+  if (_collision2->GetMaxContacts() < maxCollide)
     maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
@@ -855,7 +853,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
-    for (int i = maxCollide; i < numc; i++)
+    for (unsigned int i = maxCollide; i < numc; ++i)
     {
       if (_contactCollisions[i].depth > max)
       {
@@ -896,7 +894,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->fdir1;
+  math::Vector3 fd = surf1->frictionPyramid.direction1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -910,9 +908,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->fdir1;
+  math::Vector3 fd2 = surf2->frictionPyramid.direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        surf1->mu1 > surf2->mu1))
+        surf1->frictionPyramid.GetMuPrimary() >
+        surf2->frictionPyramid.GetMuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -935,10 +934,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(surf1->mu1,
-                                surf2->mu1);
-  contact.surface.mu2 = std::min(surf1->mu2,
-                                 surf2->mu2);
+  contact.surface.mu = std::min(surf1->frictionPyramid.GetMuPrimary(),
+                                surf2->frictionPyramid.GetMuPrimary());
+  contact.surface.mu2 = std::min(surf1->frictionPyramid.GetMuSecondary(),
+                                 surf2->frictionPyramid.GetMuSecondary());
 
 
   // Set the slip values
@@ -982,7 +981,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Create a joint for each contact
-  for (int j = 0; j < numc; j++)
+  for (unsigned int j = 0; j < numc; ++j)
   {
     contact.geom = _contactCollisions[this->indices[j]];
 
