@@ -1057,6 +1057,10 @@ double Model::GetWorldEnergyPotential()
   for (Link_V::iterator iter = this->links.begin();
     iter != this->links.end(); ++iter)
     e += (*iter)->GetWorldEnergyPotential();
+  for (Joint_V::iterator iter = this->joints.begin();
+    iter != this->joints.end(); ++iter)
+    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+      e += (*iter)->GetWorldEnergyPotentialSpring(j);
   return e;
 }
 
