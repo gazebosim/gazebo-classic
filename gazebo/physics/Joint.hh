@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ namespace gazebo
       /// \param[in] _index Index of the link to retreive.
       /// \return Pointer to the request link. NULL if the index was
       /// invalid.
-      public: virtual LinkPtr GetJointLink(int _index) const = 0;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const = 0;
 
       /// \brief Determines of the two bodies are connected by a joint.
       /// \param[in] _one First link.
@@ -156,19 +156,20 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis) = 0;
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _damping Damping value for the axis.
-      public: virtual void SetDamping(int _index, double _damping) = 0;
+      public: virtual void SetDamping(unsigned int _index, double _damping) = 0;
 
       /// \brief Returns the current joint damping coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double GetDamping(int _index);
+      public: double GetDamping(unsigned int _index);
 
       /// \brief Callback to apply damping force to joint.
       /// Deprecated by ApplyStiffnessDamping.
@@ -190,7 +191,8 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _stiffness Spring stiffness value for the axis.
-      public: virtual void SetStiffness(int _index, double _stiffness) = 0;
+      public: virtual void SetStiffness(unsigned int _index,
+                                        double _stiffness) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -213,34 +215,35 @@ namespace gazebo
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
-      public: math::Vector3 GetLocalAxis(int _index) const;
+      public: math::Vector3 GetLocalAxis(unsigned int _index) const;
 
       /// \brief Get the axis of rotation in global cooridnate frame.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const = 0;
+      public: virtual math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const = 0;
 
       /// \brief Set the anchor point.
       /// \param[in] _index Indx of the axis.
       /// \param[in] _anchor Anchor value.
-      public: virtual void SetAnchor(int _index,
+      public: virtual void SetAnchor(unsigned int _index,
                                      const math::Vector3 &_anchor) = 0;
 
       /// \brief Get the anchor point.
       /// \param[in] _index Index of the axis.
       /// \return Anchor value for the axis.
-      public: virtual math::Vector3 GetAnchor(int _index) const = 0;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const = 0;
 
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
-      public: virtual void SetHighStop(int _index,
+      public: virtual void SetHighStop(unsigned int _index,
                                        const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
-      public: virtual void SetLowStop(int _index,
+      public: virtual void SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
@@ -249,7 +252,7 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(int _index) = 0;
+      public: virtual math::Angle GetHighStop(unsigned int _index) = 0;
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -257,27 +260,32 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(int _index) = 0;
+      public: virtual math::Angle GetLowStop(unsigned int _index) = 0;
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Effort limit specified in SDF
-      public: virtual double GetEffortLimit(int _index);
+      public: virtual double GetEffortLimit(unsigned int _index);
+
+      /// \brief Set the effort limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _effort Effort limit for the axis.
+      public: virtual void SetEffortLimit(unsigned int _index, double _effort);
 
       /// \brief Get the velocity limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Velocity limit specified in SDF
-      public: virtual double GetVelocityLimit(int _index);
+      public: virtual double GetVelocityLimit(unsigned int _index);
 
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _vel Velocity.
-      public: virtual void SetVelocity(int _index, double _vel) = 0;
+      public: virtual void SetVelocity(unsigned int _index, double _vel) = 0;
 
       /// \brief Get the rotation rate of an axis(index)
       /// \param[in] _index Index of the axis.
       /// \return The rotaional velocity of the joint axis.
-      public: virtual double GetVelocity(int _index) const = 0;
+      public: virtual double GetVelocity(unsigned int _index) const = 0;
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
@@ -287,14 +295,14 @@ namespace gazebo
       /// Forces are truncated by effortLimit before applied.
       /// \param[in] _index Index of the axis.
       /// \param[in] _effort Force value.
-      public: virtual void SetForce(int _index, double _effort) = 0;
+      public: virtual void SetForce(unsigned int _index, double _effort) = 0;
 
       /// \brief check if the force against velocityLimit and effortLimit,
       /// truncate if necessary.
       /// \param[in] _index Index of the axis.
       /// \param[in] _effort Force value.
       /// \return truncated effort
-      public: double CheckAndTruncateForce(int _index, double _effort);
+      public: double CheckAndTruncateForce(unsigned int _index, double _effort);
 
       /// \brief @todo: not yet implemented.
       /// Get external forces applied at this Joint.
@@ -333,19 +341,19 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
-      public: virtual void SetMaxForce(int _index, double _force) = 0;
+      public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
 
       /// \brief Get the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
-      public: virtual double GetMaxForce(int _index) = 0;
+      public: virtual double GetMaxForce(unsigned int _index) = 0;
 
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      public: math::Angle GetAngle(int _index) const;
+      public: math::Angle GetAngle(unsigned int _index) const;
 
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.
@@ -360,7 +368,7 @@ namespace gazebo
       /// by calling JointController::SetJointPosition.
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(int _index, math::Angle _angle);
+      public: void SetAngle(unsigned int _index, math::Angle _angle);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -384,7 +392,8 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
@@ -392,7 +401,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual double GetAttribute(const std::string &_key,
-                                                unsigned int _index) = 0;
+                                          unsigned int _index) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -460,17 +469,50 @@ namespace gazebo
       /// \brief Get joint stop stiffness.
       /// \param[in] _index joint axis index.
       /// \return joint stop stiffness coefficient.
-      public: double GetStopStiffness(unsigned int _index);
+      public: double GetStopStiffness(unsigned int _index) const;
 
       /// \brief Get joint stop dissipation.
       /// \param[in] _index joint axis index.
       /// \return joint stop dissipation coefficient.
-      public: double GetStopDissipation(unsigned int _index);
+      public: double GetStopDissipation(unsigned int _index) const;
+
+      /// \brief Get initial Anchor Pose specified by model
+      /// <joint><pose>...</pose></joint>
+      /// \return Joint::anchorPose, initial joint anchor pose.
+      public: math::Pose GetInitialAnchorPose() const;
+
+      /// \brief Get pose of joint frame relative to world frame.
+      /// Note that the joint frame is defined with a fixed offset from
+      /// the child link frame.
+      /// \return Pose of joint frame relative to world frame.
+      public: math::Pose GetWorldPose() const;
+
+      /// \brief Get anchor pose on parent link relative to world frame.
+      /// When there is zero joint error, this should match the value
+      /// returned by Joint::GetWorldPose() for the constrained degrees
+      /// of freedom.
+      /// \return Anchor pose on parent link in world frame.
+      public: math::Pose GetParentWorldPose() const;
+
+      /// \brief Get pose offset between anchor pose on child and parent,
+      /// expressed in the parent link frame. This can be used to compute
+      /// the bilateral constraint error.
+      /// \return Pose offset between anchor pose on child and parent,
+      /// in parent link frame.
+      public: math::Pose GetAnchorErrorPose() const;
+
+      /// \brief Get orientation of reference frame for specified axis,
+      /// relative to world frame. The value of axisParentModelFrame
+      /// is used to determine the appropriate frame.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to world frame.
+      public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      protected: virtual math::Angle GetAngleImpl(int _index) const = 0;
+      protected: virtual math::Angle GetAngleImpl(
+                     unsigned int _index) const = 0;
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
@@ -500,6 +542,9 @@ namespace gazebo
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
       protected: math::Pose anchorPose;
+
+      /// \brief Anchor pose relative to parent link frame.
+      protected: math::Pose parentAnchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
@@ -545,6 +590,11 @@ namespace gazebo
       /// Deprecated, pushing this flag into individual physics engine,
       /// for example: ODEJoint::useImplicitSpringDamper.
       protected: bool useCFMDamping;
+
+      /// \brief Flags that are set to true if an axis value is expressed
+      /// in the parent model frame. Otherwise use the joint frame.
+      /// See issue #494.
+      protected: bool axisParentModelFrame[MAX_JOINT_AXIS];
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,12 @@ namespace gazebo
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
                 this->cmdMax = _p.cmdMax;
+                this->cmdMin = _p.cmdMin;
+                this->pErrLast = _p.pErrLast;
+                this->pErr = _p.pErr;
+                this->iErr = _p.iErr;
+                this->dErr = _p.dErr;
+                this->cmd = _p.cmd;
 
                 this->Reset();
                 return *this;

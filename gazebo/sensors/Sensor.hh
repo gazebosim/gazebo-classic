@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
@@ -113,7 +114,8 @@ namespace gazebo
       ///        And in turn, Sensor::Update is called by
       ///        SensorManager::Update
       /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool /*_force*/) {}
+      /// \return True if the sensor was updated.
+      protected: virtual bool UpdateImpl(bool /*_force*/) {return false;}
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -131,7 +133,7 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Get fully scoped name of the sensor.
-      /// \return world_name::parent_name::sensor_name.
+      /// \return world_name::model_name::link_name::sensor_name.
       public: std::string GetScopedName() const;
 
       /// \brief Get the current pose.
@@ -206,6 +208,16 @@ namespace gazebo
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
 
+      /// \brief Get the sensor's noise model.
+      /// \param[in] _index Index of the noise model. For most sensors this
+      /// will be 0. For a multi camera sensor the index can be >=0.
+      /// \return The sensor's noise model.
+      public: NoisePtr GetNoise(unsigned int _index = 0) const;
+
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      protected: bool NeedsUpdate();
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -250,12 +262,15 @@ namespace gazebo
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
 
-      /// \brief Mutex to protect resetting lastUpdateTime.
-      protected: boost::mutex mutexLastUpdateTime;
-
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
+
+      /// \brief Noise added to sensor data
+      protected: std::vector<NoisePtr> noises;
+
+      /// \brief Mutex to protect resetting lastUpdateTime.
+      private: boost::mutex mutexLastUpdateTime;
 
       /// \brief Event triggered when a sensor is updated.
       private: event::EventT<void()> updated;

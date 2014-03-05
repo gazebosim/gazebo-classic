@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,21 @@
 
 #include <gtest/gtest.h>
 #include <gazebo/rendering/rendering.hh>
+#include "ServerFixture.hh"
+
+class Issue846Test : public ServerFixture
+{
+};
+
 
 /////////////////////////////////////////////////
 // \brief Test for issue #846
-TEST(issue_846_typo_in_camera, CaptureData)
+TEST_F(Issue846Test, CaptureData)
 {
+  Load("worlds/empty.world");
+
   gazebo::rendering::CameraPtr camera(new gazebo::rendering::Camera("",
-        gazebo::rendering::ScenePtr(), false));
+        this->GetScene(), false));
 
   EXPECT_FALSE(camera->GetCaptureData());
   camera->EnableSaveFrame(true);

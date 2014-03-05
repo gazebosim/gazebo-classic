@@ -13,19 +13,199 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 ### Modifications
+1. **gazebo/gui/GuiIface.hh**
+    + ***Removed:*** void load() `ABI change`
+    + ***Replacement:*** bool load();
+    + ***Note:*** Changed return type from void to bool.
+1. **Functions in joint classes use unsigned int, instead of int**
+    + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
+    + Add const to Joint::GetInitialAnchorPose(), Joint::GetStopDissipation(), Joint::GetStopStiffness()
+1. **gazebo/sensors/Noise.hh** `ABI change`
+    + ***Removed:*** void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Replacement:*** virtual void Noise::Load(sdf::ElementPtr _sdf)
+    + ***Removed:*** void Noise::~Noise()
+    + ***Replacement:*** virtual void Noise::~Noise()
+    + ***Removed:*** void Noise::Apply() const
+    + ***Replacement:*** void Noise::Apply()
+    + ***Note:*** Make Noise a base class and refactored out GaussianNoiseModel to its own class.
+1. **gazebo/transport/ConnectionManager.hh**
+    + ***Removed:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort) `ABI change`
+    + ***Replacement:*** bool ConnectionManager::Init(const std::string &_masterHost, unsigned int _masterPort, uint32_t _timeoutIterations = 30)
+    + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+1. **gazebo/transport/TransportIface.hh**
+    + ***Removed:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0) `ABI change`
+    + ***Replacement:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0, uint32_t _timeoutIterations = 30);
+    + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
+1. **gazebo/transport/Publication.hh**
+    + ***Removed:*** void Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb, uint32_t _id) `ABI change`
+    + ***Replacement:*** int Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb, uint32_t _id)
+    + ***Note:*** Only the return type changed.
+
+1. **gazebo/common/ModelDatabase.hh** `API change`
+    + ***Removed:*** void ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
+    + ***Replacement:*** event::ConnectionPtr ModelDatabase::GetModels(boost::function<void (const std::map<std::string, std::string> &)> _func)
+    + ***Note:*** The replacement function requires that the returned connection shared pointer remain valid in order to receive the GetModels callback. Reset the shared pointer to stop receiving GetModels callback.
+
+1. **gazebo/physics/Collision.hh** `API change`
+    + ***Modified:*** SurfaceParamsPtr Collision::surface
+    + ***Note:*** Changed from `private` to `protected`
+
+1. **gazebo/physics/MultiRayShape.hh** `API change`
+    + ***Removed:*** double MultiRayShape::GetRange(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRange(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetRetro(int _index)
+    + ***Replacement:*** double MultiRayShape::GetRetro(unsigned int _index)
+    + ***Removed:*** double MultiRayShape::GetFiducial(int _index)
+    + ***Replacement:*** double MultiRayShape::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + ***Removed:*** void FillMsg(msgs::Surface &_msg)
+    + ***Replacement:*** virtual void FillMsg(msgs::Surface &_msg)
+
+1. **gazebo/sensors/RaySensor.hh** `API change`
+    + ***Removed:*** double RaySensor::GetRange(int _index)
+    + ***Replacement:*** double RaySensor::GetRange(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetRetro(int _index)
+    + ***Replacement:*** double RaySensor::GetRetro(unsigned int _index)
+    + ***Removed:*** double RaySensor::GetFiducial(int _index)
+    + ***Replacement:*** double RaySensor::GetFiducial(unsigned int _index)
+    + ***Note:*** Changed argument type from int to unsigned int.
 
 ### Additions
 
+1. **gazebo/physics/World.hh**
+    +  msgs::Scene GetSceneMsg() const
+1. **gazebo/physics/ContactManager.hh**
+    + unsigned int GetFilterCount()
+    + bool HasFilter(const std::string &_name);
+    + void RemoveFilter(const std::string &_name);
+
 1. **gazebo/physics/Joint.hh**
-    + virtual void SetStiffness(int _index, double _stiffness) = 0
+    + math::Pose GetAnchorErrorPose() const
+    + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + math::Pose GetParentWorldPose() const
+    + math::Pose GetWorldPose() const
+    + virtual void SetEffortLimit(unsigned _index, double _stiffness)
+    + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
+    + bool axisParentModelFrame[MAX_JOINT_AXIS]
+    + protected: math::Pose parentAnchorPose
+
+1. **gazebo/physics/Link.hh**
+    + bool initialized
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + FrictionPyramid()
+    + ~FrictionPyramid()
+    + double GetMuPrimary()
+    + double GetMuSecondary()
+    + void SetMuPrimary(double _mu)
+    + void SetMuSecondary(double _mu)
+    + math::Vector3 direction1
+    + ***Note:*** Replaces mu, m2, fdir1 variables
+
+1. **gazebo/physics/bullet/BulletSurfaceParams.hh**
+    + BulletSurfaceParams()
+    + virtual ~BulletSurfaceParams()
+    + virtual void Load(sdf::ElementPtr _sdf)
+    + virtual void FillMsg(msgs::Surface &_msg)
+    + virtual void ProcessMsg(msgs::Surface &_msg)
+    + FrictionPyramid frictionPyramid
+
+1. **gazebo/physics/ode/ODESurfaceParams.hh**
+    + virtual void FillMsg(msgs::Surface &_msg)
+    + virtual void ProcessMsg(msgs::Surface &_msg)
+    + double bounce
+    + double bounce
+    + double bounceThreshold
+    + double kp
+    + double kd
+    + double cfm
+    + double erp
+    + double maxVel
+    + double minDepth
+    + FrictionPyramid frictionPyramid
+    + double slip1
+    + double slip2
+
+1. **gazebo/rendering/Light.hh**
+    + bool GetVisible() const
+    + virtual void LoadFromMsg(const msgs::Light &_msg)
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + physics::JointPtr GetJoint() const
+
+1. **gazebo/sensors/Noise.hh**
+    + virtual double ApplyImpl(double _in)
+    + virtual void Fini()
+    + virtual void SetCustomNoiseCallback(boost::function<double (double)> _cb)
+
+1. **gazebo/sensors/Sensor.hh**
+    + NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/GaussianNoiseModel.hh**
 
 ### Deletions
+
+1. **Removed libtool**
+    + Libtool used to be an option for loading plugins. Now, only libdl is supported.
+
+1. **gazebo/physics/Base.hh**
+    + Base_V::iterator childrenEnd
+
+1. **gazebo/sensors/Noise.hh**
+    + double Noise::GetMean() const
+    + double Noise::GetStdDev() const
+    + double Noise::GetBias() const
+    + ***Note:*** Moved gaussian noise functions to a new GaussianNoiseModel class
+
+1. **gazebo/physics/SurfaceParams.hh**
+    + double bounce
+    + double bounce
+    + double bounceThreshold
+    + double kp
+    + double kd
+    + double cfm
+    + double erp
+    + double maxVel
+    + double minDepth
+    + double mu1
+    + double mu2
+    + double slip1
+    + double slip2
+    + math::Vector3 fdir1
+    + ***Note:*** These parameters were moved to FrictionPyramid,
+      ODESurfaceParams, and BulletSurfaceParams.
+
 
 ## Gazebo 1.9 to 2.0
 
 ### New Deprecations
 
+1. **gazebo/gazebo.hh**
+    + ***Deprecation*** void fini()
+    + ***Deprecation*** void stop()
+    + ***Replacement*** bool shutdown()
+    + ***Note*** Replace fini and stop with shutdown
+    ---
+    + ***Deprecation*** bool load()
+    + ***Deprecation*** bool init()
+    + ***Deprecation*** bool run()
+    + ***Replacement*** bool setupClient()
+        + Use this function to setup gazebo for use as a client
+    + ***Replacement*** bool setupServer()
+        + Use this function to setup gazebo for use as a server
+    + ***Note*** Replace load+init+run with setupClient/setupServer
+    ---
+    + ***Deprecation*** std::string find_file(const std::string &_file)
+    + ***Replacement*** std::string common::find_file(const std::string &_file)
+    ---
+    + ***Deprecation*** void add_plugin(const std::string &_filename)
+    + ***Replacement*** void addPlugin(const std::string &_filename)
+    ---
+    + ***Deprecation*** void print_version()
+    + ***Replacement*** void printVersion()
 1. **gazebo/physics/World.hh**
     + ***Deprecation*** void World::StepWorld(int _steps)
     + ***Replacement*** void World::Step(unsigned int _steps)
@@ -40,13 +220,13 @@
     + ***Replacement*** std::string CreateSensor(sdf::ElementPtr _elem, const std::string &_worldName, const std::string &_parentName, uint32_t _parentId)
 1. **gazebo/sensors/Collision.hh**
     + ***Deprecation*** void Collision::SetContactsEnabled(bool _enable)
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
     ---
     + ***Deprecation*** bool Colliion::GetContactsEnabled() const
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
     ---
     + ***Deprecation*** void AddContact(const Contact &_contact)
-    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html)
+    + ***Replacement*** Use [ContactManager](http://gazebosim.org/api/2.0.0/classgazebo_1_1physics_1_1ContactManager.html).
 
 ### Modifications
 
@@ -96,10 +276,10 @@
     + ***Replacement*** void Link::RemoveParentJoint(const std::string &_jointName)
 1. **gazebo/physics/MeshShape.hh**
     + ***Removed*** std::string MeshShape::GetFilename() const `API change`
-    + ***Replacement*** std::string MeshShape::GetURI() const;
+    + ***Replacement*** std::string MeshShape::GetURI() const
     ---
     + ***Removed*** void MeshShape::SetFilename() const `API change`
-    + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const;
+    + ***Replacement*** std::string MeshShape::SetMesh(const std::string &_uri, const std::string &_submesh = "", bool _center = false) const
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)

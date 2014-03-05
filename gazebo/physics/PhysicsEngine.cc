@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,7 +216,7 @@ void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(double /*_maxContacts*/)
+void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
 {
 }
 
@@ -236,13 +236,13 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(std::string /*_key*/,
+void PhysicsEngine::SetParam(const std::string &/*_key*/,
     const boost::any &/*_value*/)
 {
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 {
   return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 #include <string>
 #include <map>
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/gui/qt.h"
 
@@ -31,6 +30,9 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \brief Private
+    class InsertModelWidgetPrivate;
+
     class InsertModelWidget : public QWidget
     {
       Q_OBJECT
@@ -65,20 +67,8 @@ namespace gazebo
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
 
-      /// \brief Widget that display all the models that can be inserted.
-      private: QTreeWidget *fileTreeWidget;
-
-      /// \brief Tree item that is populated with models from the ModelDatabase.
-      private: QTreeWidgetItem *modelDatabaseItem;
-
-      /// \brief Mutex to protect the modelBuffer.
-      private: boost::mutex mutex;
-
-      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
-      private: std::map<std::string, std::string> modelBuffer;
-
-      /// \brief A file/directory watcher.
-      private: QFileSystemWatcher *watcher;
+      /// \brief Private data pointer.
+      private: InsertModelWidgetPrivate *dataPtr;
     };
   }
 }

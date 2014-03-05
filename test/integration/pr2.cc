@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <boost/filesystem.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
@@ -34,10 +36,17 @@ void PR2Test::Load(std::string _physicsEngine)
           << "Please see issue #857.\n";
     return;
   }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
 
   ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
@@ -60,7 +69,7 @@ void PR2Test::Load(std::string _physicsEngine)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
+  while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -68,13 +77,13 @@ void PR2Test::Load(std::string _physicsEngine)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << "/tmp/gazebo_test/frame_" << i << ".jpg";
+    filename << paths->GetDefaultTestPath() << "/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
 TEST_P(PR2Test, Load)
@@ -94,6 +103,12 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   {
     gzerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
     return;
   }
 

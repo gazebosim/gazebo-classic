@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf);
+                                sdf::ElementPtr _sdf);
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);
@@ -58,7 +58,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

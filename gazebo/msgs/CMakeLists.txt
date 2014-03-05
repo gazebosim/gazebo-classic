@@ -4,6 +4,7 @@ set (msgs
   axis.proto
   boxgeom.proto
   camerasensor.proto
+  camera_cmd.proto
   collision.proto
   color.proto
   contact.proto
@@ -78,6 +79,7 @@ set (msgs
   shadows.proto
   sky.proto
   spheregeom.proto
+  spherical_coordinates.proto
   subscribe.proto
   surface.proto
   tactile.proto

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <FreeImage.h>
 #include <string>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
 
 namespace gazebo
@@ -108,6 +107,7 @@ namespace gazebo
 
       /// \brief Load an image. Return 0 on success
       /// \param[in] _filename the path to the image file
+      /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename);
 
       /// \brief Save the image in PNG format
@@ -164,7 +164,8 @@ namespace gazebo
       /// \brief Get a pixel color value
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
-      public: Color GetPixel(unsigned int _x, unsigned int _y);
+      /// \return The color of the given pixel
+      public: Color GetPixel(unsigned int _x, unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
@@ -172,7 +173,7 @@ namespace gazebo
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color GetMaxColor();
+      public: Color GetMaxColor() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width
@@ -185,7 +186,7 @@ namespace gazebo
 
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const;
+          FIBITMAP *_img) const;
 
       /// \brief Count the number of images created. Used for initialising
       /// free image

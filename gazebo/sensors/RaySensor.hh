@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -133,7 +133,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns DBL_MAX for no detection.
-      public: double GetRange(int _index);
+      public: double GetRange(unsigned int _index);
 
       /// \brief Get all the ranges
       /// \param _ranges A vector that will contain all the range data
@@ -148,7 +148,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Retro (intensity) value for ray
-      public: double GetRetro(int _index);
+      public: double GetRetro(unsigned int _index);
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -159,7 +159,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index value of specific ray
       /// \return Fiducial value
-      public: int GetFiducial(int _index);
+      public: int GetFiducial(unsigned int _index);
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape
       /// \return Pointer to ray shape
@@ -176,23 +176,6 @@ namespace gazebo
       private: transport::PublisherPtr scanPub;
       private: boost::mutex mutex;
       private: msgs::LaserScanStamped laserMsg;
-
-      // Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-      // If true, apply the noise model specified by other noise parameters
-      private: bool noiseActive;
-      // Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-      // If noiseType==GAUSSIAN, noiseMean is the mean of the distibution
-      // from which we sample
-      private: double noiseMean;
-      // If noiseType==GAUSSIAN, noiseStdDev is the standard devation of
-      // the distibution from which we sample
-      private: double noiseStdDev;
     };
     /// \}
   }

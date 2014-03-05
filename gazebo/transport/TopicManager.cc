@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
   this->ConnectSubscribers(_pub.topic());
 }
 
-
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType)
@@ -392,6 +391,21 @@ void TopicManager::Unadvertise(const std::string &_topic)
   {
     publication->SetLocallyAdvertised(false);
     ConnectionManager::Instance()->Unadvertise(t);
+  }
+}
+
+//////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  if (_pub)
+  {
+    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+    if (publication)
+      publication->RemovePublisher(_pub);
+
+    this->Unadvertise(_pub->GetTopic());
   }
 }
 

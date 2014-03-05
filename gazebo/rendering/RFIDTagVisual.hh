@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc:
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
 
 #ifndef _RFIDTAGVISUAL_HH_
 #define _RFIDTAGVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -53,12 +48,6 @@ namespace gazebo
       /// \brief Callback triggered when new RFID data is received.
       /// \param[in] _msg Message containing RFID pose data
       private: void OnScan(ConstPosePtr &_msg);
-
-      /// \brief Node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber that receives RFID data.
-      private: transport::SubscriberPtr rfidSub;
     };
     /// \}
   }

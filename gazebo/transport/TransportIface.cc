@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,15 +70,24 @@ bool transport::get_master_uri(std::string &_masterHost,
   }
   else
   {
-    _masterPort = boost::lexical_cast<unsigned int>(
-        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    try
+    {
+      _masterPort = boost::lexical_cast<unsigned int>(
+          masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    }
+    catch(...)
+    {
+      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+        << "Using the default port number of 11345.\n";
+    }
   }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
+    uint32_t _timeoutIterations)
 {
   std::string host = _masterHost;
   unsigned int port = _masterPort;
@@ -87,7 +96,9 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  if (!transport::ConnectionManager::Instance()->Init(host, port))
+
+  if (!transport::ConnectionManager::Instance()->Init(host, port,
+        _timeoutIterations))
     return false;
 
   return true;
@@ -99,27 +110,6 @@ void transport::run()
   g_stopped = false;
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
-
-  std::list<std::string> namespaces;
-
-  // This chunk of code just waits until we get a list of topic namespaces.
-  unsigned int trys = 0;
-  unsigned int limit = 50;
-  while (namespaces.empty() && trys < limit)
-  {
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
-
-    if (namespaces.empty())
-    {
-      // 25 seconds max wait time
-      common::Time::MSleep(500);
-    }
-
-    trys++;
-  }
-
-  if (trys >= limit)
-    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
 /////////////////////////////////////////////////
@@ -139,9 +129,9 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  transport::stop();
   transport::TopicManager::Instance()->Fini();
 
+  transport::stop();
   if (g_runThread)
   {
     g_runThread->join();
@@ -351,3 +341,27 @@ bool transport::getMinimalComms()
   return g_minimalComms;
 }
 
+/////////////////////////////////////////////////
+bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
+{
+  std::list<std::string> namespaces;
+  gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
+
+  gazebo::common::Time waitTime = std::min(
+      gazebo::common::Time(0, 100000000), _maxWait / 10);
+
+  gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+      namespaces);
+
+  while (namespaces.empty() &&
+      gazebo::common::Time::GetWallTime() - startTime < _maxWait)
+  {
+    gazebo::transport::TopicManager::Instance()->GetTopicNamespaces(
+        namespaces);
+    gazebo::common::Time::Sleep(waitTime);
+  }
+
+  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
+    return true;
+  return false;
+}

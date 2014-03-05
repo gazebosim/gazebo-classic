@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,8 +121,9 @@ void Master::OnRead(const unsigned int _connectionIndex,
   }
   else
   {
-    gzerr << "Master got empty data message from["
-          << conn->GetRemotePort() << "]\n";
+    gzlog << "Master got empty data message from["
+          << conn->GetRemotePort() << "]. This is most likely fine, since"
+          << "the remote side probably terminated.\n";
   }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,13 +79,12 @@ void JointController::Update()
 
     if (!this->positions.empty())
     {
-      double cmd;
       std::map<std::string, double>::iterator iter;
 
       for (iter = this->positions.begin(); iter != this->positions.end();
            ++iter)
       {
-        cmd = this->posPids[iter->first].Update(
+        double cmd = this->posPids[iter->first].Update(
             this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
             stepTime);
         this->joints[iter->first]->SetForce(0, cmd);
@@ -94,13 +93,12 @@ void JointController::Update()
 
     if (!this->velocities.empty())
     {
-      double cmd;
       std::map<std::string, double>::iterator iter;
 
       for (iter = this->velocities.begin();
            iter != this->velocities.end(); ++iter)
       {
-        cmd = this->velPids[iter->first].Update(
+        double cmd = this->velPids[iter->first].Update(
             this->joints[iter->first]->GetVelocity(0) - iter->second,
             stepTime);
         this->joints[iter->first]->SetForce(0, cmd);

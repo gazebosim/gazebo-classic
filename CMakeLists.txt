@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
-set (GAZEBO_MAJOR_VERSION 2)
+set (GAZEBO_MAJOR_VERSION 3)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
@@ -92,29 +92,6 @@ set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 set (LIB_INSTALL_DIR_ARCH_INDEPENDENT "lib/")
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
     
-set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
-
-if (USE_FULL_RPATH)
-  # use, i.e. don't skip the full RPATH for the build tree
-  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
-  
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-  
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
-  # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  endif("${isSystemDir}" STREQUAL "-1")
-endif()
-
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
@@ -149,6 +126,7 @@ message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
+#####################################
 # Define some variables that are going to be used in two places:
 # 1. In CMake code to pass preprocessor definitions to certain source files
 # (especially in common/CMakeLists.txt).
@@ -293,7 +271,7 @@ else (build_errors)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
-    add_subdirectory(sdf)
+    add_subdirectory(worlds)
   endif (BUILD_GAZEBO)
 
   ########################################

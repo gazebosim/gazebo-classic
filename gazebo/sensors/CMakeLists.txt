@@ -1,10 +1,11 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources 
+set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
   ForceTorqueSensor.cc
+  GaussianNoiseModel.cc
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
@@ -21,13 +22,14 @@ set (sources
   WirelessReceiver.cc
   WirelessTransceiver.cc
   WirelessTransmitter.cc
-) 
+)
 
 set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
   ForceTorqueSensor.hh
+  GaussianNoiseModel.hh
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
@@ -79,10 +81,10 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY
 add_library(gazebo_sensors SHARED ${sources})
 
 target_link_libraries(gazebo_sensors
-  gazebo_common 
+  gazebo_common
   gazebo_rendering
   gazebo_physics
-  ${libtool_library} 
+  ${libtool_library}
   ${Boost_LIBRARIES}
   ${ogre_ldflags}
   )

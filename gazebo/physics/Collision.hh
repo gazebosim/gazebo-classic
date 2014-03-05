@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,12 +192,12 @@ namespace gazebo
       /// \brief Number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \param[in] _maxContacts max num contacts allowed for this collision.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -213,7 +213,7 @@ namespace gazebo
       protected: ShapePtr shape;
 
       /// \brief The surface parameters.
-      private: SurfaceParamsPtr surface;
+      protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
@@ -222,7 +222,7 @@ namespace gazebo
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
 
       /// \brief Unique id for collision visual.
       private: uint32_t collisionVisualId;
