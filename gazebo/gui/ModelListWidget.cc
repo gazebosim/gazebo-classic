@@ -612,7 +612,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      msg.set_irr(this->variantManager->value(
+      msg.set_inertia_ratio_reduction(this->variantManager->value(
             this->GetChildItem((*iter), "inertia ratio reduction")).toBool());
       msg.set_friction_iters(this->variantManager->value(
             this->GetChildItem((*iter), "extra friction iters")).toInt());
@@ -2394,7 +2394,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
   item = this->variantManager->addProperty(QVariant::Bool,
     tr("inertia ratio reduction"));
-  if (_msg.has_irr())
+  if (_msg.has_inertia_ratio_reduction())
     item->setValue(_msg.iters());
   solverItem->addSubProperty(item);
 

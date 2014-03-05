@@ -248,7 +248,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
-    physicsMsg.set_irr(
+    physicsMsg.set_inertia_ratio_reduction(
         boost::any_cast<bool>(this->GetParam("inertia_ratio_reduction")));
     physicsMsg.set_friction_iters(
         boost::any_cast<int>(this->GetParam("extra_friction_iterations")));
@@ -299,8 +299,8 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_precon_iters())
     this->SetSORPGSPreconIters(_msg->precon_iters());
 
-  if (_msg->has_irr())
-    this->SetParam("inertia_ratio_reduction", _msg->irr());
+  if (_msg->has_inertia_ratio_reduction())
+    this->SetParam("inertia_ratio_reduction", _msg->inertia_ratio_reduction());
 
   if (_msg->has_friction_iters())
     this->SetParam("extra_friction_iterations", _msg->friction_iters());
