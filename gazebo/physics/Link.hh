@@ -30,6 +30,7 @@
 
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Filters.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/LinkState.hh"
@@ -575,52 +576,10 @@ namespace gazebo
       private: Collision_V collisions;
 
       /// \brief For moving window average of kinetic energy
-      private: class MovingWindowFilter
-      {
-        MovingWindowFilter()
-        {
-          // for moving window smoothed velocity
-          /// \TODO FIXME hardcoded for now
-          this->velWindowSize = 4;
-          this->velHistory.resize(this->velWindowSize);
-          this->velIter = this->velHistory.begin();
-        }
+      private: filters::MovingWindowFilter<math::Vector3> linVelFil;
 
-        public: void Update(math::Vector3 _vel)
-        {
-          // update avg
-          double n = 1.0/static_cast<double>(this->velWindowSize);
-          // std::vector<math::Vector3>::iterator old = this->velIter++;
-
-          // add new data
-          if (this->velIter == this->velHistory.end())
-            this->velIter = this->velHistory.begin();
-          (*this->velIter) = _vel;
-
-          // progressive add and subtrace oldest
-          // this->velFiltered += n*(*this->velIter - *old);
-
-          // sum and avg
-          this->velFiltered = math::Vector3(0, 0, 0);
-          for (std::vector<math::Vector3>::iterator it =
-            this->velHistory.begin();
-            it != this->velHistory.end(); ++it)
-            this->velFiltered += *it;
-          this->velFiltered *= n;
-        }
-
-        public: math::Vector3 Get()
-        {  return this->velFiltered; }
-
-        private: int velWindowSize;
-        private: math::Vector3 velFiltered;
-        private: std::vector<math::Vector3> velHistory;
-        private: std::vector<math::Vector3>::iterator velIter;
-        friend class Link;
-      };
-
-      private: MovingWindowFilter linVelFil;
-      private: MovingWindowFilter angVelFil;
+      /// \brief For moving window average of kinetic energy
+      private: filters::MovingWindowFilter<math::Vector3> angVelFil;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

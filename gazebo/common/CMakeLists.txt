@@ -63,6 +63,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  Filters.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
