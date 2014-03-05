@@ -71,7 +71,7 @@ std::string GpuRaySensor::GetTopic() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
