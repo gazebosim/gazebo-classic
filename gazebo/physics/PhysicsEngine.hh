@@ -258,12 +258,86 @@ namespace gazebo
 
       /// \brief Set a parameter of the physics engine
       /// \param[in] _key String key
+      /// Below is a list of _key parameter definitions:
+      ///   - ode
+      ///       -# "type" - returns "ode"
+      ///       -# "cfm" - global CFM
+      ///       -# "erp" - global ERP
+      ///       -# "precon_iters" - precondition iterations (experimental).
+      ///       -# "iters" - number of LCP iterations.
+      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
+      ///       -# "contact_max_correcting_vel" - truncates correction
+      ///          impulses from ERP by this value.
+      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
+      ///          depths below this value.
+      ///       -# "max_contacts" - max number of contact constratins between
+      ///          pairs of collision bodies.
+      ///       -# "min_step_size" - physics step size
+      ///       -# "rms_error_tolerance" - threshold for stopping PGS.
+      ///          if total RMS error < this value, stop PGS iterations.
+      ///       -# "inertia_ratio_reduction" -
+      ///          turn on/off quickstep inertia reduction  (experimental).
+      ///       -# "contact_residual_smoothing" -
+      ///          option to smooth friction residuals (experimental).
+      ///       -# "experimental_row_reordering"
+      ///          if true, reorder constraint rows with the following order:
+      ///          bilateral constrains, contact normal constraints
+      ///          and lastly frictional constraints (experimental).
+      ///       -# "warm_start_factor" -
+      ///          relaxation factor for warm starting bilateral constraints
+      ///          from last time step's value (experimental).
+      ///       -# "extra_friction_iterations" -
+      ///          extra PGS iterations on only the frictional constraints
+      ///          (experimental).
+      ///
       /// \param[in] _value The value to set to
       public: virtual void SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
+      /// Below is a list of _key parameter definitions:
+      ///   - ode
+      ///       -# "type" - returns "ode"
+      ///       -# "cfm" - global CFM
+      ///       -# "erp" - global ERP
+      ///       -# "precon_iters" - precondition iterations (experimental).
+      ///       -# "iters" - number of LCP iterations.
+      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
+      ///       -# "contact_max_correcting_vel" - truncates correction
+      ///          impulses from ERP by this value.
+      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
+      ///          depths below this value.
+      ///       -# "max_contacts" - max number of contact constratins between
+      ///          pairs of collision bodies.
+      ///       -# "min_step_size" - physics step size
+      ///       -# "rms_error_tolerance" - threshold for stopping PGS.
+      ///       -# "rms_error" - RMS of dlambda at the end of time step
+      ///          error[0]: bilateral constraints
+      ///          error[1]: contact normal constraints
+      ///          error[2]: friciton constraints
+      ///          error[3]: all constraints
+      ///       -# "constraint_residual" - RMS of residuals: Jv
+      ///          residual[0]: bilateral constraints
+      ///          residual[1]: contact normal constraints
+      ///          residual[2]: friciton constraints
+      ///          residual[3]: all constraints
+      ///       -# "num_contacts"
+      ///       -# "inertia_ratio_reduction"
+      ///          turn on/off quickstep inertia reduction  (experimental).
+      ///       -# "contact_residual_smoothing"
+      ///          option to smooth friction residuals (experimental).
+      ///       -# "experimental_row_reordering"
+      ///          true if reorder constraint rows with the following order:
+      ///          bilateral constrains, contact normal constraints
+      ///          and lastly frictional constraints (experimental).
+      ///       -# "warm_start_factor"
+      ///          relaxation factor for warm starting bilateral constraints
+      ///          from last time step's value (experimental).
+      ///       -# "extra_friction_iterations"
+      ///          extra PGS iterations on only the frictional constraints
+      ///          (experimental).
+      ///
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 
