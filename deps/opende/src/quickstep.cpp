@@ -957,8 +957,8 @@ static void ComputeRows(
 
           // extra residual smoothing for contact constraints
           // was smoothing both contact normal and friction constraints for VRC
-          // trying only friction direction
           // if (constraint_index != -1)
+          // trying now only smooth lambda for friction directions
           if (constraint_index >= 0)
           {
             lambda[index] = (1.0 - smooth_contacts)*lambda[index]
@@ -1080,7 +1080,7 @@ static void ComputeRows(
 #endif
 
     // option to stop when tolerance has been met
-    if (iteration < precon_iterations &&
+    if (iteration >= precon_iterations &&
         qs->rms_dlambda[3] < sor_lcp_tolerance)
     {
       #ifdef DEBUG_CONVERGENCE_TOLERANCE
