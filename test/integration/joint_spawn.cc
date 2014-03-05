@@ -438,7 +438,8 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "screw"
                   , "universal"
                   , "ball"
-                  , "revolute2")));
+                  , "revolute2"
+                  , "gearbox")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,

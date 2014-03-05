@@ -11,7 +11,6 @@ set (files
   everything.world
   force_torque_demo.world
   friction_demo.world
-  gearbox.world
   gripper.world
   heightmap_dem.world
   heightmap.world

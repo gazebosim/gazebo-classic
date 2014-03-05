@@ -56,7 +56,7 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 {
   GearboxJoint<ODEJoint>::Load(_sdf);
 
-  this->SetGearRatio(this->gearRatio);
+  this->SetGearboxRatio(this->gearRatio);
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetGearRatio(double _gearRatio)
+void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 {
   this->gearRatio = _gearRatio;
   dJointSetGearboxRatio(this->jointId, _gearRatio);
