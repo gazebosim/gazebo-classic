@@ -13,6 +13,8 @@ Instructions are located at
   http://gazebosim.org/documentation.html
 
 Gazebo cmake parameters available at configuring time:
+ - USE_EXTERNAL_LIBCCD (bool) [default False]
+   Use libccd from a existing system installation
  - USE_LOW_MEMORY_TEST (bool) [default False]
    Use reduced version of tests which need less quantity of RAM memory
    available.

@@ -194,12 +194,6 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
-
-  #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
   if (NOT TBB_FOUND)
@@ -283,6 +277,22 @@ if (PKG_CONFIG_FOUND)
   else()
     # This variable will be substituted into cmake/setup.sh.in
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+  endif()
+
+  ########################################
+  # Check and find libcdd (if needed)
+  if (USE_EXTERNAL_LIBCCD)
+      pkg_check_modules(CCD ccd>=1.4)
+    if (NOT CCD_FOUND)
+       BUILD_ERROR("libccd was not found in the system")
+    else()
+	include_directories(${CCD_INCLUDE_DIRS})
+	link_directories(${CCD_LIBRARY_DIRS})
+    endif()
+  else()
+    # Use internal CCD (built as libgazebo_ccd.so)
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
   ########################################
