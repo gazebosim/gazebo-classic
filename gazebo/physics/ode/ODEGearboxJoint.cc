@@ -78,35 +78,40 @@ void ODEGearboxJoint::SetGearRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int _index) const
+math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
 {
+/*
   dVector3 result;
-
   if (_index == 0)
-    dJointGetGearboxAxis1(this->jointId, result);
+    dJointGetGearboxAnchor1(this->jointId, result);
   else if (_index == 1)
-    dJointGetGearboxAxis2(this->jointId, result);
+    dJointGetGearboxAnchor2(this->jointId, result);
   else
     gzerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
-
   return math::Vector3(result[0], result[1], result[2]);
+*/
+
+  gzerr << "GetAnchor not implmented.\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAnchor(unsigned int _index,
-                                const math::Vector3 &_anchor)
+void ODEGearboxJoint::SetAnchor(unsigned int /*_index*/,
+                                const math::Vector3 &/*_anchor*/)
 {
+/* anchor not used/needed in gearbox
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
   if (_index == 0)
-    dJointSetGearboxAxis1(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetGearboxAnchor1(this->jointId, _anchor.x, _anchor.y, _anchor.z);
   else if (_index == 1)
-    dJointSetGearboxAxis2(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetGearboxAnchor2(this->jointId, _anchor.x, _anchor.y, _anchor.z);
   else
     gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
+*/
 }
 
 
@@ -128,26 +133,29 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
+  ODEJoint::SetAxis(_index, _axis);
+
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-
   if (_index == 0)
+  {
+    /// ODE needs global axis
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
     dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
+  }
   else if (_index == 1)
+  {
+    /// ODE needs global axis
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
     dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
+  }
   else
     gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
 }
