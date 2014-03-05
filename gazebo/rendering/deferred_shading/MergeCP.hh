@@ -45,7 +45,8 @@ namespace gazebo
 
     /// The custom composition pass that is used for rendering the light
     /// geometry. This class needs to be registered with the CompositorManager
-    class GAZEBO_VISIBLE MergeCompositionPass : public Ogre::CustomCompositionPass
+    class GAZEBO_VISIBLE MergeCompositionPass : 
+      public Ogre::CustomCompositionPass
     {
       /// @copydoc CustomCompositionPass::createOperation
       public: virtual Ogre::CompositorInstance::RenderSystemOperation *

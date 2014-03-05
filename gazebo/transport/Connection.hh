@@ -97,7 +97,8 @@ namespace gazebo
     ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class GAZEBO_VISIBLE Connection : public boost::enable_shared_from_this<Connection>
+    class GAZEBO_VISIBLE Connection :
+      public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();

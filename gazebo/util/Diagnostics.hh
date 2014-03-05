@@ -73,7 +73,8 @@ namespace gazebo
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
-    class GAZEBO_VISIBLE DiagnosticManager : public SingletonT<DiagnosticManager>
+    class GAZEBO_VISIBLE DiagnosticManager :
+      public SingletonT<DiagnosticManager>
     {
       /// \brief Constructor
       private: DiagnosticManager();

@@ -68,7 +68,8 @@ namespace gazebo
     /// \param[in] _msgtype Message type name.
     /// \param[in] _classname Class name for message.
     #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
-    GAZEBO_VISIBLE boost::shared_ptr<google::protobuf::Message> New##_classname() \
+    GAZEBO_VISIBLE \
+    boost::shared_ptr<google::protobuf::Message> New##_classname() \
     { \
       return boost::shared_ptr<gazebo::msgs::_classname>(\
           new gazebo::msgs::_classname); \

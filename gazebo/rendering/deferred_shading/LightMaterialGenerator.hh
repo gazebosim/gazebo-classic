@@ -42,7 +42,8 @@ namespace gazebo
     class LightMaterialGeneratorGLSL;
 
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE LightMaterialGenerator: public MaterialGenerator, techniquePolicy
+    class GAZEBO_VISIBLE LightMaterialGenerator : 
+      public MaterialGenerator, techniquePolicy
     {
       /// Permutation of light materials
       public: enum MaterialID
@@ -73,8 +74,8 @@ namespace gazebo
     };
 
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE LightMaterialGeneratorGLSL : public MaterialGenerator::Impl,
-                                       public techniquePolicy
+    class GAZEBO_VISIBLE LightMaterialGeneratorGLSL : 
+      public MaterialGenerator::Impl, public techniquePolicy
     {
       public: typedef MaterialGenerator::Perm Perm;
 
