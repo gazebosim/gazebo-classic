@@ -2726,16 +2726,16 @@ ODE_API void dJointSetGearboxReferenceBody( dJointID j, dBodyID b );
 /**
  * @brief set gearbox reference body
  * @remarks
- * This is used to get the joint angle of the two bodies, so
+ * This is used to get the joint angle of the first body, so
  * one can enforce error correction on gear angles.
  * @ingroup joints
  */
-
 ODE_API void dJointSetGearboxReferenceBody1( dJointID j, dBodyID b );
+
 /**
  * @brief set gearbox reference body
  * @remarks
- * This is used to get the joint angle of the two bodies, so
+ * This is used to get the joint angle of the second body, so
  * one can enforce error correction on gear angles.
  * @ingroup joints
  */
