@@ -19,9 +19,11 @@
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
   /// \brief Test World::GetEntityBelowPoint
   /// \param[in] _physicsEngine Type of physics engine to test.
