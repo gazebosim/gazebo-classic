@@ -103,6 +103,7 @@ struct dxSORLCPParameters {
     int nb;
     dReal stepsize;
     int* jb;
+    int* jfric;
     const int* findex;
     dRealPtr hi;
     dRealPtr lo;
@@ -519,6 +520,7 @@ static void ComputeRows(
   dRealMutablePtr vnew         = params.vnew;
 #endif
   int* jb                      = params.jb;
+  int* jfric                   = params.jfric;
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
   dRealPtr        lo           = params.lo;
@@ -887,6 +889,7 @@ static void ComputeRows(
         dReal hi_act, lo_act;
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0) {
+          // friction directions
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = dFabs (hi[index] * lambda[constraint_index]);
           lo_act = -hi_act;
@@ -894,6 +897,7 @@ static void ComputeRows(
           hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
           lo_act_erp = -hi_act_erp;
         } else {
+          // contacts and bilaterals
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = hi[index];
           lo_act = lo[index];
@@ -970,6 +974,124 @@ static void ComputeRows(
         }
 #endif
 
+        if (0)
+        {
+          // project the friction pyramid solutions onto
+          // corresponding ellipse defined by mu1 and mu2
+          // we know that projected lambda_f[12]p:
+          //   lambda_f1p: [-lambda_ellipse1, lambda_ellipse2]
+          //   lambda_f2p: [-lambda_ellipse2, lambda_ellipse2]
+          // where:
+          //   slope = lambda_f2 / lambda_f1 // (current solution)
+          //   mu1 = -lo[fi1] = hi[fi1]
+          //   mu2 = -lo[fi2] = hi[fi2]
+          //   lambda_ellipse1 = mu1^2 * mu2^2 / (mu2^2 + mu1^2*slope)
+          //   lambda_ellipse2 = slope * lambda_ellipse1
+
+          // go through jfric, if not -1, project the two elements to ellipse
+          if (jfric[index] != -1)
+          {
+            // index to the two friction directions for this contact constraint
+            int fi1 = index;
+            int fi2 = jfric[index];
+            // extract mu1 and mu2 from current limits (see contact.cpp)
+            dReal lambda_normal = lambda[constraint_index];
+            dReal mu1 = hi[fi1]*lambda_normal;
+            dReal mu2 = hi[fi2]*lambda_normal;
+            dReal mumu1 = mu1 * mu1;
+            dReal mumu2 = mu2 * mu2;
+            // get current lambda's for the two friction directions
+            dReal lambda_f1 = lambda[fi1];
+            dReal lambda_f2 = lambda[fi2];
+            // truncate friction pyramid solution
+            // based on geometry of friction ellipse cone
+            if (!_dequal(lambda_f1, 0.0))
+            {
+              // project both
+              // calculate current slope
+              dReal slope = fabs(lambda_f2 / lambda_f1);
+              // find intersection point of current friction vector
+              // and the friction elliptical cone.
+              dReal tmp = (mumu2 + mumu1*slope*slope);
+              if (!_dequal(tmp, 0.0))
+              {
+                // truncate by friction ellipse cone
+                dReal lambda_ellipse1 = sqrt(mumu1 * mumu2 / tmp);
+                dReal lambda_ellipse2 = slope * lambda_ellipse1;
+                // truncate lambda_f1 to ellipse (mu1)
+                if (lambda_f1 > lambda_ellipse1)
+                  lambda[fi1] = lambda_ellipse1;
+                else if (lambda_f1 < -lambda_ellipse1)
+                  lambda[fi1] = -lambda_ellipse1;
+                // truncate lambda_f2 to ellipse (mu2)
+                if (lambda_f2 > lambda_ellipse2)
+                  lambda[fi2] = lambda_ellipse2;
+                else if (lambda_f2 < -lambda_ellipse2)
+                  lambda[fi2] = -lambda_ellipse2;
+                // printf("projection: %d, %d slope(%f) lambda(%f, %f) mu(%f, %f) --> mu(%f, %f) result(%f, %f)\n",
+                //   iteration, i, slope, lambda_f1, lambda_f2, mu1, mu2, lambda_ellipse1, lambda_ellipse2, lambda[fi1], lambda[fi2]);
+              }
+            }
+            else
+            {
+              // special case, if lambda_f1 is 0,
+              // simply project lambda_f2
+              if (lambda[fi2] > mu2)
+                lambda[fi2] = mu2;
+              else if (lambda[fi2] < -mu2)
+                lambda[fi2] = -mu2;
+              // printf("projection: %d, %d lambda(%f, %f) mu(%f, %f) --> result(%f, %f)\n",
+              //   iteration, i, lambda_f1, lambda_f2, mu1, mu2, lambda[fi1], lambda[fi2]);
+            }
+
+            // Now, do the same for the _erp variables
+            // extract mu1 and mu2 from current limits (see contact.cpp)
+            lambda_normal = lambda_erp[constraint_index];
+            mu1 = hi[fi1]*lambda_normal;
+            mu2 = hi[fi2]*lambda_normal;
+            mumu1 = mu1 * mu1;
+            mumu2 = mu2 * mu2;
+            // get current lambda's for the two friction directions
+            lambda_f1 = lambda_erp[fi1];
+            lambda_f2 = lambda_erp[fi2];
+            // truncate friction pyramid solution
+            // based on geometry of friction ellipse cone
+            if (!_dequal(lambda_f1, 0.0))
+            {
+              // project both
+              // calculate current slope
+              dReal slope = fabs(lambda_f2 / lambda_f1);
+              // find intersection point of current friction vector
+              // and the friction elliptical cone.
+              dReal tmp = (mumu2 + mumu1*slope);
+              if (!_dequal(tmp, 0.0))
+              {
+                // truncate by friction ellipse cone
+                dReal lambda_ellipse1 = sqrt(mumu1 * mumu2 / tmp);
+                dReal lambda_ellipse2 = slope * lambda_ellipse1;
+                // truncate lambda_f1 to ellipse (mu1)
+                if (lambda_f1 > lambda_ellipse1)
+                  lambda_erp[fi1] = lambda_ellipse1;
+                else if (lambda_f1 < -lambda_ellipse1)
+                  lambda_erp[fi1] = -lambda_ellipse1;
+                // truncate lambda_f2 to ellipse (mu2)
+                if (lambda_f2 > lambda_ellipse2)
+                  lambda_erp[fi2] = lambda_ellipse2;
+                else if (lambda_f2 < -lambda_ellipse2)
+                  lambda_erp[fi2] = -lambda_ellipse2;
+              }
+            }
+            else
+            {
+              // special case, if lambda_f1 is 0,
+              // simply project lambda_f2
+              if (lambda_erp[fi2] > mu2)
+                lambda_erp[fi2] = mu2;
+              else if (lambda_erp[fi2] < -mu2)
+                lambda_erp[fi2] = -mu2;
+            }
+          }
+        }
         // update caccel
         {
           // FOR erp throttled by info.c_v_max or info.c
@@ -1038,6 +1160,13 @@ static void ComputeRows(
       //delta *= ramp;
 
     } // end of for loop on m
+
+    for (int i=startRow; i<startRow+nRows; i++)
+    {
+      int index = order[i].index;
+      int constraint_index = findex[index];  // cache for efficiency
+    } // end of for loop on m
+
 
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
@@ -1134,6 +1263,10 @@ static void ComputeRows(
 // nb is the number of bodies in the body array.
 // J is an m*12 matrix of constraint rows
 // jb is an array of first and second body numbers for each constraint row
+// jfric is an array used to project friciton pyramid result
+// onto the appropriate circle or ellipse. jfric[1:m] is either:
+//   -1: if constraint is not a frictional constraint, or
+//    row index of complimentary frictional constraint of the friction pyramid.
 // invMOI is the global frame inverse inertia for each body (stacked 3x3 matrices)
 //
 // this returns lambda and cforce (the constraint force).
@@ -1143,7 +1276,7 @@ static void ComputeRows(
 // rhs, lo and hi are modified on exit
 //
 static void SOR_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, int *jfric, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
@@ -1338,6 +1471,48 @@ static void SOR_LCP (dxWorldProcessContext *context,
     }
     dIASSERT (orderhead-ordertail==1);
   }
+  {
+    // construct jfric array
+    // for each elemnt of jfric, if the index corresponds to a contact constraint
+    // then it contatins the indices to the friction constraint elements
+    // I.e.
+    //   if i = is a contact normal constraint, then
+    //     jfric[i][0] = fi1 = index to the first friction direction constraint
+    //     jfric[i][1] = fi2 = index to the second friction direction constraint
+    //     jfric[fi1][0] = 
+    //   else
+    //     jfric[i][0] = -1
+    //     jfric[i][1] = -1
+    // initialize all varialbes to -1
+    for (int i=0; i<m; ++i)
+      jfric[i] = -1;
+    for (int i=0; i<m; ++i) {
+      if (findex[i] >= 0)
+      {
+        // i is a friction constraint
+        // findex[i] is the index of the corresponding contact constraint
+        int index_contact_constraint = findex[i];
+
+        if (jfric[index_contact_constraint] == -1)
+        {
+          // store current fi1 index in jfric[contact normal]
+          jfric[index_contact_constraint] = i;
+        }
+        else
+        {
+          int fi1 = jfric[index_contact_constraint];
+          int fi2 = i;
+          // this must be fi2, so get fi1 from jfric and put it here
+          jfric[fi2] = fi1;
+          // put fi2 in the spot for fi1
+          jfric[fi1] = fi2;
+          // optional: reset jfric[contact normal]
+          jfric[index_contact_constraint] = -1;
+        }
+      }
+    }
+  }
+
 #endif
 
 #ifdef SHOW_CONVERGENCE
@@ -1412,6 +1587,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].nb = nb;
     params[thread_id].stepsize = stepsize;
     params[thread_id].jb = jb;
+    params[thread_id].jfric = jfric;
     params[thread_id].findex = findex;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
@@ -1930,6 +2106,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_precon = NULL;
   dReal *J_orig = NULL;
   int *jb = NULL;
+  int *jfric = NULL;
 
   dReal *vnew = NULL; // used by PENETRATION_JVERROR_CORRECTION
 
@@ -1975,6 +2152,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       const unsigned jbelements = mlocal*2;
       jb = context->AllocateArray<int> (jbelements);
+
+      jfric = context->AllocateArray<int> (mlocal);
 
       rhs = context->AllocateArray<dReal> (mlocal);
       rhs_erp = context->AllocateArray<dReal> (mlocal);
@@ -2194,7 +2373,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
-      SOR_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,body,
+      SOR_LCP (context,m,nb,J,J_precon,J_orig,vnew,jb,jfric,body,
                invMOI,MOI,lambda,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
@@ -2583,6 +2762,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += 2 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs, rhs_erp
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for jfric
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for c_v_max
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * mfb); // for Jcopy
