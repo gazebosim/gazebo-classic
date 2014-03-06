@@ -107,12 +107,6 @@ set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
-# Default for not using external libccd
-if (NOT DEFINED USE_EXTERNAL_LIBCCD)
-  set (USE_EXTERNAL_LIBCCD False)
-endif()
-
-#####################################
 # Check for low memory version to use in some tests
 if(NOT DEFINED USE_LOW_MEMORY_TESTS)
   set (USE_LOW_MEMORY_TESTS FALSE)
