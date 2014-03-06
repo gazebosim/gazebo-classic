@@ -958,7 +958,7 @@ static void ComputeRows(
           // extra residual smoothing for contact constraints
           // was smoothing both contact normal and friction constraints for VRC
           // if (constraint_index != -1)
-          // trying now only smooth lambda for friction directions
+          // smooth only lambda for friction directions fails friction_demo.world
           if (constraint_index != -1)
           {
             lambda[index] = (1.0 - smooth_contacts)*lambda[index]
