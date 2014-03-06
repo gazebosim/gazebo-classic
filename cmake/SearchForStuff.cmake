@@ -280,7 +280,7 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   ########################################
-  # Check and find libcdd (if needed)
+  # Check and find libccd (if needed)
   pkg_check_modules(CCD ccd>=1.4)
   if (NOT CCD_FOUND)
     message(STATUS "Using internal copy of libccd")
