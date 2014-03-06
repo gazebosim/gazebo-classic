@@ -45,6 +45,7 @@ namespace gazebo
       /// \brief Load the visual based on a message
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
+      using Visual::Load;
     };
     /// \}
   }

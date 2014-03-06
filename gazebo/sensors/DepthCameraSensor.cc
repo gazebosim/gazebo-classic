@@ -58,7 +58,7 @@ DepthCameraSensor::~DepthCameraSensor()
 
 //////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf)
+                                   sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
