@@ -1,6 +1,6 @@
 add_subdirectory(opende)
 
-if (NOT USE_EXTERNAL_LIBCCD)
+if (NOT HAVE_CCD)
   add_subdirectory(libccd)
 endif()
 # add_subdirectory(ann)
