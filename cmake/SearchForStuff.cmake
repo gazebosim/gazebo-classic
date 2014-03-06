@@ -286,9 +286,6 @@ if (PKG_CONFIG_FOUND)
     message(STATUS "Using internal copy of libccd")
     set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
     set(CCD_LIBRARIES gazebo_ccd)
-  else()
-    include_directories(${CCD_INCLUDE_DIRS})
-    link_directories(${CCD_LIBRARY_DIRS})
   endif()
 
   ########################################
