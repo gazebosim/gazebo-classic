@@ -170,17 +170,15 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::SIMBODY);
-    // physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
-    // physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    // physicsMsg.set_sor(this->GetSORPGSW());
-    // physicsMsg.set_cfm(this->GetWorldCFM());
-    // physicsMsg.set_erp(this->GetWorldERP());
-    // physicsMsg.set_contact_max_correcting_vel(
-    //     this->GetContactMaxCorrectingVel());
-    // physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+
+    physicsMsg.mutable_simbody()->set_accuracy(
+      static_cast<double>(this->integ->getAccuracyInUse()));
+    physicsMsg.mutable_simbody()->set_max_transient_velocity(
+      static_cast<double>(this->contact.getTransitionVelocity()));
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);

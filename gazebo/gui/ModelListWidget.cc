@@ -644,7 +644,12 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       }
       else if (this->physicsType == msgs::Physics::SIMBODY)
       {
-        /// \TODO
+        msg.mutable_simbody()->set_accuracy(
+          this->variantManager->value(
+          this->GetChildItem((*iter), "accuracy")).toDouble());
+        msg.mutable_simbody()->set_max_transient_velocity(
+          this->variantManager->value(
+          this->GetChildItem((*iter), "max transient velocity")).toDouble());
       }
       else
       {
@@ -2608,7 +2613,23 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   }
   else if (this->physicsType == msgs::Physics::SIMBODY)
   {
-    /// \TODO
+    item = this->variantManager->addProperty(QVariant::Double,
+      tr("accuracy"));
+    static_cast<QtVariantPropertyManager*>
+      (this->variantFactory->propertyManager(item))->setAttribute(
+          item, "decimals", 6);
+    if (_msg.has_simbody() && _msg.simbody().has_accuracy())
+      item->setValue(_msg.simbody().accuracy());
+    solverItem->addSubProperty(item);
+
+    item = this->variantManager->addProperty(QVariant::Double,
+      tr("max transient velocity"));
+    static_cast<QtVariantPropertyManager*>
+      (this->variantFactory->propertyManager(item))->setAttribute(
+          item, "decimals", 6);
+    if (_msg.has_simbody() && _msg.simbody().has_max_transient_velocity())
+      item->setValue(_msg.simbody().max_transient_velocity());
+    solverItem->addSubProperty(item);
   }
   else
   {
