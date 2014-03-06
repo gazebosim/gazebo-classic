@@ -106,11 +106,11 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   /// \TODO: get from sdf for simbody physics
   this->integratorType = "semi_explicit_euler";
 
-  if (this->integratorType == "")
+  if (this->integratorType == "rk_merson")
     this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  else if (this->integratorType == "")
+  else if (this->integratorType == "rk3")
     this->integ = new SimTK::RungeKutta3Integrator(system);
-  else if (this->integratorType == "")
+  else if (this->integratorType == "rk2")
     this->integ = new SimTK::RungeKutta2Integrator(system);
   else if (this->integratorType == "semi_explicit_euler")
     this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
