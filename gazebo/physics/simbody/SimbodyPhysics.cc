@@ -73,11 +73,6 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
   // Instantiate the Simbody Matter Subsystem
   // Instantiate the Simbody General Force Subsystem
 
-  // Create an integrator
-  // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  // this->integ = new SimTK::RungeKutta3Integrator(system);
-  // this->integ = new SimTK::RungeKutta2Integrator(system);
-  this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   this->simbodyPhysicsInitialized = false;
   this->simbodyPhysicsStepped = false;
 }
@@ -102,6 +97,28 @@ ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  // Create an integrator
+  /// \TODO: get from sdf for simbody physics
+  /// \TODO: use this when pgs rigid body solver is implemented
+  this->solverType = "elastic_foundation";
+
+  /// \TODO: get from sdf for simbody physics
+  this->integratorType = "semi_explicit_euler";
+
+  if (this->integratorType == "")
+    this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  else if (this->integratorType == "")
+    this->integ = new SimTK::RungeKutta3Integrator(system);
+  else if (this->integratorType == "")
+    this->integ = new SimTK::RungeKutta2Integrator(system);
+  else if (this->integratorType == "semi_explicit_euler")
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  else
+  {
+    gzerr << "type not specified, using SemiExplicitEuler2Integrator.\n";
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  }
 
   this->stepTimeDouble = this->GetMaxStepSize();
 
@@ -178,42 +195,17 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // if (_msg->has_solver_type())
-  // {
-  //   sdf::ElementPtr solverElem =
-  //     this->sdf->GetElement("ode")->GetElement("solver");
-  //   if (_msg->solver_type() == "quick")
-  //   {
-  //     solverElem->GetElement("type")->Set("quick");
-  //     this->physicsStepFunc = &dWorldQuickStep;
-  //   }
-  //   else if (_msg->solver_type() == "world")
-  //   {
-  //     solverElem->GetElement("type")->Set("world");
-  //     this->physicsStepFunc = &dWorldStep;
-  //   }
-  // }
+  // Set integrator accuracy (measured with Richardson Extrapolation)
+  if (_msg->has_simbody() && _msg->simbody().has_accuracy())
+    this->integ->setAccuracy(_msg->simbody().accuracy());
 
-  // if (_msg->has_iters())
-  //   this->SetSORPGSIters(_msg->iters());
-
-  // if (_msg->has_sor())
-  //   this->SetSORPGSW(_msg->sor());
-
-  // if (_msg->has_cfm())
-  //   this->SetWorldCFM(_msg->cfm());
-
-  // if (_msg->has_erp())
-  //   this->SetWorldERP(_msg->erp());
+  // Set stiction max slip velocity to make it less stiff.
+  if (_msg->has_simbody() && _msg->simbody().has_max_transient_velocity())
+    this->contact.setTransitionVelocity(
+    _msg->simbody().max_transient_velocity());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  // if (_msg->has_contact_max_correcting_vel())
-  //   this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
-
-  // if (_msg->has_contact_surface_layer())
-  //   this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));

@@ -68,6 +68,12 @@ namespace gazebo
         /// \brief Surface layer depth
         CONTACT_SURFACE_LAYER,
 
+        /// \brief split impulse
+        SPLIT_IMPULSE,
+
+        /// \brief split impulse penetration threshold
+        SPLIT_IMPULSE_PENETRATION_THRESHOLD,
+
         /// \brief Maximum number of contacts
         MAX_CONTACTS,
 

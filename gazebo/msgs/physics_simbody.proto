@@ -6,6 +6,8 @@ package gazebo.msgs;
 
 message PhysicsSimbody
 {
-  optional double accuracy                   = 1;
-  optional double max_transient_velocity     = 2;
+  optional string solver_type                = 1;
+  optional string integrator_type            = 2;
+  optional double accuracy                   = 3;
+  optional double max_transient_velocity     = 4;
 }

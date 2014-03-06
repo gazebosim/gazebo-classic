@@ -6,12 +6,11 @@ package gazebo.msgs;
 
 message PhysicsBullet
 {
-  optional int32 iters                              = 1;
-  optional double sor                               = 2;
-  optional double cfm                               = 3;
-  optional double erp                               = 4;
-  optional double contact_max_correcting_vel        = 5;
-  optional double contact_surface_layer             = 6;
-  optional bool split_impulse                       = 7;
-  optional bool split_impulse_penetration_threshold = 8;
+  optional int32 iters                                = 1;
+  optional double sor                                 = 2;
+  optional double cfm                                 = 3;
+  optional double erp                                 = 4;
+  optional double contact_surface_layer               = 5;
+  optional bool split_impulse                         = 6;
+  optional double split_impulse_penetration_threshold = 7;
 }
