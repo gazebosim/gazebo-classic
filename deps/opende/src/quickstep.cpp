@@ -959,7 +959,7 @@ static void ComputeRows(
           // was smoothing both contact normal and friction constraints for VRC
           // if (constraint_index != -1)
           // trying now only smooth lambda for friction directions
-          if (constraint_index >= 0)
+          if (constraint_index != -1)
           {
             lambda[index] = (1.0 - smooth_contacts)*lambda[index]
               + smooth_contacts*old_lambda;
