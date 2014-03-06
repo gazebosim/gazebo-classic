@@ -346,7 +346,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GAZEBO_VISIBLE GzTerrainMatGen 
+    class GAZEBO_VISIBLE GzTerrainMatGen
       : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor

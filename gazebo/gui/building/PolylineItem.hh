@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class PolylineItem PolylineItem.hh
     /// \brief 2D polyline.
-    class GAZEBO_VISIBLE PolylineItem 
+    class GAZEBO_VISIBLE PolylineItem
       : public EditorItem, public QGraphicsPathItem
     {
       /// \brief Constructor
