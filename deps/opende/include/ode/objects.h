@@ -411,14 +411,15 @@ ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
 
 
 /**
- * @brief Set the tolerance of when sor lcp stops
- * @param num The default is 1 chunk
+ * @brief Get the tolerance of when sor lcp stops
+ * @param dWorldID world id
  */
 ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
 
 /**
- * @brief Set the tolerance of when sor lcp stops
- * @param num The default is 1 chunk
+ * @brief Set the tolerance of when sor lcp stops.  When 
+ * @param dWorldID world id
+ * @param dReal tolerance
  */
 ODE_API void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
 
@@ -499,13 +500,23 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
 
 /**
  * @brief Get the RMS of \Delta \lambda of the quickstep step
+ * Given dLambda is measures by (b_i - a_{ij} lambda_j)/a_{ii}
+ * it's a reasonable measure for the linear system we are solving
+ * via PGS.  Note the dLambda used are post-projection.
+ * The unit of errors are the same as the units of forces.
  * @ingroup world
  * @returns the rms error
  */
 ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
 
 /**
- * @brief Get the RMS of Ax-b of the quickstep step
+ * @brief Get the RMS of Jv of the quickstep step
+ * Bug: projection is not taken in to account for
+ * unilateral contact normal and frictional solutions.
+ * I.e. if two bodies constrained by contact normal are moving
+ * apart, the positive separation velocity shows up as error.
+ * Please fix.
+ * The unit of constraint residuals are same as the units of velocities.
  * @ingroup world
  * @returns the rms error
  */
