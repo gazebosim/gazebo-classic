@@ -23,6 +23,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #ifndef _SkyX_Prerequisites_H_
 #define _SkyX_Prerequisites_H_
+#pragma clang diagnostic ignored "-W#warnings"
 
 #ifdef _MSC_VER
   // conversion from 'xxx' to 'yyy', possible loss of data
