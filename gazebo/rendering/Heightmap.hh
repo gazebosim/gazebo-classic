@@ -378,6 +378,8 @@ namespace gazebo
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
         /// \brief Utility class to help with generating shaders for GLSL.
         protected: class ShaderHelperGLSL :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
@@ -505,6 +507,7 @@ namespace gazebo
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
+#pragma clang diagnostic pop
       };
     };
   }
