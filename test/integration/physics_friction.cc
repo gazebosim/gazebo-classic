@@ -115,6 +115,9 @@ class PhysicsFrictionTest : public ServerFixture,
     /// \brief Link pose.
     public: math::Pose linkPose;
 
+    /// \brief Inertial pose.
+    public: math::Pose inertialPose;
+
     /// \brief Collision pose.
     public: math::Pose collisionPose;
 
@@ -151,6 +154,7 @@ class PhysicsFrictionTest : public ServerFixture,
               << "  <link name='link'>"
               << "    <pose>" << _opt.linkPose << "</pose>"
               << "    <inertial>"
+              << "      <pose>" << _opt.inertialPose << "</pose>"
               << "      <mass>" << _opt.mass << "</mass>"
               << "      <inertia>"
               << "        <ixx>" << ixx << "</ixx>"
@@ -224,6 +228,12 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
+
+  /// \brief Test Link::GetWorldInertia* functions.
+  /// \TODO: move the SpawnBox function to ServerFixture,
+  /// and then move this test to a different file.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void LinkGetWorldInertia(const std::string &_physicsEngine);
 
   /// \brief Count of spawned models, used to ensure unique model names.
   private: unsigned int spawnCount;
@@ -461,7 +471,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   math::Vector3 g(0.0, 1.5, -1.0);
   physics->SetGravity(g);
 
-  // Spawn concentric semi-circles of boxes
+  // Spawn a single box
   double dx = 0.5;
   double dy = 0.5;
   double dz = 0.2;
@@ -474,6 +484,79 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   physics::ModelPtr model = SpawnBox(opt);
   ASSERT_TRUE(model != NULL);
+
+  // Step forward
+  world->Step(1500);
+  double t = world->GetSimTime().Double();
+
+  gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
+  double velMag = (g.y+g.z) * t;
+  math::Vector3 vel = model->GetWorldLinearVel();
+  EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
+  EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);
+}
+
+/////////////////////////////////////////////////
+// LinkGetWorldInertia:
+// Spawn boxes and verify Link::GetWorldInertia* functions
+void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
+{
+  // Load a blank world (no ground plane)
+  Load("worlds/blank.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
+  // Box size
+  double dx = 1.0;
+  double dy = 4.0;
+  double dz = 9.0;
+  double mass = 10.0;
+  double angle = M_PI / 3.0;
+
+  const unsigned int testCases = 4;
+  for (unsigned int i = 0; i < testCases; ++i)
+  {
+    // Set box size and position
+    SpawnFrictionBoxOptions opt;
+    opt.size.Set(dx, dy, dz);
+    opt.mass = mass;
+    opt.modelPose.pos.x = i * dz;
+    opt.modelPose.pos.z = dz;
+
+    // i=0: rotated model pose
+    //  expect inertial pose to match model pose
+    if (i == 0)
+    {
+      opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=1: rotated link pose
+    //  expect inertial pose to match link pose
+    else if (i == 1)
+    {
+      opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=2: offset and rotated inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 2)
+    {
+      opt.inertialPose.pos.Set(1, 1, 1);
+      opt.inertialPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+
+    physics::ModelPtr model = SpawnBox(opt);
+    ASSERT_TRUE(model != NULL);
+
+    physics::LinkPtr link = model->GetLink();
+    ASSERT_TRUE(link != NULL);
+  }
 
   // Step forward
   world->Step(1500);
@@ -502,6 +585,12 @@ TEST_P(PhysicsFrictionTest, BoxDirectionRing)
 TEST_P(PhysicsFrictionTest, DirectionNaN)
 {
   DirectionNaN(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, LinkGetWorldInertia)
+{
+  LinkGetWorldInertia(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,
