@@ -381,16 +381,16 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
-    physicsMsg.set_iters(
+    physicsMsg.mutable_bullet()->set_iters(
         boost::any_cast<int>(this->GetParam(PGS_ITERS)));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    physicsMsg.set_sor(
+    physicsMsg.mutable_bullet()->set_sor(
         boost::any_cast<double>(this->GetParam(SOR)));
-    physicsMsg.set_cfm(
+    physicsMsg.mutable_bullet()->set_cfm(
         boost::any_cast<double>(this->GetParam(GLOBAL_CFM)));
-    physicsMsg.set_erp(
+    physicsMsg.mutable_bullet()->set_erp(
         boost::any_cast<double>(this->GetParam(GLOBAL_ERP)));
-    physicsMsg.set_contact_surface_layer(
+    physicsMsg.mutable_bullet()->set_contact_surface_layer(
         boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -412,23 +412,24 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_solver_type())
     this->SetParam(SOLVER_TYPE, _msg->solver_type());
 
-  if (_msg->has_iters())
-    this->SetParam(PGS_ITERS, _msg->iters());
+  if (_msg->has_bullet() && _msg->bullet().has_iters())
+    this->SetParam(PGS_ITERS, _msg->bullet().iters());
 
-  if (_msg->has_sor())
-    this->SetParam(SOR, _msg->sor());
+  if (_msg->has_bullet() && _msg->bullet().has_sor())
+    this->SetParam(SOR, _msg->bullet().sor());
 
-  if (_msg->has_cfm())
-    this->SetParam(GLOBAL_CFM, _msg->cfm());
+  if (_msg->has_bullet() && _msg->bullet().has_cfm())
+    this->SetParam(GLOBAL_CFM, _msg->bullet().cfm());
 
-  if (_msg->has_erp())
-    this->SetParam(GLOBAL_ERP, _msg->erp());
+  if (_msg->has_bullet() && _msg->bullet().has_erp())
+    this->SetParam(GLOBAL_ERP, _msg->bullet().erp());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
-  if (_msg->has_contact_surface_layer())
-    this->SetParam(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
+  if (_msg->has_bullet() && _msg->bullet().has_contact_surface_layer())
+    this->SetParam(CONTACT_SURFACE_LAYER,
+    _msg->bullet().contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));

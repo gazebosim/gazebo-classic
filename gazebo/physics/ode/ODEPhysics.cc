@@ -247,25 +247,26 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
         boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
-    physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
-    physicsMsg.set_inertia_ratio_reduction(
+    physicsMsg.mutable_ode()->set_precon_iters(this->GetSORPGSPreconIters());
+    physicsMsg.mutable_ode()->set_inertia_ratio_reduction(
         boost::any_cast<bool>(this->GetParam("inertia_ratio_reduction")));
-    physicsMsg.set_friction_iters(
+    physicsMsg.mutable_ode()->set_friction_iters(
         boost::any_cast<int>(this->GetParam("extra_friction_iterations")));
-    physicsMsg.set_warm_start_factor(
+    physicsMsg.mutable_ode()->set_warm_start_factor(
         boost::any_cast<double>(this->GetParam("warm_start_factor")));
-    physicsMsg.set_reorder(
+    physicsMsg.mutable_ode()->set_reorder(
         boost::any_cast<bool>(this->GetParam("experimental_row_reordering")));
-    physicsMsg.set_contact_residual_smoothing(
+    physicsMsg.mutable_ode()->set_contact_residual_smoothing(
         boost::any_cast<double>(this->GetParam("contact_residual_smoothing")));
-    physicsMsg.set_iters(this->GetSORPGSIters());
+    physicsMsg.mutable_ode()->set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    physicsMsg.set_sor(this->GetSORPGSW());
-    physicsMsg.set_cfm(this->GetWorldCFM());
-    physicsMsg.set_erp(this->GetWorldERP());
-    physicsMsg.set_contact_max_correcting_vel(
-        this->GetContactMaxCorrectingVel());
-    physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+    physicsMsg.mutable_ode()->set_sor(this->GetSORPGSW());
+    physicsMsg.mutable_ode()->set_cfm(this->GetWorldCFM());
+    physicsMsg.mutable_ode()->set_erp(this->GetWorldERP());
+    physicsMsg.mutable_ode()->set_contact_max_correcting_vel(
+      this->GetContactMaxCorrectingVel());
+    physicsMsg.mutable_ode()->set_contact_surface_layer(
+      this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -296,45 +297,46 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     }
   }
 
-  if (_msg->has_precon_iters())
-    this->SetSORPGSPreconIters(_msg->precon_iters());
+  if (_msg->has_ode() && _msg->ode().has_precon_iters())
+    this->SetSORPGSPreconIters(_msg->ode().precon_iters());
 
-  if (_msg->has_inertia_ratio_reduction())
-    this->SetParam("inertia_ratio_reduction", _msg->inertia_ratio_reduction());
+  if (_msg->has_ode() && _msg->ode().has_inertia_ratio_reduction())
+    this->SetParam("inertia_ratio_reduction",
+    _msg->ode().inertia_ratio_reduction());
 
-  if (_msg->has_friction_iters())
-    this->SetParam("extra_friction_iterations", _msg->friction_iters());
+  if (_msg->has_ode() && _msg->ode().has_friction_iters())
+    this->SetParam("extra_friction_iterations", _msg->ode().friction_iters());
 
-  if (_msg->has_warm_start_factor())
-    this->SetParam("warm_start_factor", _msg->warm_start_factor());
+  if (_msg->has_ode() && _msg->ode().has_warm_start_factor())
+    this->SetParam("warm_start_factor", _msg->ode().warm_start_factor());
 
-  if (_msg->has_reorder())
-    this->SetParam("experimental_row_reordering", _msg->reorder());
+  if (_msg->has_ode() && _msg->ode().has_reorder())
+    this->SetParam("experimental_row_reordering", _msg->ode().reorder());
 
-  if (_msg->has_contact_residual_smoothing())
+  if (_msg->has_ode() && _msg->ode().has_contact_residual_smoothing())
     this->SetParam("contact_residual_smoothing",
-    _msg->contact_residual_smoothing());
+    _msg->ode().contact_residual_smoothing());
 
-  if (_msg->has_iters())
-    this->SetSORPGSIters(_msg->iters());
+  if (_msg->has_ode() && _msg->ode().has_iters())
+    this->SetSORPGSIters(_msg->ode().iters());
 
-  if (_msg->has_sor())
-    this->SetSORPGSW(_msg->sor());
+  if (_msg->has_ode() && _msg->ode().has_sor())
+    this->SetSORPGSW(_msg->ode().sor());
 
-  if (_msg->has_cfm())
-    this->SetWorldCFM(_msg->cfm());
+  if (_msg->has_ode() && _msg->ode().has_cfm())
+    this->SetWorldCFM(_msg->ode().cfm());
 
-  if (_msg->has_erp())
-    this->SetWorldERP(_msg->erp());
+  if (_msg->has_ode() && _msg->ode().has_erp())
+    this->SetWorldERP(_msg->ode().erp());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
-  if (_msg->has_contact_max_correcting_vel())
-    this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+  if (_msg->has_ode() && _msg->ode().has_contact_max_correcting_vel())
+    this->SetContactMaxCorrectingVel(_msg->ode().contact_max_correcting_vel());
 
-  if (_msg->has_contact_surface_layer())
-    this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+  if (_msg->has_ode() && _msg->ode().has_contact_surface_layer())
+    this->SetContactSurfaceLayer(_msg->ode().contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));

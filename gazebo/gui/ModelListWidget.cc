@@ -612,30 +612,33 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      msg.set_inertia_ratio_reduction(this->variantManager->value(
+      msg.mutable_ode()->set_inertia_ratio_reduction(
+        this->variantManager->value(
             this->GetChildItem((*iter), "inertia ratio reduction")).toBool());
-      msg.set_friction_iters(this->variantManager->value(
+      msg.mutable_ode()->set_friction_iters(this->variantManager->value(
             this->GetChildItem((*iter), "extra friction iters")).toInt());
-      msg.set_warm_start_factor(this->variantManager->value(
+      msg.mutable_ode()->set_warm_start_factor(this->variantManager->value(
             this->GetChildItem((*iter), "warm start factor")).toDouble());
-      msg.set_reorder(this->variantManager->value(
+      msg.mutable_ode()->set_reorder(this->variantManager->value(
             this->GetChildItem((*iter), "pgs row reorder")).toBool());
-      msg.set_contact_residual_smoothing(this->variantManager->value(
+      msg.mutable_ode()->set_contact_residual_smoothing(
+            this->variantManager->value(
             this->GetChildItem((*iter), "contact smoothing")).toDouble());
-      msg.set_iters(this->variantManager->value(
+      msg.mutable_ode()->set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
-      msg.set_sor(this->variantManager->value(
+      msg.mutable_ode()->set_sor(this->variantManager->value(
             this->GetChildItem((*iter), "SOR")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "constraints")
     {
-      msg.set_cfm(this->variantManager->value(
+      msg.mutable_ode()->set_cfm(this->variantManager->value(
             this->GetChildItem((*iter), "CFM")).toDouble());
-      msg.set_erp(this->variantManager->value(
+      msg.mutable_ode()->set_erp(this->variantManager->value(
             this->GetChildItem((*iter), "ERP")).toDouble());
-      msg.set_contact_max_correcting_vel(this->variantManager->value(
+      msg.mutable_ode()->set_contact_max_correcting_vel(
+            this->variantManager->value(
             this->GetChildItem((*iter), "max velocity")).toDouble());
-      msg.set_contact_surface_layer(this->variantManager->value(
+      msg.mutable_ode()->set_contact_surface_layer(this->variantManager->value(
             this->GetChildItem((*iter), "surface layer")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "real time update rate")
@@ -2392,16 +2395,17 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
 
+  /// \TODO: FIXME switch options below based on physics engine type.
   item = this->variantManager->addProperty(QVariant::Bool,
     tr("inertia ratio reduction"));
-  if (_msg.has_inertia_ratio_reduction())
-    item->setValue(_msg.iters());
+  if (_msg.has_ode() && _msg.ode().has_inertia_ratio_reduction())
+    item->setValue(_msg.ode().iters());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Int,
     tr("extra friction iters"));
-  if (_msg.has_friction_iters())
-    item->setValue(_msg.friction_iters());
+  if (_msg.has_ode() && _msg.ode().has_friction_iters())
+    item->setValue(_msg.ode().friction_iters());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double,
@@ -2409,14 +2413,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_warm_start_factor())
-    item->setValue(_msg.warm_start_factor());
+  if (_msg.has_ode() && _msg.ode().has_warm_start_factor())
+    item->setValue(_msg.ode().warm_start_factor());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Bool,
     tr("pgs row reorder"));
-  if (_msg.has_reorder())
-    item->setValue(_msg.iters());
+  if (_msg.has_ode() && _msg.ode().has_reorder())
+    item->setValue(_msg.ode().iters());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double,
@@ -2424,21 +2428,21 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_contact_residual_smoothing())
-    item->setValue(_msg.contact_residual_smoothing());
+  if (_msg.has_ode() && _msg.ode().has_contact_residual_smoothing())
+    item->setValue(_msg.ode().contact_residual_smoothing());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
-  if (_msg.has_iters())
-    item->setValue(_msg.iters());
+  if (_msg.has_ode() && _msg.ode().has_iters())
+    item->setValue(_msg.ode().iters());
   solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("SOR"));
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_sor())
-    item->setValue(_msg.sor());
+  if (_msg.has_ode() && _msg.ode().has_sor())
+    item->setValue(_msg.ode().sor());
   solverItem->addSubProperty(item);
 
 
@@ -2450,16 +2454,16 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_cfm())
-    item->setValue(_msg.cfm());
+  if (_msg.has_ode() && _msg.ode().has_cfm())
+    item->setValue(_msg.ode().cfm());
   constraintsItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("ERP"));
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_erp())
-    item->setValue(_msg.erp());
+  if (_msg.has_ode() && _msg.ode().has_erp())
+    item->setValue(_msg.ode().erp());
   constraintsItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double,
@@ -2467,8 +2471,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_contact_max_correcting_vel())
-    item->setValue(_msg.contact_max_correcting_vel());
+  if (_msg.has_ode() && _msg.ode().has_contact_max_correcting_vel())
+    item->setValue(_msg.ode().contact_max_correcting_vel());
   constraintsItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double,
@@ -2476,8 +2480,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  if (_msg.has_contact_surface_layer())
-    item->setValue(_msg.contact_surface_layer());
+  if (_msg.has_ode() && _msg.ode().has_contact_surface_layer())
+    item->setValue(_msg.ode().contact_surface_layer());
   constraintsItem->addSubProperty(item);
 }
 

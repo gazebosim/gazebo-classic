@@ -156,7 +156,6 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     // physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
-    // physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     // physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     // physicsMsg.set_sor(this->GetSORPGSW());
@@ -194,9 +193,6 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   //     this->physicsStepFunc = &dWorldStep;
   //   }
   // }
-
-  // if (_msg->has_precon_iters())
-  //   this->SetSORPGSPreconIters(_msg->precon_iters());
 
   // if (_msg->has_iters())
   //   this->SetSORPGSIters(_msg->iters());
