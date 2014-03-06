@@ -93,6 +93,7 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
+  ModelListWidget_TEST.cc
   TimePanel_TEST.cc
 )
 

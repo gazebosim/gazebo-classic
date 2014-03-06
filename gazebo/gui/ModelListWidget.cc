@@ -74,6 +74,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setObjectName("modelTreeWidget");
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
@@ -91,6 +92,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
+  this->propTreeBrowser->setObjectName("propTreeBrowser");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);

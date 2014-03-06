@@ -771,7 +771,9 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(_name);
+  if (this->rootElement)
+    return this->rootElement->GetByName(_name);
+  else return BasePtr();
 }
 
 /////////////////////////////////////////////////
