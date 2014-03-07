@@ -122,6 +122,11 @@ namespace gazebo
       /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
       public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
 
+      /// \brief Get flag indicating whether implicit stiffness and damping
+      /// is enabled.
+      /// \return True if implicit stiffness / damping is used.
+      public: bool HasImplicitStiffnessDamping();
+
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
       public: void ApplyImplicitStiffnessDamping();
