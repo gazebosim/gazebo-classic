@@ -82,8 +82,8 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         this->baseLink->GetRelativePose();
     std::cerr << " child " << joints[0]->GetChild()->GetName()
         << " " << child << std::endl;
-  	std::cerr << " parent " << this->baseLink->GetName()
-  	    << " " << parent << std::endl;
+    std::cerr << " parent " << this->baseLink->GetName()
+        << " " << parent << std::endl;
   }
   else*/
   {
@@ -119,11 +119,11 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
              + joints[i]->GetChild()->GetRelativePose();
 
         if (joints[i+1]->GetChild()->GetCollisions().size() > 0)
-  	      std::cerr << " child " << joints[i+1]->GetChild()->GetName()
-  	          << " " << child << std::endl;
-  	    if (joints[i]->GetChild()->GetCollisions().size() > 0)
-  		    std::cerr << " parent " << joints[i]->GetParent()->GetName()
-  		    << " " << parent << std::endl;
+          std::cerr << " child " << joints[i+1]->GetChild()->GetName()
+              << " " << child << std::endl;
+        if (joints[i]->GetChild()->GetCollisions().size() > 0)
+    	    std::cerr << " parent " << joints[i]->GetParent()->GetName()
+    	    << " " << parent << std::endl;
       }
       else*/
       {
@@ -188,10 +188,6 @@ void SimpleIKPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         this->joints[i]->GetScopedName(), qResult(i));
 
     this->jointController->SetPositionPID(this->joints[i]->GetScopedName(),
-<<<<<<< local
-        //common::PID(820, 1, 25));
-=======
->>>>>>> other
         common::PID(1220, 1, 25));
   }
   this->fkSolver->JntToCart(qResult, cartpos);
