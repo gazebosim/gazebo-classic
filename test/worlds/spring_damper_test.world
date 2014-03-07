@@ -27,6 +27,14 @@
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
+      <simbody>
+        <accuracy>0.01</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>111.111</stiffness>
+          <dissipation>0</dissipation>
+        </contact>
+      </simbody>
       <real_time_update_rate>0</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
