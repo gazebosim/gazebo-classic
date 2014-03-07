@@ -159,10 +159,10 @@ void dJointSetGearboxReferenceBody1( dJointID j, dBodyID b )
       else
       {
         // set qrel1 to the transpose of the first body q
-        joint->qrel1[0] = b->q[0];
-        joint->qrel1[1] = b->q[1];
-        joint->qrel1[2] = b->q[2];
-        joint->qrel1[3] = b->q[3];
+        joint->qrel1[0] = joint->node[0].body->q[0];
+        joint->qrel1[1] = joint->node[0].body->q[1];
+        joint->qrel1[2] = joint->node[0].body->q[2];
+        joint->qrel1[3] = joint->node[0].body->q[3];
       }
     }
     else
@@ -197,10 +197,10 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
       else
       {
         // set qrel1 to the transpose of the first body q
-        joint->qrel2[0] = b->q[0];
-        joint->qrel2[1] = b->q[1];
-        joint->qrel2[2] = b->q[2];
-        joint->qrel2[3] = b->q[3];
+        joint->qrel2[0] = joint->node[1].body->q[0];
+        joint->qrel2[1] = joint->node[1].body->q[1];
+        joint->qrel2[2] = joint->node[1].body->q[2];
+        joint->qrel2[3] = joint->node[1].body->q[3];
       }
     }
     else

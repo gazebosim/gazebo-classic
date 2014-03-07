@@ -45,10 +45,7 @@ void ODEGearboxJoint::Init()
 {
   Joint::Init();
   LinkPtr link = this->model->GetLink(this->referenceBody);
-  if (link)
-    this->SetReferenceBody(link);
-  else
-    gzerr << "reference Link has not been set yet.\n";
+  this->SetReferenceBody(link);
 }
 
 //////////////////////////////////////////////////
@@ -63,11 +60,18 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
   ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
-
+  dBodyID refId;
   if (odelink == NULL)
+  {
     gzwarn << "Reference body not valid, using inertial frame.\n";
+    refId = 0;
+  }
   else
-    dJointSetGearboxReferenceBody(this->jointId, odelink->GetODEId());
+  {
+    refId = odelink->GetODEId();
+  }
+
+  dJointSetGearboxReferenceBody(this->jointId, refId);
 }
 
 //////////////////////////////////////////////////

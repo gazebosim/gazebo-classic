@@ -111,6 +111,14 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     }
   }
 
+  if (_jointType == "gearbox")
+  {
+    gzerr << "Skip connect to world tests, since we aren't specifying "
+          << "the reference body."
+          << std::endl;
+    return;
+  }
+
   {
     gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, true);
@@ -293,6 +301,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     return;
   }
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
+      _joint->HasType(physics::Base::GEARBOX_JOINT) ||
       _joint->HasType(physics::Base::SCREW_JOINT) ||
       _joint->HasType(physics::Base::UNIVERSAL_JOINT))
   {
@@ -418,6 +427,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
 TEST_P(JointSpawningTest_All, SpawnJointTypes)
 {
+  if (this->jointType == "gearbox" && this->physicsEngine != "ode")
+  {
+    gzerr << "Skip test, gearbox is only supported in ODE."
+          << std::endl;
+    return;
+  }
   SpawnJointTypes(this->physicsEngine, this->jointType);
 }
 
