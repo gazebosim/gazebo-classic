@@ -170,19 +170,21 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSPreconIters(unsigned int _iters);
+      public: virtual void SetSORPGSPreconIters(unsigned int _iters)
+              GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSIters(unsigned int _iters);
+      public: virtual void SetSORPGSIters(unsigned int _iters)
+              GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _w SORPGSW value.
-      public: virtual void SetSORPGSW(double _w);
+      public: virtual void SetSORPGSW(double _w) GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -224,19 +226,22 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters.
       /// \return SORPGS precondition iterations.
-      public: virtual int GetSORPGSPreconIters() {return 0;}
+      public: virtual int GetSORPGSPreconIters() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief access functions to set ODE parameters.
       /// \return SORPGS iterations.
-      public: virtual int GetSORPGSIters() {return 0;}
+      public: virtual int GetSORPGSIters() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters
       /// \return SORPGSW value.
-      public: virtual double GetSORPGSW() {return 0;}
+      public: virtual double GetSORPGSW() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.

@@ -258,6 +258,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
         boost::any_cast<bool>(this->GetParam("experimental_row_reordering")));
     physicsMsg.mutable_ode()->set_contact_residual_smoothing(
         boost::any_cast<double>(this->GetParam("contact_residual_smoothing")));
+    physicsMsg.mutable_ode()->set_sor_lcp_tolerance(
+        boost::any_cast<double>(this->GetParam("sor_lcp_tolerance")));
     physicsMsg.mutable_ode()->set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.mutable_ode()->set_sor(this->GetSORPGSW());
@@ -316,6 +318,10 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_ode() && _msg->ode().has_contact_residual_smoothing())
     this->SetParam("contact_residual_smoothing",
     _msg->ode().contact_residual_smoothing());
+
+  if (_msg->has_ode() && _msg->ode().has_sor_lcp_tolerance())
+    this->SetParam("sor_lcp_tolerance",
+    _msg->ode().sor_lcp_tolerance());
 
   if (_msg->has_ode() && _msg->ode().has_iters())
     this->SetSORPGSIters(_msg->ode().iters());
@@ -1311,6 +1317,12 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "sor_lcp_tolerance")
+  {
+    dWorldSetQuickStepTolerance(this->worldId,
+        boost::any_cast<double>(_value));
+    return;
+  }
   else if (_key == "rms_error_tolerance")
   {
     dWorldSetQuickStepTolerance(this->worldId,
@@ -1450,6 +1462,8 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "sor_lcp_tolerance")
+    return dWorldGetQuickStepTolerance(this->worldId);
   else if (_key == "rms_error_tolerance")
     return dWorldGetQuickStepTolerance(this->worldId);
   else if (_key == "rms_error")

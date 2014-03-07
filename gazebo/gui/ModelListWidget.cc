@@ -630,6 +630,8 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
               this->GetChildItem((*iter), "iterations")).toInt());
         msg.mutable_ode()->set_sor(this->variantManager->value(
               this->GetChildItem((*iter), "SOR")).toDouble());
+        msg.mutable_ode()->set_sor_lcp_tolerance(this->variantManager->value(
+              this->GetChildItem((*iter), "SOR LCP Tolerance")).toDouble());
       }
       else if (this->physicsType == msgs::Physics::BULLET)
       {
@@ -2505,6 +2507,15 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_sor())
       item->setValue(_msg.ode().sor());
+    solverItem->addSubProperty(item);
+
+    item = this->variantManager->addProperty(QVariant::Double,
+      tr("SOR LCP Tolerance"));
+    static_cast<QtVariantPropertyManager*>
+      (this->variantFactory->propertyManager(item))->setAttribute(
+          item, "decimals", 6);
+    if (_msg.has_ode() && _msg.ode().has_sor_lcp_tolerance())
+      item->setValue(_msg.ode().sor_lcp_tolerance());
     solverItem->addSubProperty(item);
 
 

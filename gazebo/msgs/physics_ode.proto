@@ -18,4 +18,5 @@ message PhysicsODE
   optional double erp                        = 10;
   optional double contact_max_correcting_vel = 11;
   optional double contact_surface_layer      = 12;
+  optional double sor_lcp_tolerance          = 13;
 }
