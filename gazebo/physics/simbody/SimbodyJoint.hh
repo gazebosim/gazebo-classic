@@ -190,6 +190,20 @@ namespace gazebo
       // Keeps track if simbody physics has been initialized
       public: bool physicsInitialized;
 
+      // Documentation inherited.
+      public: virtual void SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;
 
