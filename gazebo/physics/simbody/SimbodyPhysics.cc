@@ -567,7 +567,7 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    if (this->simbodyPhysicsInitialized)
+    if (this->simbodyPhysicsInitialized && this->world->GetModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
     else
