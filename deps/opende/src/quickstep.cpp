@@ -1930,6 +1930,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_precon = NULL;
   dReal *J_orig = NULL;
   int *jb = NULL;
+  int *findex;
 
   dReal *vnew = NULL; // used by PENETRATION_JVERROR_CORRECTION
 
@@ -1944,7 +1945,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
     dReal *c_v_max;
-    int *findex;
 
     {
       int mlocal = m;
@@ -2229,7 +2229,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     // note that the SOR method overwrites rhs and J at this point, so
     // they should not be used again.
-
     {
       IFTIMING (dTimerNow ("velocity update due to constraint forces"));
       //
@@ -2294,6 +2293,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         lambdacurr += infom;
       }
     }
+  }
 
   {
     IFTIMING (dTimerNow ("compute velocity update"));
@@ -2386,8 +2386,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
     } END_STATE_SAVE(context, rmsstate);
   }
 #endif
-  } // keep "compute velocity update and check velocity obeys constraint
-
   {
     // update the position and orientation from the new linear/angular velocity
     // (over the given timestep)
@@ -2414,8 +2412,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int j=0; j<3; j++) {
         // dReal v0 = b_ptr->lvel[j];
         // dReal a0 = b_ptr->avel[j];
-        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
-        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+        dReal dv = erp_removal * stepsize *
+          (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize *
+          (caccel_curr[3+j] - caccel_erp_curr[3+j]);
 
         /* default v removal
         */
@@ -2566,14 +2566,18 @@ size_t dxEstimateQuickStepMemoryRequirements (
 
   size_t res = 0;
 
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invMOI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for MOI (inertia) needed by preconditioner
+  // for invMOI
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb);
+  // for MOI (inertia) needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb);
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
-    size_t sub1_res1 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * _nj); // for initial jointiinfos
+    // for initial jointiinfos
+    size_t sub1_res1 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * _nj);
 
-    size_t sub1_res2 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * nj); // for shrunk jointiinfos
+    // for shrunk jointiinfos
+    size_t sub1_res2 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * nj);
     if (m > 0) {
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
@@ -2608,12 +2612,14 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 #endif
         {
-          size_t sub3_res1 = EstimateSOR_LCPMemoryRequirements(m,nb); // for SOR_LCP
+          // for SOR_LCP
+          size_t sub3_res1 = EstimateSOR_LCPMemoryRequirements(m,nb);
 
           size_t sub3_res2 = 0;
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
           {
-            size_t sub4_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
+            // for vel
+            size_t sub4_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb);
             sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for tmp
             sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 
