@@ -20,6 +20,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <gazebo/common/CommonIface.hh>
 #include <gazebo/common/Time.hh>
+#include <sdf/sdf_config.h>
 
 #include <stdio.h>
 #include <string>
@@ -140,28 +141,48 @@ TEST(gzlog, EchoFilter)
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2StateLog, echo);
-  EXPECT_EQ(shasum, "0bf1f293b164bbe820267f970c4b419acdca4b01");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "0bf1f293b164bbe820267f970c4b419acdca4b01");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "e9fe77982392cc3361d72559edee536cc6fc3bdd");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseStateLog, echo);
-  EXPECT_EQ(shasum, "33db2cbd0841466a67abd7d2bbc69cf2cfae19b6");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "33db2cbd0841466a67abd7d2bbc69cf2cfae19b6");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "1f240ed84d3b8ec3db0cffb8bea2e69f655cb7d1");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.x ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseXStateLog, echo);
-  EXPECT_EQ(shasum, "07113f16d44e2484f769fd1947ff5dca93f55cf4");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "07113f16d44e2484f769fd1947ff5dca93f55cf4");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "294cc6bf9d450cc1db43fc3fa12b841fb8bc76b4");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
       std::string("gzlog echo --filter pr2.pose.[x,y] ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseXYStateLog, echo);
-  EXPECT_EQ(shasum, "7f34f3fac505707727a74ac8659bb8736932ab07");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "7f34f3fac505707727a74ac8659bb8736932ab07");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "5e9dc6ed989b2ec25b89694437ec81b41993d2a8");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   // Test link filter
   echo = custom_exec(
@@ -169,7 +190,12 @@ TEST(gzlog, EchoFilter)
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2LinkStateLog, echo);
-  EXPECT_EQ(shasum, "d52ba4333511b7e4339db3eb71814c73473fba36");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "d52ba4333511b7e4339db3eb71814c73473fba36");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "f28ff9d4a3462bcd3ef6d193884783cfaf0cc605");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   // Test joint filter
   echo = custom_exec(
@@ -177,7 +203,12 @@ TEST(gzlog, EchoFilter)
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2JointStateLog, echo);
-  EXPECT_EQ(shasum, "2f689dadc66171a76f7f3400bc218485a923c324");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "2f689dadc66171a76f7f3400bc218485a923c324");
+  else if (std::string("1.5").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "ee10f7121f7f9165b24fde7ff163d201ee974266");
+  else
+    FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }
 
 /////////////////////////////////////////////////
@@ -245,7 +276,6 @@ TEST(gzlog, RawFilterStamp)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gzlog step' returns correct information
-/// Just check number of characters returned for now
 TEST(gzlog, Step)
 {
   std::string stepCmd, shasum;
@@ -260,12 +290,18 @@ TEST(gzlog, Step)
   // Call gzlog step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq1);
-  EXPECT_EQ(shasum, "43eacb140e00ef0525d54667bc558d63dac3d21f");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "43eacb140e00ef0525d54667bc558d63dac3d21f");
+  else
+    EXPECT_EQ(shasum, "58622f6f536b412ab8f4c691a16dc6dfa923d506");
 
   // Call gzlog step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq2);
-  EXPECT_EQ(shasum, "37e133d15d3f74cbc686bfceb26b8db46e2f6bf5");
+  if (std::string("1.4").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "37e133d15d3f74cbc686bfceb26b8db46e2f6bf5");
+  else
+    EXPECT_EQ(shasum, "f997ff7268c30e1fb771b1611f6cdcc2d5254f03");
 }
 
 /////////////////////////////////////////////////

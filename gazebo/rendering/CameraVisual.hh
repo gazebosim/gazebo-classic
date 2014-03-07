@@ -53,6 +53,7 @@ namespace gazebo
       /// \param[in] _width Width of the Camera image
       /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
+      using Visual::Load;
 
       /// \brief Update the visual
       private: void Update();

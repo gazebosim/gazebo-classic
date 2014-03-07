@@ -50,6 +50,7 @@ namespace gazebo
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+      using Visual::Load;
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message

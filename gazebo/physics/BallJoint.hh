@@ -64,12 +64,12 @@ namespace gazebo
       /// \internal
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int /*_index*/,
-                                       math::Angle /*_angle*/) {}
+                                 const math::Angle &/*_angle*/) {}
 
       /// \internal
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int /*_index*/,
-                  math::Angle /*_angle*/) {}
+                                 const math::Angle &/*_angle*/) {}
 
       /// \internal
       /// \brief Get the high stop of an axis(index).

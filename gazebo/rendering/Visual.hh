@@ -271,7 +271,7 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
