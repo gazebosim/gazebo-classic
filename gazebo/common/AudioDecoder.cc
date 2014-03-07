@@ -26,9 +26,14 @@
 #endif
 
 extern "C" {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++11-extensions"
+#pragma clang diagnostic ignored "-Wvariadic-macros"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
+#pragma clang diagnostic pop
 }
 #endif
 

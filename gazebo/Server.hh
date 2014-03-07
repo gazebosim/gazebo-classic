@@ -119,9 +119,6 @@ namespace gazebo
     /// \brief Boolean used to stop the server.
     private: static bool stop;
 
-    /// \brief Pointer to the master.
-    private: Master *master;
-
     /// \brief Communication node.
     private: transport::NodePtr node;
 

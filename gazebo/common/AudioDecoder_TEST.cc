@@ -22,7 +22,11 @@
 
 #ifdef HAVE_FFMPEG
 extern "C" {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++11-extensions"
+#pragma clang diagnostic ignored "-Wvariadic-macros"
 #include <libavformat/avformat.h>
+#pragma clang diagnostic pop
 }
 #endif
 
