@@ -172,7 +172,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
@@ -649,7 +649,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 }
 
 //////////////////////////////////////////////////
-int ODEPhysics::GetMaxContacts()
+unsigned int ODEPhysics::GetMaxContacts()
 {
   return this->maxContacts;
 }
@@ -820,23 +820,21 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
   }*/
 
-  int numc = 0;
+  unsigned int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
-  int maxCollide = MAX_CONTACT_JOINTS;
+  unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
   if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
 
   // over-ride with minimum of max_contacts from both collisions
-  if (_collision1->GetMaxContacts() >= 0 &&
-      _collision1->GetMaxContacts() < maxCollide)
+  if (_collision1->GetMaxContacts() < maxCollide)
     maxCollide = _collision1->GetMaxContacts();
 
-  if (_collision2->GetMaxContacts() >= 0 &&
-      _collision2->GetMaxContacts() < maxCollide)
+  if (_collision2->GetMaxContacts() < maxCollide)
     maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
@@ -855,7 +853,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
-    for (int i = maxCollide; i < numc; i++)
+    for (unsigned int i = maxCollide; i < numc; ++i)
     {
       if (_contactCollisions[i].depth > max)
       {
@@ -983,7 +981,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Create a joint for each contact
-  for (int j = 0; j < numc; j++)
+  for (unsigned int j = 0; j < numc; ++j)
   {
     contact.geom = _contactCollisions[this->indices[j]];
 

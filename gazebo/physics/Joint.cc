@@ -269,7 +269,7 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->sdf->HasElement("axis"))
+  if (this->GetAngleCount() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
@@ -293,7 +293,7 @@ void Joint::Init()
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->GetAngleCount() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
@@ -530,43 +530,13 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set high stop\n";
-  }
+  this->SetUpperLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////
 void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set low stop\n";
-  }
+  this->SetLowerLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////
