@@ -543,12 +543,17 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
     {
       opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
     }
-    // i=2: offset and rotated inertial pose
+    // i=2: rotated inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 2)
     {
-      opt.inertialPose.pos.Set(1, 1, 1);
       opt.inertialPose.rot.SetFromEuler(0.0, 0.0, angle);
+    }
+    // i=3: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 3)
+    {
+      opt.inertialPose.pos.Set(1, 1, 1);
     }
 
     physics::ModelPtr model = SpawnBox(opt);
@@ -556,17 +561,77 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
 
     physics::LinkPtr link = model->GetLink();
     ASSERT_TRUE(link != NULL);
+
+    EXPECT_EQ(model->GetWorldPose(), opt.modelPose);
+    EXPECT_EQ(link->GetWorldPose(), opt.linkPose + opt.modelPose);
+    EXPECT_EQ(link->GetWorldInertialPose(),
+              opt.inertialPose + opt.linkPose + opt.modelPose);
+
+    // i=0: rotated model pose
+    //  expect inertial pose to match model pose
+    if (i == 0)
+    {
+      EXPECT_EQ(model->GetWorldPose(),
+                link->GetWorldInertialPose());
+    }
+    // i=1: rotated link pose
+    //  expect inertial pose to match link pose
+    else if (i == 1)
+    {
+      EXPECT_EQ(link->GetWorldPose(),
+                link->GetWorldInertialPose());
+    }
+    // i=2: offset and rotated inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 2)
+    {
+      EXPECT_EQ(link->GetWorldPose().pos,
+                link->GetWorldInertialPose().pos);
+    }
+    // i=3: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 3)
+    {
+      EXPECT_EQ(link->GetWorldPose().pos + opt.inertialPose.pos,
+                link->GetWorldInertialPose().pos);
+    }
+
+    // Expect rotated inertia matrix
+    math::Matrix3 inertia = link->GetWorldInertiaMatrix();
+    if (i == 3)
+    {
+      EXPECT_NEAR(inertia[0][0], 80.8333, 1e-4);
+      EXPECT_NEAR(inertia[1][1], 68.3333, 1e-4);
+      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      for (int row = 0; row < 3; ++row)
+        for (int col = 0; col < 3; ++col)
+          if (row != col)
+            EXPECT_NEAR(inertia[row][col], 0.0, g_friction_tolerance);
+    }
+    else
+    {
+      EXPECT_NEAR(inertia[0][0], 71.4583, 1e-4);
+      EXPECT_NEAR(inertia[1][1], 77.7083, 1e-4);
+      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      EXPECT_NEAR(inertia[0][1],  5.4126, 1e-4);
+      EXPECT_NEAR(inertia[1][0],  5.4126, 1e-4);
+      EXPECT_NEAR(inertia[0][2], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[2][0], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[1][2], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia[2][1], 0, g_friction_tolerance);
+    }
+
+    // For 0-2, apply torque and expect equivalent response
+    if (i <= 2)
+    {
+      for (int step = 0; step < 50; ++step)
+      {
+        link->SetTorque(math::Vector3(100, 0, 0));
+        world->Step(1);
+      }
+      std::cout << i << ' ' << link->GetWorldAngularVel() << std::endl;
+    }
   }
-
-  // Step forward
-  world->Step(1500);
-  double t = world->GetSimTime().Double();
-
-  gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
-  double velMag = (g.y+g.z) * t;
-  math::Vector3 vel = model->GetWorldLinearVel();
-  EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
-  EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);
 }
 
 /////////////////////////////////////////////////
