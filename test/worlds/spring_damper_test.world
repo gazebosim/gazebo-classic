@@ -105,7 +105,7 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
-            <stiffness>1.0e12</stiffness>
+            <stiffness>1.0e6</stiffness>
             <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 0.0 1.0</xyz>
