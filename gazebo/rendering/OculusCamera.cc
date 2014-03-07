@@ -44,7 +44,7 @@ using namespace gazebo;
 using namespace rendering;
 
 const float g_defaultNearClip = 0.1f;
-const float g_defaultFarClip = 300.0f;
+const float g_defaultFarClip = 5000.0f;
 const float g_defaultIPD = 0.064f;
 const float g_defautlProjectionCenterOffset = 0.14529906f;
 const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
