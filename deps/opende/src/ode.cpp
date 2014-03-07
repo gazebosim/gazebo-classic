@@ -1675,7 +1675,7 @@ dxWorld * dWorldCreate()
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
-  w->qs.sor_lcp_tolerance = 0;
+  w->qs.sor_lcp_tolerance = -1;
   w->qs.rms_dlambda[0] = 0;
   w->qs.rms_dlambda[1] = 0;
   w->qs.rms_dlambda[2] = 0;
