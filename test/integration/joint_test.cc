@@ -292,6 +292,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     EXPECT_EQ(cyclesRevolute,       17);
     EXPECT_EQ(cyclesContact,        17);
   }
+  else if (_physicsEngine.compare("simbody") == 0)
+  {
+    gzdbg << "Extra tests for simbody" << std::endl;
+    EXPECT_EQ(cyclesPrismatic,      17);
+    EXPECT_EQ(cyclesRevolute,       17);
+  }
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
 }

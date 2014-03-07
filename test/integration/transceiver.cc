@@ -20,6 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -409,20 +410,8 @@ TEST_P(TransceiverTest, FreqOutOfBounds)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
-    ::testing::Values("ode"));
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
-
-/////////////////////////////////////////////////
-#ifdef HAVE_DART
-INSTANTIATE_TEST_CASE_P(TestTransceiverDART, TransceiverTest,
-    ::testing::Values("dart"));
-#endif  // HAVE_DART
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, TransceiverTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

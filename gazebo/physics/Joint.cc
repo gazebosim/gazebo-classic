@@ -148,9 +148,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[0] = limitElem->Get<double>("upper");
+      this->lowerLimit[0] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[0] = limitElem->Get<double>("stiffness");
       this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[0] = limitElem->Get<double>("effort");
+      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
   if (_sdf->HasElement("axis2"))
@@ -167,9 +173,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[1] = limitElem->Get<double>("upper");
+      this->lowerLimit[1] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[1] = limitElem->Get<double>("stiffness");
       this->stopDissipation[1] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[1] = limitElem->Get<double>("effort");
+      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -269,7 +281,7 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->sdf->HasElement("axis"))
+  if (this->GetAngleCount() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
@@ -277,23 +289,16 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->Get<double>("upper");
-      this->lowerLimit[0] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(0, this->upperLimit[0].Radian());
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
-
-      this->effortLimit[0] = limitElem->Get<double>("effort");
-      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->GetAngleCount() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
@@ -301,19 +306,12 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->Get<double>("upper");
-      this->lowerLimit[1] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(1, this->upperLimit[1].Radian());
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
-
-      this->effortLimit[1] = limitElem->Get<double>("effort");
-      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -530,43 +528,13 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("upper")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set high stop\n";
-  }
+  this->SetUpperLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////
 void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  if (_index == 0)
-  {
-    this->sdf->GetElement("axis")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else if (_index == 1)
-  {
-    this->sdf->GetElement("axis2")->GetElement("limit")
-             ->GetElement("lower")->Set(_angle.Radian());
-  }
-  else
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to set low stop\n";
-  }
+  this->SetLowerLimit(_index, _angle);
 }
 
 //////////////////////////////////////////////////

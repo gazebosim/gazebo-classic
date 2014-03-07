@@ -345,7 +345,30 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 void SimbodyJoint::SaveSimbodyState(const SimTK::State &/*_state*/)
 {
+/*
+  // Implementation not complete
   // Not implemented
+  // skip if not a free joint, state is saved in SimbodyJoint::mobod
+  if (!this->masterMobod.isEmptyHandle() &&
+      SimTK::MobilizedBody::Free::isInstanceOf(this->masterMobod))
+  {
+    if (this->simbodyQ.empty())
+      this->simbodyQ.resize(this->masterMobod.getNumQ(_state));
+
+    if (this->simbodyU.empty())
+      this->simbodyU.resize(this->masterMobod.getNumU(_state));
+
+    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
+      this->simbodyQ[i] = this->masterMobod.getOneQ(_state, i);
+
+    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
+      this->simbodyU[i] = this->masterMobod.getOneU(_state, i);
+  }
+  else
+  {
+    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
+  }
+*/
 }
 
 //////////////////////////////////////////////////
@@ -464,4 +487,103 @@ double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
 {
   gzdbg << "Not implement in Simbody\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetHighStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    Joint::SetHighStop(_index, _angle);
+    if (this->physicsInitialized)
+    {
+      this->limitForce[_index].setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        this->GetLowStop(_index).Radian(), _angle.Radian());
+    }
+    else
+    {
+      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
+    }
+  }
+  else
+    gzerr << "SetHighStop: index out of bounds.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetLowStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    Joint::SetLowStop(_index, _angle);
+    if (this->physicsInitialized)
+    {
+      this->limitForce[_index].setBounds(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _angle.Radian(),
+        this->GetHighStop(_index).Radian());
+    }
+    else
+    {
+      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+    }
+  }
+  else
+    gzerr << "SetLowStop: index out of bounds.\n";
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get high stop\n";
+    return math::Angle(0.0);  /// \TODO: should return NaN
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper"));
+  }
+  else if (_index == 1)
+  {
+    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("upper"));
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    return math::Angle(0.0);  /// \TODO: should return NaN
+  }
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get low stop\n";
+    return math::Angle(0.0);  /// \TODO: should return NaN
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower"));
+  }
+  else if (_index == 1)
+  {
+    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("lower"));
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    return math::Angle(0.0);  /// \TODO: should return NaN
+  }
 }

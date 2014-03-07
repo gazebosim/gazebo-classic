@@ -45,6 +45,9 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
+      public: virtual void Init();
+
+      // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
@@ -60,20 +63,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetThreadPitch();
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;
