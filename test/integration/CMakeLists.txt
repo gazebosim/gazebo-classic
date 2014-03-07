@@ -57,6 +57,7 @@ set(tests
   transceiver.cc
   transport.cc
   world.cc
+  world_entity_below_point.cc
   worlds_installed.cc
   )
 

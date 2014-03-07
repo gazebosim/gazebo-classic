@@ -191,7 +191,7 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer();
 
       // Documentation inherited
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -324,7 +324,7 @@ namespace gazebo
       private: int indices[MAX_CONTACT_JOINTS];
 
       /// \brief Maximum number of contact points per collision pair.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
     };
   }
 }
