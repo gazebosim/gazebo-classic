@@ -19,10 +19,12 @@
 
 /** \def GAZEBO_VISIBLE
  * Use to represent "symbol visible" if supported
+ * In Mach-O is ignored
  */
 
 /** \def GAZEBO_HIDDEN
  * Use to represent "symbol hidden" if supported
+ * In Mach-O is ignored
  */
 
 #if defined _WIN32 || defined __CYGWIN__
@@ -41,7 +43,7 @@
   #endif
   #define GAZEBO_HIDDEN
 #else
-  #if __GNUC__ >= 4
+  #if __GNUC__ >= 4 && ! defined __APPLE__
     #define GAZEBO_VISIBLE __attribute__ ((visibility ("default")))
     #define GAZEBO_HIDDEN  __attribute__ ((visibility ("hidden")))
   #else
