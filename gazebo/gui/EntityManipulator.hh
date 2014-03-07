@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class EntityManipulatorPrivate;
+
     /// \class EntityManipulator EntityManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
@@ -149,63 +151,12 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose scale is to be published.
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
-      /// \brief Selection object which users can interact with to manipulate
-      /// the model.
-      private: rendering::SelectionObjPtr selectionObj;
-
-      /// \brief The current manipulation mode.
-      private: std::string manipMode;
-
-      /// \brief Keep track of the mouse start pose before a move action.
-      private: math::Pose mouseMoveVisStartPose;
-
-      /// \brief Keep track of the mouse start screen position.
-      private: math::Vector2i mouseStart;
-
-      /// \brief The current selected visual.
-      private: rendering::VisualPtr selectedVis;
-
-      /// \brief The current visual attached to the mouse.
-      private: rendering::VisualPtr mouseMoveVis;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Model publisher that publishes model pose to the server.
-      private: transport::PublisherPtr modelPub;
-
-      /// \brief Light publisher that publishes light pose to the server.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Pointer to the user camera.
-      private: rendering::UserCameraPtr userCamera;
-
-      /// \brief Pointer to the scene where models are in.
-      private: rendering::ScenePtr scene;
-
-      /// \brief Current mouse event.
-      private: common::MouseEvent mouseEvent;
-
-      /// \brief Current key event.
-      private: common::KeyEvent keyEvent;
-
-      /// \brief True if the model manipulator is initialized.
-      private: bool initialized;
-
-      /// \brief Scale of the visual attached to the mouse.
-      private: math::Vector3 mouseVisualScale;
-
-      /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      private: math::Box mouseVisualBbox;
-
-      /// \brief True to manipulate model in global frame.
-      private: bool globalManip;
-
-      /// \brief True to manipulate model, false manipulates link
-      private: bool controlLink;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<EntityManipulator>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: EntityManipulatorPrivate *dataPtr;
     };
   }
 }

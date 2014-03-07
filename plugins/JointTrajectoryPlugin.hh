@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,11 @@ namespace gazebo
     private: void UpdateStates(const common::UpdateInfo &_info);
 
 
-    private: void FixLink(physics::LinkPtr link);
-    private: void UnfixLink();
+    // This function is commented out because it is not used.
+    // private: void FixLink(physics::LinkPtr link);
+
+    // This function is commented out because it is not used.
+    // private: void UnfixLink();
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;

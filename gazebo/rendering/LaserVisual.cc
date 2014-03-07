@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/LaserVisualPrivate.hh"
 #include "gazebo/rendering/LaserVisual.hh"
 
 using namespace gazebo;
@@ -33,43 +34,55 @@ using namespace rendering;
 /////////////////////////////////////////////////
 LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
-: Visual(_name, _vis)
+: Visual(*new LaserVisualPrivate, _name, _vis)
 {
-  this->receivedMsg = false;
+  LaserVisualPrivate *dPtr =
+      reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  dPtr->receivedMsg = false;
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->GetName());
+
+  dPtr->laserScanSub = dPtr->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
 
-  this->connection = event::Events::ConnectPreRender(
+  dPtr->connection = event::Events::ConnectPreRender(
         boost::bind(&LaserVisual::Update, this));
 }
 
 /////////////////////////////////////////////////
 LaserVisual::~LaserVisual()
 {
-  for (unsigned int i = 0; i < rayFans.size(); ++i)
+  LaserVisualPrivate *dPtr =
+      reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
+
+  for (unsigned int i = 0; i < dPtr->rayFans.size(); ++i)
   {
-    this->DeleteDynamicLine(this->rayFans[i]);
-    this->rayFans[i] = NULL;
+    this->DeleteDynamicLine(dPtr->rayFans[i]);
+    dPtr->rayFans[i] = NULL;
   }
-  this->rayFans.clear();
+  dPtr->rayFans.clear();
 }
 
 /////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  this->laserMsg = _msg;
-  this->receivedMsg = true;
+  LaserVisualPrivate *dPtr =
+      reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
+
+  boost::mutex::scoped_lock lock(dPtr->mutex);
+  dPtr->laserMsg = _msg;
+  dPtr->receivedMsg = true;
 }
 
 /////////////////////////////////////////////////
 void LaserVisual::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  LaserVisualPrivate *dPtr =
+      reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
+
+  boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Skip the update if the user is moving the laser.
   if ((this->GetScene()->GetSelectedVisual() &&
@@ -79,52 +92,52 @@ void LaserVisual::Update()
     return;
   }
 
-  if (!this->laserMsg || !this->receivedMsg)
+  if (!dPtr->laserMsg || !dPtr->receivedMsg)
     return;
 
-  this->receivedMsg = false;
+  dPtr->receivedMsg = false;
 
-  double angle = this->laserMsg->scan().angle_min();
-  double verticalAngle = this->laserMsg->scan().vertical_angle_min();
+  double angle = dPtr->laserMsg->scan().angle_min();
+  double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
   double r;
   math::Vector3 pt;
-  math::Pose offset = msgs::Convert(this->laserMsg->scan().world_pose()) -
+  math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
 
-  unsigned int vertCount = this->laserMsg->scan().has_vertical_count() ?
-      this->laserMsg->scan().vertical_count() : 1u;
+  unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
+      dPtr->laserMsg->scan().vertical_count() : 1u;
 
   math::Quaternion ray;
   math::Vector3 axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
-    if (j+1 > this->rayFans.size())
+    if (j+1 > dPtr->rayFans.size())
     {
-      this->rayFans.push_back(
-        this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
-      this->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      this->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->rayFans.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+      dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
+      dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
-    this->rayFans[j]->SetPoint(0, offset.pos);
+    dPtr->rayFans[j]->SetPoint(0, offset.pos);
 
-    angle = this->laserMsg->scan().angle_min();
-    unsigned int count = this->laserMsg->scan().count();
+    angle = dPtr->laserMsg->scan().angle_min();
+    unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
-      r = this->laserMsg->scan().ranges(j*count + i);
+      r = dPtr->laserMsg->scan().ranges(j*count + i);
       ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
       axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.pos;
 
-      if (i+1 >= this->rayFans[j]->GetPointCount())
-        this->rayFans[j]->AddPoint(pt);
+      if (i+1 >= dPtr->rayFans[j]->GetPointCount())
+        dPtr->rayFans[j]->AddPoint(pt);
       else
-        this->rayFans[j]->SetPoint(i+1, pt);
+        dPtr->rayFans[j]->SetPoint(i+1, pt);
 
-      angle += this->laserMsg->scan().angle_step();
+      angle += dPtr->laserMsg->scan().angle_step();
     }
-    verticalAngle += this->laserMsg->scan().vertical_angle_step();
+    verticalAngle += dPtr->laserMsg->scan().vertical_angle_step();
   }
 }
 

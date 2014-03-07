@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- */
 
 #include <time.h>
 
@@ -209,6 +206,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
+  this->lightSub = this->node->Subscribe("~/light", &World::OnLightMsg, this);
+
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
@@ -328,26 +327,26 @@ void World::Init()
   this->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
-
   this->prevStates[0].SetWorld(shared_from_this());
   this->prevStates[1].SetWorld(shared_from_this());
 
   this->prevStates[0].SetName(this->GetName());
   this->prevStates[1].SetName(this->GetName());
 
-  this->initialized = true;
-
   this->updateInfo.worldName = this->GetName();
 
   this->iterations = 0;
   this->logPrevIteration = 0;
 
-  // Mark the world initialization
-  gzlog << "World::Init" << std::endl;
-
   util::DiagnosticManager::Instance()->Init(this->GetName());
+
+  util::LogRecord::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
+
+  this->initialized = true;
+
+  // Mark the world initialization
+  gzlog << "Init world[" << this->GetName() << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -357,6 +356,14 @@ void World::Run(unsigned int _iterations)
   this->stopIterations = _iterations;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+}
+
+//////////////////////////////////////////////////
+void World::RunBlocking(unsigned int _iterations)
+{
+  this->stop = false;
+  this->stopIterations = _iterations;
+  this->RunLoop();
 }
 
 //////////////////////////////////////////////////
@@ -391,11 +398,12 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
-
   // Get the first state
   this->prevStates[0] = WorldState(shared_from_this());
+  this->prevStates[1] = WorldState(shared_from_this());
   this->stateToggle = 0;
+
+  this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
 
   if (!util::LogPlay::Instance()->IsOpen())
   {
@@ -420,6 +428,10 @@ void World::RunLoop()
   if (this->logThread)
   {
     this->logCondition.notify_all();
+    {
+      boost::mutex::scoped_lock lock(this->logMutex);
+      this->logCondition.notify_all();
+    }
     this->logThread->join();
     delete this->logThread;
     this->logThread = NULL;
@@ -1446,6 +1458,15 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type(sceneMsg.GetTypeName());
     }
+    else if ((*iter).request() == "spherical_coordinates_info")
+    {
+      msgs::SphericalCoordinates sphereCoordMsg;
+      msgs::Set(&sphereCoordMsg, *(this->sphericalCoordinates));
+
+      std::string *serializedData = response.mutable_serialized_data();
+      sphereCoordMsg.SerializeToString(serializedData);
+      response.set_type(sphereCoordMsg.GetTypeName());
+    }
     else
       send = false;
 
@@ -1521,7 +1542,8 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(*iter);
     }
   }
-  if (this->modelMsgs.size())
+
+  if (!this->modelMsgs.empty())
   {
     this->EnableAllModels();
     this->modelMsgs.clear();
@@ -2019,4 +2041,35 @@ void World::RemoveModel(const std::string &_name)
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void World::OnLightMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+
+  bool lightExists = false;
+
+  // Find the light by name, and copy the new parameters.
+  for (int i = 0; i < this->sceneMsg.light_size(); ++i)
+  {
+    if (this->sceneMsg.light(i).name() == _msg->name())
+    {
+      lightExists = true;
+      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      break;
+    }
+  }
+
+  // Add a new light if the light doesn't exist.
+  if (!lightExists)
+  {
+    this->sceneMsg.add_light()->CopyFrom(*_msg);
+  }
+}
+
+/////////////////////////////////////////////////
+msgs::Scene World::GetSceneMsg() const
+{
+  return this->sceneMsg;
 }

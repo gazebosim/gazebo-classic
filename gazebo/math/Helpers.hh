@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,6 +187,27 @@ namespace gazebo
     inline bool isPowerOfTwo(unsigned int _x)
     {
       return ((_x != 0) && ((_x & (~_x + 1)) == _x));
+    }
+
+    /// \brief Get the smallest power of two that is greater or equal to a given
+    /// value
+    /// \param[in] _x the number
+    /// \return the same value if _x is already a power of two. Otherwise,
+    /// it returns the smallest power of two that is greater than _x
+    inline unsigned int roundUpPowerOfTwo(unsigned int _x)
+    {
+      if (_x == 0)
+        return 1;
+
+      if (isPowerOfTwo(_x))
+        return _x;
+
+      while (_x & (_x - 1))
+        _x = _x & (_x - 1);
+
+      _x = _x << 1;
+
+      return _x;
     }
 
     /// \brief parse string into an integer

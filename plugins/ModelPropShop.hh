@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,17 @@ namespace gazebo
     /// \brief Initialize the plugin.
     private: void Init();
 
+    /// \brief Callback triggered when the world has been created.
+    private: void OnWorldCreated();
+
     /// \brief Update the plugin.
     private: void Update();
 
-    /// \brief The connections.
+    /// \brief The update connection.
     private: event::ConnectionPtr updateConn;
+
+    /// \brief The world created connection.
+    private: event::ConnectionPtr worldCreatedConn;
 
     /// \brief Node for communication.
     private: transport::NodePtr node;
@@ -58,6 +64,9 @@ namespace gazebo
 
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
+
+    /// \brief Pointer to the light.
+    private: rendering::LightPtr light;
 
     /// \brief Pointer to the sdf document.
     private: boost::shared_ptr<sdf::SDF> sdf;

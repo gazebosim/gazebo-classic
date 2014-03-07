@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       protected: virtual void Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf);
+                                   sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
@@ -86,9 +86,6 @@ namespace gazebo
 
       /// \brief Pointer to the camera.
       private: rendering::DepthCameraPtr camera;
-
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

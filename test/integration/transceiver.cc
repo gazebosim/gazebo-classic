@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -244,6 +245,13 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issue #916)" << std::endl;
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
 
   double avgSignalLevelEmpty = 0.0;
@@ -402,14 +410,8 @@ TEST_P(TransceiverTest, FreqOutOfBounds)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
-    ::testing::Values("ode"));
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, TransceiverTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

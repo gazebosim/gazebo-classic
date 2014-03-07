@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifndef _LIGHT_HH_
 #define _LIGHT_HH_
 
@@ -75,6 +69,10 @@ namespace gazebo
       /// \param[in] _msg Containing the light information.
       public: void LoadFromMsg(ConstLightPtr &_msg);
 
+      /// \brief Load from a light message.
+      /// \param[in] _msg Message containing the light information.
+      public: void LoadFromMsg(const msgs::Light &_msg);
+
       /// \brief Set the name of the visual.
       /// \param[in] _name Name of the light source.
       public: void SetName(const std::string &_name);
@@ -106,6 +104,10 @@ namespace gazebo
       /// \brief Set whether to show the visual
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(bool _s);
+
+      /// \brief Get whether the light is visible.
+      /// \return True if the light is visible.
+      public: bool GetVisible() const;
 
       /// \brief Set the light type.
       /// \param[in] _type The light type: "point", "spot", "directional"
@@ -182,7 +184,7 @@ namespace gazebo
 
       /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
+      private: void UpdateSDFFromMsg(const msgs::Light &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;
