@@ -2461,7 +2461,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->variantManager->addProperty(QVariant::Bool,
       tr("inertia ratio reduction"));
     if (_msg.has_ode() && _msg.ode().has_inertia_ratio_reduction())
-      item->setValue(_msg.ode().iters());
+      item->setValue(_msg.ode().inertia_ratio_reduction());
     solverItem->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Int,
@@ -2482,7 +2482,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->variantManager->addProperty(QVariant::Bool,
       tr("pgs row reorder"));
     if (_msg.has_ode() && _msg.ode().has_reorder())
-      item->setValue(_msg.ode().iters());
+      item->setValue(_msg.ode().reorder());
     solverItem->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
