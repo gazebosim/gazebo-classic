@@ -2550,7 +2550,7 @@ void Scene::SetSky()
 
   // Moon phase in [-1,1] range, where -1 means fully covered Moon,
   // 0 clear Moon and 1 fully covered Moon
-  this->skyxController->setMoonPhase(0.3);
+  this->skyxController->setMoonPhase(0);
 
   this->skyx->getAtmosphereManager()->setOptions(
       SkyX::AtmosphereManager::Options(
