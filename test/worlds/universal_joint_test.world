@@ -6,7 +6,7 @@
     <model name="model_1">
       <link name="link_00">
         <gravity>true</gravity>
-        <pose>0 0 2 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <inertial>
           <mass>0.1</mass>
           <pose>0 0 -0.5 0 0 0</pose>
@@ -50,6 +50,7 @@
           </material>
         </visual>
       </link>
+      <!--
       <link name="link_01">
         <gravity>true</gravity>
         <pose>0 0 1.0 0 0 0</pose>
@@ -109,6 +110,8 @@
           </material>
         </visual>
       </link>
+      -->
+      
       <joint name="joint_00" type="universal">
         <parent>world</parent>
         <child>link_00</child>
@@ -120,7 +123,7 @@
             <stiffness>1e12</stiffness>
           </limit>
           <dynamics>
-            <damping>0.1</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis>
         <axis2>
@@ -131,7 +134,7 @@
             <stiffness>1e12</stiffness>
           </limit>
           <dynamics>
-            <damping>0.1</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis2>
         <physics>
@@ -140,6 +143,7 @@
           </ode>
         </physics>
       </joint>
+      <!--
       <joint name="joint_01" type="universal">
         <child>link_01</child>
         <parent>link_00</parent>
@@ -169,6 +173,7 @@
           </ode>
         </physics>
       </joint>
+      -->
     </model>
   </world>
 </sdf>

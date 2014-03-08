@@ -28,13 +28,9 @@ class JointTestUniversal : public ServerFixture,
   public: void UniversalJoint1(const std::string &_physicsEngine);
 };
 
+/////////////////////////////////////////////////
 void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";

@@ -137,11 +137,15 @@ void BulletHingeJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "unable to create bullet hinge without links.\n";
+    return;
   }
 
   if (!this->bulletHinge)
-    gzthrow("unable to create bullet hinge constraint\n");
+  {
+    gzerr << "unable to create bullet hinge constraint\n";
+    return;
+  }
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
