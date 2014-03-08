@@ -65,7 +65,7 @@ TEST_F(Matrix3Test, Multiplication)
 
     // Vector3::Zero
     EXPECT_EQ(math::Vector3::Zero, matrix * math::Vector3::Zero);
-    // left multiply with Vector3 not implemented 
+    // left multiply with Vector3 not implemented
 
     // Matrix3::ZERO
     EXPECT_EQ(math::Matrix3::ZERO, matrix * math::Matrix3::ZERO);
