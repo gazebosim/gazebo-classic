@@ -16,6 +16,7 @@ set (files
   heightmap.world
   lights.world
   model_nesting.world
+  multilink_shape.world
   pioneer2dx.world
   openal.world
   trimesh_test.world

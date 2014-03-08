@@ -511,6 +511,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     return;
 
   QTreeWidgetItem *currentItem = this->modelTreeWidget->currentItem();
+
   if (!currentItem)
     return;
 
