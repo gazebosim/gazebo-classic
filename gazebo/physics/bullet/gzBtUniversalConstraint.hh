@@ -23,6 +23,14 @@ ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint :
 public btGeneric6DofConstraint
 {
   public: BT_DECLARE_ALIGNED_ALLOCATOR();
+
+  /// \brief Constructor
+  /// \param[in] _rbA Rigid body A, also known as the parent link.
+  /// \param[in] _rbB Rigid body B, also known as the child link.
+  /// \param[in] _anchor The point in world space that constrains the two
+  /// rigid bodies.
+  /// \param[in] _axis1 First axis of rotation.
+  /// \param[in] _axis2 Second axis of rotation.
   public: gzBtUniversalConstraint(
               btRigidBody& rbA,
               btRigidBody& rbB,
@@ -30,58 +38,88 @@ public btGeneric6DofConstraint
               const btVector3& axis1,
               const btVector3& axis2);
 
+  /// \brief Constructor
+  /// \param[in] _rbB Rigid body B, also known as the child link.
+  /// \param[in] _anchor The point in world space that constrains the child
+  /// link to the world.
+  /// \param[in] _axis1 First axis of rotation.
+  /// \param[in] _axis2 Second axis of rotation.
   public: gzBtUniversalConstraint(
               btRigidBody &_rbA,
               const btVector3 &_anchor,
               const btVector3 &_axis1,
               const btVector3 &_axis2);
 
-  const btVector3& getAnchor() { return m_calculatedTransformA.getOrigin(); }
-  const btVector3& getAnchor2() { return m_calculatedTransformB.getOrigin(); }
-  const btVector3& getAxis1() { return m_axis1; }
-  const btVector3& getAxis2() { return m_axis2; }
-  btScalar getAngle1() { return getAngle(2); }
-  btScalar getAngle2() { return getAngle(1); }
+  /// \brief Get the anchor point in link A reference frame.
+  /// \return Anchor point in link A's reference frame.
+  public: const btVector3 &getAnchor();
 
-  // Set upper limit.
-  public: void setUpperLimit(btScalar ang1max, btScalar ang2max)
-          {
-            this->setAngularUpperLimit(btVector3(0.f, ang1max, ang2max));
-          }
+  /// \brief Get the anchor point in link B reference frame.
+  /// \return Anchor point in link B's reference frame.
+  public: const btVector3 &getAnchor2();
 
-  // Set lower limit.
-  public: void setLowerLimit(btScalar ang1min, btScalar ang2min)
-          {
-            this->setAngularLowerLimit(btVector3(0.f, ang1min, ang2min));
-          }
+  /// \brief Get the first axis of rotation.
+  /// \return The first axis of rotation as a vector
+  public: const btVector3 &getAxis1();
 
-  void setAxis( const btVector3& axis1, const btVector3& axis2);
+  /// \brief Get the second axis of rotation.
+  /// \return The second axis of rotation as a vector
+  public: const btVector3 &getAxis2();
 
-  public: inline btScalar getMaxMotorImpulse1() const
-          {
-            return m_maxMotorImpulse[0];
-          }
+  /// \brief Get the value of angle 1 in radians.
+  /// \return Angle value of the first axis in radians.
+  public: btScalar getAngle1();
 
-  public: inline btScalar getMaxMotorImpulse2() const
-          {
-            return m_maxMotorImpulse[1];
-          }
+  /// \brief Get the value of angle 2 in radians.
+  /// \return Angle value of the second axis in radians.
+  public: btScalar getAngle2();
 
-  public: inline void setMaxMotorImpulse1(btScalar _i)
-          {
-            m_maxMotorImpulse[0] = _i;
-          }
+  /// \brief Set upper limit.
+  /// \param[in] _ang1max Maximum value for angle 1
+  /// \param[in] _ang2max Maximum value for angle 2
+  public: void setUpperLimit(btScalar _ang1max, btScalar _ang2max);
 
-  public: inline void setMaxMotorImpulse2(btScalar _i)
-          {
-            m_maxMotorImpulse[1] = _i;
-          }
+  /// \brief Set lower limit.
+  /// \param[in] _ang1min Minimum value for angle 1
+  /// \param[in] _ang2min Minimum value for angle 2
+  public: void setLowerLimit(btScalar _ang1min, btScalar _ang2min);
 
+  /// \brief Set the axis of rotation.
+  /// \param[in] _axis1 First axis of rotation.
+  /// \param[in] _axis2 Second axis of rotation.
+  public: void setAxis(const btVector3 &_axis1, const btVector3 &_axis2);
+
+  /// \brief Get the maximum allowed motor impluse for the first axis of
+  /// rotation.
+  /// \return Maximum motor impulse for axis 1.
+  public: btScalar getMaxMotorImpulse1() const;
+
+  /// \brief Get the maximum allowed motor impluse for the second axis of
+  /// rotation.
+  /// \return Maximum motor impulse for axis 2.
+  public: btScalar getMaxMotorImpulse2() const;
+
+  /// \brief Set the maximum allowed motor impluse for the first axis of
+  /// rotation.
+  /// \param[in] _i Maximum motor impulse for axis 1.
+  public: void setMaxMotorImpulse1(btScalar _i);
+
+  /// \brief Set the maximum allowed motor impluse for the second axis of
+  /// rotation.
+  /// \param[in] _i Maximum motor impulse for axis 2.
+  public: void setMaxMotorImpulse2(btScalar _i);
+
+  /// \brief Anchor point in world coordinate frame.
   protected: btVector3 m_anchor;
+
+  /// \brief First axis of rotation.
   protected: btVector3 m_axis1;
+
+  /// \brief Second axis of rotation.
   protected: btVector3 m_axis2;
 
-  private: btScalar m_maxMotorImpulse[2];
+  /// \brief Maximum motor impulses.
+  private: btScalar maxMotorImpulse[2];
 };
 
 #endif

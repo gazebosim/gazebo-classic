@@ -60,63 +60,6 @@ void BulletUniversalJoint::Init()
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
-  // Local variables used to compute pivots and axes in body-fixed frames
-  // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  btTransform frameParent, frameChild;
-  btVector3 baxis2, baxis3;
-  math::Pose pose;
-
-  std::cout << "AnchorPos[" << this->anchorPos << "]\n";
-
-  // Initialize pivots to anchorPos, which is expressed in the
-  // world coordinate frame.
-  pivotParent = this->anchorPos;
-  pivotChild = this->anchorPos;
-
-  // Check if parentLink exists. If not, the parent will be the world.
-  if (this->parentLink)
-  {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
-    // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
-    frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
-    axisParent = pose.rot.RotateVectorReverse(axis1);
-    axisParent = axisParent.Normalize();
-    // The following math is based on btHingeConstraint.cpp:95-115
-    btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), baxis2, baxis3);
-    frameParent.getBasis().setValue(
-      axisParent.x, baxis2.x(), baxis3.x(),
-      axisParent.y, baxis2.y(), baxis3.y(),
-      axisParent.z, baxis2.z(), baxis3.z());
-  }
-  // Check if childLink exists. If not, the child will be the world.
-  if (this->childLink)
-  {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
-    // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
-    frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
-    axisChild = pose.rot.RotateVectorReverse(axis1);
-    axisChild = axisChild.Normalize();
-    // The following math is based on btHingeConstraint.cpp:95-115
-    btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), baxis2, baxis3);
-    frameChild.getBasis().setValue(
-      axisChild.x, baxis2.x(), baxis3.x(),
-      axisChild.y, baxis2.y(), baxis3.y(),
-      axisChild.z, baxis2.z(), baxis3.z());
-  }
-
-  std::cout << "PivotParent[" << pivotParent << "]\n";
-  std::cout << "PivotChild[" << pivotChild << "]\n";
-
-
   if (bulletChildLink && bulletParentLink)
   {
     this->bulletUniversal = new gzBtUniversalConstraint(
@@ -128,7 +71,6 @@ void BulletUniversalJoint::Init()
   }
   else if (bulletParentLink)
   {
-    printf("Parent link\n");
     this->bulletUniversal = new gzBtUniversalConstraint(
         *bulletParentLink->GetBulletLink(),
         btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
@@ -137,7 +79,6 @@ void BulletUniversalJoint::Init()
   }
   else if (bulletChildLink)
   {
-    printf("CHild link\n");
     this->bulletUniversal = new gzBtUniversalConstraint(
         *bulletChildLink->GetBulletLink(),
         btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
@@ -191,15 +132,6 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
   {
     gzerr << "SetAxis for existing joint is not implemented\n";
   }
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetAngle(unsigned int _index) const
-{
-  if (_index == 0)
-    return this->bulletUniversal->getAngle1();
-  else
-    return this->bulletUniversal->getAngle2();
 }
 
 //////////////////////////////////////////////////
@@ -346,13 +278,19 @@ math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
   {
     if (_index == 0)
     {
-      result = BulletTypes::ConvertVector3(
-          this->bulletUniversal->getAxis1());
+      btVector3 vec = this->bulletUniversal->
+        getRigidBodyA().getCenterOfMassTransform().getBasis() *
+        this->bulletUniversal->getFrameOffsetA().getBasis().getColumn(2);
+
+      result = BulletTypes::ConvertVector3(vec);
     }
     else if (_index == 1)
     {
-      result = BulletTypes::ConvertVector3(
-          this->bulletUniversal->getAxis2());
+      btVector3 vec = this->bulletUniversal->
+        getRigidBodyB().getCenterOfMassTransform().getBasis() *
+        this->bulletUniversal->getFrameOffsetB().getBasis().getColumn(1);
+
+      result = BulletTypes::ConvertVector3(vec);
     }
     else
       gzerr << "Invalid axis index[" << _index << "]\n";
@@ -369,9 +307,9 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
   if (this->bulletUniversal)
   {
     if (_index == 0)
-      result = this->bulletUniversal->getAngle1() - this->angleOffset[0];
+      result = this->angleOffset[0] - this->bulletUniversal->getAngle1();
     else if (_index == 1)
-      result = this->bulletUniversal->getAngle2() - this->angleOffset[1];
+      result = this->angleOffset[1] - this->bulletUniversal->getAngle2();
     else
       gzerr << "Invalid axis index[" << _index << "]\n";
   }

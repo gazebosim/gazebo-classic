@@ -141,11 +141,15 @@ void BulletSliderJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "joint without links\n";
+    return;
   }
 
   if (!this->bulletSlider)
-    gzthrow("unable to create bullet slider joint\n");
+  {
+    gzerr << "unable to create bullet slider joint\n";
+    return;
+  }
 
   // btSliderConstraint has 2 degrees-of-freedom (like a piston)
   // so disable the rotation.

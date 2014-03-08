@@ -53,9 +53,6 @@ namespace gazebo
       /// \brief Set the first axis of rotation
       public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
 
-      /// \brief Get the angle of axis 1
-      public: virtual math::Angle GetAngle(unsigned int _index) const;
-
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
