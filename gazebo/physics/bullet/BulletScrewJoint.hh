@@ -58,7 +58,13 @@ namespace gazebo
                   double _threadPitch);
 
       // Documentation inherited
+      public: virtual void SetThreadPitch(double _threadPitch);
+
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch();
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int _index,

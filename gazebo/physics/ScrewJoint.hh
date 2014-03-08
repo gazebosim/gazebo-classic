@@ -60,17 +60,6 @@ namespace gazebo
                      _sdf->GetElement("thread_pitch")->Get<double>();
                  }
 
-      /// \brief Set the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \param[in] _anchor Anchor value for the joint.
-      public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
-
-      /// \brief Get the anchor.
-      /// \param[in] _index Index of the axis. Not Used.
-      /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
-
       /// \brief Set screw joint thread pitch.
       ///
       /// This must be implemented in a child class
@@ -79,6 +68,13 @@ namespace gazebo
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch) GAZEBO_DEPRECATED(3.0) = 0;
 
+      /// \brief Set screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _threadPitch Thread pitch value.
+      public: virtual void SetThreadPitch(double _threadPitch) = 0;
+
       /// \brief Get screw joint thread pitch.
       ///
       /// This must be implemented in a child class
@@ -86,6 +82,13 @@ namespace gazebo
       /// \return _threadPitch Thread pitch value.
       public: virtual double GetThreadPitch(unsigned int _index)
         GAZEBO_DEPRECATED(3.0) = 0;
+
+      /// \brief Get screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \return _threadPitch Thread pitch value.
+      public: virtual double GetThreadPitch() = 0;
 
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;
@@ -100,15 +103,6 @@ namespace gazebo
                  }
     };
     /// \}
-
-    template<class T>
-    void ScrewJoint<T>::SetAnchor(unsigned int /*_index*/,
-                                  const math::Vector3 &_anchor)
-    {this->fakeAnchor = _anchor;}
-
-    template<class T>
-    math::Vector3 ScrewJoint<T>::GetAnchor(unsigned int /*_index*/) const
-    {return this->fakeAnchor;}
   }
 }
 #endif

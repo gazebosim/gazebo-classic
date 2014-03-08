@@ -18,6 +18,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
@@ -43,102 +44,226 @@ SimbodyScrewJoint::~SimbodyScrewJoint()
 void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<SimbodyJoint>::Load(_sdf);
-  this->SetThreadPitch(0, this->threadPitch);
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::Init()
+double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 {
-  gzerr << "Not implemented in simbody\n";
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    if (this->physicsInitialized &&
+        this->simbodyPhysics->simbodyPhysicsInitialized)
+      return this->mobod.getOneU(
+        this->simbodyPhysics->integ->getState(),
+        SimTK::MobilizerUIndex(_index));
+    else
+    {
+      gzdbg << "SimbodyScrewJoint::GetVelocity() simbody not yet initialized, "
+            << "initial velocity should be zero until restart from "
+            << "state has been implemented.\n";
+      return 0.0;
+    }
+  }
+  else
+  {
+    gzerr << "SimbodyScrewJoint::Invalid index for joint, returning NaN\n";
+    return SimTK::NaN;
+  }
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetVelocity(unsigned int /*_index*/) const
+void SimbodyScrewJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  gzerr << "Not implemented in simbody\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
-{
-  gzerr << "Not implemented in simbody\n";
+  if (_index < static_cast<int>(this->GetAngleCount()))
+    this->mobod.setOneU(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      SimTK::MobilizerUIndex(_index), _rate);
+  else
+    gzerr << "SimbodyScrewJoint::SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
     const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented in simbody\n";
+  // Simbody seems to handle setAxis improperly. It readjust all the pivot
+  // points
+  gzdbg << "SimbodyScrewJoint::SetAxis: setting axis is "
+        << "not yet implemented.  The axis are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
     double /*_threadPitch*/)
 {
-  gzerr << "Not implemented\n";
+  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+        << "not yet implemented.  The pitch are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
+void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
 {
-  gzerr << "Not implemented\n";
+  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+        << "not yet implemented.  The pitch are set during joint construction "
+        << "in SimbodyPhysics.cc for now.\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
+void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(unsigned int /*_index*/)
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(unsigned int /*_index*/)
-{
-  return math::Angle();
+  if (_index < static_cast<int>(this->GetAngleCount()) &&
+      this->physicsInitialized)
+    this->simbodyPhysics->discreteForces.setOneMobilityForce(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      this->mobod, SimTK::MobilizerUIndex(_index), _torque);
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
 {
-  gzerr << "Not implemented\n";
+  gzdbg << "SimbodyScrewJoint::SetMaxForce: doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
 {
-  gzerr << "Not implemented\n";
+  gzdbg << "SimbodyScrewJoint::GetMaxForce: doesn't make sense in simbody...\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
-  gzerr << "SimbodyScrewJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  if (this->simbodyPhysics &&
+      this->simbodyPhysics->simbodyPhysicsStepped &&
+      _index < static_cast<int>(this->GetAngleCount()))
+  {
+    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+      this->simbodyPhysics->integ->getState());
+
+    // express Z-axis of X_OM in world frame
+    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
+      this->simbodyPhysics->integ->getState(), X_OM.z()));
+
+    return SimbodyPhysics::Vec3ToVector3(z_W);
+  }
+  else
+  {
+    if (_index >= static_cast<int>(this->GetAngleCount()))
+    {
+      gzerr << "index out of bound\n";
+      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+    }
+    else
+    {
+      gzdbg << "SimbodyScrewJoint::GetGlobalAxis() sibmody physics"
+            << " engine not initialized yet, "
+            << "use local axis and initial pose to compute "
+            << "global axis.\n";
+      // if local axis specified in model frame (to be changed)
+      // switch to code below if issue #494 is to be addressed
+      return this->model->GetWorldPose().rot.RotateVector(
+        this->GetLocalAxis(_index));
+
+      // if local axis specified in joint frame (Issue #494)
+      // Remember to remove include of Model.hh when switching.
+      // if (this->childLink)
+      // {
+      //   math::Pose jointPose =
+      //    this->anchorPose + this->childLink->GetWorldPose();
+      //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
+      // }
+      // else
+      // {
+      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
+      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      // }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
+math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  gzerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  if (_index < static_cast<int>(this->GetAngleCount()))
+  {
+    if (this->physicsInitialized &&
+        this->simbodyPhysics->simbodyPhysicsInitialized)
+    {
+      gzerr << "Get " << _index << "\n";
+      return math::Angle(this->mobod.getOneQ(
+        this->simbodyPhysics->integ->getState(), _index));
+    }
+    else
+    {
+      gzdbg << "SimbodyScrewJoint::GetAngleImpl() simbody not yet initialized, "
+            << "initial angle should be zero until <initial_angle> "
+            << "is implemented.\n";
+      return math::Angle(0.0);
+    }
+  }
+  else
+  {
+    gzerr << "index out of bound\n";
+    return math::Angle(SimTK::NaN);
+  }
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+double SimbodyScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  gzerr << "Not implemented in Simbody\n";
-  return 0;
+  return this->threadPitch;
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetThreadPitch()
+{
+  return this->threadPitch;
+
+  /* if we want to get active thread pitch, use below
+  /// \TODO: deprecate _index parameter, thread pitch is a property of the
+  /// joint, not related to an axis.
+  if (this->physicsInitialized &&
+      this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    // downcast mobod to screw mobod first
+    return SimTK::MobilizedBody::Screw::downcast(this->mobod).getDefaultPitch();
+  }
+  else
+  {
+    gzdbg << "SimbodyScrewJoint::GetThreadPitch() failed, "
+          << " simbody not yet initialized\n";
+    return 0.0;
+  }
+  */
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetAttribute(const std::string &_key, int _index,
+  const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else
+    SimbodyJoint::SetAttribute(_key, _index, _value);
+}
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetAttribute(const std::string &_key,
+  unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return SimbodyJoint::GetAttribute(_key, _index);
 }

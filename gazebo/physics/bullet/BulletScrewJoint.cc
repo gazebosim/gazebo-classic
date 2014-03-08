@@ -271,6 +271,22 @@ void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
+void BulletScrewJoint::SetThreadPitch(double _threadPitch)
+{
+  if (this->bulletScrew)
+    this->bulletScrew->setThreadPitch(_threadPitch);
+}
+
+//////////////////////////////////////////////////
+double BulletScrewJoint::GetThreadPitch()
+{
+  double result = this->threadPitch;
+  if (this->bulletScrew)
+    result = this->bulletScrew->getThreadPitch();
+  return result;
+}
+
+//////////////////////////////////////////////////
 double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
   double result = this->threadPitch;

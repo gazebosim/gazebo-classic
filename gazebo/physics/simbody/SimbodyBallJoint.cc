@@ -52,12 +52,6 @@ math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
-/////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
@@ -103,18 +97,3 @@ void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
-
-//////////////////////////////////////////////////
-void SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented\n";
-}
-

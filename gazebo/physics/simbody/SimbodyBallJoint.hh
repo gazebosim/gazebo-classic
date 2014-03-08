@@ -43,9 +43,6 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
-
-      // Documentation inherited.
       public: math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
@@ -63,14 +60,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
