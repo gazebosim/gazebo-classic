@@ -184,6 +184,7 @@ void BulletLink::Init()
   bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
 
   // Only use auto disable if no joints and no sensors are present
+  this->rigidLink->setActivationState(DISABLE_DEACTIVATION);
   if (this->GetModel()->GetAutoDisable() &&
       this->GetModel()->GetJointCount() == 0 &&
       this->GetSensorCount() == 0)
