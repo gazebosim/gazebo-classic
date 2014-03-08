@@ -113,6 +113,17 @@ namespace gazebo
                                               const Matrix3 &_m)
       { return _m * _s; }
 
+      /// \brief Matrix times column vector
+      /// \param[in] _v Vector3 to multiply
+      /// \return product of this * _v
+      public: Vector3 operator*(const Vector3 &_v) const
+      {
+        return Vector3(
+          this->m[0][0]*_v[0] + this->m[0][1]*_v[1] + this->m[0][2]*_v[2],
+          this->m[1][0]*_v[0] + this->m[1][1]*_v[1] + this->m[1][2]*_v[2],
+          this->m[2][0]*_v[0] + this->m[2][1]*_v[1] + this->m[2][2]*_v[2]);
+      }
+
       /// \brief Matrix multiplication operator
       /// \param[in] _m Matrix3 to multiply
       /// \return product of this * _m
@@ -175,6 +186,12 @@ namespace gazebo
 
               return _out;
             }
+
+      /// \brief Identity matrix
+      public: static const Matrix3 IDENTITY;
+
+      /// \brief Zero matrix
+      public: static const Matrix3 ZERO;
 
       /// \brief the 3x3 matrix
       protected: double m[3][3];
