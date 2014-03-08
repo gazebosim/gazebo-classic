@@ -187,6 +187,12 @@ namespace gazebo
               return _out;
             }
 
+      /// \brief Identity matrix
+      public: static const Matrix3 IDENTITY;
+
+      /// \brief Zero matrix
+      public: static const Matrix3 ZERO;
+
       /// \brief the 3x3 matrix
       protected: double m[3][3];
 
