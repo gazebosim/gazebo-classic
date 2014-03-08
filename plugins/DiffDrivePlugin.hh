@@ -47,8 +47,6 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
-
-    private: double sum;
   };
 }
 #endif

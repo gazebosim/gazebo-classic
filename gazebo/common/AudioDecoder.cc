@@ -16,26 +16,9 @@
 */
 
 #include <gazebo/gazebo_config.h>
-#include <gazebo/common/Console.hh>
 #include <gazebo/common/AudioDecoder.hh>
-
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C" {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc++11-extensions"
-#pragma clang diagnostic ignored "-Wvariadic-macros"
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/opt.h>
-#pragma clang diagnostic pop
-}
-#endif
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/ffmpeg_inc.h>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096

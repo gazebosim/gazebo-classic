@@ -19,20 +19,11 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
-
-#ifdef HAVE_FFMPEG
-extern "C" {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc++11-extensions"
-#pragma clang diagnostic ignored "-Wvariadic-macros"
-#include <libavformat/avformat.h>
-#pragma clang diagnostic pop
-}
-#endif
+#include <gazebo/common/ffmpeg_inc.h>
 
 #include "test_config.h"
-#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/AudioDecoder.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "test/util.hh"
 
 using namespace gazebo;

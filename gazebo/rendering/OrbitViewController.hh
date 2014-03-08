@@ -108,10 +108,10 @@ namespace gazebo
       private: void Orbit(double _dy, double _dp);
 
       /// \brief Yaw value.
-      private: float yaw, initYaw;
+      private: float yaw;
 
       /// \brief Pitch value.
-      private: float pitch, initPitch;
+      private: float pitch;
 
       /// \brief Distance to the focal point.
       private: float distance;
