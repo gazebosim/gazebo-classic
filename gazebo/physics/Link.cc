@@ -783,6 +783,9 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_far_clip(elem->Get<double>("far_clip"));
     msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
+
+  if (this->IsCanonicalLink())
+    _msg.set_canonical(true);
 }
 
 //////////////////////////////////////////////////
@@ -829,7 +832,6 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.collision_size()>0)
     this->UpdateSurface();
 }
-
 
 //////////////////////////////////////////////////
 unsigned int Link::GetSensorCount() const

@@ -154,6 +154,10 @@ void QTestFixture::cleanup()
 
   delete this->serverThread;
   this->serverThread = NULL;
+
+  // Events are static and allocated on the stack so we need to reset them
+  // in between tests
+  gazebo::event::Events::setSelectedEntity.Reset();
 }
 
 /////////////////////////////////////////////////
