@@ -72,9 +72,6 @@ class ModelListWidget_TEST : public QTestFixture
     bool _selfCollide, bool _gravity, bool _kinematic, bool _canonical,
     const gazebo::math::Pose &_pose);
 
-  /// \brief Populate the model tree item with name of models in the world.
-  private: void PopulateModelsTree();
-
   /// \brief Test to see the tree widget has correct items.
   private slots: void TreeWidget();
 
@@ -82,6 +79,8 @@ class ModelListWidget_TEST : public QTestFixture
   private slots: void ModelsTree();
 
   /// \brief Test that the property browser displays correct model properties.
+  /// The test then modifies the properties, refresh the property browser, and
+  /// verify the changes are set.
   private slots: void ModelProperties();
 
   /// \brief Test that the property browser displays correct link properties.
@@ -89,7 +88,6 @@ class ModelListWidget_TEST : public QTestFixture
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
   private slots: void LinkProperties();
-
 };
 
 #endif

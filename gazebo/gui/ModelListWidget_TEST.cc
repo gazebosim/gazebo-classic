@@ -36,7 +36,6 @@ void ModelListWidget_TEST::TreeWidget()
 
     gazebo::gui::ModelListWidget *modelListWidget
         = new gazebo::gui::ModelListWidget;
-    modelListWidget->show();
     QCoreApplication::processEvents();
 
     // Get tree widget
@@ -64,28 +63,9 @@ void ModelListWidget_TEST::TreeWidget()
     QTreeWidgetItem *modelsItem = treeModelItems.front();
     QVERIFY(modelsItem != NULL);
 
-    modelListWidget->hide();
     delete modelListWidget;
   }
 }
-/*
-/////////////////////////////////////////////////
-void ModelListWidget_TEST::PopulateModelsTree()
-{
-  gazebo::transport::NodePtr node;
-  gazebo::transport::SubscriberPtr sub;
-
-  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::PublisherPtr requestPub =
-      node->Advertise<gazebo::msgs::Request>("~/request");
-  gazebo::transport::SubscriberPtr responseSub = node->Subscribe("~/response",
-      &ModelListWidget_TEST::OnResponse, this);
-
-  gazebo::msgs::Request *requestMsg =
-      gazebo::msgs::CreateRequest("entity_list");
-  requestPub->Publish(*requestMsg);
-}*/
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::OnResponse(ConstResponsePtr &_msg)
@@ -185,7 +165,7 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
     bool _canonical, const gazebo::math::Pose &_pose)
 {
-  //ignore checking link id in _properties[0]
+  // ignore checking link id in _properties[0]
   QtVariantProperty *property =
       static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
@@ -224,42 +204,42 @@ void ModelListWidget_TEST::SetLinkProperty(
     bool _canonical, const gazebo::math::Pose &_pose)
 {
   QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
+      static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
-  /*QCOMPARE(property->propertyName(), tr("name"));
+  QCOMPARE(property->propertyName(), tr("name"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(tr(_name.c_str()));*/
-  property = static_cast<QtVariantProperty *>(_properties[1]);
+  property->setValue(tr(_name.c_str()));
+  property = static_cast<QtVariantProperty *>(_properties[2]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("self_collide"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
   property->setValue(_selfCollide);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
+  property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("gravity"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
   property->setValue(_gravity);
-  property = static_cast<QtVariantProperty *>(_properties[3]);
+  property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("kinematic"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
   property->setValue(_kinematic);
-  property = static_cast<QtVariantProperty *>(_properties[4]);
+  property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   // only set the pose for non-canonical links
   QCOMPARE(property->propertyName(), tr("canonical"));
   QCOMPARE(property->value().toBool(), _canonical);
   if (!property->value().toBool())
   {
-    property = static_cast<QtVariantProperty *>(_properties[5]);
+    property = static_cast<QtVariantProperty *>(_properties[6]);
     Q_ASSERT(property);
     QCOMPARE(property->propertyName(), tr("pose"));
     QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+    propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
     propTreeBrowser->setExpanded(propTreeBrowser->topLevelItem(property), true);
     this->SetPoseProperty(propTreeBrowser, property->subProperties(), _pose);
   }
@@ -273,7 +253,6 @@ void ModelListWidget_TEST::ModelsTree()
 {
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
-  modelListWidget->show();
   QCoreApplication::processEvents();
 
   this->Load("worlds/shapes.world");
@@ -348,10 +327,10 @@ void ModelListWidget_TEST::ModelsTree()
   QVERIFY(sphereItem != NULL);
   QVERIFY(cylinderItem != NULL);
 
-  modelListWidget->hide();
   node.reset();
   delete requestMsg;
   delete modelListWidget;
+  modelListWidget = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -405,7 +384,7 @@ void ModelListWidget_TEST::ModelProperties()
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
-  // Get tree widget
+  // Get propery browser widget
   QtTreePropertyBrowser *propTreeBrowser =
     modelListWidget->findChild<QtTreePropertyBrowser *>(
       "propTreeBrowser");
@@ -458,6 +437,7 @@ void ModelListWidget_TEST::ModelProperties()
   bool hasStatic = false;
   bool hasPose = false;
   int numLinks = 0;
+  int nameIndex = 1;
   QList<QtProperty *> modelProperties = propTreeBrowser->properties();
   for (int i = 0; i < modelProperties.size(); ++i)
   {
@@ -482,7 +462,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("link"))
     {
       QVERIFY(property->subProperties().size() > 0);
-      if (property->subProperties()[0]->valueText().toStdString().
+      if (property->subProperties()[nameIndex]->valueText().toStdString().
           find("box_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
@@ -490,7 +470,7 @@ void ModelListWidget_TEST::ModelProperties()
           gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
-      else if (property->subProperties()[0]->valueText().toStdString().
+      else if (property->subProperties()[nameIndex]->valueText().toStdString().
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
@@ -513,9 +493,16 @@ void ModelListWidget_TEST::ModelProperties()
     QtVariantProperty *property =
       static_cast<QtVariantProperty *>(modelProperties[i]);
 
+    // TODO changing model name currently fails
+    // if (property->propertyName() == tr("name"))
+    // {
+    //  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+    //  property->setValue(true);
+    // }
     if (property->propertyName() == tr("is_static"))
     {
-      //property->setValue(true);
+      propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+      property->setValue(true);
     }
     else if (property->propertyName() == tr("pose"))
     {
@@ -525,7 +512,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("link"))
     {
       QVERIFY(property->subProperties().size() > 0);
-      if (property->subProperties()[0]->valueText().toStdString().
+      if (property->subProperties()[nameIndex]->valueText().toStdString().
           find("box_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
@@ -533,7 +520,7 @@ void ModelListWidget_TEST::ModelProperties()
             gazebo::math::Pose(1.5, 2.0, 3.2, 0.6, 0.7, 0.8));
         numLinks++;
       }
-      else if (property->subProperties()[0]->valueText().toStdString().
+      else if (property->subProperties()[nameIndex]->valueText().toStdString().
         find("sphere_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
@@ -544,7 +531,7 @@ void ModelListWidget_TEST::ModelProperties()
     }
   }
   QCOMPARE(numLinks, 2);
-/*
+
   // select the multi-link model again to refresh the property browser
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       modelRect.center() );
@@ -588,7 +575,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("link"))
     {
       QVERIFY(property->subProperties().size() > 0);
-      if (property->subProperties()[0]->valueText().toStdString().
+      if (property->subProperties()[nameIndex]->valueText().toStdString().
           find("box_link") != std::string::npos)
       {
         // as this is the canonical link, the pose properties should remain
@@ -598,7 +585,7 @@ void ModelListWidget_TEST::ModelProperties()
             gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
-      else if (property->subProperties()[0]->valueText().toStdString().
+      else if (property->subProperties()[nameIndex]->valueText().toStdString().
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
@@ -608,7 +595,7 @@ void ModelListWidget_TEST::ModelProperties()
       }
     }
   }
-  QCOMPARE(numLinks, 2);*/
+  QCOMPARE(numLinks, 2);
 
   modelListWidget->hide();
   node.reset();
@@ -667,7 +654,7 @@ void ModelListWidget_TEST::LinkProperties()
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
-  // Get tree widget
+  // Get propery browser widget
   QtTreePropertyBrowser *propTreeBrowser =
     modelListWidget->findChild<QtTreePropertyBrowser *>(
       "propTreeBrowser");
@@ -680,7 +667,7 @@ void ModelListWidget_TEST::LinkProperties()
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       modelsRect.center() );
   QCoreApplication::processEvents();
-  // wait for the model to be selected
+  // wait for the models item to be selected
   sleep = 0;
   maxSleep = 5;
   while (!modelsItem->isSelected() && sleep < maxSleep)
@@ -693,7 +680,7 @@ void ModelListWidget_TEST::LinkProperties()
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center() );
+      modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -743,7 +730,6 @@ void ModelListWidget_TEST::LinkProperties()
     QTest::qWait(500);
     sleep++;
   }
-  // link has at least 7 properties
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
   // check the box link properties
@@ -751,7 +737,8 @@ void ModelListWidget_TEST::LinkProperties()
       modelName + "::" + boxLinkName, false, true, false, true,
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
- // change box link properties
+  // change box link properties
+  // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
       modelName + "::" + boxLinkName, true, false, true, true,
       gazebo::math::Pose(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
@@ -824,6 +811,7 @@ void ModelListWidget_TEST::LinkProperties()
       gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
 
  // change sphere link properties
+  // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
       modelName + "::" + sphereLinkName, true, false, true, false,
       gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));

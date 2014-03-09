@@ -147,6 +147,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelListWidget::~ModelListWidget()
 {
+  this->connections.clear();
   delete this->propMutex;
   delete this->receiveMutex;
 }
@@ -193,7 +194,6 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
                                           const std::string &/*_mode*/)
 {
   this->selectedEntityName = _name;
-
   this->propTreeBrowser->clear();
   if (!this->selectedEntityName.empty())
   {
@@ -729,7 +729,7 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
   }
 
   this->modelPub->Publish(msg);
-  std::cerr << msg.DebugString() << std::endl;
+  // std::cerr << msg.DebugString() << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1009,7 +1009,6 @@ void ModelListWidget::FillMsg(QtProperty *_item,
         dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
     ((msgs::Link*)(_message))->set_id(idItem->value().toInt());
-     // gui::get_entity_id(nameItem->valueText().toStdString()));
   }
   else if (_item->propertyName().toStdString() == "collision")
   {
@@ -1018,8 +1017,6 @@ void ModelListWidget::FillMsg(QtProperty *_item,
         dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
     ((msgs::Collision*)(_message))->set_id(idItem->value().toInt());
-    //((msgs::Collision*)_message)->set_id(
-    //  gui::get_entity_id(nameItem->valueText().toStdString()));
   }
 
   if (_item->propertyName().toStdString() == "geometry" &&
@@ -1397,6 +1394,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  // TODO: setting link name currently causes problems
+  item->setEnabled(false);
 
   // Self-collide
   item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
@@ -1537,6 +1536,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
 
+  // TODO: disable setting inertial properties until there are tests
+  // in place to verify the functionality
+  item->setEnabled(false);
+
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   inertialItem->addSubProperty(topItem);
@@ -1553,6 +1556,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     else
       this->propTreeBrowser->addProperty(prop);
 
+    // TODO: disable setting collision properties until there are tests
+    // in place to verify the functionality
+    prop->setEnabled(false);
+
     this->FillPropertyTree(_msg.collision(i), prop);
   }
 
@@ -1566,6 +1573,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
       _parent->addSubProperty(prop);
     else
       this->propTreeBrowser->addProperty(prop);
+
+    // TODO: disable setting visual properties until there are tests
+    // in place to verify the functionality
+    prop->setEnabled(false);
 
     this->FillPropertyTree(_msg.visual(i), prop);
   }
@@ -1943,6 +1954,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
                                            tr("name"));
   item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
+  // TODO: setting model name currently causes problems
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Bool,
                                            tr("is_static"));

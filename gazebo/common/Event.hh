@@ -96,6 +96,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~EventT();
 
+      /// \brief Reset the event by deleting all connections.
+      public: void Reset();
+
       /// \brief Connect a callback to this event
       /// \param[in] _subscriber Pointer to a callback function
       /// \return A Connection object, which will automatically call
@@ -442,6 +445,13 @@ namespace gazebo
     /// \brief Destructor. Deletes all the associated connections.
     template<typename T>
     EventT<T>::~EventT()
+    {
+      this->Reset();
+    }
+
+    /// \brief Reset. Deletes all the associated connections.
+    template<typename T>
+    void EventT<T>::Reset()
     {
       for (unsigned int i = 0; i < this->connections.size(); i++)
         delete this->connections[i];
