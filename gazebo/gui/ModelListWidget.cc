@@ -729,7 +729,6 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
   }
 
   this->modelPub->Publish(msg);
-  // std::cerr << msg.DebugString() << std::endl;
 }
 
 /////////////////////////////////////////////////
