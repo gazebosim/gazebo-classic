@@ -18,6 +18,7 @@
 #ifndef _MODELLISTWIDGET_TEST_HH_
 #define _MODELLISTWIDGET_TEST_HH_
 
+#include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
 class QtProperty;

@@ -194,7 +194,7 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
   // pose settings for canonical links should be disabled
   QCOMPARE(property->isEnabled(), !_canonical);
 
-  ///TODO check inertial, collision, visual properties
+  /// TODO check inertial, collision, visual properties
 }
 
 /////////////////////////////////////////////////
@@ -244,7 +244,7 @@ void ModelListWidget_TEST::SetLinkProperty(
     this->SetPoseProperty(propTreeBrowser, property->subProperties(), _pose);
   }
   QTest::qWait(1000);
-  ///TODO set inertial, collision, visual properties
+  /// TODO set inertial, collision, visual properties
 }
 
 
@@ -810,7 +810,7 @@ void ModelListWidget_TEST::LinkProperties()
       modelName + "::" + sphereLinkName, false, true, false, false,
       gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
 
- // change sphere link properties
+  // change sphere link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
       modelName + "::" + sphereLinkName, true, false, true, false,

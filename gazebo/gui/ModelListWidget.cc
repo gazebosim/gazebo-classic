@@ -1602,7 +1602,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
-   // id, store it but but make it hidden
+  // id, store it but but make it hidden
   QtBrowserItem *browserItem = NULL;
   item = this->variantManager->addProperty(QVariant::String, tr("id"));
   item->setValue(_msg.id());

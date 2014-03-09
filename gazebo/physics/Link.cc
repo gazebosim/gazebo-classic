@@ -782,7 +782,6 @@ void Link::FillMsg(msgs::Link &_msg)
 
   if (this->IsCanonicalLink())
     _msg.set_canonical(true);
-
 }
 
 //////////////////////////////////////////////////
