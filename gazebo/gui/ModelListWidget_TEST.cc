@@ -185,28 +185,29 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
     bool _canonical, const gazebo::math::Pose &_pose)
 {
+  //ignore checking link id in _properties[0]
   QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
+      static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("name"));
   QCOMPARE(property->valueText(), tr(_name.c_str()));
-  property = static_cast<QtVariantProperty *>(_properties[1]);
+  property = static_cast<QtVariantProperty *>(_properties[2]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("self_collide"));
   QCOMPARE(property->value().toBool(), _selfCollide);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
+  property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("gravity"));
   QCOMPARE(property->value().toBool(), _gravity);
-  property = static_cast<QtVariantProperty *>(_properties[3]);
+  property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("kinematic"));
   QCOMPARE(property->value().toBool(), _kinematic);
-  property = static_cast<QtVariantProperty *>(_properties[4]);
+  property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("canonical"));
   QCOMPARE(property->value().toBool(), _canonical);
-  property = static_cast<QtVariantProperty *>(_properties[5]);
+  property = static_cast<QtVariantProperty *>(_properties[6]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pose"));
   CheckPoseProperty(property->subProperties(), _pose);

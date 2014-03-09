@@ -1005,16 +1005,21 @@ void ModelListWidget::FillMsg(QtProperty *_item,
   if (_item->propertyName().toStdString() == "link")
   {
     QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtVariantProperty *idItem =
+        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
-    ((msgs::Link*)(_message))->set_id(
-      gui::get_entity_id(nameItem->valueText().toStdString()));
+    ((msgs::Link*)(_message))->set_id(idItem->value().toInt());
+     // gui::get_entity_id(nameItem->valueText().toStdString()));
   }
   else if (_item->propertyName().toStdString() == "collision")
   {
     QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtVariantProperty *idItem =
+        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
-    ((msgs::Collision*)_message)->set_id(
-      gui::get_entity_id(nameItem->valueText().toStdString()));
+    ((msgs::Collision*)(_message))->set_id(idItem->value().toInt());
+    //((msgs::Collision*)_message)->set_id(
+    //  gui::get_entity_id(nameItem->valueText().toStdString()));
   }
 
   if (_item->propertyName().toStdString() == "geometry" &&
@@ -1374,6 +1379,18 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   QtProperty *inertialItem = NULL;
   QtVariantProperty *item = NULL;
 
+  // id, store it but but make it hidden
+  QtBrowserItem *browserItem = NULL;
+  item = this->variantManager->addProperty(QVariant::String, tr("id"));
+  item->setValue(_msg.id());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  browserItem = this->propTreeBrowser->items(item)[0];
+  this->propTreeBrowser->setItemVisible(browserItem, false);
+
+  // name
   item = this->variantManager->addProperty(QVariant::String, tr("name"));
   item->setValue(_msg.name().c_str());
   if (_parent)
@@ -1575,6 +1592,18 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
+   // id, store it but but make it hidden
+  QtBrowserItem *browserItem = NULL;
+  item = this->variantManager->addProperty(QVariant::String, tr("id"));
+  item->setValue(_msg.id());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  browserItem = this->propTreeBrowser->items(item)[0];
+  this->propTreeBrowser->setItemVisible(browserItem, false);
+
+  // name
   item = this->variantManager->addProperty(QVariant::String,
                                            tr("name"));
   item->setValue(_msg.name().c_str());
