@@ -1462,6 +1462,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     this->propTreeBrowser->addProperty(inertialItem);
 
+  // TODO: disable setting inertial properties until there are tests
+  // in place to verify the functionality
+  inertialItem->setEnabled(false);
+
   // Inertial::Mass
   item = this->variantManager->addProperty(QVariant::Double, tr("mass"));
   if (_msg.inertial().has_mass())
@@ -1535,10 +1539,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
-
-  // TODO: disable setting inertial properties until there are tests
-  // in place to verify the functionality
-  item->setEnabled(false);
 
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
