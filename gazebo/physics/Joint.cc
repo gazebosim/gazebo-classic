@@ -148,9 +148,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[0] = limitElem->Get<double>("upper");
+      this->lowerLimit[0] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[0] = limitElem->Get<double>("stiffness");
       this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[0] = limitElem->Get<double>("effort");
+      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
   if (_sdf->HasElement("axis2"))
@@ -167,9 +173,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[1] = limitElem->Get<double>("upper");
+      this->lowerLimit[1] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[1] = limitElem->Get<double>("stiffness");
       this->stopDissipation[1] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[1] = limitElem->Get<double>("effort");
+      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -277,19 +289,12 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->Get<double>("upper");
-      this->lowerLimit[0] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(0, this->upperLimit[0].Radian());
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
-
-      this->effortLimit[0] = limitElem->Get<double>("effort");
-      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -301,19 +306,12 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->Get<double>("upper");
-      this->lowerLimit[1] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(1, this->upperLimit[1].Radian());
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
-
-      this->effortLimit[1] = limitElem->Get<double>("effort");
-      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -711,6 +709,21 @@ double Joint::GetStiffness(unsigned int _index)
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get stiffness coefficient.\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetSpringReferencePosition(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->springReferencePosition[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get spring reference position.\n";
     return 0;
   }
 }

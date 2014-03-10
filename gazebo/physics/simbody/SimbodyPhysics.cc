@@ -845,6 +845,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           gzJoint->damper[nj] =
             Force::MobilityLinearDamper(this->forces, mobod, nj,
                                      gzJoint->GetDamping(nj));
+          // add spring (stiffness proportional to mass)
+          gzJoint->spring[nj] =
+            Force::MobilityLinearSpring(this->forces, mobod, nj,
+              gzJoint->GetStiffness(nj),
+              gzJoint->GetSpringReferencePosition(nj));
         }
       }
       else if (type == "revolute")
@@ -881,11 +886,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "prismatic")
       {
@@ -918,11 +923,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "ball")
       {
