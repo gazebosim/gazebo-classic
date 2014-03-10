@@ -1127,7 +1127,7 @@ void ODEJoint::CFMDamping()
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::HasImplicitStiffnessDamping()
+bool ODEJoint::UsesImplicitSprintDamper()
 {
   return this->useImplicitSpringDamper;
 }
