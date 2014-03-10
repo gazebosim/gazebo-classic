@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_FFMPEG_INC_HH_
 #define _GAZEBO_FFMPEG_INC_HH_
 
-#pragma clang system_header
+#pragma GCC system_header
 
 #ifdef HAVE_FFMPEG
 #ifndef INT64_C
