@@ -17,9 +17,10 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/physics/Joint.hh"
-#include "gazebo/physics/ScrewJoint.hh"
-#include "test/integration/helper_physics_generator.hh"
+#// include "gazebo/physics/Joint.hh"
+// #include "gazebo/physics/ScrewJoint.hh"
+#include "ServerFixture.hh"
+#include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -34,11 +35,6 @@ class JointTestScrew : public ServerFixture,
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJoint1(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Bullet Screw Joint is not yet working.  See issue #992.\n";
-    return;
-  }
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 
@@ -56,11 +52,6 @@ void JointTestScrew::ScrewJoint1(const std::string &_physicsEngine)
   // simulate 1 step
   world->Step(1);
   double t = world->GetSimTime().Double();
-
-
-  /// \TODO: FIXME: simbody loses joint limits after resetting simulation
-  /// Add a test to check joint limits after calling Joint::Reset()
-
 
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
@@ -154,12 +145,11 @@ void JointTestScrew::ScrewJoint1(const std::string &_physicsEngine)
 
 TEST_P(JointTestScrew, ScrewJoint1)
 {
-  ScrewJoint1(this->physicsEngine);
+  ScrewJoint1(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestScrew,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("")));
+  PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

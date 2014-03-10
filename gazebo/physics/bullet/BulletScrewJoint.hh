@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~BulletScrewJoint();
 
       /// \brief Load the BulletScrewJoint
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Init();
@@ -65,20 +65,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetThreadPitch();
-
-      /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Get the rate of change
       public: virtual double GetVelocity(unsigned int _index) const;

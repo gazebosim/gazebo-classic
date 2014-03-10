@@ -38,6 +38,7 @@ set(tests
   joint_revolute.cc
   joint_spawn.cc
   joint_test.cc
+  joint_screw.cc
   joint_universal.cc
   laser.cc
   model_database.cc
