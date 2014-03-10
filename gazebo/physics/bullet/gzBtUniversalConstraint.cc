@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include <iostream>
 #include "gazebo/physics/bullet/gzBtUniversalConstraint.hh"
 
@@ -9,9 +26,9 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
     const btVector3 &_axis2)
 : btGeneric6DofConstraint(_rbA, _rbB, btTransform::getIdentity(),
     btTransform::getIdentity(), true),
- m_anchor(_anchor),
- m_axis1(_axis1),
- m_axis2(_axis2)
+  m_anchor(_anchor),
+  m_axis1(_axis1),
+  m_axis2(_axis2)
 {
   this->maxMotorImpulse[0] = 0;
   this->maxMotorImpulse[1] = 0;
@@ -34,9 +51,9 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
   btVector3 xAxis = yAxis.cross(zAxis);
   btTransform frameInW;
   frameInW.setIdentity();
-  frameInW.getBasis().setValue(  xAxis[0], yAxis[0], zAxis[0],
-                  xAxis[1], yAxis[1], zAxis[1],
-                  xAxis[2], yAxis[2], zAxis[2]);
+  frameInW.getBasis().setValue(xAxis[0], yAxis[0], zAxis[0],
+                               xAxis[1], yAxis[1], zAxis[1],
+                               xAxis[2], yAxis[2], zAxis[2]);
   frameInW.setOrigin(_anchor);
 
   // now get constraint frame in local coordinate systems
@@ -56,9 +73,9 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
 gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbB,
     const btVector3 &_anchor, const btVector3 &_axis1, const btVector3 &_axis2)
 : btGeneric6DofConstraint(_rbB, btTransform::getIdentity(), true),
- m_anchor(_anchor),
- m_axis1(_axis1),
- m_axis2(_axis2)
+  m_anchor(_anchor),
+  m_axis1(_axis1),
+  m_axis2(_axis2)
 {
   this->maxMotorImpulse[0] = 0;
   this->maxMotorImpulse[1] = 0;

@@ -102,7 +102,6 @@ void BulletUniversalJoint::Init()
 
   // Setup Joint force and torque feedback
   this->SetupJointFeedback();
-
 }
 
 //////////////////////////////////////////////////

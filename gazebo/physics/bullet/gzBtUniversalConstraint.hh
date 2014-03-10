@@ -19,8 +19,8 @@
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 
-ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint :
-public btGeneric6DofConstraint
+ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
+: public btGeneric6DofConstraint
 {
   public: BT_DECLARE_ALIGNED_ALLOCATOR();
 
