@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FFMPEG_INC_HH
-#define _GAZEBO_FFMPEG_INC_HH
+#ifndef _GAZEBO_FFMPEG_INC_HH_
+#define _GAZEBO_FFMPEG_INC_HH_
 
 #pragma clang system_header
 
