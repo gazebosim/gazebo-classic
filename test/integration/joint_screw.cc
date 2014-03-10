@@ -35,6 +35,14 @@ class JointTestScrew : public ServerFixture,
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJoint1(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody Screw Joint test needs work,"
+          << " in particular, SetWorldPose appears broken."
+          << " See issue #857.\n";
+    return;
+  }
+
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 
