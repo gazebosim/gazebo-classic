@@ -49,7 +49,7 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -74,7 +74,7 @@ double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
@@ -113,7 +113,7 @@ void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-  if (_index < static_cast<int>(this->GetAngleCount()) &&
+  if (_index < this->GetAngleCount() &&
       this->physicsInitialized)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -138,7 +138,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < static_cast<int>(this->GetAngleCount()))
+      _index < this->GetAngleCount())
   {
     const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
       this->simbodyPhysics->integ->getState());
@@ -151,7 +151,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    if (_index >= static_cast<int>(this->GetAngleCount()))
+    if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -187,7 +187,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index < static_cast<int>(this->GetAngleCount()))
+  if (_index < this->GetAngleCount())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -211,9 +211,9 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetThreadPitch(unsigned int _index)
+double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  return this->threadPitch;
+  return this->GetThreadPitch();
 }
 
 //////////////////////////////////////////////////
