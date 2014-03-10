@@ -716,7 +716,7 @@ double Joint::GetStiffness(unsigned int _index)
 //////////////////////////////////////////////////
 double Joint::GetSpringReferencePosition(unsigned int _index) const
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     return this->springReferencePosition[_index];
   }
