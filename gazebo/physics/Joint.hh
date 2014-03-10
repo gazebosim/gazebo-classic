@@ -525,11 +525,6 @@ namespace gazebo
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
-      /// \brief Get spring reference (neutral) position
-      /// \param[in] _index joint axis index.
-      /// \return reference position
-      public: double GetSpringReferencePosition(unsigned int _index) const;
-
       /// \brief Returns this joint's spring potential energy,
       /// based on reference position.
       /// \return this joint's spring potential energy,
