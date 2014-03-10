@@ -4,11 +4,14 @@
 #define UNIV_EPS btScalar(0.01f)
 
 /////////////////////////////////////////////////
-gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB, const btVector3& anchor, const btVector3& axis1, const btVector3& axis2)
-: btGeneric6DofConstraint(rbA, rbB, btTransform::getIdentity(), btTransform::getIdentity(), true),
- m_anchor(anchor),
- m_axis1(axis1),
- m_axis2(axis2)
+gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
+    btRigidBody &_rbB, const btVector3 &_anchor, const btVector3 &_axis1,
+    const btVector3 &_axis2)
+: btGeneric6DofConstraint(_rbA, _rbB, btTransform::getIdentity(),
+    btTransform::getIdentity(), true),
+ m_anchor(_anchor),
+ m_axis1(_axis1),
+ m_axis2(_axis2)
 {
   this->maxMotorImpulse[0] = 0;
   this->maxMotorImpulse[1] = 0;
@@ -34,11 +37,11 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody& rbA, btRigidBody& 
   frameInW.getBasis().setValue(  xAxis[0], yAxis[0], zAxis[0],
                   xAxis[1], yAxis[1], zAxis[1],
                   xAxis[2], yAxis[2], zAxis[2]);
-  frameInW.setOrigin(anchor);
+  frameInW.setOrigin(_anchor);
 
   // now get constraint frame in local coordinate systems
-  m_frameInA = rbA.getCenterOfMassTransform().inverse() * frameInW;
-  m_frameInB = rbB.getCenterOfMassTransform().inverse() * frameInW;
+  m_frameInA = _rbA.getCenterOfMassTransform().inverse() * frameInW;
+  m_frameInB = _rbB.getCenterOfMassTransform().inverse() * frameInW;
 
   // sei limits
   setLinearLowerLimit(btVector3(0., 0., 0.));

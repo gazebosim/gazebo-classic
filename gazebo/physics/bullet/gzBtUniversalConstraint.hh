@@ -32,11 +32,11 @@ public btGeneric6DofConstraint
   /// \param[in] _axis1 First axis of rotation.
   /// \param[in] _axis2 Second axis of rotation.
   public: gzBtUniversalConstraint(
-              btRigidBody& rbA,
-              btRigidBody& rbB,
-              const btVector3& anchor,
-              const btVector3& axis1,
-              const btVector3& axis2);
+              btRigidBody &_rbA,
+              btRigidBody &_rbB,
+              const btVector3 &_anchor,
+              const btVector3 &_axis1,
+              const btVector3 &_axis2);
 
   /// \brief Constructor
   /// \param[in] _rbB Rigid body B, also known as the child link.
