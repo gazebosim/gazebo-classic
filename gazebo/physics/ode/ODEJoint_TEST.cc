@@ -67,9 +67,9 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   physics::JointPtr joint_1 = model_1->GetJoint("joint_1");
 
   EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_0)->
-      HasImplicitStiffnessDamping());
+      UsesImplicitSpringDamper());
   EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_1)->
-      HasImplicitStiffnessDamping());
+      UsesImplicitSpringDamper());
 
   gzdbg << "-------------------Test 1 (y)-------------------\n";
   physics->SetGravity(math::Vector3(0, 10, 0));
