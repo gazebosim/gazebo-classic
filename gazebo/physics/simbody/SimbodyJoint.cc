@@ -496,7 +496,6 @@ void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 
   if (_index < this->GetAngleCount())
   {
-    Joint::SetHighStop(_index, _angle);
     if (this->physicsInitialized)
     {
       this->limitForce[_index].setBounds(
@@ -505,7 +504,7 @@ void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
+      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
     }
   }
   else
@@ -519,7 +518,6 @@ void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 
   if (_index < this->GetAngleCount())
   {
-    Joint::SetLowStop(_index, _angle);
     if (this->physicsInitialized)
     {
       this->limitForce[_index].setBounds(
@@ -543,7 +541,8 @@ math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -558,7 +557,8 @@ math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
   else
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
   }
 }
 
@@ -569,7 +569,8 @@ math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -584,6 +585,7 @@ math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
   else
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
   }
 }
