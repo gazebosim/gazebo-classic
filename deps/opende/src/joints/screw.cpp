@@ -124,16 +124,19 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
                                      node[1].body,
                                      axis1, qrel );
         // from angle, update cumulative_angle, which does not wrap
-        cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
+        cumulative_angle = cumulative_angle +
+          shortest_angular_distance(cumulative_angle,angle);
 
-        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle, limot.lostop, limot.histop);
+        // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle,
+        //   limot.lostop, limot.histop);
 
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
 
         // FIXME: reset does not reset joint angle if more than 2pi
         // printf("cumulative angle: %f  lo: %f  hi:  %f test: %f\n",
-        //  cumulative_angle, limot.lostop, limot.histop, limot.testRotationalLimit( cumulative_angle ));
+        //   cumulative_angle, limot.lostop, limot.histop,
+        //   limot.testRotationalLimit( cumulative_angle ));
     }
 
     /* uncommnet to enforce slider joint limit
@@ -238,11 +241,15 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
         {
             // get body2 + offset point in global coordinates
             dMultiply0_331 ( q, node[1].body->posr.R, offset );
-            //printf("debug offset q[%f %f %f] p0[%f %f %f] p1[%f %f %f] \t",q[0],q[1],q[2],
-            //    node[0].body->posr.pos[0], node[0].body->posr.pos[1], node[0].body->posr.pos[2],
-            //    node[1].body->posr.pos[0], node[1].body->posr.pos[1], node[1].body->posr.pos[2]);
+            //printf("debug offset q[%f %f %f] p0[%f %f %f] p1[%f %f %f] \t",
+            //  q[0],q[1],q[2],
+            //  node[0].body->posr.pos[0], node[0].body->posr.pos[1],
+            //  node[0].body->posr.pos[2],
+            //  node[1].body->posr.pos[0], node[1].body->posr.pos[1],
+            //  node[1].body->posr.pos[2]);
             for ( int ii = 0; ii < 3; ++ii )
-              q[ii] = node[0].body->posr.pos[ii] - q[ii] - node[1].body->posr.pos[ii];
+              q[ii] = node[0].body->posr.pos[ii] - q[ii] -
+                node[1].body->posr.pos[ii];
         }
         else
         {
@@ -287,7 +294,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
         for (int i = 0; i < 3; i++ ) info->J2l[s0+i] = -p[i];
         for (int i = 0; i < 3; i++ ) info->J2l[s1+i] = -q[i];
 
-        // screw constraint: now constrain the sliding axis by rotation of the other body
+        // screw constraint:
+        // constrain the sliding axis by rotation of the other body
         for (int i = 0; i < 3; i++ ) info->J2a[s2+i] =  ax1[i]*thread_pitch;
         for (int i = 0; i < 3; i++ ) info->J2l[s2+i] = -ax1[i];
       }
@@ -308,8 +316,10 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       // printf ("tmpp %f %f %f\n", tmpp[0], tmpp[1], tmpp[2]);
       // printf ("p %f %f %f\n", p[0], p[1], p[2]);
       // printf ("q %f %f %f\n", q[0], q[1], q[2]);
-      // printf ("J1a[s0] %f %f %f\n", info->J1a[s0+0], info->J1a[s0+1], info->J1a[s0+2]);
-      // printf ("J1a[s1] %f %f %f\n", info->J1a[s1+0], info->J1a[s1+1], info->J1a[s1+2]);
+      // printf ("J1a[s0] %f %f %f\n", info->J1a[s0+0], info->J1a[s0+1],
+      //   info->J1a[s0+2]);
+      // printf ("J1a[s1] %f %f %f\n", info->J1a[s1+0], info->J1a[s1+1],
+      //   info->J1a[s1+2]);
       // info->J1a[s0+0] = 1;
       // info->J1a[s0+1] = 0;
       // info->J1a[s0+2] = 0;
@@ -321,10 +331,13 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       for (int i = 0; i < 3; i++ ) info->J1l[s0+i] = p[i];
       for (int i = 0; i < 3; i++ ) info->J1l[s1+i] = q[i];
 
-      // screw constraint: now constrain the sliding axis by rotation of the other body
+      // screw constraint:
+      // now constrain the sliding axis by rotation of the other body
       for (int i = 0; i < 3; i++ ) info->J1l[s2+i] = ax1[i];
       for (int i = 0; i < 3; i++ ) info->J1a[s2+i] = -ax1[i]*thread_pitch;
-      //printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",thread_pitch*lin_disp, cumulative_angle, lin_err, (int)this->use_damping, thread_pitch);
+      // printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",
+      //   thread_pitch*lin_disp, cumulative_angle, lin_err,
+      //   (int)this->use_damping, thread_pitch);
 
       // compute last two elements of right hand side. we want to align the offset
       // point (in body 2's frame) with the center of body 1.
@@ -338,7 +351,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           // error between body anchors
           dVector3 error12;
           for (int i = 0; i < 3; ++i)
-            error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] - node[0].body->posr.pos[i];
+            error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] -
+              node[0].body->posr.pos[i];
 
           // error in the p direction is error12 dot p
           info->c[0] = k * (dCalcVectorDot3(error12, p));
@@ -360,7 +374,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
           // error of body's anchor
           dVector3 error1;
-          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] - node[0].body->posr.pos[i];
+          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] -
+            node[0].body->posr.pos[i];
           // printf ("error1 %f %f %f\n", error1[0], error1[1], error1[2]);
 
           // error in the p direction is error1 dot p
@@ -391,7 +406,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->J2ld[1] = -ax1[1];
           info->J2ld[2] = -ax1[2];
         }
-        // there's no rhs for damping setup, all we want to use is the jacobian information above
+        // there's no rhs for damping setup, all we want to use is the
+        // jacobian information above
       }
       */
     }
@@ -479,7 +495,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->J2ad[1] = -ax1[1];
           info->J2ad[2] = -ax1[2];
         }
-        // there's no rhs for damping setup, all we want to use is the jacobian information above
+        // there's no rhs for damping setup, all we want to use is
+        // the jacobian information above
       }
     }
 }
@@ -496,7 +513,8 @@ void dJointSetScrewAnchor( dJointID j, dReal x, dReal y, dReal z )
 }
 
 
-void dJointSetScrewAnchorDelta( dJointID j, dReal x, dReal y, dReal z, dReal dx, dReal dy, dReal dz )
+void dJointSetScrewAnchorDelta( dJointID j, dReal x, dReal y, dReal z,
+  dReal dx, dReal dy, dReal dz )
 {
     dxJointScrew* joint = ( dxJointScrew* )j;
     dUASSERT( joint, "bad joint argument" );
@@ -674,8 +692,10 @@ dReal dJointGetScrewAngleRate( dJointID j )
         dVector3 axis;
         dMultiply0_331( axis, joint->node[0].body->posr.R, joint->axis1 );
         dReal rate = dCalcVectorDot3( axis, joint->node[0].body->avel );
-        if ( joint->node[1].body ) rate -= dCalcVectorDot3( axis, joint->node[1].body->avel );
-        if ( joint->flags & dJOINT_REVERSE ) rate = - rate;
+        if (joint->node[1].body)
+          rate -= dCalcVectorDot3( axis, joint->node[1].body->avel );
+        if (joint->flags & dJOINT_REVERSE)
+          rate = - rate;
         return rate;
     }
     else return 0;
@@ -695,7 +715,7 @@ dReal dJointGetScrewPosition ( dJointID j )
 
     dMultiply0_331 ( ax1, joint->node[0].body->posr.R, joint->axis1 );
 
-    if ( joint->node[1].body )
+    if (joint->node[1].body)
     {
         // get body2 + offset point in global coordinates
         dMultiply0_331 ( q, joint->node[1].body->posr.R, joint->offset );
@@ -713,8 +733,8 @@ dReal dJointGetScrewPosition ( dJointID j )
         if ( joint->flags & dJOINT_REVERSE )
         {
             // N.B. it could have been simplier to only inverse the sign of
-            //      the dCalcVectorDot3 result but this case is exceptional and doing
-            //      the check for all case can decrease the performance.
+            //      the dCalcVectorDot3 result but this case is exceptional and
+            //      doing the check for all case can decrease the performance.
             ax1[0] = -ax1[0];
             ax1[1] = -ax1[1];
             ax1[2] = -ax1[2];
@@ -798,9 +818,12 @@ void dJointAddScrewForce ( dJointID j, dReal force )
         dVector3 ltd; // Linear Torque Decoupling vector (a torque)
 
         dVector3 cgdiff;
-        cgdiff[0] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[0] - joint->node[0].body->posr.pos[0] );
-        cgdiff[1] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[1] - joint->node[0].body->posr.pos[1] );
-        cgdiff[2] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[2] - joint->node[0].body->posr.pos[2] );
+        cgdiff[0] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[0] -
+          joint->node[0].body->posr.pos[0] );
+        cgdiff[1] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[1] -
+          joint->node[0].body->posr.pos[1] );
+        cgdiff[2] = REAL ( 0.5 ) * ( joint->node[1].body->posr.pos[2] -
+          joint->node[0].body->posr.pos[2] );
         dCalcVectorCross3( ltd, cgdiff, axis );
 
         dBodyAddTorque ( joint->node[0].body, ltd[0], ltd[1], ltd[2] );

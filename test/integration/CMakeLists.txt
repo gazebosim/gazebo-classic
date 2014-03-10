@@ -34,11 +34,11 @@ set(tests
   file_handling.cc
   gripper.cc
   imu.cc
+  joint_screw.cc
   joint_force_torque.cc
   joint_revolute.cc
   joint_spawn.cc
   joint_test.cc
-  joint_screw.cc
   joint_universal.cc
   laser.cc
   model_database.cc
