@@ -15,10 +15,10 @@ if ARGV.size < 2
 end
 
 # Two weeks in seconds
-two_weeks = 1209600
+two_weeks = 2*7*24*60*60
 
 # One day in seconds
-one_day = 86400
+one_day = 24*60*60
 
 # Timestamp of the last snapshot
 last_snapshot = 0
