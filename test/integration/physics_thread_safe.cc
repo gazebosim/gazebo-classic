@@ -29,6 +29,7 @@ class PhysicsThreadSafeTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
   /// \brief Load a blank world and try to change gravity.
+  /// The test passes if it doesn't seg-fault.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void BlankWorld(const std::string &_physicsEngine);
 
@@ -49,6 +50,8 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // The following lines cause a seg-fault on revision 031749b
+  // This test passes if it doesn't seg-fault.
   math::Vector3 g = physics->GetGravity();
   physics->SetGravity(g);
 }
