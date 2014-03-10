@@ -149,6 +149,13 @@ namespace gazebo
       /// \brief default mobilizer pose
       public: SimTK::Transform defxAB;
 
+      /// \brief: Spring force element for enforcing joint stiffness.
+      /// The element is assigned when constructing Simbody model in
+      /// SimbodyPhysics::AddDynamicModelToSimbodySystem.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom springs for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearSpring spring[MAX_JOINT_AXIS];
+
       /// \brief: for enforcing joint damping forces.
       /// Set when we build the Simbody model.
       /// \TODO: Also, consider moving this into individual joint type subclass
@@ -182,6 +189,20 @@ namespace gazebo
 
       // Keeps track if simbody physics has been initialized
       public: bool physicsInitialized;
+
+      // Documentation inherited.
+      public: virtual void SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;
