@@ -199,11 +199,11 @@ filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-
 
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
-if (UNIX)
+if (UNIX AND NOT APPLE)
   filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${VALID_CXX_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
 
 #################################################
 # OS Specific initialization

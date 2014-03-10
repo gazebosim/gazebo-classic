@@ -159,7 +159,9 @@ endforeach()
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 # Need to add default visibility to gazebo_msgs
-my_add_compile_flags(gazebo_msgs "-fvisibility=default")
+if (UNIX AND NOT APPLE)
+  my_add_compile_flags(gazebo_msgs "-fvisibility=default")
+endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
