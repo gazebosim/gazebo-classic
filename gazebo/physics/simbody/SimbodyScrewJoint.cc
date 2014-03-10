@@ -192,7 +192,6 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
     {
-      gzerr << "Get " << _index << "\n";
       return math::Angle(this->mobod.getOneQ(
         this->simbodyPhysics->integ->getState(), _index));
     }
