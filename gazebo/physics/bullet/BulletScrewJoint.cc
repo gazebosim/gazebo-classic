@@ -66,6 +66,9 @@ namespace gazebo
           const btVector3& linVelB,
           btScalar rbAinvMass,btScalar rbBinvMass);
 
+      public: btScalar getAngle1();
+      public: btScalar getAngle2();
+
       public: virtual void setThreadPitch(double _threadPitch)
       {
         this->threadPitch = _threadPitch;
@@ -353,14 +356,41 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
+math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
   if (this->bulletScrew)
-    result = this->bulletScrew->getLinearPos();
+  {
+    if (_index == 0)
+    {
+      // angular position
+      result = this->bulletScrew->getAngle2();
+    }
+    else if (_index == 1)
+    {
+      // linear position
+      result = this->bulletScrew->getAngle1();
+    }
+  }
   else
     gzerr << "bulletScrew not created yet\n";
   return result;
+}
+
+//////////////////////////////////////////////////
+btScalar btScrewConstraint::getAngle1()
+{
+  this->calculateTransforms(
+    m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
+  return this->getLinearPos();
+}
+
+//////////////////////////////////////////////////
+btScalar btScrewConstraint::getAngle2()
+{
+  this->calculateTransforms(
+    m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
+  return this->getAngularPos();
 }
 
 //////////////////////////////////////////////////
