@@ -18,6 +18,7 @@
 #ifndef _SIMBODY_SCREWJOINT_HH_
 #define _SIMBODY_SCREWJOINT_HH_
 
+#include <string>
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 

@@ -22,6 +22,7 @@
 #ifndef _ODESCREWJOINT_HH_
 #define _ODESCREWJOINT_HH_
 
+#include <string>
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 

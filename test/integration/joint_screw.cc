@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#// include "gazebo/physics/Joint.hh"
+// #include "gazebo/physics/Joint.hh"
 // #include "gazebo/physics/ScrewJoint.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
