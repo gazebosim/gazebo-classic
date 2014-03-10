@@ -922,18 +922,6 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetSpringReferencePosition(unsigned int _index) const
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Get spring potential error, _index[" << _index
-          << "] out of range" << std::endl;
-    return 0;
-  }
-  return this->springReferencePosition[_index];
-}
-
-//////////////////////////////////////////////////
 double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
