@@ -82,44 +82,6 @@ void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
-{
-/*
-  dVector3 result;
-  if (_index == 0)
-    dJointGetGearboxAnchor1(this->jointId, result);
-  else if (_index == 1)
-    dJointGetGearboxAnchor2(this->jointId, result);
-  else
-    gzerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
-  return math::Vector3(result[0], result[1], result[2]);
-*/
-
-  gzerr << "GetAnchor not implmented.\n";
-  return math::Vector3();
-}
-
-//////////////////////////////////////////////////
-void ODEGearboxJoint::SetAnchor(unsigned int /*_index*/,
-                                const math::Vector3 &/*_anchor*/)
-{
-/* anchor not used/needed in gearbox
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
-
-  if (_index == 0)
-    dJointSetGearboxAnchor1(this->jointId, _anchor.x, _anchor.y, _anchor.z);
-  else if (_index == 1)
-    dJointSetGearboxAnchor2(this->jointId, _anchor.x, _anchor.y, _anchor.z);
-  else
-    gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
-*/
-}
-
-
-//////////////////////////////////////////////////
 math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
@@ -129,7 +91,7 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else if (_index == 1)
     dJointGetGearboxAxis2(this->jointId, result);
   else
-    gzerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
+    gzerr << "index [" << _index << "] out of range\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -161,7 +123,7 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
       globalAxis.z);
   }
   else
-    gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
+    gzerr << "index [" << _index << "] out of range\n";
 }
 
 //////////////////////////////////////////////////
