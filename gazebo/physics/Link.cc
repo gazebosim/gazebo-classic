@@ -1118,11 +1118,11 @@ double Link::GetWorldEnergyPotential() const
 {
   // compute gravitational potential energy for link CG location
   // use origin as reference position
-  // E = m g^T z
+  // E = -m g^T z
   double m = this->GetInertial()->GetMass();
   math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
-  math::Vector3 z = this->GetWorldPose().pos;
-  return m * g.Dot(z);
+  math::Vector3 z = this->GetWorldCoGPose().pos;
+  return -m * g.Dot(z);
 }
 
 /////////////////////////////////////////////////
@@ -1134,7 +1134,7 @@ double Link::GetWorldEnergyKinetic() const
   // E = 1/2 m v^T v
   {
     double m = this->GetInertial()->GetMass();
-    math::Vector3 v = this->GetWorldLinearVel();
+    math::Vector3 v = this->GetWorldCoGLinearVel();
     energy += 0.5 * m * v.Dot(v);
   }
 
