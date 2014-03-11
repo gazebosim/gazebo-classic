@@ -86,30 +86,6 @@ void SimbodyScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(unsigned int /*_index*/)
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(unsigned int /*_index*/)
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
 void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";

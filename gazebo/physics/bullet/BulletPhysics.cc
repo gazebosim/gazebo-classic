@@ -279,6 +279,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
 
 //////////////////////////////////////////////////
