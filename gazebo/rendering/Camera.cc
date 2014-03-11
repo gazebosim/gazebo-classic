@@ -383,8 +383,11 @@ void Camera::Update()
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
 
-    double currPitch = this->GetWorldRotation().GetAsEuler().y;
-    double currYaw = this->GetWorldRotation().GetAsEuler().z;
+    Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+    math::Quaternion localRot = math::Quaternion(
+      localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+    double currPitch = localRot.GetAsEuler().y;
+    double currYaw = localRot.GetAsEuler().z;
 
     double pitchError = currPitch - pitch;
 
@@ -410,7 +413,9 @@ void Camera::Update()
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 pos = this->GetWorldPosition() + displacement;
+    math::Vector3 localPos =
+      Conversions::Convert(this->sceneNode->_getDerivedPosition());
+    math::Vector3 pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -1529,7 +1534,10 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   math::Vector3 rpy = _pose.rot.GetAsEuler();
   math::Vector3 start = this->GetWorldPose().pos;
 
-  double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
+  Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+  math::Quaternion localRot = math::Quaternion(
+    localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+  double dyaw =  localRot.GetAsEuler().z - rpy.z;
 
   if (dyaw > M_PI)
     rpy.z += 2*M_PI;
@@ -1608,7 +1616,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   double dt = _time / (_pts.size()-1);
   double tt = 0;
 
-  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
+  Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+  math::Quaternion localRot = math::Quaternion(
+    localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+  double prevYaw = localRot.GetAsEuler().z;
   for (unsigned int j = 0; j < _pts.size(); j++)
   {
     math::Vector3 pos = _pts[j].pos;

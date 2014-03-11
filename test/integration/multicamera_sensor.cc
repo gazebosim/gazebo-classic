@@ -71,7 +71,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   // get two cameras, one with rotation and one without.
   std::string cameraUnrotated = "multicamera_sensor_unrotated";
-  std::string cameraTranslated = "multicamera_sensor_translated";
+  std::string cameraTranslated = "camera_sensor_translated";
   std::string cameraRotated1 = "multicamera_sensor_rotated1";
   std::string cameraRotated2 = "multicamera_sensor_rotated2";
 
@@ -311,6 +311,113 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
   delete[] img0Right;
   delete[] img1Right;
   delete[] img2Right;
+}
+
+/////////////////////////////////////////////////
+TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
+{
+  // this test checks Camera::GetWorldRotation and other
+  // world pose functions.
+  // motivated by issue #1087
+
+  Load("worlds/camera_rotation_test.world");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get two cameras, one with rotation and one without.
+  std::string modelUnrotated = "cam_x_rot_test_unrotated_cameras_1";
+  std::string multicameraUnrotated = "multicamera_sensor_unrotated";
+
+  std::string modelTranslated = "cam_x_rot_test_translated_camera_1";
+  std::string cameraTranslated = "camera_sensor_translated";
+
+  std::string modelRotated1 = "cam_x_rot_test_rotated_cameras_1";
+  std::string multicameraRotated1 = "multicamera_sensor_rotated1";
+
+  std::string modelRotated2 = "cam_x_rot_test_rotated_cameras_2";
+  std::string multicameraRotated2 = "multicamera_sensor_rotated2";
+
+  physics::ModelPtr model1 = world->GetModel(modelUnrotated);
+  sensors::SensorPtr sensor1 = sensors::get_sensor(multicameraUnrotated);
+  sensors::MultiCameraSensorPtr multicamera1 =
+    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
+
+  physics::ModelPtr model2 = world->GetModel(modelTranslated);
+  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraTranslated);
+  sensors::CameraSensorPtr camera2 =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+
+  physics::ModelPtr model3 = world->GetModel(modelRotated1);
+  sensors::SensorPtr sensor3 = sensors::get_sensor(multicameraRotated1);
+  sensors::MultiCameraSensorPtr multicamera3 =
+    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
+
+  physics::ModelPtr model4 = world->GetModel(modelRotated2);
+  sensors::SensorPtr sensor4 = sensors::get_sensor(multicameraRotated2);
+  sensors::MultiCameraSensorPtr multicamera4 =
+    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
+
+  // check poses in world frame
+  // each multicamera have 2 cameras
+  EXPECT_EQ(model1->GetWorldPose(),
+    multicamera1->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(),
+    sensor1->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose() + multicamera1->GetPose(),
+    multicamera1->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), multicamera1->GetCamera(1)->GetWorldPose());
+  gzdbg << "model1 [" << model1->GetWorldPose()
+        << "] sensor1 [" << sensor1->GetPose() + model1->GetWorldPose()
+        << "] multicamera1 ["
+        << multicamera1->GetPose() + model1->GetWorldPose()
+        << "] camera1 WorldPose [" << multicamera1->GetCamera(0)->GetWorldPose()
+        << "] camera2 WorldPose [" << multicamera1->GetCamera(1)->GetWorldPose()
+        << "]\n";
+  EXPECT_EQ(model2->GetWorldPose(),
+    camera2->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model2->GetWorldPose(),
+    sensor2->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), camera2->GetCamera()->GetWorldPose());
+  gzdbg << "model2 [" << model2->GetWorldPose()
+        << "] sensor2 [" << sensor2->GetPose() + model1->GetWorldPose()
+        << "] camera2 [" << camera2->GetPose() + model1->GetWorldPose()
+        << "] camera WorldPose [" << camera2->GetCamera()->GetWorldPose()
+        << "]\n";
+  EXPECT_EQ(model3->GetWorldPose(),
+    multicamera3->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model3->GetWorldPose(),
+    sensor3->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), multicamera3->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), multicamera3->GetCamera(1)->GetWorldPose());
+  gzdbg << "model3 [" << model3->GetWorldPose()
+        << "] sensor3 [" << sensor3->GetPose() + model1->GetWorldPose()
+        << "] multicamera3 ["
+        << multicamera3->GetPose() + model1->GetWorldPose()
+        << "] camera1 WorldPose [" << multicamera3->GetCamera(0)->GetWorldPose()
+        << "] camera2 WorldPose [" << multicamera3->GetCamera(1)->GetWorldPose()
+        << "]\n";
+  EXPECT_EQ(model4->GetWorldPose(),
+    multicamera4->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model4->GetWorldPose(),
+    sensor4->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), multicamera4->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
+  gzdbg << "model4 [" << model4->GetWorldPose()
+        << "] sensor4 [" << sensor4->GetPose() + model1->GetWorldPose()
+        << "] multicamera4 ["
+        << multicamera4->GetPose() + model1->GetWorldPose()
+        << "] camera1 WorldPose [" << multicamera4->GetCamera(0)->GetWorldPose()
+        << "] camera2 WorldPose [" << multicamera4->GetCamera(1)->GetWorldPose()
+        << "]\n";
 }
 
 /////////////////////////////////////////////////
