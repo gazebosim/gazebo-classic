@@ -28,6 +28,7 @@ endif()
 
 set(tests
   bandwidth.cc
+  concave_mesh.cc
   contact_sensor.cc
   dem.cc
   factory.cc
@@ -46,6 +47,7 @@ set(tests
   nondefault_world.cc
   physics.cc
   physics_friction.cc
+  physics_link.cc
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
@@ -57,6 +59,7 @@ set(tests
   transceiver.cc
   transport.cc
   world.cc
+  world_entity_below_point.cc
   worlds_installed.cc
   )
 

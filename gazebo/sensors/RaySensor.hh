@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Nate Koenig
- * Date: 23 february 2004
-*/
-
 #ifndef _RAYSENSOR_HH_
 #define _RAYSENSOR_HH_
 
