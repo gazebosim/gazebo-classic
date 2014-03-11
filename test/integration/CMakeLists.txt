@@ -28,6 +28,7 @@ endif()
 
 set(tests
   bandwidth.cc
+  concave_mesh.cc
   contact_sensor.cc
   dem.cc
   factory.cc

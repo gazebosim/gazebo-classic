@@ -29,6 +29,7 @@ class PhysicsThreadSafeTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
   /// \brief Load a blank world and try to change gravity.
+  /// The test passes if it doesn't seg-fault.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void BlankWorld(const std::string &_physicsEngine);
 
@@ -49,6 +50,8 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // The following lines cause a seg-fault on revision 031749b
+  // This test passes if it doesn't seg-fault.
   math::Vector3 g = physics->GetGravity();
   physics->SetGravity(g);
 }
@@ -63,9 +66,6 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-
-  math::Vector3 g = physics->GetGravity();
-  physics->SetGravity(0*g);
 
   // Unthrottle the update rate
   physics->SetRealTimeUpdateRate(0);
@@ -92,8 +92,6 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
     vel += link->GetWorldLinearVel(math::Vector3(), math::Quaternion());
     vel += link->GetWorldCoGLinearVel();
     vel += link->GetWorldAngularVel();
-    vel += physics->GetGravity();
-    physics->SetGravity(math::Vector3(0, 0, -9.81));
   }
 }
 
