@@ -1051,7 +1051,7 @@ size_t Model::GetGripperCount() const
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergyPotential()
+double Model::GetWorldEnergyPotential() const
 {
   double e = 0;
   for (Link_V::iterator iter = this->links.begin();
@@ -1065,7 +1065,7 @@ double Model::GetWorldEnergyPotential()
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergyKinetic()
+double Model::GetWorldEnergyKinetic() const
 {
   double e = 0;
   for (Link_V::iterator iter = this->links.begin();
@@ -1075,7 +1075,7 @@ double Model::GetWorldEnergyKinetic()
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergy()
+double Model::GetWorldEnergy() const
 {
   double e = 0;
   for (Link_V::iterator iter = this->links.begin();

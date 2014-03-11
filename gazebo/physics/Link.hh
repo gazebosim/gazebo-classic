@@ -470,15 +470,15 @@ namespace gazebo
       /// \brief Returns this link's potential energy,
       /// based on position in world frame and gravity.
       /// \return this link's potential energy,
-      public: double GetWorldEnergyPotential();
+      public: double GetWorldEnergyPotential() const;
 
       /// \brief Returns this link's kinetic energy
       /// \return this link's kinetic energy
-      public: double GetWorldEnergyKinetic();
+      public: double GetWorldEnergyKinetic() const;
 
       /// \brief Returns this link's total energy
       /// \return this link's total energy
-      public: double GetWorldEnergy();
+      public: double GetWorldEnergy() const;
 
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise

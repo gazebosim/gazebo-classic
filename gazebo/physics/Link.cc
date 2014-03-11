@@ -1114,7 +1114,7 @@ void Link::SetScale(const math::Vector3 &_scale)
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergyPotential()
+double Link::GetWorldEnergyPotential() const
 {
   // compute potential energy for link CG location
   math::Vector3 pos = this->GetWorldPose().pos;
@@ -1125,7 +1125,7 @@ double Link::GetWorldEnergyPotential()
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergyKinetic()
+double Link::GetWorldEnergyKinetic() const
 {
   // compute potential energy for link CG location
   math::Vector3 linVel = this->GetWorldLinearVel();
@@ -1149,7 +1149,7 @@ double Link::GetWorldEnergyKinetic()
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergy()
+double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }
