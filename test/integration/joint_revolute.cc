@@ -64,7 +64,7 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
     SpawnJointOptions opt;
     opt.type = "revolute";
     opt.worldParent = true;
-    double Am = 0*M_PI / 4;
+    double Am = M_PI / 4;
     opt.modelPose.rot.SetFromEuler(0, 0, Am);
     opt.childLinkPose.pos.z = 3.0;
     opt.jointPose.pos.y = 1.5;
@@ -77,16 +77,18 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
     // Get initial energy
     physics::LinkPtr link = joint->GetChild();
     ASSERT_TRUE(link);
+    physics::ModelPtr model = link->GetModel();
+    ASSERT_TRUE(model);
 
-    double energy0 = link->GetWorldEnergy();
-    EXPECT_NEAR(link->GetWorldEnergyKinetic(), 0.0, g_tolerance);
+    double energy0 = model->GetWorldEnergy();
+    EXPECT_NEAR(model->GetWorldEnergyKinetic(), 0.0, g_tolerance);
 
     unsigned int stepSize = 5;
     unsigned int stepCount = 500;
     for (unsigned int i = 0; i < stepCount; ++i)
     {
       world->Step(stepSize);
-      double energy = link->GetWorldEnergy();
+      double energy = model->GetWorldEnergy();
       EXPECT_NEAR(energy / energy0, 1.0, g_tolerance);
     }
   }
