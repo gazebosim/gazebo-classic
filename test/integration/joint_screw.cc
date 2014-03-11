@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#// include "gazebo/physics/Joint.hh"
+// #include "gazebo/physics/Joint.hh"
 // #include "gazebo/physics/ScrewJoint.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
@@ -35,6 +35,14 @@ class JointTestScrew : public ServerFixture,
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJoint1(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody Screw Joint test needs work,"
+          << " in particular, SetWorldPose appears broken."
+          << " See issue #857.\n";
+    return;
+  }
+
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 
