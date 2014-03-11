@@ -1,5 +1,4 @@
 
-
 /*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
@@ -411,22 +410,34 @@ ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
 
 
 /**
- * @brief Set the tolerance of when sor lcp stops
- * @param num The default is 1 chunk
+ * @brief Get the tolerance of when sor lcp stops
+ * @param dWorldID world id
  */
-void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
+ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
+
+/**
+ * @brief Set a tolerance to stop quickstep iterations.
+ * PGS iteration stops when the RMS of \Delta \lambda in the
+ * quickstep inner iteration (see dWorldGetQuickStepRMSError)
+ * is less than the tolerance specified here.
+ * The units of tolerance is the same as units of \lambda,
+ * which is in units of force.
+ * @param dWorldID world id
+ * @param dReal tolerance
+ */
+ODE_API void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
 
 /**
  * @brief Set the number of chunks quickstep divide up constraint rows
  * @param num The default is 1 chunk
  */
-void dWorldSetQuickStepNumChunks (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumChunks (dWorldID, int num);
 
 /**
  * @brief Set the number of overlap when quickstep divide up constraint rows
  * @param num The default is 0 overlap
  */
-void dWorldSetQuickStepNumOverlap (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumOverlap (dWorldID, int num);
 
 /**
  * @brief Get the maximum number of iterations that the RobustStep method 
@@ -492,11 +503,129 @@ ODE_API void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
 ODE_API dReal dWorldGetQuickStepW (dWorldID);
 
 /**
- * @brief Get the RMS error of the quickstep step
+ * @brief Get the RMS of \Delta \lambda of the quickstep step
+ * Given dLambda is measures by (b_i - a_{ij} lambda_j)/a_{ii}
+ * it's a reasonable measure for the linear system we are solving
+ * via PGS.  Note the dLambda used are post-projection.
+ * The unit of errors are the same as the units of forces.
  * @ingroup world
  * @returns the rms error
  */
-ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
+ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
+
+/**
+ * @brief Get the RMS of Jv of the quickstep step
+ * Bug: projection is not taken in to account for
+ * unilateral contact normal and frictional solutions.
+ * I.e. if two bodies constrained by contact normal are moving
+ * apart, the positive separation velocity shows up as error.
+ * Please fix.
+ * The unit of constraint residuals are same as the units of velocities.
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API dReal *dWorldGetQuickStepRMSConstraintResidual (dWorldID);
+
+/**
+ * @brief Get the min of Ax-b of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API int dWorldGetQuickStepNumContacts (dWorldID);
+
+/* PGS experimental parameters */
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to tru to turn on inertia ratio reduction.
+ */
+ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
+
+/**
+ * @brief Set friction residual exponential smoothing coefficient
+ * @ingroup world
+ * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
+ */
+ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
+
+/**
+ * @brief Turn on experimental row reordering, so within one sweep,
+ * follwoing ordering of constraints are used:
+ *   1. bilateral constrains
+ *   2. all contact normal constrains
+ *   3. all friction force constrains
+ * otherwise, use standard reordering
+ *   1. bilateral constrains
+ *   2. sweep each contact sequentially.  For each contact,
+ *      solve normal constraint followed by 2 friciton constraints.
+ * @ingroup world
+ * @param reorder set to true to turn on experimental row reordering
+ */
+ODE_API bool dWorldGetQuickStepExperimentalRowReordering (dWorldID);
+
+/**
+ * @brief Set warm start scaling coefficient
+ * @ingroup world
+ * @param warm 0: turn off warm starting, anything else is a scaling factor
+ * for lambda from previous time step.
+ */
+ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
+
+/**
+ * @brief Set extra friciton constraint iterations within each time step,
+ * to be done after initial sweeps.
+ * @ingroup world
+ * @param iterations extra constraint iterations for friction rows after
+ * default sweep.
+ */
+ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to tru to turn on inertia ratio reduction.
+ */
+ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
+
+/**
+ * @brief Set friction residual exponential smoothing coefficient
+ * @ingroup world
+ * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
+ */
+ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Turn on experimental row reordering, so within one sweep,
+ * follwoing ordering of constraints are used:
+ *   1. bilateral constrains
+ *   2. all contact normal constrains
+ *   3. all friction force constrains
+ * otherwise, use standard reordering
+ *   1. bilateral constrains
+ *   2. sweep each contact sequentially.  For each contact,
+ *      solve normal constraint followed by 2 friciton constraints.
+ * @ingroup world
+ * @param reorder set to true to turn on experimental row reordering
+ */
+ODE_API void dWorldSetQuickStepExperimentalRowReordering (dWorldID, bool order);
+
+/**
+ * @brief Set warm start scaling coefficient
+ * @ingroup world
+ * @param warm 0: turn off warm starting, anything else is a scaling factor
+ * for lambda from previous time step.
+ */
+ODE_API void dWorldSetQuickStepWarmStartFactor (dWorldID, dReal warm);
+
+/**
+ * @brief Set extra friciton constraint iterations within each time step,
+ * to be done after initial sweeps.
+ * @ingroup world
+ * @param iterations extra constraint iterations for friction rows after
+ * default sweep.
+ */
+ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
 
 /* World contact parameter functions */
 
