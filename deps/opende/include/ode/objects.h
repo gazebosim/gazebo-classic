@@ -1,5 +1,4 @@
 
-
 /*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
@@ -417,7 +416,12 @@ ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
 ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
 
 /**
- * @brief Set the tolerance of when sor lcp stops.  When 
+ * @brief Set a tolerance to stop quickstep iterations.
+ * PGS iteration stops when the RMS of \Delta \lambda in the
+ * quickstep inner iteration (see dWorldGetQuickStepRMSError)
+ * is less than the tolerance specified here.
+ * The units of tolerance is the same as units of \lambda,
+ * which is in units of force.
  * @param dWorldID world id
  * @param dReal tolerance
  */
