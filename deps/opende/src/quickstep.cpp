@@ -534,6 +534,10 @@ static void ComputeRows(
   int m                        = params.m; // m used for rms error computation
 #endif
   // int nb                       = params.nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dReal stepsize               = params.stepsize;
+  dRealMutablePtr vnew         = params.vnew;
+#endif
   int* jb                      = params.jb;
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
@@ -560,6 +564,53 @@ static void ComputeRows(
   dRealMutablePtr last_lambda_erp  = params.last_lambda_erp;
 #endif
 
+  //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
+  //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
+  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
+
+
+
+  /*  DEBUG PRINTOUTS
+  // print J_orig
+  printf("J_orig\n");
+  for (int i=startRow; i<startRow+nRows; i++) {
+    for (int j=0; j < 12 ; j++) {
+      printf("  %12.6f",J_orig[i*12+j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
+  printf("J_precon\n");
+  for (int i=startRow; i<startRow+nRows; i++) {
+    for (int j=0; j < 12 ; j++) {
+      printf("  %12.6f",J_precon[i*12+j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("J\n");
+  for (int i=startRow; i<startRow+nRows; i++) {
+    for (int j=0; j < 12 ; j++) {
+      printf("  %12.6f",J[i*12+j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("rhs_precon\n");
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("  %12.6f",rhs_precon[i]);
+  printf("\n");
+
+  printf("rhs\n");
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("  %12.6f",rhs[i]);
+  printf("\n");
+  */
+
   double rms_error = 0;
   int num_iterations = qs->num_iterations;
   int precon_iterations = qs->precon_iterations;
@@ -573,6 +624,9 @@ static void ComputeRows(
 #ifdef INSTRUMENT
   errors.resize(num_iterations + precon_iterations); 
 #endif
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dReal Jvnew_final = 0;
+#endif
   for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
 
     rms_error = 0;
@@ -580,24 +634,88 @@ static void ComputeRows(
     if (iteration < precon_iterations) preconditioning = true;
     else                               preconditioning = false;
 
+#ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
+    // constraints with findex < 0 always come first.
+    if (iteration < 2) {
+      // for the first two iterations, solve the constraints in
+      // the given order
+      IndexError *ordercurr = order+startRow;
+      for (int i = startRow; i != startRow+nRows; ordercurr++, i++) {
+        ordercurr->error = i;
+        ordercurr->findex = findex[i];
+        ordercurr->index = i;
+      }
+    }
+    else {
+      // sort the constraints so that the ones converging slowest
+      // get solved last. use the absolute (not relative) error.
+      for (int i=startRow; i<startRow+nRows; i++) {
+        dReal v1 = dFabs (lambda[i]);
+        dReal v2 = dFabs (last_lambda[i]);
+        dReal max = (v1 > v2) ? v1 : v2;
+        if (max > 0) {
+          //@@@ relative error: order[i].error = dFabs(lambda[i]-last_lambda[i])/max;
+          order[i].error = dFabs(lambda[i]-last_lambda[i]);
+        }
+        else {
+          order[i].error = dInfinity;
+        }
+        order[i].findex = findex[i];
+        order[i].index = i;
+      }
+    }
+
+    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("=====> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+
+    qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
+
+    //@@@ potential optimization: swap lambda and last_lambda pointers rather
+    //    than copying the data. we must make sure lambda is properly
+    //    returned to the caller
+    memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
+
+    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("-----> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+
+#endif
 #ifdef RANDOMLY_REORDER_CONSTRAINTS
     if ((iteration & 7) == 0) {
       #ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
         boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every swap
       #endif
+      //  int swapi = dRandInt(i+1); // swap across engire matrix
       for (int i=startRow+1; i<startRow+nRows; i++) { // swap within boundary of our own segment
         int swapi = dRandInt(i+1-startRow)+startRow; // swap within boundary of our own segment
+        //printf("xxxxxxxx>id %d swaping order[%d].index=%d order[%d].index=%d\n",thread_id,i,order[i].index,swapi,order[swapi].index);
         IndexError tmp = order[i];
         order[i] = order[swapi];
         order[swapi] = tmp;
       }
+
+      // {
+      //   // verify
+      //   boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
+      //   printf("  random id %d iter %d\n",thread_id,iteration);
+      //   for (int i=startRow+1; i<startRow+nRows; i++)
+      //     printf(" %5d,",i);
+      //   printf("\n");
+      //   for (int i=startRow+1; i<startRow+nRows; i++)
+      //     printf(" %5d;",(int)order[i].index);
+      //   printf("\n");
+      // }
     }
 #endif
+
     dRealMutablePtr caccel_ptr1;
     dRealMutablePtr caccel_ptr2;
     dRealMutablePtr caccel_erp_ptr1;
     dRealMutablePtr caccel_erp_ptr2;
 
+#ifdef PENETRATION_JVERROR_CORRECTION
+    dRealMutablePtr vnew_ptr1;
+    dRealMutablePtr vnew_ptr2;
+    const dReal stepsize1 = dRecip(stepsize);
+    dReal Jvnew = 0;
+#endif
     dRealMutablePtr cforce_ptr1;
     dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
@@ -620,6 +738,10 @@ static void ComputeRows(
         caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
         caccel_erp_ptr1 = caccel_erp + 6*b1;
         caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+#ifdef PENETRATION_JVERROR_CORRECTION
+        vnew_ptr1 = vnew + 6*b1;
+        vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
+#endif
         cforce_ptr1 = cforce + 6*b1;
         cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
@@ -795,8 +917,14 @@ static void ComputeRows(
                 Jvnew = dot6(vnew_ptr1,J_ptr);
                 if (caccel_ptr2)
                   Jvnew += dot6(vnew_ptr2,J_ptr+6);
+                //printf("iter [%d] findex [%d] Jvnew [%f] lo [%f] hi [%f]\n",
+                //       iteration, findex[index], Jvnew, lo[index], hi[index]);
               }
             }
+            //printf("iter [%d] vnew [%f,%f,%f,%f,%f,%f] Jvnew [%f]\n",
+            //       iteration,
+            //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
+            //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
 #endif
 
           }
@@ -868,6 +996,8 @@ static void ComputeRows(
         }
       }
 
+
+
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
@@ -899,6 +1029,25 @@ static void ComputeRows(
     rms_error = sqrt(rms_error/(dReal)nRows);
 #endif
 
+    //printf("------ %d %d %20.18f\n",thread_id,iteration,rms_error);
+
+    //for (int i=startRow; i<startRow+nRows; i++) printf("debug: %d %f\n",i,delta_error[i]);
+
+
+    //{
+    //  // verify
+    //  boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
+    //  printf("  random id %d iter %d\n",thread_id,iteration);
+    //  for (int i=startRow+1; i<startRow+nRows; i++)
+    //    printf(" %10d,",i);
+    //  printf("\n");
+    //  for (int i=startRow+1; i<startRow+nRows; i++)
+    //    printf(" %10d;",order[i].index);
+    //  printf("\n");
+    //  for (int i=startRow+1; i<startRow+nRows; i++)
+    //    printf(" %10.8f,",delta_error[i]);
+    //  printf("\n%f\n",rms_error);
+    //}
     #ifdef INSTRUMENT
     errors[iteration] = rms_error;
     #endif
@@ -956,7 +1105,6 @@ static void ComputeRows(
 //
 // rhs, lo and hi are modified on exit
 //
-
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
   dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
@@ -1219,6 +1367,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     IFTIMING( dTimerOperations( this_nb * (  qs->num_iterations + qs->precon_iterations)) );
   }
   #endif
+
 #ifdef USE_TPROW
   IFTIMING (dTimerNow ("wait for threads"));
   if (row_threadpool && row_threadpool->size() > 0)
@@ -1282,7 +1431,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 	initptr(&ptr_n);
 */	
 //	if ((*ptr_n)==5)
-    IFTIMING(dTimerStart("preprocessing"));
+  IFTIMING(dTimerStart("preprocessing"));
 
   const dReal stepsize1 = dRecip(stepsize);
 
@@ -1389,7 +1538,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
     nj = jicurr - jointiinfos;
   }
-
 
   context->ShrinkArray<dJointWithInfo1>(jointiinfos, _nj, nj);
 
@@ -1583,6 +1731,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dIASSERT (jb_ptr == jb+2*m);
         //printf("jjjjjjjjj %d %d\n",jb[0],jb[1]);
       }
+
+
 
    IFTIMING (dTimerNow ("Dump data"));
 //  if ((*ptr_n)==5) 
@@ -1949,6 +2099,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dSetZero (b_ptr->tacc,3);
     }
   }
+
  // if ((*ptr_n)==5){
   IFTIMING (dTimerEnd());
   static int count = 0;
