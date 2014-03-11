@@ -90,9 +90,6 @@ namespace gazebo
       /// \return _threadPitch Thread pitch value.
       public: virtual double GetThreadPitch() = 0;
 
-      /// \brief The anchor value is not used internally.
-      protected: math::Vector3 fakeAnchor;
-
       /// \brief Pitch of the thread.
       protected: double threadPitch;
 
