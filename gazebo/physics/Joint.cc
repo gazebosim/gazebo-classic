@@ -949,7 +949,9 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   }
 
   // compute potential energy due to spring compression
-  return this->stiffnessCoefficient[_index] *
-    fabs(this->GetAngle(_index).Radian() -
-    this->springReferencePosition[_index]);
+  // 1/2 k x^2
+  double k = this->stiffnessCoefficient[_index];
+  double x = this->GetAngle(_index).Radian() - 
+    this->springReferencePosition[_index];
+  return 0.5 * k * x * x;
 }
