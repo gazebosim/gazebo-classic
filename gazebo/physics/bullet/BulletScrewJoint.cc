@@ -66,8 +66,8 @@ namespace gazebo
           const btVector3& linVelB,
           btScalar rbAinvMass,btScalar rbBinvMass);
 
-      public: btScalar getAngle1();
-      public: btScalar getAngle2();
+      public: btScalar getAngular();
+      public: btScalar getLinear();
 
       public: virtual void setThreadPitch(double _threadPitch)
       {
@@ -343,11 +343,10 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
   math::Vector3 result = this->initialWorldAxis;
   if (this->bulletScrew)
   {
-    // I have not verified the following math, though I based it on internal
-    // bullet code at line 250 of btHingeConstraint.cpp
+    // bullet uses x-axis for slider
     btVector3 vec =
-      this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis() *
-      this->bulletScrew->getFrameOffsetA().getBasis().getColumn(2);
+      this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis()
+      * this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
     result = BulletTypes::ConvertVector3(vec);
   }
   else
@@ -364,12 +363,12 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
     if (_index == 0)
     {
       // angular position
-      result = this->bulletScrew->getAngle2();
+      result = this->bulletScrew->getLinear();
     }
     else if (_index == 1)
     {
       // linear position
-      result = this->bulletScrew->getAngle1();
+      result = this->bulletScrew->getAngular();
     }
   }
   else
@@ -378,19 +377,25 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-btScalar btScrewConstraint::getAngle1()
+btScalar btScrewConstraint::getAngular()
 {
   this->calculateTransforms(
-    m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
+    m_rbA.getCenterOfMassTransform(), m_rbB.getCenterOfMassTransform());
+  // gzerr << this->threadPitch << " : " << this->getLinearPos() << "\n";
   return this->getLinearPos();
 }
 
 //////////////////////////////////////////////////
-btScalar btScrewConstraint::getAngle2()
+btScalar btScrewConstraint::getLinear()
 {
   this->calculateTransforms(
-    m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
-  return this->getAngularPos();
+    m_rbA.getCenterOfMassTransform(), m_rbB.getCenterOfMassTransform());
+  // gzerr << this->threadPitch << " : " << this->getLinearPos() << "\n";
+
+  /// \TODO: this might be off if pgs does not converge,
+  /// should use btHingeJoint's getHingeAngle()
+  /// or update getAngularPos().
+  return this->threadPitch * this->getLinearPos();
 }
 
 //////////////////////////////////////////////////
