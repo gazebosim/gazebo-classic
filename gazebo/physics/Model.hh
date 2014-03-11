@@ -306,6 +306,19 @@ namespace gazebo
       /// \sa Model::GetGripper()
       public: size_t GetGripperCount() const;
 
+      /// \brief Returns this link's potential energy,
+      /// based on position in world frame and gravity.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential();
+
+      /// \brief Returns this link's kinetic energy
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic();
+
+      /// \brief Returns this link's total energy
+      /// \return this link's total energy
+      public: double GetWorldEnergy();
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 

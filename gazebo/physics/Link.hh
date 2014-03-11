@@ -467,6 +467,19 @@ namespace gazebo
       /// \param[int] _name Name of the collision to remove.
       public: void RemoveCollision(const std::string &_name);
 
+      /// \brief Returns this link's potential energy,
+      /// based on position in world frame and gravity.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential();
+
+      /// \brief Returns this link's kinetic energy
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic();
+
+      /// \brief Returns this link's total energy
+      /// \return this link's total energy
+      public: double GetWorldEnergy();
+
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.

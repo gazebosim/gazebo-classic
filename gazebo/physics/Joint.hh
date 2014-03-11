@@ -514,6 +514,11 @@ namespace gazebo
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
+      /// \brief Returns this joint's spring potential energy,
+      /// based on reference position.
+      /// \return this joint's spring potential energy,
+      public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.

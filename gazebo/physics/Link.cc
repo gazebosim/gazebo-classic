@@ -1112,3 +1112,44 @@ void Link::SetScale(const math::Vector3 &_scale)
     this->visPub->Publish(msg);
   }*/
 }
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyPotential()
+{
+  // compute potential energy for link CG location
+  math::Vector3 pos = this->GetWorldPose().pos;
+  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  double height = pos.Dot(g.Normalize());
+  double m = this->GetInertial()->GetMass();
+  return 0.5 * m * g.GetLength() * height;
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyKinetic()
+{
+  // compute potential energy for link CG location
+  math::Vector3 linVel = this->GetWorldLinearVel();
+  math::Vector3 angVel = this->GetWorldAngularVel();
+  double m = this->GetInertial()->GetMass();
+  math::Matrix3 moi = this->GetInertial()->GetMOI();
+
+  double linKE = 0.5 * m * linVel.GetSquaredLength();
+
+  // todo: make this an operator
+  // compute tmp = w' * MOI
+  math::Vector3 tmp(
+    angVel.x * moi[0][0] + angVel.y * moi[1][0] + angVel.z * moi[2][0],
+    angVel.x * moi[0][1] + angVel.y * moi[1][1] + angVel.z * moi[2][1],
+    angVel.x * moi[0][2] + angVel.y * moi[1][2] + angVel.z * moi[2][2]);
+  // compute w' * MOI * w = tmp * w
+  double wIw = tmp.Dot(angVel);
+  double angKE = 0.5 * wIw;
+
+  return linKE + angKE;
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergy()
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}

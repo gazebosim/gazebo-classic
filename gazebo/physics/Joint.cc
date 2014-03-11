@@ -937,3 +937,19 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 
   return this->GetWorldPose().rot;
 }
+
+//////////////////////////////////////////////////
+double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Get spring potential error, _index[" << _index
+          << "] out of range" << std::endl;
+    return 0;
+  }
+
+  // compute potential energy due to spring compression
+  return this->stiffnessCoefficient[_index] *
+    fabs(this->GetAngle(_index).Radian() -
+    this->springReferencePosition[_index]);
+}
