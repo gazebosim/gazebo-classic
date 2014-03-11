@@ -84,6 +84,9 @@ namespace gazebo
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index);
       /// \brief Set the screw force
       protected: virtual void SetForceImpl(unsigned int _index, double _force);
 
