@@ -165,7 +165,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   // TODO simbody currently fails this test
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting LinkProperties test for Simbody" << std::endl;;
+    gzerr << "Aborting LinkProperties test for Simbody" << std::endl;
     return;
   }
 
@@ -173,11 +173,9 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  // set gravity to zero
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-//  physics->SetGravity(math::Vector3::Zero);
 
   // spawn a box
   std::string name = "test_box";
@@ -201,7 +199,6 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   {
     // gravity mode should be enabled by default
     EXPECT_TRUE(link->GetGravityMode());
-
 
     // TODO Bullet currently fails this test
     if (_physicsEngine != "bullet")
