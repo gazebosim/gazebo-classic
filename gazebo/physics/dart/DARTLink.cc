@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -254,8 +255,10 @@ void DARTLink::OnPoseChange()
 
   if (joint->getJointType() == dart::dynamics::Joint::FREE)
   {
+    // If the parent joint is free joint, set the 6 dof to fit the target pose.
     dart::dynamics::FreeJoint* freeJoint =
         dynamic_cast<dart::dynamics::FreeJoint*>(joint);
+    GZ_ASSERT(freeJoint, "The parent joint is not free joint.");
 
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
     const Eigen::Isometry3d &T1 = joint->getTransformFromParentBodyNode();
@@ -266,15 +269,18 @@ void DARTLink::OnPoseChange()
       P = this->dtBodyNode->getParentBodyNode()->getWorldTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
-    Eigen::Vector6d t = Eigen::Vector6d::Zero();
-    t.tail<3>() = Q.translation();
-    t.head<3>() = dart::math::logMap(Q.linear());
-    freeJoint->set_q(t);
+    freeJoint->set_q(dart::math::logMap(Q));
+  }
+  else if (joint->getNumGenCoords() > 0)
+  {
+    // If the parent joint is not free joint (nor weld joint), set the n dof
+    // as minimal value that makes the link's pose close to the target pose.
+    const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
   }
   else
   {
-    gzdbg << "DARTLink::OnPoseChange() doesn't make sense unless the link has "
-          << "free joint.\n";
+    gzdbg << "DARTLink::OnPoseChange() doesn't make sense if the dof of the "
+          << "parent joint is 0.\n";
   }
 }
 
