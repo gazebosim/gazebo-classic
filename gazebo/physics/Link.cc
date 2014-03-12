@@ -1114,42 +1114,43 @@ void Link::SetScale(const math::Vector3 &_scale)
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergyPotential()
+double Link::GetWorldEnergyPotential() const
 {
-  // compute potential energy for link CG location
-  math::Vector3 pos = this->GetWorldPose().pos;
+  // compute gravitational potential energy for link CG location
+  // use origin as reference position
+  // E = -m g^T z
+  double m = this->GetInertial()->GetMass();
   math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
-  double height = pos.Dot(g.Normalize());
-  double m = this->GetInertial()->GetMass();
-  return 0.5 * m * g.GetLength() * height;
+  math::Vector3 z = this->GetWorldCoGPose().pos;
+  return -m * g.Dot(z);
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergyKinetic()
+double Link::GetWorldEnergyKinetic() const
 {
-  // compute potential energy for link CG location
-  math::Vector3 linVel = this->GetWorldLinearVel();
-  math::Vector3 angVel = this->GetWorldAngularVel();
-  double m = this->GetInertial()->GetMass();
-  math::Matrix3 moi = this->GetInertial()->GetMOI();
+  double energy = 0.0;
 
-  double linKE = 0.5 * m * linVel.GetSquaredLength();
+  // compute linear kinetic energy
+  // E = 1/2 m v^T v
+  {
+    double m = this->GetInertial()->GetMass();
+    math::Vector3 v = this->GetWorldCoGLinearVel();
+    energy += 0.5 * m * v.Dot(v);
+  }
 
-  // todo: make this an operator
-  // compute tmp = w' * MOI
-  math::Vector3 tmp(
-    angVel.x * moi[0][0] + angVel.y * moi[1][0] + angVel.z * moi[2][0],
-    angVel.x * moi[0][1] + angVel.y * moi[1][1] + angVel.z * moi[2][1],
-    angVel.x * moi[0][2] + angVel.y * moi[1][2] + angVel.z * moi[2][2]);
-  // compute w' * MOI * w = tmp * w
-  double wIw = tmp.Dot(angVel);
-  double angKE = 0.5 * wIw;
+  // compute angular kinetic energy
+  // E = 1/2 w^T I w
+  {
+    math::Vector3 w = this->GetWorldAngularVel();
+    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    energy += 0.5 * w.Dot(I * w);
+  }
 
-  return linKE + angKE;
+  return energy;
 }
 
 /////////////////////////////////////////////////
-double Link::GetWorldEnergy()
+double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }
