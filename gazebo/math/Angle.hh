@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <iostream>
+#include "gazebo/util/system.hh"
 
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
@@ -48,7 +49,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
-  class Angle
+  class GAZEBO_VISIBLE Angle
   {
     /// \brief math::Angle(0)
     public: static const Angle Zero;

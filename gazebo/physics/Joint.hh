@@ -31,6 +31,7 @@
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 /// \brief maximum number of axis per joint anticipated.
 /// Currently, this is 2 as 3-axis joints (e.g. ball)
@@ -46,7 +47,7 @@ namespace gazebo
 
     /// \class Joint Joint.hh physics/physics.hh
     /// \brief Base class for all joints
-    class Joint : public Base
+    class GAZEBO_VISIBLE Joint : public Base
     {
       /// \enum Attribute
       /// \brief Joint attribute types.
@@ -194,6 +195,12 @@ namespace gazebo
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
       public: double GetStiffness(unsigned int _index);
+
+      /// \brief Get joint spring reference position.
+      /// \param[in] _index Index of the axis to get.
+      /// \return Joint spring reference position
+      /// (in radians for angular joints).
+      public: double GetSpringReferencePosition(unsigned int _index) const;
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.

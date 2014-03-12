@@ -23,6 +23,7 @@
 #include <utility>
 
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
 
     /// \class Skeleton Skeleton.hh common/common.hh
     /// \brief A skeleton
-    class Skeleton
+    class GAZEBO_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();
@@ -166,7 +167,7 @@ namespace gazebo
 
     /// \class SkeletonNode Skeleton.hh common/common.hh
     /// \brief A skeleton node
-    class SkeletonNode
+    class GAZEBO_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};
@@ -351,7 +352,7 @@ namespace gazebo
 
     /// \clas NodeTransform Skeleton.hh common/common.hh
     /// \brief A transformation node
-    class NodeTransform
+    class GAZEBO_VISIBLE NodeTransform
     {
       /// \brief Enumeration of the transform types
       public: enum TransformType {TRANSLATE, ROTATE, SCALE, MATRIX};

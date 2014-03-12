@@ -1122,6 +1122,12 @@ void ODEJoint::CFMDamping()
 }
 
 //////////////////////////////////////////////////
+bool ODEJoint::UsesImplicitSpringDamper()
+{
+  return this->useImplicitSpringDamper;
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::ApplyImplicitStiffnessDamping()
 {
   // check if we are violating joint limits
