@@ -1076,7 +1076,9 @@ double Model::GetWorldEnergyKinetic() const
   double e = 0;
   for (Link_V::const_iterator iter = this->links.begin();
     iter != this->links.end(); ++iter)
+  {
     e += (*iter)->GetWorldEnergyKinetic();
+  }
   return e;
 }
 
