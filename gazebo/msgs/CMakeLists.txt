@@ -128,14 +128,6 @@ macro(my_append_target_property target property str)
   endif()
 endmacro(my_append_target_property)
 
-###########################################################
-# Add/append compile flags to a target.
-# target: string: target name.
-# flags : string: compile flags to be appended
-macro(my_add_compile_flags target flags)
-  my_append_target_property(${target} COMPILE_FLAGS ${flags})
-endmacro(my_add_compile_flags)
-
 set(PROTO_SRCS)
 set(PROTO_HDRS)
 foreach(FIL ${msgs})
@@ -159,7 +151,12 @@ endforeach()
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 # Need to add default visibility to gazebo_msgs
-my_add_compile_flags(gazebo_msgs "-fvisibility=default")
+get_target_property(current_property gazebo_msgs COMPILE_FLAGS)
+if(NOT current_property) # property non-existent or empty
+  set_target_properties(gazebo_msgs PROPERTIES GENERATED TRUE COMPILE_FLAGS "-fvisibility=default")
+else()
+  set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
+endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
