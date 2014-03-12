@@ -36,6 +36,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/util/system.hh"
 
 namespace SkyX
 {
@@ -76,7 +77,7 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class Scene : public boost::enable_shared_from_this<Scene>
+    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,

@@ -22,6 +22,7 @@
 
 #include "Connection.hh"
 #include "CallbackHelper.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Handles sending data over the wire to
     /// remote subscribers
-    class SubscriptionTransport : public CallbackHelper
+    class GAZEBO_VISIBLE SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
       public: SubscriptionTransport();
