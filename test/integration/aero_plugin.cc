@@ -88,11 +88,11 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   double dihedral = 0.1;
   double rho = 1.2041;
   double area = 10;
-  double stall_v = 10.0;
+  // double stall_alpha = 10.0;
   double a0 = 0.1;
 
   // run for 100 seconds
-  for (unsigned int i = 0; i < 100000; ++i)
+  for (unsigned int i = 0; i < 2400; ++i)
   {
     world->Step(1);
     body->AddForce(math::Vector3(-1, 0, 0));
@@ -107,18 +107,29 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
       physics::JointWrench body_wrench = body_joint->GetForceTorque(0);
       physics::JointWrench wing_1_wrench = wing_1_joint->GetForceTorque(0);
       physics::JointWrench wing_2_wrench = wing_2_joint->GetForceTorque(0);
+      math::Pose wing_1_pose = wing_1->GetWorldPose();
+      math::Vector3 wing_1_force =
+        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Force);
+      math::Vector3 wing_1_torque =
+        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Torque);
+
+      math::Pose wing_2_pose = wing_2->GetWorldPose();
+      math::Vector3 wing_2_force =
+        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Force);
+      math::Vector3 wing_2_torque =
+        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Torque);
       gzdbg << "body velocity [" << body->GetWorldLinearVel()
             << "] cl [" << cl
             << "] cd [" << cd
             << "] body force [" << body_wrench.body2Force
             << "] body torque [" << body_wrench.body2Torque
-            << "] wing_1 force [" << wing_1_wrench.body2Force
-            << "] wing_1 torque [" << wing_1_wrench.body2Torque
-            << "] wing_2 force [" << wing_2_wrench.body2Force
-            << "] wing_2 torque [" << wing_2_wrench.body2Torque
+            << "] wing_1 force [" << wing_1_force
+            << "] wing_1 torque [" << wing_1_torque
+            << "] wing_2 force [" << wing_2_force
+            << "] wing_2 torque [" << wing_2_torque
             << "]\n";
-      EXPECT_NEAR(wing_1_wrench.body2Force.z, cl * cos(dihedral), TOL);
-      getchar();
+      
+      EXPECT_NEAR(wing_1_force.z, cl * cos(dihedral), TOL);
     }
   }
 }

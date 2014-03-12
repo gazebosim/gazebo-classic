@@ -1,12 +1,17 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>10 0 3 0 0 3.141592</pose>
+      </camera>
+    </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -1.00</gravity>
+      <gravity>0.0 0.0 -10.00</gravity>
       <ode>
         <solver>
           <type>quick</type>
-          <iters>50</iters>
+          <iters>100</iters>
           <sor>0.8</sor>
         </solver>
         <constraints>
@@ -22,10 +27,11 @@
     <include>
       <uri>model://sun</uri>
     </include>
-
+<!--
     <include>
       <uri>model://drc_terrain</uri>
     </include>
+-->
 
     <model name="ground_plane">
       <static>true</static>
@@ -34,7 +40,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>1000 1000</size>
+              <size>10000 10000</size>
             </plane>
           </geometry>
           <surface>
@@ -51,13 +57,13 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>1000 1000</size>
+              <size>10000 10000</size>
             </plane>
           </geometry>
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
+              <name>Gazebo/WoodFloor</name>
             </script>
           </material>
         </visual>
@@ -72,14 +78,14 @@
         <inertial>
           <pose>-1.5 0.0 0.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1.8</ixx>
+            <ixx>5.8</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyy>10.8</iyy>
             <iyz>0.0</iyz>
             <izz>10.8</izz>
           </inertia>
-          <mass>100.0</mass>
+          <mass>200.0</mass>
         </inertial>
         <collision name="collision">
           <geometry>
@@ -108,9 +114,9 @@
           </material>
         </visual>
         <sensor name="camera" type="camera">
-          <pose>-3 0 1.0 0 0.1 3.1416</pose>
+          <pose>15 0 1.0 0 0.1 3.1416</pose>
           <camera>
-            <horizontal_fov>1.047</horizontal_fov>
+            <horizontal_fov>1.347</horizontal_fov>
             <image>
               <width>320</width>
               <height>240</height>
@@ -426,7 +432,7 @@
             <lower>-1e16</lower>
             <upper>1e16</upper>
           </limit>
-          <xyz>1.0 0.0 0.0</xyz>
+          <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>0.0001</damping>
           </dynamics>
@@ -482,7 +488,7 @@
 
 
       <link name="wing_1">
-        <pose>3 0 1.5 0.1 0 0</pose>
+        <pose>3 0 1.5 0.3 0 0</pose>
         <inertial>
           <pose>0.0 5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -517,7 +523,7 @@
         </visual>
       </link>
       <link name="wing_2">
-        <pose>3 0 1.5 -0.1 0 0</pose>
+        <pose>3 0 1.5 -0.3 0 0</pose>
         <inertial>
           <pose>0.0 -5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -763,33 +769,34 @@
 
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <cla>0.100</cla>
+        <cla>10.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
         <forward>0 0 -1</forward>
-        <upward>1 0 0</upward>
+        <upward>-1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_1</link_name>
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <cla>0.100</cla>
+        <cla>10.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
         <air_density>1.2041</air_density>
-        <forward>0 0 -1</forward>
+        <!-- link flipped about z-axis 180 degrees -->
+        <forward>0 0 1</forward>
         <upward>1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_2</link_name>
       </plugin>
@@ -798,9 +805,9 @@
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 5.0 0</cp>
         <area>10</area>
@@ -814,9 +821,9 @@
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 -5.0 0</cp>
         <area>10</area>
@@ -826,13 +833,13 @@
         <link_name>lift_drag_demo_model::wing_2</link_name>
       </plugin>
       <plugin name="gazebo_wing_3" filename="libLiftDragPlugin.so">
-        <a0>0.01</a0>
+        <a0>0.02</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 1.5 0</cp>
         <area>3</area>
@@ -842,13 +849,13 @@
         <link_name>lift_drag_demo_model::wing_3</link_name>
       </plugin>
       <plugin name="gazebo_wing_4" filename="libLiftDragPlugin.so">
-        <a0>0.01</a0>
+        <a0>0.02</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 -1.5 0</cp>
         <area>3</area>
@@ -858,25 +865,22 @@
         <link_name>lift_drag_demo_model::wing_4</link_name>
       </plugin>
       <plugin name="gazebo_wing_5" filename="libLiftDragPlugin.so">
-        <a0>0.03</a0>
-        <cla>4.000</cla>
+        <!-- force turn -->
+        <a0>0.0</a0>
+        <cla>8.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
-        <alpha_stall>0.2</alpha_stall>
-        <cla_stall>-0.2</cla_stall>
-        <cda_stall>1.0</cda_stall>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0 1.0</cp>
         <area>3</area>
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
-        <upward>0 1 0</upward>
+        <upward>0 -1 0</upward>
         <link_name>lift_drag_demo_model::wing_5</link_name>
       </plugin>
-
-
-
-
 
     </model>
   </world>

@@ -90,9 +90,11 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<math::Vector3>("cp");
 
+  // blade forward (-drag) direction in link frame
   if (_sdf->HasElement("forward"))
     this->forward = _sdf->Get<math::Vector3>("forward");
 
+  // blade upward (+lift) direction in link frame
   if (_sdf->HasElement("upward"))
     this->upward = _sdf->Get<math::Vector3>("upward");
 
@@ -138,11 +140,11 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 forwardI = pose.rot.RotateVector(this->forward);
   math::Vector3 upwardI = pose.rot.RotateVector(this->upward);
 
-  // normal vector to lift-drag-plane described in inertial frame
-  math::Vector3 normal = forwardI.Cross(upwardI).Normalize();
+  // ldNormal vector to lift-drag-plane described in inertial frame
+  math::Vector3 ldNormal = forwardI.Cross(upwardI).Normalize();
 
   // check sweep (angle between vel and lift-drag-plane)
-  double sinSweepAngle = normal.Dot(vel) / vel.GetLength();
+  double sinSweepAngle = ldNormal.Dot(vel) / vel.GetLength();
 
   // get cos from trig identity
   double cosSweepAngle2 = (1.0 - sinSweepAngle * sinSweepAngle);
@@ -158,22 +160,22 @@ void LiftDragPlugin::OnUpdate()
   //  and
   // forward vector
   //
-  // projected = normal Xcross ( vector Xcross normal)
+  // projected = ldNormal Xcross ( vector Xcross ldNormal)
   //
   // so,
   // velocity in lift-drag plane (expressed in inertial frame) is:
-  math::Vector3 velInLDPlane = normal.Cross(vel.Cross(normal));
+  math::Vector3 velInLDPlane = ldNormal.Cross(vel.Cross(ldNormal));
 
   // get direction of drag
   math::Vector3 dragDirection = -velInLDPlane;
   dragDirection.Normalize();
 
   // get direction of lift
-  math::Vector3 liftDirection = normal.Cross(velInLDPlane);
+  math::Vector3 liftDirection = ldNormal.Cross(velInLDPlane);
   liftDirection.Normalize();
 
   // get direction of moment
-  math::Vector3 momentDirection = normal;
+  math::Vector3 momentDirection = ldNormal;
 
   double cosAlpha = math::clamp(
     forwardI.Dot(velInLDPlane) /
@@ -226,9 +228,6 @@ void LiftDragPlugin::OnUpdate()
   // compute lift force at cp
   math::Vector3 lift = cl * q * this->area * liftDirection;
 
-  // rotate into link frame
-  lift = pose.rot.RotateVector(lift);
-
   // compute cd at cp, check for stall, correct for sweep
   double cd;
   if (this->alpha > this->alphaStall)
@@ -251,9 +250,6 @@ void LiftDragPlugin::OnUpdate()
 
   // drag at cp
   math::Vector3 drag = cd * q * this->area * dragDirection;
-
-  // rotate into link frame
-  drag = pose.rot.RotateVector(drag);
 
   // compute cm at cp, check for stall, correct for sweep
   double cm;
@@ -288,31 +284,38 @@ void LiftDragPlugin::OnUpdate()
   // gzerr << this->cp << " : " << this->link->GetInertial()->GetCoG() << "\n";
 
   // force an torque about cg in inertial frame
-  math::Vector3 force = lift + drag + moment.Cross(momentArm);
-  math::Vector3 torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
+  math::Vector3 force = lift + drag; // + moment.Cross(momentArm);
+  math::Vector3 torque = moment; // - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   // debug
   //
-  // gzerr << "=============================\n";
-  // gzerr << "Link: [" << this->link->GetName()
-  //       << "] pose: [" << pose
-  //       << "] dynamic pressure: [" << q << "]\n";
-  // gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
-  // gzerr << "spd sweep: [" << velInLDPlane.GetLength()
-  //       << "] vel: [" << velInLDPlane << "]\n";
-  // gzerr << "forward: " << forwardI << "\n";
-  // gzerr << "upward: " << upwardI << "\n";
-  // gzerr << "normal: " << normal << "\n";
-  // gzerr << "sweep: " << this->sweep << "\n";
-  // gzerr << "alpha: " << this->alpha << "\n";
-  // gzerr << "lift: " << lift << "\n";
-  // gzerr << "drag: " << drag << " cd: "
-  // << cd << " cda: " << this->cda << "\n";
-  // gzerr << "moment: " << moment << "\n";
-  // gzerr << "cp momentArm: " << momentArm << "\n";
-  // gzerr << "force: " << force << "\n";
-  // gzerr << "torque: " << torque << "\n";
-  //
+  // if ((this->link->GetName() == "wing_1" ||
+  //      this->link->GetName() == "wing_2") &&
+  //     (vel.GetLength() > 50.0 &&
+  //      vel.GetLength() < 50.0))
+  if (0)
+  {
+    gzerr << "=============================\n";
+    gzerr << "Link: [" << this->link->GetName()
+          << "] pose: [" << pose
+          << "] dynamic pressure: [" << q << "]\n";
+    gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
+    gzerr << "spd sweep: [" << velInLDPlane.GetLength()
+          << "] vel in LD: [" << velInLDPlane << "]\n";
+    gzerr << "forward (inertial): " << forwardI << "\n";
+    gzerr << "upward (inertial): " << upwardI << "\n";
+    gzerr << "lift dir (inertial): " << liftDirection << "\n";
+    gzerr << "LD Normal: " << ldNormal << "\n";
+    gzerr << "sweep: " << this->sweep << "\n";
+    gzerr << "alpha: " << this->alpha << "\n";
+    gzerr << "lift: " << lift << "\n";
+    gzerr << "drag: " << drag << " cd: "
+    << cd << " cda: " << this->cda << "\n";
+    gzerr << "moment: " << moment << "\n";
+    gzerr << "cp momentArm: " << momentArm << "\n";
+    gzerr << "force: " << force << "\n";
+    gzerr << "torque: " << torque << "\n";
+  }
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
