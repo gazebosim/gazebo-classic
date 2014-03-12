@@ -48,6 +48,7 @@ Video::Video()
   this->swsCtx = NULL;
   this->avFrame = NULL;
   this->pic = NULL;
+  this->videoStream = -1;
 
 #ifdef HAVE_FFMPEG
   this->pic = new AVPicture;
