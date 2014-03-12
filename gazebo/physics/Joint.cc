@@ -643,9 +643,8 @@ double Joint::GetInertiaRatio(unsigned int _index) const
       // get parent model pose
       math::Pose pose = this->model->GetWorldPose();
 
-      // rotate joint axis in local frame into global frame
-      math::Vector3 axis = this->GetLocalAxis(_index);
-      axis = pose.rot.RotateVectorReverse(axis);
+      // joint axis in global frame
+      math::Vector3 axis = this->GetGlobalAxis(_index);
 
       // compute ratio about axis
       return this->GetInertiaRatio(axis);
