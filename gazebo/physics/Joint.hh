@@ -515,7 +515,8 @@ namespace gazebo
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
-      /// based on reference position.
+      /// based on the reference position of the spring.
+      /// If using metric system, the unit of energy will be Joules.
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
