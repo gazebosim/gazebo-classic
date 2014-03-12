@@ -171,6 +171,7 @@ namespace gazebo
 
     /// \brief Create a connection to master.
     /// \return Connection to the master.
+    GAZEBO_VISIBLE
     transport::ConnectionPtr connectToMaster();
 
     /// \brief Blocks while waiting for topic namespaces from the Master.
