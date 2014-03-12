@@ -306,8 +306,8 @@ namespace gazebo
       /// \sa Model::GetGripper()
       public: size_t GetGripperCount() const;
 
-      /// \brief Returns this link's potential energy,
-      /// based on position in world frame and gravity.
+      /// \brief Returns the potential energy of all links
+      /// and joint springs in the model.
       /// \return this link's potential energy,
       public: double GetWorldEnergyPotential() const;
 
