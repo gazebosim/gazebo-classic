@@ -149,6 +149,33 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
+void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
+{
+  // Load our inertia ratio world
+  Load("worlds/inertia_ratio.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("double_pendulum");
+  ASSERT_TRUE(model != NULL);
+
+  {
+    physics::JointPtr joint = model->GetJoint("lower_joint");
+    ASSERT_TRUE(joint != NULL);
+
+    EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+  }
+}
+//////////////////////////////////////////////////
 void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 {
   /// SpringDamper implemented not yet released for dart
@@ -347,6 +374,11 @@ TEST_F(JointTest, joint_SDF14)
 TEST_P(JointTest, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
+}
+
+TEST_P(JointTest, GetInertiaRatio)
+{
+  GetInertiaRatio(this->physicsEngine);
 }
 
 TEST_P(JointTest, SpringDamperTest)
