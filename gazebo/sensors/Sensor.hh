@@ -38,6 +38,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -68,7 +69,7 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class Sensor : public boost::enable_shared_from_this<Sensor>
+    class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _class

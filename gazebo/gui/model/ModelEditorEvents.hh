@@ -19,6 +19,7 @@
 
 #include <string>
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -26,7 +27,7 @@ namespace gazebo
   {
     namespace model
     {
-      class Events
+      class GAZEBO_VISIBLE Events
       {
         /// \brief Connect a boost::slot to the finish model signal
         /// \param[in] _subscriber the subscriber to this event

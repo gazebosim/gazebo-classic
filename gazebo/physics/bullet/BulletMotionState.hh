@@ -26,6 +26,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet btMotionState encapsulation
-    class BulletMotionState : public btMotionState
+    class GAZEBO_VISIBLE BulletMotionState : public btMotionState
     {
       /// \brief Constructor
       public: BulletMotionState(LinkPtr _link);

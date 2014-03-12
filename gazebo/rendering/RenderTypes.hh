@@ -18,6 +18,7 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL
 /// \brief Render everything visibility mask.

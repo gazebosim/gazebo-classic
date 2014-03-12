@@ -42,6 +42,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -73,7 +74,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

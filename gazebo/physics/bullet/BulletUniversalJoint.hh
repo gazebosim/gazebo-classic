@@ -25,6 +25,7 @@
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btUniversalConstraint;
 
@@ -37,7 +38,8 @@ namespace gazebo
     /// \{
 
     /// \brief A bullet universal joint class
-    class BulletUniversalJoint : public UniversalJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletUniversalJoint
+      : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
