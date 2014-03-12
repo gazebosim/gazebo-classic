@@ -29,7 +29,10 @@
 #include <stdlib.h>
 #include <string>
 
+#include "test/util.hh"
 #include "test_config.h"
+
+class gzTest : public gazebo::testing::AutoLogFixture { };
 
 std::string g_msgDebugOut;
 boost::mutex g_mutex;
@@ -176,7 +179,7 @@ void CameraCB(ConstCameraCmdPtr &_msg)
 
 /////////////////////////////////////////////////
 /// Check to make sure that 'gz' exists
-TEST(gz, Alive)
+TEST_F(gzTest, Alive)
 {
   std::string rawOutput = custom_exec_str("gz");
   std::string helpOutput = custom_exec_str("gz help");
@@ -187,7 +190,7 @@ TEST(gz, Alive)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Joint)
+TEST_F(gzTest, Joint)
 {
   init();
 
@@ -252,7 +255,7 @@ TEST(gz, Joint)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Model)
+TEST_F(gzTest, Model)
 {
   init();
 
@@ -345,7 +348,7 @@ TEST(gz, Model)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, World)
+TEST_F(gzTest, World)
 {
   init();
 
@@ -418,7 +421,7 @@ TEST(gz, World)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Physics)
+TEST_F(gzTest, Physics)
 {
   init();
 
@@ -479,7 +482,7 @@ TEST(gz, Physics)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Camera)
+TEST_F(gzTest, Camera)
 {
   init();
 
@@ -508,7 +511,7 @@ TEST(gz, Camera)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Stats)
+TEST_F(gzTest, Stats)
 {
   init();
 
@@ -527,7 +530,7 @@ TEST(gz, Stats)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Topic)
+TEST_F(gzTest, Topic)
 {
   init();
 
@@ -562,7 +565,7 @@ TEST(gz, Topic)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, Stress)
+TEST_F(gzTest, Stress)
 {
   init();
 
@@ -588,7 +591,7 @@ TEST(gz, Stress)
 }
 
 /////////////////////////////////////////////////
-TEST(gz, SDF)
+TEST_F(gzTest, SDF)
 {
   boost::filesystem::path path;
 
