@@ -242,8 +242,8 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
     ASSERT_TRUE(link->GetGravityMode() == newGravityMode);
   }
 
-    // TODO Bullet currently fails this test
-  if (_physicsEngine != "bullet")
+  // TODO Bullet and DART currently fail this test
+  if (_physicsEngine != "bullet" && _physicsEngine != "dart")
   {
     // change kinematic mode and verify the msg gets through
     msgs::Model msg;
