@@ -421,19 +421,19 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief Computes MOI inertia across joint DOF axis given index.
-      /// The inertia ratio for each joint across joint axis
-      /// gives a sense of how sensitive the joint being controlled
-      /// is to joint actuation torques.
+      /// \brief Computes moment of inertia (MOI) across a specified joint axis.
+      /// The inertia ratio for each joint axis
+      /// indicates the sensitivity of the joint to actuation torques.
       /// \param[in] _index axis number about which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
       public: double GetInertiaRatio(unsigned int _index) const;
 
-      /// \brief Computes MOI inertia across an arbitrary axis.
-      /// The inertia ratio for each joint across constrained direction
-      /// gives a sense of how well this model will perform using PGS-type
+      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
+      /// specified in the world frame.
+      /// The inertia ratio along the constrained directions of a joint
+      /// has an impact on the performance of Projected Gauss Seidel (PGS)
       /// iterative LCP methods.
-      /// \param[in] _axis axis about which MOI ratio is computed.
+      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
       public: double GetInertiaRatio(math::Vector3 _axis) const;
 

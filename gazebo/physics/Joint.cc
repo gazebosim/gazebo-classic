@@ -617,7 +617,6 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
     math::Matrix3 cm = this->childLink->GetWorldInertiaMatrix();
 
     // matrix times axis
-    // \todo: add operator in Matrix3 class so we can do Matrix3 * Vector3
     math::Vector3 pia = pm * _axis;
     math::Vector3 cia = cm * _axis;
     double piam = pia.GetLength();
