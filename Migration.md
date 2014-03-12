@@ -84,6 +84,7 @@
 1. **gazebo/physics/Joint.hh**
     + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + double GetWorldEnergyPotentialSpring(unsigned int _index) const
     + math::Pose GetParentWorldPose() const
     + double GetSpringReferencePosition(unsigned int) const
     + math::Pose GetWorldPose() const
@@ -94,7 +95,15 @@
     + protected: math::Pose parentAnchorPose
 
 1. **gazebo/physics/Link.hh**
+    + double GetWorldEnergy() const
+    + double GetWorldEnergyKinetic() const
+    + double GetWorldEnergyPotential() const
     + bool initialized
+
+1. **gazebo/physics/Model.hh**
+    + double GetWorldEnergy() const
+    + double GetWorldEnergyKinetic() const
+    + double GetWorldEnergyPotential() const
 
 1. **gazebo/physics/SurfaceParams.hh**
     + FrictionPyramid()
