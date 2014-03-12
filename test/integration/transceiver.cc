@@ -245,13 +245,6 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Abort test since this test frequently fails with dart, "
-          << " see (issue #916)" << std::endl;
-    return;
-  }
-
   Load("worlds/empty.world", true, _physicsEngine);
 
   double avgSignalLevelEmpty = 0.0;
@@ -400,6 +393,19 @@ TEST_P(TransceiverTest, EmptyWorld)
 /////////////////////////////////////////////////
 TEST_P(TransceiverTest, Obstacle)
 {
+  if (std::string(GetParam()) == "simbody")
+  {
+    gzerr << "Abort test since this test frequently fails with simbody, "
+          << " see (issues #867)" << std::endl;
+    return;
+  }
+  if (std::string(GetParam()) == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issues #916, #911)" << std::endl;
+    return;
+  }
+
   TxRxObstacle(GetParam());
 }
 
