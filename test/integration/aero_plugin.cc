@@ -33,7 +33,6 @@ class JointLiftDragPluginTest : public ServerFixture,
   /// Measure / verify force torques against analytical answers.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void LiftDragPlugin1(const std::string &_physicsEngine);
-
 };
 
 /////////////////////////////////////////////////
@@ -88,7 +87,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   double dihedral = 0.1;
   double rho = 1.2041;
   double area = 10;
-  double stall_v = 10.0;
+  // double stall_v = 10.0;
   double a0 = 0.1;
 
   // run for 100 seconds
