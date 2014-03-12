@@ -52,6 +52,20 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+math::Vector3 BulletScrewJoint::GetAnchor(unsigned int /*index*/) const
+{
+  gzerr << "BulletScrewJoint::GetAnchor not implemented, return 0 vector.\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void BulletScrewJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &/*_anchor*/)
+{
+  gzerr << "BulletScrewJoint::SetAnchor not implemented.\n";
+}
+
+//////////////////////////////////////////////////
 void BulletScrewJoint::Init()
 {
   ScrewJoint<BulletJoint>::Init();
@@ -172,10 +186,21 @@ void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+void BulletScrewJoint::SetThreadPitch(double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";
-  return 0;
+}
+
+//////////////////////////////////////////////////
+double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+{
+  return this->threadPitch;
+}
+
+//////////////////////////////////////////////////
+double BulletScrewJoint::GetThreadPitch()
+{
+  return this->threadPitch;
 }
 
 //////////////////////////////////////////////////

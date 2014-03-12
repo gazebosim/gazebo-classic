@@ -47,6 +47,13 @@ namespace gazebo
       /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
+
       // Documentation inherited.
       public: virtual void Init();
 
@@ -57,8 +64,14 @@ namespace gazebo
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 
+      /// \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(double _threadPitch);
+
       /// \copydoc ScrewJoint::GetThreadPitch
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      /// \copydoc ScrewJoint::GetThreadPitch
+      public: virtual double GetThreadPitch();
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int _index,
