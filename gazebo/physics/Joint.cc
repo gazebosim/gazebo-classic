@@ -640,9 +640,6 @@ double Joint::GetInertiaRatio(unsigned int _index) const
   {
     if (_index < this->GetAngleCount())
     {
-      // get parent model pose
-      math::Pose pose = this->model->GetWorldPose();
-
       // joint axis in global frame
       math::Vector3 axis = this->GetGlobalAxis(_index);
 
