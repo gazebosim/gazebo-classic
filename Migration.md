@@ -85,6 +85,7 @@
     + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
     + math::Pose GetParentWorldPose() const
+    + double GetSpringReferencePosition(unsigned int) const
     + math::Pose GetWorldPose() const
     + virtual void SetEffortLimit(unsigned _index, double _stiffness)
     + virtual void SetStiffness(unsigned int _index, double _stiffness) = 0

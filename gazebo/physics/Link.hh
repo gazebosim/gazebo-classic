@@ -89,6 +89,7 @@ namespace gazebo
       /// \brief Update the collision.
       /// \param[in] _info Update information.
       public: void Update(const common::UpdateInfo &_info);
+      using Base::Update;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale to set the link to.
@@ -201,6 +202,12 @@ namespace gazebo
       ///         frame.
       public: math::Pose GetWorldCoGPose() const;
 
+      /// \brief Get the linear velocity of the origin of the link frame,
+      ///        expressed in the world frame.
+      /// \return Linear velocity of the link frame.
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              {return this->GetWorldLinearVel(math::Vector3::Zero);}
+
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in a body-fixed frame. If
       ///        no offset is given, the velocity at the origin of the Link
@@ -209,7 +216,7 @@ namespace gazebo
       ///                    frame, expressed in the body-fixed frame.
       /// \return Linear velocity of the point on the body
       public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
+                  const math::Vector3 &_offset) const = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
@@ -280,6 +287,18 @@ namespace gazebo
       /// \brief Set the mass of the link.
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
+
+      /// \brief Get the world pose of the link inertia (cog position
+      /// and Moment of Inertia frame). This differs from GetWorldCoGPose(),
+      /// which returns the cog position in the link frame
+      /// (not the Moment of Inertia frame).
+      /// \return Inertial pose in world frame.
+      public: math::Pose GetWorldInertialPose() const;
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
+      public: math::Matrix3 GetWorldInertiaMatrix() const;
 
       /// \cond
       /// This is an internal function
@@ -393,6 +412,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
