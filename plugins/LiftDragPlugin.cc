@@ -226,6 +226,9 @@ void LiftDragPlugin::OnUpdate()
   // compute lift force at cp
   math::Vector3 lift = cl * q * this->area * liftDirection;
 
+  // rotate into link frame
+  lift = pose.rot.RotateVector(lift);
+
   // compute cd at cp, check for stall, correct for sweep
   double cd;
   if (this->alpha > this->alphaStall)
@@ -248,6 +251,9 @@ void LiftDragPlugin::OnUpdate()
 
   // drag at cp
   math::Vector3 drag = cd * q * this->area * dragDirection;
+
+  // rotate into link frame
+  drag = pose.rot.RotateVector(drag);
 
   // compute cm at cp, check for stall, correct for sweep
   double cm;
@@ -287,25 +293,25 @@ void LiftDragPlugin::OnUpdate()
 
   // debug
   //
-  //   gzerr << "=============================\n";
-  //   gzerr << "Link: [" << this->link->GetName()
-  //         << "] pose: [" << pose
-  //         << "] dynamic pressure: [" << q << "]\n";
-  //   gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
-  //   gzerr << "spd sweep: [" << velInLDPlane.GetLength()
-  //         << "] vel: [" << velInLDPlane << "]\n";
-  //   // gzerr << "forward: " << forwardI << "\n";
-  //   // gzerr << "upward: " << upwardI << "\n";
-  //   gzerr << "normal: " << normal << "\n";
-  //   gzerr << "sweep: " << this->sweep << "\n";
-  //   gzerr << "alpha: " << this->alpha << "\n";
-  //   gzerr << "lift: " << lift << "\n";
-  //   gzerr << "drag: " << drag << " cd: "
-  //   << cd << " cda: " << this->cda << "\n";
-  //   gzerr << "moment: " << moment << "\n";
-  //   gzerr << "cp momentArm: " << momentArm << "\n";
-  //   gzerr << "force: " << force << "\n";
-  //   gzerr << "torque: " << torque << "\n";
+  // gzerr << "=============================\n";
+  // gzerr << "Link: [" << this->link->GetName()
+  //       << "] pose: [" << pose
+  //       << "] dynamic pressure: [" << q << "]\n";
+  // gzerr << "spd: [" << vel.GetLength() << "] vel: [" << vel << "]\n";
+  // gzerr << "spd sweep: [" << velInLDPlane.GetLength()
+  //       << "] vel: [" << velInLDPlane << "]\n";
+  // gzerr << "forward: " << forwardI << "\n";
+  // gzerr << "upward: " << upwardI << "\n";
+  // gzerr << "normal: " << normal << "\n";
+  // gzerr << "sweep: " << this->sweep << "\n";
+  // gzerr << "alpha: " << this->alpha << "\n";
+  // gzerr << "lift: " << lift << "\n";
+  // gzerr << "drag: " << drag << " cd: "
+  // << cd << " cda: " << this->cda << "\n";
+  // gzerr << "moment: " << moment << "\n";
+  // gzerr << "cp momentArm: " << momentArm << "\n";
+  // gzerr << "force: " << force << "\n";
+  // gzerr << "torque: " << torque << "\n";
   //
 
   // apply forces at cg (with torques for position shift)
