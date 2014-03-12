@@ -473,10 +473,13 @@ namespace gazebo
       public: double GetWorldEnergyPotential() const;
 
       /// \brief Returns this link's kinetic energy
+      /// computed using link's CoG velocity in the inertia (world) frame.
       /// \return this link's kinetic energy
       public: double GetWorldEnergyKinetic() const;
 
-      /// \brief Returns this link's total energy
+      /// \brief Returns this link's total energy, or
+      /// sum of Link::GetWorldEnergyPotential() and
+      /// Link::GetWorldEnergyKinetic().
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
