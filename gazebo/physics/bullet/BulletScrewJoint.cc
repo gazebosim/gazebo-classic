@@ -835,12 +835,14 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // right-hand part
     btScalar lostop = getLowerLinLimit();
     btScalar histop = getUpperLinLimit();
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-    if (limit && (lostop == histop))
-#pragma GCC diagnostic pop
-    {  // the joint motor is ineffective
+
+    // issue #1104:
+    // if (limit && (lostop == histop)) raises warnings, using
+    // a warning-less implementation.
+    if (limit &&
+      math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+    {
+      // the joint motor is ineffective
       powered = 0;
     }
     info->m_constraintError[srow] = 0.;
@@ -870,17 +872,18 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimLin;
       }
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-      if (lostop == histop)
-#pragma GCC diagnostic pop
-      {  // limited low and high simultaneously
+      // issue #1104:
+      // if (lostop == histop) raises warnings, using
+      // a warning-less implementation.
+      if (math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+      {
+        // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
         info->m_upperLimit[srow] = SIMD_INFINITY;
       }
       else if (limit == 1)
-      { // low limit
+      {
+         // low limit
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
         info->m_upperLimit[srow] = 0;
       }
@@ -968,11 +971,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
 
     btScalar lostop = getLowerAngLimit();
     btScalar histop = getUpperAngLimit();
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-    if (limit && (lostop == histop))
-#pragma GCC diagnostic pop
+    // issue #1104:
+    // if (limit && (lostop == histop)) raises warnings, using
+    // a warning-less implementation.
+    if (limit &&
+      math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -998,11 +1001,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimAng;
       }
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-      if (lostop == histop)
-#pragma GCC diagnostic pop
+      // issue #1104:
+      // if (lostop == histop) raises warnings, using
+      // a warning-less implementation.
+      if (math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
       {
         // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
