@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// This class is used to visualize a camera image generated from
     /// a CameraSensor. The sensor's image is drawn on a billboard in the 3D
     /// environment.
-    class CameraVisual : public Visual
+    class GAZEBO_VISIBLE CameraVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual

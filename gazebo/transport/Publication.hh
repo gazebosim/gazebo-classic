@@ -29,6 +29,7 @@
 #include "gazebo/transport/CallbackHelper.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \class Publication Publication.hh transport/transport.hh
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
-    class Publication
+    class GAZEBO_VISIBLE Publication
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're publishing

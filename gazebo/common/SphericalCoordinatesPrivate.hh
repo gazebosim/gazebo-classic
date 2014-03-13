@@ -20,6 +20,7 @@
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/math/Angle.hh"
+#include "gazebo/util/system.hh"
 
 
 namespace gazebo
@@ -34,7 +35,7 @@ namespace gazebo
     /// \class SphericalCoordinatesPrivate SphericalCoordinatesPrivate.hh
     ///        commmon/common.hh
     /// \brief Private data for the SphericalCoordinates class.
-    class SphericalCoordinatesPrivate
+    class GAZEBO_VISIBLE SphericalCoordinatesPrivate
     {
       /// \brief Type of surface being used.
       public: SphericalCoordinates::SurfaceType surfaceType;

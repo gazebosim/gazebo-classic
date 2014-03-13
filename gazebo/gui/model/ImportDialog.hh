@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class ImportDialog gui/ImportDialog.hh
     /// \brief Dialog for saving to file.
-    class ImportDialog : public QDialog
+    class GAZEBO_VISIBLE ImportDialog : public QDialog
     {
       Q_OBJECT
 

@@ -84,6 +84,7 @@
 1. **gazebo/physics/Joint.hh**
     + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
+    + double GetWorldEnergyPotentialSpring(unsigned int _index) const
     + math::Pose GetParentWorldPose() const
     + double GetSpringReferencePosition(unsigned int) const
     + math::Pose GetWorldPose() const
@@ -92,9 +93,18 @@
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
     + bool axisParentModelFrame[MAX_JOINT_AXIS]
     + protected: math::Pose parentAnchorPose
+    + public: double GetInertiaRatio(const math::Vector3 &_axis) const
 
 1. **gazebo/physics/Link.hh**
+    + double GetWorldEnergy() const
+    + double GetWorldEnergyKinetic() const
+    + double GetWorldEnergyPotential() const
     + bool initialized
+
+1. **gazebo/physics/Model.hh**
+    + double GetWorldEnergy() const
+    + double GetWorldEnergyKinetic() const
+    + double GetWorldEnergyPotential() const
 
 1. **gazebo/physics/SurfaceParams.hh**
     + FrictionPyramid()
@@ -263,6 +273,9 @@
 1. **gazebo/physics/Joint.hh**
     + ***Removed:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos) `API chance`
     + ***Replacement:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+    ---
+    + ***Removed:*** public: double GetInertiaRatio(unsigned int _index) const
+    + ***Replacement:*** public: double GetInertiaRatio(const unsigned int _index) const
 1. **gazebo/common/Events.hh**
     + ***Removed:*** Events::ConnectWorldUpdateStart(T _subscriber) `API change`
     + ***Replacement*** ConnectionPtr Events::ConnectWorldUpdateBegin(T _subscriber)

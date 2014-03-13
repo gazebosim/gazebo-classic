@@ -16,6 +16,7 @@
 */
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \brief ODE wrapper forward declarations and typedefs

@@ -16,21 +16,9 @@
 */
 
 #include <gazebo/gazebo_config.h>
-#include <gazebo/common/Console.hh>
 #include <gazebo/common/AudioDecoder.hh>
-
-#ifdef HAVE_FFMPEG
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-#endif
-
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/opt.h>
-}
-#endif
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/ffmpeg_inc.h>
 
 #define AUDIO_INBUF_SIZE (20480 * 2)
 #define AUDIO_REFILL_THRESH 4096
