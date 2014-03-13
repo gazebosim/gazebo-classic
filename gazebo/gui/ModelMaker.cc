@@ -44,6 +44,7 @@ using namespace gui;
 : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->clone = false;
 }
 
@@ -269,10 +270,16 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == common::MouseEvent::LEFT)
   {
-    this->CreateTheEntity();
-    this->Stop();
+    // Place if not dragging, or if dragged for less than 50 pixels.
+    // The 50 pixels is used to account for accidental mouse movement
+    // when placing an object.
+    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    {
+      this->CreateTheEntity();
+      this->Stop();
+    }
   }
 }
 

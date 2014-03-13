@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -860,7 +856,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
@@ -1052,4 +1048,42 @@ GripperPtr Model::GetGripper(size_t _index) const
 size_t Model::GetGripperCount() const
 {
   return this->grippers.size();
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyPotential() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyPotential();
+  }
+  for (Joint_V::const_iterator iter = this->joints.begin();
+    iter != this->joints.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    {
+      e += (*iter)->GetWorldEnergyPotentialSpring(j);
+    }
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKinetic() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyKinetic();
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }

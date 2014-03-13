@@ -76,6 +76,7 @@ MainWindow::MainWindow()
 
   this->inputStepSize = 1;
   this->requestMsg = NULL;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
@@ -139,8 +140,7 @@ MainWindow::MainWindow()
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
-  std::string title = "Gazebo : ";
-  title += gui::get_world();
+  std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
@@ -238,7 +238,6 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
   this->toolsWidget->hide();
@@ -246,6 +245,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////

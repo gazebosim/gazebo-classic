@@ -85,7 +85,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
@@ -296,8 +296,12 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
-  _msg.add_visual()->CopyFrom(*this->visualMsg);
-  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+
+  if (!this->HasType(physics::Base::SENSOR_COLLISION))
+  {
+    _msg.add_visual()->CopyFrom(*this->visualMsg);
+    _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -368,14 +372,14 @@ void Collision::SetState(const CollisionState &_state)
 }
 
 /////////////////////////////////////////////////
-void Collision::SetMaxContacts(double _maxContacts)
+void Collision::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContacts = static_cast<int>(_maxContacts);
+  this->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 /////////////////////////////////////////////////
-int Collision::GetMaxContacts()
+unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
 }

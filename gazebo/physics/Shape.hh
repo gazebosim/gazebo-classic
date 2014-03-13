@@ -26,6 +26,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class Shape Shape.hh physics/physics.hh
     /// \brief Base class for all shapes.
-    class Shape : public Base
+    class GAZEBO_VISIBLE Shape : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.

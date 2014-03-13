@@ -28,6 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -41,7 +42,7 @@ namespace gazebo
   /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
-  class Server
+  class GAZEBO_VISIBLE Server
   {
     /// \brief Constructor.
     public: Server();
@@ -73,9 +74,6 @@ namespace gazebo
     /// \param[in] _sdfString SDF string from which to load a World.
     /// \return True on success.
     public: bool LoadString(const std::string &_sdfString);
-
-    /// \brief Initialized the Server.
-    public: void Init();
 
     /// \brief Run the Server.
     public: void Run();
@@ -122,9 +120,6 @@ namespace gazebo
     /// \brief Boolean used to stop the server.
     private: static bool stop;
 
-    /// \brief Pointer to the master.
-    private: Master *master;
-
     /// \brief Communication node.
     private: transport::NodePtr node;
 
@@ -145,6 +140,9 @@ namespace gazebo
 
     /// \brief Boost program options variable map.
     private: boost::program_options::variables_map vm;
+
+    /// \brief True when initialized.
+    private: bool initialized;
 
     /// \brief Save argc for access by system plugins.
     private: int systemPluginsArgc;

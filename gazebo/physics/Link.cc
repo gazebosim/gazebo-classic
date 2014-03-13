@@ -276,6 +276,8 @@ void Link::Fini()
   }
 
 #ifdef HAVE_OPENAL
+  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+      this->GetScopedName() + "/audio_collision");
   this->audioSink.reset();
 #endif
 
@@ -672,6 +674,28 @@ bool Link::SetSelected(bool _s)
 void Link::SetInertial(const InertialPtr &/*_inertial*/)
 {
   gzwarn << "Link::SetMass is empty\n";
+}
+
+//////////////////////////////////////////////////
+math::Pose Link::GetWorldInertialPose() const
+{
+  math::Pose inertialPose;
+  if (this->inertial)
+    inertialPose = this->inertial->GetPose();
+  return inertialPose + this->GetWorldPose();
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Link::GetWorldInertiaMatrix() const
+{
+  math::Matrix3 moi;
+  if (this->inertial)
+  {
+    math::Vector3 pos = this->inertial->GetPose().pos;
+    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
+    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+  }
+  return moi;
 }
 
 //////////////////////////////////////////////////
@@ -1087,4 +1111,46 @@ void Link::SetScale(const math::Vector3 &_scale)
 
     this->visPub->Publish(msg);
   }*/
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyPotential() const
+{
+  // compute gravitational potential energy for link CG location
+  // use origin as reference position
+  // E = -m g^T z
+  double m = this->GetInertial()->GetMass();
+  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  math::Vector3 z = this->GetWorldCoGPose().pos;
+  return -m * g.Dot(z);
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyKinetic() const
+{
+  double energy = 0.0;
+
+  // compute linear kinetic energy
+  // E = 1/2 m v^T v
+  {
+    double m = this->GetInertial()->GetMass();
+    math::Vector3 v = this->GetWorldCoGLinearVel();
+    energy += 0.5 * m * v.Dot(v);
+  }
+
+  // compute angular kinetic energy
+  // E = 1/2 w^T I w
+  {
+    math::Vector3 w = this->GetWorldAngularVel();
+    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    energy += 0.5 * w.Dot(I * w);
+  }
+
+  return energy;
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }

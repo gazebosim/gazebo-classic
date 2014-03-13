@@ -9,6 +9,7 @@ require 'rubygems'
 require 'rest_client'
 require 'json'
 require 'optparse'
+require 'date'
 
 $stderr.sync = true
 
@@ -19,19 +20,26 @@ class BitbucketPullRequests
     attr_reader :source
     attr_reader :destination
     attr_reader :branch
+    attr_reader :createdOn
 
     def initialize(jsonHash)
       @id          = jsonHash["id"]
       @source      = jsonHash["source"]["commit"]["hash"]
       @destination = jsonHash["destination"]["commit"]["hash"]
       @branch      = jsonHash["source"]["branch"]["name"]
+      @createdOn   = jsonHash["created_on"]
     end
 
     def to_s
       @id.to_s.rjust(5, ' ') + "    " +
-      @source + "    " +
-      @destination + "    " +
-      @branch + "\n"
+        DateTime.parse(@createdOn).strftime("%Y-%m-%d") + "    " +
+        @source + "    " +
+        @destination + "    " +
+        @branch + "\n"
+    end
+
+    def date_and_string
+      [@createdOn, self.to_s]
     end
   end
 
@@ -57,12 +65,27 @@ class BitbucketPullRequests
   # summary of open pull requests
   def listPullRequests()
     jsonHash = getJson(@url_pullrequests + "/?state=OPEN")
+
     output = ""
-    jsonHash["values"].each { |pr| output += Summary.new(pr).to_s }
+
+    # Hash of pull requests.
+    pullrequests = {}
+    jsonHash["values"].each { |pr|
+      date, str = Summary.new(pr).date_and_string
+      pullrequests[date] = str
+    }
+
     while jsonHash.has_key? "next"
       jsonHash = getJson(jsonHash["next"])
-      jsonHash["values"].each { |pr| output += Summary.new(pr).to_s }
+      jsonHash["values"].each { |pr|
+        date, str = Summary.new(pr).date_and_string
+        pullrequests[date] = str
+      }
     end
+
+    # Generate output sorted by creation time
+    pullrequests.keys.sort.each { |k| output += pullrequests[k] }
+
     return output
   end
 

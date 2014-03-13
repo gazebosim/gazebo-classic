@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 
@@ -27,7 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelEditWidget : public QWidget
+    class GAZEBO_VISIBLE ModelEditWidget : public QWidget
     {
       Q_OBJECT
       public: ModelEditWidget(QWidget *_parent = 0);
@@ -38,7 +39,7 @@ namespace gazebo
       private: QTreeWidget *treeWidget;
     };
 
-    class ModelPropertyWidget : public QWidget
+    class GAZEBO_VISIBLE ModelPropertyWidget : public QWidget
     {
       Q_OBJECT
       public: ModelPropertyWidget(QWidget *_parent = 0);

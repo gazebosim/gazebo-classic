@@ -20,6 +20,7 @@
 
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief A screw joint
-    class SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the Simbody world.
@@ -57,20 +58,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetThreadPitch(unsigned int /*_index*/);
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

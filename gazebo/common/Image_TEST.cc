@@ -18,10 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Image.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(ImageTest, Image)
+class ImageTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(ImageTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));

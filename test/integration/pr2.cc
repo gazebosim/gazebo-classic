@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <boost/filesystem.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
@@ -23,10 +25,10 @@ class PR2Test : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
   public: void StaticPR2(std::string _physicsEngine);
-  public: void Load(std::string _physicsEngine);
+  public: void LoadPR2(std::string _physicsEngine);
 };
 
-void PR2Test::Load(std::string _physicsEngine)
+void PR2Test::LoadPR2(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
@@ -42,8 +44,9 @@ void PR2Test::Load(std::string _physicsEngine)
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
 
   ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
@@ -66,7 +69,7 @@ void PR2Test::Load(std::string _physicsEngine)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
+  while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -74,18 +77,18 @@ void PR2Test::Load(std::string _physicsEngine)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << "/tmp/gazebo_test/frame_" << i << ".jpg";
+    filename << paths->GetDefaultTestPath() << "/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
-TEST_P(PR2Test, Load)
+TEST_P(PR2Test, LoadPR2)
 {
-  Load(GetParam());
+  LoadPR2(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
