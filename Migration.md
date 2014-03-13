@@ -92,6 +92,7 @@
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
     + bool axisParentModelFrame[MAX_JOINT_AXIS]
     + protected: math::Pose parentAnchorPose
+    + public: double GetInertiaRatio(const math::Vector3 &_axis) const
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
@@ -263,6 +264,9 @@
 1. **gazebo/physics/Joint.hh**
     + ***Removed:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos) `API chance`
     + ***Replacement:*** Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+    ---
+    + ***Removed:*** public: double GetInertiaRatio(unsigned int _index) const
+    + ***Replacement:*** public: double GetInertiaRatio(const unsigned int _index) const
 1. **gazebo/common/Events.hh**
     + ***Removed:*** Events::ConnectWorldUpdateStart(T _subscriber) `API change`
     + ***Replacement*** ConnectionPtr Events::ConnectWorldUpdateBegin(T _subscriber)

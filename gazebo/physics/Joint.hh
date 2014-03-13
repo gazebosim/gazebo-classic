@@ -422,10 +422,25 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief Accessor to inertia ratio across this joint.
-      /// \param[in] _index Joint axis index.
-      /// \return returns the inertia ratio across specified joint axis.
-      public: double GetInertiaRatio(unsigned int _index) const;
+      /// \brief Computes moment of inertia (MOI) across a specified joint axis.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The inertia ratio for each joint axis indicates the sensitivity
+      /// of the joint to actuation torques.
+      /// \param[in] _index axis number about which MOI ratio is computed.
+      /// \return ratio of child MOI to parent MOI.
+      public: double GetInertiaRatio(const unsigned int _index) const;
+
+      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
+      /// specified in the world frame.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The moment of inertia ratio along constrained directions of a joint
+      /// has an impact on the performance of Projected Gauss Seidel (PGS)
+      /// iterative LCP methods.
+      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
+      /// \return ratio of child MOI to parent MOI.
+      public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
@@ -525,11 +540,6 @@ namespace gazebo
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
 
-      /// \brief Computes inertiaRatio for this joint during Joint::Init
-      /// The inertia ratio for each joint between [1, +inf] gives a sense
-      /// of how well this model will perform in iterative LCP methods.
-      private: void ComputeInertiaRatio();
-
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
 
@@ -578,10 +588,6 @@ namespace gazebo
 
       /// \brief Store Joint velocity limit as specified in SDF
       protected: double velocityLimit[MAX_JOINT_AXIS];
-
-      /// \brief Store Joint inertia ratio.  This is a measure of how well
-      /// this model behaves using interative LCP solvers.
-      protected: double inertiaRatio[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
       protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
