@@ -108,15 +108,7 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbB,
   m_frameInA =  btTransform::getIdentity().inverse() * frameInW;
   m_frameInB = _rbB.getCenterOfMassTransform().inverse() * frameInW;
 
-  std::cout << "FrameInA[" << m_frameInA.getOrigin().getX() << " "
-    << m_frameInA.getOrigin().getY() << " "
-    << m_frameInA.getOrigin().getZ() << "]\n";
-
-  std::cout << "FrameInB[" << m_frameInB.getOrigin().getX() << " "
-    << m_frameInB.getOrigin().getY() << " "
-    << m_frameInB.getOrigin().getZ() << "]\n";
-
-  // sei limits
+  // set limits
   setLinearLowerLimit(btVector3(0., 0., 0.));
   setLinearUpperLimit(btVector3(0., 0., 0.));
   setAngularLowerLimit(btVector3(0.f,

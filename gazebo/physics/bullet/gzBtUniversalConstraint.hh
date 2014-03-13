@@ -29,8 +29,8 @@ ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
   /// \param[in] _rbB Rigid body B, also known as the child link.
   /// \param[in] _anchor The point in world space that constrains the two
   /// rigid bodies.
-  /// \param[in] _axis1 First axis of rotation.
-  /// \param[in] _axis2 Second axis of rotation.
+  /// \param[in] _axis1 First axis of rotation in world frame.
+  /// \param[in] _axis2 Second axis of rotation in world frame.
   public: gzBtUniversalConstraint(
               btRigidBody &_rbA,
               btRigidBody &_rbB,
@@ -42,8 +42,8 @@ ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
   /// \param[in] _rbB Rigid body B, also known as the child link.
   /// \param[in] _anchor The point in world space that constrains the child
   /// link to the world.
-  /// \param[in] _axis1 First axis of rotation.
-  /// \param[in] _axis2 Second axis of rotation.
+  /// \param[in] _axis1 First axis of rotation in world frame.
+  /// \param[in] _axis2 Second axis of rotation in world frame.
   public: gzBtUniversalConstraint(
               btRigidBody &_rbA,
               const btVector3 &_anchor,
