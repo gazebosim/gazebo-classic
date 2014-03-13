@@ -87,6 +87,7 @@ set (headers
   Timer.hh
   UpdateInfo.hh
   Video.hh
+  ffmpeg_inc.h
  )
 
 if (HAVE_GTS)

@@ -38,6 +38,7 @@ CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
   this->visualMsg->mutable_material()->mutable_script()->add_uri(

@@ -37,6 +37,7 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -64,7 +65,8 @@ namespace gazebo
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    class GpuLaser : public Camera, public Ogre::RenderObjectListener
+    class GAZEBO_VISIBLE GpuLaser
+      : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

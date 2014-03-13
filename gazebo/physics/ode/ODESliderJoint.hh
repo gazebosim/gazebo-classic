@@ -24,13 +24,14 @@
 
 #include "gazebo/physics/SliderJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A slider joint
-    class ODESliderJoint : public SliderJoint<ODEJoint>
+    class GAZEBO_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldId ODE world id.

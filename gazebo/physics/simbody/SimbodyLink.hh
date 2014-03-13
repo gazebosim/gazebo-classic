@@ -24,6 +24,7 @@
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody Link class
-    class SimbodyLink : public Link
+    class GAZEBO_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
       public: SimbodyLink(EntityPtr _parent);

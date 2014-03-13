@@ -20,13 +20,14 @@
 
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A universal joint.
-    class DARTUniversalJoint : public UniversalJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTUniversalJoint : public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent

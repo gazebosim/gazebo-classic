@@ -19,16 +19,11 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
-
-#ifdef HAVE_FFMPEG
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#endif
+#include <gazebo/common/ffmpeg_inc.h>
 
 #include "test_config.h"
-#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/AudioDecoder.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
