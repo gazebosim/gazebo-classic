@@ -58,7 +58,7 @@ TEST_F(GzCamera, Follow)
   // Tell the camera to follow the box. The camera should move toward the
   // box.
   custom_exec("gz camera -c test_camera -f box");
-  world->Step(1000);
+  world->Step(5000);
 
   // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
