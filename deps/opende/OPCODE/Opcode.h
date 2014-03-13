@@ -19,6 +19,7 @@
 // Include Guard
 #ifndef __OPCODE_H__
 #define __OPCODE_H__
+#pragma GCC system_header
 
 // stdarg.h must be included before Opcode headers as it later
 // may not compile being not able to find std::va_list
