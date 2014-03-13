@@ -38,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
