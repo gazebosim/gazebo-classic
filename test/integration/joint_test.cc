@@ -149,6 +149,33 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
+void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
+{
+  // Load our inertia ratio world
+  Load("worlds/inertia_ratio.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("double_pendulum");
+  ASSERT_TRUE(model != NULL);
+
+  {
+    physics::JointPtr joint = model->GetJoint("lower_joint");
+    ASSERT_TRUE(joint != NULL);
+
+    EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+  }
+}
+//////////////////////////////////////////////////
 void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 {
   /// SpringDamper implemented not yet released for dart
@@ -199,6 +226,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkPluginImplicit != NULL);
   ASSERT_TRUE(linkContact != NULL);
 
+  physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
+  ASSERT_TRUE(jointPluginImplicit);
+
   int cyclesPrismatic = 0;
   int cyclesRevolute = 0;
   int cyclesPluginExplicit = 0;
@@ -211,6 +241,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   double velPluginImplicit = 1.0;
   double velContact = 1.0;
   const double vT = 0.01;
+
+  double energyPluginImplicit0 = linkPluginImplicit->GetWorldEnergy()
+        + jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
 
   // check number of oscillations for each of the setup.  They should all
   // be the same.
@@ -277,6 +310,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       velContact = -1.0;
     }
 
+    double energy = linkPluginImplicit->GetWorldEnergy() +
+                   jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
+    EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 1e-3);
     // gzdbg << i << "\n";
     // gzdbg << cyclesPrismatic << " : "
     //       << linkPrismatic->GetWorldLinearVel() << "\n";
@@ -288,16 +324,10 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   if (_physicsEngine.compare("ode") == 0)
   {
     gzdbg << "Extra tests for ode" << std::endl;
-    EXPECT_EQ(cyclesPrismatic,      17);
-    EXPECT_EQ(cyclesRevolute,       17);
     EXPECT_EQ(cyclesContact,        17);
   }
-  else if (_physicsEngine.compare("simbody") == 0)
-  {
-    gzdbg << "Extra tests for simbody" << std::endl;
-    EXPECT_EQ(cyclesPrismatic,      17);
-    EXPECT_EQ(cyclesRevolute,       17);
-  }
+  EXPECT_EQ(cyclesPrismatic,      17);
+  EXPECT_EQ(cyclesRevolute,       17);
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
 }
@@ -347,6 +377,11 @@ TEST_F(JointTest, joint_SDF14)
 TEST_P(JointTest, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
+}
+
+TEST_P(JointTest, GetInertiaRatio)
+{
+  GetInertiaRatio(this->physicsEngine);
 }
 
 TEST_P(JointTest, SpringDamperTest)
