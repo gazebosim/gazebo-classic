@@ -577,12 +577,12 @@ ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
 
 /**
  * @brief Turn on experimental row reordering, so within one sweep,
- * follwoing ordering of constraints are used:
- *   1. bilateral constrains
- *   2. all contact normal constrains
- *   3. all friction force constrains
+ * following ordering of constraints are used:
+ *   1. bilateral constraints
+ *   2. all contact normal constraints
+ *   3. all friction force constraints
  * otherwise, use standard reordering
- *   1. bilateral constrains
+ *   1. bilateral constraints
  *   2. sweep each contact sequentially.  For each contact,
  *      solve normal constraint followed by 2 friction constraints.
  * @ingroup world

@@ -105,13 +105,13 @@ struct dxQuickStepParameters {
   // rms_dlambda for this time step
   // rms_dlambda[0]: bilateral constraints (findex = -1)
   // rms_dlambda[1]: contact normal constraints (findex = -2)
-  // rms_dlambda[2]: friciton constraints (findex >= 0)
+  // rms_dlambda[2]: friction constraints (findex >= 0)
   // rms_dlambda[3]: total
   dReal rms_dlambda[4];
   // rms of Jv bbresiduals for this time step
   // rms_constraint_residual[0]: bilateral constraints (findex = -1)
   // rms_constraint_residual[1]: contact normal constraints (findex = -2)
-  // rms_constraint_residual[2]: friciton constraints (findex >= 0)
+  // rms_constraint_residual[2]: friction constraints (findex >= 0)
   // rms_constraint_residual[3]: total
   dReal rms_constraint_residual[4];     // all constraint errors
   int num_contacts;           // for monitoring number of contacts
