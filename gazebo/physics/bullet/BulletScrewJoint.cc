@@ -708,11 +708,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // right-hand part
     btScalar lostop = getLowerLinLimit();
     btScalar histop = getUpperLinLimit();
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-    if (limit && (lostop == histop))
-#pragma GCC diagnostic pop
+    if (limit && math::equal(lostop == histop))
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -743,11 +739,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimLin;
       }
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-      if (lostop == histop)
-#pragma GCC diagnostic pop
+      if (math::equal(lostop == histop))
       {  // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
         info->m_upperLimit[srow] = SIMD_INFINITY;
@@ -841,11 +833,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
 
     btScalar lostop = getLowerAngLimit();
     btScalar histop = getUpperAngLimit();
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-    if (limit && (lostop == histop))
-#pragma GCC diagnostic pop
+    if (limit && math::equal(lostop == histop))
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -871,11 +859,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimAng;
       }
-// copied from bullet, I don't want to change code to mess with behavior
-// until further testing.
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-      if (lostop == histop)
-#pragma GCC diagnostic pop
+      if (math::equal(lostop == histop))
       {
         // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
