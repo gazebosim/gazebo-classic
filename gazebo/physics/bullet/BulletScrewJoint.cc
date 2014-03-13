@@ -69,6 +69,10 @@ namespace gazebo
       public: btScalar getLinearPosition();
       public: btScalar getAngularPosition();
 
+      // needed non-const version for SetForce
+      public: btRigidBody& getRigidBodyA();
+      public: btRigidBody& getRigidBodyB();
+
       public: virtual void setThreadPitch(double _threadPitch)
       {
         this->threadPitch = _threadPitch;
@@ -330,9 +334,64 @@ double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
+void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
 {
-  gzlog << "Not implemented\n";
+  if (this->bulletScrew)
+  {
+    // if (_index < this->GetAngleCount())
+    if (_index == 0)
+    {
+      // z-axis of constraint frame
+      btVector3 hingeAxisLocalA =
+        this->bulletScrew->getFrameOffsetA().getBasis().getColumn(2);
+      btVector3 hingeAxisLocalB =
+        this->bulletScrew->getFrameOffsetB().getBasis().getColumn(2);
+
+      btVector3 hingeAxisWorldA =
+        this->bulletScrew->getRigidBodyA().getWorldTransform().getBasis() *
+        hingeAxisLocalA;
+      btVector3 hingeAxisWorldB =
+        this->bulletScrew->getRigidBodyB().getWorldTransform().getBasis() *
+        hingeAxisLocalB;
+
+      btVector3 hingeTorqueA = _force * hingeAxisWorldA;
+      btVector3 hingeTorqueB = _force * hingeAxisWorldB;
+
+      this->bulletScrew->getRigidBodyA().applyTorque(hingeTorqueA);
+      this->bulletScrew->getRigidBodyB().applyTorque(-hingeTorqueB);
+    }
+    else if (_index == 1)
+    {
+      if (this->constraint)
+      {
+        // x-axis of constraint frame
+        btVector3 hingeAxisLocalA =
+          this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
+        btVector3 hingeAxisLocalB =
+          this->bulletScrew->getFrameOffsetB().getBasis().getColumn(0);
+
+        btVector3 hingeAxisWorldA =
+          this->bulletScrew->getRigidBodyA().getWorldTransform().getBasis() *
+          hingeAxisLocalA;
+        btVector3 hingeAxisWorldB =
+          this->bulletScrew->getRigidBodyB().getWorldTransform().getBasis() *
+          hingeAxisLocalB;
+
+        btVector3 hingeForceA = _force * hingeAxisWorldA;
+        btVector3 hingeForceB = _force * hingeAxisWorldB;
+
+        // TODO: switch to applyForce and specify body-fixed offset
+        this->constraint->getRigidBodyA().applyCentralForce(-hingeForceA);
+        this->constraint->getRigidBodyB().applyCentralForce(hingeForceB);
+      }
+      else
+        gzerr << "BulletScrewJoint::constraint not created yet.\n";
+    }
+    else
+      gzerr << "Invalid index [" << _index << "]\n";
+  }
+  else
+    gzerr << "bulletScrew not created yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -421,6 +480,18 @@ btScalar btScrewConstraint::getLinearPosition()
   this->calculateTransforms(
     m_rbA.getCenterOfMassTransform(), m_rbB.getCenterOfMassTransform());
   return this->m_depth[0];
+}
+
+//////////////////////////////////////////////////
+btRigidBody& btScrewConstraint::getRigidBodyA()	
+{		
+  return this->m_rbA;	
+}	
+
+//////////////////////////////////////////////////
+btRigidBody& btScrewConstraint::getRigidBodyB()	
+{		
+  return this->m_rbB;	
 }
 
 //////////////////////////////////////////////////

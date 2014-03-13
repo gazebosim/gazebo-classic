@@ -41,12 +41,6 @@ class JointTestScrew : public ServerFixture,
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Bullet Screw Joint will not work until pull request #1008.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
@@ -184,8 +178,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Bullet Screw Joint will not work until pull request #1008.\n";
-    return;
+    gzerr << "BulletScrewJoint::SetForce() is broken (issue #1105).\n";
+    // return;
   }
 
   if (_physicsEngine == "dart")
