@@ -25,6 +25,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// will intelligently generate fixed joints between the gripper and an
     /// object within the gripper. This allows the object to be manipulated
     /// without falling or behaving poorly.
-    class Gripper
+    class GAZEBO_VISIBLE Gripper
     {
       /// \brief Constructor
       /// \param[in] _model The model which contains the Gripper.
