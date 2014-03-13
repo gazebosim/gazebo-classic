@@ -664,6 +664,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
       cameraName = cameraBaseName + boost::lexical_cast<std::string>(++i);
     }
   }
+  else
+    gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
     this->userCamera = _scene->CreateUserCamera(cameraName);
