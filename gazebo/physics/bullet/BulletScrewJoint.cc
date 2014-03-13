@@ -217,11 +217,15 @@ void BulletScrewJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "Unable to create a joint without links\n";
+    return;
   }
 
   if (!this->bulletScrew)
-    gzthrow("unable to create bullet screw joint\n");
+  {
+    gzerr << "unable to create bullet screw joint\n";
+    return;
+  }
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
