@@ -74,6 +74,9 @@
 
 ### Additions
 
+1. **gazebo/transport/TransportIface.hh**
+    +  transport::ConnectionPtr connectToMaster()
+
 1. **gazebo/physics/World.hh**
     +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
