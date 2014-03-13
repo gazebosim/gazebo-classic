@@ -36,6 +36,7 @@
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 /// \brief maximum number of axis per joint anticipated.
 /// Currently, this is 2 as 3-axis joints (e.g. ball)
@@ -51,7 +52,7 @@ namespace gazebo
 
     /// \class Joint Joint.hh physics/physics.hh
     /// \brief Base class for all joints
-    class Joint : public Base
+    class GAZEBO_VISIBLE Joint : public Base
     {
       /// \enum Attribute
       /// \brief Joint attribute types.
@@ -421,21 +422,25 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief Computes MOI inertia across joint DOF axis given index.
-      /// The inertia ratio for each joint across joint axis
-      /// gives a sense of how sensitive the joint being controlled
-      /// is to joint actuation torques.
+      /// \brief Computes moment of inertia (MOI) across a specified joint axis.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The inertia ratio for each joint axis indicates the sensitivity
+      /// of the joint to actuation torques.
       /// \param[in] _index axis number about which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(unsigned int _index) const;
+      public: double GetInertiaRatio(const unsigned int _index) const;
 
-      /// \brief Computes MOI inertia across an arbitrary axis.
-      /// The inertia ratio for each joint across constrained direction
-      /// gives a sense of how well this model will perform using PGS-type
+      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
+      /// specified in the world frame.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The moment of inertia ratio along constrained directions of a joint
+      /// has an impact on the performance of Projected Gauss Seidel (PGS)
       /// iterative LCP methods.
-      /// \param[in] _axis axis about which MOI ratio is computed.
+      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(math::Vector3 _axis) const;
+      public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
@@ -526,7 +531,8 @@ namespace gazebo
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
-      /// based on reference position.
+      /// based on the reference position of the spring.
+      /// If using metric system, the unit of energy will be Joules.
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 

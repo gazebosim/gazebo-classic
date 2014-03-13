@@ -22,11 +22,12 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief A plugin for breakable joints, based on a ForceTorque sensor plugin
-  class BreakableJointPlugin : public ForceTorquePlugin
+  class GAZEBO_VISIBLE BreakableJointPlugin : public ForceTorquePlugin
   {
     /// \brief Constructor
     public: BreakableJointPlugin();

@@ -26,6 +26,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class Pose Pose.hh math/gzmath.hh
     /// \brief Encapsulates a position and rotation in three space
-    class Pose
+    class GAZEBO_VISIBLE Pose
     {
       /// \brief math::Pose(0, 0, 0, 0, 0, 0)
       public: static const Pose Zero;

@@ -22,6 +22,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -32,7 +33,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private class attributes for InsertModelWidget.
-    class InsertModelWidgetPrivate
+    class GAZEBO_VISIBLE InsertModelWidgetPrivate
     {
       /// \brief Widget that display all the models that can be inserted.
       public: QTreeWidget *fileTreeWidget;

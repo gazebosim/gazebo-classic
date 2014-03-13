@@ -609,7 +609,7 @@ void Joint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(math::Vector3 _axis) const
+double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
@@ -617,14 +617,21 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
     math::Matrix3 cm = this->childLink->GetWorldInertiaMatrix();
 
     // matrix times axis
-    // \todo: add operator in Matrix3 class so we can do Matrix3 * Vector3
     math::Vector3 pia = pm * _axis;
     math::Vector3 cia = cm * _axis;
     double piam = pia.GetLength();
     double ciam = cia.GetLength();
 
     // return ratio of child MOI to parent MOI.
-    return ciam/piam;
+    if (!math::equal(piam, 0.0))
+    {
+      return ciam/piam;
+    }
+    else
+    {
+      gzerr << "Parent MOI is zero, ratio is not well defined.\n";
+      return 0;
+    }
   }
   else
   {
@@ -635,18 +642,14 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(unsigned int _index) const
+double Joint::GetInertiaRatio(const unsigned int _index) const
 {
   if (this->parentLink && this->childLink)
   {
     if (_index < this->GetAngleCount())
     {
-      // get parent model pose
-      math::Pose pose = this->model->GetWorldPose();
-
-      // rotate joint axis in local frame into global frame
-      math::Vector3 axis = this->GetLocalAxis(_index);
-      axis = pose.rot.RotateVectorReverse(axis);
+      // joint axis in global frame
+      math::Vector3 axis = this->GetGlobalAxis(_index);
 
       // compute ratio about axis
       return this->GetInertiaRatio(axis);
@@ -660,8 +663,8 @@ double Joint::GetInertiaRatio(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get inertia ratio across joint.\n";
+    gzerr << "Either parent or child link is missing or static, "
+          << "cannot compute inertia ratio.  Returning 0.\n";
     return 0;
   }
 }
@@ -934,7 +937,7 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   // compute potential energy due to spring compression
   // 1/2 k x^2
   double k = this->stiffnessCoefficient[_index];
-  double x = this->GetAngle(_index).Radian() - 
+  double x = this->GetAngle(_index).Radian() -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
 }
