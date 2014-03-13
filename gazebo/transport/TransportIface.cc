@@ -377,6 +377,24 @@ transport::ConnectionPtr transport::connectToMaster()
       if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
         std::cerr << "Conflicting gazebo versions\n";
     }
+    else
+    {
+      gzerr  << "Failed to received init packet from master. "
+        << "Connection to master failed\n";
+      connection.reset();
+    }
+  }
+  else
+  {
+    gzerr << "Unable to connect to master.\n";
+    connection.reset();
+  }
+
+  if (connection && !connection->IsOpen())
+  {
+    gzerr << "Connection to master instatiated, but socket is not open."
+      << "Connection to master failed\n";
+    connection.reset();
   }
 
   return connection;
