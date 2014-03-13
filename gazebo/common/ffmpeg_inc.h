@@ -14,26 +14,24 @@
  * limitations under the License.
  *
 */
-#ifndef _SSAOLOGIC_HH_
-#define _SSAOLOGIC_HH_
 
-#include <OgreCompositorInstance.h>
-#include <OgreCompositorLogic.h>
-#include <map>
+#ifndef _GAZEBO_FFMPEG_INC_HH_
+#define _GAZEBO_FFMPEG_INC_HH_
 
-#include "gazebo/rendering/deferred_shading/ListenerFactoryLogic.hh"
-#include "gazebo/util/system.hh"
+#pragma GCC system_header
 
-namespace gazebo
-{
-  namespace rendering
-  {
-    class GAZEBO_VISIBLE SSAOLogic : public ListenerFactoryLogic
-    {
-      /// @copydoc ListenerFactoryLogic::createListener
-      protected: virtual Ogre::CompositorInstance::Listener *createListener(
-                     Ogre::CompositorInstance* instance);
-    };
-  }
-}
+#ifdef HAVE_FFMPEG
+#ifndef INT64_C
+#define INT64_C(c) (c ## LL)
+#define UINT64_C(c) (c ## ULL)
 #endif
+
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/opt.h>
+#include <libswscale/swscale.h>
+}
+#endif  // ifdef HAVE_FFMPEG
+
+#endif  // ifndef _GAZEBO_FFMPEG_INC_HH

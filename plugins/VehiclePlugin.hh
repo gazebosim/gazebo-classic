@@ -28,10 +28,11 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class VehiclePlugin : public ModelPlugin
+  class GAZEBO_VISIBLE VehiclePlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: VehiclePlugin();

@@ -23,7 +23,9 @@
 #ifndef _ODE_UTIL_H_
 #define _ODE_UTIL_H_
 
+#ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)(-1))
+#endif
 #include "objects.h"
 
 

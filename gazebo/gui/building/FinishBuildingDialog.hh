@@ -20,6 +20,7 @@
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class FinishBuildingDialog FinishBuildingDialog.hh
     /// \brief Dialog for saving the building model.
-    class FinishBuildingDialog : public QDialog
+    class GAZEBO_VISIBLE FinishBuildingDialog : public QDialog
     {
       Q_OBJECT
 
