@@ -609,7 +609,7 @@ void Joint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(math::Vector3 _axis) const
+double Joint::GetInertiaRatio(const math::Vector3 _axis) const
 {
   if (this->parentLink && this->childLink)
   {
@@ -642,7 +642,7 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(unsigned int _index) const
+double Joint::GetInertiaRatio(const unsigned int _index) const
 {
   if (this->parentLink && this->childLink)
   {

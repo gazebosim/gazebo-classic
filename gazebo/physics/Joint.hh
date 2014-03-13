@@ -428,7 +428,7 @@ namespace gazebo
       /// of the joint to actuation torques.
       /// \param[in] _index axis number about which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(unsigned int _index) const;
+      public: double GetInertiaRatio(const unsigned int _index) const;
 
       /// \brief Computes moment of inertia (MOI) across an arbitrary axis
       /// specified in the world frame.
@@ -439,7 +439,7 @@ namespace gazebo
       /// iterative LCP methods.
       /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(math::Vector3 _axis) const;
+      public: double GetInertiaRatio(const math::Vector3 _axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
