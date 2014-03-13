@@ -106,6 +106,14 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
       public: virtual double GetAttribute(const std::string &_key,
                   unsigned int _index);
 

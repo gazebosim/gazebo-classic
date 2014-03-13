@@ -341,11 +341,11 @@ void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
     // if (_index < this->GetAngleCount())
     if (_index == 0)
     {
-      // z-axis of constraint frame
+      // x-axis of constraint frame
       btVector3 hingeAxisLocalA =
-        this->bulletScrew->getFrameOffsetA().getBasis().getColumn(2);
+        this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
       btVector3 hingeAxisLocalB =
-        this->bulletScrew->getFrameOffsetB().getBasis().getColumn(2);
+        this->bulletScrew->getFrameOffsetB().getBasis().getColumn(0);
 
       btVector3 hingeAxisWorldA =
         this->bulletScrew->getRigidBodyA().getWorldTransform().getBasis() *
@@ -357,8 +357,8 @@ void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
       btVector3 hingeTorqueA = _force * hingeAxisWorldA;
       btVector3 hingeTorqueB = _force * hingeAxisWorldB;
 
-      this->bulletScrew->getRigidBodyA().applyTorque(hingeTorqueA);
-      this->bulletScrew->getRigidBodyB().applyTorque(-hingeTorqueB);
+      this->bulletScrew->getRigidBodyA().applyTorque(-hingeTorqueA);
+      this->bulletScrew->getRigidBodyB().applyTorque(hingeTorqueB);
     }
     else if (_index == 1)
     {
@@ -415,6 +415,60 @@ double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
 }
 
 //////////////////////////////////////////////////
+void BulletScrewJoint::SetHighStop(unsigned int _index,
+                      const math::Angle &_angle)
+{
+  Joint::SetHighStop(0, _angle);
+
+  // bulletScrew axial rotation is backward
+  if (this->bulletScrew)
+  {
+    double upper = this->bulletScrew->getUpperLinLimit();
+    if (_index == 0)
+    {
+      // angular is linear * threadPitch
+      this->bulletScrew->setLowerLinLimit(std::min(upper,
+        _angle.Radian()*this->threadPitch));
+    }
+    else if (_index == 1)
+    {
+      this->bulletScrew->setLowerLinLimit(std::min(upper, _angle.Radian()));
+    }
+    else
+      gzerr << "Invalid index [" << _index << "]\n";
+  }
+  else
+    gzerr << "bulletScrew not created yet.\n";
+}
+
+//////////////////////////////////////////////////
+void BulletScrewJoint::SetLowStop(unsigned int _index,
+                     const math::Angle &_angle)
+{
+  Joint::SetLowStop(0, _angle);
+
+  // bulletScrew axial rotation is backward
+  if (this->bulletScrew)
+  {
+    double lower = this->bulletScrew->getLowerLinLimit();
+    if (_index == 0)
+    {
+      // angular is linear * threadPitch
+      this->bulletScrew->setUpperLinLimit(std::max(lower,
+        _angle.Radian()*this->threadPitch));
+    }
+    else if (_index == 1)
+    {
+      this->bulletScrew->setUpperLinLimit(std::max(lower, _angle.Radian()));
+    }
+    else
+      gzerr << "Invalid index [" << _index << "]\n";
+  }
+  else
+    gzerr << "bulletScrew not created yet.\n";
+}
+
+//////////////////////////////////////////////////
 math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   math::Vector3 result = this->initialWorldAxis;
@@ -447,6 +501,8 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
       // linear position
       result = this->bulletScrew->getLinearPosition();
     }
+    else
+      gzerr << "Invalid index [" << _index << "]\n";
   }
   else
     gzerr << "bulletScrew not created yet\n";

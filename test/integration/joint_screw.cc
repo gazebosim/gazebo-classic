@@ -178,8 +178,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "BulletScrewJoint::SetForce() is broken (issue #1105).\n";
-    // return;
+    gzerr << "BulletScrewJoint::GetAngle() is broken (issue #1081).\n";
+    return;
   }
 
   if (_physicsEngine == "dart")
