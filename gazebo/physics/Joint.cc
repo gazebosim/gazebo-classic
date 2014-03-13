@@ -623,7 +623,15 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
     double ciam = cia.GetLength();
 
     // return ratio of child MOI to parent MOI.
-    return ciam/piam;
+    if (!math::equal(piam, 0.0))
+    {
+      return ciam/piam;
+    }
+    else
+    {
+      gzerr << "Parent MOI is zero, ratio is not well defined.\n";
+      return 0;
+    }
   }
   else
   {
