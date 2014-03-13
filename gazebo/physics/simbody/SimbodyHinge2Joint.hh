@@ -23,6 +23,7 @@
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
     {
       /// \brief Constructor
       public: SimbodyHinge2Joint(SimTK::MultibodySystem *world,

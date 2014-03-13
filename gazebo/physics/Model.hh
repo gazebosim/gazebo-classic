@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -48,7 +49,7 @@ namespace gazebo
 
     /// \class Model Model.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class Model : public Entity
+    class GAZEBO_VISIBLE Model : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
@@ -305,6 +306,23 @@ namespace gazebo
       /// \return Size of this->grippers array.
       /// \sa Model::GetGripper()
       public: size_t GetGripperCount() const;
+
+      /// \brief Returns the potential energy of all links
+      /// and joint springs in the model.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential() const;
+
+      /// \brief Returns sum of the kinetic energies of all links
+      /// in this model.  Computed using link's CoG velocity in
+      /// the inertial (world) frame.
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic() const;
+
+      /// \brief Returns this model's total energy, or
+      /// sum of Model::GetWorldEnergyPotential() and
+      /// Model::GetWorldEnergyKinetic().
+      /// \return this link's total energy
+      public: double GetWorldEnergy() const;
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
