@@ -514,12 +514,7 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
 ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
 
 /**
- * @brief Get the RMS of Jv of the quickstep step
- * Bug: projection is not taken in to account for
- * unilateral contact normal and frictional solutions.
- * I.e. if two bodies constrained by contact normal are moving
- * apart, the positive separation velocity shows up as error.
- * Please fix.
+ * @brief Get the RMS of Jv of the quickstep step.
  * The unit of constraint residuals are same as the units of velocities.
  * @ingroup world
  * @returns the rms error
