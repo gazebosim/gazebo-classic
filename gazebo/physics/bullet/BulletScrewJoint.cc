@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -34,11 +33,12 @@ namespace gazebo
           const btTransform &_frameInA, const btTransform &_frameInB,
           bool _useLinearReferenceFrameA)
           : btSliderConstraint(_rbA, _rbB, _frameInA, _frameInB,
-              _useLinearReferenceFrameA) {}
+              _useLinearReferenceFrameA), threadPitch(0.0) {}
 
       public: btScrewConstraint(btRigidBody &_rbB,
           const btTransform &_frameInB, bool _useLinearReferenceFrameA)
-          : btSliderConstraint(_rbB, _frameInB, _useLinearReferenceFrameA) {}
+          : btSliderConstraint(_rbB, _frameInB, _useLinearReferenceFrameA),
+          threadPitch(0.0) {}
 
       public: virtual void getInfo1(btConstraintInfo1 *_info)
       {
@@ -704,7 +704,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // right-hand part
     btScalar lostop = getLowerLinLimit();
     btScalar histop = getUpperLinLimit();
+// copied from bullet, I don't want to change code to mess with behavior
+// until further testing.
+#pragma GCC diagnostic ignored "-Wfloat-equal"
     if (limit && (lostop == histop))
+#pragma GCC diagnostic pop
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -735,7 +739,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimLin;
       }
+// copied from bullet, I don't want to change code to mess with behavior
+// until further testing.
+#pragma GCC diagnostic ignored "-Wfloat-equal"
       if (lostop == histop)
+#pragma GCC diagnostic pop
       {  // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
         info->m_upperLimit[srow] = SIMD_INFINITY;
@@ -829,7 +837,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
 
     btScalar lostop = getLowerAngLimit();
     btScalar histop = getUpperAngLimit();
+// copied from bullet, I don't want to change code to mess with behavior
+// until further testing.
+#pragma GCC diagnostic ignored "-Wfloat-equal"
     if (limit && (lostop == histop))
+#pragma GCC diagnostic pop
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -855,7 +867,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
       {
         info->cfm[srow] = m_cfmLimAng;
       }
+// copied from bullet, I don't want to change code to mess with behavior
+// until further testing.
+#pragma GCC diagnostic ignored "-Wfloat-equal"
       if (lostop == histop)
+#pragma GCC diagnostic pop
       {
         // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
@@ -974,4 +990,3 @@ void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
   }
   // printf("m: %d\n", info->m_numConstraintRows);
 }
-
