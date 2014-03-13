@@ -52,7 +52,7 @@
 //#define PENETRATION_JVERROR_CORRECTION
 //#define POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
 
-#define CHECK_VELOCITY_OBEYS_CONSTRAINT
+#undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
 
 #ifdef USE_TPROW
@@ -108,6 +108,7 @@ struct dxSORLCPParameters {
     dRealPtr lo;
     dRealPtr invMOI;
     dRealPtr MOI;
+    dRealPtr Ad;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
     dRealMutablePtr rhs;
@@ -522,6 +523,7 @@ static void ComputeRows(
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
   dRealPtr        lo           = params.lo;
+  dRealPtr        Ad           = params.Ad;
   dRealPtr        Adcfm        = params.Adcfm;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
   dRealMutablePtr rhs          = params.rhs;
@@ -588,12 +590,18 @@ static void ComputeRows(
   printf("\n");
   */
 
-  int m_rms_error[3];
-  m_rms_error[0] = 0;
-  m_rms_error[1] = 0;
-  m_rms_error[2] = 0;
+  int m_rms_dlambda[3];
+  m_rms_dlambda[0] = 0;
+  m_rms_dlambda[1] = 0;
+  m_rms_dlambda[2] = 0;
+
+  // rms of dlambda
+  dReal rms_dlambda[4];
+  dSetZero(rms_dlambda, 4);
+  // rms of b_i - A_ij \lambda_j as we sweep through rows
   dReal rms_error[4];
   dSetZero(rms_error, 4);
+
   int num_iterations = qs->num_iterations;
   int precon_iterations = qs->precon_iterations;
   dReal sor_lcp_tolerance = qs->sor_lcp_tolerance;
@@ -621,17 +629,21 @@ static void ComputeRows(
     friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
+    // reset rms_dlambda at beginning of iteration
+    rms_dlambda[2] = 0;
     // reset rms_error at beginning of iteration
     rms_error[2] = 0;
-    m_rms_error[2] = 0;
+    m_rms_dlambda[2] = 0;
     if (iteration < num_iterations + precon_iterations)
     {
-      // skip resetting rms_error for bilateral constraints
+      // skip resetting rms_dlambda and rms_error for bilateral constraints
       // and contacct normals during extra friciton iterations.
+      rms_dlambda[0] = 0;
       rms_error[0] = 0;
-      m_rms_error[0] = 0;
+      m_rms_dlambda[0] = 0;
+      rms_dlambda[1] = 0;
       rms_error[1] = 0;
-      m_rms_error[1] = 0;
+      m_rms_dlambda[1] = 0;
     }
 
 #ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
@@ -831,20 +843,46 @@ static void ComputeRows(
         }
 
         // record error (for the non-erp version)
+        // given
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   where  Ad = sor / (A_ii + cfm)
+        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
+        // thus, to get residual from dlambda,
+        //   residual = dlambda / Ad
+        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        //   where AdAd1 = 1/(Ad * Ad)
+        dReal AdAd1 = 0.0;
+        if (!_dequal(Ad[index], 0.0))
+        {
+          // Ad[i] = sor_w / (sum + cfm[i]);
+          AdAd1 = 1.0 / (Ad[index] * Ad[index]);
+        }
+        else
+        {
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
+        }
+
         if (constraint_index == -1)  // bilateral
         {
-          rms_error[0] += delta_precon*delta_precon;
-          m_rms_error[0]++;
+          rms_dlambda[0] += delta_precon*delta_precon;
+          rms_error[0] += rms_dlambda[0]*AdAd1;
+          m_rms_dlambda[0]++;
         }
         else if (constraint_index == -2)  // contact normal
         {
-          rms_error[1] += delta_precon*delta_precon;
-          m_rms_error[1]++;
+          rms_dlambda[1] += delta_precon*delta_precon;
+          rms_error[1] += rms_dlambda[1]*AdAd1;
+          m_rms_dlambda[1]++;
         }
         else  // friction forces
         {
-          rms_error[2] += delta_precon*delta_precon;
-          m_rms_error[2]++;
+          rms_dlambda[2] += delta_precon*delta_precon;
+          rms_error[2] += rms_dlambda[2]*AdAd1;
+          m_rms_dlambda[2]++;
         }
 
         old_lambda_erp = old_lambda;
@@ -1016,20 +1054,46 @@ static void ComputeRows(
         }
 
         // record error (for the non-erp version)
+        // given
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        //   where  Ad = sor / (A_ii + cfm)
+        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
+        // thus, to get residual from dlambda,
+        //   residual = dlambda / Ad
+        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        //   where AdAd1 = 1/(Ad * Ad)
+        dReal AdAd1 = 0.0;
+        if (!_dequal(Ad[index], 0.0))
+        {
+          // Ad[i] = sor_w / (sum + cfm[i]);
+          AdAd1 = 1.0 / (Ad[index] * Ad[index]);
+        }
+        else
+        {
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
+        }
+
         if (constraint_index == -1)  // bilateral
         {
-          rms_error[0] += delta*delta;
-          m_rms_error[0]++;
+          rms_dlambda[0] += delta*delta;
+          rms_error[0] += rms_dlambda[0]*AdAd1;
+          m_rms_dlambda[0]++;
         }
         else if (constraint_index == -2)  // contact normal
         {
-          rms_error[1] += delta*delta;
-          m_rms_error[1]++;
+          rms_dlambda[1] += delta*delta;
+          rms_error[1] += rms_dlambda[1]*AdAd1;
+          m_rms_dlambda[1]++;
         }
         else  // friction forces
         {
-          rms_error[2] += delta*delta;
-          m_rms_error[2]++;
+          rms_dlambda[2] += delta*delta;
+          rms_error[2] += rms_dlambda[2]*AdAd1;
+          m_rms_dlambda[2]++;
         }
       }
 
@@ -1046,11 +1110,19 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-    qs->rms_dlambda[0] = sqrt(rms_error[0]/(dReal)m_rms_error[0]);
-    qs->rms_dlambda[1] = sqrt(rms_error[1]/(dReal)m_rms_error[1]);
-    qs->rms_dlambda[2] = sqrt(rms_error[2]/(dReal)m_rms_error[2]);
+    qs->rms_dlambda[0] = sqrt(rms_dlambda[0]/(dReal)m_rms_dlambda[0]);
+    qs->rms_dlambda[1] = sqrt(rms_dlambda[1]/(dReal)m_rms_dlambda[1]);
+    qs->rms_dlambda[2] = sqrt(rms_dlambda[2]/(dReal)m_rms_dlambda[2]);
     qs->rms_dlambda[3] =
       qs->rms_dlambda[0] + qs->rms_dlambda[1] + qs->rms_dlambda[2];
+
+    qs->rms_constraint_residual[0] = sqrt(rms_error[0]/(dReal)m_rms_dlambda[0]);
+    qs->rms_constraint_residual[1] = sqrt(rms_error[1]/(dReal)m_rms_dlambda[1]);
+    qs->rms_constraint_residual[2] = sqrt(rms_error[2]/(dReal)m_rms_dlambda[2]);
+    qs->rms_constraint_residual[3] =
+      qs->rms_constraint_residual[0] +
+      qs->rms_constraint_residual[1] +
+      qs->rms_constraint_residual[2];
 
     // debugging mutex locking
     //{
@@ -1081,13 +1153,14 @@ static void ComputeRows(
 
     // option to stop when tolerance has been met
     if (iteration >= precon_iterations &&
-        qs->rms_dlambda[3] < sor_lcp_tolerance)
+        qs->rms_constraint_residual[3] < sor_lcp_tolerance)
     {
       #ifdef DEBUG_CONVERGENCE_TOLERANCE
         printf("CONVERGED: id: %d steps: %d,"
                " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
           thread_id, iteration,
-          qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
+          qs->rms_constraint_residual[0], qs->rms_constraint_residual[1],
+          qs->rms_constraint_residual[2],
           sor_lcp_tolerance);
       #endif
       // tolerance satisfied, stop iterating
@@ -1099,7 +1172,8 @@ static void ComputeRows(
         printf("WARNING: id: %d did not converge in %d steps,"
                " rms(%20.18f + %20.18f + %20.18f) > tol(%20.18f)\n",
           thread_id, num_iterations,
-          qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
+          qs->rms_constraint_residual[0], qs->rms_constraint_residual[1],
+          qs->rms_constraint_residual[2],
           sor_lcp_tolerance);
       #endif
     }
@@ -1112,9 +1186,12 @@ static void ComputeRows(
     printf("%f, ", lambda[i]);
   printf("]\n");
   printf("MONITOR: id: %d steps: %d,"
+         " dlambda(%20.18f + %20.18f + %20.18f),"
          " rms(%20.18f + %20.18f + %20.18f) < tol(%20.18f)\n",
     thread_id, total_iterations,
     qs->rms_dlambda[0], qs->rms_dlambda[1], qs->rms_dlambda[2],
+    qs->rms_constraint_residual[0], qs->rms_constraint_residual[1],
+    qs->rms_constraint_residual[2],
     sor_lcp_tolerance);
 #endif
   //printf("vnew: ");
@@ -1417,6 +1494,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].lo = lo;
     params[thread_id].invMOI = invMOI;
     params[thread_id].MOI= MOI;
+    params[thread_id].Ad = Ad;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
     params[thread_id].rhs = rhs;
