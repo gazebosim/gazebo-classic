@@ -942,7 +942,7 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    if (!readFile(path.string(), sdf))
+    if (!sdf::readFile(path.string(), sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
@@ -996,7 +996,7 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    if (!readFile(path.string(), sdf))
+    if (!sdf::readFile(path.string(), sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return false;

@@ -370,16 +370,16 @@ transport::ConnectionPtr transport::connectToMaster()
     }
 
     packet.ParseFromString(data);
-    if (packet.type() == "init")
+    if (packet.type() == "version_init")
     {
       msgs::GzString msg;
       msg.ParseFromString(packet.serialized_data());
-      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
         std::cerr << "Conflicting gazebo versions\n";
     }
     else
     {
-      gzerr  << "Failed to received init packet from master. "
+      gzerr  << "Failed to received version_init packet from master. "
         << "Connection to master failed\n";
       connection.reset();
     }
