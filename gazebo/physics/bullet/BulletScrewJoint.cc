@@ -414,14 +414,20 @@ void btScrewConstraint::_getInfo2NonVirtual(
     const btVector3& linVelB,
     btScalar rbAinvMass,btScalar rbBinvMass)
 {
-  ///TODO set up screw constraints;
+  /// This is a copy of btSliderConstraint::getInfo2NonVirtual(...)
+  /// with minor changes to the ax1 direction constraint.
+  /// Mainly, the axial limit constraint is always on and is
+  /// changed to a screw constraint.
+
+  /// First, always turn on 
   const btTransform& trA = getCalculatedTransformA();
   const btTransform& trB = getCalculatedTransformB();
   
   btAssert(!m_useSolveConstraintObsolete);
   int i, s = info->rowskip;
   
-  btScalar signFact = m_useLinearReferenceFrameA ? btScalar(1.0f) : btScalar(-1.0f);
+  btScalar signFact = m_useLinearReferenceFrameA ?
+    btScalar(1.0f) : btScalar(-1.0f);
   
   // difference between frames in WCS
   btVector3 ofs = trB.getOrigin() - trA.getOrigin();
@@ -496,7 +502,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
   // ax1 x ax2 is in the plane space of ax1, so we project the angular
   // velocity to p and q to find the right hand side.
 //  btScalar k = info->fps * info->erp * getSoftnessOrthoAng();
-  btScalar currERP = (m_flags & BT_SLIDER_FLAGS_ERP_ORTANG) ? m_softnessOrthoAng : m_softnessOrthoAng * info->erp;
+  btScalar currERP = (m_flags & BT_SLIDER_FLAGS_ERP_ORTANG) ?
+    m_softnessOrthoAng : m_softnessOrthoAng * info->erp;
   btScalar k = info->fps * currERP;
 
   btVector3 u = ax1A.cross(ax1B);
@@ -516,7 +523,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
 
   // next two rows. 
   // we want: velA + wA x relA == velB + wB x relB ... but this would
-  // result in three equations, so we project along two orthos to the slider axis
+  // result in three equations, so we project along two orthos to the
+  // slider axis
 
   btTransform bodyA_trans = transA;
   btTransform bodyB_trans = transB;
@@ -539,7 +547,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
     btVector3 orthoA = relA - projA;
     // get desired offset between frames A and B along slider axis
     btScalar sliderOffs = m_linPos - m_depth[0];
-    // desired vector from projection of center of bodyA to projection of center of bodyB to slider axis
+    // desired vector from projection of center of bodyA to projection of
+    // center of bodyB to slider axis
     btVector3 totalDist = projA + ax1 * sliderOffs - projB;
     // get offset vectors relA and relB
     relA = orthoA + totalDist * factA;
@@ -578,8 +587,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
     for (i=0; i<3; i++) info->m_J2linearAxis[s3+i] = -q[i];
   }
   else
-  {  // old way - maybe incorrect if bodies are not on the slider axis
-    // see discussion "Bug in slider constraint" http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4024&start=0
+  {
+    // old way - maybe incorrect if bodies are not on the slider axis
+    // see discussion "Bug in slider constraint"
+    // http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4024&start=0
     c = bodyB_trans.getOrigin() - bodyA_trans.getOrigin();
     btVector3 tmp = c.cross(p);
     for (i=0; i<3; i++) info->m_J1angularAxis[s2+i] = factA*tmp[i];
@@ -596,7 +607,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
   // compute two elements of right hand side
 
   //  k = info->fps * info->erp * getSoftnessOrthoLin();
-  currERP = (m_flags & BT_SLIDER_FLAGS_ERP_ORTLIN) ? m_softnessOrthoLin : m_softnessOrthoLin * info->erp;
+  currERP = (m_flags & BT_SLIDER_FLAGS_ERP_ORTLIN) ?
+    m_softnessOrthoLin : m_softnessOrthoLin * info->erp;
   k = info->fps * currERP;
 
   btScalar rhs = k * p.dot(ofs);
@@ -640,7 +652,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
     info->m_J2linearAxis[srow+2] = -ax1[2];
     // linear torque decoupling step:
     //
-    // we have to be careful that the linear constraint forces (+/- ax1) applied to the two bodies
+    // we have to be careful that the linear constraint forces (+/- ax1)
+    // applied to the two bodies
     // do not create a torque couple. in other words, the points that the
     // constraint force is applied at must lie along the same ax1 axis.
     // a torque couple will result in limited slider-jointed free
@@ -681,7 +694,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
     info->m_constraintError[srow] = 0.;
     info->m_lowerLimit[srow] = 0.;
     info->m_upperLimit[srow] = 0.;
-    currERP = (m_flags & BT_SLIDER_FLAGS_ERP_LIMLIN) ? m_softnessLimLin : info->erp;
+    currERP = (m_flags & BT_SLIDER_FLAGS_ERP_LIMLIN) ?
+      m_softnessLimLin : info->erp;
     if(powered)
     {
       if(m_flags & BT_SLIDER_FLAGS_CFM_DIRLIN)
@@ -689,8 +703,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
         info->cfm[srow] = m_cfmDirLin;
       }
       btScalar tag_vel = getTargetLinMotorVelocity();
-      btScalar mot_fact = getMotorFactor(m_linPos, m_lowerLinLimit, m_upperLinLimit, tag_vel, info->fps * currERP);
-      info->m_constraintError[srow] -= signFact * mot_fact * getTargetLinMotorVelocity();
+      btScalar mot_fact = getMotorFactor(m_linPos, m_lowerLinLimit,
+        m_upperLinLimit, tag_vel, info->fps * currERP);
+      info->m_constraintError[srow] -=
+        signFact * mot_fact * getTargetLinMotorVelocity();
       info->m_lowerLimit[srow] += -getMaxLinMotorForce() * info->fps;
       info->m_upperLimit[srow] += getMaxLinMotorForce() * info->fps;
     }
@@ -717,7 +733,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
         info->m_lowerLimit[srow] = 0;
         info->m_upperLimit[srow] = SIMD_INFINITY;
       }
-      // bounce (we'll use slider parameter abs(1.0 - m_dampingLimLin) for that)
+      // bounce (we'll use slider parameter abs(1.0 - m_dampingLimLin)
+      //   for that)
       btScalar bounce = btFabs(btScalar(1.0) - getDampingLimLin());
       if(bounce > btScalar(0.0))
       {
@@ -797,14 +814,16 @@ void btScrewConstraint::_getInfo2NonVirtual(
     {  // the joint motor is ineffective
       powered = 0;
     }
-    currERP = (m_flags & BT_SLIDER_FLAGS_ERP_LIMANG) ? m_softnessLimAng : info->erp;
+    currERP = (m_flags & BT_SLIDER_FLAGS_ERP_LIMANG) ?
+      m_softnessLimAng : info->erp;
     if(powered)
     {
       if(m_flags & BT_SLIDER_FLAGS_CFM_DIRANG)
       {
         info->cfm[srow] = m_cfmDirAng;
       }
-      btScalar mot_fact = getMotorFactor(m_angPos, m_lowerAngLimit, m_upperAngLimit, getTargetAngMotorVelocity(), info->fps * currERP);
+      btScalar mot_fact = getMotorFactor(m_angPos, m_lowerAngLimit,
+        m_upperAngLimit, getTargetAngMotorVelocity(), info->fps * currERP);
       info->m_constraintError[srow] = mot_fact * getTargetAngMotorVelocity();
       info->m_lowerLimit[srow] = -getMaxAngMotorForce() * info->fps;
       info->m_upperLimit[srow] = getMaxAngMotorForce() * info->fps;
@@ -833,7 +852,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
         info->m_upperLimit[srow] = 0;
       }
-      // bounce (we'll use slider parameter abs(1.0 - m_dampingLimAng) for that)
+      // bounce (we'll use slider parameter abs(1.0 - m_dampingLimAng)
+      // for that)
       btScalar bounce = btFabs(btScalar(1.0) - getDampingLimAng());
       if(bounce > btScalar(0.0))
       {
@@ -872,8 +892,15 @@ void btScrewConstraint::_getInfo2NonVirtual(
 //////////////////////////////////////////////////
 void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
 {
+  /// this is a modified version of
+  /// void btSliderConstraint::getInfo1(btConstraintInfo1* info)
+  /// with the rotational limits always turned on.
+  /// The rotational limit constraint is modified to be a screw constraint
+  /// in btScrewConstraint::_getInfo2NonVirtual
+  /// which is a copy of btSliderConstraint::getInfo2NonVirtual.
 
-  // info->m_numConstraintRows = 6; // Fixed 2 linear + 2 angular + 1 limit (even if not used)
+  // info->m_numConstraintRows = 6;
+  // Fixed 2 linear + 2 angular + 1 limit (even if not used)
   // info->nub = 0; 
 
   if (m_useSolveConstraintObsolete)
@@ -886,7 +913,8 @@ void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
     info->m_numConstraintRows = 4; // Fixed 2 linear + 2 angular
     info->nub = 2; 
     //prepare constraint
-    calculateTransforms(m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
+    calculateTransforms(
+      m_rbA.getCenterOfMassTransform(),m_rbB.getCenterOfMassTransform());
     testLinLimits();
     if(getSolveLinLimit() || getPoweredLinMotor())
     {
