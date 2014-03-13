@@ -537,7 +537,7 @@ math::Vector3 Camera::GetWorldPosition() const
 //////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
-  Ogre::Quaternion rot = this->sceneNode->getOrientation();
+  Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
   return math::Quaternion(rot.w, rot.x, rot.y, rot.z);
 }
 
@@ -1439,10 +1439,8 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
     this->sceneNode->setInheritOrientation(_inheritOrientation);
-    this->SetWorldPose(origPose);
     return true;
   }
 

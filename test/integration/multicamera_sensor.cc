@@ -20,6 +20,7 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
 #include "ServerFixture.hh"
@@ -368,55 +369,126 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 
   // check poses in world frame
   // each multicamera have 2 cameras
+
+  // model 1
+  // multicamera1 sensor has zero pose offset from the model
   EXPECT_EQ(model1->GetWorldPose(),
     multicamera1->GetPose() + model1->GetWorldPose());
   EXPECT_EQ(model1->GetWorldPose(),
     sensor1->GetPose() + model1->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose() + multicamera1->GetPose(),
+
+  // multicamera1 sensor's camera 0 has a pose offset from the sensor
+  EXPECT_NE(multicamera1->GetPose() + model1->GetWorldPose(),
+      multicamera1->GetCamera(0)->GetWorldPose());
+
+  // Get multicamera1's local pose. There is current no GetPose() in Camera,
+  // so grab it from it's ogre scene node
+  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->GetSceneNode();
+  math::Pose cameraPose(
+      rendering::Conversions::Convert(cameraNode->getPosition()),
+      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  // verify multicamera sensor's camera world pose
+  EXPECT_EQ(cameraPose + multicamera1->GetPose() + model1->GetWorldPose(),
     multicamera1->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), multicamera1->GetCamera(1)->GetWorldPose());
-  gzdbg << "model1 [" << model1->GetWorldPose()
-        << "] sensor1 [" << sensor1->GetPose() + model1->GetWorldPose()
-        << "] multicamera1 ["
-        << multicamera1->GetPose() + model1->GetWorldPose()
-        << "] camera1 WorldPose [" << multicamera1->GetCamera(0)->GetWorldPose()
-        << "] camera2 WorldPose [" << multicamera1->GetCamera(1)->GetWorldPose()
-        << "]\n";
+
+  // multicamera1 sensor's camera 1 has zero pose offset from the sensor
+  EXPECT_EQ(multicamera1->GetPose() + model1->GetWorldPose(),
+      multicamera1->GetCamera(1)->GetWorldPose());
+
+  gzdbg << "model1 [" << model1->GetWorldPose() << "]\n"
+        << "sensor1 [" << sensor1->GetPose() + model1->GetWorldPose() << "]\n"
+        << "multicamera1 [" << multicamera1->GetPose() + model1->GetWorldPose()
+        << "]\n"
+        << "camera left WorldPose ["
+        << multicamera1->GetCamera(0)->GetWorldPose() << "]\n"
+        << "camera right WorldPose ["
+        << multicamera1->GetCamera(1)->GetWorldPose() << "]\n";
+
+  // model 2
+  // camera2 sensor has zero pose offset from the model
   EXPECT_EQ(model2->GetWorldPose(),
-    camera2->GetPose() + model1->GetWorldPose());
+    camera2->GetPose() + model2->GetWorldPose());
   EXPECT_EQ(model2->GetWorldPose(),
-    sensor2->GetPose() + model1->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), camera2->GetCamera()->GetWorldPose());
-  gzdbg << "model2 [" << model2->GetWorldPose()
-        << "] sensor2 [" << sensor2->GetPose() + model1->GetWorldPose()
-        << "] camera2 [" << camera2->GetPose() + model1->GetWorldPose()
-        << "] camera WorldPose [" << camera2->GetCamera()->GetWorldPose()
+    sensor2->GetPose() + model2->GetWorldPose());
+
+  // camera2 sensor's camera has zero pose offset from the sensor
+  EXPECT_EQ(model2->GetWorldPose(), camera2->GetCamera()->GetWorldPose());
+
+  gzdbg << "model2 [" << model2->GetWorldPose() << "]\n"
+        << "sensor2 [" << sensor2->GetPose() + model2->GetWorldPose() << "]\n"
+        << "camera2 [" << camera2->GetPose() + model2->GetWorldPose() << "]\n"
+        << "camera WorldPose [" << camera2->GetCamera()->GetWorldPose()
         << "]\n";
+
+  // model 3
+  // multicamera3 sensor has zero pose offset from the model
   EXPECT_EQ(model3->GetWorldPose(),
-    multicamera3->GetPose() + model1->GetWorldPose());
+      multicamera3->GetPose() + model3->GetWorldPose());
   EXPECT_EQ(model3->GetWorldPose(),
-    sensor3->GetPose() + model1->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), multicamera3->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), multicamera3->GetCamera(1)->GetWorldPose());
-  gzdbg << "model3 [" << model3->GetWorldPose()
-        << "] sensor3 [" << sensor3->GetPose() + model1->GetWorldPose()
-        << "] multicamera3 ["
-        << multicamera3->GetPose() + model1->GetWorldPose()
-        << "] camera1 WorldPose [" << multicamera3->GetCamera(0)->GetWorldPose()
-        << "] camera2 WorldPose [" << multicamera3->GetCamera(1)->GetWorldPose()
-        << "]\n";
+      sensor3->GetPose() + model3->GetWorldPose());
+
+  // multicamera3 sensor's camera 0 has a pose offset from the sensor
+  EXPECT_NE(multicamera3->GetPose() + model3->GetWorldPose(),
+      multicamera3->GetCamera(0)->GetWorldPose());
+  // Get multicamera3 sensor's camera 0 local pose
+  cameraNode = multicamera3->GetCamera(0)->GetSceneNode();
+  cameraPose = math::Pose(
+      rendering::Conversions::Convert(cameraNode->getPosition()),
+      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  // verify multicamera sensor's camera 0 world pose
+  EXPECT_EQ(cameraPose + multicamera3->GetPose() + model3->GetWorldPose(),
+    multicamera3->GetCamera(0)->GetWorldPose());
+
+  // multicamera3 sensor's camera 1 has zero pose offset from the sensor
+  EXPECT_EQ(multicamera3->GetPose() + model3->GetWorldPose(),
+      multicamera3->GetCamera(1)->GetWorldPose());
+  EXPECT_EQ(model3->GetWorldPose(), multicamera3->GetCamera(1)->GetWorldPose());
+
+  gzdbg << "model3 [" << model3->GetWorldPose() << "]\n"
+        << "sensor3 [" << sensor3->GetPose() + model3->GetWorldPose() << "]\n"
+        << "multicamera3 [" << multicamera3->GetPose() + model3->GetWorldPose()
+        << "]\n"
+        << "camera left  WorldPose ["
+        << multicamera3->GetCamera(0)->GetWorldPose() << "]\n"
+        << "camera right WorldPose ["
+        << multicamera3->GetCamera(1)->GetWorldPose() << "]\n";
+
+  // model 4
+  // multicamera4 sensor has zero pose offset from the model
   EXPECT_EQ(model4->GetWorldPose(),
-    multicamera4->GetPose() + model1->GetWorldPose());
+    multicamera4->GetPose() + model4->GetWorldPose());
   EXPECT_EQ(model4->GetWorldPose(),
-    sensor4->GetPose() + model1->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), multicamera4->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
-  gzdbg << "model4 [" << model4->GetWorldPose()
-        << "] sensor4 [" << sensor4->GetPose() + model1->GetWorldPose()
-        << "] multicamera4 ["
-        << multicamera4->GetPose() + model1->GetWorldPose()
-        << "] camera1 WorldPose [" << multicamera4->GetCamera(0)->GetWorldPose()
-        << "] camera2 WorldPose [" << multicamera4->GetCamera(1)->GetWorldPose()
+    sensor4->GetPose() + model4->GetWorldPose());
+
+  // multicamera4 sensor's camera 0 has a pose offset from the sensor
+  EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(0)->GetWorldPose());
+  // Get multicamera4's camera 0 local pose
+  cameraNode = multicamera4->GetCamera(0)->GetSceneNode();
+  cameraPose = math::Pose(
+      rendering::Conversions::Convert(cameraNode->getPosition()),
+      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  // verify multicamera sensor's camera 0 world pose
+  EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
+    multicamera4->GetCamera(0)->GetWorldPose());
+
+  // multicamera4 sensor's camera 1 has a pose offset from the sensor
+  EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
+  // Get multicamera4 sensor's camera 1 local pose
+  cameraNode = multicamera4->GetCamera(1)->GetSceneNode();
+  cameraPose = math::Pose(
+      rendering::Conversions::Convert(cameraNode->getPosition()),
+      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  // verify multicamera4 sensor's camera 1 world pose
+  EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
+    multicamera4->GetCamera(1)->GetWorldPose());
+
+  gzdbg << "model4 [" << model4->GetWorldPose() << "]\n"
+        << "sensor4 [" << sensor4->GetPose() + model4->GetWorldPose() << "]\n"
+        << "multicamera4 [" << multicamera4->GetPose() + model4->GetWorldPose()
+        << "]\n"
+        << "camera1 WorldPose [" << multicamera4->GetCamera(0)->GetWorldPose()
+        << "]\n"
+        << "camera2 WorldPose [" << multicamera4->GetCamera(1)->GetWorldPose()
         << "]\n";
 }
 
