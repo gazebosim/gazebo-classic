@@ -34,34 +34,31 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_filters
-  /// \brief Filters namespace
-  namespace filters
+  namespace common
   {
-    /// \addtogroup gazebo_filters MovingWindowFilter
+    /// \addtogroup gazebo_common Common
     /// \{
 
     /// \internal
-    // Private data members for MovingWindowFilter class.
-    // This must be in the header due to templatization.
+    /// \brief Private data members for MovingWindowFilter class.
+    /// This must be in the header due to templatization.
     template< typename T>
     class MovingWindowFilterPrivate
     {
       // \brief Constructor
       public: MovingWindowFilterPrivate();
 
+      /// \brief For moving window smoothed velocity
       public: int velWindowSize;
       public: T velFiltered;
-      typedef std::vector<T> T_V;
-      public: T_V velHistory;
-      public: typename T_V::iterator velIter;
+      public: std::vector<T> velHistory;
+      public: typename std::vector<T>::iterator velIter;
     };
 
     //////////////////////////////////////////////////
     template<typename T>
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
-      // for moving window smoothed velocity
       /// \TODO FIXME hardcoded for now
       this->velWindowSize = 4;
       this->velHistory.resize(this->velWindowSize);
@@ -115,7 +112,6 @@ namespace gazebo
     {
       // update avg
       double n = 1.0/static_cast<double>(this->dataPtr->velWindowSize);
-      // std::vector<T>::iterator old = this->dataPtr->velIter++;
 
       // add new data
       if (this->dataPtr->velIter == this->dataPtr->velHistory.end())
