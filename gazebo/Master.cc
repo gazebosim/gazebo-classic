@@ -293,6 +293,9 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       {
         if (siter->first.topic() == req.data())
         {
+          // If the topic info message type has not been set or the
+          // topic info message type is an empty string, then set the topic
+          // info message type based on a subscriber's message type.
           if (!ti.has_msg_type() || ti.msg_type().empty())
             ti.set_msg_type(siter->first.msg_type());
           msgs::Subscribe *sub = ti.add_subscriber();
