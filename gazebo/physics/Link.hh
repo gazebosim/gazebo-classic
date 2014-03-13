@@ -583,10 +583,10 @@ namespace gazebo
       private: Collision_V collisions;
 
       /// \brief For moving window average of kinetic energy
-      private: filters::MovingWindowFilter<math::Vector3> linVelFil;
+      private: common::MovingWindowFilter<math::Vector3> linVelFil;
 
       /// \brief For moving window average of kinetic energy
-      private: filters::MovingWindowFilter<math::Vector3> angVelFil;
+      private: common::MovingWindowFilter<math::Vector3> angVelFil;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
