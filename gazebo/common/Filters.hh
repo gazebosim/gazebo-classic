@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _FILTERS_HH_
-#define _FILTERS_HH_
+#ifndef _GAZEBO_FILTERS_HH_
+#define _GAZEBO_FILTERS_HH_
 
 #include <iostream>
 #include <vector>
