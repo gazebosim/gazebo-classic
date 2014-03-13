@@ -199,6 +199,12 @@ void SimbodyLink::OnPoseChange()
   if (this->masterMobod.isEmptyHandle())
     return;
 
+  // debug
+  // gzerr << "original: [" << SimbodyPhysics::Transform2Pose(
+  //   this->masterMobod.getBodyTransform(
+  //   this->simbodyPhysics->integ->updAdvancedState()))
+  //       << "]\n";
+
   if (!this->masterMobod.isGround())
   {
     if (this->masterMobod.getParentMobilizedBody().isGround())
@@ -209,10 +215,11 @@ void SimbodyLink::OnPoseChange()
       this->masterMobod.setQToFitTransform(
          this->simbodyPhysics->integ->updAdvancedState(),
          SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
-      gzerr << "ground: " << this->GetWorldPose() << "\n";
     }
     else
     {
+      gzerr << "SetWorldPose (OnPoseChange) for child links need testing.\n";
+      /*
       /// If the inboard joint is not free, simbody tries to project
       /// target pose into available DOF's.
       /// But first convert to relative pose to parent mobod.
@@ -223,7 +230,7 @@ void SimbodyLink::OnPoseChange()
       this->masterMobod.setQToFitTransform(
          this->simbodyPhysics->integ->updAdvancedState(),
          SimbodyPhysics::Pose2Transform(relPose));
-      gzerr << "not ground: " << relPose << "\n";
+      */
     }
     // realize system after updating Q's
     this->simbodyPhysics->system.realize(
