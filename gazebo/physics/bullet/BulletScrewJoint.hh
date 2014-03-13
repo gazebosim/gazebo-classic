@@ -22,6 +22,8 @@
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
+#include <string>
+
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/util/system.hh"
