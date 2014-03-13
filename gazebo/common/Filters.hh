@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _FILTERS_HH_
-#define _FILTERS_HH_
+#ifndef _GAZEBO_FILTERS_HH_
+#define _GAZEBO_FILTERS_HH_
 
 #include <iostream>
 #include <vector>
@@ -34,34 +34,31 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_filters
-  /// \brief Filters namespace
-  namespace filters
+  namespace common
   {
-    /// \addtogroup gazebo_filters MovingWindowFilter
+    /// \addtogroup gazebo_common Common
     /// \{
 
     /// \internal
-    // Private data members for MovingWindowFilter class.
-    // This must be in the header due to templatization.
+    /// \brief Private data members for MovingWindowFilter class.
+    /// This must be in the header due to templatization.
     template< typename T>
     class MovingWindowFilterPrivate
     {
       // \brief Constructor
       public: MovingWindowFilterPrivate();
 
+      /// \brief For moving window smoothed velocity
       public: int velWindowSize;
       public: T velFiltered;
-      typedef std::vector<T> T_V;
-      public: T_V velHistory;
-      public: typename T_V::iterator velIter;
+      public: std::vector<T> velHistory;
+      public: typename std::vector<T>::iterator velIter;
     };
 
     //////////////////////////////////////////////////
     template<typename T>
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
-      // for moving window smoothed velocity
       /// \TODO FIXME hardcoded for now
       this->velWindowSize = 4;
       this->velHistory.resize(this->velWindowSize);
@@ -81,6 +78,9 @@ namespace gazebo
 
       /// \brief Update value of filter
       public: void Update(T _vel);
+
+      /// \brief Set window size
+      public: void SetWindowSize(unsigned int _n);
 
       /// \brief Get filtered result
       public: T Get();
@@ -115,7 +115,6 @@ namespace gazebo
     {
       // update avg
       double n = 1.0/static_cast<double>(this->dataPtr->velWindowSize);
-      // std::vector<T>::iterator old = this->dataPtr->velIter++;
 
       // add new data
       if (this->dataPtr->velIter == this->dataPtr->velHistory.end())
@@ -132,6 +131,13 @@ namespace gazebo
         it != this->dataPtr->velHistory.end(); ++it)
         this->dataPtr->velFiltered += *it;
       this->dataPtr->velFiltered *= n;
+    }
+
+    //////////////////////////////////////////////////
+    template<typename T>
+    void MovingWindowFilter<T>::SetWindowSize(unsigned int _n)
+    {
+      this->dataPtr->velWindowSize = _n;
     }
 
     //////////////////////////////////////////////////
