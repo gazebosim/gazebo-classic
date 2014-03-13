@@ -439,7 +439,7 @@ namespace gazebo
       /// iterative LCP methods.
       /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(const math::Vector3 _axis) const;
+      public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
