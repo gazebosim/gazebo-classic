@@ -92,7 +92,7 @@
     + virtual void SetStiffnessDamping(unsigned int _index, double _stiffness, double _damping, double _reference = 0) = 0
     + bool axisParentModelFrame[MAX_JOINT_AXIS]
     + protected: math::Pose parentAnchorPose
-    + public: double GetInertiaRatio(const math::Vector3 _axis) const
+    + public: double GetInertiaRatio(const math::Vector3 &_axis) const
 
 1. **gazebo/physics/Link.hh**
     + bool initialized
