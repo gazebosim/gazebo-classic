@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ std::map<std::string, Command *> g_commandMap;
 
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
-  : name(_name), brief(_brief), visibleOptions("Options")
+  : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
     ("help,h", "Print this help message");
@@ -43,6 +43,8 @@ Command::Command(const std::string &_name, const std::string &_brief)
 /////////////////////////////////////////////////
 Command::~Command()
 {
+  delete [] this->argv;
+  this->argv = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +66,12 @@ void Command::ListOptions()
     pieces.clear();
     std::string formatName = (*iter)->format_name();
     boost::split(pieces, formatName, boost::is_any_of(" "));
+
+    if (pieces.empty())
+    {
+      std::cerr << "Unable to process list options.\n";
+      return;
+    }
 
     // Output the short name option, or long name if there is no shortname
     std::cout << pieces[0] << std::endl;
@@ -91,12 +99,16 @@ std::string Command::GetBrief() const
 /////////////////////////////////////////////////
 bool Command::TransportInit()
 {
+  // Some command require transport, and some do not. Only initialize
+  // transport if required.
   if (!this->TransportRequired())
     return true;
 
+  // Setup transport (communication)
   if (!transport::init("", 0, 1))
     return false;
 
+  // Run transport (communication)
   transport::run();
 
   return true;
@@ -705,6 +717,11 @@ bool CameraCommand::RunImpl()
         }
       }
     }
+    else
+    {
+      std::cerr << "Unable to connect to a running instance of gazebo.\n";
+    }
+
     return true;
   }
 
