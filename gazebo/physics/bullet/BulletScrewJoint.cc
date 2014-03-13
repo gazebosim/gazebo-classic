@@ -770,8 +770,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
         }
       }
       info->m_constraintError[srow] *= getSoftnessLimLin();
-    } // if (limit)
-  } // if linear limit
+    }
+    // line above is the end of if (limit)
+  }
+  // line above is the end of if linear limit
 
   // printf("tp: %f\n", this->threadPitch);
 
@@ -888,8 +890,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
         }
       }
       info->m_constraintError[srow] *= getSoftnessLimAng();
-    } // if (limit)
-  } // if angular limit or powered
+    }
+    // line above is the end of if (limit)
+  }
+  // line above is the end of if angular limit or powered
 }
 
 //////////////////////////////////////////////////
@@ -916,7 +920,7 @@ void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
     // Fixed 2 linear + 2 angular
     info->m_numConstraintRows = 4;
     info->nub = 2;
-    //prepare constraint
+    // prepare constraint
     calculateTransforms(
       m_rbA.getCenterOfMassTransform(), m_rbB.getCenterOfMassTransform());
     testLinLimits();
