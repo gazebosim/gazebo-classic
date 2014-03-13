@@ -153,7 +153,7 @@ void JointFilter::Init(const std::string &_filter)
   {
     boost::split(this->parts, _filter, boost::is_any_of("."));
 
-    if (!this->parts.size())
+    if (this->parts.empty())
       this->parts.push_back(_filter);
   }
 }
@@ -274,7 +274,7 @@ void LinkFilter::Init(const std::string &_filter)
   {
     boost::split(this->parts, _filter, boost::is_any_of("."));
 
-    if (!this->parts.size())
+    if (this->parts.empty())
       this->parts.push_back(_filter);
   }
 }
