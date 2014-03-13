@@ -226,6 +226,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkPluginImplicit != NULL);
   ASSERT_TRUE(linkContact != NULL);
 
+  physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
+  ASSERT_TRUE(jointPluginImplicit);
+
   int cyclesPrismatic = 0;
   int cyclesRevolute = 0;
   int cyclesPluginExplicit = 0;
@@ -238,6 +241,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   double velPluginImplicit = 1.0;
   double velContact = 1.0;
   const double vT = 0.01;
+
+  double energyPluginImplicit0 = linkPluginImplicit->GetWorldEnergy()
+        + jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
 
   // check number of oscillations for each of the setup.  They should all
   // be the same.
@@ -304,6 +310,9 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       velContact = -1.0;
     }
 
+    double energy = linkPluginImplicit->GetWorldEnergy() +
+                   jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
+    EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 1e-3);
     // gzdbg << i << "\n";
     // gzdbg << cyclesPrismatic << " : "
     //       << linkPrismatic->GetWorldLinearVel() << "\n";
@@ -315,16 +324,10 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   if (_physicsEngine.compare("ode") == 0)
   {
     gzdbg << "Extra tests for ode" << std::endl;
-    EXPECT_EQ(cyclesPrismatic,      17);
-    EXPECT_EQ(cyclesRevolute,       17);
     EXPECT_EQ(cyclesContact,        17);
   }
-  else if (_physicsEngine.compare("simbody") == 0)
-  {
-    gzdbg << "Extra tests for simbody" << std::endl;
-    EXPECT_EQ(cyclesPrismatic,      17);
-    EXPECT_EQ(cyclesRevolute,       17);
-  }
+  EXPECT_EQ(cyclesPrismatic,      17);
+  EXPECT_EQ(cyclesRevolute,       17);
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
 }
