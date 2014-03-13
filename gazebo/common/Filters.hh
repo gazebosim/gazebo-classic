@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief Update value of filter
       public: void Update(T _vel);
 
+      /// \brief Set window size
+      public: void SetWindowSize(unsigned int _n);
+
       /// \brief Get filtered result
       public: T Get();
 
@@ -128,6 +131,13 @@ namespace gazebo
         it != this->dataPtr->velHistory.end(); ++it)
         this->dataPtr->velFiltered += *it;
       this->dataPtr->velFiltered *= n;
+    }
+
+    //////////////////////////////////////////////////
+    template<typename T>
+    void MovingWindowFilter<T>::SetWindowSize(unsigned int _n)
+    {
+      this->dataPtr->velWindowSize = _n;
     }
 
     //////////////////////////////////////////////////
