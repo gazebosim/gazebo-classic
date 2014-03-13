@@ -8,16 +8,13 @@ endmacro(ADD_MANPAGE_TARGET)
 find_program(GZIP gzip)
 
 if (NOT GZIP)
-  if (NOT GZIP)
-    BUILD_WARNING ("gzip not found, manpages won't be generated")
-  endif(NOT GZIP)
+  BUILD_WARNING ("gzip not found, manpages won't be generated")
   macro(roffman MANFILE)
   endmacro(roffman)
 else (NOT GZIP)
   message (STATUS "Looking for gzip to generate manpages - found")
 
-  MACRO(roffman _source _section)
-
+  macro(roffman _source _section)
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
       COMMAND ${GZIP} -c ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.${_section}.roff
@@ -33,6 +30,5 @@ else (NOT GZIP)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
       DESTINATION share/man/man${_section}
     )
-
   endmacro(roffman _source _section)
 endif(NOT GZIP)
