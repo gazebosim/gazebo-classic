@@ -54,12 +54,6 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
           << " See issue #857.\n";
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint test needs work."
-          << " See issue #1096.\n";
-    return;
-  }
 
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
