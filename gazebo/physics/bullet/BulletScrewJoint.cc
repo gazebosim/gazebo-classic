@@ -423,16 +423,27 @@ void BulletScrewJoint::SetHighStop(unsigned int _index,
   // bulletScrew axial rotation is backward
   if (this->bulletScrew)
   {
-    double upper = this->bulletScrew->getUpperLinLimit();
     if (_index == 0)
     {
       // angular is linear * threadPitch
-      this->bulletScrew->setLowerLinLimit(std::min(upper,
-        _angle.Radian()*this->threadPitch));
+      if (this->threadPitch > 0)
+      {
+        double lower = this->bulletScrew->getLowerLinLimit();
+        this->bulletScrew->setUpperLinLimit(std::max(lower,
+          _angle.Radian()*this->threadPitch));
+      }
+      else
+      {
+        // flip upper lower because thread pitch is negative
+        double upper = this->bulletScrew->getUpperLinLimit();
+        this->bulletScrew->setLowerLinLimit(std::min(upper,
+          _angle.Radian()*this->threadPitch));
+      }
     }
     else if (_index == 1)
     {
-      this->bulletScrew->setLowerLinLimit(std::min(upper, _angle.Radian()));
+      double lower = this->bulletScrew->getLowerLinLimit();
+      this->bulletScrew->setUpperLinLimit(std::max(lower, _angle.Radian()));
     }
     else
       gzerr << "Invalid index [" << _index << "]\n";
@@ -450,16 +461,27 @@ void BulletScrewJoint::SetLowStop(unsigned int _index,
   // bulletScrew axial rotation is backward
   if (this->bulletScrew)
   {
-    double lower = this->bulletScrew->getLowerLinLimit();
     if (_index == 0)
     {
       // angular is linear * threadPitch
-      this->bulletScrew->setUpperLinLimit(std::max(lower,
-        _angle.Radian()*this->threadPitch));
+      if (this->threadPitch > 0)
+      {
+        double upper = this->bulletScrew->getUpperLinLimit();
+        this->bulletScrew->setLowerLinLimit(std::min(upper,
+          _angle.Radian()*this->threadPitch));
+      }
+      else
+      {
+          // flip upper lower because thread pitch is negative
+        double lower = this->bulletScrew->getLowerLinLimit();
+        this->bulletScrew->setUpperLinLimit(std::max(lower,
+          _angle.Radian()*this->threadPitch));
+      }
     }
     else if (_index == 1)
     {
-      this->bulletScrew->setUpperLinLimit(std::max(lower, _angle.Radian()));
+      double upper = this->bulletScrew->getUpperLinLimit();
+      this->bulletScrew->setLowerLinLimit(std::min(upper, _angle.Radian()));
     }
     else
       gzerr << "Invalid index [" << _index << "]\n";
