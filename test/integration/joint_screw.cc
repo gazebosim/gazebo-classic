@@ -225,7 +225,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   // set new upper limit for joint_00
   joint_00->SetHighStop(0, 0.3);
   // push joint_00 till it hits new upper limit
-  while(joint_00->GetAngle(0) < 0.3)
+  while (joint_00->GetAngle(0) < 0.3)
   {
     joint_00->SetForce(0, 0.1);
     world->Step(1);
@@ -248,7 +248,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   // set joint_01 upper limit to 1.0
   joint_01->SetHighStop(0, 1.0);
   // push joint_01 until limit is reached
-  while(joint_01->GetAngle(0) < 1.0)
+  while (joint_01->GetAngle(0) < 1.0)
   {
     joint_01->SetForce(0, 0.1);
     world->Step(1);
@@ -282,7 +282,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   }
 
   // push joint_01 the other way until -1 is reached
-  while(joint_01->GetAngle(0) > -1.0)
+  while (joint_01->GetAngle(0) > -1.0)
   {
     joint_01->SetForce(0, -0.1);
     world->Step(1);
