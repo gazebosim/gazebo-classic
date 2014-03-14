@@ -561,15 +561,15 @@ btScalar btScrewConstraint::getLinearPosition()
 }
 
 //////////////////////////////////////////////////
-btRigidBody& btScrewConstraint::getRigidBodyA()	
-{		
-  return this->m_rbA;	
-}	
+btRigidBody& btScrewConstraint::getRigidBodyA()
+{
+  return this->m_rbA;
+}
 
 //////////////////////////////////////////////////
-btRigidBody& btScrewConstraint::getRigidBodyB()	
-{		
-  return this->m_rbB;	
+btRigidBody& btScrewConstraint::getRigidBodyB()
+{
+  return this->m_rbB;
 }
 
 //////////////////////////////////////////////////
