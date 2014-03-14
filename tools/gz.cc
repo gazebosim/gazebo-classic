@@ -195,7 +195,8 @@ WorldCommand::WorldCommand()
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
-    ("pause,p", po::value<bool>(), "Pause/unpause simulation.")
+    ("pause,p", po::value<bool>(), "Pause/unpause simulation. "
+     "0=unpause, 1=pause.")
     ("step,s", "Step simulation one iteration.")
     ("multi-step,m", po::value<uint32_t>(),
      "Step simulation mulitple iteration.")
