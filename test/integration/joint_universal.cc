@@ -114,11 +114,20 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
 
   // move child link 90deg about both x and "rotated y axis" (z)
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0.5*M_PI);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+
+  if (_physicsEngine == "bullet")
+  {
+    // Bullet is off by one step. See issue 1081
+    world->Step(1);
+    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
+  }
+  else
+    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
+
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)

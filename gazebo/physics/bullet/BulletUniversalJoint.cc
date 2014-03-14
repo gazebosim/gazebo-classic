@@ -94,11 +94,11 @@ void BulletUniversalJoint::Init()
   this->angleOffset[1] = this->bulletUniversal->getAngle2();
 
   this->bulletUniversal->setUpperLimit(
-    this->angleOffset[0] + this->GetUpperLimit(0).Radian(),
-    this->angleOffset[1] + this->GetUpperLimit(1).Radian());
+    this->angleOffset[1] + this->GetUpperLimit(1).Radian(),
+    this->angleOffset[0] + this->GetUpperLimit(0).Radian());
   this->bulletUniversal->setLowerLimit(
-    this->angleOffset[0] + this->GetLowerLimit(0).Radian(),
-    this->angleOffset[1] + this->GetLowerLimit(1).Radian());
+    this->angleOffset[1] + this->GetLowerLimit(1).Radian(),
+    this->angleOffset[0] + this->GetLowerLimit(0).Radian());
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
@@ -155,17 +155,46 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetVelocity(unsigned int /*_index*/,
-    double /*_angle*/)
+void BulletUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // gzerr << "Not implemented\n";
+  math::Vector3 desiredVel;
+  if (this->parentLink)
+    desiredVel = this->parentLink->GetWorldAngularVel();
+  desiredVel += _angle * this->GetGlobalAxis(_index);
+  if (this->childLink)
+    this->childLink->SetAngularVel(desiredVel);
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetForceImpl(unsigned int /*_index*/,
-    double /*_torque*/)
+void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
-  // gzerr << "Not implemented\n";
+  if (this->bulletUniversal)
+  {
+    int col = _index == 0 ? 2 : 1;
+
+    // z-axis of constraint frame
+    btVector3 hingeAxisLocalA =
+      this->bulletUniversal->getFrameOffsetA().getBasis().getColumn(col);
+
+    btVector3 hingeAxisLocalB =
+      this->bulletUniversal->getFrameOffsetB().getBasis().getColumn(col);
+
+    btVector3 hingeAxisWorldA =
+      this->bulletUniversal->getRigidBodyA().getWorldTransform().getBasis() *
+      hingeAxisLocalA;
+
+    btVector3 hingeAxisWorldB =
+      this->bulletUniversal->getRigidBodyB().getWorldTransform().getBasis() *
+      hingeAxisLocalB;
+
+    btVector3 hingeTorqueA = _effort * hingeAxisWorldA;
+    btVector3 hingeTorqueB = _effort * hingeAxisWorldB;
+
+    this->bulletUniversal->getRigidBodyA().applyTorque(-hingeTorqueA);
+    this->bulletUniversal->getRigidBodyB().applyTorque(hingeTorqueB);
+  }
+  else
+    gzerr << "Trying to set force on a joint that has not been created\n";
 }
 
 //////////////////////////////////////////////////
@@ -212,10 +241,10 @@ void BulletUniversalJoint::SetHighStop(unsigned int _index,
   {
     if (_index == 0)
       this->bulletUniversal->setUpperLimit(
-        this->angleOffset[0] + _angle.Radian(), this->GetHighStop(1).Radian());
+        this->angleOffset[1] + _angle.Radian(), this->GetHighStop(1).Radian());
     else
       this->bulletUniversal->setUpperLimit(
-        this->GetHighStop(0).Radian(), this->angleOffset[1] + _angle.Radian());
+        this->GetHighStop(0).Radian(), this->angleOffset[0] + _angle.Radian());
   }
 }
 
@@ -227,11 +256,15 @@ void BulletUniversalJoint::SetLowStop(unsigned int _index,
   if (this->bulletUniversal)
   {
     if (_index == 0)
+    {
       this->bulletUniversal->setLowerLimit(
-        this->angleOffset[0] + _angle.Radian(), this->GetLowStop(1).Radian());
+        this->angleOffset[1] + _angle.Radian(), this->GetLowStop(1).Radian());
+    }
     else
-      this->bulletUniversal->setUpperLimit(
-        this->GetLowStop(0).Radian(), this->angleOffset[1] + _angle.Radian());
+    {
+      this->bulletUniversal->setLowerLimit(
+        this->GetLowStop(0).Radian(), this->angleOffset[0] + _angle.Radian());
+    }
   }
 }
 

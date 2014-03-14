@@ -62,9 +62,9 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
   // sei limits
   setLinearLowerLimit(btVector3(0., 0., 0.));
   setLinearUpperLimit(btVector3(0., 0., 0.));
-  setAngularLowerLimit(btVector3(0.f,
+  this->setAngularLowerLimit(btVector3(0.f,
         -SIMD_HALF_PI + UNIV_EPS, -SIMD_PI + UNIV_EPS));
-  setAngularUpperLimit(btVector3(0.f,
+  this->setAngularUpperLimit(btVector3(0.f,
         SIMD_HALF_PI - UNIV_EPS,  SIMD_PI - UNIV_EPS));
 }
 

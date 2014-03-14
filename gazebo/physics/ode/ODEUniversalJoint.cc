@@ -24,7 +24,6 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
     : UniversalJoint<ODEJoint>(_parent)
