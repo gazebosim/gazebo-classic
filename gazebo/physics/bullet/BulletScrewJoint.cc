@@ -862,7 +862,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // if (limit && (lostop == histop)) raises warnings, using
     // a warning-less implementation.
     if (limit &&
-      math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+      math::equal(lostop, histop,
+      static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
     {
       // the joint motor is ineffective
       powered = 0;
@@ -897,7 +898,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
       // issue #1104:
       // if (lostop == histop) raises warnings, using
       // a warning-less implementation.
-      if (math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+      if (math::equal(lostop, histop,
+          static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
       {
         // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
@@ -997,7 +999,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // if (limit && (lostop == histop)) raises warnings, using
     // a warning-less implementation.
     if (limit &&
-      math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+      math::equal(lostop, histop,
+      static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
     {  // the joint motor is ineffective
       powered = 0;
     }
@@ -1026,7 +1029,8 @@ void btScrewConstraint::_getInfo2NonVirtual(
       // issue #1104:
       // if (lostop == histop) raises warnings, using
       // a warning-less implementation.
-      if (math::equal(lostop, histop, std::numeric_limits<double>::epsilon()))
+      if (math::equal(lostop, histop,
+          static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
       {
         // limited low and high simultaneously
         info->m_lowerLimit[srow] = -SIMD_INFINITY;
