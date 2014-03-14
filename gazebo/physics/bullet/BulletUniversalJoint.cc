@@ -155,10 +155,48 @@ void BulletUniversalJoint::SetVelocity(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetForceImpl(unsigned int /*_index*/,
-    double /*_torque*/)
+void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
-  // gzerr << "Not implemented\n";
+  if (this->bulletUniversal)
+  {
+    // z-axis of constraint frame
+    btVector3 hingeAxisLocalA =
+      this->bulletUniversal->getFrameOffsetA().getBasis().getColumn(2);
+
+    std::cout << "HingeAxisLocalA["
+      << hingeAxisLocalA.getX() << " "
+      << hingeAxisLocalA.getY() << " "
+      << hingeAxisLocalA.getZ() << "]\n";
+
+    btVector3 hingeAxisLocalB =
+      this->bulletUniversal->getFrameOffsetB().getBasis().getColumn(2);
+
+    btVector3 hingeAxisWorldA =
+      this->bulletUniversal->getRigidBodyA().getWorldTransform().getBasis() *
+      hingeAxisLocalA;
+
+    std::cout << "HingeAxisLocalA Transformed["
+      << hingeAxisLocalA.getX() << " "
+      << hingeAxisLocalA.getY() << " "
+      << hingeAxisLocalA.getZ() << "]\n";
+
+    btVector3 hingeAxisWorldB =
+      this->bulletUniversal->getRigidBodyB().getWorldTransform().getBasis() *
+      hingeAxisLocalB;
+
+    btVector3 hingeTorqueA = _effort * hingeAxisWorldA;
+    btVector3 hingeTorqueB = _effort * hingeAxisWorldB;
+
+    std::cout << "HingeAxisLocalA Effort["
+      << hingeTorqueA.getX() << " "
+      << hingeTorqueA.getY() << " "
+      << hingeTorqueA.getZ() << "]\n";
+
+    this->bulletUniversal->getRigidBodyA().applyTorque(hingeTorqueA);
+    this->bulletUniversal->getRigidBodyB().applyTorque(-hingeTorqueB);
+  }
+  else
+    gzerr << "Trying to set force on a joint that has not been created\n";
 }
 
 //////////////////////////////////////////////////
