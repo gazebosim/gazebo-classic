@@ -40,91 +40,91 @@ namespace gazebo
     public: virtual void Init();
 
     /// \brief Callback for World Update events.
-    private: void OnUpdate();
+    protected: virtual void OnUpdate();
 
     /// \brief Connection to World Update events.
-    private: event::ConnectionPtr updateConnection;
+    protected: event::ConnectionPtr updateConnection;
 
     /// \brief Pointer to world.
-    private: physics::WorldPtr world;
+    protected: physics::WorldPtr world;
 
     /// \brief Pointer to physics engine.
-    private: physics::PhysicsEnginePtr physics;
+    protected: physics::PhysicsEnginePtr physics;
 
     /// \brief Pointer to model containing plugin.
-    private: physics::ModelPtr model;
+    protected: physics::ModelPtr model;
 
     /// \brief Name of model containing plugin.
-    private: std::string modelName;
+    protected: std::string modelName;
 
     /// \brief Coefficient of Lift / alpha slope.
     /// Lift = C_L * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
-    private: double cla;
+    protected: double cla;
 
     /// \brief Coefficient of Drag / alpha slope.
     /// Drag = C_D * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
-    private: double cda;
+    protected: double cda;
 
     /// \brief Coefficient of Moment / alpha slope.
     /// Moment = C_M * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
-    private: double cma;
+    protected: double cma;
 
     /// \brief angle of attach when airfoil stalls
-    private: double alphaStall;
+    protected: double alphaStall;
 
     /// \brief Cl-alpha rate after stall
-    private: double claStall;
+    protected: double claStall;
 
     /// \brief Cd-alpha rate after stall
-    private: double cdaStall;
+    protected: double cdaStall;
 
     /// \brief Cm-alpha rate after stall
-    private: double cmaStall;
+    protected: double cmaStall;
 
     /// \brief: \TODO: make a stall velocity curve
-    private: double velocityStall;
+    protected: double velocityStall;
 
     /// \brief air density
     /// at 25 deg C it's about 1.1839 kg/m^3
     /// At 20 °C and 101.325 kPa, dry air has a density of 1.2041 kg/m3.
-    private: double rho;
+    protected: double rho;
 
     /// \brief effective planeform surface area
-    private: double area;
+    protected: double area;
 
     /// \brief angle of sweep
-    private: double sweep;
+    protected: double sweep;
 
     /// \brief initial angle of attack
-    private: double alpha0;
+    protected: double alpha0;
 
     /// \brief angle of attack
-    private: double alpha;
+    protected: double alpha;
 
     /// \brief center of pressure in link local coordinates
-    private: math::Vector3 cp;
+    protected: math::Vector3 cp;
 
     /// \brief forward flight direction in link local coordinates
-    private: math::Vector3 forward;
+    protected: math::Vector3 forward;
 
     /// \brief A vector in the lift/drag plane, anything orthogonal to it
     /// is considered wing sweep.
-    private: math::Vector3 upward;
+    protected: math::Vector3 upward;
 
     /// \brief Smooth velocity
-    private: math::Vector3 velSmooth;
+    protected: math::Vector3 velSmooth;
 
     /// \brief Names of allowed target links, specified in sdf parameters.
-    private: std::string linkName;
+    protected: std::string linkName;
 
     /// \brief Pointer to link currently targeted by mud joint.
-    private: physics::LinkPtr link;
+    protected: physics::LinkPtr link;
 
     /// \brief SDF for this plugin;
-    private: sdf::ElementPtr sdf;
+    protected: sdf::ElementPtr sdf;
   };
 }
 #endif
