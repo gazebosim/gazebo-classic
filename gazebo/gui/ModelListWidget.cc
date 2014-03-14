@@ -2050,6 +2050,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
     item->setValue(_msg.is_static());
   else
     item->setValue(false);
+  /// \todo Dynamically setting a model static doesn't currently work.
+  item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 
   topItem = this->variantManager->addProperty(
