@@ -1498,15 +1498,18 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     {
       boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
-      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
-      if (iter != this->poseMsgs.end())
-        iter->second.CopyFrom(_msg.link(j).pose());
-      else
-        this->poseMsgs.insert(
-            std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
+      if (_msg.link(j).has_pose())
+      {
+        PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
+        if (iter != this->poseMsgs.end())
+          iter->second.CopyFrom(_msg.link(j).pose());
+        else
+          this->poseMsgs.insert(
+              std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
 
-      this->poseMsgs[_msg.link(j).id()].set_name(linkName);
-      this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+        this->poseMsgs[_msg.link(j).id()].set_name(linkName);
+        this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+      }
     }
 
     if (_msg.link(j).has_inertial())
