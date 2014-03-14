@@ -183,6 +183,26 @@ btScalar gzBtUniversalConstraint::getAngle2()
 }
 
 /////////////////////////////////////////////////
+void gzBtUniversalConstraint::getUpperLimit(
+    btScalar &_ang1max, btScalar &_ang2max)
+{
+  btVector3 angles;
+  this->getAngularUpperLimit(angles);
+  _ang1max = angles.getY();
+  _ang2max = angles.getZ();
+}
+
+/////////////////////////////////////////////////
+void gzBtUniversalConstraint::getLowerLimit(
+    btScalar &_ang1min, btScalar &_ang2min)
+{
+  btVector3 angles;
+  this->getAngularLowerLimit(angles);
+  _ang1min = angles.getY();
+  _ang2min = angles.getZ();
+}
+
+/////////////////////////////////////////////////
 void gzBtUniversalConstraint::setUpperLimit(
     btScalar _ang1max, btScalar _ang2max)
 {
