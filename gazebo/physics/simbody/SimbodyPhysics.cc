@@ -1253,7 +1253,7 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   if (_key == "type")
     return this->GetType();
   // else if (_key == "rms_error")
-  //   return dWorldGetQuickStepRMSError(this->worldId);
+  //   return dWorldGetQuickStepRMSDeltaLambda(this->worldId);
   // else if (_key == "constraint_residual")
   //   return dWorldGetQuickStepConstraintResidual(this->worldId);
   // else if (_key == "bilateral_residual")

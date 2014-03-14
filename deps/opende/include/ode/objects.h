@@ -417,8 +417,8 @@ ODE_API dReal dWorldGetQuickStepTolerance (dWorldID);
 
 /**
  * @brief Set a tolerance to stop quickstep iterations.
- * PGS iteration stops when the RMS of \Delta \lambda in the
- * quickstep inner iteration (see dWorldGetQuickStepRMSError)
+ * PGS iteration stops when the RMS of total constraint residual in the
+ * quickstep inner iteration (see dWorldGetQuickStepRMSConstraintResidual)
  * is less than the tolerance specified here.
  * The units of tolerance is the same as units of \lambda,
  * which is in units of force.
@@ -505,19 +505,29 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
 /**
  * @brief Get the RMS of \Delta \lambda of the quickstep step
  * Given dLambda is measures by (b_i - a_{ij} lambda_j)/a_{ii}
- * it's a reasonable measure for the linear system we are solving
- * via PGS.  Note the dLambda used are post-projection.
+ * it's a reasonable convergence measure for the linear system
+ * being solved via PGS.  Note the dLambda used are post-projection.
  * The unit of errors are the same as the units of forces.
+ * RMS of \Delta \Lambda array is defined as:
+ * rms_dlambda[0]: bilateral constraints (findex = -1)
+ * rms_dlambda[1]: contact normal constraints (findex = -2)
+ * rms_dlambda[2]: friction constraints (findex >= 0)
+ * rms_dlambda[3]: total (sum of previous 3)
  * @ingroup world
- * @returns the rms error
+ * @returns the RMS of delta lambda
  */
-ODE_API dReal *dWorldGetQuickStepRMSError (dWorldID);
+ODE_API dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID);
 
 /**
- * @brief Get the RMS of Jv of the quickstep step.
+ * @brief Get the RMS of constraint residuals for the quickstep step.
  * The unit of constraint residuals are same as the units of velocities.
+ * RMS of constraint residuals array is defined as:
+ * rms_constraint_residual[0]: bilateral constraints (findex = -1)
+ * rms_constraint_residual[1]: contact normal constraints (findex = -2)
+ * rms_constraint_residual[2]: friction constraints (findex >= 0)
+ * rms_constraint_residual[3]: total (sum of previous 3)
  * @ingroup world
- * @returns the rms error
+ * @returns the RMS of constraint residuals
  */
 ODE_API dReal *dWorldGetQuickStepRMSConstraintResidual (dWorldID);
 

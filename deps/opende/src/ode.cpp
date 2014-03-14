@@ -2274,7 +2274,7 @@ dReal dWorldGetQuickStepW (dWorldID w)
 	return w->qs.w;
 }
 
-dReal *dWorldGetQuickStepRMSError (dWorldID w)
+dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID w)
 {
 	dAASSERT(w);
 	return w->qs.rms_dlambda;

@@ -101,18 +101,19 @@ struct dxQuickStepParameters {
   dReal w;			// the SOR over-relaxation parameter
   int num_chunks;		// divide rows to these many chunks
   int num_overlap;		// divide rows but over lap this many rows
-  dReal sor_lcp_tolerance;	// the stop if rms_error falls below this
+	// stop iteration if total rms_constraint_residual falls below this value
+  dReal sor_lcp_tolerance;
   // rms_dlambda for this time step
   // rms_dlambda[0]: bilateral constraints (findex = -1)
   // rms_dlambda[1]: contact normal constraints (findex = -2)
   // rms_dlambda[2]: friction constraints (findex >= 0)
-  // rms_dlambda[3]: total
+  // rms_dlambda[3]: total (sum of previous 3)
   dReal rms_dlambda[4];
-  // rms of Jv bbresiduals for this time step
+  // rms of constraint residuals for this time step
   // rms_constraint_residual[0]: bilateral constraints (findex = -1)
   // rms_constraint_residual[1]: contact normal constraints (findex = -2)
   // rms_constraint_residual[2]: friction constraints (findex >= 0)
-  // rms_constraint_residual[3]: total
+  // rms_constraint_residual[3]: total (sum of previous 3)
   dReal rms_constraint_residual[4];     // all constraint errors
   int num_contacts;           // for monitoring number of contacts
   bool dynamic_inertia_reduction;  // turn on/off quickstep inertia reduction.
