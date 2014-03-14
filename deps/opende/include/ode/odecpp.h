@@ -115,7 +115,7 @@ public:
   dReal getQuickStepW() const
     { return dWorldGetQuickStepW (get_id()); }
   dReal *getQuickStepRMSError() const
-    { return dWorldGetQuickStepRMSError (get_id()); }
+    { return dWorldGetQuickStepRMSDeltaLambda (get_id()); }
   dReal *getQuickStepRMSConstraintResidual() const
     { return dWorldGetQuickStepRMSConstraintResidual (get_id()); }
   dReal getQuickStepNumContacts() const
