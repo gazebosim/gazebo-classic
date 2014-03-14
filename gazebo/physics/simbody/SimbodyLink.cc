@@ -492,8 +492,7 @@ void SimbodyLink::AddForce(const math::Vector3 &_force)
   this->simbodyPhysics->discreteForces.addForceToBodyPoint(
     this->simbodyPhysics->integ->updAdvancedState(),
     this->masterMobod,
-    SimTK::Vec3(0), 
-    f);
+    SimTK::Vec3(0), f);
 }
 
 /////////////////////////////////////////////////
