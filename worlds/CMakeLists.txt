@@ -20,6 +20,7 @@ set (files
   lights.world
   mud_bitmask.world
   mud.world
+  multilink_shape.world
   openal.world
   pioneer2dx.world
   plugin.world
