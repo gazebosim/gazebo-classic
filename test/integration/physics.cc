@@ -31,6 +31,7 @@ class PhysicsTest : public ServerFixture,
   public: void EmptyWorld(const std::string &_physicsEngine);
   public: void SpawnDrop(const std::string &_physicsEngine);
   public: void SpawnDropCoGOffset(const std::string &_physicsEngine);
+  public: void SimplePushTest(const std::string &_physicsEngine);
   public: void SphereAtlasLargeError(const std::string &_physicsEngine);
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
@@ -1323,6 +1324,102 @@ TEST_P(PhysicsTest, CollisionFiltering)
 {
   CollisionFiltering(GetParam());
 }
+
+
+////////////////////////////////////////////////////////////////////////
+// sanity check for physics engines
+// push an object and expect velocity and acceleration to work correctly
+////////////////////////////////////////////////////////////////////////
+void PhysicsTest::SimplePushTest(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  physics->SetGravity(math::Vector3(0, 0, 0));
+  math::Vector3 g = physics->GetGravity();
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_EQ(g.z, 0);
+
+  // get physics time step
+  double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  SpawnSphere("ball", math::Vector3(0, 0, 1),
+              math::Vector3::Zero, math::Vector3::Zero, 0.5);
+
+  double m = 1.0;
+  double f = 2.0;
+  physics::ModelPtr model = world->GetModel("ball");
+  physics::LinkPtr link = model->GetLink("body");
+  link->GetInertial()->SetMass(m);
+
+  math::Pose x0 = link->GetWorldPose();
+  math::Vector3 v0 = link->GetWorldLinearVel();
+
+  link->AddForce(math::Vector3(f, 0, 0));
+  world->Step(1);
+
+  if (_physicsEngine == "ode")
+  {
+    double v = v0.x + dt * f / m;
+    EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+
+    double x = x0.pos.x + dt * v;
+    EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+  }
+  else if (_physicsEngine == "bullet")
+  {
+    gzerr << "bullet fails as describe by issue #1081,"
+          << " it's behind by one time step.\n";
+    return;
+
+    double v = v0.x + dt * f / m;
+    EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+
+    double x = x0.pos.x + dt * v;
+    EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+  }
+  else if (_physicsEngine == "dart")
+  {
+    double v = v0.x + dt * f / m;
+    EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+
+    double x = x0.pos.x + dt * v;
+    EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+  }
+  else if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody fails as describe by issue #1081,"
+          << " it's behind by one time step.\n";
+    gzerr << "Please update Simbody test here (this depends on"
+          << " integrator used).\n";
+    return;
+
+    double v = v0.x + dt * f / m;
+    EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+
+    double x = x0.pos.x + dt * v;
+    EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+  }
+  else
+  {
+    gzerr << "unknown physics engine [" << _physicsEngine << "]\n";
+  }
+}
+
+TEST_P(PhysicsTest, SimplePushTest)
+{
+  SimplePushTest(GetParam());
+}
+
 
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
