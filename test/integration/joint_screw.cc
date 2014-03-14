@@ -275,7 +275,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     {
       EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
     }
-    EXPECT_NEAR(pose_01.pos.x, 
+    EXPECT_NEAR(pose_01.pos.x,
       angle_00_angular * pitch_00 + angle_01_angular * pitch_01, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
@@ -309,7 +309,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     {
       EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
     }
-    EXPECT_NEAR(pose_01.pos.x, 
+    EXPECT_NEAR(pose_01.pos.x,
       angle_00_angular * pitch_00 + angle_01_angular * pitch_01, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
