@@ -284,7 +284,8 @@ PhysicsCommand::PhysicsCommand()
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("gravity,g", po::value<std::string>(),
-     "Gravity vector. Comma separated 3-tuple.")
+     "Gravity vector. Comma separated 3-tuple without whitespace, "
+     "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
     ("update-rate,u", po::value<double>(), "Target real-time update rate.");
