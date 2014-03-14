@@ -1450,7 +1450,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       item->setEnabled(false);
 
       // limit velocity
-      item = this->variantManager->addProperty(QVariant::Double, tr("velocity"));
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("velocity"));
       item->setValue(axis->limit_velocity());
       topItem->addSubProperty(item);
       item->setEnabled(false);
@@ -1462,7 +1463,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       item->setEnabled(false);
 
       // friction
-      item = this->variantManager->addProperty(QVariant::Double, tr("friction"));
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("friction"));
       item->setValue(axis->friction());
       topItem->addSubProperty(item);
       item->setEnabled(false);
