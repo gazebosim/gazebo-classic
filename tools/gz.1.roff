@@ -187,7 +187,7 @@ Print this help message
 .TP
 .B \-i, \-\-info
 .
-Output information about a log file.
+Output information about a log file. Log filename should be specified using the --file option
 .TP
 .B \-e, \-\-echo
 .
@@ -199,7 +199,7 @@ Step through the contents of a log file.
 .TP
 .B \-d, \-\-record\fR=\fIarg\fR
 .
-Start/stop recording a log file from an active Gazebo server.
+Start/stop recording a log file from an active Gazebo server.O=stop record, 1=start recording.
 .TP
 .B \-w, \-\-world\-name\fR=\fIarg\fR
 .
@@ -207,7 +207,7 @@ World name, used when starting or stopping recording.
 .TP
 .B \-r, \-\-raw
 .
-Output the data from echo and step without XML formatting.
+Output the data from echo and step without XML formatting.Used in conjuction with --echo or --step.
 .TP
 .B \-\-stamp\fR=\fIarg\fR
 .
@@ -306,7 +306,7 @@ World name.
 .TP
 .B \-g, \-\-gravity\fR=\fIarg\fR
 .
-Gravity vector. Comma separated 3\-tuple.
+Gravity vector. Comma separated 3\-tuple without whitespace, eg: -g 0,0,-9.8
 .TP
 .B \-s, \-\-step\-size\fR=\fIarg\fR
 .
@@ -482,7 +482,7 @@ World name.
 .TP
 .B \-p, \-\-pause\fR=\fIarg\fR
 .
-Pause/unpause simulation (0=unpause, 1=pause).
+Pause/unpause simulation. 0=unpause, 1=pause.
 .TP
 .B \-s, \-\-step
 .

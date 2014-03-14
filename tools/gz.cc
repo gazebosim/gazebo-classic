@@ -874,13 +874,13 @@ SDFCommand::SDFCommand()
   this->visibleOptions.add_options()
     ("describe,d", "Print SDF format for given version(-v).")
     ("convert,c", po::value<std::string>(),
-     "In place conversion of [arg] to the latest SDF version.")
+     "In place conversion of arg to the latest SDF version.")
     ("doc,o", "Print HTML SDF. Use -v to specify version.")
-    ("check,k", po::value<std::string>(), "Validate [arg].")
+    ("check,k", po::value<std::string>(), "Validate arg.")
     ("version,v", po::value<double>(),
      "Version of SDF to use with other options.")
     ("print,p", po::value<std::string>(),
-     "Print [arg], useful for debugging and as a conversion tool.");
+     "Print arg, useful for debugging and as a conversion tool.");
 }
 
 /////////////////////////////////////////////////

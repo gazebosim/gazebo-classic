@@ -566,7 +566,8 @@ LogCommand::LogCommand()
     ("echo,e", "Output the contents of a log file to screen.")
     ("step,s", "Step through the contents of a log file.")
     ("record,d", po::value<bool>(),
-     "Start/stop recording a log file from an active Gazebo server.")
+     "Start/stop recording a log file from an active Gazebo server."
+     "O=stop record, 1=start recording.")
     ("world-name,w", po::value<std::string>(), "World name, used when "
      "starting or stopping recording.")
     ("raw,r", "Output the data from echo and step without XML formatting."
