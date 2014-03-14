@@ -74,12 +74,22 @@ ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
   /// \return Angle value of the second axis in radians.
   public: btScalar getAngle2();
 
-  /// \brief Set upper limit.
+  /// \brief Get upper limits.
+  /// \param[out] _ang1max Maximum value for angle 1
+  /// \param[out] _ang2max Maximum value for angle 2
+  public: void getUpperLimit(btScalar &_ang1max, btScalar &_ang2max);
+
+  /// \brief Get lower limits.
+  /// \param[out] _ang1min Minimum value for angle 1
+  /// \param[out] _ang2min Minimum value for angle 2
+  public: void getLowerLimit(btScalar &_ang1min, btScalar &_ang2min);
+
+  /// \brief Set upper limits.
   /// \param[in] _ang1max Maximum value for angle 1
   /// \param[in] _ang2max Maximum value for angle 2
   public: void setUpperLimit(btScalar _ang1max, btScalar _ang2max);
 
-  /// \brief Set lower limit.
+  /// \brief Set lower limits.
   /// \param[in] _ang1min Minimum value for angle 1
   /// \param[in] _ang2min Minimum value for angle 2
   public: void setLowerLimit(btScalar _ang1min, btScalar _ang2min);

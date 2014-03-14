@@ -93,6 +93,13 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle1();
   this->angleOffset[1] = this->bulletUniversal->getAngle2();
 
+  this->bulletUniversal->setUpperLimit(
+    this->angleOffset[0] + this->GetUpperLimit(0).Radian(),
+    this->angleOffset[1] + this->GetUpperLimit(1).Radian());
+  this->bulletUniversal->setLowerLimit(
+    this->angleOffset[0] + this->GetLowerLimit(0).Radian(),
+    this->angleOffset[1] + this->GetLowerLimit(1).Radian());
+
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->bulletUniversal, true);
@@ -243,10 +250,10 @@ void BulletUniversalJoint::SetHighStop(unsigned int _index,
   {
     if (_index == 0)
       this->bulletUniversal->setUpperLimit(
-        _angle.Radian(), this->GetHighStop(1).Radian());
+        this->angleOffset[0] + _angle.Radian(), this->GetHighStop(1).Radian());
     else
       this->bulletUniversal->setUpperLimit(
-        this->GetHighStop(0).Radian(), _angle.Radian());
+        this->GetHighStop(0).Radian(), this->angleOffset[1] + _angle.Radian());
   }
 }
 
@@ -259,10 +266,10 @@ void BulletUniversalJoint::SetLowStop(unsigned int _index,
   {
     if (_index == 0)
       this->bulletUniversal->setLowerLimit(
-        _angle.Radian(), this->GetLowStop(1).Radian());
+        this->angleOffset[0] + _angle.Radian(), this->GetLowStop(1).Radian());
     else
       this->bulletUniversal->setUpperLimit(
-        this->GetLowStop(0).Radian(), _angle.Radian());
+        this->GetLowStop(0).Radian(), this->angleOffset[1] + _angle.Radian());
   }
 }
 
@@ -273,12 +280,15 @@ math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    btRotationalLimitMotor *motor;
-    motor = this->bulletUniversal->getRotationalLimitMotor(_index);
-    result = motor->m_hiLimit;
+    double limit1, limit2;
+    this->bulletUniversal->getUpperLimit(limit1, limit2);
+    if (_index == 0)
+      result.SetFromRadian(limit1);
+    else if (_index == 1)
+      result.SetFromRadian(limit2);
+    else
+      gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
-  else
-    gzerr << "Joint must be created first\n";
 
   return result;
 }
@@ -290,9 +300,14 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    btRotationalLimitMotor *motor;
-    motor = this->bulletUniversal->getRotationalLimitMotor(_index);
-    result = motor->m_loLimit;
+    double limit1, limit2;
+    this->bulletUniversal->getLowerLimit(limit1, limit2);
+    if (_index == 0)
+      result.SetFromRadian(limit1);
+    else if (_index == 1)
+      result.SetFromRadian(limit2);
+    else
+      gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
   else
     gzerr << "Joint must be created first\n";
