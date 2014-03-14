@@ -1161,27 +1161,26 @@ double Link::GetWorldEnergy() const
 double Link::GetWorldEnergyKineticFiltered()
 {
   // update filtered velocity for box
-  this->linVelFil.Update(this->GetWorldLinearVel());
+  this->linVelFil.Update(this->GetWorldCoGLinearVel());
   this->angVelFil.Update(this->GetWorldAngularVel());
 
-  // compute potential energy for link CG location
-  math::Vector3 linVel = this->linVelFil.Get();
-  math::Vector3 angVel = this->angVelFil.Get();
+  // compute linear kinetic energy
+  // E = 1/2 m v^T v
+  double linKE;
+  {
+    math::Vector3 v = this->linVelFil.Get();
+    double m = this->GetInertial()->GetMass();
+    linKE = 0.5 * m * v.Dot(v);
+  }
 
-  double m = this->GetInertial()->GetMass();
-  math::Matrix3 moi = this->GetInertial()->GetMOI();
-
-  double linKE = 0.5 * m * linVel.GetSquaredLength();
-
-  // todo: make this an operator
-  // compute tmp = w' * MOI
-  math::Vector3 tmp(
-    angVel.x * moi[0][0] + angVel.y * moi[1][0] + angVel.z * moi[2][0],
-    angVel.x * moi[0][1] + angVel.y * moi[1][1] + angVel.z * moi[2][1],
-    angVel.x * moi[0][2] + angVel.y * moi[1][2] + angVel.z * moi[2][2]);
-  // compute w' * MOI * w = tmp * w
-  double wIw = tmp.Dot(angVel);
-  double angKE = 0.5 * wIw;
+  // compute angular kinetic energy
+  // E = 1/2 w^T I w
+  double angKE;
+  {
+    math::Vector3 w = this->angVelFil.Get();
+    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    angKE = 0.5 * w.Dot(I * w);
+  }
 
   return linKE + angKE;
 }
