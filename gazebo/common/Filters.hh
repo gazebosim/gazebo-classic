@@ -48,21 +48,27 @@ namespace gazebo
       // \brief Constructor
       public: MovingWindowFilterPrivate();
 
-      /// \brief For moving window smoothed velocity
-      public: int velWindowSize;
-      public: T velFiltered;
-      public: std::vector<T> velHistory;
-      public: typename std::vector<T>::iterator velIter;
+      /// \brief For moving window smoothed value
+      public: int valWindowSize;
+
+      /// \brief filtered value
+      public: T valFiltered;
+
+      /// \brief buffer history of raw values
+      public: std::vector<T> valHistory;
+
+      /// \brief iterator pointing to current value in buffer
+      public: typename std::vector<T>::iterator valIter;
     };
 
     //////////////////////////////////////////////////
     template<typename T>
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
-      /// \TODO FIXME hardcoded for now
-      this->velWindowSize = 4;
-      this->velHistory.resize(this->velWindowSize);
-      this->velIter = this->velHistory.begin();
+      /// \TODO FIXME hardcoded initial value for now
+      this->valWindowSize = 4;
+      this->valHistory.resize(this->valWindowSize);
+      this->valIter = this->valHistory.begin();
     }
 
     /// \class MovingWindowFilter filters.hh common/common.hh
@@ -77,12 +83,15 @@ namespace gazebo
       public: virtual ~MovingWindowFilter();
 
       /// \brief Update value of filter
-      public: void Update(T _vel);
+      /// \param[in] _val new raw value
+      public: void Update(T _val);
 
       /// \brief Set window size
+      /// \param[in] _n new desired window size
       public: void SetWindowSize(unsigned int _n);
 
       /// \brief Get filtered result
+      /// \return latest filtered value
       public: T Get();
 
       /// \brief Allow subclasses to initialize their own data pointer.
@@ -104,47 +113,47 @@ namespace gazebo
     template<typename T>
     MovingWindowFilter<T>::~MovingWindowFilter()
     {
-      this->dataPtr->velHistory.clear();
+      this->dataPtr->valHistory.clear();
       delete this->dataPtr;
       this->dataPtr = NULL;
     }
 
     //////////////////////////////////////////////////
     template<typename T>
-    void MovingWindowFilter<T>::Update(T _vel)
+    void MovingWindowFilter<T>::Update(T _val)
     {
       // update avg
-      double n = 1.0/static_cast<double>(this->dataPtr->velWindowSize);
+      double n = 1.0/static_cast<double>(this->dataPtr->valWindowSize);
 
       // add new data
-      if (this->dataPtr->velIter == this->dataPtr->velHistory.end())
-        this->dataPtr->velIter = this->dataPtr->velHistory.begin();
-      (*this->dataPtr->velIter) = _vel;
+      if (this->dataPtr->valIter == this->dataPtr->valHistory.end())
+        this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+      (*this->dataPtr->valIter) = _val;
 
       // progressive add and subtrace oldest
-      // this->dataPtr->velFiltered += n*(*this->dataPtr->velIter - *old);
+      // this->dataPtr->valFiltered += n*(*this->dataPtr->valIter - *old);
 
       // sum and avg
-      this->dataPtr->velFiltered = T();
+      this->dataPtr->valFiltered = T();
       for (typename std::vector<T>::iterator it =
-        this->dataPtr->velHistory.begin();
-        it != this->dataPtr->velHistory.end(); ++it)
-        this->dataPtr->velFiltered += *it;
-      this->dataPtr->velFiltered *= n;
+        this->dataPtr->valHistory.begin();
+        it != this->dataPtr->valHistory.end(); ++it)
+        this->dataPtr->valFiltered += *it;
+      this->dataPtr->valFiltered *= n;
     }
 
     //////////////////////////////////////////////////
     template<typename T>
     void MovingWindowFilter<T>::SetWindowSize(unsigned int _n)
     {
-      this->dataPtr->velWindowSize = _n;
+      this->dataPtr->valWindowSize = _n;
     }
 
     //////////////////////////////////////////////////
     template<typename T>
     T MovingWindowFilter<T>::Get()
     {
-      return this->dataPtr->velFiltered;
+      return this->dataPtr->valFiltered;
     }
     /// \}
   }
