@@ -1374,6 +1374,17 @@ void PhysicsTest::SimplePushTest(const std::string &_physicsEngine)
 
     double x = x0.pos.x + dt * v;
     EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+
+    // take 10 steps
+    for (int j = 0; j < 10; ++j)
+    {
+      link->AddForce(math::Vector3(f, 0, 0));
+      world->Step(1);
+      v = v + dt * f / m;
+      EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+      x = x + dt * v;
+      EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+    }
   }
   else if (_physicsEngine == "bullet")
   {
@@ -1386,6 +1397,17 @@ void PhysicsTest::SimplePushTest(const std::string &_physicsEngine)
 
     double x = x0.pos.x + dt * v;
     EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+
+    // take 10 steps
+    for (int j = 0; j < 10; ++j)
+    {
+      link->AddForce(math::Vector3(f, 0, 0));
+      world->Step(1);
+      v = v + dt * f / m;
+      EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+      x = x + dt * v;
+      EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+    }
   }
   else if (_physicsEngine == "dart")
   {
@@ -1394,20 +1416,42 @@ void PhysicsTest::SimplePushTest(const std::string &_physicsEngine)
 
     double x = x0.pos.x + dt * v;
     EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+
+    // take 10 steps
+    for (int j = 0; j < 10; ++j)
+    {
+      link->AddForce(math::Vector3(f, 0, 0));
+      world->Step(1);
+      v = v + dt * f / m;
+      EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+      x = x + dt * v;
+      EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+    }
   }
   else if (_physicsEngine == "simbody")
   {
-    gzerr << "Simbody fails as describe by issue #1081,"
-          << " it's behind by one time step.\n";
-    gzerr << "Please update Simbody test here (this depends on"
-          << " integrator used).\n";
-    return;
+    // mimic simbody's semi-explicit scheme
+    // v(n+1) = v(n) + dt * f(n) / m
+    // x(n+1) = x(n) + dt * (0.75*v(n+1) + 0.25*v(n))
 
+    double vlast = v0.x;
     double v = v0.x + dt * f / m;
     EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
 
-    double x = x0.pos.x + dt * v;
+    double x = x0.pos.x + dt * (0.75*v + 0.25*vlast);
     EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+
+    // take 10 steps
+    for (int j = 0; j < 10; ++j)
+    {
+      link->AddForce(math::Vector3(f, 0, 0));
+      world->Step(1);
+      vlast = v;
+      v = v + dt * f / m;
+      EXPECT_DOUBLE_EQ(v, link->GetWorldLinearVel().x);
+      x = x + dt * (0.75*v + 0.25*vlast);
+      EXPECT_DOUBLE_EQ(x, link->GetWorldPose().pos.x);
+    }
   }
   else
   {
