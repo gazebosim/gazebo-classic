@@ -123,7 +123,7 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
   {
     // Bullet is off by one step. See issue 1081
     world->Step(1);
-    EXPECT_NEAR(joint_00->GetAngle(0).Radian(), 1.49, 1e-2);
+    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
   }
   else
     EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
