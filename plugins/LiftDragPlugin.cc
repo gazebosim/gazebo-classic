@@ -283,9 +283,12 @@ void LiftDragPlugin::OnUpdate()
     this->cp - this->link->GetInertial()->GetCoG());
   // gzerr << this->cp << " : " << this->link->GetInertial()->GetCoG() << "\n";
 
-  // force an torque about cg in inertial frame
-  math::Vector3 force = lift + drag; // + moment.Cross(momentArm);
-  math::Vector3 torque = moment; // - lift.Cross(momentArm) - drag.Cross(momentArm);
+  // force and torque about cg in inertial frame
+  math::Vector3 force = lift + drag;
+  // + moment.Cross(momentArm);
+
+  math::Vector3 torque = moment;
+  // - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   // debug
   //

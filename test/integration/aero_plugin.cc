@@ -127,7 +127,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
             << "] wing_2 force [" << wing_2_force
             << "] wing_2 torque [" << wing_2_torque
             << "]\n";
-      
+
       EXPECT_NEAR(wing_1_force.z, cl * cos(dihedral), TOL);
     }
   }
