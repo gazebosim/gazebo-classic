@@ -363,8 +363,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_01_0 = joint_01->GetAngle(0).Radian();
     double angle_01_1 = joint_01->GetAngle(1).Radian();
 
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().x, angle_00_0 + angle_01_0, 1e-7);
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-7);
+    EXPECT_NEAR(pose_01.rot.GetAsEuler().x, angle_00_0 + angle_01_0, 1e-6);
+    EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-6);
   }
 }
 
