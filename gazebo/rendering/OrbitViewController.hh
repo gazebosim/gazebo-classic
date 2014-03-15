@@ -22,6 +22,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class OrbitViewController OrbitVeiwController.hh rendering/rendering.hh
     /// \brief Orbit view controller
-    class OrbitViewController : public ViewController
+    class GAZEBO_VISIBLE OrbitViewController : public ViewController
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.

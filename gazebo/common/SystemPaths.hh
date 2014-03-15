@@ -34,6 +34,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -51,7 +52,7 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class SystemPaths : public SingletonT<SystemPaths>
+    class GAZEBO_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();

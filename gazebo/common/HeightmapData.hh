@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class HeightmapData HeightmapData.hh common/common.hh
     /// \brief Encapsulates a generic heightmap data file.
-    class HeightmapData
+    class GAZEBO_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() {}

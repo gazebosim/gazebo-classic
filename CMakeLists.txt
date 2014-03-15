@@ -193,10 +193,17 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_warnings(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
+filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow 
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS}")
+
+# Check and add visibility hidden by default. Only in UNIX
+# Windows and MacosX does not handled properly the hidden compilation
+if (UNIX AND NOT APPLE)
+  filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
+endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
 
 #################################################
 # OS Specific initialization
@@ -209,6 +216,9 @@ endif()
 if(APPLE)
   gz_setup_apple()
 endif()
+
+# Main includes for compilation
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -253,7 +263,6 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
  
-  include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
