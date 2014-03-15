@@ -33,6 +33,9 @@ namespace gazebo
     /// \brief Constructor.
     public: LiftDragPlugin();
 
+    /// \brief Destructor.
+    public: ~LiftDragPlugin();
+
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
@@ -125,6 +128,17 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
+
+    /// \brief Pointer to engine joint for applying force
+    protected: physics::JointPtr engineJoint;
+
+    /// \brief Pointer to engine joint for applying force
+    protected: double throttleState;
+
+    protected: int clIncKey;
+    protected: int clDecKey;
+    protected: double clIncVal;
+    protected: double clDecVal;
   };
 }
 #endif

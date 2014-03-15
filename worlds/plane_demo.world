@@ -782,6 +782,10 @@
         <forward>0 0 -1</forward>
         <upward>-1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_1</link_name>
+        <engine>
+          <engine_joint>rod_1_joint</engine_joint>
+          <max_torque>1000</max_torque>
+        </engine>
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -815,6 +819,12 @@
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::wing_1</link_name>
+        <control>
+           <cl_inc_key>e</cl_inc_key>
+           <cl_inc_val>-0.01</cl_inc_val>
+           <cl_dec_key>r</cl_dec_key>
+           <cl_dec_val>0.01</cl_dec_val>
+        </control>
       </plugin>
       <plugin name="gazebo_wing_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -831,6 +841,14 @@
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::wing_2</link_name>
+        <cl_dec>
+           <key>e</key>
+           <val>0.01</val>
+        </cl_dec>
+        <cl_inc>
+           <key>r</key>
+           <val>-0.01</val>
+        </cl_inc>
       </plugin>
       <plugin name="gazebo_wing_3" filename="libLiftDragPlugin.so">
         <a0>0.02</a0>
@@ -866,7 +884,7 @@
       </plugin>
       <plugin name="gazebo_wing_5" filename="libLiftDragPlugin.so">
         <!-- force turn -->
-        <a0>0.0</a0>
+        <a0>0.01</a0>
         <cla>8.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
@@ -874,7 +892,7 @@
         <cla_stall>0.0</cla_stall>
         <cda_stall>0.01</cda_stall>
         <cma_stall>0.0</cma_stall>
-        <cp>0.0 0 1.0</cp>
+        <cp>0.0 0 0</cp>
         <area>3</area>
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
