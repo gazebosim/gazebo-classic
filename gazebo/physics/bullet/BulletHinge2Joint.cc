@@ -212,7 +212,10 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
 math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
 {
   if (!this->bulletHinge2)
+  {
     gzerr << "Joint must be created first.\n";
+    return math::Angle();
+  }
 
   btRotationalLimitMotor *motor =
     this->bulletHinge2->getRotationalLimitMotor(_index);
