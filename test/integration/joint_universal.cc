@@ -293,25 +293,44 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   joint_00->SetHighStop(0, 0.3);
   // push joint_00 till it hits new upper limit
   int count = 0;
-  while (joint_00->GetAngle(0) < 0.3 && count < 1220)
+  while (joint_00->GetAngle(0) < 0.4 && count < 1220)
   {
     count++;
 
     joint_00->SetForce(0, 0.1);
     world->Step(1);
     // check link pose
-    double angle_00_angular = joint_00->GetAngle(0).Radian();
-    EXPECT_EQ(link_00->GetWorldPose(),
-      math::Pose(0, 0, 2, angle_00_angular, 0, 0));
+    double angle_00_0 = joint_00->GetAngle(0).Radian();
+    math::Pose pose_00 = link_00->GetWorldPose();
+    EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
+    EXPECT_LT(pose_00.rot.GetAsEuler().x, 0.35);
+  }
+
+  // push it back to 0 then lock
+  joint_00->SetLowStop(0, 0.0);
+  count = 0;
+  while (joint_00->GetAngle(0) > 0.1 && count < 1220)
+  {
+    count++;
+
+    joint_00->SetForce(0, -0.1);
+    world->Step(1);
+    // check link pose
+    double angle_00_0 = joint_00->GetAngle(0).Radian();
+    math::Pose pose_00 = link_00->GetWorldPose();
+    EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
+    EXPECT_GT(pose_00.rot.GetAsEuler().x, -0.05);
   }
   // lock joint at this location by setting lower limit here too
-  joint_00->SetLowStop(0, 0.3);
+  joint_00->SetHighStop(0, 0.0);
 
   // set joint_01 upper limit to 1.0
-  joint_01->SetHighStop(0, 1.0);
+  joint_01->SetHighStop(0, 0.0);
+  joint_01->SetLowStop(0, 0.0);
+  joint_01->SetHighStop(1, 2.0);
   // push joint_01 until limit is reached
   count = 0;
-  while (joint_01->GetAngle(0) < 1.0 && count < 1350)
+  while (joint_01->GetAngle(1) < 2.1 && count < 2700)
   {
     count++;
 
@@ -319,46 +338,33 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     world->Step(1);
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
     math::Pose pose_01 = link_01->GetWorldPose();
-    double angle_00_angular = joint_00->GetAngle(0).Radian();
-    double angle_00_linear = joint_00->GetAngle(1).Radian();
-    double angle_01_angular = joint_01->GetAngle(0).Radian();
-    double angle_01_linear = joint_01->GetAngle(1).Radian();
+    double angle_00_1 = joint_00->GetAngle(1).Radian();
+    double angle_01_1 = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(0, 0, 2, angle_00_angular, 0, 0));
-
-    EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
-
-    EXPECT_NEAR(pose_01.pos.x, 0, 1e-8);
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
-      angle_00_angular + angle_01_angular, 1e-8);
+    EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-8);
+    EXPECT_LT(pose_01.rot.GetAsEuler().y, 2.05);
   }
 
   // push joint_01 the other way until -1 is reached
+  joint_01->SetLowStop(1, -1.0);
   count = 0;
-  while (joint_01->GetAngle(0) > -1.0 && count < 2100)
+  while (joint_01->GetAngle(1) > -1.1 && count < 2100)
   {
     count++;
 
-    joint_01->SetForce(0, -0.1);
+    joint_01->SetForce(1, -0.1);
     world->Step(1);
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
     math::Pose pose_01 = link_01->GetWorldPose();
-    double angle_00_angular = joint_00->GetAngle(0).Radian();
-    double angle_00_linear = joint_00->GetAngle(1).Radian();
-    double angle_01_angular = joint_01->GetAngle(0).Radian();
-    double angle_01_linear = joint_01->GetAngle(1).Radian();
+    double angle_00_0 = joint_00->GetAngle(0).Radian();
+    double angle_00_1 = joint_00->GetAngle(1).Radian();
+    double angle_01_0 = joint_01->GetAngle(0).Radian();
+    double angle_01_1 = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(0, 0, 2, angle_00_angular, 0, 0));
-
-    EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
-
-    EXPECT_NEAR(pose_01.pos.x, 0, 1e-8);
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
-      angle_00_angular + angle_01_angular, 1e-8);
+    EXPECT_NEAR(pose_01.rot.GetAsEuler().x, angle_00_0 + angle_01_0, 1e-7);
+    EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-7);
   }
 }
 
