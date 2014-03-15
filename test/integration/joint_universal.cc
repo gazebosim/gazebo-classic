@@ -276,8 +276,6 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
-  double pitch_00 = joint_00->GetAttribute("thread_pitch", 0);
-  double pitch_01 = joint_01->GetAttribute("thread_pitch", 0);
 
   // both initial angles should be zero
   EXPECT_EQ(joint_00->GetAngle(0), 0);
@@ -293,15 +291,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     // check link pose
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     EXPECT_EQ(link_00->GetWorldPose(),
-      math::Pose(angle_00_angular * pitch_00, 0, 2, angle_00_angular, 0, 0));
-
-    if (_physicsEngine == "simbody")
-    {
-      double angle_00_linear = joint_00->GetAngle(1).Radian();
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " shoudl be 0.3\n";
-    }
+      math::Pose(0, 0, 2, angle_00_angular, 0, 0));
   }
   // lock joint at this location by setting lower limit here too
   joint_00->SetLowStop(0, 0.3);
@@ -322,22 +312,11 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_01_angular = joint_01->GetAngle(0).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(
-      angle_00_angular * pitch_00, 0, 2, angle_00_angular, 0, 0));
-    if (_physicsEngine == "simbody")
-    {
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " should be 0.3. "
-            << " joint_01 " << angle_01_linear
-            << " is off too.\n";
-    }
-    else
-    {
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
-    }
-    EXPECT_NEAR(pose_01.pos.x, 
-      angle_00_angular * pitch_00 + angle_01_angular * pitch_01, 1e-8);
+    EXPECT_EQ(pose_00, math::Pose(0, 0, 2, angle_00_angular, 0, 0));
+
+    EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+
+    EXPECT_NEAR(pose_01.pos.x, 0, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
   }
@@ -356,22 +335,11 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_01_angular = joint_01->GetAngle(0).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(
-      angle_00_angular * pitch_00, 0, 2, angle_00_angular, 0, 0));
-    if (_physicsEngine == "simbody")
-    {
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " should be 0.3. "
-            << " joint_01 " << angle_01_linear
-            << " is off too.\n";
-    }
-    else
-    {
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
-    }
-    EXPECT_NEAR(pose_01.pos.x, 
-      angle_00_angular * pitch_00 + angle_01_angular * pitch_01, 1e-8);
+    EXPECT_EQ(pose_00, math::Pose(0, 0, 2, angle_00_angular, 0, 0));
+
+    EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+
+    EXPECT_NEAR(pose_01.pos.x, 0, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
   }
