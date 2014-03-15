@@ -147,7 +147,6 @@ namespace gazebo
         }
         this->dataPtr->valFiltered /=
           static_cast<double>(this->dataPtr->valWindowSize);
-
       }
       else
       {
@@ -170,7 +169,6 @@ namespace gazebo
         this->dataPtr->valIter = this->dataPtr->valHistory.begin();
         this->dataPtr->filled = true;
       }
-
     }
 
     //////////////////////////////////////////////////
