@@ -126,9 +126,9 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
   {
     // flipping axis 1 and 2 around
     if (_index == UniversalJoint::AXIS_CHILD)
-      result = dJointGetUniversalAngle2(this->jointId);
-    else if (_index == UniversalJoint::AXIS_PARENT)
       result = dJointGetUniversalAngle1(this->jointId);
+    else if (_index == UniversalJoint::AXIS_PARENT)
+      result = dJointGetUniversalAngle2(this->jointId);
     else
       gzerr << "Joint index out of bounds.\n";
   }
@@ -222,4 +222,198 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
     dJointSetUniversalParam(this->jointId, _parameter, _value);
   else
     gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+void ODEUniversalJoint::SetHighStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  // Overload because we switched axis orders
+  Joint::SetHighStop(_index, _angle);
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      this->SetParam(dParamHiStop, _angle.Radian());
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      this->SetParam(dParamHiStop2, _angle.Radian());
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      break;
+  };
+}
+
+//////////////////////////////////////////////////
+void ODEUniversalJoint::SetLowStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  // Overload because we switched axis orders
+  Joint::SetLowStop(_index, _angle);
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      this->SetParam(dParamLoStop, _angle.Radian());
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      this->SetParam(dParamLoStop2, _angle.Radian());
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      break;
+  };
+}
+
+//////////////////////////////////////////////////
+void ODEUniversalJoint::SetAttribute(
+  const std::string &_key, unsigned int _index, const boost::any &_value)
+{
+  if (_key == "stop_erp")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+          break;
+        case UniversalJoint::AXIS_PARENT:
+          this->SetParam(dParamStopERP2, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "stop_cfm")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+          break;
+        case UniversalJoint::AXIS_PARENT:
+          this->SetParam(dParamStopCFM2, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "hi_stop")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
+          break;
+        case UniversalJoint::AXIS_PARENT:
+          this->SetParam(dParamHiStop2, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "lo_stop")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
+          break;
+        case UniversalJoint::AXIS_PARENT:
+          this->SetParam(dParamLoStop2, boost::any_cast<double>(_value));
+          break;
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          break;
+      };
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else
+  {
+    // Overload because we switched axis orders
+    ODEJoint::SetAttribute(_key, _index, _value);
+  }
+}
+
+//////////////////////////////////////////////////
+double ODEUniversalJoint::GetAttribute(
+  const std::string &_key, unsigned int _index)
+{
+  // Overload because we switched axis orders
+  if (_key == "hi_stop")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          return this->GetParam(dParamHiStop);
+        case UniversalJoint::AXIS_PARENT:
+          return this->GetParam(dParamHiStop2);
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          return 0;
+          break;
+      };
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      return 0;
+    }
+  }
+  else if (_key == "lo_stop")
+  {
+    try
+    {
+      switch (_index)
+      {
+        case UniversalJoint::AXIS_CHILD:
+          return this->GetParam(dParamLoStop);
+        case UniversalJoint::AXIS_PARENT:
+          return this->GetParam(dParamLoStop2);
+        default:
+          gzerr << "Invalid index[" << _index << "]\n";
+          return 0;
+          break;
+      };
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      return 0;
+    }
+  }
+  else
+  {
+    return ODEJoint::GetAttribute(_key, _index);
+  }
 }
