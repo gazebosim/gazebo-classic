@@ -23,6 +23,7 @@
 #define _ODEUNIVERSALJOINT_HH_
 
 #include <boost/any.hpp>
+#include <string>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/UniversalJoint.hh"
