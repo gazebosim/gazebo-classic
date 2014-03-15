@@ -42,6 +42,7 @@ set(tests
   joint_universal.cc
   laser.cc
   model_database.cc
+  moving_window_filter.cc
   noise.cc
   nondefault_world.cc
   physics.cc

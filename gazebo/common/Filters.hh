@@ -59,6 +59,11 @@ namespace gazebo
 
       /// \brief iterator pointing to current value in buffer
       public: typename std::vector<T>::iterator valIter;
+
+      /// \brief if incoming is larger than window size,
+      /// we know the history is full, and we can sum the entire
+      /// history.
+      public: bool filled;
     };
 
     //////////////////////////////////////////////////
@@ -66,6 +71,7 @@ namespace gazebo
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
       /// \TODO FIXME hardcoded initial value for now
+      this->filled = false;
       this->valWindowSize = 4;
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
@@ -122,31 +128,60 @@ namespace gazebo
     template<typename T>
     void MovingWindowFilter<T>::Update(T _val)
     {
-      // update avg
-      double n = 1.0/static_cast<double>(this->dataPtr->valWindowSize);
+      // each element of valHistory stores
+      // incoming value / size of window
+      // so the average is the sum of the elements in the vector
 
-      // add new data
-      if (this->dataPtr->valIter == this->dataPtr->valHistory.end())
-        this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+      // put new value into queue
       (*this->dataPtr->valIter) = _val;
 
-      // progressive add and subtrace oldest
-      // this->dataPtr->valFiltered += n*(*this->dataPtr->valIter - *old);
-
       // sum and avg
-      this->dataPtr->valFiltered = T();
-      for (typename std::vector<T>::iterator it =
-        this->dataPtr->valHistory.begin();
-        it != this->dataPtr->valHistory.end(); ++it)
-        this->dataPtr->valFiltered += *it;
-      this->dataPtr->valFiltered *= n;
+      if (this->dataPtr->filled)
+      {
+        this->dataPtr->valFiltered = T();
+        for (typename std::vector<T>::iterator it =
+          this->dataPtr->valHistory.begin();
+          it != this->dataPtr->valHistory.end(); ++it)
+        {
+          this->dataPtr->valFiltered += *it;
+        }
+        this->dataPtr->valFiltered /=
+          static_cast<double>(this->dataPtr->valWindowSize);
+
+      }
+      else
+      {
+        this->dataPtr->valFiltered = _val;
+        double count = 1.0;
+        for (typename std::vector<T>::iterator it =
+          this->dataPtr->valHistory.begin();
+          it != this->dataPtr->valIter; ++it)
+        {
+          this->dataPtr->valFiltered += *it;
+          count += 1.0;
+        }
+        this->dataPtr->valFiltered /= count;
+      }
+
+      // shift pointer
+      this->dataPtr->valIter++;
+      if (this->dataPtr->valIter == this->dataPtr->valHistory.end())
+      {
+        this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+        this->dataPtr->filled = true;
+      }
+
     }
 
     //////////////////////////////////////////////////
     template<typename T>
     void MovingWindowFilter<T>::SetWindowSize(unsigned int _n)
     {
+      this->dataPtr->filled = false;
       this->dataPtr->valWindowSize = _n;
+      this->dataPtr->valHistory.clear();
+      this->dataPtr->valHistory.resize(this->dataPtr->valWindowSize);
+      this->dataPtr->valIter = this->dataPtr->valHistory.begin();
     }
 
     //////////////////////////////////////////////////
