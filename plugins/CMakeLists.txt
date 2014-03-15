@@ -27,6 +27,7 @@ set (plugins
   ModelPropShop
   MotorDemoPlugin
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin

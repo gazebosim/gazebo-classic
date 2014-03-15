@@ -782,10 +782,6 @@
         <forward>0 0 -1</forward>
         <upward>-1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_1</link_name>
-        <engine>
-          <engine_joint>rod_1_joint</engine_joint>
-          <max_torque>1000</max_torque>
-        </engine>
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -819,12 +815,6 @@
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::wing_1</link_name>
-        <control>
-           <cl_inc_key>e</cl_inc_key>
-           <cl_inc_val>-0.01</cl_inc_val>
-           <cl_dec_key>r</cl_dec_key>
-           <cl_dec_val>0.01</cl_dec_val>
-        </control>
       </plugin>
       <plugin name="gazebo_wing_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -841,14 +831,6 @@
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>lift_drag_demo_model::wing_2</link_name>
-        <cl_dec>
-           <key>e</key>
-           <val>0.01</val>
-        </cl_dec>
-        <cl_inc>
-           <key>r</key>
-           <val>-0.01</val>
-        </cl_inc>
       </plugin>
       <plugin name="gazebo_wing_3" filename="libLiftDragPlugin.so">
         <a0>0.02</a0>
@@ -898,6 +880,29 @@
         <forward>-1 0 0</forward>
         <upward>0 -1 0</upward>
         <link_name>lift_drag_demo_model::wing_5</link_name>
+      </plugin>
+      <plugin name="plane_demo_plugin" filename="libPlaneDemo.so">
+        <engine name="engine1">
+          <engine_joint>rod_1_joint</engine_joint>
+          <engine_max_torque>1000</engine_max_torque>
+          <engine_inc_key>a</engine_inc_key>
+          <engine_dec_key>z</engine_dec_key>
+          <engine_inc_val>50</engine_inc_val>
+        </engine>
+        <thruster name="thruster1">
+          <thruster_link>body</thruster_link>
+          <engine_max_force>-1000 0 0</engine_max_force>
+          <engine_inc_key>a</engine_inc_key>
+          <engine_dec_key>z</engine_dec_key>
+          <engine_inc_val>-3 0 0</engine_inc_val>
+        </thruster>
+        <control name="left_wing_rudder">
+          <cl_joint>rod_1_joint</cl_joint>
+          <cl_inc_key>e</cl_inc_key>
+          <cl_inc_val>-0.01</cl_inc_val>
+          <cl_dec_key>r</cl_dec_key>
+          <cl_dec_val>0.01</cl_dec_val>
+        </control>
       </plugin>
 
     </model>

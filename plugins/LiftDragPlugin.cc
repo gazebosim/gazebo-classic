@@ -46,9 +46,6 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   /// \TODO: what's flat plate drag?
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
-
-  // engine
-  this->throttleState = 0;
 }
 
 /////////////////////////////////////////////////
@@ -120,25 +117,6 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     this->linkName = elem->Get<std::string>();
     this->link = this->model->GetLink(this->linkName);
   }
-
-  if (_sdf->HasElement("engine"))
-  {
-    sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
-    if (enginePtr->HasElement("engine_joint"))
-    {
-      std::string ejn = enginePtr->Get<std::string>("engine_joint");
-      this->engineJoint = this->model->GetJoint(ejn);
-    }
-  }
-
-  if (_sdf->HasElement("control"))
-  {
-    sdf::ElementPtr controlPtr = _sdf->GetElement("control");
-    if (controlPtr->HasElement("cl_inc_key"))
-      this->clIncKey =
-        (int)(*(controlPtr->Get<std::string>("cl_inc_key").c_str()));
-    // gzerr << " clIncKey: " << this->clIncKey << "\n";
-  }
 }
 
 /////////////////////////////////////////////////
@@ -151,42 +129,6 @@ void LiftDragPlugin::Init()
 /////////////////////////////////////////////////
 void LiftDragPlugin::OnUpdate()
 {
-  char ch='x';
-  if( _kbhit() )
-  {
-    printf("you hit");
-    do
-    {
-      ch = getchar();
-      printf(" '%c'(%i)", isprint(ch)?ch:'?', (int)ch );
-    } while( _kbhit() );
-    // puts("");
-
-    gzerr << " clIncKey: " << this->clIncKey << "\n";
-    if ((int)ch == 97)
-    {
-      // spin up motor
-      this->throttleState += 50;
-      gzerr << "torque: " << this->throttleState << "\n";
-    }
-    else if ((int)ch == 122)
-    {
-      this->throttleState -= 50;
-      gzerr << "torque: " << this->throttleState << "\n";
-    }
-    else if (((int)ch) == this->clIncKey)
-    {
-      gzerr << "increasing lift " << this->alpha0
-            << " : " << this->clIncKey << "\n";
-    }
-    else
-      gzerr << (int)ch << " : " << this->clIncKey << "\n";
-
-  }
-
-  if (this->engineJoint)
-    this->engineJoint->SetForce(0, this->throttleState);
-
   // get linear velocity at cp in inertial frame
   math::Vector3 vel = this->link->GetWorldLinearVel(this->cp);
 
