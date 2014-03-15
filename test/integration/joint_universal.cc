@@ -64,6 +64,8 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   physics::JointPtr jointLower = model->GetJoint("joint_01");
   ASSERT_TRUE(jointUpper);
   ASSERT_TRUE(jointLower);
+  physics::LinkPtr linkLower = jointLower->GetChild();
+  ASSERT_TRUE(linkLower);
 
   // freeze upper joint
   jointUpper->SetHighStop(0, 1e-6);
@@ -115,9 +117,15 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     gzdbg << "Setting gravity "
           << "gx " << gx << ' '
           << "gy " << gy << ' '
+          << "pose " << jointLower->GetChild()->GetWorldPose()
           << std::endl;
     EXPECT_NEAR(des0, jointLower->GetAngle(0).Radian(), 1e-2);
     EXPECT_NEAR(des1, jointLower->GetAngle(1).Radian(), 1e-2);
+
+    // Also test expected pose of body, math is approximate
+    math::Vector3 eulerAngles = linkLower->GetWorldPose().rot.GetAsEuler();
+    EXPECT_NEAR(des0, eulerAngles.x, 0.05);
+    EXPECT_NEAR(des1, eulerAngles.y, 0.05);
   }
 }
 
