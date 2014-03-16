@@ -151,7 +151,7 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 {
   this->threadPitch = _threadPitch;
-  this->dartScrewJoint->setPitch(_threadPitch);
+  this->dartScrewJoint->setPitch(_threadPitch * 2.0 * M_PI);
 }
 
 //////////////////////////////////////////////////
@@ -167,7 +167,7 @@ double DARTScrewJoint::GetThreadPitch()
 {
   double result = this->threadPitch;
   if (this->dartScrewJoint)
-    result = this->dartScrewJoint->getPitch();
+    result = this->dartScrewJoint->getPitch() * 0.5 / M_PI;
   else
     gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
   return result;
@@ -189,7 +189,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     {
       // linear position
       double angPos = this->dartScrewJoint->getGenCoord(0)->get_q();
-      result = dartScrewJoint->getPitch() * angPos;
+      result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
     }
     else
     {
