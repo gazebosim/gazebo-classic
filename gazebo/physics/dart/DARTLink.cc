@@ -305,13 +305,13 @@ bool DARTLink::GetEnabled() const
 //////////////////////////////////////////////////
 void DARTLink::SetLinearVel(const math::Vector3 &/*_vel*/)
 {
-  gzdbg << "DARTLink::SetLinearVel() doesn't make sense in dart.\n";
+  // gzdbg << "DARTLink::SetLinearVel() doesn't make sense in dart.\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 {
-  gzdbg << "DARTLink::SetAngularVel() doesn't make sense in dart.\n";
+  // gzdbg << "DARTLink::SetAngularVel() doesn't make sense in dart.\n";
 }
 
 //////////////////////////////////////////////////
@@ -401,9 +401,9 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
-  Eigen::Vector3d worldCOM = this->dtBodyNode->getWorldCOM();
+  Eigen::Vector3d localCOM = this->dtBodyNode->getLocalCOM();
   Eigen::Vector3d linVel
-    = this->dtBodyNode->getWorldVelocity(worldCOM).tail<3>();
+    = this->dtBodyNode->getWorldVelocity(localCOM, true).tail<3>();
 
   return DARTTypes::ConvVec3(linVel);
 }
