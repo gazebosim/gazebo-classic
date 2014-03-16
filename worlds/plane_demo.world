@@ -293,6 +293,9 @@
           </material>
         </visual>
       </link>
+
+
+      <!--
       <link name="blade_1">
         <pose>-0.25 0 1.5 0 0 0</pose>
         <inertial>
@@ -363,6 +366,79 @@
           </material>
         </visual>
       </link>
+      <joint name="blade_1_joint" type="revolute">
+        <parent>rod_1</parent>
+        <child>blade_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+          </limit>
+          <xyz>1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="blade_2_joint" type="revolute">
+        <parent>rod_1</parent>
+        <child>blade_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+          </limit>
+          <xyz>-1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+      <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
+        <a0>0.1</a0>
+        <cla>10.000</cla>
+        <cda>0.001</cda>
+        <cma>0.00</cma>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
+        <cma_stall>0.0</cma_stall>
+        <cp>0.0 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>0 0 -1</forward>
+        <upward>-1 0 0</upward>
+        <link_name>lift_drag_demo_model::blade_1</link_name>
+      </plugin>
+      <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
+        <a0>0.1</a0>
+        <cla>10.000</cla>
+        <cda>0.001</cda>
+        <cma>0.00</cma>
+        <alpha_stall>10.0</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>0.01</cda_stall>
+        <cma_stall>0.0</cma_stall>
+        <cp>0.0 0.5 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <forward>0 0 1</forward>
+        <upward>1 0 0</upward>
+        <link_name>lift_drag_demo_model::blade_2</link_name>
+      </plugin>
+      -->
       <joint name="wheel_1_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_1</child>
@@ -435,46 +511,6 @@
           <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
             <damping>0.0001</damping>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>1</cfm_damping>
-          </ode>
-        </physics>
-      </joint>
-      <joint name="blade_1_joint" type="revolute">
-        <parent>rod_1</parent>
-        <child>blade_1</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
-          </limit>
-          <xyz>1.0 0.0 0.0</xyz>
-          <dynamics>
-            <damping>1.000000</damping>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>1</cfm_damping>
-          </ode>
-        </physics>
-      </joint>
-      <joint name="blade_2_joint" type="revolute">
-        <parent>rod_1</parent>
-        <child>blade_2</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
-          </limit>
-          <xyz>-1.0 0.0 0.0</xyz>
-          <dynamics>
-            <damping>1.000000</damping>
           </dynamics>
         </axis>
         <physics>
@@ -712,39 +748,6 @@
       </joint>
 
 
-      <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <cla>10.000</cla>
-        <cda>0.001</cda>
-        <cma>0.00</cma>
-        <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <cp>0.0 0.5 0</cp>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <forward>0 0 -1</forward>
-        <upward>-1 0 0</upward>
-        <link_name>lift_drag_demo_model::blade_1</link_name>
-      </plugin>
-      <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <cla>10.000</cla>
-        <cda>0.001</cda>
-        <cma>0.00</cma>
-        <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <cp>0.0 0.5 0</cp>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <!-- link flipped about z-axis 180 degrees -->
-        <forward>0 0 1</forward>
-        <upward>1 0 0</upward>
-        <link_name>lift_drag_demo_model::blade_2</link_name>
-      </plugin>
       <plugin name="gazebo_wing_right" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>4.000</cla>
@@ -827,6 +830,7 @@
         <link_name>lift_drag_demo_model::rudder</link_name>
       </plugin>
       <plugin name="plane_demo_plugin" filename="libPlaneDemoPlugin.so">
+        <!--
         <engine name="engine1">
           <joint_name>rod_1_joint</joint_name>
           <max_torque>1000</max_torque>
@@ -834,9 +838,9 @@
           <dec_key>122</dec_key>
           <inc_val>50</inc_val>
         </engine>
+        -->
         <thruster name="thruster1">
-          <thruster_link>body</thruster_link>
-          <max_force>-1000 0 0</max_force>
+          <link_name>body</link_name>
           <inc_key>97</inc_key>
           <dec_key>122</dec_key>
           <inc_val>-3 0 0</inc_val>

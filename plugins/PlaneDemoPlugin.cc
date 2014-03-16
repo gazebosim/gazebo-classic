@@ -89,6 +89,34 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
     enginePtr = enginePtr->GetNextElement("engine");
   }
 
+  // get thruster controls
+  sdf::ElementPtr thrusterPtr = _sdf->GetElement("thruster");
+  while (thrusterPtr)
+  {
+    if (thrusterPtr->HasElement("link_name"))
+    {
+      std::string linkName = thrusterPtr->Get<std::string>("link_name");
+      gzerr << linkName << "\n";
+      physics::LinkPtr link = this->model->GetLink(linkName);
+      if (link.get() != NULL)
+      {
+        ThrusterControl tc;
+        // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
+        tc.link = link;
+        if (thrusterPtr->HasElement("inc_key"))
+          tc.incKey = thrusterPtr->Get<int>("inc_key");
+        if (thrusterPtr->HasElement("dec_key"))
+          tc.decKey = thrusterPtr->Get<int>("dec_key");
+        if (thrusterPtr->HasElement("inc_val"))
+          tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
+        tc.force = math::Vector3();
+        this->thrusterControls.push_back(tc);
+      }
+    }
+    // get next element
+    thrusterPtr = thrusterPtr->GetNextElement("thruster");
+  }
+
   // get controls
   sdf::ElementPtr controlPtr = _sdf->GetElement("control");
   while (controlPtr)
@@ -178,13 +206,35 @@ void PlaneDemoPlugin::OnUpdate()
       if ((int)ch == ei->incKey)
       {
         // spin up motor
-        ei->torque += 50;
+        ei->torque += ei->incVal;
         gzerr << "torque: " << ei->torque << "\n";
       }
       else if ((int)ch == ei->decKey)
       {
-        ei->torque -= 50;
+        ei->torque -= ei->incVal;
         gzerr << "torque: " << ei->torque << "\n";
+      }
+      else
+      {
+        // ungetc( ch, stdin );
+        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+      }
+    }
+
+    for (std::vector<ThrusterControl>::iterator
+      ti = this->thrusterControls.begin();
+      ti != this->thrusterControls.end(); ++ti)
+    {
+      if ((int)ch == ti->incKey)
+      {
+        // spin up motor
+        ti->force += ti->incVal;
+        gzerr << "force: " << ti->force << "\n";
+      }
+      else if ((int)ch == ti->decKey)
+      {
+        ti->force -= ti->incVal;
+        gzerr << "force: " << ti->force << "\n";
       }
       else
       {
@@ -235,6 +285,16 @@ void PlaneDemoPlugin::OnUpdate()
     // spin up engine
     ei->joint->SetForce(0, ei->torque);
   }
+
+  for (std::vector<ThrusterControl>::iterator
+    ti = this->thrusterControls.begin();
+    ti != this->thrusterControls.end(); ++ti)
+  {
+    // fire up thruster
+    math::Pose pose = ti->link->GetWorldPose();
+    ti->link->SetForce(pose.rot.RotateVector(ti->force));
+  }
+
   for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
     ji != this->jointControls.end(); ++ji)
   {

@@ -64,9 +64,6 @@ namespace gazebo
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
 
-    /// \brief Pointer to engine joint for applying force
-    protected: physics::JointPtr engineJoint;
-
     class EngineControl
     {
       public: std::string name;
@@ -78,6 +75,18 @@ namespace gazebo
       public: double torque;
     };
     protected: std::vector<EngineControl> engineControls;
+
+    class ThrusterControl
+    {
+      public: std::string name;
+      public: physics::LinkPtr link;
+      public: double maxTorque;
+      public: int incKey;
+      public: int decKey;
+      public: math::Vector3 incVal;
+      public: math::Vector3 force;
+    };
+    protected: std::vector<ThrusterControl> thrusterControls;
 
     class JointControl
     {
