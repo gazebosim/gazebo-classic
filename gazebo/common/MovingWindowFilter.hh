@@ -49,7 +49,7 @@ namespace gazebo
       public: MovingWindowFilterPrivate();
 
       /// \brief For moving window smoothed value
-      public: int valWindowSize;
+      public: unsigned int valWindowSize;
 
       /// \brief filtered value
       public: T valFiltered;
@@ -95,6 +95,13 @@ namespace gazebo
       /// \brief Set window size
       /// \param[in] _n new desired window size
       public: void SetWindowSize(unsigned int _n);
+
+      /// \brief Get the window size.
+      /// \return The size of the moving window.
+      public: unsigned int GetWindowSize() const;
+
+      /// \brief Get whether the window has been filled.
+      public: bool GetWindowFilled() const;
 
       /// \brief Get filtered result
       /// \return latest filtered value
@@ -180,6 +187,20 @@ namespace gazebo
       this->dataPtr->valHistory.clear();
       this->dataPtr->valHistory.resize(this->dataPtr->valWindowSize);
       this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+    }
+
+    //////////////////////////////////////////////////
+    template<typename T>
+    unsigned int MovingWindowFilter<T>::GetWindowSize() const
+    {
+      return this->dataPtr->valWindowSize;
+    }
+
+    //////////////////////////////////////////////////
+    template<typename T>
+    bool MovingWindowFilter<T>::GetWindowFilled() const
+    {
+      return this->dataPtr->filled;
     }
 
     //////////////////////////////////////////////////

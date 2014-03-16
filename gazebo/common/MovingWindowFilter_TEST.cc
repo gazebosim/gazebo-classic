@@ -16,17 +16,26 @@
 */
 
 #include <gtest/gtest.h>
-#include "ServerFixture.hh"
 #include "gazebo/common/MovingWindowFilter.hh"
 #include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 
-class MovingWindowFilterTest : public ServerFixture
+/////////////////////////////////////////////////
+TEST(MovingWindowFilterTest, SetWindowSize)
 {
-};
+  common::MovingWindowFilter<int> filterInt;
 
-TEST_F(MovingWindowFilterTest, FilterSomething)
+  EXPECT_EQ(filterInt.GetWindowSize(), 4u);
+  EXPECT_FALSE(filterInt.GetWindowFilled());
+
+  filterInt.SetWindowSize(10);
+  EXPECT_EQ(filterInt.GetWindowSize(), 10u);
+  EXPECT_FALSE(filterInt.GetWindowFilled());
+}
+
+/////////////////////////////////////////////////
+TEST(MovingWindowFilterTest, FilterSomething)
 {
   common::MovingWindowFilter<double> doubleMWF;
   common::MovingWindowFilter<double> doubleMWF2;
@@ -65,4 +74,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
