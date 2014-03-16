@@ -292,7 +292,7 @@ void PlaneDemoPlugin::OnUpdate()
   {
     // fire up thruster
     math::Pose pose = ti->link->GetWorldPose();
-    ti->link->SetForce(pose.rot.RotateVector(ti->force));
+    ti->link->AddForce(pose.rot.RotateVector(ti->force));
   }
 
   for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
