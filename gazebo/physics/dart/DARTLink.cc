@@ -270,12 +270,17 @@ void DARTLink::OnPoseChange()
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
     freeJoint->set_q(dart::math::logMap(Q));
+
+    this->dtBodyNode->getSkeleton()->setConfig(
+          this->dtBodyNode->getSkeleton()->getConfig());
   }
   else if (joint->getNumGenCoords() > 0)
   {
     // If the parent joint is not free joint (nor weld joint), set the n dof
     // as minimal value that makes the link's pose close to the target pose.
+    dart::dynamics::Skeleton* skeleton = this->dtBodyNode->getSkeleton();
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
+    skeleton->solveInvKinematics(this->dtBodyNode, W);
   }
   else
   {

@@ -47,13 +47,6 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
     return;
   }
 
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
-          << " See issue #1096.\n";
-    return;
-  }
-
   if (_physicsEngine == "simbody")
   {
     gzerr << "Simbody Screw Joint will not work with Link::SetWorldPose."
@@ -180,12 +173,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   if (_physicsEngine == "bullet")
   {
     gzerr << "Bullet Screw Joint will not work until pull request #1008.\n";
-    return;
-  }
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint not yet implemented.\n";
     return;
   }
 
