@@ -621,7 +621,7 @@
           </limit>
           <xyz>0.0 0.98 0.198669</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>
@@ -641,7 +641,7 @@
           </limit>
           <xyz>0.0 -0.98 0.198669</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>

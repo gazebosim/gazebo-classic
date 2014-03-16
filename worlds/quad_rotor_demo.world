@@ -1033,6 +1033,44 @@
         <link_name>lift_drag_demo_model::blade_8</link_name>
       </plugin>
 
+      <plugin name="quad_rotor_demo_plugin" filename="libPlaneDemoPlugin.so">
+        <engine name="engine1">
+          <joint_name>rod_1_joint</joint_name>
+          <max_torque>1000</max_torque>
+          <inc_key>65</inc_key>
+          <dec_key>66</dec_key>
+          <inc_val>3</inc_val>
+        </engine>
+        <engine name="engine2">
+          <joint_name>rod_2_joint</joint_name>
+          <max_torque>1000</max_torque>
+          <inc_key>65</inc_key>
+          <dec_key>66</dec_key>
+          <inc_val>3</inc_val>
+        </engine>
+        <engine name="engine3">
+          <joint_name>rod_3_joint</joint_name>
+          <max_torque>1000</max_torque>
+          <inc_key>65</inc_key>
+          <dec_key>66</dec_key>
+          <inc_val>3</inc_val>
+        </engine>
+        <engine name="engine4">
+          <joint_name>rod_4_joint</joint_name>
+          <max_torque>1000</max_torque>
+          <inc_key>65</inc_key>
+          <dec_key>66</dec_key>
+          <inc_val>3</inc_val>
+        </engine>
+        <!--
+        <thruster name="thruster1">
+          <link_name>body</link_name>
+          <inc_key>97</inc_key>
+          <dec_key>122</dec_key>
+          <inc_val>-50 0 0</inc_val>
+        </thruster>
+        -->
+      </plugin>
     </model>
   </world>
 </sdf>
