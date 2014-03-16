@@ -24,6 +24,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/common/PID.hh"
 
 namespace gazebo
 {
@@ -54,19 +55,11 @@ namespace gazebo
     /// \brief Pointer to physics engine.
     protected: physics::PhysicsEnginePtr physics;
 
-
-
     /// \brief Pointer to model containing plugin.
     protected: physics::ModelPtr model;
 
     /// \brief Name of model containing plugin.
     protected: std::string modelName;
-
-    /// \brief Names of allowed target links, specified in sdf parameters.
-    protected: std::string linkName;
-
-    /// \brief Pointer to link currently targeted by mud joint.
-    protected: physics::LinkPtr link;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
@@ -74,13 +67,30 @@ namespace gazebo
     /// \brief Pointer to engine joint for applying force
     protected: physics::JointPtr engineJoint;
 
-    /// \brief Pointer to engine joint for applying force
-    protected: double throttleState;
+    class EngineControl
+    {
+      public: std::string name;
+      public: physics::JointPtr joint;
+      public: double maxTorque;
+      public: int incKey;
+      public: int decKey;
+      public: double incVal;
+      public: double torque;
+    };
+    protected: std::vector<EngineControl> engineControls;
 
-    protected: int clIncKey;
-    protected: int clDecKey;
-    protected: double clIncVal;
-    protected: double clDecVal;
+    class JointControl
+    {
+      public: std::string name;
+      public: physics::JointPtr joint;
+      public: double cmd;
+      public: double incVal;
+      public: int incKey;
+      public: int decKey;
+      public: common::PID pid;
+    };
+    protected: std::vector<JointControl> jointControls;
+    protected: common::Time lastUpdateTime;
   };
 }
 #endif

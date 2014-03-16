@@ -33,8 +33,6 @@ GZ_REGISTER_MODEL_PLUGIN(PlaneDemoPlugin)
 /////////////////////////////////////////////////
 PlaneDemoPlugin::PlaneDemoPlugin()
 {
-  // engine
-  this->throttleState = 0;
 }
 
 /////////////////////////////////////////////////
@@ -59,38 +57,102 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
 
   GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
 
-  if (_sdf->HasElement("link_name"))
+  gzerr << "model: " << this->model->GetName() << "\n";
+
+  // get engine controls
+  sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
+  while (enginePtr)
   {
-    sdf::ElementPtr elem = _sdf->GetElement("link_name");
-    this->linkName = elem->Get<std::string>();
-    this->link = this->model->GetLink(this->linkName);
+    if (enginePtr->HasElement("joint_name"))
+    {
+      std::string jointName = enginePtr->Get<std::string>("joint_name");
+      gzerr << jointName << "\n";
+      physics::JointPtr joint = this->model->GetJoint(jointName);
+      if (joint.get() != NULL)
+      {
+        EngineControl ec;
+        // ec.name = enginePtr->GetAttribute("name")->GetAsString();
+        ec.joint = joint;
+        if (enginePtr->HasElement("max_torque"))
+          ec.maxTorque = enginePtr->Get<double>("max_torque");
+        if (enginePtr->HasElement("inc_key"))
+          ec.incKey = enginePtr->Get<int>("inc_key");
+        if (enginePtr->HasElement("dec_key"))
+          ec.decKey = enginePtr->Get<int>("dec_key");
+        if (enginePtr->HasElement("inc_val"))
+          ec.incVal = enginePtr->Get<double>("inc_val");
+        ec.torque = 0;
+        this->engineControls.push_back(ec);
+      }
+    }
+    // get next element
+    enginePtr = enginePtr->GetNextElement("engine");
   }
 
-  if (_sdf->HasElement("engine"))
+  // get controls
+  sdf::ElementPtr controlPtr = _sdf->GetElement("control");
+  while (controlPtr)
   {
-    sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
-    if (enginePtr->HasElement("engine_joint"))
+    if (controlPtr->HasElement("joint_name"))
     {
-      std::string ejn = enginePtr->Get<std::string>("engine_joint");
-      this->engineJoint = this->model->GetJoint(ejn);
+      std::string jointName = controlPtr->Get<std::string>("joint_name");
+      gzerr << jointName << "\n";
+      physics::JointPtr joint = this->model->GetJoint(jointName);
+      if (joint.get() != NULL)
+      {
+        JointControl jc;
+        // jc.name = controlPtr->GetAttribute("name")->GetAsString();
+        jc.joint = joint;
+        if (controlPtr->HasElement("inc_key"))
+          jc.incKey = controlPtr->Get<int>("inc_key");
+        if (controlPtr->HasElement("dec_key"))
+          jc.decKey = controlPtr->Get<int>("dec_key");
+        if (controlPtr->HasElement("inc_val"))
+          jc.incVal = controlPtr->Get<double>("inc_val");
+        double p, i, d, iMax, iMin, cmdMax, cmdMin;
+        if (controlPtr->HasElement("p"))
+          p = controlPtr->Get<double>("p");
+        else
+          p = 0.0;
+        if (controlPtr->HasElement("i"))
+          i = controlPtr->Get<double>("i");
+        else
+          i = 0.0;
+        if (controlPtr->HasElement("d"))
+          d = controlPtr->Get<double>("d");
+        else
+          d = 0.0;
+        if (controlPtr->HasElement("i_max"))
+          iMax = controlPtr->Get<double>("i_max");
+        else
+          iMax = 0.0;
+        if (controlPtr->HasElement("i_min"))
+          iMin = controlPtr->Get<double>("i_min");
+        else
+          iMin = 0.0;
+        if (controlPtr->HasElement("cmd_max"))
+          cmdMax = controlPtr->Get<double>("cmd_max");
+        else
+          cmdMax = 1000.0;
+        if (controlPtr->HasElement("cmd_min"))
+          cmdMin = controlPtr->Get<double>("cmd_min");
+        else
+          cmdMin = -1000.0;
+        jc.pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+        jc.cmd = joint->GetAngle(0).Radian();
+        jc.pid.SetCmd(jc.cmd);
+        this->jointControls.push_back(jc);
+      }
     }
-  }
-
-  if (_sdf->HasElement("control"))
-  {
-    sdf::ElementPtr controlPtr = _sdf->GetElement("control");
-    if (controlPtr->HasElement("cl_inc_key"))
-    {
-      this->clIncKey =
-        (int)(*(controlPtr->Get<std::string>("cl_inc_key").c_str()));
-      gzerr << " clIncKey: " << this->clIncKey << "\n";
-    }
+    // get next element
+    controlPtr = controlPtr->GetNextElement("control");
   }
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Init()
 {
+  this->lastUpdateTime = this->world->GetSimTime();
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&PlaneDemoPlugin::OnUpdate, this));
 }
@@ -98,10 +160,10 @@ void PlaneDemoPlugin::Init()
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
+  common::Time curTime = this->world->GetSimTime();
   char ch='x';
   if( _kbhit() )
   {
-    gzerr << this->linkName << "\n";
     printf("you hit");
     do
     {
@@ -110,32 +172,77 @@ void PlaneDemoPlugin::OnUpdate()
     } while( _kbhit() );
     // puts("");
 
-    gzerr << " clIncKey: " << this->clIncKey << "\n";
-    if ((int)ch == 97)
+    for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
+      ei != this->engineControls.end(); ++ei)
     {
-      // spin up motor
-      this->throttleState += 50;
-      gzerr << "torque: " << this->throttleState << "\n";
-    }
-    else if ((int)ch == 122)
-    {
-      this->throttleState -= 50;
-      gzerr << "torque: " << this->throttleState << "\n";
-    }
-    else if (((int)ch) == this->clIncKey)
-    {
-      // gzerr << "increasing lift " << this->jointAngle
-      //       << " : " << this->clIncKey << "\n";
-    }
-    else
-    {
-      ungetc( ch, stdin );
-      gzerr << (int)ch << " : " << this->clIncKey << "\n";
+      if ((int)ch == ei->incKey)
+      {
+        // spin up motor
+        ei->torque += 50;
+        gzerr << "torque: " << ei->torque << "\n";
+      }
+      else if ((int)ch == ei->decKey)
+      {
+        ei->torque -= 50;
+        gzerr << "torque: " << ei->torque << "\n";
+      }
+      else
+      {
+        // ungetc( ch, stdin );
+        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+      }
     }
 
+    for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
+      ji != this->jointControls.end(); ++ji)
+    {
+      if ((int)ch == ji->incKey)
+      {
+        // spin up motor
+        ji->cmd += ji->incVal;
+        ji->pid.SetCmd(ji->cmd);
+        gzerr << ji->joint->GetName()
+              << " cur: " << ji->joint->GetAngle(0).Radian()
+              << " cmd: " << ji->cmd << "\n";
+      }
+      else if ((int)ch == ji->decKey)
+      {
+        ji->cmd -= ji->incVal;
+        ji->pid.SetCmd(ji->cmd);
+        gzerr << ji->joint->GetName()
+              << " cur: " << ji->joint->GetAngle(0).Radian()
+              << " cmd: " << ji->cmd << "\n";
+      }
+      else if ((int)ch == 99)  // 'c' resets all control surfaces
+      {
+        ji->cmd = 0;
+        ji->pid.SetCmd(ji->cmd);
+        gzerr << ji->joint->GetName()
+              << " cur: " << ji->joint->GetAngle(0).Radian()
+              << " cmd: " << ji->cmd << "\n";
+      }
+      else
+      {
+        // ungetc( ch, stdin );
+        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+      }
+    }
   }
 
-  // spin up engine
-  if (this->engineJoint)
-    this->engineJoint->SetForce(0, this->throttleState);
+  for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
+    ei != this->engineControls.end(); ++ei)
+  {
+    // spin up engine
+    ei->joint->SetForce(0, ei->torque);
+  }
+  for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
+    ji != this->jointControls.end(); ++ji)
+  {
+    // spin up joint control
+    double pos = ji->joint->GetAngle(0).Radian();
+    double error = pos - ji->cmd;
+    double force = ji->pid.Update(error, curTime - this->lastUpdateTime);
+    ji->joint->SetForce(0, force);
+  }
+  this->lastUpdateTime = curTime;
 }

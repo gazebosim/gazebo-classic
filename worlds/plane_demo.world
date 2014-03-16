@@ -487,8 +487,8 @@
 
 
 
-      <link name="wing_1">
-        <pose>3 0 1.5 0.3 0 0</pose>
+      <link name="wing_right">
+        <pose>3 0 1.5 0.0 0 0</pose>
         <inertial>
           <pose>0.0 5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -522,8 +522,8 @@
           </material>
         </visual>
       </link>
-      <link name="wing_2">
-        <pose>3 0 1.5 -0.3 0 0</pose>
+      <link name="wing_left">
+        <pose>3 0 1.5 -0.0 0 0</pose>
         <inertial>
           <pose>0.0 -5.5 0 0.0 0.0 0.0</pose>
           <inertia>
@@ -557,14 +557,14 @@
           </material>
         </visual>
       </link>
-      <joint name="wing_1_joint" type="revolute">
+      <joint name="wing_right_joint" type="revolute">
         <parent>body</parent>
-        <child>wing_1</child>
+        <child>wing_right</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
+            <lower>-0.3</lower>
+            <upper>0.3</upper>
           </limit>
           <xyz>0.0 1.0 0.0</xyz>
           <dynamics>
@@ -577,14 +577,14 @@
           </ode>
         </physics>
       </joint>
-      <joint name="wing_2_joint" type="revolute">
+      <joint name="wing_left_joint" type="revolute">
         <parent>body</parent>
-        <child>wing_2</child>
+        <child>wing_left</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
+            <lower>-0.3</lower>
+            <upper>0.3</upper>
           </limit>
           <xyz>0.0 -1.0 0.0</xyz>
           <dynamics>
@@ -599,10 +599,10 @@
       </joint>
 
 
-      <link name="wing_3">
+      <link name="elevator">
         <pose>9 0 1.5 0 0 0</pose>
         <inertial>
-          <pose>0.0 2.0 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <inertia>
             <ixx>0.0465</ixx>
             <ixy>0.0</ixy>
@@ -611,21 +611,21 @@
             <iyz>0.0</iyz>
             <izz>0.0470</izz>
           </inertia>
-          <mass>2.0</mass>
+          <mass>4.0</mass>
         </inertial>
         <collision name="collision">
-          <pose>0.0 2.0 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <geometry>
             <box>
-              <size>1.0 3.0 0.01</size>
+              <size>1.0 6.0 0.01</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
-          <pose>0.0 2.0 0 0.0 0.0 0.0</pose>
+          <pose>0.0 0.0 0 0.0 0.0 0.0</pose>
           <geometry>
             <box>
-              <size>1.0 3.0 0.01</size>
+              <size>1.0 6.0 0.01</size>
             </box>
           </geometry>
           <material>
@@ -634,73 +634,18 @@
           </material>
         </visual>
       </link>
-      <link name="wing_4">
-        <pose>9 0 1.5 0 0 0</pose>
-        <inertial>
-          <pose>0.0 -2.0 0 0.0 0.0 0.0</pose>
-          <inertia>
-            <ixx>0.0465</ixx>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyy>0.0006</iyy>
-            <iyz>0.0</iyz>
-            <izz>0.0470</izz>
-          </inertia>
-          <mass>2.0</mass>
-        </inertial>
-        <collision name="collision">
-          <pose>0.0 -2.0 0 0.0 0.0 0.0</pose>
-          <geometry>
-            <box>
-              <size>1.0 3.0 0.01</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <pose>0.0 -2.0 0 0.0 0.0 0</pose>
-          <geometry>
-            <box>
-              <size>1.0 3.0 0.01</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0.2 0.5 0.2 1.0</ambient>
-            <diffuse>.421 0.225 0.0 1.0</diffuse>
-          </material>
-        </visual>
-      </link>
-      <joint name="wing_3_joint" type="revolute">
+      <joint name="elevator_joint" type="revolute">
         <parent>body</parent>
-        <child>wing_3</child>
+        <child>elevator</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
+            <lower>-0.5</lower>
+            <upper>0.5</upper>
           </limit>
           <xyz>0.0 1.0 0.0</xyz>
           <dynamics>
-            <damping>1.000000</damping>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>1</cfm_damping>
-          </ode>
-        </physics>
-      </joint>
-      <joint name="wing_4_joint" type="revolute">
-        <parent>body</parent>
-        <child>wing_4</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
-          </limit>
-          <xyz>0.0 -1.0 0.0</xyz>
-          <dynamics>
-            <damping>1.000000</damping>
+            <damping>2.000000</damping>
           </dynamics>
         </axis>
         <physics>
@@ -710,28 +655,7 @@
         </physics>
       </joint>
 
-      <joint name="wing_5_joint" type="revolute">
-        <parent>body</parent>
-        <child>wing_5</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
-          </limit>
-          <xyz>0.0 0.0 1.0</xyz>
-          <dynamics>
-            <damping>1.000000</damping>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>1</cfm_damping>
-          </ode>
-        </physics>
-      </joint>
-
-      <link name="wing_5">
+      <link name="rudder">
         <pose>9 0 2.0 0 0 0</pose>
         <inertial>
           <pose>0.0 0 1 0.0 0.0 0.0</pose>
@@ -766,6 +690,27 @@
           </material>
         </visual>
       </link>
+      <joint name="rudder_joint" type="revolute">
+        <parent>body</parent>
+        <child>rudder</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>-0.3</lower>
+            <upper>0.3</upper>
+          </limit>
+          <xyz>0.0 0.0 1.0</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <cfm_damping>1</cfm_damping>
+          </ode>
+        </physics>
+      </joint>
+
 
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
@@ -800,7 +745,7 @@
         <upward>1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_2</link_name>
       </plugin>
-      <plugin name="gazebo_wing_1" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_wing_right" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
@@ -814,9 +759,9 @@
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::wing_1</link_name>
+        <link_name>lift_drag_demo_model::wing_right</link_name>
       </plugin>
-      <plugin name="gazebo_wing_2" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_wing_left" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
@@ -830,9 +775,9 @@
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::wing_2</link_name>
+        <link_name>lift_drag_demo_model::wing_left</link_name>
       </plugin>
-      <plugin name="gazebo_wing_3" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_elevator_right" filename="libLiftDragPlugin.so">
         <a0>0.02</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
@@ -846,9 +791,9 @@
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::wing_3</link_name>
+        <link_name>lift_drag_demo_model::elevator</link_name>
       </plugin>
-      <plugin name="gazebo_wing_4" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_elevator_left" filename="libLiftDragPlugin.so">
         <a0>0.02</a0>
         <cla>4.000</cla>
         <cda>0.001</cda>
@@ -862,11 +807,11 @@
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
         <upward>0 0 1</upward>
-        <link_name>lift_drag_demo_model::wing_4</link_name>
+        <link_name>lift_drag_demo_model::elevator</link_name>
       </plugin>
-      <plugin name="gazebo_wing_5" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_rudder" filename="libLiftDragPlugin.so">
         <!-- force turn -->
-        <a0>0.01</a0>
+        <a0>0.00</a0>
         <cla>8.000</cla>
         <cda>0.001</cda>
         <cma>0.00</cma>
@@ -879,29 +824,58 @@
         <air_density>1.2041</air_density>
         <forward>-1 0 0</forward>
         <upward>0 -1 0</upward>
-        <link_name>lift_drag_demo_model::wing_5</link_name>
+        <link_name>lift_drag_demo_model::rudder</link_name>
       </plugin>
-      <plugin name="plane_demo_plugin" filename="libPlaneDemo.so">
+      <plugin name="plane_demo_plugin" filename="libPlaneDemoPlugin.so">
         <engine name="engine1">
-          <engine_joint>rod_1_joint</engine_joint>
-          <engine_max_torque>1000</engine_max_torque>
-          <engine_inc_key>a</engine_inc_key>
-          <engine_dec_key>z</engine_dec_key>
-          <engine_inc_val>50</engine_inc_val>
+          <joint_name>rod_1_joint</joint_name>
+          <max_torque>1000</max_torque>
+          <inc_key>97</inc_key>
+          <dec_key>122</dec_key>
+          <inc_val>50</inc_val>
         </engine>
         <thruster name="thruster1">
           <thruster_link>body</thruster_link>
-          <engine_max_force>-1000 0 0</engine_max_force>
-          <engine_inc_key>a</engine_inc_key>
-          <engine_dec_key>z</engine_dec_key>
-          <engine_inc_val>-3 0 0</engine_inc_val>
+          <max_force>-1000 0 0</max_force>
+          <inc_key>97</inc_key>
+          <dec_key>122</dec_key>
+          <inc_val>-3 0 0</inc_val>
         </thruster>
-        <control name="left_wing_rudder">
-          <cl_joint>rod_1_joint</cl_joint>
-          <cl_inc_key>e</cl_inc_key>
-          <cl_inc_val>-0.01</cl_inc_val>
-          <cl_dec_key>r</cl_dec_key>
-          <cl_dec_val>0.01</cl_dec_val>
+        <control name="wing_left_control">
+          <joint_name>wing_left_joint</joint_name>
+          <inc_key>67</inc_key>
+          <inc_val>-0.01</inc_val>
+          <dec_key>68</dec_key>
+          <p>1000</p>
+          <i>0</i>
+          <d>0</d>
+        </control>
+        <control name="wing_right_control">
+          <joint_name>wing_right_joint</joint_name>
+          <inc_key>68</inc_key>
+          <inc_val>0.01</inc_val>
+          <dec_key>67</dec_key>
+          <p>1000</p>
+          <i>0</i>
+          <d>0</d>
+        </control>
+        <control name="elevator_control">
+          <joint_name>elevator_joint</joint_name>
+          <inc_key>65</inc_key>
+          <inc_val>0.01</inc_val>
+          <dec_key>66</dec_key>
+          <p>100</p>
+          <i>0</i>
+          <d>0</d>
+        </control>
+        <control name="rudder_control">
+          <joint_name>rudder_joint</joint_name>
+          <inc_key>119</inc_key>
+          <inc_val>0.01</inc_val>
+          <dec_key>113</dec_key>
+          <p>100</p>
+          <i>0</i>
+          <d>0</d>
         </control>
       </plugin>
 
