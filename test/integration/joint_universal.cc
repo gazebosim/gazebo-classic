@@ -35,11 +35,6 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
     gzerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
-    return;
-  }
 
   // Load our universal joint test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
