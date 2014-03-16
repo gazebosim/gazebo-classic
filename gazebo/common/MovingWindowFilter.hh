@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FILTERS_HH_
-#define _GAZEBO_FILTERS_HH_
+#ifndef _GAZEBO_MOVING_WINDOW_FILTER_HH_
+#define _GAZEBO_MOVING_WINDOW_FILTER_HH_
 
 #include <iostream>
 #include <vector>
@@ -77,7 +77,7 @@ namespace gazebo
       this->valIter = this->valHistory.begin();
     }
 
-    /// \class MovingWindowFilter filters.hh common/common.hh
+    /// \class MovingWindowFilter MovingWindowFilter.hh common/common.hh
     /// \brief Base class for MovingWindowFilter
     template< typename T>
     class MovingWindowFilter

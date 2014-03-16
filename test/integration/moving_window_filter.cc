@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "ServerFixture.hh"
-#include "gazebo/common/Filters.hh"
+#include "gazebo/common/MovingWindowFilter.hh"
 #include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;

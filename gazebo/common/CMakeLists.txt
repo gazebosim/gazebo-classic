@@ -63,7 +63,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
-  Filters.hh
+  MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
