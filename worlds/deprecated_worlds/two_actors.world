@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <light type="directional" name="sun">
+      <pose>0 0 100 0 0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>100</range>
+        <linear>0.01</linear>
+        <constant>0.8</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0.0 0.2 -8.0</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+    <actor name="actor1" static="true">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <filename>talk_a.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+      </script>
+    </actor>
+    <actor name="actor2" static="true">
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <filename>talk_b.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+      </script>
+    </actor>
+  </world>
+</sdf>

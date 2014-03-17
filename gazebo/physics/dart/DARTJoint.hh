@@ -25,13 +25,14 @@
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief DART joint interface
-    class DARTJoint : public Joint
+    class GAZEBO_VISIBLE DARTJoint : public Joint
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.

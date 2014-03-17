@@ -26,13 +26,14 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \class Master Master.hh gazebo_core.hh
   /// \brief A manager that directs topic connections, enables each gazebo
   /// network client to locate one another for peer-to-peer communication.
-  class Master
+  class GAZEBO_VISIBLE Master
   {
     /// \def Map of unique id's to connections.
     typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;

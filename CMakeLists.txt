@@ -92,29 +92,6 @@ set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 set (LIB_INSTALL_DIR_ARCH_INDEPENDENT "lib/")
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
     
-set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
-
-if (USE_FULL_RPATH)
-  # use, i.e. don't skip the full RPATH for the build tree
-  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
-  
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-  
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
-  # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  endif("${isSystemDir}" STREQUAL "-1")
-endif()
-
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
@@ -216,10 +193,17 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_warnings(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
+filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow 
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS}")
+
+# Check and add visibility hidden by default. Only in UNIX
+# Windows and MacosX does not handled properly the hidden compilation
+if (UNIX AND NOT APPLE)
+  filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
+endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
 
 #################################################
 # OS Specific initialization
@@ -232,6 +216,9 @@ endif()
 if(APPLE)
   gz_setup_apple()
 endif()
+
+# Main includes for compilation
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -276,7 +263,6 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
  
-  include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
@@ -311,7 +297,6 @@ else (build_errors)
   set(PKG_NAME ${PROJECT_NAME_UPPER})
   set(PKG_LIBRARIES
     gazebo
-    gazebo_ccd
     gazebo_common
     gazebo_gimpact
     gazebo_gui
@@ -330,6 +315,10 @@ else (build_errors)
     gazebo_skyx
     gazebo_transport
     gazebo_util)
+    
+  if (NOT HAVE_CCD)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
+  endif()
     
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)

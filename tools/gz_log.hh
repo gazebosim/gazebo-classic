@@ -233,6 +233,7 @@ namespace gazebo
 
     /// \brief Load a log file from a filename.
     /// \param[in] _filename Filename to open
+    /// \return True on success.
     private: bool LoadLogFromFile(const std::string &_filename);
 
     /// \brief Node pointer.

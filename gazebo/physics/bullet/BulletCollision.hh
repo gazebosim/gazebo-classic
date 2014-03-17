@@ -31,11 +31,13 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 */
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 class btCollisionShape;
 
@@ -48,7 +50,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collisions
-    class BulletCollision : public Collision
+    class GAZEBO_VISIBLE BulletCollision : public Collision
     {
       /// \brief Constructor
       public: BulletCollision(LinkPtr _parent);

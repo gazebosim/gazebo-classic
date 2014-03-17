@@ -110,27 +110,6 @@ void transport::run()
   g_stopped = false;
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
-
-  std::list<std::string> namespaces;
-
-  // This chunk of code just waits until we get a list of topic namespaces.
-  unsigned int trys = 0;
-  unsigned int limit = 50;
-  while (namespaces.empty() && trys < limit)
-  {
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
-
-    if (namespaces.empty())
-    {
-      // 25 seconds max wait time
-      common::Time::MSleep(500);
-    }
-
-    trys++;
-  }
-
-  if (trys >= limit)
-    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
 /////////////////////////////////////////////////
@@ -391,13 +370,31 @@ transport::ConnectionPtr transport::connectToMaster()
     }
 
     packet.ParseFromString(data);
-    if (packet.type() == "init")
+    if (packet.type() == "version_init")
     {
       msgs::GzString msg;
       msg.ParseFromString(packet.serialized_data());
-      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
         std::cerr << "Conflicting gazebo versions\n";
     }
+    else
+    {
+      gzerr  << "Failed to received version_init packet from master. "
+        << "Connection to master failed\n";
+      connection.reset();
+    }
+  }
+  else
+  {
+    gzerr << "Unable to connect to master.\n";
+    connection.reset();
+  }
+
+  if (connection && !connection->IsOpen())
+  {
+    gzerr << "Connection to master instatiated, but socket is not open."
+      << "Connection to master failed\n";
+    connection.reset();
   }
 
   return connection;

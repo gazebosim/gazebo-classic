@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ TEST_F(GzCamera, Follow)
   // Tell the camera to follow the box. The camera should move toward the
   // box.
   custom_exec("gz camera -c test_camera -f box");
-  world->Step(1000);
+  world->Step(5000);
 
   // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);

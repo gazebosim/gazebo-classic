@@ -181,15 +181,15 @@ if (ENABLE_TESTS_COMPILATION)
 endif()
 
 #################################################
-# Macro to setup supported compiler warnings
+# Macro to setup supported compiler flags
 # Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
 include(CheckCXXCompilerFlag)
 
-macro(filter_valid_compiler_warnings) 
+macro(filter_valid_compiler_flags) 
   foreach(flag ${ARGN})
     CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
     if(${R${flag}})
-      set(WARNING_CXX_FLAGS "${WARNING_CXX_FLAGS} ${flag}")
+      set(VALID_CXX_FLAGS "${VALID_CXX_FLAGS} ${flag}")
     endif()
   endforeach()
 endmacro()

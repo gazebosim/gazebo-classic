@@ -30,7 +30,7 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs
-    ${tinyxml_libraries}
+    ${tinyxml_LIBRARIES}
     ${PLAYER_LINK_LIBS}
     )
 

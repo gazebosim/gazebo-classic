@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ std::map<std::string, Command *> g_commandMap;
 
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
-  : name(_name), brief(_brief), visibleOptions("Options")
+  : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
     ("help,h", "Print this help message");
@@ -43,6 +43,8 @@ Command::Command(const std::string &_name, const std::string &_brief)
 /////////////////////////////////////////////////
 Command::~Command()
 {
+  delete [] this->argv;
+  this->argv = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +66,12 @@ void Command::ListOptions()
     pieces.clear();
     std::string formatName = (*iter)->format_name();
     boost::split(pieces, formatName, boost::is_any_of(" "));
+
+    if (pieces.empty())
+    {
+      std::cerr << "Unable to process list options.\n";
+      return;
+    }
 
     // Output the short name option, or long name if there is no shortname
     std::cout << pieces[0] << std::endl;
@@ -91,12 +99,16 @@ std::string Command::GetBrief() const
 /////////////////////////////////////////////////
 bool Command::TransportInit()
 {
+  // Some command require transport, and some do not. Only initialize
+  // transport if required.
   if (!this->TransportRequired())
     return true;
 
+  // Setup transport (communication)
   if (!transport::init("", 0, 1))
     return false;
 
+  // Run transport (communication)
   transport::run();
 
   return true;
@@ -183,7 +195,8 @@ WorldCommand::WorldCommand()
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
-    ("pause,p", po::value<bool>(), "Pause/unpause simulation.")
+    ("pause,p", po::value<bool>(), "Pause/unpause simulation. "
+     "0=unpause, 1=pause.")
     ("step,s", "Step simulation one iteration.")
     ("multi-step,m", po::value<uint32_t>(),
      "Step simulation mulitple iteration.")
@@ -272,7 +285,8 @@ PhysicsCommand::PhysicsCommand()
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("gravity,g", po::value<std::string>(),
-     "Gravity vector. Comma separated 3-tuple.")
+     "Gravity vector. Comma separated 3-tuple without whitespace, "
+     "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
     ("update-rate,u", po::value<double>(), "Target real-time update rate.");
@@ -705,6 +719,11 @@ bool CameraCommand::RunImpl()
         }
       }
     }
+    else
+    {
+      std::cerr << "Unable to connect to a running instance of gazebo.\n";
+    }
+
     return true;
   }
 
@@ -855,13 +874,13 @@ SDFCommand::SDFCommand()
   this->visibleOptions.add_options()
     ("describe,d", "Print SDF format for given version(-v).")
     ("convert,c", po::value<std::string>(),
-     "In place conversion of [arg] to the latest SDF version.")
+     "In place conversion of arg to the latest SDF version.")
     ("doc,o", "Print HTML SDF. Use -v to specify version.")
-    ("check,k", po::value<std::string>(), "Validate [arg].")
+    ("check,k", po::value<std::string>(), "Validate arg.")
     ("version,v", po::value<double>(),
      "Version of SDF to use with other options.")
     ("print,p", po::value<std::string>(),
-     "Print [arg], useful for debugging and as a conversion tool.");
+     "Print arg, useful for debugging and as a conversion tool.");
 }
 
 /////////////////////////////////////////////////
@@ -925,7 +944,7 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    if (!readFile(path.string(), sdf))
+    if (!sdf::readFile(path.string(), sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return -1;
@@ -979,7 +998,7 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    if (!readFile(path.string(), sdf))
+    if (!sdf::readFile(path.string(), sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return false;
