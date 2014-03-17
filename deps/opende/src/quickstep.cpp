@@ -1121,19 +1121,28 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-    qs->rms_dlambda[0] = sqrt(rms_dlambda[0]/(dReal)m_rms_dlambda[0]);
-    qs->rms_dlambda[1] = sqrt(rms_dlambda[1]/(dReal)m_rms_dlambda[1]);
-    qs->rms_dlambda[2] = sqrt(rms_dlambda[2]/(dReal)m_rms_dlambda[2]);
-    qs->rms_dlambda[3] =
-      qs->rms_dlambda[0] + qs->rms_dlambda[1] + qs->rms_dlambda[2];
+    dReal dlambda_bilateral_mean        = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
+    dReal dlambda_contact_normal_mean   = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
+    dReal dlambda_contact_friction_mean = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
+    dReal dlambda_total = dlambda_bilateral_mean +
+      dlambda_contact_normal_mean + dlambda_contact_friction_mean;
 
-    qs->rms_constraint_residual[0] = sqrt(rms_error[0]/(dReal)m_rms_dlambda[0]);
-    qs->rms_constraint_residual[1] = sqrt(rms_error[1]/(dReal)m_rms_dlambda[1]);
-    qs->rms_constraint_residual[2] = sqrt(rms_error[2]/(dReal)m_rms_dlambda[2]);
-    qs->rms_constraint_residual[3] =
-      qs->rms_constraint_residual[0] +
-      qs->rms_constraint_residual[1] +
-      qs->rms_constraint_residual[2];
+    qs->rms_dlambda[0] = sqrt(dlambda_bilateral_mean);
+    qs->rms_dlambda[1] = sqrt(dlambda_contact_normal_mean);
+    qs->rms_dlambda[2] = sqrt(dlambda_contact_friction_mean);
+    qs->rms_dlambda[3] = sqrt(dlambda_total);
+
+    dReal residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
+    dReal residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
+    dReal residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
+    dReal residual_total = residual_bilateral_mean +
+      residual_contact_normal_mean + residual_contact_friction_mean;
+
+    qs->rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
+    qs->rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
+    qs->rms_constraint_residual[2] = sqrt(residual_contact_friction_mean);
+    qs->rms_constraint_residual[3] = sqrt(residual_total);
+    qs->num_contacts = m_rms_dlambda[1];
 
     // debugging mutex locking
     //{
@@ -2429,29 +2438,29 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal *tmp = context->AllocateArray<dReal> (m);
       multiply_J (m,J,jb,vel,tmp);
 
-      int m_bilateral_error = 0;
-      int m_contact_error = 0;
-      int m_friction_error = 0;
-      dReal bilateral_error = 0;
-      dReal contact_error = 0;
-      dReal friction_error = 0;
+      int m_Jv_bilateral = 0;
+      int m_Jv_contact = 0;
+      int m_Jv_friction = 0;
+      dReal Jv_bilateral = 0;
+      dReal Jv_contact = 0;
+      dReal Jv_friction = 0;
       for (int i=0; i<m; i++)
       {
         if (findex[i] == -1)
         {
-          m_bilateral_error++;
-          bilateral_error += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_bilateral++;
+          Jv_bilateral += dFabs(tmp[i])*dFabs(tmp[i]);
         }
         else if (findex[i] == -2)
         {
           // contact error includes joint limits
-          contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
-          m_contact_error++;
+          Jv_contact += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_contact++;
         }
         else if (findex[i] >= 0)
         {
-          m_friction_error++;
-          friction_error += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_friction++;
+          Jv_friction += dFabs(tmp[i])*dFabs(tmp[i]);
         }
 
         // Note: This is not a good measure of constraint error
@@ -2459,19 +2468,20 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // Better measure is compute the residual.  \\\ TODO
       }
       // printf ("error = %10.6e %10.6e %10.6e\n",
-      //   error, bilateral_error, contact_error);
+      //   error, Jv_bilateral, Jv_contact);
       // world->qs.rms_constraint_residual[0] = sqrt(error/(dReal)m);
-      world->qs.rms_constraint_residual[0] = sqrt(bilateral_error/
-        (dReal)m_bilateral_error);
-      world->qs.rms_constraint_residual[1] =
-        sqrt(contact_error/(dReal)(m_contact_error));
-      world->qs.rms_constraint_residual[2] =
-        sqrt(friction_error/(dReal)(m_friction_error));
-      world->qs.rms_constraint_residual[3] =
-        world->qs.rms_constraint_residual[0] +
-        world->qs.rms_constraint_residual[1] +
-        world->qs.rms_constraint_residual[2];
-      world->qs.num_contacts = m_contact_error;
+
+      dReal residual_bilateral_mean        = Jv_bilateral/(dReal)m_Jv_bilateral;
+      dReal residual_contact_normal_mean   = Jv_contact/(dReal)m_Jv_contact;
+      dReal residual_contact_friction_mean = Jv_friction/(dReal)m_Jv_friction;
+      dReal residual_total = residual_bilateral_mean +
+        residual_contact_normal_mean + residual_contact_friction_mean;
+
+      world->qs.rms_constraint_residual[0] = sqrt();
+      world->qs.rms_constraint_residual[1] = sqrt();
+      world->qs.rms_constraint_residual[2] = sqrt();
+      world->qs.rms_constraint_residual[3] = sqrt();
+      world->qs.num_contacts = m_Jv_contact;
     } END_STATE_SAVE(context, rmsstate);
   }
 #endif
