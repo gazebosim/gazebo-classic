@@ -95,7 +95,10 @@ void init()
 
   if (!g_pid)
   {
-    execlp("gzserver", "-q", "worlds/simple_arm.world", NULL);
+    if (execlp("gzserver", "-q", "worlds/simple_arm.world", NULL) < 0)
+    {
+      gzerr << "Failed to start the gazebo server.\n";
+    }
     return;
   }
 
@@ -106,7 +109,8 @@ void init()
 void fini()
 {
   gazebo::transport::fini();
-  kill(g_pid, SIGINT);
+  if (kill(g_pid, SIGINT) < 0)
+    gzerr << "Failed to kill the gazebo server.\n";
 
   int status;
   int p1 = 0;
@@ -560,32 +564,6 @@ TEST_F(gzTest, Topic)
   // Bw
   output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
   EXPECT_NE(output.find("Total["), std::string::npos);
-
-  fini();
-}
-
-/////////////////////////////////////////////////
-TEST_F(gzTest, Stress)
-{
-  init();
-
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/world_control", &WorldControlCB, true);
-
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
-  // Test world reset time
-  for (unsigned int i = 0; i < 100; ++i)
-  {
-    waitForMsg("gz world -w default -t");
-
-    gazebo::msgs::WorldControl msg;
-    msg.mutable_reset()->set_time_only(true);
-    ASSERT_EQ(g_msgDebugOut, msg.DebugString());
-  }
 
   fini();
 }
