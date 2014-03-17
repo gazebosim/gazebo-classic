@@ -103,7 +103,11 @@ void init()
 
   if (!g_pid)
   {
-    if (execlp("gzserver", "-q", "worlds/simple_arm.world", NULL) < 0)
+    // use "--iters 60000" to make gzserver timeout
+    // after 60 seconds (assuming 1 ms time step)
+    // in case fini doesn't get called
+    if (execlp("gzserver", "-q", "--iters", "60000"
+             , "worlds/simple_arm.world", NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
     }
