@@ -642,12 +642,12 @@ static void ComputeRows(
     if (iteration < num_iterations + precon_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
-      // and contacct normals during extra friciton iterations.
+      // and contact normals during extra friciton iterations.
       rms_dlambda[0] = 0;
-      rms_error[0] = 0;
-      m_rms_dlambda[0] = 0;
       rms_dlambda[1] = 0;
+      rms_error[0] = 0;
       rms_error[1] = 0;
+      m_rms_dlambda[0] = 0;
       m_rms_dlambda[1] = 0;
     }
 
@@ -847,14 +847,17 @@ static void ComputeRows(
             sum6(cforce_ptr2, delta_precon, J_ptr + 6);
         }
 
-        // record error (for the non-erp version)
+        // record residual (error) (for the non-erp version)
         // given
         //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        //   where  Ad = sor / (A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
-        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        // or
+        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
         //   where AdAd1 = 1/(Ad * Ad)
         dReal AdAd1 = 0.0;
         if (!_dequal(Ad[index], 0.0))
@@ -1058,14 +1061,17 @@ static void ComputeRows(
 #endif
         }
 
-        // record error (for the non-erp version)
+        // record residual (error) (for the non-erp version)
         // given
         //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        //   where  Ad = sor / (A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
-        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        // or
+        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
         //   where AdAd1 = 1/(Ad * Ad)
         dReal AdAd1 = 0.0;
         if (!_dequal(Ad[index], 0.0))
