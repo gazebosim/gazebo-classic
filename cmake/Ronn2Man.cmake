@@ -3,13 +3,6 @@
 # Copyright 2009, 2012 Emmanuel Roullit.
 # Subject to the GPL, version 2.
 #
-#MACRO(ADD_MANPAGE_TARGET)
-#  # It is not possible add a dependency to target 'install'
-#  # Run hard-coded 'make man' when 'make install' is invoked
-#  INSTALL(CODE "EXECUTE_PROCESS(COMMAND make man)")
-#  ADD_CUSTOM_TARGET(man)
-#ENDMACRO(ADD_MANPAGE_TARGET)
-
 FIND_PROGRAM(RONN ronn)
 FIND_PROGRAM(GZIP gzip)
 
