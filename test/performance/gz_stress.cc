@@ -83,7 +83,7 @@ void waitForMsg(const std::string &_cmd)
 
   bool good = false;
   int iters = 0;
-  while (!good and iters < 20)
+  while (!good && iters < 20)
   {
     custom_exec(_cmd);
 
@@ -103,7 +103,7 @@ void init()
 
   if (!g_pid)
   {
-    if (execlp("gzserver", "-q", "worlds/simple_arm.world", NULL) < 0)
+    if (execlp("gzserver", "worlds/simple_arm.world", NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
     }

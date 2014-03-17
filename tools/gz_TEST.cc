@@ -95,7 +95,7 @@ void init()
 
   if (!g_pid)
   {
-    if (execlp("gzserver", "-q", "worlds/simple_arm.world", NULL) < 0)
+    if (execlp("gzserver", "worlds/simple_arm.world", NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
     }
