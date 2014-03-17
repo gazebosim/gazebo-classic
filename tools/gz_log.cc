@@ -338,7 +338,7 @@ std::string LinkFilter::Filter(gazebo::physics::ModelState &_state)
   {
     // Filter the elements of the link (pose, velocity,
     // acceleration, wrench). If no filter parts were specified,
-    // then output the while link state.
+    // then output the whole link state.
     if (partIter != this->parts.end())
     {
       if (this->xmlOutput)
