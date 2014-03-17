@@ -278,9 +278,8 @@ void DARTLink::OnPoseChange()
   {
     // If the parent joint is not free joint (nor weld joint), set the n dof
     // as minimal value that makes the link's pose close to the target pose.
-    dart::dynamics::Skeleton* skeleton = this->dtBodyNode->getSkeleton();
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
-    skeleton->solveInvKinematics(this->dtBodyNode, W);
+    this->dtBodyNode->fitWorldTransform(W);
   }
   else
   {
@@ -303,15 +302,15 @@ bool DARTLink::GetEnabled() const
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetLinearVel(const math::Vector3 &/*_vel*/)
+void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 {
-  // gzdbg << "DARTLink::SetLinearVel() doesn't make sense in dart.\n";
+  dtBodyNode->fitWorldLinearVel(DARTTypes::ConvVec3(_vel));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 {
-  // gzdbg << "DARTLink::SetAngularVel() doesn't make sense in dart.\n";
+  dtBodyNode->fitWorldAngularVel(DARTTypes::ConvVec3(_vel));
 }
 
 //////////////////////////////////////////////////
