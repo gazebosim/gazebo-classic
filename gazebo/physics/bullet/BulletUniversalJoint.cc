@@ -125,7 +125,7 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
   // but bullet uses a body-fixed frame
   if (!this->bulletUniversal)
   {
-    if (_index < 2)
+    if (_index < this->GetAngleCount())
     {
       // this hasn't been initialized yet, store axis in initialWorldAxis
       math::Quaternion axisFrame = this->GetAxisFrame(_index);
@@ -239,7 +239,7 @@ void BulletUniversalJoint::SetHighStop(unsigned int _index,
   Joint::SetHighStop(_index, _angle);
   if (this->bulletUniversal)
   {
-    if (_index == 0)
+    if (_index == 1)
       this->bulletUniversal->setUpperLimit(
         this->angleOffset[1] + _angle.Radian(), this->GetHighStop(1).Radian());
     else
@@ -255,7 +255,7 @@ void BulletUniversalJoint::SetLowStop(unsigned int _index,
   Joint::SetLowStop(_index, _angle);
   if (this->bulletUniversal)
   {
-    if (_index == 0)
+    if (_index == 1)
     {
       this->bulletUniversal->setLowerLimit(
         this->angleOffset[1] + _angle.Radian(), this->GetLowStop(1).Radian());
