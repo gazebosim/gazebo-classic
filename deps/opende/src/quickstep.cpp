@@ -590,6 +590,11 @@ static void ComputeRows(
   printf("\n");
   */
 
+  // m_rms_dlambda[3] keeps track of number of constraint
+  // rows per type of constraint.
+  // m_rms_dlambda[0]: bilateral constraints (findex = -1)
+  // m_rms_dlambda[1]: contact normal constraints (findex = -2)
+  // rm_ms_dlambda[2]: friction constraints (findex >= 0)
   int m_rms_dlambda[3];
   m_rms_dlambda[0] = 0;
   m_rms_dlambda[1] = 0;
