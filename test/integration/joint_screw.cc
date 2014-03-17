@@ -172,7 +172,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "BulletScrewJoint::GetAngle() is broken (issue #1081).\n";
+    /// \TODO skipping bullet, see issue #1081
+    gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
     return;
   }
 

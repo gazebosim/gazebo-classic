@@ -1388,6 +1388,7 @@ void PhysicsTest::SimplePushTest(const std::string &_physicsEngine)
   }
   else if (_physicsEngine == "bullet")
   {
+    /// \TODO skipping bullet, see issue #1081
     gzerr << "bullet fails as describe by issue #1081,"
           << " it's behind by one time step.\n";
     return;
