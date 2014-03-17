@@ -170,7 +170,19 @@ void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->bulletUniversal)
   {
-    int col = _index == 0 ? 2 : 1;
+    int col;
+    switch (_index)
+    {
+      case 0:
+        col = 2;
+        break;
+      case 1:
+        col = 1;
+        break;
+      default:
+        gzerr << "Invalid joint index [" << _index << "].\n";
+        return;
+    }
 
     // z-axis of constraint frame
     btVector3 hingeAxisLocalA =
