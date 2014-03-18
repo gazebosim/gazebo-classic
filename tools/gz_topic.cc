@@ -367,5 +367,8 @@ void TopicCommand::View(const std::string &_topic)
 
   app->exec();
 
+  delete app;
+  app = NULL;
+
   gazebo::shutdown();
 }

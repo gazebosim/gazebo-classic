@@ -1207,7 +1207,7 @@ int main(int argc, char **argv)
   }
 
   for (iter = g_commandMap.begin(); iter != g_commandMap.end(); ++iter)
-    delete iter.second;
+    delete iter->second;
 
   return result;
 }
