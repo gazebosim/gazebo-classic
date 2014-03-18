@@ -879,7 +879,7 @@ SDFCommand::SDFCommand()
      "In place conversion of arg to the latest SDF version.")
     ("doc,o", "Print HTML SDF. Use -v to specify version.")
     ("check,k", po::value<std::string>(), "Validate arg.")
-    ("version,v", po::value<double>(),
+    ("version,v", po::value<std::string>(),
      "Version of SDF to use with other options.")
     ("print,p", po::value<std::string>(),
      "Print arg, useful for debugging and as a conversion tool.");
@@ -917,22 +917,23 @@ bool SDFCommand::RunImpl()
     std::cerr << "Error initializing log file" << std::endl;
   }
 
+  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+
   if (this->vm.count("version"))
   {
     try
     {
       sdf::SDF::version = boost::lexical_cast<std::string>(
-          this->vm["version"].as<double>());
+          this->vm["version"].as<std::string>());
     }
     catch(...)
     {
-      gzerr << "Invalid version number[" << this->vm["version"].as<double>()
-      << "]\n";
+      gzerr << "Invalid version number["
+        <<this->vm["version"].as<std::string>() << "]\n";
       return false;
     }
   }
 
-  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
   if (!sdf::init(sdf))
   {
     std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;

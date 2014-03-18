@@ -97,7 +97,8 @@ void init()
   {
     boost::filesystem::path worldFilePath = TEST_PATH;
     worldFilePath = worldFilePath / "worlds" / "simple_arm_test.world";
-    if (execlp("gzserver", worldFilePath.string().c_str(), NULL) < 0)
+    if (execlp("gzserver", "--iters 60000", 
+          worldFilePath.string().c_str(), NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
     }
@@ -583,59 +584,45 @@ TEST_F(gzTest, SDF)
   // compare the shasum's in the three blocks below
   // gazebo issue #1003
   // https://bitbucket.org/osrf/gazebo/issue/1003
+
+  // Regenerate each sum using:
+  // gz sdf -d -v <major.minor> | sha1sum'
+  std::map<std::string, std::string> descSums;
+  descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
+  descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
+  descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
+  descSums["1.4"] = "a917916d211b711c6cba42ffd6811f9a659fce75";
+  descSums["1.5"] = "2904518b31e9d2319e6a5b8737b29826218b5b54";
+
+  // Test each descSum
+  for (std::map<std::string, std::string>::iterator iter = descSums.begin();
+       iter != descSums.end(); ++iter)
   {
-    // 1.0 description
-    // Regenerate using:
-    // gz sdf -d -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -d -v 1.0");
+    std::string cmd = std::string("gz sdf -d -v ") + iter->first;
+    std::string output = custom_exec_str(cmd);
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "2904518b31e9d2319e6a5b8737b29826218b5b54");
+    EXPECT_EQ(shasum, iter->second);
   }
 
+  // Regenerate each sum using:
+  // gz sdf -o -v <major.minor> | sha1sum'
+  std::map<std::string, std::string> docSums;
+  docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
+  docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
+  docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
+  docSums["1.4"] = "8d136b204ea6428bd99ee2dc4fd5cf385a3e4c3d";
+  docSums["1.5"] = "6fc5f41d43e8c0a32cfb9a194488eb6ba0bc6281";
+
+  // Test each docSum
+  for (std::map<std::string, std::string>::iterator iter = docSums.begin();
+       iter != docSums.end(); ++iter)
   {
-    // 1.2 description
-    // Regenerate using:
-    // gz sdf -d -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -d -v 1.2");
+    std::string cmd = std::string("gz sdf -o -v ") + iter->first;
+    std::string output = custom_exec_str(cmd);
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "2904518b31e9d2319e6a5b8737b29826218b5b54");
+    EXPECT_EQ(shasum, iter->second);
   }
 
-  {
-    // 1.3 description
-    // Regenerate using:
-    // gz sdf -d -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -d -v 1.3");
-    std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "2904518b31e9d2319e6a5b8737b29826218b5b54");
-  }
-
-  {
-    // 1.0 doc
-    // Regenerate using:
-    // gz sdf -o -v 1.0 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -o -v 1.0");
-    std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "f1b4e1b60ab6fd83f0cbeb688811b32bccdea3de");
-  }
-
-  {
-    // 1.2 doc
-    // Regenerate using:
-    // gz sdf -o -v 1.2 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -o -v 1.2");
-    std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "1031817ad9ecb1ebe22b62c56b5c93633e6d1ce5");
-  }
-
-  {
-    // 1.3 doc
-    // Regenerate using:
-    // gz sdf -o -v 1.3 | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output = custom_exec_str("gz sdf -o -v 1.3");
-    std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "04805587ee4e5a6bb12f7148687d7e5b9955ca29");
-  }
 
   path = TEST_PATH;
   path /= "worlds/empty_different_name.world";
