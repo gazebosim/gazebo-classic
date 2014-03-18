@@ -33,12 +33,12 @@ namespace gazebo
           const btTransform &_frameInA, const btTransform &_frameInB,
           bool _useLinearReferenceFrameA)
           : btSliderConstraint(_rbA, _rbB, _frameInA, _frameInB,
-              _useLinearReferenceFrameA), threadPitch(0.0) {}
+              _useLinearReferenceFrameA), threadPitch(1.0) {}
 
       public: btScrewConstraint(btRigidBody &_rbB,
           const btTransform &_frameInB, bool _useLinearReferenceFrameA)
           : btSliderConstraint(_rbB, _frameInB, _useLinearReferenceFrameA),
-          threadPitch(0.0) {}
+          threadPitch(1.0) {}
 
       public: virtual void getInfo1(btConstraintInfo1 *_info)
       {
@@ -238,11 +238,18 @@ void BulletScrewJoint::Init()
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   // joint limit is set on the revolute dof in sdf, but enforced
   // by linear dof in bullet.
-  double upper = this->threadPitch*limitElem->Get<double>("upper");
-  double lower = this->threadPitch*limitElem->Get<double>("lower");
+  double pitch = this->threadPitch;
+  if (math::equal(pitch, 0.0))
+  {
+    gzerr << "thread pitch should not be zero (joint is a slider?)"
+          << " using pitch = 1.0e6\n";
+    pitch = 1.0e6;
+  }
+  double upper = limitElem->Get<double>("upper")/pitch;
+  double lower = limitElem->Get<double>("lower")/pitch;
   this->bulletScrew->setLowerLinLimit(std::min(lower, upper));
   this->bulletScrew->setUpperLinLimit(std::max(lower, upper));
-  this->bulletScrew->setThreadPitch(this->threadPitch);
+  this->bulletScrew->setThreadPitch(pitch);
 
   this->constraint = this->bulletScrew;
 
@@ -408,19 +415,26 @@ void BulletScrewJoint::SetHighStop(unsigned int _index,
   {
     if (_index == 0)
     {
+      double pitch = this->threadPitch;
+      if (math::equal(pitch, 0.0))
+      {
+        gzerr << "thread pitch should not be zero (joint is a slider?)"
+              << " using pitch = 1.0e6\n";
+        pitch = 1.0e6;
+      }
       // angular is linear * threadPitch
-      if (this->threadPitch > 0)
+      if (pitch > 0)
       {
         double lower = this->bulletScrew->getLowerLinLimit();
         this->bulletScrew->setUpperLinLimit(std::max(lower,
-          _angle.Radian()*this->threadPitch));
+          _angle.Radian()/pitch));
       }
       else
       {
         // flip upper lower because thread pitch is negative
         double upper = this->bulletScrew->getUpperLinLimit();
         this->bulletScrew->setLowerLinLimit(std::min(upper,
-          _angle.Radian()*this->threadPitch));
+          _angle.Radian()/pitch));
       }
     }
     else if (_index == 1)
@@ -446,19 +460,26 @@ void BulletScrewJoint::SetLowStop(unsigned int _index,
   {
     if (_index == 0)
     {
+      double pitch = this->threadPitch;
+      if (math::equal(pitch, 0.0))
+      {
+        gzerr << "thread pitch should not be zero (joint is a slider?)"
+              << " using pitch = 1.0e6\n";
+        pitch = 1.0e6;
+      }
       // angular is linear * threadPitch
-      if (this->threadPitch > 0)
+      if (pitch > 0)
       {
         double upper = this->bulletScrew->getUpperLinLimit();
         this->bulletScrew->setLowerLinLimit(std::min(upper,
-          _angle.Radian()*this->threadPitch));
+          _angle.Radian()/pitch));
       }
       else
       {
           // flip upper lower because thread pitch is negative
         double lower = this->bulletScrew->getLowerLinLimit();
         this->bulletScrew->setUpperLinLimit(std::max(lower,
-          _angle.Radian()*this->threadPitch));
+          _angle.Radian()/pitch));
       }
     }
     else if (_index == 1)
@@ -958,21 +979,21 @@ void btScrewConstraint::_getInfo2NonVirtual(
   {
     nrow++;
     srow = nrow * info->rowskip;
-    info->m_J1linearAxis[srow+0] = -ax1[0];
-    info->m_J1linearAxis[srow+1] = -ax1[1];
-    info->m_J1linearAxis[srow+2] = -ax1[2];
+    info->m_J1linearAxis[srow+0] = -ax1[0] * this->threadPitch;
+    info->m_J1linearAxis[srow+1] = -ax1[1] * this->threadPitch;
+    info->m_J1linearAxis[srow+2] = -ax1[2] * this->threadPitch;
 
-    info->m_J1angularAxis[srow+0] = ax1[0] * this->threadPitch;
-    info->m_J1angularAxis[srow+1] = ax1[1] * this->threadPitch;
-    info->m_J1angularAxis[srow+2] = ax1[2] * this->threadPitch;
+    info->m_J1angularAxis[srow+0] = ax1[0];
+    info->m_J1angularAxis[srow+1] = ax1[1];
+    info->m_J1angularAxis[srow+2] = ax1[2];
 
-    info->m_J2linearAxis[srow+0] = ax1[0];
-    info->m_J2linearAxis[srow+1] = ax1[1];
-    info->m_J2linearAxis[srow+2] = ax1[2];
+    info->m_J2linearAxis[srow+0] = ax1[0] * this->threadPitch;
+    info->m_J2linearAxis[srow+1] = ax1[1] * this->threadPitch;
+    info->m_J2linearAxis[srow+2] = ax1[2] * this->threadPitch;
 
-    info->m_J2angularAxis[srow+0] = -ax1[0] * this->threadPitch;
-    info->m_J2angularAxis[srow+1] = -ax1[1] * this->threadPitch;
-    info->m_J2angularAxis[srow+2] = -ax1[2] * this->threadPitch;
+    info->m_J2angularAxis[srow+0] = -ax1[0];
+    info->m_J2angularAxis[srow+1] = -ax1[1];
+    info->m_J2angularAxis[srow+2] = -ax1[2];
 
     return;
 
