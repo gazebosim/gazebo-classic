@@ -579,11 +579,6 @@ TEST_F(gzTest, SDF)
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
-  // Note that the sdf descriptions are currently identical
-  // compare the shasum's in the three blocks below
-  // gazebo issue #1003
-  // https://bitbucket.org/osrf/gazebo/issue/1003
-
   // Regenerate each sum using:
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
