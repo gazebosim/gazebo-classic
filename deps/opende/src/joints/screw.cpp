@@ -258,7 +258,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             q[2] = node[0].body->posr.pos[2] - offset[2];
         }
         lin_disp = dCalcVectorDot3 ( ax1, q );
-        lin_err = -(lin_disp-cumulative_angle*thread_pitch);
+        lin_err = -(lin_disp*thread_pitch-cumulative_angle);
         // printf("lin disp: %f lin err: %f\n", lin_disp, lin_err);
       }
 
@@ -296,8 +296,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
         // screw constraint:
         // constrain the sliding axis by rotation of the other body
-        for (int i = 0; i < 3; i++ ) info->J2a[s2+i] =  ax1[i]*thread_pitch;
-        for (int i = 0; i < 3; i++ ) info->J2l[s2+i] = -ax1[i];
+        for (int i = 0; i < 3; i++ ) info->J2a[s2+i] =  ax1[i];
+        for (int i = 0; i < 3; i++ ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
       }
 
       // angular constraints if axis are not aligned with cg's
@@ -333,8 +333,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
       // screw constraint:
       // now constrain the sliding axis by rotation of the other body
-      for (int i = 0; i < 3; i++ ) info->J1l[s2+i] = ax1[i];
-      for (int i = 0; i < 3; i++ ) info->J1a[s2+i] = -ax1[i]*thread_pitch;
+      for (int i = 0; i < 3; i++ ) info->J1l[s2+i] = ax1[i]*thread_pitch;
+      for (int i = 0; i < 3; i++ ) info->J1a[s2+i] = -ax1[i];
       // printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",
       //   thread_pitch*lin_disp, cumulative_angle, lin_err,
       //   (int)this->use_damping, thread_pitch);

@@ -145,7 +145,8 @@
       <joint name="joint_00" type="screw">
         <parent>world</parent>
         <child>link_00</child>
-        <thread_pitch>-0.1</thread_pitch>
+        <!-- copy thread pitch from pr2 -->
+        <thread_pitch>-3141.6</thread_pitch>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
@@ -167,7 +168,8 @@
       <joint name="joint_01" type="screw">
         <child>link_01</child>
         <parent>link_00</parent>
-        <thread_pitch>0.1</thread_pitch>
+        <!-- copy thread pitch from pr2 -->
+        <thread_pitch>3141.6</thread_pitch>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>

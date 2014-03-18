@@ -62,7 +62,8 @@ namespace gazebo
                  }
 
       /// \brief Set screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
@@ -70,14 +71,16 @@ namespace gazebo
                   double _threadPitch) GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Set screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(double _threadPitch) = 0;
 
       /// \brief Get screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \return _threadPitch Thread pitch value.
@@ -85,7 +88,8 @@ namespace gazebo
         GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get screw joint thread pitch.
-      ///
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \return _threadPitch Thread pitch value.
