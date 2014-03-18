@@ -636,16 +636,9 @@ void GLWidget::OnMouseReleaseNormal()
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
   if (_scene->GetUserCameraCount() == 0)
-  {
-    // Create a user camera if one doesn't exist.
-    // The camera requires a name.
     this->userCamera = _scene->CreateUserCamera("gzclient_camera");
-  }
   else
-  {
-    // Otherwise, get a pointer to the user camera.
     this->userCamera = _scene->GetUserCamera(0);
-  }
 
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
