@@ -130,8 +130,6 @@ void BulletScrewJoint::Init()
 {
   ScrewJoint<BulletJoint>::Init();
 
-  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
-
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
@@ -236,20 +234,30 @@ void BulletScrewJoint::Init()
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  // joint limit is set on the revolute dof in sdf, but enforced
-  // by linear dof in bullet.
-  double pitch = this->threadPitch;
-  if (math::equal(pitch, 0.0))
+  // joint limit is set on the revolute dof in sdf,
+  double upper = limitElem->Get<double>("upper");
+  double lower = limitElem->Get<double>("lower");
+  this->bulletScrew->setLowerAngLimit(std::min(lower, upper));
+  this->bulletScrew->setUpperAngLimit(std::max(lower, upper));
+  // enforce linear dof in bullet.
+  double tp = this->threadPitch;
+  if (math::equal(tp, 0.0))
   {
     gzerr << "thread pitch should not be zero (joint is a slider?)"
-          << " using pitch = 1.0e6\n";
-    pitch = 1.0e6;
+          << " using thread pitch = 1.0e6\n";
+    tp = 1.0e6;
   }
-  double upper = limitElem->Get<double>("upper")/pitch;
-  double lower = limitElem->Get<double>("lower")/pitch;
-  this->bulletScrew->setLowerLinLimit(std::min(lower, upper));
-  this->bulletScrew->setUpperLinLimit(std::max(lower, upper));
-  this->bulletScrew->setThreadPitch(pitch);
+  if (tp > 0)
+  {
+    this->bulletScrew->setLowerLinLimit(std::min(lower/tp, upper/tp));
+    this->bulletScrew->setUpperLinLimit(std::max(lower/tp, upper/tp));
+  }
+  else
+  {
+    this->bulletScrew->setLowerLinLimit(std::min(upper/tp, lower/tp));
+    this->bulletScrew->setUpperLinLimit(std::max(upper/tp, lower/tp));
+  }
+  this->bulletScrew->setThreadPitch(tp);
 
   this->constraint = this->bulletScrew;
 
@@ -415,32 +423,55 @@ void BulletScrewJoint::SetHighStop(unsigned int _index,
   {
     if (_index == 0)
     {
-      double pitch = this->threadPitch;
-      if (math::equal(pitch, 0.0))
+      // _index = 0: angular constraint
+      double upperAng = this->bulletScrew->getUpperAngLimit();
+      this->bulletScrew->setUpperAngLimit(std::max(upperAng, _angle.Radian()));
+
+      // set corresponding linear constraints
+      double tp = this->threadPitch;
+      if (math::equal(tp, 0.0))
       {
         gzerr << "thread pitch should not be zero (joint is a slider?)"
-              << " using pitch = 1.0e6\n";
-        pitch = 1.0e6;
+              << " using thread pitch = 1.0e6\n";
+        tp = 1.0e6;
       }
-      // angular is linear * threadPitch
-      if (pitch > 0)
+      // linear is angular / threadPitch
+      if (tp > 0)
       {
-        double lower = this->bulletScrew->getLowerLinLimit();
-        this->bulletScrew->setUpperLinLimit(std::max(lower,
-          _angle.Radian()/pitch));
+        double lowerLin = this->bulletScrew->getLowerLinLimit();
+        this->bulletScrew->setUpperLinLimit(std::max(lowerLin,
+          _angle.Radian()/tp));
       }
       else
       {
         // flip upper lower because thread pitch is negative
-        double upper = this->bulletScrew->getUpperLinLimit();
-        this->bulletScrew->setLowerLinLimit(std::min(upper,
-          _angle.Radian()/pitch));
+        double upperLin = this->bulletScrew->getUpperLinLimit();
+        this->bulletScrew->setLowerLinLimit(std::min(upperLin,
+          _angle.Radian()/tp));
       }
     }
     else if (_index == 1)
     {
-      double lower = this->bulletScrew->getLowerLinLimit();
-      this->bulletScrew->setUpperLinLimit(std::max(lower, _angle.Radian()));
+      // _index = 1: linear constraint
+      double lowerLin = this->bulletScrew->getLowerLinLimit();
+      this->bulletScrew->setUpperLinLimit(std::max(lowerLin, _angle.Radian()));
+
+      // set corresponding angular constraints
+      double tp = this->threadPitch;
+      // angular is linear * threadPitch
+      if (tp > 0)
+      {
+        double lowerAng = this->bulletScrew->getLowerAngLimit();
+        this->bulletScrew->setUpperAngLimit(std::max(lowerAng,
+          _angle.Radian()*tp));
+      }
+      else
+      {
+        // flip upper lower because thread pitch is negative
+        double upperAng = this->bulletScrew->getUpperAngLimit();
+        this->bulletScrew->setLowerAngLimit(std::min(upperAng,
+          _angle.Radian()*tp));
+      }
     }
     else
       gzerr << "Invalid index [" << _index << "]\n";
@@ -460,32 +491,55 @@ void BulletScrewJoint::SetLowStop(unsigned int _index,
   {
     if (_index == 0)
     {
-      double pitch = this->threadPitch;
-      if (math::equal(pitch, 0.0))
+      // _index = 0: angular constraint
+      double upperAng = this->bulletScrew->getUpperAngLimit();
+      this->bulletScrew->setLowerAngLimit(std::min(upperAng, _angle.Radian()));
+
+      // set corresponding linear constraints
+      double tp = this->threadPitch;
+      if (math::equal(tp, 0.0))
       {
         gzerr << "thread pitch should not be zero (joint is a slider?)"
-              << " using pitch = 1.0e6\n";
-        pitch = 1.0e6;
+              << " using thread pitch = 1.0e6\n";
+        tp = 1.0e6;
       }
-      // angular is linear * threadPitch
-      if (pitch > 0)
+      // linear is angular / threadPitch
+      if (tp > 0)
       {
-        double upper = this->bulletScrew->getUpperLinLimit();
-        this->bulletScrew->setLowerLinLimit(std::min(upper,
-          _angle.Radian()/pitch));
+        double upperLin = this->bulletScrew->getUpperLinLimit();
+        this->bulletScrew->setLowerLinLimit(std::min(upperLin,
+          _angle.Radian()/tp));
       }
       else
       {
           // flip upper lower because thread pitch is negative
-        double lower = this->bulletScrew->getLowerLinLimit();
-        this->bulletScrew->setUpperLinLimit(std::max(lower,
-          _angle.Radian()/pitch));
+        double lowerLin = this->bulletScrew->getLowerLinLimit();
+        this->bulletScrew->setUpperLinLimit(std::max(lowerLin,
+          _angle.Radian()/tp));
       }
     }
     else if (_index == 1)
     {
-      double upper = this->bulletScrew->getUpperLinLimit();
-      this->bulletScrew->setLowerLinLimit(std::min(upper, _angle.Radian()));
+      // _index = 1: linear constraint
+      double upperLin = this->bulletScrew->getUpperLinLimit();
+      this->bulletScrew->setLowerLinLimit(std::min(upperLin, _angle.Radian()));
+
+      // set corresponding angular constraints
+      double tp = this->threadPitch;
+      // angular is linear * threadPitch
+      if (tp > 0)
+      {
+        double upperAng = this->bulletScrew->getUpperAngLimit();
+        this->bulletScrew->setLowerAngLimit(std::min(upperAng,
+          _angle.Radian()*tp));
+      }
+      else
+      {
+          // flip upper lower because thread pitch is negative
+        double lowerAng = this->bulletScrew->getLowerAngLimit();
+        this->bulletScrew->setUpperAngLimit(std::max(lowerAng,
+          _angle.Radian()*tp));
+      }
     }
     else
       gzerr << "Invalid index [" << _index << "]\n";
@@ -794,6 +848,38 @@ void btScrewConstraint::_getInfo2NonVirtual(
     info->cfm[s3] = m_cfmOrthoLin;
   }
 
+  // Screw Constraint (coupled linear and angular motion)
+  {
+    nrow++;
+    srow = nrow * info->rowskip;
+    info->m_J1linearAxis[srow+0] = -ax1[0] * this->threadPitch;
+    info->m_J1linearAxis[srow+1] = -ax1[1] * this->threadPitch;
+    info->m_J1linearAxis[srow+2] = -ax1[2] * this->threadPitch;
+
+    info->m_J1angularAxis[srow+0] = ax1[0];
+    info->m_J1angularAxis[srow+1] = ax1[1];
+    info->m_J1angularAxis[srow+2] = ax1[2];
+
+    info->m_J2linearAxis[srow+0] = ax1[0] * this->threadPitch;
+    info->m_J2linearAxis[srow+1] = ax1[1] * this->threadPitch;
+    info->m_J2linearAxis[srow+2] = ax1[2] * this->threadPitch;
+
+    info->m_J2angularAxis[srow+0] = -ax1[0];
+    info->m_J2angularAxis[srow+1] = -ax1[1];
+    info->m_J2angularAxis[srow+2] = -ax1[2];
+
+    // correction
+		// rhs = k * ax1.dot(ofs);  // from hinge constraint
+    btScalar lin_disp = ax1.dot(ofs);
+    btScalar ang_pos = this->getAngularPosition();
+    info->m_constraintError[srow] =
+      -k * (lin_disp * this->threadPitch - ang_pos);
+    info->cfm[srow] = -m_cfmOrthoLin;
+
+    // debug, set error to 0
+    info->m_constraintError[srow] = 0.0;
+  }
+
   // notes: below enforces
   // joint limit
   // powered joint
@@ -977,25 +1063,15 @@ void btScrewConstraint::_getInfo2NonVirtual(
   }
   if (limit || powered)
   {
-    nrow++;
-    srow = nrow * info->rowskip;
-    info->m_J1linearAxis[srow+0] = -ax1[0] * this->threadPitch;
-    info->m_J1linearAxis[srow+1] = -ax1[1] * this->threadPitch;
-    info->m_J1linearAxis[srow+2] = -ax1[2] * this->threadPitch;
+		nrow++;
+		srow = nrow * info->rowskip;
+		info->m_J1angularAxis[srow+0] = ax1[0];
+		info->m_J1angularAxis[srow+1] = ax1[1];
+		info->m_J1angularAxis[srow+2] = ax1[2];
 
-    info->m_J1angularAxis[srow+0] = ax1[0];
-    info->m_J1angularAxis[srow+1] = ax1[1];
-    info->m_J1angularAxis[srow+2] = ax1[2];
-
-    info->m_J2linearAxis[srow+0] = ax1[0] * this->threadPitch;
-    info->m_J2linearAxis[srow+1] = ax1[1] * this->threadPitch;
-    info->m_J2linearAxis[srow+2] = ax1[2] * this->threadPitch;
-
-    info->m_J2angularAxis[srow+0] = -ax1[0];
-    info->m_J2angularAxis[srow+1] = -ax1[1];
-    info->m_J2angularAxis[srow+2] = -ax1[2];
-
-    return;
+		info->m_J2angularAxis[srow+0] = -ax1[0];
+		info->m_J2angularAxis[srow+1] = -ax1[1];
+		info->m_J2angularAxis[srow+2] = -ax1[2];
 
     btScalar lostop = getLowerAngLimit();
     btScalar histop = getUpperAngLimit();
@@ -1113,6 +1189,11 @@ void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
     // Fixed 2 linear + 2 angular
     info->m_numConstraintRows = 4;
     info->nub = 2;
+
+    // Add constraint for screw motion, coupling linear and angular motion.
+    info->m_numConstraintRows++;
+    info->nub++;
+
     // prepare constraint
     calculateTransforms(
       m_rbA.getCenterOfMassTransform(), m_rbB.getCenterOfMassTransform());
@@ -1123,28 +1204,8 @@ void btScrewConstraint::_getInfo1NonVirtual(btConstraintInfo1* info)
       info->m_numConstraintRows++;
       info->nub--;
     }
-    // angular constraint is now the screw constraint, always active
-    // testAngLimits();
-    {
-      const btVector3 axisA0 = m_calculatedTransformA.getBasis().getColumn(1);
-      const btVector3 axisA1 = m_calculatedTransformA.getBasis().getColumn(2);
-      const btVector3 axisB0 = m_calculatedTransformB.getBasis().getColumn(1);
-      //  btScalar rot = btAtan2Fast(axisB0.dot(axisA1), axisB0.dot(axisA0));
-      btScalar rot = btAtan2(axisB0.dot(axisA1), axisB0.dot(axisA0));
-      rot = btAdjustAngleToLimits(rot, m_lowerAngLimit, m_upperAngLimit);
-      m_angPos = rot;
-      if (rot < m_lowerAngLimit)
-      {
-        m_angDepth = rot - m_lowerAngLimit;
-        m_solveAngLim = true;
-      }
-      else if (rot > m_upperAngLimit)
-      {
-        m_angDepth = rot - m_upperAngLimit;
-        m_solveAngLim = true;
-      }
-    }
-    // if (getSolveAngLimit() || getPoweredAngMotor())
+    testAngLimits();
+    if (getSolveAngLimit() || getPoweredAngMotor())
     {
       // limit 3rd angular as well
       info->m_numConstraintRows++;
