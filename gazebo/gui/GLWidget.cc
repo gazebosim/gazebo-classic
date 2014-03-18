@@ -635,6 +635,7 @@ void GLWidget::OnMouseReleaseNormal()
 //////////////////////////////////////////////////
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
+  // The user camera name.
   std::string cameraBaseName = "gzclient_camera";
   std::string cameraName = cameraBaseName;
 
