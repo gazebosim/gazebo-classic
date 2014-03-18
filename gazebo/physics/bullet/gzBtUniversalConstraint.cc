@@ -172,14 +172,14 @@ const btVector3 &gzBtUniversalConstraint::getAxis2()
 btScalar gzBtUniversalConstraint::getAngle1()
 {
   this->calculateTransforms();
-  return this->getAngle(2);
+  return this->getAngle(1);
 }
 
 /////////////////////////////////////////////////
 btScalar gzBtUniversalConstraint::getAngle2()
 {
   this->calculateTransforms();
-  return this->getAngle(1);
+  return this->getAngle(2);
 }
 
 /////////////////////////////////////////////////

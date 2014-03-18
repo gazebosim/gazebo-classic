@@ -90,8 +90,8 @@ void BulletUniversalJoint::Init()
 
   // Set angleOffset based on hinge angle at joint creation.
   // GetAngleImpl will report angles relative to this offset.
-  this->angleOffset[0] = this->bulletUniversal->getAngle1();
-  this->angleOffset[1] = this->bulletUniversal->getAngle2();
+  this->angleOffset[0] = this->bulletUniversal->getAngle2();
+  this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
   this->bulletUniversal->setUpperLimit(
     this->angleOffset[1] + this->GetUpperLimit(1).Radian(),
@@ -374,9 +374,9 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
   if (this->bulletUniversal)
   {
     if (_index == 0)
-      result = this->angleOffset[0] - this->bulletUniversal->getAngle1();
+      result = this->angleOffset[0] - this->bulletUniversal->getAngle2();
     else if (_index == 1)
-      result = this->angleOffset[1] - this->bulletUniversal->getAngle2();
+      result = this->angleOffset[1] - this->bulletUniversal->getAngle1();
     else
       gzerr << "Invalid axis index[" << _index << "]\n";
   }
