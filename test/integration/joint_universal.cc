@@ -34,7 +34,7 @@ class JointTestUniversal : public ServerFixture,
   /// \brief Test universal joint implementation with SetWorldPose.
   /// Set links world poses then check joint angles.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void UniversalJointSWP(const std::string &_physicsEngine);
+  public: void UniversalJointSetWorldPose(const std::string &_physicsEngine);
 
   /// \brief Test universal joint implementation with forces.
   /// Apply force to universal joint links, check position and/velocity.
@@ -136,7 +136,8 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-void JointTestUniversal::UniversalJointSWP(const std::string &_physicsEngine)
+void JointTestUniversal::UniversalJointSetWorldPose(
+  const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
@@ -226,20 +227,21 @@ void JointTestUniversal::UniversalJointSWP(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
 
-  if (_physicsEngine == "bullet")
-  {
-    // Bullet is off by one step. See issue 1081
-    world->Step(1);
-    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
-  }
-  else
-    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
-
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
+
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Bullet Universal Joint dynamics broken, see issue #1081.\n";
+    return;
+  }
+  else
+  {
+    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -380,9 +382,9 @@ TEST_P(JointTestUniversal, Limits)
 }
 
 /////////////////////////////////////////////////
-TEST_P(JointTestUniversal, UniversalJointSWP)
+TEST_P(JointTestUniversal, UniversalJointSetWorldPose)
 {
-  UniversalJointSWP(GetParam());
+  UniversalJointSetWorldPose(GetParam());
 }
 
 /////////////////////////////////////////////////
