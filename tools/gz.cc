@@ -1206,5 +1206,8 @@ int main(int argc, char **argv)
     result = -1;
   }
 
+  for (iter = g_commandMap.begin(); iter != g_commandMap.end(); ++iter)
+    delete iter.second;
+
   return result;
 }
