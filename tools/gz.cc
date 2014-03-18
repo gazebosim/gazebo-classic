@@ -805,6 +805,8 @@ bool StatsCommand::RunImpl()
 /////////////////////////////////////////////////
 void StatsCommand::CB(ConstWorldStatisticsPtr &_msg)
 {
+  GZ_ASSERT(_msg, "Invalid message received");
+
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
