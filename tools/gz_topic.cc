@@ -238,8 +238,10 @@ void TopicCommand::BwCB(const std::string &_data)
   this->bwBytes.push_back(_data.size());
   this->bwTime.push_back(common::Time::GetWallTime());
 
+  // One second time window
   if (curTime - this->prevMsgTime > common::Time(1, 0))
   {
+    // Make sure we have received at least 10 bytes of data.
     if (this->bwBytes.size() >= 10)
     {
       std::sort(this->bwBytes.begin(), this->bwBytes.end());
