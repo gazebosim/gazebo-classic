@@ -103,7 +103,9 @@ void init()
 
   if (!g_pid)
   {
-    if (execlp("gzserver", "worlds/simple_arm.world", NULL) < 0)
+    boost::filesystem::path worldFilePath = TEST_PATH;
+    worldFilePath = worldFilePath / "worlds" / "simple_arm_test.world";
+    if (execlp("gzserver", worldFilePath.string().c_str(), NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
     }
