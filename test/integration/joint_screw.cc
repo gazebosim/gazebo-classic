@@ -231,6 +231,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
   // set new upper limit for joint_00
   joint_00->SetHighStop(0, 0.3);
+  bool once = false;
   // push joint_00 till it hits new upper limit
   while (joint_00->GetAngle(0) < 0.3)
   {
@@ -244,9 +245,13 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     if (_physicsEngine == "simbody")
     {
       double angle_00_linear = joint_00->GetAngle(1).Radian();
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " shoudl be 0.3\n";
+      if (!once)
+      {
+        once = true;
+        gzerr << "skip test: issue #857 in simbody screw joint linear angle:"
+              << " joint_00 " << angle_00_linear
+              << " shoudl be 0.3\n";
+      }
     }
   }
   // lock joint at this location by setting lower limit here too
@@ -255,6 +260,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   // set joint_01 upper limit to 1.0
   joint_01->SetHighStop(0, 1.0);
   // push joint_01 until limit is reached
+  once = false;
   while (joint_01->GetAngle(0) < 1.0)
   {
     joint_01->SetForce(0, 0.1);
@@ -272,11 +278,15 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
       angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " should be 0.3. "
-            << " joint_01 " << angle_01_linear
-            << " is off too.\n";
+      if (!once)
+      {
+        once = true;
+        gzerr << "skip test: issue #857 in simbody screw joint linear angle:"
+              << " joint_00 " << angle_00_linear
+              << " should be 0.3. "
+              << " joint_01 " << angle_01_linear
+              << " is off too.\n";
+      }
     }
     else
     {
@@ -289,6 +299,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   }
 
   // push joint_01 the other way until -1 is reached
+  once = false;
   while (joint_01->GetAngle(0) > -1.0)
   {
     joint_01->SetForce(0, -0.1);
@@ -306,11 +317,15 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
       angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
-      gzerr << "issue #857 in simbody screw joint linear angle:"
-            << " joint_00 " << angle_00_linear
-            << " should be 0.3. "
-            << " joint_01 " << angle_01_linear
-            << " is off too.\n";
+      if (!once)
+      {
+        once = true;
+        gzerr << "skip test: issue #857 in simbody screw joint linear angle:"
+              << " joint_00 " << angle_00_linear
+              << " should be 0.3. "
+              << " joint_01 " << angle_01_linear
+              << " is off too.\n";
+      }
     }
     else
     {
