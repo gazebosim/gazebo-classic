@@ -105,7 +105,7 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbB,
   frameInW.setOrigin(_anchor);
 
   // now get constraint frame in local coordinate systems
-  m_frameInA =  btTransform::getIdentity().inverse() * frameInW;
+  m_frameInA = frameInW;
   m_frameInB = _rbB.getCenterOfMassTransform().inverse() * frameInW;
 
   // set limits
@@ -138,7 +138,7 @@ void gzBtUniversalConstraint::setAxis(const btVector3 &_axis1,
   frameInW.setOrigin(m_anchor);
 
   // now get constraint frame in local coordinate systems
-  m_frameInA = m_rbB.getCenterOfMassTransform().inverse() * frameInW;
+  m_frameInA = m_rbA.getCenterOfMassTransform().inverse() * frameInW;
   m_frameInB = m_rbB.getCenterOfMassTransform().inverse() * frameInW;
 
   this->calculateTransforms();
