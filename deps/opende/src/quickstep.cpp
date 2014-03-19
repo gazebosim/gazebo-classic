@@ -1124,8 +1124,8 @@ static void ComputeRows(
     dReal dlambda_bilateral_mean        = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
     dReal dlambda_contact_normal_mean   = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
     dReal dlambda_contact_friction_mean = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
-    dReal dlambda_total = dlambda_bilateral_mean +
-      dlambda_contact_normal_mean + dlambda_contact_friction_mean;
+    dReal dlambda_total = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
+      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
     qs->rms_dlambda[0] = sqrt(dlambda_bilateral_mean);
     qs->rms_dlambda[1] = sqrt(dlambda_contact_normal_mean);
@@ -1135,8 +1135,8 @@ static void ComputeRows(
     dReal residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
     dReal residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
     dReal residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
-    dReal residual_total = residual_bilateral_mean +
-      residual_contact_normal_mean + residual_contact_friction_mean;
+    dReal residual_total = (rms_error[0] + rms_error[1] + rms_error[2])/
+      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
     qs->rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
     qs->rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
@@ -2474,8 +2474,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal residual_bilateral_mean        = Jv_bilateral/(dReal)m_Jv_bilateral;
       dReal residual_contact_normal_mean   = Jv_contact/(dReal)m_Jv_contact;
       dReal residual_contact_friction_mean = Jv_friction/(dReal)m_Jv_friction;
-      dReal residual_total = residual_bilateral_mean +
-        residual_contact_normal_mean + residual_contact_friction_mean;
+      dReal residual_total = (Jv_bilateral + Jv_contact + Jv_friction)/
+        ((dReal)(m_Jv_bilateral + m_Jv_contact + m_Jv_friction));
 
       world->qs.rms_constraint_residual[0] = sqrt();
       world->qs.rms_constraint_residual[1] = sqrt();
