@@ -152,7 +152,7 @@ namespace gazebo
 
       if (this->dataPtr->samples > this->dataPtr->valWindowSize)
       {
-        // subtrace old value if buffer already filled
+        // subtract old value if buffer already filled
         this->dataPtr->sum -= (*this->dataPtr->valIter);
         // put new value into queue
         (*this->dataPtr->valIter) = _val;
