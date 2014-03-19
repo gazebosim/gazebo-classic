@@ -590,6 +590,11 @@ static void ComputeRows(
   printf("\n");
   */
 
+  // m_rms_dlambda[3] keeps track of number of constraint
+  // rows per type of constraint.
+  // m_rms_dlambda[0]: bilateral constraints (findex = -1)
+  // m_rms_dlambda[1]: contact normal constraints (findex = -2)
+  // rm_ms_dlambda[2]: friction constraints (findex >= 0)
   int m_rms_dlambda[3];
   m_rms_dlambda[0] = 0;
   m_rms_dlambda[1] = 0;
@@ -637,12 +642,12 @@ static void ComputeRows(
     if (iteration < num_iterations + precon_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
-      // and contacct normals during extra friciton iterations.
+      // and contact normals during extra friciton iterations.
       rms_dlambda[0] = 0;
-      rms_error[0] = 0;
-      m_rms_dlambda[0] = 0;
       rms_dlambda[1] = 0;
+      rms_error[0] = 0;
       rms_error[1] = 0;
+      m_rms_dlambda[0] = 0;
       m_rms_dlambda[1] = 0;
     }
 
@@ -842,14 +847,17 @@ static void ComputeRows(
             sum6(cforce_ptr2, delta_precon, J_ptr + 6);
         }
 
-        // record error (for the non-erp version)
+        // record residual (error) (for the non-erp version)
         // given
         //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        //   where  Ad = sor / (A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
-        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        // or
+        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
         //   where AdAd1 = 1/(Ad * Ad)
         dReal AdAd1 = 0.0;
         if (!_dequal(Ad[index], 0.0))
@@ -1053,14 +1061,17 @@ static void ComputeRows(
 #endif
         }
 
-        // record error (for the non-erp version)
+        // record residual (error) (for the non-erp version)
         // given
         //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        //   where  Ad = sor / (A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
         //   dlambda = Ad  * (b_i - A_ij * lambda_j)
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
-        //   oo residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
+        // or
+        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
         //   where AdAd1 = 1/(Ad * Ad)
         dReal AdAd1 = 0.0;
         if (!_dequal(Ad[index], 0.0))
@@ -1110,19 +1121,28 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-    qs->rms_dlambda[0] = sqrt(rms_dlambda[0]/(dReal)m_rms_dlambda[0]);
-    qs->rms_dlambda[1] = sqrt(rms_dlambda[1]/(dReal)m_rms_dlambda[1]);
-    qs->rms_dlambda[2] = sqrt(rms_dlambda[2]/(dReal)m_rms_dlambda[2]);
-    qs->rms_dlambda[3] =
-      qs->rms_dlambda[0] + qs->rms_dlambda[1] + qs->rms_dlambda[2];
+    dReal dlambda_bilateral_mean        = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
+    dReal dlambda_contact_normal_mean   = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
+    dReal dlambda_contact_friction_mean = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
+    dReal dlambda_total_mean = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
+      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
-    qs->rms_constraint_residual[0] = sqrt(rms_error[0]/(dReal)m_rms_dlambda[0]);
-    qs->rms_constraint_residual[1] = sqrt(rms_error[1]/(dReal)m_rms_dlambda[1]);
-    qs->rms_constraint_residual[2] = sqrt(rms_error[2]/(dReal)m_rms_dlambda[2]);
-    qs->rms_constraint_residual[3] =
-      qs->rms_constraint_residual[0] +
-      qs->rms_constraint_residual[1] +
-      qs->rms_constraint_residual[2];
+    qs->rms_dlambda[0] = sqrt(dlambda_bilateral_mean);
+    qs->rms_dlambda[1] = sqrt(dlambda_contact_normal_mean);
+    qs->rms_dlambda[2] = sqrt(dlambda_contact_friction_mean);
+    qs->rms_dlambda[3] = sqrt(dlambda_total_mean);
+
+    dReal residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
+    dReal residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
+    dReal residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
+    dReal residual_total_mean = (rms_error[0] + rms_error[1] + rms_error[2])/
+      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
+
+    qs->rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
+    qs->rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
+    qs->rms_constraint_residual[2] = sqrt(residual_contact_friction_mean);
+    qs->rms_constraint_residual[3] = sqrt(residual_total_mean);
+    qs->num_contacts = m_rms_dlambda[1];
 
     // debugging mutex locking
     //{
@@ -2418,29 +2438,29 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal *tmp = context->AllocateArray<dReal> (m);
       multiply_J (m,J,jb,vel,tmp);
 
-      int m_bilateral_error = 0;
-      int m_contact_error = 0;
-      int m_friction_error = 0;
-      dReal bilateral_error = 0;
-      dReal contact_error = 0;
-      dReal friction_error = 0;
+      int m_Jv_bilateral = 0;
+      int m_Jv_contact = 0;
+      int m_Jv_friction = 0;
+      dReal Jv_bilateral = 0;
+      dReal Jv_contact = 0;
+      dReal Jv_friction = 0;
       for (int i=0; i<m; i++)
       {
         if (findex[i] == -1)
         {
-          m_bilateral_error++;
-          bilateral_error += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_bilateral++;
+          Jv_bilateral += dFabs(tmp[i])*dFabs(tmp[i]);
         }
         else if (findex[i] == -2)
         {
           // contact error includes joint limits
-          contact_error += dFabs(tmp[i])*dFabs(tmp[i]);
-          m_contact_error++;
+          Jv_contact += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_contact++;
         }
         else if (findex[i] >= 0)
         {
-          m_friction_error++;
-          friction_error += dFabs(tmp[i])*dFabs(tmp[i]);
+          m_Jv_friction++;
+          Jv_friction += dFabs(tmp[i])*dFabs(tmp[i]);
         }
 
         // Note: This is not a good measure of constraint error
@@ -2448,19 +2468,20 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // Better measure is compute the residual.  \\\ TODO
       }
       // printf ("error = %10.6e %10.6e %10.6e\n",
-      //   error, bilateral_error, contact_error);
+      //   error, Jv_bilateral, Jv_contact);
       // world->qs.rms_constraint_residual[0] = sqrt(error/(dReal)m);
-      world->qs.rms_constraint_residual[0] = sqrt(bilateral_error/
-        (dReal)m_bilateral_error);
-      world->qs.rms_constraint_residual[1] =
-        sqrt(contact_error/(dReal)(m_contact_error));
-      world->qs.rms_constraint_residual[2] =
-        sqrt(friction_error/(dReal)(m_friction_error));
-      world->qs.rms_constraint_residual[3] =
-        world->qs.rms_constraint_residual[0] +
-        world->qs.rms_constraint_residual[1] +
-        world->qs.rms_constraint_residual[2];
-      world->qs.num_contacts = m_contact_error;
+
+      dReal residual_bilateral_mean        = Jv_bilateral/(dReal)m_Jv_bilateral;
+      dReal residual_contact_normal_mean   = Jv_contact/(dReal)m_Jv_contact;
+      dReal residual_contact_friction_mean = Jv_friction/(dReal)m_Jv_friction;
+      dReal residual_total_mean            = (Jv_bilateral + Jv_contact + Jv_friction)/
+        ((dReal)(m_Jv_bilateral + m_Jv_contact + m_Jv_friction));
+
+      world->qs.rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
+      world->qs.rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
+      world->qs.rms_constraint_residual[2] = sqrt(residual_contact_friction_mean);
+      world->qs.rms_constraint_residual[3] = sqrt(residual_total_mean);
+      world->qs.num_contacts = m_Jv_contact;
     } END_STATE_SAVE(context, rmsstate);
   }
 #endif
