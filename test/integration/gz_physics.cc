@@ -49,7 +49,7 @@ TEST_F(GzPhysics, Gravity)
 
   world->Step(100);
 
-  EXPECT_GT(model->GetWorldPose().pos.z, 0);
+  EXPECT_GT(model->GetWorldPose().pos.z, 0.5);
 }
 
 /////////////////////////////////////////////////

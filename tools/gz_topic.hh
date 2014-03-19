@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GZSTATS_HH_
-#define _GZSTATS_HH_
+#ifndef _GZ_TOPIC_HH_
+#define _GZ_TOPIC_HH_
 
 #include <string>
 #include <vector>
