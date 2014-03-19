@@ -100,6 +100,7 @@ namespace gazebo
       public: unsigned int GetWindowSize() const;
 
       /// \brief Get whether the window has been filled.
+      /// \return True if the window has been filled.
       public: bool GetWindowFilled() const;
 
       /// \brief Get filtered result
