@@ -857,13 +857,13 @@ static void ComputeRows(
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
         // or
-        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
-        //   where AdAd1 = 1/(Ad * Ad)
-        dReal AdAd1 = 0.0;
+        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
+        //   where Ad2 = 1/(Ad * Ad)
+        dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
           // Ad[i] = sor_w / (sum + cfm[i]);
-          AdAd1 = 1.0 / (Ad[index] * Ad[index]);
+          Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
@@ -874,22 +874,23 @@ static void ComputeRows(
           // then use the Ad without SOR to back out residual.
         }
 
+        dReal delta_precon2 = delta_precon*delta_precon;
         if (constraint_index == -1)  // bilateral
         {
-          rms_dlambda[0] += delta_precon*delta_precon;
-          rms_error[0] += rms_dlambda[0]*AdAd1;
+          rms_dlambda[0] += delta_precon2;
+          rms_error[0] += delta_precon2*Ad2;
           m_rms_dlambda[0]++;
         }
         else if (constraint_index == -2)  // contact normal
         {
-          rms_dlambda[1] += delta_precon*delta_precon;
-          rms_error[1] += rms_dlambda[1]*AdAd1;
+          rms_dlambda[1] += delta_precon2;
+          rms_error[1] += delta_precon2*Ad2;
           m_rms_dlambda[1]++;
         }
         else  // friction forces
         {
-          rms_dlambda[2] += delta_precon*delta_precon;
-          rms_error[2] += rms_dlambda[2]*AdAd1;
+          rms_dlambda[2] += delta_precon2;
+          rms_error[2] += delta_precon2*Ad2;
           m_rms_dlambda[2]++;
         }
 
@@ -1071,13 +1072,13 @@ static void ComputeRows(
         // thus, to get residual from dlambda,
         //   residual = dlambda / Ad
         // or
-        //   residual = sqrt(sum( AdAd1 * dlambda_i * dlambda_i))
-        //   where AdAd1 = 1/(Ad * Ad)
-        dReal AdAd1 = 0.0;
+        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
+        //   where Ad2 = 1/(Ad * Ad)
+        dReal Ad2 = 0.0;
         if (!_dequal(Ad[index], 0.0))
         {
           // Ad[i] = sor_w / (sum + cfm[i]);
-          AdAd1 = 1.0 / (Ad[index] * Ad[index]);
+          Ad2 = 1.0 / (Ad[index] * Ad[index]);
         }
         else
         {
@@ -1088,22 +1089,23 @@ static void ComputeRows(
           // then use the Ad without SOR to back out residual.
         }
 
+        dReal delta2 = delta*delta;
         if (constraint_index == -1)  // bilateral
         {
-          rms_dlambda[0] += delta*delta;
-          rms_error[0] += rms_dlambda[0]*AdAd1;
+          rms_dlambda[0] += delta2;
+          rms_error[0] += delta2*Ad2;
           m_rms_dlambda[0]++;
         }
         else if (constraint_index == -2)  // contact normal
         {
-          rms_dlambda[1] += delta*delta;
-          rms_error[1] += rms_dlambda[1]*AdAd1;
+          rms_dlambda[1] += delta2;
+          rms_error[1] += delta2*Ad2;
           m_rms_dlambda[1]++;
         }
         else  // friction forces
         {
-          rms_dlambda[2] += delta*delta;
-          rms_error[2] += rms_dlambda[2]*AdAd1;
+          rms_dlambda[2] += delta2;
+          rms_error[2] += delta2*Ad2;
           m_rms_dlambda[2]++;
         }
       }
