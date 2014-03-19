@@ -82,6 +82,7 @@
     + void RemoveFilter(const std::string &_name);
 
 1. **gazebo/physics/Joint.hh**
+    + virtual void Fini()
     + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
     + double GetWorldEnergyPotentialSpring(unsigned int _index) const

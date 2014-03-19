@@ -113,6 +113,9 @@ namespace gazebo
       /// \brief Initialize a joint.
       public: virtual void Init();
 
+      /// \brief Finialize the object
+      public: virtual void Fini();
+
       /// \brief Update the joint.
       public: void Update();
 
