@@ -51,19 +51,17 @@ namespace gazebo
       /// \brief For moving window smoothed value
       public: unsigned int valWindowSize;
 
-      /// \brief filtered value
-      public: T valFiltered;
-
       /// \brief buffer history of raw values
       public: std::vector<T> valHistory;
 
       /// \brief iterator pointing to current value in buffer
       public: typename std::vector<T>::iterator valIter;
 
-      /// \brief if incoming is larger than window size,
-      /// we know the history is full, and we can sum the entire
-      /// history.
-      public: bool filled;
+      /// \brief keep track of running sum
+      public: T sum;
+
+      /// \brief keep track of number of elements
+      public: unsigned int samples;
     };
 
     //////////////////////////////////////////////////
@@ -71,10 +69,11 @@ namespace gazebo
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
     {
       /// \TODO FIXME hardcoded initial value for now
-      this->filled = false;
       this->valWindowSize = 4;
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
+      this->sum = T();
+      this->samples = 0;
     }
 
     /// \class MovingWindowFilter MovingWindowFilter.hh common/common.hh
@@ -135,46 +134,35 @@ namespace gazebo
     template<typename T>
     void MovingWindowFilter<T>::Update(T _val)
     {
-      // each element of valHistory stores
-      // incoming value / size of window
-      // so the average is the sum of the elements in the vector
+      // update sum and sample size with incoming _val
 
-      // put new value into queue
-      (*this->dataPtr->valIter) = _val;
+      // keep running sum
+      this->dataPtr->sum += _val;
 
-      // sum and avg
-      if (this->dataPtr->filled)
+      // shift pointer, wrap around if end has been reached.
+      ++this->dataPtr->valIter;
+      if (this->dataPtr->valIter == this->dataPtr->valHistory.end())
       {
-        this->dataPtr->valFiltered = T();
-        for (typename std::vector<T>::iterator it =
-          this->dataPtr->valHistory.begin();
-          it != this->dataPtr->valHistory.end(); ++it)
-        {
-          this->dataPtr->valFiltered += *it;
-        }
-        this->dataPtr->valFiltered /=
-          static_cast<double>(this->dataPtr->valWindowSize);
+        // reset iterator to beginning of queue
+        this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+      }
+
+      // increment sample size
+      ++this->dataPtr->samples;
+
+      if (this->dataPtr->samples > this->dataPtr->valWindowSize)
+      {
+        // subtrace old value if buffer already filled
+        this->dataPtr->sum -= (*this->dataPtr->valIter);
+        // put new value into queue
+        (*this->dataPtr->valIter) = _val;
+        // reduce sample size
+        --this->dataPtr->samples;
       }
       else
       {
-        this->dataPtr->valFiltered = _val;
-        double count = 1.0;
-        for (typename std::vector<T>::iterator it =
-          this->dataPtr->valHistory.begin();
-          it != this->dataPtr->valIter; ++it)
-        {
-          this->dataPtr->valFiltered += *it;
-          count += 1.0;
-        }
-        this->dataPtr->valFiltered /= count;
-      }
-
-      // shift pointer
-      this->dataPtr->valIter++;
-      if (this->dataPtr->valIter == this->dataPtr->valHistory.end())
-      {
-        this->dataPtr->valIter = this->dataPtr->valHistory.begin();
-        this->dataPtr->filled = true;
+        // put new value into queue
+        (*this->dataPtr->valIter) = _val;
       }
     }
 
@@ -182,11 +170,12 @@ namespace gazebo
     template<typename T>
     void MovingWindowFilter<T>::SetWindowSize(unsigned int _n)
     {
-      this->dataPtr->filled = false;
       this->dataPtr->valWindowSize = _n;
       this->dataPtr->valHistory.clear();
       this->dataPtr->valHistory.resize(this->dataPtr->valWindowSize);
       this->dataPtr->valIter = this->dataPtr->valHistory.begin();
+      this->dataPtr->sum = T();
+      this->dataPtr->samples = 0;
     }
 
     //////////////////////////////////////////////////
@@ -200,14 +189,14 @@ namespace gazebo
     template<typename T>
     bool MovingWindowFilter<T>::GetWindowFilled() const
     {
-      return this->dataPtr->filled;
+      return this->dataPtr->samples == this->dataPtr->valWindowSize;
     }
 
     //////////////////////////////////////////////////
     template<typename T>
     T MovingWindowFilter<T>::Get()
     {
-      return this->dataPtr->valFiltered;
+      return this->dataPtr->sum / static_cast<double>(this->dataPtr->samples);
     }
     /// \}
   }
