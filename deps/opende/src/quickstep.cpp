@@ -1124,24 +1124,24 @@ static void ComputeRows(
     dReal dlambda_bilateral_mean        = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
     dReal dlambda_contact_normal_mean   = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
     dReal dlambda_contact_friction_mean = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
-    dReal dlambda_total = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
+    dReal dlambda_total_mean = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
       ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
     qs->rms_dlambda[0] = sqrt(dlambda_bilateral_mean);
     qs->rms_dlambda[1] = sqrt(dlambda_contact_normal_mean);
     qs->rms_dlambda[2] = sqrt(dlambda_contact_friction_mean);
-    qs->rms_dlambda[3] = sqrt(dlambda_total);
+    qs->rms_dlambda[3] = sqrt(dlambda_total_mean);
 
     dReal residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
     dReal residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
     dReal residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
-    dReal residual_total = (rms_error[0] + rms_error[1] + rms_error[2])/
+    dReal residual_total_mean = (rms_error[0] + rms_error[1] + rms_error[2])/
       ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
     qs->rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
     qs->rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
     qs->rms_constraint_residual[2] = sqrt(residual_contact_friction_mean);
-    qs->rms_constraint_residual[3] = sqrt(residual_total);
+    qs->rms_constraint_residual[3] = sqrt(residual_total_mean);
     qs->num_contacts = m_rms_dlambda[1];
 
     // debugging mutex locking
@@ -2474,13 +2474,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
       dReal residual_bilateral_mean        = Jv_bilateral/(dReal)m_Jv_bilateral;
       dReal residual_contact_normal_mean   = Jv_contact/(dReal)m_Jv_contact;
       dReal residual_contact_friction_mean = Jv_friction/(dReal)m_Jv_friction;
-      dReal residual_total = (Jv_bilateral + Jv_contact + Jv_friction)/
+      dReal residual_total_mean            = (Jv_bilateral + Jv_contact + Jv_friction)/
         ((dReal)(m_Jv_bilateral + m_Jv_contact + m_Jv_friction));
 
-      world->qs.rms_constraint_residual[0] = sqrt();
-      world->qs.rms_constraint_residual[1] = sqrt();
-      world->qs.rms_constraint_residual[2] = sqrt();
-      world->qs.rms_constraint_residual[3] = sqrt();
+      world->qs.rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
+      world->qs.rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
+      world->qs.rms_constraint_residual[2] = sqrt(residual_contact_friction_mean);
+      world->qs.rms_constraint_residual[3] = sqrt(residual_total_mean);
       world->qs.num_contacts = m_Jv_contact;
     } END_STATE_SAVE(context, rmsstate);
   }
