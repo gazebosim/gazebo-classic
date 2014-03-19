@@ -30,7 +30,7 @@
 
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/Filters.hh"
+#include "gazebo/common/MovingWindowFilter.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/LinkState.hh"
