@@ -497,7 +497,7 @@ namespace gazebo
 
       /// \brief Returns this link's kinetic vibrational
       /// "thermal" energy.  Where this is basically
-      ///   GetWorldEnergyKinetic() - GetWorldEnergyKineticFilterd()
+      ///   GetWorldEnergyKinetic() - GetWorldEnergyKineticFiltered()
       /// \return this link's kinetic vibrational energy
       public: double GetWorldEnergyKineticVibrational();
 

@@ -1101,11 +1101,8 @@ double Model::GetWorldEnergyKineticFiltered() const
 /////////////////////////////////////////////////
 double Model::GetWorldEnergyFiltered() const
 {
-  double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
-    e += (*iter)->GetWorldEnergyFiltered();
-  return e;
+  return this->GetWorldEnergyPotential()
+       + this->GetWorldEnergyKineticFiltered();
 }
 
 /////////////////////////////////////////////////
