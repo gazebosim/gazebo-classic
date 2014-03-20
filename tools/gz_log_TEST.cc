@@ -52,10 +52,10 @@ std::string custom_exec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog info' returns correct information
-TEST(gzlog, Info)
+/// Check to make sure that 'gz log -i' returns correct information
+TEST(gz_log, Info)
 {
-  std::string info = custom_exec(std::string("gzlog info ") +
+  std::string info = custom_exec(std::string("gz log -i -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(info);
 
@@ -75,10 +75,10 @@ TEST(gzlog, Info)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog echo' returns correct information
-TEST(gzlog, Echo)
+/// Check to make sure that 'gz log -e' returns correct information
+TEST(gz_log, Echo)
 {
-  std::string echo = custom_exec(std::string("gzlog echo ") +
+  std::string echo = custom_exec(std::string("gz log -e -f ") +
       PROJECT_SOURCE_PATH + "/test/data/empty_state.log");
   boost::trim_right(echo);
 
@@ -130,14 +130,14 @@ TEST(gzlog, Echo)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog echo --filter' returns correct information
-TEST(gzlog, EchoFilter)
+/// Check to make sure that 'gz log -e --filter' returns correct information
+TEST(gz_log, EchoFilter)
 {
   std::string echo, shasum;
 
   // Test model filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2 ") +
+      std::string("gz log -e --filter pr2 -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2StateLog, echo);
@@ -149,7 +149,7 @@ TEST(gzlog, EchoFilter)
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose ") +
+      std::string("gz log -e --filter pr2.pose -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseStateLog, echo);
@@ -161,7 +161,7 @@ TEST(gzlog, EchoFilter)
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose.x ") +
+      std::string("gz log -e --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseXStateLog, echo);
@@ -173,7 +173,7 @@ TEST(gzlog, EchoFilter)
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2.pose.[x,y] ") +
+      std::string("gz log -e --filter pr2.pose.[x,y] -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseXYStateLog, echo);
@@ -186,7 +186,7 @@ TEST(gzlog, EchoFilter)
 
   // Test link filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2/r_upper*.pose ") +
+      std::string("gz log -e --filter pr2/r_upper*.pose -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2LinkStateLog, echo);
@@ -199,7 +199,7 @@ TEST(gzlog, EchoFilter)
 
   // Test joint filter
   echo = custom_exec(
-      std::string("gzlog echo --filter pr2//r_upper_arm_roll_joint ") +
+      std::string("gz log -e --filter pr2//r_upper_arm_roll_joint -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2JointStateLog, echo);
@@ -213,13 +213,13 @@ TEST(gzlog, EchoFilter)
 
 /////////////////////////////////////////////////
 /// Check to Hz filtering
-TEST(gzlog, HzFilter)
+TEST(gz_log, HzFilter)
 {
   std::string echo, validEcho;
 
   // Test Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z 1.0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z 1.0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008";
@@ -227,7 +227,7 @@ TEST(gzlog, HzFilter)
 
   // Test zero Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z 0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z 0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -235,7 +235,7 @@ TEST(gzlog, HzFilter)
 
   // Test negative Hz filter
   echo = custom_exec(
-      std::string("gzlog echo -r -z -1.0 --filter pr2.pose.z ") +
+      std::string("gz log -e -r -z -1.0 --filter pr2.pose.z -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -275,19 +275,19 @@ TEST(gzlog, RawFilterStamp)
 }
 
 /////////////////////////////////////////////////
-/// Check to make sure that 'gzlog step' returns correct information
-TEST(gzlog, Step)
+/// Check to make sure that 'gz log -s' returns correct information
+TEST(gz_log, Step)
 {
   std::string stepCmd, shasum;
-  stepCmd = std::string("gzlog step ") + PROJECT_SOURCE_PATH +
+  stepCmd = std::string("gz log -s -f ") + PROJECT_SOURCE_PATH +
     std::string("/test/data/pr2_state.log");
 
-  // Call gzlog step and press q immediately
+  // Call gz log step and press q immediately
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq0);
   EXPECT_EQ(shasum, "6d3af4f4d1214fe3a4860ab42777eb4d0f89c6b2");
 
-  // Call gzlog step and press space once, then q
+  // Call gz log step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq1);
   if (std::string("1.4").compare(SDF_VERSION) == 0)
@@ -295,7 +295,7 @@ TEST(gzlog, Step)
   else
     EXPECT_EQ(shasum, "58622f6f536b412ab8f4c691a16dc6dfa923d506");
 
-  // Call gzlog step and press space twice, then q
+  // Call gz log step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq2);
   if (std::string("1.4").compare(SDF_VERSION) == 0)
@@ -305,10 +305,10 @@ TEST(gzlog, Step)
 }
 
 /////////////////////////////////////////////////
-TEST(gzlog, HangCheck)
+TEST(gz_log, HangCheck)
 {
   gazebo::common::Time start = gazebo::common::Time::GetWallTime();
-  custom_exec("gzlog stop");
+  custom_exec("gz log -r 0");
   gazebo::common::Time end = gazebo::common::Time::GetWallTime();
 
   EXPECT_LT(end - start, gazebo::common::Time(60, 0));

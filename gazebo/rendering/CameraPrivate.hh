@@ -22,6 +22,7 @@
 #include <list>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -33,7 +34,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Private data for the Camera class
-    class CameraPrivate
+    class GAZEBO_VISIBLE CameraPrivate
     {
       /// \brief Visual that the camera is tracking.
       public: VisualPtr trackedVisual;

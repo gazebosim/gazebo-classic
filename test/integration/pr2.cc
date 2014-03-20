@@ -25,10 +25,10 @@ class PR2Test : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
   public: void StaticPR2(std::string _physicsEngine);
-  public: void Load(std::string _physicsEngine);
+  public: void LoadPR2(std::string _physicsEngine);
 };
 
-void PR2Test::Load(std::string _physicsEngine)
+void PR2Test::LoadPR2(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
@@ -86,9 +86,9 @@ void PR2Test::Load(std::string _physicsEngine)
   boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
-TEST_P(PR2Test, Load)
+TEST_P(PR2Test, LoadPR2)
 {
-  Load(GetParam());
+  LoadPR2(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

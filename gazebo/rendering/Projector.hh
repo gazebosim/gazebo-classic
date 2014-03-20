@@ -32,6 +32,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +43,7 @@ namespace gazebo
 
     /// \class Projector Projector.hh rendering/rendering.hh
     /// \brief Projects a material onto surface, light a light projector.
-    class Projector
+    class GAZEBO_VISIBLE Projector
     {
       /// \brief Constructor.
       /// \param[in] _parent Name of the parent visual.

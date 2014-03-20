@@ -19,6 +19,7 @@ set (files
   lights.world
   mud_bitmask.world
   mud.world
+  multilink_shape.world
   openal.world
   pioneer2dx.world
   plugin.world
@@ -34,6 +35,7 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  simple_arm.world
   simple_gripper.world
   sonar_demo.world
   sphere_atlas_demo.world
