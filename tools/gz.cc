@@ -329,7 +329,22 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("iters"))
   {
-    msg.set_iters(this->vm["iters"].as<double>());
+    msg.mutable_ode()->set_iters(this->vm["iters"].as<double>());
+    msg.mutable_bullet()->set_iters(this->vm["iters"].as<double>());
+    msg.mutable_dart()->set_iters(this->vm["iters"].as<double>());
+    good = true;
+  }
+
+  if (this->vm.count("accuracy"))
+  {
+    msg.mutable_simbody()->set_accuracy(this->vm["accuracy"].as<double>());
+    good = true;
+  }
+
+  if (this->vm.count("max-transient-velocity"))
+  {
+    msg.mutable_simbody()->set_max_transient_velocity(
+      this->vm["max_transient_velocity"].as<double>());
     good = true;
   }
 
