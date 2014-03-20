@@ -15,7 +15,10 @@
  *
 */
 
+#include <algorithm>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "gazebo/msgs/msgs.hh"
 
