@@ -24,12 +24,12 @@ message Physics
   optional Type type                         = 1[default=ODE];
 
   optional string solver_type                = 2;
-  optional double min_step_size              = 3;
-  optional Vector3d gravity                  = 4;
-  optional bool enable_physics               = 5;
-  optional double real_time_factor           = 6;
-  optional double real_time_update_rate      = 7;
-  optional double max_step_size              = 8;
+  optional Vector3d gravity                  = 3;
+  optional bool enable_physics               = 4;
+  optional double real_time_factor           = 5;
+  optional double real_time_update_rate      = 6;
+  optional double max_step_size              = 7;
+  optional double min_step_size              = 8;
   optional PhysicsBullet bullet              = 9;
   optional PhysicsDART dart                  = 10;
   optional PhysicsODE ode                    = 11;
