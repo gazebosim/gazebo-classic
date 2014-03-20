@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+#include <string>
 
 #include "gazebo/physics/physics.hh"
 #include "ServerFixture.hh"
