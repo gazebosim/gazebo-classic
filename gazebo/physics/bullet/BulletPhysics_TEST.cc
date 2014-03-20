@@ -118,6 +118,10 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   splitImpulse = true;
   splitImpulsePenetrationThreshold = 0.0;
 
+  int maxContacts = 32;
+  double minStepSize = 32.32;
+  double maxStepSize = 3232.32;
+
   bulletPhysics->SetParam("type", type);
   bulletPhysics->SetParam("iters", iters);
   bulletPhysics->SetParam("sor", sor);
@@ -158,6 +162,22 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);
+
+  int maxContactsRet;
+  double minStepSizeRet;
+  double maxStepSizeRet;
+  bulletPhysics->SetParam("max_contacts", maxContacts);
+  bulletPhysics->SetParam("min_step_size", minStepSize);
+  bulletPhysics->SetParam("max_step_size", maxStepSize);
+  value = bulletPhysics->GetParam("max_contacts");
+  maxContactsRet = boost::any_cast<int>(value);
+  EXPECT_DOUBLE_EQ(maxContacts, maxContactsRet);
+  value = bulletPhysics->GetParam("min_step_size");
+  minStepSizeRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
+  value = bulletPhysics->GetParam("max_step_size");
+  maxStepSizeRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
 }
 
 /////////////////////////////////////////////////
