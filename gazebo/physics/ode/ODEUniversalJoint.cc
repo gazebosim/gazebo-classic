@@ -287,7 +287,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(const boost::bad_any_cast &e)
+    catch(boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
