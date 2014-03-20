@@ -131,6 +131,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      // Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
       /// \brief Get an parameter of the physics engine
       /// \param[in] _param A parameter listed in the ODEParam enum
       /// \return The value of the parameter

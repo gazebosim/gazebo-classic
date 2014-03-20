@@ -218,6 +218,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      // Documentation inherited
+      public: virtual void SetParam(const std::string &_key,
+                  const boost::any &_value);
+
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;
 

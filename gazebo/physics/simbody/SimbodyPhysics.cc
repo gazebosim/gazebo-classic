@@ -1267,3 +1267,30 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   }
 }
 
+//////////////////////////////////////////////////
+void SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1116
+  if (_key == "accuracy")
+  {
+    int value = boost::any_cast<double>(_value);
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    int value = boost::any_cast<double>(_value);
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "max_step_size")
+  {
+    int value = boost::any_cast<double>(_value);
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in Simbody" << std::endl;
+  }
+}

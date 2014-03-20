@@ -393,6 +393,33 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 }
 
 //////////////////////////////////////////////////
+void DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1115
+  if (_key == "max_contacts")
+  {
+    int value = boost::any_cast<int>(_value);
+    gzerr << "Setting [" << _key << "] in DART to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "min_step_size")
+  {
+    int value = boost::any_cast<double>(_value);
+    gzerr << "Setting [" << _key << "] in DART to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "max_step_size")
+  {
+    int value = boost::any_cast<double>(_value);
+    this->dtWorld->setTimeStep(value);
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in DART" << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
