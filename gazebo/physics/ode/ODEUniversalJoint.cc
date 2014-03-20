@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <string>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -285,7 +287,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
