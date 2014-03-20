@@ -653,15 +653,7 @@ void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
   }
   else
   {
-    try
-    {
-      gzerr << "Unable to handle joint attribute["
-            << boost::any_cast<std::string>(_value) << "]\n";
-    }
-    catch(boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-    }
+    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
   }
 }
 
