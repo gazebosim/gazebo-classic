@@ -1,0 +1,57 @@
+# gazebo bash completion
+
+shopt -s extglob
+
+function _gz
+{
+  local prev cur cmd opts
+  local gz="$1"
+  COMPREPLY=()
+  cur="$2"
+  prev="$3"
+
+  # searching for the command
+  for ((i=1; $i<=$COMP_CWORD; i++)); do
+	  if [[ ${COMP_WORDS[i]} != -* ]]; then
+		  cmd="${COMP_WORDS[i]}"
+      break
+    fi
+  done
+
+  if [[ "$cur" == -* ]] || [[ "$prev" != "gz" ]]; then
+
+    if [[ "$cmd" == "topic" ]]; then
+      case ${prev} in
+        -e|--echo|-i|--info|-v|--view|-z|--hz|-b|--bw)
+          opts=`gz topic -l 2>/dev/null`
+          COMPREPLY=($(compgen -W "$opts" -- ${cur}))
+          return
+          ;;
+      esac;
+    elif [[ "$cmd" == "camera" ]]; then
+      case ${prev} in
+        -c|--camera-name)
+          opts=`gz camera -l 2>/dev/null`
+          COMPREPLY=($(compgen -W "$opts" -- ${cur}))
+          return
+          ;;
+      esac;
+    fi
+
+    if [[ "$cmd" == "help" ]]; then
+      opts=`gz debug`
+    elif [[ "$cur" == -* ]]; then
+      opts=`gz debug -o "$cmd"`
+    else
+      COMPREPLY=($(compgen -f  -- "${COMP_WORDS[${COMP_CWORD}]}" ))
+      complete -o filenames -o nospace -F "_gz" "gz"
+      return
+    fi
+
+  else
+    opts=`gz debug`
+  fi
+
+  COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+complete  -F "_gz" "gz"
