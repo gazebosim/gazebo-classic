@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
     <include>
@@ -13,10 +13,10 @@
     <include>
       <uri>model://simple_arm</uri>
     </include>
-    <model name='cylinder'>
+    <model name="cylinder">
       <pose>1.0 1.0 0 0 0 0</pose>
-      <link name='base'>
-        <visual name='cylinder_visual'>
+      <link name="base">
+        <visual name="cylinder_visual">
           <geometry>
             <cylinder>
               <radius>0.15</radius>
@@ -24,7 +24,7 @@
             </cylinder>
           </geometry>
         </visual>
-        <collision name='cylinder_collision'>
+        <collision name="cylinder_collision">
           <geometry>
             <cylinder>
               <radius>0.15</radius>
