@@ -65,6 +65,8 @@ namespace gazebo
       /// Thread Pitch is defined as angular motion per linear
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
+      /// Deprecated, please use the index-less version in the future:
+      /// virtual void SetThreadPitch(double _threadPitch) = 0;
       /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(unsigned int _index,

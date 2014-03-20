@@ -11,6 +11,9 @@
 1. **gazebo/physics/ode/ODEJoint.hh**
     + ***Deprecation*** void CFMDamping()
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
+1. **gazebo/physics/ScrewJoint.hh**
+    + ***Deprecation*** virtual void SetThreadPitch(unsigned int _index, double _threadPitch) = 0
+    + ***Replacement*** virtual void SetThreadPitch(double _threadPitch) = 0
 
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
