@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
