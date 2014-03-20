@@ -34,6 +34,11 @@ set(tests
   factory.cc
   file_handling.cc
   gripper.cc
+  gz_joint.cc
+  gz_log.cc
+  gz_model.cc
+  gz_physics.cc
+  gz_world.cc
   imu.cc
   joint_force_torque.cc
   joint_revolute.cc
@@ -85,6 +90,7 @@ set(dri_tests
   camera_sensor.cc
   multicamera_sensor.cc
   gpu_laser.cc
+  gz_camera.cc
   camera_follow.cc
   heightmap.cc
   ogre_log.cc

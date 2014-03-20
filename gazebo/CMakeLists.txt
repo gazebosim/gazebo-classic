@@ -76,6 +76,8 @@ endif()
 
 gz_install_executable(gzserver)
 gz_install_executable(gazebo)
+manpage(gzserver 1)
+manpage(gazebo 1)
 
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")

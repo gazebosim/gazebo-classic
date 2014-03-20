@@ -68,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.10)
+  pkg_check_modules(SDF sdformat>=2.0.0)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -435,6 +435,7 @@ endif ()
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################
