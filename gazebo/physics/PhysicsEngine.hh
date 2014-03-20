@@ -285,7 +285,7 @@ namespace gazebo
       ///          (defined but not used in ode).
       ///       -# "max_step_size" (double) - maximum physics step size when
       ///          physics update step must return.
-      ///       -# "rms_error_tolerance" (double) - threshold for stopping
+      ///       -# "sor_lcp_tolerance" (double) - threshold for stopping
       ///          Projected Gauss-Seidel udpates. I.e.
       ///          if total RMS residual < this value, stop PGS iterations.
       ///          The error metric is the residual for the constraint
@@ -342,9 +342,9 @@ namespace gazebo
       ///       -# "precon_iters" (int) - precondition iterations
       ///          (experimental).
       ///       -# "iters" (int) - number of LCP PGS iterations. If
-      ///          rms_error_tolerance is negative, full iteration count is
+      ///          sor_lcp_tolerance is negative, full iteration count is
       ///          executed.  Otherwise, PGS may stop iteration early if
-      ///          rms_error_tolerance is satisfied by the total RMS residual.
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
       ///       -# "sor" (double) - relaxation parameter for the Projected
       ///          Gauss-Seidel updates.
       ///       -# "contact_max_correcting_vel" (double) - truncates correction
@@ -357,7 +357,7 @@ namespace gazebo
       ///          (defined but not used in ode).
       ///       -# "max_step_size" (double) - maximum physics step size when
       ///          physics update step must return.
-      ///       -# "rms_error_tolerance" (double) - threshold for stopping PGS.
+      ///       -# "sor_lcp_tolerance" (double) - threshold for stopping PGS.
       ///       -# "rms_error" (double) - RMS of dlambda at the end of time step
       ///          error[0]: bilateral constraints
       ///          error[1]: contact normal constraints

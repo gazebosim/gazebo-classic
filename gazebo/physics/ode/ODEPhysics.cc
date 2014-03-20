@@ -1478,7 +1478,10 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   else if (_key == "sor_lcp_tolerance")
     return dWorldGetQuickStepTolerance(this->worldId);
   else if (_key == "rms_error_tolerance")
+  {
+    gzwarn << "please use sor_lcp_tolerance in the future.\n";
     return dWorldGetQuickStepTolerance(this->worldId);
+  }
   else if (_key == "rms_error")
     return dWorldGetQuickStepRMSDeltaLambda(this->worldId);
   else if (_key == "constraint_residual")
