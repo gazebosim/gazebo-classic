@@ -59,8 +59,12 @@ namespace gazebo
                 }
                 else
                 {
-                  gzerr << "should not see this\n";
+                  gzerr << "gearbox_ratio_not_specified, set to 1.\n";
                   this->gearRatio = 1.0;
+                  /* below should bring in default values for sdf 1.4+
+                  this->gearRatio =
+                    _sdf->Get<double>("gearbox_ratio");
+                  */
                 }
 
                 if (_sdf->HasElement("gearbox_reference_body"))
