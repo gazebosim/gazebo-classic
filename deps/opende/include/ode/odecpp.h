@@ -102,12 +102,46 @@ public:
     { return dWorldGetQuickStepPreconIterations (get_id()); }
   int getQuickStepNumIterations() const
     { return dWorldGetQuickStepNumIterations (get_id()); }
+  dReal getQuickStepTolerance()
+    { return dWorldGetQuickStepTolerance (get_id()); }
+  void setQuickStepTolerance(dReal tol)
+    { dWorldSetQuickStepTolerance (get_id(), tol); }
+  void setQuickStepNumChunks (int num)
+    { dWorldSetQuickStepNumChunks (get_id(), num); }
+  void setQuickStepNumOverlap (dWorldID, int num)
+    { dWorldSetQuickStepNumOverlap (get_id(), num); }
   void setQuickStepW(dReal over_relaxation)
     { dWorldSetQuickStepW (get_id(), over_relaxation); }
   dReal getQuickStepW() const
     { return dWorldGetQuickStepW (get_id()); }
-  dReal getQuickStepRMSError() const
-    { return dWorldGetQuickStepRMSError (get_id()); }
+  dReal *getQuickStepRMSError() const
+    { return dWorldGetQuickStepRMSDeltaLambda (get_id()); }
+  dReal *getQuickStepRMSConstraintResidual() const
+    { return dWorldGetQuickStepRMSConstraintResidual (get_id()); }
+  dReal getQuickStepNumContacts() const
+    { return dWorldGetQuickStepNumContacts (get_id()); }
+
+  /* experimental PGS */
+  bool getQuickStepInertiaRatioReduction() const
+    { return dWorldGetQuickStepInertiaRatioReduction (get_id()); }
+  dReal getQuickStepContactResidualSmoothing() const
+    { return dWorldGetQuickStepContactResidualSmoothing (get_id()); }
+  bool getQuickStepExperimentalRowReordering() const
+    { return dWorldGetQuickStepExperimentalRowReordering (get_id()); }
+  dReal getQuickStepWarmStartFactor() const
+    { return dWorldGetQuickStepWarmStartFactor (get_id()); }
+  int getQuickStepExtraFrictionIterations() const
+    { return dWorldGetQuickStepExtraFrictionIterations (get_id()); }
+  void setQuickStepInertiaRatioReduction(bool irr)
+    { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
+  void setQuickStepContactResidualSmoothing(dReal smoo)
+    { dWorldSetQuickStepContactResidualSmoothing (get_id(), smoo); }
+  void setQuickStepExperimentalRowReordering(bool order)
+    { dWorldSetQuickStepExperimentalRowReordering (get_id(), order); }
+  void setQuickStepWarmStartFactor(dReal warm)
+    { dWorldSetQuickStepWarmStartFactor (get_id(), warm); }
+  void setQuickStepExtraFrictionIterations(int iters)
+    { dWorldSetQuickStepExtraFrictionIterations (get_id(), iters); }
 
   void  setAutoDisableLinearThreshold (dReal threshold) 
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }
