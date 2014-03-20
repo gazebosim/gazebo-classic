@@ -201,7 +201,7 @@ math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return 0;
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -215,5 +215,5 @@ math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return 0;
+  return math::Angle();
 }
