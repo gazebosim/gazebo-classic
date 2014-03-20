@@ -280,7 +280,7 @@ namespace gazebo
       ///       -# "contact_surface_layer" (double) - ERP is 0 for
       ///          interpenetration depths below this value.
       ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between pairs of collision bodies.
+      ///          between any pair of collision bodies.
       ///       -# "min_step_size" (double) - minimum internal step size.
       ///          (defined but not used in ode).
       ///       -# "max_step_size" (double) - maximum physics step size when
@@ -319,7 +319,7 @@ namespace gazebo
       ///       -# "split_impulse_penetration_threshold" (double) -
       ///          Split impulse penetration threshold.
       ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between pairs of collision bodies.
+      ///          between any pair of collision bodies.
       ///       -# "min_step_size" (double) - minimum internal step size.
       ///       -# "max_step_size" (double) - maximum physics step size when
       ///          physics update step must return.
@@ -336,81 +336,84 @@ namespace gazebo
       /// \param[in] _attr String key
       /// Below is a list of _key parameter definitions:
       ///   - ode
-      ///       -# "type" - returns "ode"
-      ///       -# "cfm" - global CFM
-      ///       -# "erp" - global ERP
-      ///       -# "precon_iters" - precondition iterations (experimental).
-      ///       -# "iters" - number of LCP PGS iterations.  If
+      ///       -# "type" (string) - returns "ode"
+      ///       -# "cfm" (double) - global CFM
+      ///       -# "erp" (double) - global ERP
+      ///       -# "precon_iters" (int) - precondition iterations
+      ///          (experimental).
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
       ///          rms_error_tolerance is negative, full iteration count is
       ///          executed.  Otherwise, PGS may stop iteration early if
       ///          rms_error_tolerance is satisfied by the total RMS residual.
-      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" - truncates correction
+      ///       -# "sor" (double) - relaxation parameter for the Projected
+      ///          Gauss-Seidel updates.
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
       ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
-      ///          depths below this value.
-      ///       -# "max_contacts" - max number of contact constraints between
-      ///          pairs of collision bodies.
-      ///       -# "min_step_size" - minimum internal step size
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value.
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size
       ///          (defined but not used in ode).
-      ///       -# "max_step_size" - maximum physics step size when physics
-      ///          update step must return.
-      ///       -# "rms_error_tolerance" - threshold for stopping PGS.
-      ///       -# "rms_error" - RMS of dlambda at the end of time step
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
+      ///       -# "rms_error_tolerance" (double) - threshold for stopping PGS.
+      ///       -# "rms_error" (double) - RMS of dlambda at the end of time step
       ///          error[0]: bilateral constraints
       ///          error[1]: contact normal constraints
       ///          error[2]: friction constraints
       ///          error[3]: all constraints
-      ///       -# "constraint_residual" - RMS of residuals: Jv
+      ///       -# "constraint_residual" (double) - RMS of residuals: Jv
       ///          residual[0]: bilateral constraints
       ///          residual[1]: contact normal constraints
       ///          residual[2]: friction constraints
       ///          residual[3]: all constraints
-      ///       -# "num_contacts"
-      ///       -# "inertia_ratio_reduction"
+      ///       -# "num_contacts" (int) - returns number of active
+      ///          contact constraints.
+      ///       -# "inertia_ratio_reduction" (bool) -
       ///          turn on/off quickstep inertia reduction  (experimental).
-      ///       -# "contact_residual_smoothing"
-      ///          option to smooth friction residuals (experimental).
-      ///       -# "experimental_row_reordering"
+      ///       -# "contact_residual_smoothing" (double) -
+      ///          option to smooth friction residuals if > 0 (experimental).
+      ///       -# "experimental_row_reordering" (bool) -
       ///          true if reorder constraint rows with the following order:
       ///          bilateral constrains, contact normal constraints
       ///          and lastly frictional constraints (experimental).
-      ///       -# "warm_start_factor"
+      ///       -# "warm_start_factor" (double) -
       ///          relaxation factor for warm starting bilateral constraints
       ///          from last time step's value (experimental).
-      ///       -# "extra_friction_iterations"
+      ///       -# "extra_friction_iterations" (int) -
       ///          extra PGS iterations on only the frictional constraints
       ///          (experimental).
       ///   - bullet
-      ///       -# "type" - returns "bullet"
-      ///       -# "cfm" - global CFM
-      ///       -# "erp" - global ERP
-      ///       -# "iters" - number of LCP PGS iterations.
-      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" - truncates correction
+      ///       -# "type" (string) - returns "bullet"
+      ///       -# "cfm" (double) - global CFM
+      ///       -# "erp" (double) - global ERP
+      ///       -# "iters" (int) - number of LCP PGS iterations.
+      ///       -# "sor" (double) - relaxation parameter for the Projected
+      ///          Gauss-Seidel updates.
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
       ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
-      ///          depths below this value.
-      ///       -# "split_impulse" - true turns on split impulse.
-      ///       -# "split_impulse_penetration_threshold" - Split impulse
-      ///          penetration threshold.
-      ///       -# "max_contacts" - max number of contact constraints between
-      ///          pairs of collision bodies.
-      ///       -# "min_step_size" - minimum internal step size.
-      ///       -# "max_step_size" - maximum physics step size when physics
-      ///          update step must return.
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value.
+      ///       -# "split_impulse" (bool) - true turns on/off split impulse.
+      ///       -# "split_impulse_penetration_threshold" (double) -
+      ///          Split impulse penetration threshold.
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
       ///   - dart (note: most features are not yet implemented, issue #1115)
-      ///       -# "min_step_size" - minimum internal step size.
-      ///       -# "max_contacts" - max number of contact constraints between
-      ///          pairs of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
       ///   - simbody (note: most features are not yet implemented, issue #1116)
       ///       -* "type" (string) - returns "simbody"
       ///       -* "integrator_type" (string) - returns integrator type.
       ///       -* "accuracy" (double) - returns integrator accuracy tolerance.
       ///          Returns result of SimTK::Integrator::getAccuracyInUse.
       ///       -* "max_transient_velocity" (double) - returns contact
-      ///          maximum transient velocity tolerance.
-      ///          Returns result of
+      ///          maximum transient velocity tolerance.  Returns result of
       ///          SimTK::CompliantContactSubsystem::getTransitionVelocity.
       ///
       /// \return The value of the parameter
