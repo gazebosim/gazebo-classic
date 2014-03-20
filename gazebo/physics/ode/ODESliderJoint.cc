@@ -156,29 +156,16 @@ double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetAnchor(unsigned int _index) const
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
   dVector3 result;
-
-  if (this->jointId)
-    dJointGetHingeAnchor(this->jointId, result);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
   return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAnchor(unsigned int _index,
-  const math::Vector3 &_anchor)
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
-
-  if (this->jointId)
-    dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }
