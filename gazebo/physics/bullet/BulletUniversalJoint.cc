@@ -168,6 +168,12 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
 //////////////////////////////////////////////////
 double BulletUniversalJoint::GetVelocity(unsigned int _index) const
 {
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint axis index[" << _index << "], returning 0.\n";
+    return 0;
+  }
+
   double result = 0;
   math::Vector3 globalAxis = this->GetGlobalAxis(_index);
   if (this->childLink)
@@ -175,8 +181,6 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
   if (this->parentLink)
     result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
   return result;
-
-  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -376,7 +380,7 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 //////////////////////////////////////////////////
 math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
-  if (_index >= 2)
+  if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint axis index[" << _index << "]\n";
     return math::Vector3::Zero;
