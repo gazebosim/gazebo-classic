@@ -1092,8 +1092,8 @@ double Model::GetWorldEnergy() const
 double Model::GetWorldEnergyKineticFiltered() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  Link_V::const_iterator iter;
+  for (iter = this->links.begin(); iter != this->links.end(); ++iter)
     e += (*iter)->GetWorldEnergyKineticFiltered();
   return e;
 }
@@ -1109,8 +1109,8 @@ double Model::GetWorldEnergyFiltered() const
 double Model::GetWorldEnergyKineticVibrational() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  Link_V::const_iterator iter;
+  for (iter = this->links.begin(); iter != this->links.end(); ++iter)
     e += (*iter)->GetWorldEnergyKineticVibrational();
   return e;
 }
