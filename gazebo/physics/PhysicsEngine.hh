@@ -311,8 +311,6 @@ namespace gazebo
       ///       -# "iters" (int) - number of LCP PGS iterations.
       ///       -# "sor" (double) - relaxation parameter for Projected
       ///          Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
       ///       -# "contact_surface_layer" (double) - ERP is 0 for
       ///          interpenetration depths below this value.
       ///       -# "split_impulse" (bool) - turns on/off split impulse.
@@ -391,8 +389,6 @@ namespace gazebo
       ///       -# "iters" (int) - number of LCP PGS iterations.
       ///       -# "sor" (double) - relaxation parameter for the Projected
       ///          Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
       ///       -# "contact_surface_layer" (double) - ERP is 0 for
       ///          interpenetration depths below this value.
       ///       -# "split_impulse" (bool) - true turns on/off split impulse.
