@@ -470,6 +470,8 @@ TEST_F(gzTest, Physics)
     waitForMsg("gz physics -w default -i 561 ");
 
     gazebo::msgs::Physics msg;
+    msg.mutable_bullet()->set_iters(561);
+    msg.mutable_dart()->set_iters(561);
     msg.mutable_ode()->set_iters(561);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());

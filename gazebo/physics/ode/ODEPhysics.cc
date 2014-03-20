@@ -118,7 +118,7 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world), maxContacts(0)
+    : PhysicsEngine(_world), physicsStepFunc(NULL), maxContacts(0)
 {
   // Collision detection init
   dInitODE2(0);
@@ -222,11 +222,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
 
   // Set the physics update function
-  if (this->stepType == "quick")
-    this->physicsStepFunc = &dWorldQuickStep;
-  else if (this->stepType == "world")
-    this->physicsStepFunc = &dWorldStep;
-  else
+  this->SetStepType(this->stepType);
+  if (this->physicsStepFunc == NULL)
     gzthrow(std::string("Invalid step type[") + this->stepType);
 }
 
@@ -285,83 +282,88 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_solver_type())
   {
-    sdf::ElementPtr solverElem =
-      this->sdf->GetElement("ode")->GetElement("solver");
-    if (_msg->solver_type() == "quick")
-    {
-      solverElem->GetElement("type")->Set("quick");
-      this->physicsStepFunc = &dWorldQuickStep;
-    }
-    else if (_msg->solver_type() == "world")
-    {
-      solverElem->GetElement("type")->Set("world");
-      this->physicsStepFunc = &dWorldStep;
-    }
+    this->SetStepType(_msg->solver_type());
   }
 
-  if (_msg->has_ode() && _msg->ode().has_precon_iters())
-    this->SetSORPGSPreconIters(_msg->ode().precon_iters());
-
-  if (_msg->has_ode() && _msg->ode().has_inertia_ratio_reduction())
-    this->SetParam("inertia_ratio_reduction",
-    _msg->ode().inertia_ratio_reduction());
-
-  if (_msg->has_ode() && _msg->ode().has_friction_iters())
-    this->SetParam("extra_friction_iterations", _msg->ode().friction_iters());
-
-  if (_msg->has_ode() && _msg->ode().has_warm_start_factor())
-    this->SetParam("warm_start_factor", _msg->ode().warm_start_factor());
-
-  if (_msg->has_ode() && _msg->ode().has_reorder())
-    this->SetParam("experimental_row_reordering", _msg->ode().reorder());
-
-  if (_msg->has_ode() && _msg->ode().has_contact_residual_smoothing())
-    this->SetParam("contact_residual_smoothing",
-    _msg->ode().contact_residual_smoothing());
-
-  if (_msg->has_ode() && _msg->ode().has_sor_lcp_tolerance())
-    this->SetParam("sor_lcp_tolerance",
-    _msg->ode().sor_lcp_tolerance());
-
-  if (_msg->has_ode() && _msg->ode().has_iters())
-    this->SetSORPGSIters(_msg->ode().iters());
-
-  if (_msg->has_ode() && _msg->ode().has_sor())
-    this->SetSORPGSW(_msg->ode().sor());
-
-  if (_msg->has_ode() && _msg->ode().has_cfm())
-    this->SetWorldCFM(_msg->ode().cfm());
-
-  if (_msg->has_ode() && _msg->ode().has_erp())
-    this->SetWorldERP(_msg->ode().erp());
-
-  if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  if (_msg->has_ode() && _msg->ode().has_contact_max_correcting_vel())
-    this->SetContactMaxCorrectingVel(_msg->ode().contact_max_correcting_vel());
-
-  if (_msg->has_ode() && _msg->ode().has_contact_surface_layer())
-    this->SetContactSurfaceLayer(_msg->ode().contact_surface_layer());
-
-  if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
-
-  if (_msg->has_real_time_factor())
-    this->SetTargetRealTimeFactor(_msg->real_time_factor());
-
-  if (_msg->has_real_time_update_rate())
+  if (_msg->has_min_step_size())
   {
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
   }
 
-  if (_msg->has_max_step_size())
+  if (_msg->has_ode())
   {
-    this->SetMaxStepSize(_msg->max_step_size());
+    const msgs::PhysicsODE *msgODE = &_msg->ode();
+
+    if (msgODE->has_precon_iters())
+    {
+      this->SetSORPGSPreconIters(msgODE->precon_iters());
+    }
+
+    if (msgODE->has_inertia_ratio_reduction())
+    {
+      this->SetParam("inertia_ratio_reduction",
+        msgODE->inertia_ratio_reduction());
+    }
+
+    if (msgODE->has_friction_iters())
+    {
+      this->SetParam("extra_friction_iterations", msgODE->friction_iters());
+    }
+
+    if (msgODE->has_warm_start_factor())
+    {
+      this->SetParam("warm_start_factor", msgODE->warm_start_factor());
+    }
+
+    if (msgODE->has_reorder())
+    {
+      this->SetParam("experimental_row_reordering", msgODE->reorder());
+    }
+
+    if (msgODE->has_contact_residual_smoothing())
+    {
+      this->SetParam("contact_residual_smoothing",
+        msgODE->contact_residual_smoothing());
+    }
+
+    if (msgODE->has_iters())
+    {
+      this->SetSORPGSIters(msgODE->iters());
+    }
+
+    if (msgODE->has_sor())
+    {
+      this->SetSORPGSW(msgODE->sor());
+    }
+
+    if (msgODE->has_cfm())
+    {
+      this->SetWorldCFM(msgODE->cfm());
+    }
+
+    if (msgODE->has_erp())
+    {
+      this->SetWorldERP(msgODE->erp());
+    }
+
+    if (msgODE->has_contact_max_correcting_vel())
+    {
+      this->SetContactMaxCorrectingVel(msgODE->contact_max_correcting_vel());
+    }
+
+    if (msgODE->has_contact_surface_layer())
+    {
+      this->SetContactSurfaceLayer(msgODE->contact_surface_layer());
+    }
+
+    if (msgODE->has_sor_lcp_tolerance())
+    {
+      this->SetParam("sor_lcp_tolerance", msgODE->sor_lcp_tolerance());
+    }
   }
 
-  /// Make sure all models get at least on update cycle.
-  this->world->EnableAllModels();
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 
@@ -756,6 +758,14 @@ void ODEPhysics::SetStepType(const std::string &_type)
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
   elem->GetElement("type")->Set(_type);
   this->stepType = _type;
+
+  // Set the physics update function
+  if (this->stepType == "quick")
+    this->physicsStepFunc = &dWorldQuickStep;
+  else if (this->stepType == "world")
+    this->physicsStepFunc = &dWorldStep;
+  else
+    gzerr << "Invalid step type[" << this->stepType << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -1158,8 +1168,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return;
       }
-      odeElem->GetElement("solver")->GetElement("type")->Set(value);
-      this->stepType = value;
+      this->SetStepType(value);
       break;
     }
     case GLOBAL_CFM:
@@ -1320,6 +1329,7 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "max_step_size")
   {
     this->SetMaxStepSize(boost::any_cast<double>(_value));
+    return;
   }
   else if (_key == "sor_lcp_tolerance")
   {
