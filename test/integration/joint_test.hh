@@ -184,28 +184,18 @@ class JointTest : public ServerFixture,
               modelStr << "    <child>child</child>";
             modelStr
               << "    <axis>"
-              << "      <xyz>" << _opt.axis << "</xyz>";
-            if (!(SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5))
-            {
-              modelStr
-                << "      <use_parent_model_frame>" << _opt.useParentModelFrame
-                << "      </use_parent_model_frame>";
-            }
-            modelStr
+              << "      <xyz>" << _opt.axis << "</xyz>"
+              << "      <use_parent_model_frame>" << _opt.useParentModelFrame
+              << "      </use_parent_model_frame>"
               << "    </axis>";
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal")
             {
               modelStr
                 << "  <axis2>"
-                << "    <xyz>" << math::Vector3(0, 1, 0) << "</xyz>";
-              if (!(SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5))
-              {
-                modelStr
-                  << "    <use_parent_model_frame>" << _opt.useParentModelFrame
-                  << "    </use_parent_model_frame>";
-              }
-              modelStr
+                << "    <xyz>" << math::Vector3(0, 1, 0) << "</xyz>"
+                << "    <use_parent_model_frame>" << _opt.useParentModelFrame
+                << "    </use_parent_model_frame>"
                 << "  </axis2>";
             }
             modelStr
