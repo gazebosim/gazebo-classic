@@ -41,6 +41,7 @@ set(tests
   gz_world.cc
   imu.cc
   joint_force_torque.cc
+  joint_gearbox.cc
   joint_revolute.cc
   joint_spawn.cc
   joint_test.cc
