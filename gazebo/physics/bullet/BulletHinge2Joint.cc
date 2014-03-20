@@ -213,7 +213,7 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
 {
   if (!this->bulletHinge2)
   {
-    gzerr << "Joint must be created first.\n";
+    gzerr << "BulletHinge2Joint not yet created, returning 0.\n";
     return math::Angle();
   }
 
