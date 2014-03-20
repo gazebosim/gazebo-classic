@@ -81,7 +81,7 @@ void PGSTest::WarmStartTest(const std::string &_physicsEngine)
     //       << "]\n";
   }
   physicsEngine->SetMaxStepSize(0.0001);
-  physicsEngine->SetSORPGSIters(1000);
+  physicsEngine->SetParam("iters", 1000);
 
   {
     // test with global contact_max_correcting_vel at 0 as set by world file
