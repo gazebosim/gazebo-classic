@@ -36,6 +36,7 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  simple_arm.world
   simple_gripper.world
   sonar_demo.world
   sphere_atlas_demo.world
