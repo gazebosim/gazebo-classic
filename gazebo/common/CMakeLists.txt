@@ -63,6 +63,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
@@ -110,10 +111,11 @@ set (gtest_sources
   Dem_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
-  Material_TEST.cc
-  Mesh_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
+  Material_TEST.cc
+  Mesh_TEST.cc
+  MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
