@@ -1068,7 +1068,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
     info->m_J1angularAxis[srow+0] = ax1[0];
     info->m_J1angularAxis[srow+1] = ax1[1];
     info->m_J1angularAxis[srow+2] = ax1[2];
-    
+
     info->m_J2angularAxis[srow+0] = -ax1[0];
     info->m_J2angularAxis[srow+1] = -ax1[1];
     info->m_J2angularAxis[srow+2] = -ax1[2];
