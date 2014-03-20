@@ -287,7 +287,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -309,7 +309,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -331,7 +331,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -353,7 +353,7 @@ void ODEUniversalJoint::SetAttribute(
           break;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -386,7 +386,7 @@ double ODEUniversalJoint::GetAttribute(
           break;
       };
     }
-    catch(common::Exception &e)
+    catch(const common::Exception &e)
     {
       gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
       return 0;
@@ -408,7 +408,7 @@ double ODEUniversalJoint::GetAttribute(
           break;
       };
     }
-    catch(common::Exception &e)
+    catch(const common::Exception &e)
     {
       gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
       return 0;
