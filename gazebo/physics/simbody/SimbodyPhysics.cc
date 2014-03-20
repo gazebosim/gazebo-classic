@@ -810,7 +810,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         if (math::equal(pitch, 0.0))
         {
-          gzerr << "thread pitch cannot be zero (joint is a slider?)"
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using pitch = 1.0e6\n";
           pitch = 1.0e6;
         }

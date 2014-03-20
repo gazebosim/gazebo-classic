@@ -553,3 +553,16 @@ double BulletJoint::GetAttribute(const std::string &/*_key*/,
   gzdbg << "Not implement in Bullet\n";
   return 0;
 }
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetHighStop(unsigned int _index)
+{
+  return this->GetUpperLimit(_index);
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetLowStop(unsigned int _index)
+{
+  return this->GetLowerLimit(_index);
+}
+
