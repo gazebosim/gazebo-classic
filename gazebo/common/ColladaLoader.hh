@@ -24,6 +24,7 @@
 
 #include "gazebo/common/MeshLoader.hh"
 #include "gazebo/math/MathTypes.hh"
+#include "gazebo/util/system.hh"
 
 class TiXmlElement;
 
@@ -38,7 +39,7 @@ namespace gazebo
 
     /// \class ColladaLoader ColladaLoader.hh common/common.hh
     /// \brief Class used to load Collada mesh files
-    class ColladaLoader : public MeshLoader
+    class GAZEBO_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

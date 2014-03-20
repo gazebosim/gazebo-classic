@@ -23,6 +23,7 @@
 #define CAMERAINTERFACE_HH
 
 #include <string>
+#include "gazebo/util/system.hh"
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface
@@ -31,7 +32,7 @@
 /// \brief Camera interface
 /// \{
 /// \brief Camera interface
-class CameraInterface : public GazeboInterface
+class GAZEBO_VISIBLE CameraInterface : public GazeboInterface
 {
   /// \brief Constructor
   public: CameraInterface(player_devaddr_t _addr, GazeboDriver *_driver,

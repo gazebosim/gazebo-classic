@@ -30,6 +30,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,7 +45,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet physics engine
-    class BulletPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
