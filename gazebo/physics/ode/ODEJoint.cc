@@ -23,6 +23,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/JointWrench.hh"
 
@@ -651,6 +652,22 @@ void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
       }
     }
   }
+  else if (_key == "gearbox_ratio")
+  {
+    GearboxJoint<ODEJoint>* gearboxJoint =
+      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+    if (gearboxJoint != NULL)
+    {
+      try
+      {
+        gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
+  }
   else
   {
     gzerr << "Unable to handle joint attribute[" << _key << "]\n";
@@ -835,6 +852,28 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
     else
     {
       gzerr << "Trying to get thread_pitch for non-screw joints.\n";
+      return 0;
+    }
+  }
+  else if (_key == "gearbox_ratio")
+  {
+    GearboxJoint<ODEJoint>* gearboxJoint =
+      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+    if (gearboxJoint != NULL)
+    {
+      try
+      {
+        return gearboxJoint->GetGearboxRatio();
+      }
+      catch(common::Exception &e)
+      {
+        gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+        return 0;
+      }
+    }
+    else
+    {
+      gzerr << "Trying to get thread_pitch for non-gearbox joints.\n";
       return 0;
     }
   }
