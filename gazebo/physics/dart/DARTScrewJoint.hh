@@ -85,6 +85,12 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
+      // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
       /// \brief Universal joint of DART

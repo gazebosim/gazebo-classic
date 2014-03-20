@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _JOINT_HH_
-#define _JOINT_HH_
+#ifndef _GAZEBO_JOINT_HH_
+#define _GAZEBO_JOINT_HH_
 
 #include <string>
 #include <vector>
