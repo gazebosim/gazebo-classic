@@ -106,19 +106,17 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
+  /// ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(_index);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+
   if (_index == 0)
   {
-    /// ODE needs global axis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
-    math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
     dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
   }
   else if (_index == 1)
   {
-    /// ODE needs global axis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
-    math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
     dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
   }
