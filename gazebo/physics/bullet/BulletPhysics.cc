@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 

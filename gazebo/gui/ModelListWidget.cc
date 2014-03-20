@@ -1470,59 +1470,79 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
     item->setEnabled(false);
   }
 
-  if (_msg.has_axis1())
+  // Add joint axes if present
+  for (int i = 0; i < 2; ++i)
   {
-    // Axis shape value
-    topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("axis"));
-    if (_parent)
-      _parent->addSubProperty(topItem);
-    else
-      this->propTreeBrowser->addProperty(topItem);
-    topItem->setEnabled(false);
+    const msgs::Axis *axis = NULL;
+    std::string axisName;
 
-    /// XYZ of the axis
-    QtProperty *xyzItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("xyz"));
-    topItem->addSubProperty(xyzItem);
-    xyzItem->setEnabled(false);
-    this->FillVector3dProperty(_msg.axis1().xyz(), xyzItem);
+    if (i == 0 && _msg.has_axis1())
+    {
+      axis = &(_msg.axis1());
+      axisName = "axis1";
+    }
+    else if (i == 1 && _msg.has_axis2())
+    {
+      axis = &(_msg.axis2());
+      axisName = "axis2";
+    }
 
-    // lower limit
-    item = this->variantManager->addProperty(QVariant::Double, tr("lower"));
-    item->setValue(_msg.axis1().limit_lower());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+    if (axis)
+    {
+      // Axis shape value
+      topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr(axisName.c_str()));
+      if (_parent)
+        _parent->addSubProperty(topItem);
+      else
+        this->propTreeBrowser->addProperty(topItem);
+      topItem->setEnabled(false);
 
-    // upper limit
-    item = this->variantManager->addProperty(QVariant::Double, tr("upper"));
-    item->setValue(_msg.axis1().limit_upper());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+      /// XYZ of the axis
+      QtProperty *xyzItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("xyz"));
+      topItem->addSubProperty(xyzItem);
+      xyzItem->setEnabled(false);
+      this->FillVector3dProperty(axis->xyz(), xyzItem);
 
-    // limit effort
-    item = this->variantManager->addProperty(QVariant::Double, tr("effort"));
-    item->setValue(_msg.axis1().limit_effort());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+      // lower limit
+      item = this->variantManager->addProperty(QVariant::Double, tr("lower"));
+      item->setValue(axis->limit_lower());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // limit velocity
-    item = this->variantManager->addProperty(QVariant::Double, tr("velocity"));
-    item->setValue(_msg.axis1().limit_velocity());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+      // upper limit
+      item = this->variantManager->addProperty(QVariant::Double, tr("upper"));
+      item->setValue(axis->limit_upper());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // damping
-    item = this->variantManager->addProperty(QVariant::Double, tr("damping"));
-    item->setValue(_msg.axis1().damping());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+      // limit effort
+      item = this->variantManager->addProperty(QVariant::Double, tr("effort"));
+      item->setValue(axis->limit_effort());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // friction
-    item = this->variantManager->addProperty(QVariant::Double, tr("friction"));
-    item->setValue(_msg.axis1().friction());
-    topItem->addSubProperty(item);
-    item->setEnabled(false);
+      // limit velocity
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("velocity"));
+      item->setValue(axis->limit_velocity());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // damping
+      item = this->variantManager->addProperty(QVariant::Double, tr("damping"));
+      item->setValue(axis->damping());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // friction
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("friction"));
+      item->setValue(axis->friction());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+    }
   }
 }
 
