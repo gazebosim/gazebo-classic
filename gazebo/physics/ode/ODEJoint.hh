@@ -218,7 +218,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
-                                        double _value);
+                                        double _value) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,

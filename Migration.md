@@ -160,6 +160,12 @@
 
 1. **gazebo/sensors/GaussianNoiseModel.hh**
 
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
 ### Deletions
 
 1. **Removed libtool**

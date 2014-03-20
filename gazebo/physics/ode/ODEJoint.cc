@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -430,38 +425,10 @@ void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
       this->SetParam(dParamSuspensionCFM, _value);
       break;
     case STOP_ERP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopERP, _value);
-          break;
-        case 1:
-          this->SetParam(dParamStopERP2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamStopERP3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("stop_erp", _index, _value);
       break;
     case STOP_CFM:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopCFM, _value);
-          break;
-        case 1:
-          this->SetParam(dParamStopCFM2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamStopCFM3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("stop_cfm", _index, _value);
       break;
     case ERP:
       this->SetParam(dParamERP, _value);
@@ -476,38 +443,10 @@ void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
       this->SetParam(dParamVel, _value);
       break;
     case HI_STOP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamHiStop, _value);
-          break;
-        case 1:
-          this->SetParam(dParamHiStop2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamHiStop3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("hi_stop", _index, _value);
       break;
     case LO_STOP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamLoStop, _value);
-          break;
-        case 1:
-          this->SetParam(dParamLoStop2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamLoStop3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("lo_stop", _index, _value);
       break;
     default:
       gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
@@ -714,15 +653,7 @@ void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
   }
   else
   {
-    try
-    {
-      gzerr << "Unable to handle joint attribute["
-            << boost::any_cast<std::string>(_value) << "]\n";
-    }
-    catch(boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-    }
+    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
   }
 }
 
