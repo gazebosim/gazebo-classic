@@ -677,7 +677,7 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
-      bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
+      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
       break;
     }
     case MIN_STEP_SIZE:
@@ -797,7 +797,7 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
     }
     case MAX_CONTACTS:
     {
-      value = bulletElem->GetElement("max_contacts")->Get<int>();
+      value = this->sdf->GetElement("max_contacts")->Get<int>();
       break;
     }
     case MIN_STEP_SIZE:
