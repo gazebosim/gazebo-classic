@@ -58,7 +58,22 @@ void BulletUniversalJoint::Init()
   math::Vector3 axis1 = this->initialWorldAxis[0];
   math::Vector3 axis2 = this->initialWorldAxis[1];
 
-  // TODO: should check that axis1 and axis2 are orthogonal unit vectors
+  // Check that axis1 and axis2 are orthogonal unit vectors
+  if (!math::equal(axis1.GetLength(), 1.0))
+  {
+    gzerr << "axis1 must be a unit vector, aborting" << std::endl;
+    return;
+  }
+  if (!math::equal(axis2.GetLength(), 1.0))
+  {
+    gzerr << "axis2 must be a unit vector, aborting" << std::endl;
+    return;
+  }
+  if (!math::equal(axis1.Dot(axis2), 0.0))
+  {
+    gzerr << "axis1 and axis2 must be orthogonal, aborting" << std::endl;
+    return;
+  }
 
   if (bulletChildLink && bulletParentLink)
   {
@@ -344,8 +359,6 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
     else
       gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
-  else
-    gzerr << "Joint must be created first\n";
 
   return result;
 }
@@ -401,7 +414,7 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
       gzerr << "Invalid axis index[" << _index << "]\n";
   }
   else
-    gzerr << "bulletUniversal does not yet exist" << std::endl;
+    gzlog << "bulletUniversal does not yet exist" << std::endl;
 
   return result;
 }

@@ -189,3 +189,31 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
+
+//////////////////////////////////////////////////
+math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
+{
+  switch (_index)
+  {
+  case 0:
+    return this->dtJoint->getGenCoord(_index)->get_qMax();
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
+
+  return 0;
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
+{
+  switch (_index)
+  {
+  case 0:
+    return this->dtJoint->getGenCoord(_index)->get_qMin();
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
+
+  return 0;
+}
