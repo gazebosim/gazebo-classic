@@ -1317,6 +1317,10 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "max_step_size")
+  {
+    this->SetMaxStepSize(boost::any_cast<double>(_value));
+  }
   else if (_key == "sor_lcp_tolerance")
   {
     dWorldSetQuickStepTolerance(this->worldId,
@@ -1462,6 +1466,8 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "max_step_size")
+    return this->GetMaxStepSize();
   else if (_key == "sor_lcp_tolerance")
     return dWorldGetQuickStepTolerance(this->worldId);
   else if (_key == "rms_error_tolerance")

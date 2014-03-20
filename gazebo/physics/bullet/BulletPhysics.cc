@@ -733,6 +733,10 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "max_step_size")
+  {
+    this->SetMaxStepSize(boost::any_cast<double>(_value));
+  }
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
@@ -838,6 +842,8 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "max_step_size")
+    return this->GetMaxStepSize();
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
