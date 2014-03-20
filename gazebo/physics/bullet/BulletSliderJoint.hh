@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETSLIDERJOINT_HH_
 #define _BULLETSLIDERJOINT_HH_
 #include "gazebo/math/Angle.hh"
