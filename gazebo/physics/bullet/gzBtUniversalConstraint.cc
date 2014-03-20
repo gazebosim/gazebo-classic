@@ -59,7 +59,7 @@ gzBtUniversalConstraint::gzBtUniversalConstraint(btRigidBody &_rbA,
   m_frameInA = _rbA.getCenterOfMassTransform().inverse() * frameInW;
   m_frameInB = _rbB.getCenterOfMassTransform().inverse() * frameInW;
 
-  // sei limits
+  // set limits
   setLinearLowerLimit(btVector3(0., 0., 0.));
   setLinearUpperLimit(btVector3(0., 0., 0.));
   this->setAngularLowerLimit(btVector3(0.f,
