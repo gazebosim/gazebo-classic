@@ -869,7 +869,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
     info->m_J2angularAxis[srow+2] = -ax1[2];
 
     // correction
-		// rhs = k * ax1.dot(ofs);  // from hinge constraint
+    // rhs = k * ax1.dot(ofs);  // from hinge constraint
     btScalar lin_disp = ax1.dot(ofs);
     btScalar ang_pos = this->getAngularPosition();
     info->m_constraintError[srow] =
@@ -1063,15 +1063,15 @@ void btScrewConstraint::_getInfo2NonVirtual(
   }
   if (limit || powered)
   {
-		nrow++;
-		srow = nrow * info->rowskip;
-		info->m_J1angularAxis[srow+0] = ax1[0];
-		info->m_J1angularAxis[srow+1] = ax1[1];
-		info->m_J1angularAxis[srow+2] = ax1[2];
-
-		info->m_J2angularAxis[srow+0] = -ax1[0];
-		info->m_J2angularAxis[srow+1] = -ax1[1];
-		info->m_J2angularAxis[srow+2] = -ax1[2];
+    nrow++;
+    srow = nrow * info->rowskip;
+    info->m_J1angularAxis[srow+0] = ax1[0];
+    info->m_J1angularAxis[srow+1] = ax1[1];
+    info->m_J1angularAxis[srow+2] = ax1[2];
+    
+    info->m_J2angularAxis[srow+0] = -ax1[0];
+    info->m_J2angularAxis[srow+1] = -ax1[1];
+    info->m_J2angularAxis[srow+2] = -ax1[2];
 
     btScalar lostop = getLowerAngLimit();
     btScalar histop = getUpperAngLimit();
