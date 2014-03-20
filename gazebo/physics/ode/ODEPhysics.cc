@@ -1275,7 +1275,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
-      odeElem->GetElement("max_contacts")->GetValue()->Set(value);
+      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
       break;
     }
     case MIN_STEP_SIZE:
@@ -1339,8 +1339,9 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   else if (_key == "rms_error_tolerance")
   {
+    gzwarn << "please use sor_lcp_tolerance in the future.\n";
     dWorldSetQuickStepTolerance(this->worldId,
-        boost::any_cast<bool>(_value));
+        boost::any_cast<double>(_value));
     return;
   }
   else if (_key == "inertia_ratio_reduction")
@@ -1434,7 +1435,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case MAX_CONTACTS:
     {
-      value = odeElem->GetElement("max_contacts")->Get<int>();
+      value = this->sdf->Get<int>("max_contacts");
       break;
     }
     case MIN_STEP_SIZE:
