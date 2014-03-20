@@ -59,21 +59,31 @@ void BulletUniversalJoint::Init()
   math::Vector3 axis2 = this->initialWorldAxis[1];
 
   // Check that axis1 and axis2 are orthogonal unit vectors
-  if (!math::equal(axis1.GetLength(), 1.0))
+  if (math::equal(axis1.GetLength(), 0.0))
   {
-    gzerr << "axis1 must be a unit vector, aborting" << std::endl;
+    gzerr << "Joint [" << this->GetScopedName()
+          << "] axis1 must have non-zero length, aborting"
+          << std::endl;
     return;
   }
-  if (!math::equal(axis2.GetLength(), 1.0))
+  if (math::equal(axis2.GetLength(), 0.0))
   {
-    gzerr << "axis2 must be a unit vector, aborting" << std::endl;
+    gzerr << "Joint [" << this->GetScopedName()
+          << "] axis2 must have non-zero length, aborting"
+          << std::endl;
     return;
   }
-  if (!math::equal(axis1.Dot(axis2), 0.0))
+  if (math::equal(axis1.Cross(axis2).GetLength(), 0.0))
   {
-    gzerr << "axis1 and axis2 must be orthogonal, aborting" << std::endl;
+    gzerr << "Joint [" << this->GetScopedName()
+          << "] axis1 and axis2 must not be parallel, aborting"
+          << std::endl;
     return;
   }
+
+  // Normalize axis unit vectors
+  axis1.Normalize();
+  axis2.Normalize();
 
   if (bulletChildLink && bulletParentLink)
   {
